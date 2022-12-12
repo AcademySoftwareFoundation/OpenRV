@@ -1,0 +1,62 @@
+package: RV Color/Image Management
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 4.3
+requires: ''
+rv: 4.0
+openrv: 1.0.0
+system: true
+hidden: true
+
+modes: 
+  - file: source_setup.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+
+  <p>This package implements RV's default color and image geometry
+  management. See also: 
+  <a href="https://www.shotgridsoftware.com/rv">Color Management in RV Reference Manual</a> for more complete information.</p>
+
+  <h4>The default new-source behavior</h4>
+
+  <p>By default RV binds its own color management function located in the
+  source_setup.mu file called sourceSetup(). This is part of the
+  source_setup system package introduced in version 3.10.</p>
+
+  <p>Its a good idea to override or augment this package for use in
+  production environments. For example, you may want to have certain
+  default color behavior for technical directors using movie files which
+  differs from how a coordinator might view them (the coordinator may be
+  looking at movies in sRGB space instead of with a film simulation for
+  example).</p>
+
+  <p>RV's default color management package tries to use good defaults for incoming file formats. Here’s
+  the complete behavior shown as a set of heuristics applied in order:
+  </p>
+
+  <ul>
+  <li>If the incoming image is a TIFF file and it has no color space attribute assume its linear</li>
+  <li>If the image is JPEG or a quicktime movie file (.mov) and there is no color space attribute assume its in sRGB space</li>
+  <li>If there is an embedded ICC profile and that profile is for sRGB space use RV's internal sRGB space transform instead (because RV does not yet handle embedded ICC profiles)</li>
+  <li>If the image is TIFF and it was created by ifftoany, assume the pixel aspect ratio is incorrect and fix it</li>
+  <li>If the image is JPEG, has no pixel aspect ratio attribute and no densisty attribute and looks like it comes from Maya, fix the pixel aspect ratio</li>
+
+  <li>Use the proper built-in conversion for the color space indicated in the color space attribute of the image</li>
+  <li>Use the sRGB display transform if any color space was successfully determined for the input image(s)</li>
+  </ul>
+
+  <p>From the user's point of view, the following situations will occur:</p>
+  <ul>
+  <li>A DPX or Cineon is loaded which is determined to be in Log space -- turn on the built in log to linear converter</li>
+  <li>A JPEG or Quicktime movie file is determined to be in sRGB space or if no space is specified assumed to be in sRGB space -- apply the built-in sRGB to linear converter</li>
+  <li>An EXR is loaded -- assume its linear</li>
+  <li>A TIFF file with no color space indication is assumed to be linear, if it does have a color space use that.</li>
+  <li>A PNG file with no color space is assumed linear, otherwise use the color space attribute in the file</li>
+  <li>Any file with a pixel aspect ratio attribute will be assumed to be correct (unless its determined to have come from Maya)<\li>
+  <li>The monitor's gamma will be accounted for automatically (because RV assumes the monitor is an sRGB device)</li>
+  </ul>
+

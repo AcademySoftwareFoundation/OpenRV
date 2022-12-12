@@ -1,0 +1,50 @@
+package: Missing Frame Bling
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.7
+rv: 3.10.9
+openrv: 1.0.0
+requires: ''
+optional: true
+
+modes: 
+  - file: missing_frame_bling_mode
+    load: immediate
+
+description: |
+
+  <p> 
+  This package provides four different methods of annotating missing
+  frames: 
+  </p>
+
+  <ul>
+  <li> A big red <b>X</b> is drawn across the frame along with
+  an error message.</li>
+  <li> Text indcating the missing frame number</li>
+  <li> Do nothing -- which essentially holds a previous good frame</li>
+  <li> Clear to black </li>
+  </ul>
+
+  <p>
+  A sub-menu called "Missing Frames" is added to the View menu. This menu
+  lets you choose which method to use for rendering the missing frames. The
+  choice is stored in the application preferences -- so its remembered when
+  you exit RV.
+  </p>
+
+  <h2>How It Works</h2>
+  <p>
+  The "missing-frame" event is bound to a method in the mode. When RV
+  detects a missing frame this event is sent. RV's default behavior is to
+  render an earlier valid frame in place of the missing frame so the
+  initial contents of the view is that frame.</p>
+
+  <p>The mode has four methods: renderX, renderNothing, renderShow, and
+  renderBlack which implement the different styles. When the event is
+  received, one of the render functions is chosen from a list of
+  name/function pairs. The name is stored in the settings automatically by
+  the mode.</p>
+
+  <p>You can control the display of the missing frame feedback option, by
+  enabling or disabling "Display Feedback Message" appropriately.</p>

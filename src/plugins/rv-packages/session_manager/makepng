@@ -1,0 +1,5 @@
+#!/bin/tcsh -f
+
+foreach file (tiff/*_out.tif)
+    /Applications/RV64.app/Contents/MacOS/rvio_hw $file -o $file:r.png -outunpremult -outres 48 48
+end

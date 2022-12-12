@@ -1,0 +1,28 @@
+**/.DS_Store
+
+.vscode/**
+.idea/**
+
+# Qt generated
+**/*.moc
+**/moc_*.cpp
+**/ui_*.h
+**/qrc_*.cpp
+**/*.qmlc
+**/*.pkg
+**/*.dmg
+
+# Windows
+**/*.pdb
+**/*.idb
+
+**/*.xcodeproj/
+
+compile_commands.json
+
+**/__pycache__
+**/*.pyc
+
+cmake-*/*
+build/*
+_build/*

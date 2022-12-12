@@ -1,0 +1,426 @@
+<html>
+<head>
+<link rel=StyleSheet href="../../pdbstyle.css" type="text/css" media=all>
+<title>SGI Image File Format Specification</title>
+</head>
+<body bgcolor="#ffffff">
+
+<center>
+<h3>The SGI Image File Format</h3>
+Version 1.00<p>
+Paul Haeberli<br>
+Silicon Graphics Computer Systems<br>
+</center>
+<p><hr><p>
+
+<h3>Introduction</h3>
+<p>
+This is the definitive document describing the SGI image file format.  This 
+is a low level spec that describes the actual byte level format of SGI image
+files.  On SGI machines the preferred way of reading and writing SGI image
+files is to use the image library -limage.  This library provides a set
+of functions that make it easy to read and write SGI images.  If you are 
+on an SGI workstation you can get info on -limage by doing:
+<pre>
+% man 4 rgb
+</pre>
+<h3>A note on byte order of values in the SGI image files</h3>
+<p>
+In the following description a notation like bits[7..0] is used to denote
+a range of bits in a binary value.   Bit 0 is the lowest order bit in
+the value.
+<p>
+All short values are represented by 2 bytes.  The first byte stores the
+high order 8 bits of the value: bits[15..8].  The second byte stores
+the low order 8 bits of the value: bits[7..0].  
+<p>
+So this function will read a short value from the file:
+<pre>
+    unsigned short getshort(inf)
+    FILE *inf;
+    {
+	unsigned char buf[2];
+
+	fread(buf,2,1,inf);
+	return (buf[0]<<8)+(buf[1]<<0);
+    }
+</pre>
+<p>
+All long values are represented by 4 bytes.  The first byte stores the
+high order 8 bits of the value: bits[31..24].  The second byte stores
+bits[23..16].  The third byte stores bits[15..8]. The forth byte stores
+the low order 8 bits of the value: bits[7..0].  
+<p>
+And this function will read a long value from the file:
+<pre>
+    static long getlong(inf)
+    FILE *inf;
+    {
+	unsigned char buf[4];
+
+	fread(buf,4,1,inf);
+	return (buf[0]<<24)+(buf[1]<<16)+(buf[2]<<8)+(buf[3]<<0);
+    }
+</pre>
+ 
+<p>
+<h3>The general structure of an SGI image file</h3>
+     The header indicates whether the image is run length encoded (RLE).
+<p>
+     If the image is not run length encoded, this is the structure:
+<pre>
+ 	The Header
+ 	The Image Data
+</pre>
+ 
+     If the image is run length encoded, this is the structure:
+<pre>
+ 	The Header
+ 	The Offset Tables
+ 	The Image Data
+</pre>
+ 
+<h3>The Header</h3>
+<p>
+The header consists of the following:
+<pre>        Size  | Type   | Name      | Description   
+ 
+      2 bytes | short  | MAGIC     | IRIS image file magic number
+      1 byte  | char   | STORAGE   | Storage format
+      1 byte  | char   | BPC       | Number of bytes per pixel channel 
+      2 bytes | ushort | DIMENSION | Number of dimensions
+      2 bytes | ushort | XSIZE     | X size in pixels 
+      2 bytes | ushort | YSIZE     | Y size in pixels 
+      2 bytes | ushort | ZSIZE     | Number of channels
+      4 bytes | long   | PIXMIN    | Minimum pixel value
+      4 bytes | long   | PIXMAX    | Maximum pixel value
+      4 bytes | char   | DUMMY     | Ignored
+     80 bytes | char   | IMAGENAME | Image name
+      4 bytes | long   | COLORMAP  | Colormap ID
+    404 bytes | char   | DUMMY     | Ignored
+</pre>
+
+<p> 
+Here is a description of each field in the image file header:
+<p> 
+ 	MAGIC - This is the decimal value 474 saved as a short. This
+ 	identifies the file as an SGI image file.
+<p> 
+ 	STORAGE - specifies whether the image is stored using run
+ 	length encoding (RLE) or not (VERBATIM).   If RLE is used, the value 
+        of this byte will be 1.  Otherwise the value of this byte will be 0.
+ 	The only allowed values for this field are 0 or 1.
+<p> 
+ 	BPC - describes the precision that is used to store each
+ 	channel of an image.  This is the number of bytes per pixel
+ 	component.  The majority of SGI image files use 1 byte per 
+ 	pixel component, giving 256 levels.  Some SGI image files use 
+ 	2 bytes per component.  The only allowed values for this field 
+ 	are 1 or 2.
+ 
+<p> 
+ 	DIMENSION - described the number of dimensions in the data stored
+ 	in the image file.  The only allowed values are 1, 2, or 3.  If
+ 	this value is 1, the image file consists of only 1 channel and 
+ 	only 1 scanline (row).  The length of this scanline is given by the 
+ 	value of XSIZE below.  If this value is 2, the file consists of a 
+ 	single channel with a number of scanlines. The width and height
+ 	of the image are given by the values of XSIZE and YSIZE below.
+ 	If this value is 3, the file consists of a number of channels.
+ 	The width and height of the image are given by the values of 
+ 	XSIZE and YSIZE below.  The number of channels is given by the 
+ 	value of ZSIZE below.  
+<p> 
+ 	XSIZE - The width of the image in pixels
+<p> 
+ 
+ 	YSIZE - The height of the image in pixels
+<p> 
+ 
+ 	ZSIZE - The number of channels in the image.  B/W (greyscale) images 
+ 	are stored as 2 dimensional images with a ZSIZE or 1.  RGB color 
+ 	images are stored as 3 dimensional images with a ZSIZE of 3.  An RGB 
+ 	image with an ALPHA channel is stored as a 3 dimensional image with 
+ 	a ZSIZE of 4.  There are no inherent limitations in the SGI image 
+ 	file format that would preclude the creation of image files with more 
+ 	than 4 channels.
+ 
+<p> 
+ 	PINMIN - The minimum pixel value in the image.  The value of
+ 	0 may be used if no pixel has a value that is smaller than 0.
+<p> 
+ 
+ 	PINMAX - The maximum pixel value in the image.  The value of
+ 	255 may be used if no pixel has a value that is greater than 255.
+ 	This is the value that is considered to be full brightness in 
+ 	the image.  
+ 
+<p> 
+ 	DUMMY - This 4 bytes of data should be set to 0. 
+<p> 
+ 
+ 	IMAGENAME - An null terminated ascii string of up to 79 characters 
+ 	terminated by a null may be included here.  This is not commonly
+ 	used.
+ 
+<p> 
+ 	COLORMAP - This controls how the pixel values in the file should be
+ 	interpreted.  It can have one of these four values:
+ 
+<p> 
+ 	    0:  NORMAL - The data in the channels represent B/W values
+ 		for images with 1 channel, RGB values for images with 3
+ 		channels, and RGBA values for images with 4 channels.
+ 		Almost all the SGI image files are of this type. 
+ 
+<p> 
+ 	    1:  DITHERED - The image will have only 1 channel of data.
+ 		For each pixel, RGB data is packed into one 8 bit value.
+ 		3 bits are used for red and green, while blue uses 2 bits.
+ 		Red data is found in bits[2..0], green data in bits[5..3],
+ 		and blue data in bits[7..6].  This format is obsolete.
+ 
+<p> 
+ 	    2:  SCREEN - The image will have only 1 channel of data.
+ 		This format was used to store color-indexed pixels.
+ 		To convert the pixel values into RGB values a colormap
+ 		must be used.  The appropriate color map varies from
+ 		image to image.  This format is obsolete.
+ 
+<p> 
+ 	    3:  COLORMAP - The image is used to store a color map from
+ 		an SGI machine.  In this case the image is not displayable
+ 		in the conventional sense.
+ 
+<p> 
+ 	DUMMY - This 404 bytes of data should be set to 0. This makes the
+ 	header exactly 512 bytes. 
+ 
+<p> 
+<h3>The Image Data (if not RLE)</h3>
+<p> 
+     If the image is stored verbatim (without RLE), then image data directly
+     follows the 512 byte header.  The data for each scanline of the first
+     channel is written first.  If the image has more than 1 channel, all
+     the data for the first channel is written, followed by the remaining
+     channels.  If the BPC value is 1, then each scanline is written as XSIZE
+     bytes.  If the BPC value is 2, then each scanline is written as XSIZE 
+     shorts.  These shorts are stored in the byte order described above.
+<p> 
+<h3>The Offset Tables (if RLE)</h3>
+<p> 
+     If the image is stored using run length encoding, offset tables
+     follow the header that describe what the file offsets are to the 
+     RLE for each scanline.  This information only applies if the value 
+     for STORAGE above is 1.
+<pre>         Size  | Type   | Name      | Description   
+
+  tablen longs | long   | STARTTAB  | Start table
+  tablen longs | long   | LENGTHTAB | Length table
+</pre> 
+<p> 
+     One entry in each table is needed for each scanline of RLE data.  The 
+     total number of scanlines in the image (tablen) is determined by the
+     product of the YSIZE and ZSIZE.  There are two tables of longs that 
+     are written. Each consists of tablen longs of data.  The first
+     table has the file offsets to the RLE data for each scanline in the
+     image.  In a file with more than 1 channel (ZSIZE > 1) this table first 
+     has all the offsets for the scanlines in the first channel, followed
+     be offsets for the scanlines in the second channel, etc.  The second 
+     table has the RLE data length for each scanline in the image.  In a 
+     file with more than 1 channel (ZSIZE > 1) this table first has all the 
+     RLE data lengths for the scanlines in the first channel, followed
+     be RLE data lengths for the scanlines in the second channel, etc.
+ 
+<p> 
+     To find the the file offset, and the number of bytes in the RLE data 
+     for a particular scanline, these two arrays may be read in and indexed as
+     follows: 
+ 
+<p> 
+ 	To read in the tables:
+<pre>    unsigned long *starttab, *lengthtab;
+
+    tablen = YSIZE*ZSIZE*sizeof(long);
+    starttab = (unsigned long *)mymalloc(tablen);
+    lengthtab = (unsigned long *)mymalloc(tablen);
+    fseek(inf,512,SEEK_SET);
+    readlongtab(inf,starttab);
+    readlongtab(ing,lengthtab);
+</pre> 
+
+<p> 
+ 	To find the file offset and RLE data length for a scanline:
+<p> 
+ 	    rowno is an integer in the range 0 to YSIZE-1
+ 	    channo is an integer in the range 0 to ZSIZE-1
+<pre>
+    rleoffset = starttab[rowno+channo*YSIZE]
+    rlelength = lengthtab[rowno+channo*YSIZE]
+</pre>
+<p> 
+     It is possible for two identical rows (scanlines) to share compressed 
+     data.  A completely white image could be written as a single compressed 
+     row and having all table entries point to that row.  Another little hack 
+     that should work is if you are writing out a RGB RLE file, and a 
+     particular scanline is achromatic (greyscale), you could just make the 
+     r, g and b rows point to the same data!!
+<h3>The Image Data (if RLE)</h3>
+<p> 
+     This information only applies if the value for STORAGE above is 1.  If
+     the image is stored using run length encoding, the image data follows
+     the offset tables above.  The RLE data is not in any particular order.
+     The offset tables above are used to locate the rle data for any scanline.
+<p> 
+     The RLE data must be read in from the file and expanded into pixel 
+     data in the following manner:
+<p> 
+     If BPC is 1, then there is one byte per pixel.  In this case the 
+     RLE data should be read into an array of chars.  To expand
+     data, the low order seven bits of the first byte: bits[6..0]
+     are used to form a count.  If the high order bit of the first
+     byte is 1: bit[7], then the count is used to specify how many
+     bytes to copy from the RLE data buffer to the destination.
+     Otherwise, if the high order bit of the first byte is 0: bit[7],
+     then the count is used to specify how many times to repeat the 
+     value of the following byte, in the destination.  This process
+     continues until a count of 0 is found.  This should decompress
+     exactly XSIZE pixels.  
+<p> 
+ 	Here is example code to decompress a scanline:
+<pre>    expandrow(optr,iptr,z)
+    unsigned char *optr, *iptr;
+    int z;
+    {
+	unsigned char pixel, count;
+    
+	optr += z;
+	while(1) {
+	    pixel = *iptr++;
+	    if ( !(count = (pixel & 0x7f)) )
+		return;
+	    if(pixel & 0x80) {
+		while(count--) 
+		    *optr++ = *iptr++;
+	    } else {
+		pixel = *iptr++;
+		while(count--) 
+		    *optr++ = pixel;
+	    }
+	}
+    }
+</pre> 
+<p>
+     If BPC is 2, there is one short (2 bytes) per pixel.  In this 
+     case the RLE data should be read into an array of shorts.  To 
+     expand data, the low order seven bits of the first short: bits[6..0]
+     are used to form a count.  If bit[7] of the first short is 1, then 
+     the count is used to specify how many shorts to copy from the RLE 
+     data buffer to the destination.  Otherwise, if bit[7] of the first 
+     short is 0, then the count is used to specify how many times to 
+     repeat the value of the following short, in the destination.  This 
+     process proceeds until a count of 0 is found.  This should decompress
+     exactly XSIZE pixels.  Note that the byte order of short data in
+     the input file should be used, as described above.
+<h3>Implementation notes</h3>
+<p>
+     Implementation of both RLE and VERBATIM format for images with
+     BPC of 1 is required since the great majority of SGI images are in
+     this format.  Support for images with a 2 BPC is encouraged.
+<p>
+     If the ZSIZE of an image is 1, it is assumed to represent B/W
+     values.  If the ZSIZE is 3, it is assumed to represent RGB data,
+     and if ZSIZE is 4, it is assumed to contain RGB data with alpha.
+<p>
+     The origin for all SGI images is the lower left hand corner.  The
+     first scanline (row 0) is always the bottom row of the image.   
+<h3>Naming Conventions</h3>
+<p>
+     On SGI systems, SGI image files end with the extension .bw if
+     they are B/W images, they end in .rgb if they contain RGB image
+     data, and end in .rgba if they are RGB images with alpha channel.
+<p>
+     Sometimes the .sgi extension is used as well.
+<h3>An example</h3>
+<p>
+This program will write out a valid B/W SGI image file:
+<pre>
+    #include <stdio.h>
+     
+    #define IXSIZE      (23)
+    #define IYSIZE      (15)
+     
+    putbyte(outf,val)
+    FILE *outf;
+    unsigned char val;
+    {
+	unsigned char buf[1];
+     
+	buf[0] = val;
+	fwrite(buf,1,1,outf);
+    }
+     
+    putshort(outf,val)
+    FILE *outf;
+    unsigned short val;
+    {
+	unsigned char buf[2];
+     
+	buf[0] = (val>>8);
+	buf[1] = (val>>0);
+	fwrite(buf,2,1,outf);
+    }
+     
+    static int putlong(outf,val)
+    FILE *outf;
+    unsigned long val;
+    {
+	unsigned char buf[4];
+     
+	buf[0] = (val>>24);
+	buf[1] = (val>>16);
+	buf[2] = (val>>8);
+	buf[3] = (val>>0);
+	return fwrite(buf,4,1,outf);
+    }
+     
+    main()
+    {
+	FILE *of;
+	char iname[80];
+	unsigned char outbuf[IXSIZE];
+	int i, x, y;
+     
+	of = fopen("example.rgb","w");
+	if(!of) {
+	    fprintf(stderr,"sgiimage: can't open output file\n");
+	    exit(1);
+	}
+	putshort(of,474);       /* MAGIC               */
+	putbyte(of,0);          /* STORAGE is VERBATIM */
+	putbyte(of,1);          /* BPC is 1            */
+	putshort(of,2);         /* DIMENSION is 2      */
+	putshort(of,IXSIZE);    /* XSIZE               */
+	putshort(of,IYSIZE);    /* YSIZE               */
+	putshort(of,1);         /* ZSIZE               */
+	putlong(of,0);          /* PIXMIN is 0         */
+	putlong(of,255);        /* PIXMAX is 255       */
+	for(i=0; i&lt;4; i++)      /* DUMMY 4 bytes       */
+	    putbyte(of,0);
+	strcpy(iname,"No Name");
+	fwrite(iname,80,1,of);  /* IMAGENAME           */
+	putlong(of,0);          /* COLORMAP is 0       */
+	for(i=0; i&lt;404; i++)    /* DUMMY 404 bytes     */
+	    putbyte(of,0);
+     
+	for(y=0; y&lt;IYSIZE; y++) {
+	    for(x=0; x&lt;IXSIZE; x++) 
+            outbuf[x] = (255*x)/(IXSIZE-1);
+	    fwrite(outbuf,IXSIZE,1,of);
+	}
+	fclose(of);
+    }
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+= Stereo Disassembly Package (v1.1) = 
+
+++++++++++++++++++++++++++
+<style type="text/css">
+    a:link {
+        color: blue;
+        color:#4444dd;
+    }
+    a:visited {
+        color: darkgray; 
+        color: #666666;
+    }
+    a:hover {
+        color: #ff5555;
+    }
+</style>
+++++++++++++++++++++++++++
+
+(C) 2021 https://www.shotgridsoftware.com/rv[Autodesk]
+
+=== Introduction ===
+This experimental package enables you to load stereo media with both eyes in the same image (either top-and-bottom or side-by-side) and then "disassemble" it into separate eyes, so that it can be processed and displayed by RV in any of the usual stereo output formats.  Note that this only works with "squeezed" media (IE half-height in the top-and-bottom case, or half-width in the side-by-side case).
+
+=== Menu Items ===
+Four menu items provide access to various functions of the package:
+
+==== 'Image/Stereo/Disassembly-Add Disassembly Node' ====
+Selecting this menu item will cause RV to examine the currently visible sources, and for each, if it does not already have a StereoDisassmbly node, add one.  Note that the node will be added "internally" (in the RVLinearizePipelineGroup within the Source), so the new node will not be visible in the Session Manager, and any view using this Source will see the result of the "disassembly".
+
+==== 'Image/Stereo/Disassembly-Remove Disassembly Node' ====
+Remove StereoDisassembly nodes from all visible sources.
+
+==== 'Image/Stereo/Disassembly-Expect Top/Bottom By Default' ====
+If this item is checked, any added StereoDisassembly nodes will expect Top-and-Bottom format input.  If it is not checked, Side-by-Side input will be expected.
+This setting is stored as a preference.
+
+==== 'Image/Stereo/Disassembly-Expect Frame Packed By Default' ====
+If this item is checked, any added StereoDisassembly nodes will expect two full frames of information in Frame Packed format.  If it is not checked, Squeezed input will be expected.
+This setting is stored as a preference.
+
+==== 'Image/Stereo/Disassembly-Swap Eyes By Default' ====
+Unfortunately, the effect of the "disassembly" can depend on the orientation of the pixels in the actual media file.  If you find that your media comes in with eyes swapped, try checking this item.  This setting is stored as a preference.
+
+

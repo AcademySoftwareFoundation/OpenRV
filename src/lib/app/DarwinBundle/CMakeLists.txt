@@ -1,0 +1,37 @@
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+INCLUDE(cxx_defaults)
+
+SET(_target
+    "DarwinBundle"
+)
+
+FILE(GLOB _sources DarwinBundle.mm)
+
+ADD_LIBRARY(
+  ${_target} STATIC
+  ${_sources}
+)
+
+TARGET_INCLUDE_DIRECTORIES(
+  ${_target}
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+TARGET_LINK_LIBRARIES(
+  ${_target}
+  PUBLIC TwkApp
+  PRIVATE TwkUtil
+          TwkExc
+          stl_ext
+          Boost::headers
+          "-framework ApplicationServices"
+          "-framework AppKit"
+          "-framework Foundation"
+)
+
+RV_STAGE(TYPE "LIBRARY" TARGET ${_target})

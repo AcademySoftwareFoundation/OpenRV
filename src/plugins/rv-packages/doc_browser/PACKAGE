@@ -1,0 +1,20 @@
+package: Documentation Browser
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.4
+rv: 7.5.0
+openrv: 1.0.0
+requires: ''
+system: true
+hidden: true
+
+modes: 
+  - file: doc_browser
+    load: delay
+
+description: |
+
+  <p> Interactive Mu documentation browser
+  </p> 
+
+

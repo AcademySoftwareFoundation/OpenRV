@@ -1,0 +1,3 @@
+# To build stereo_autoload_help.html
+
+asciidoc -a data-uri stereo_autoload_help.asciidoc

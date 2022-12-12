@@ -1,0 +1,20 @@
+package: OS Dependent Path Conversion
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.7
+requires: ''
+rv: 4.0.7
+openrv: 1.0.0
+optional: true
+
+modes: 
+  - file: os_dependent_path_conversion_mode.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+    <p>
+    This is a sample package that demonstrates a method for abstracting platform specific disk layout discrepancies. If you plan to use it you should make a copy of it and then modify your copy to set each and every platform disk/filesystem prefix. If you do not set each prefix the translation will not be triggered. Note that this package only translates the paths loaded in session files. In its present form it is not designed to modify paths of files added by drag & dropor specified on the command line.
+    </p>

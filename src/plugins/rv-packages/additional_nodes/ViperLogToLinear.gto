@@ -1,0 +1,37 @@
+GTOa (4)
+
+ViperLogToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "viperlogtolinear"
+        string creator = "Tweak Software"
+        string documentation = "ViperLogToLinear"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/ViperLogToLinear.glsl"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

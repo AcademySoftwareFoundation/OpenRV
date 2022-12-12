@@ -1,0 +1,21 @@
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+IF(RV_TARGET_DARWIN)
+  ADD_SUBDIRECTORY(DarwinBundle)
+ENDIF()
+ADD_SUBDIRECTORY(mu_rvui)
+ADD_SUBDIRECTORY(py_rvui)
+ADD_SUBDIRECTORY(RvApp)
+ADD_SUBDIRECTORY(MuTwkApp)
+ADD_SUBDIRECTORY(PyTwkApp)
+ADD_SUBDIRECTORY(TwkMediaLibrary)
+ADD_SUBDIRECTORY(RvPackage)
+ADD_SUBDIRECTORY(TwkQtBase)
+ADD_SUBDIRECTORY(RvCommon)
+ADD_SUBDIRECTORY(QTBundle)
+ADD_SUBDIRECTORY(TwkApp)
+ADD_SUBDIRECTORY(OutputVideoDevices)

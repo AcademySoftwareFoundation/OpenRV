@@ -1,0 +1,37 @@
+GTOa (4)
+
+YCbCr709ToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycbcr709torgb"
+        string creator = "Tweak Software"
+        string documentation = "YCbCr709ToRGB"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/YCbCr709ToRGB.glsl"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

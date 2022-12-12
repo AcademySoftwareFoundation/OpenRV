@@ -1,0 +1,31 @@
+
+Installation
+
+    * install the package
+
+    * make dir "~/.nuke/tweak"
+
+    * copy py files to tweak area:
+
+        cp <package install dir>/SupportFiles/rvnuke/*.py ~/.nuke/tweak
+
+    * add these lines to ~/.nuke/init.py :
+
+        nuke.pluginAddPath('./tweak')
+        import rvNuke
+
+    Then you should be able to see the RV menu in Nuke
+
+Usage
+
+    * Set the rvExecPath preference in nuke (RV->RVPreferences) to point to the
+      RV executable, or if you leave it blank it will try to run your current
+      build (if SRC_ROOT and BUILD_ROOT env vars are set).
+
+# To build rvnuke_help.html
+
+asciidoc -a data-uri -a toc -a toclevels=4 -a toc-tile=Contents rvnuke_help.asciidoc
+
+
+
+

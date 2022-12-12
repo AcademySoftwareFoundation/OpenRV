@@ -1,0 +1,103 @@
+package: Custom Mattes Example
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 2.3
+optional: true
+rv: 4.0.7
+openrv: 1.0.0
+requires: ''
+
+modes: 
+  - file: custom_mattes.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+
+  <p>Creates a sub-menu in the View menu called Custom Mattes menu. The
+  matte characteristics are specified in a plain UTF8/ASCII text file by aspect
+  ratio, visible fraction of the image, as well as the center point of the
+  matte in normalized coordinates. This package is primarily intended as an 
+  example. This package is documented in in the <i>RV reference manual</i> in
+  its own chapter.</p>
+
+  <p>The matte description file location can be set in the environment
+  variable RV_CUSTOM_MATTE_DEFINITIONS or chosen from the file open dialog
+  launched by selecting "Choose Definition File..." from View -> Custom Mattes
+  in the menubar.</p>
+
+  <h4>The Matte File</h4>
+
+  <p>The file is a very simple comma separated value (CSV) ﬁle. Each line
+  starts with the name of the custom matte (shown in the menu) followed by
+  four ﬂoating point values and then a text field desciption which will be
+  displayed when that matte is activated. Each line will should contain the
+  following:</p>
+
+  <pre>
+    Short name used for user feedback and UI
+    Aspect ratio of the unmatted visible area
+    Fraction of image visible by height (if top and bottom are 5% matted then this would be 0.9)
+    Center point of matte in normalized X (0 is centered see "Normalized Coordinates" below)
+    Center point of matte in normalized Y (0 is centered see "Normalized Coordinates" below)
+    Long form descriptive text
+  </pre>
+
+  <p>There is an example file in the package which will be installed at
+  "SupportFiles/custom_mattes/mattes". The file is included here as well.</p>
+
+  <h3>Example Matte File</h3>
+  <pre>
+    Full Ap 2.35,2.35,0.5,0.0,0.0,2K Full Aperture 2.35 Matte
+    Full Ap 2.35 Offset,2.35,0.5,0.0,0.1,2K Full Aperture 2.35 Matte Offset
+    Full Ap 1.85 Centered,1.85,0.5,0.0,0.0,2K Full Aperture 1.85 Centered Matte
+    Full Ap 1.66 Centered,1.66,0.5,0.0,0.0,2K Full Aperture 1.66 Centered Matte
+    2.5 Off-Centered,2.5,0.5,0.2,0.1,2.5 Matte Off-Centered
+    HD To SD 4:3,1.33,1.0,0.0,0.0,SD From HD
+  </pre>
+
+  <p>The first four custom matte definitions are intended to be used on 2K
+  full aperture (or files with the same aspect ratio of 2048/1556). Applying
+  these mattes to any other aspect ratio will produce inaccurate results.</p>
+
+  <h3>Normalized Coordinates</h3>
+  <p>The center point of the matte is defined using normalized values. RV is
+  resolution agnostic. We call the image coordinate system Normalized Coordinates.
+  The center of the image is at 0, 0. The float values that make up the horizontal
+  and vertical positions are measured in units of the height of the image. So are
+  the width and height size values of RVOverlay rectangles.</p>
+
+  <p>The left hand side is at:</p>
+
+  <pre>
+    -1 * ( source width / source height ) / 2
+  </pre>
+
+  <p>Note that the divide by 2 above is for each half of the coordinate system.</p>
+
+  <p>The right hand side would be:</p>
+
+  <pre>
+    ( source width / source height ) / 2
+  </pre>
+
+  <p>The top is at:</p>
+
+  <pre>
+    1 / 2
+     or
+    0.5
+  </pre>
+
+  <p>Since everything is measured in units of the height and 0 is the center. The
+  top of the image is one half of the height (0.5).</p>
+
+  <p>Which puts the bottom at:</p>
+
+  <pre>
+    -1 / 2
+     or
+    -0.5
+  </pre>

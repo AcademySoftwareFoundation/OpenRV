@@ -1,0 +1,90 @@
+package: Custom LUT Menu Mode
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 2.9
+rv: 4.0.12
+openrv: 1.0.0
+optional: true
+requires: ''
+
+modes: 
+  - file: custom_lut_menu_mode 
+    load: immediate
+
+description: |
+    <h2>Custom LUT Menu Mode</h2>
+    <p>Builds up custom lists of possible LUT files for Display, Look, File,
+    and Pre-Cache LUT files.</p>
+    <p>No matter how you set the directory it will be remembered between
+    launches of RV. Though note "Prefer Last Used Over Environment LUT_DIR" 
+    below. If you want to force RV to read from the environment use that.</p>
+    <h3>Environment Variables</h3>
+    <p>The path to the directory containing the relevant
+    LUT files can be set by environment variable:</p>
+    <p><i>For Display LUT</i></p>
+    <pre>
+    RV_CUSTOM_DLUT_DIR
+    </pre>
+    <p><i>For Look LUT</i></p>
+    <pre>
+    RV_CUSTOM_LLUT_DIR
+    </pre>
+    <p><i>For File LUT</i></p>
+    <pre>
+    RV_CUSTOM_FLUT_DIR
+    </pre>
+    <p><i>For Pre-Cache LUT</i></p>
+    <pre>
+    RV_CUSTOM_PLUT_DIR
+    </pre>
+    <h3>Dialog Selection</h3>
+    <p>Alternatively you can select the directory from a file open dialog for
+    the relevant LUT type. In each respective Current menu you will find:</p>
+    <p><i>For Display LUT</i></p>
+    <pre>
+    Change DLUT Directory...
+    </pre>
+    <p><i>For Look LUT</i></p>
+    <pre>
+    Change LLUT Directory...
+    </pre>
+    <p><i>For File LUT</i></p>
+    <pre>
+    Change FLUT Directory...
+    </pre>
+    <p><i>For Pre-Cache LUT</i></p>
+    <pre>
+    Change PLUT Directory...
+    </pre>
+    <h3>Options and Settings</h3>
+    <h4>Display</h4>
+    <ul>
+    <li>Save Current Display LUT As Default
+    <p>Stores the current Disply LUT as a setting so it can be automatically
+    loaded.</p></li>
+    <li>Auto Load Default Display LUT On Launch
+    <p>Sets a preference so that the default display LUT will be automatially
+    loaded during the initialization of future sessions of RV.</p></li>
+    <li>Force View->No Correction On Launch
+    <p>Sets a preference so that RV will always start with display corrections
+    disabled.</p></li>
+    <li>Apply To All Displays
+    <p>Applies any display LUT loaded to all display devices.</p></li>
+    </ul>
+    <h4>Sources</h4>
+    <ul>
+    <li>Auto Load Accompanying CDL/Look LUT
+    <p>Is a menu to a list of the supported CDL and LUT file extensions. When
+    one is selected the first file with that extension is loaded automatically
+    and applied to any new incoming sources.  There is an option to select the
+    LUT from the same directory or the parent directory of the source.</p></li>
+    <li>Toggle CDL/Look LUT On/Off
+    <p>Use the "/" key to quickly turn on or off the LUT or CDL values being
+    applied by this package.</p></li>
+    <li>Force Color->No Conversion On Load
+    <p>Sets a preference so that sources loaded in RV will have all
+    linearization disabled.</p></li>
+    <li>Prefer Last Used Over Environment LUT_DIR
+    <p>Any last used LUT directory will trump the path defined by the respective
+    RV_CUSTOM_?LUT_DIR environment variable.</p></li>
+    </ul>

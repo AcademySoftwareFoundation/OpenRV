@@ -1,0 +1,19 @@
+package: Collapse Missing Frames
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+rv: 6.0
+openrv: 1.0.0
+requires: ''
+optional: true
+
+modes: 
+  - file: collapse_missing_frames.py
+    load: immediate
+
+description: |
+
+  <p>This package provides a way to collapse a loaded frame sequence to the frames present on disk by pruning the missing frames with an RVRetime node.</p>
+
+  <p>You will find the per-source option under the Image menu as "Collapse Image Sequence" and the global preference for all sources listed along side as "Collapse All Image Sequences".</p>
+

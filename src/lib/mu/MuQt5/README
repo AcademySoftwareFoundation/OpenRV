@@ -1,0 +1,115 @@
+
+Overview
+--------
+
+The script qtXX_to_mu.py where XX is the qt version, converts Qt
+documentation into a Mu API in two steps:
+
+    1) The docs are scanned and parsed into structures which describe the
+       API in terms of functions and classes. This is usually dumped to a
+       python pickle file (.p file).
+
+    2) The parsed structures are then converted into C++ files and headers
+       using files in the templates and handrolled directories. This
+       results in a C++ native Mu module which can be loaded at runtime.
+
+Right now steps 1 and 2 are both implemented in the same script, but they
+could just as well be implemented separately.
+
+The script *does not* convert properties or slots to C++
+code. Instead, these are automatically generated at runtime by
+Bridge.cpp using the Qt MetaObject system. This makes it possible to
+MuQt to pick up slots and props for objects it doesn't know about at
+compile time. 
+
+Probably the biggest digression from the C++ usage is the fact that
+the connect() C++ function is not a member in Mu (its global) and that
+any arbitrary function in Mu can be "connected" to a Qt signal if the
+signatures match. This is achieved by overloading the QSignalSpy class
+and unfortunately requires hacking some of its internals. The upside
+is more flexible event handling in Mu than in C++.
+
+The wrapping attempts to make it possible to use Qt in almost the same way
+it is used in C++. So for example, the Mu user should be able to inherit
+from a Qt class and implement behavior in a similar fashion to the C++
+user.
+
+In order to allow inheritance, the wrapper generates a "MuQt" class
+for each Qt class which the user can inherit from. This class bridges
+Mu to C++ at runtime. So for every instance of a MuQt class in C++
+there will be a corresponding Mu class instance which is the Mu
+interface to the Qt class.
+
+No Q_OBJECT so no moc files
+---------------------------
+
+We're not declaring MuQt_* classes with Q_OBJECT. This is on purpose: we
+don't want Qt to have access to our derived "controller" classes. The MuQt
+objects need to live outside of the Qt ecosystem and shuffle data in/out
+of it.
+
+Getting around Microsoft name mangling
+--------------------------------------
+
+Each MuQt class has a _pub and _pub_parent inline version of all protected
+class functions. The _pub version simply allows code to call the protected
+version from the outside. The _pub_parent version does the same thing, but
+explicitly calls the "parent" (i.e. the actual Qt class) version. This is
+necessary because some compilers (microsoft's) mangle the access permission
+into the symbol name so you can't just #undef protected to call these from
+the outside. In cases where the pub and pub_parent functions need to be
+called the class pointer is cast to the corresponding MuQt object in order
+to get access to that function. This is a dubious way to do this since in
+some cases the object really isnt an ancestor of MuQt object being cast
+to. But since the MuQt object is a linear descendant the vtables, etc,
+should all work out so that its "safe" to make this call. Basically this
+whole mess exists this in order to allow calling protected functions
+outside of the class without using #undef protected. So from the user's
+perspective, it allows you do do things like:
+
+class: MyView : QTreeView
+{
+    ...
+
+    method: dragEnterEvent (void; QDragEnterEvent event)
+    {
+        QAbstractItemView.dragEnterEvent(this, event);
+    }
+}
+
+from you derived class in Mu. In this case for example internally all we
+know is that "this" is a QAbstractItemView. The actual controller class is
+a MuQt_QTreeView, but in QAbstractItemView its cast to a
+MuQt_QAbstractItemView in order to call its dragEnterEvent_pub_parent()
+function. Becase the class hierarchy is actually
+
+    QAbstractItemView->QTreeView->MuQt_QTreeView 
+
+The vtable ording is identical.
+
+
+Finalization
+------------
+
+Finalization is tricky because the timing must be correct. Its
+preferable to delete the underlying Qt object first and then have the
+Mu object expire. However, it may be necessary to enforce this in the
+app in some cases if the MuQt objects are part of a larger C++ Qt
+hierarchy. The library will not delete QObjects directly currently.
+
+
+TODO
+----
+
+    finalizers for Qt reference counted types ONLY (right now its on all
+    primitive types)
+
+    implement operator functions
+
+    QString class which can be converted back and forth to string
+
+    QFileInfo is causing problems because of QFile semantics
+
+
+
+

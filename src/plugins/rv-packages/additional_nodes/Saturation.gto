@@ -1,0 +1,45 @@
+GTOa (4)
+
+Saturation : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "saturation"
+        string creator = "Tweak Software"
+        string documentation = "Saturation"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/Saturation.glsl"
+    }
+
+    parameters
+    {
+       float saturation = [ 1.0 ]
+       float[3] lumaCoefficients = [ [0.2126 0.7152 0.0722] ]
+       float minClamp = [ 0.0 ]
+       float maxClamp = [ 1.0 ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

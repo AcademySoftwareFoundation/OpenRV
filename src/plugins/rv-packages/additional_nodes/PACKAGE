@@ -1,0 +1,12 @@
+package: Additional RV Nodes
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+requires: ''
+rv: 4.0.7
+openrv: 1.0.0
+hidden: true
+system: true
+
+description: |
+

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>rvprof</string>
+				<string>timedata</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>rvprof.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>playbackVis file</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>RVPROF</string>
+			</array>
+			<key>LSIsAppleDefaultForType</key>
+			<string>Yes</string>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>rvprof</string>
+	<key>CFBundleIconFile</key>
+	<string>rvprof.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tweakfilms.rvprof.0.1</string>
+	<key>CFBundleName</key>
+	<string>rvprof</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleResourcesFileMapped</key>
+	<string>Yes</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>0.1</string>
+	<key>LSHasLocalizedDisplayName</key>
+	<string>0</string>
+	<key>NSAppleScriptEnabled</key>
+	<string>0</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright (c) Autodesk, Inc. All rights reserved.</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+</dict>
+</plist>

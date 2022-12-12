@@ -1,0 +1,42 @@
+
+The "standard" windows registry files here are:
+
+    openwith.reg
+
+        Launch RV when double-clicking on media files.
+
+    rvlink.reg
+
+        Register RV as the handler for the "rvlink://" custom protocol.  Docs on the rvlink protocol here:
+
+            https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-user-manual/rv-user-manual-chapter-c.md
+
+
+The "rvpush" .reg files are alternates to support different workflows.  RVPUSH
+is an executable we provide that allows you to communicate with a running RV
+from the command line.  Docs here:
+
+    https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-user-manual/rv-user-manual-chapter-eighteen.md
+
+It's a general utility, but it's used here in the .reg files to avoid the RV
+startup time when loading media by using a running RV if one is available.
+
+In particular:
+
+    rvlink_rvpush.reg 
+
+        This one uses RVPUSH to handle URLs, IE the first one will open a new
+        RV (tagged as the URL handler) and if that RV is still running when
+        next you click on a URL, that will be handled by the running RV instead
+        of a new one.
+
+    openwith_rvpush_set.reg 
+
+        Similar to the above, but for the "double click on a file" workflow.
+
+    openwith_rvpush_merge.reg 
+    
+        This uses the "merge" action instead of the "set" action for RVPUSH,
+        which means that double-clicking on a second file after you have
+        already opened one will merge that media into the running RV instead of
+        replacing the previous media.

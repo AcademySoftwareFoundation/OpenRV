@@ -1,0 +1,3 @@
+# To rebuild lat_long_viewer_help.html
+
+asciidoc -a data-uri lat_long_viewer_help.asciidoc

@@ -1,0 +1,118 @@
+#!/bin/tcsh -f
+#
+#
+#    This script attempts to register RV as the protocol hander for
+#    links that look like rvlink://blah.  
+#
+#    It should be sufficient for gnome apps like pidgin and kde apps
+#    like konqueror.  Firefox seems to pay attention to the gnome
+#    settings at least to the degree that it recognizes links of the
+#    form rvlink://blah as hot-links, but it may still ask you to
+#    select the application the first time you click on one.
+#
+#    We (tweak) are not expert on this stuff, so if you have ideas
+#    about how to do this better or more completely, please let us
+#    know !  (support@tweakadmin.com)
+#
+
+if (! $?RV_HOME) then
+    pushd `dirname $0` >& /dev/null
+    setenv RV_HOME `dirname ${cwd}`
+    popd >& /dev/null
+endif
+
+set rvpush = "$RV_HOME/bin/rvpush"
+
+#
+#   Gnome: register rv as rvlink protocol handler
+#
+echo "Installing rvlink protocol handler for Gnome."
+
+set gconfTool = "`which gconftool-2`"
+
+if ($status == 0) then
+    gconftool-2 --set --type=string /desktop/gnome/url-handlers/rvlink/command $rvpush' -tag rvlink url "%s"'
+    gconftool-2 --set --type=bool /desktop/gnome/url-handlers/rvlink/enabled true
+    gconftool-2 --set --type=bool /desktop/gnome/url-handlers/rvlink/need-terminal false
+else
+    echo "WARNING: gconftool-2 not found: skipping gnome url-handler registration."
+endif
+
+#
+#   KDE: register rv as rvlink protocol handler
+#   If you want to install this system wide copy the rvlink.protocol file to /usr/share/kde4/services/
+#
+echo "Installing rvlink protocol handler for KDE."
+
+set kdeProtoDir = ~/.kde/share/services
+if ( -e ~/.kde4/share/services ) then
+    set kdeProtoDir = ~/.kde4/share/services
+endif
+if (${?KDEDIR}) then
+    set kdeProtoDir = ${KDEDIR}/share/services
+endif
+
+if ( ! -e $kdeProtoDir) then
+    mkdir -p $kdeProtoDir
+endif
+
+if ( -e $kdeProtoDir) then
+    set kdeProtoFile = $kdeProtoDir/rvlink.protocol
+    rm -f $kdeProtoFile
+    cat > $kdeProtoFile << EOF
+[Protocol]
+exec=$rvpush -tag rvlink url "%u"
+protocol=rvlink
+input=none
+output=none
+helper=true
+listing=false
+reading=false
+writing=false
+makedir=false
+deleting=false
+EOF
+    echo "Successfully created ${kdeProtoFile}"
+else
+    echo "WARNING: can't find or create KDE protocol directory: ${kdeProtoDir}:  skipping KDE url-handler registration."
+endif
+
+#
+#   Gnome part 2 for xdg/Chrome: register rv as rvlink protocol handler
+#   If you want to install this system wide run the desktop-file-install as sudo/root
+#   and remove the --dir= bit.
+#
+echo "Installing rvlink protocol handler for XDG"
+
+set desktopInstall = "`which desktop-file-install`"
+
+if ($status == 0) then
+    set xdgDir = $HOME/.local/share/applications
+    if ( ! -e $xdgDir ) then
+        mkdir -p $xdgDir
+    endif
+
+    if ( -e $xdgDir) then
+        set xdgFile = $xdgDir/rv.desktop
+        rm -f $xdgFile
+        cat > $xdgFile << EOF
+[Desktop Entry]
+Name=RVLink
+Type=Application
+Exec=$rvpush -tag rvlink url %U
+Terminal=false
+Categories=AudioVideo;Viewer;Player;
+MimeType=x-scheme-handler/rvlink;
+NoDisplay=true
+EOF
+        echo "Successfully created ${xdgFile}"
+    else
+        echo "WARNING: can't find or create XDG directory: ${xdgDir}:  skipping XDG url-handler registration."
+    endif
+
+    desktop-file-install $xdgFile --rebuild-mime-info-cache --dir=$xdgDir
+else
+    echo "WARNING: desktop-file-install not found: skipping xdg-handler registration."
+endif
+
+echo "Done."

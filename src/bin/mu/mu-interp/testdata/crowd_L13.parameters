@@ -1,0 +1,243 @@
+#     -*- mode: shell-script -*-
+#
+#   Parameter file for sprite generation
+#
+#   SYNTAX
+#   ------
+#
+#   * Each line is a parameter assignment
+#     or a comment or blank
+#
+#   * A '#' on a line starts a comment and goes
+#     until the end of the line
+#
+#   * lines are of the form: PARAM ARG = VALUE(S)
+#     the ARG part is only needed for some
+#     parameters
+#
+#   * some parameters have an extra argument
+#     like "angle" or "actor"
+#
+#   * some parameters take three values ("target")
+#
+#   * some parameters are boolean (yes, true, 1)
+
+#   Some basic parameters
+#
+# Note: Boolean paramters can be "yes", "true", or "1" for true, anything
+#       else for false.
+#
+# New selection method !!
+# selection method: random or linear, 
+# defaults to random (the old way), so far linear yields fewer twins
+# selection method: use linear
+#
+########################
+#
+#   a note about the seeds: First change the "emitSeed" number 
+#   (by one at a time is OK) to get a new random position
+#   and sprite choice. If you like the physical distribution, 
+#   stop changing "emitSeed". If you still need to try different
+#   random sprite distributions without changing how they are layed 
+#   out, change just the "seed". emitSeed will change the random seed 
+#   used to place the particles and which sprite gets put at each 
+#   particle position, seed will change which sprite gets put at 
+#   each particle
+#
+########################
+
+
+# stuff that gets changed most often:
+startFrame      = 1
+endFrame        = 65
+offset          = -10 20               # start frame offset of -10 to 10
+staticOffset    = 90 110               # start frame offset of -10 to 10
+
+# for upper stands
+#emitSeed        = 123
+#seed            = 123
+#skipProbability = 0.35       # use 0.35 for upper stands
+#file in_sprite_a000fsa7 = 0.02 # banners
+#file in_sprite_a000fsa8 = 0.03 # banners
+#file in_sprite_a000fsa9 = 0.10 # banners
+
+#for lower stands
+emitSeed        = 123
+seed            = 123
+skipProbability = 0.25       # use 0.25 for lower stands
+file in_sprite_a000fsa7 = 0.03  # banners
+file in_sprite_a000fsa8 = 0.04  # banners
+file in_sprite_a000fsa9 = 0.13  # banners
+
+
+# #all banners
+# file in_sprite_a000fsa71dA01 = 0.03	# banner - go anyone
+# file in_sprite_a000fsa72dA01 = 0.03	# banner - hi mom
+# file in_sprite_a000fsa74dA01 = 0.03	# banner - will win
+# file in_sprite_a000fsa75dA01 = 0.03	# banner - stan the man
+# file in_sprite_a000fsa76dA01 = 0.03	# banner - just win
+# file in_sprite_a000fsa77dA01 = 0.03	# banner - this is our year 76
+# file in_sprite_a000fsa78dA01 = 0.03	# banner - on the road to victory
+# 
+# file in_sprite_a000fsa81dA01 = 0.05	# banner - go anyone
+# file in_sprite_a000fsa82dA01 = 0.05	# banner - hi mom
+# file in_sprite_a000fsa84dA01 = 0.05	# banner - will win
+# file in_sprite_a000fsa85dA01 = 0.05	# banner - stan the man
+# file in_sprite_a000fsa86dA01 = 0.05	# banner - just win
+# file in_sprite_a000fsa87dA01 = 0.05	# banner - this is our year 76
+# file in_sprite_a000fsa88dA01 = 0.05	# banner - on the road to victory
+# 
+# file in_sprite_a000fsa91dA01 = 0.14	# banner - go anyone
+# file in_sprite_a000fsa92dA01 = 0.14	# banner - hi mom
+# file in_sprite_a000fsa94dA01 = 0.14	# banner - will win
+# file in_sprite_a000fsa95dA01 = 0.14	# banner - stan the man
+# file in_sprite_a000fsa96dA01 = 0.14	# banner - just win
+# file in_sprite_a000fsa97dA01 = 0.14	# banner - this is our year 76
+# file in_sprite_a000fsa98dA01 = 0.14	# banner - on the road to victory
+
+
+# use a sequence version of the stands
+#geomfile        = /net/show/invincible/assets/stadium/gto/stands_v004.gto
+
+# use a shot version of the stands
+geomfile        = /net/show/invincible/master/inc/inc022//gto/inc022_stands_v002.gto
+
+geomobject      = stands_LShape13
+suffix          = A                    # card + suffix, cardA in this case
+cardSize        = 130 130              # width height  WATCH YOUR UNITS!
+cardOffset      = .130 .43 0           # Offset of cards X & Y = % of cardSize, Z = worldSpace
+target          = 0 0 0                # used by MAX
+flip            = yes                  # Randomly flip sprites
+alwaysFlip      = no                   # Always flip sprites (overrides 'flip' if true)
+outfile         = out.ms               # Ignored for Tweak
+cacheOutput     = gto/cache/crowd_L13
+select          = linear
+
+# c4 params
+
+seperation      = 49.75        # UNIT of length (foot, meter, inch, etc)
+stagger         = 5
+margin          = 0.0
+
+densityMap      = None       #gto/Test_stand_A_dist.tif
+# lightingMap = light.tif
+
+#   parameters which apply weights
+
+angle 0         = 1.0
+angle 30        = 1.0   
+angle 60        = 0.0
+angle 80        = 0.0
+angle 120       = 0.0
+angle 160       = 0.0
+angle 180       = 0.0
+
+forwardFacing   = 1.0
+cameraFacing    = 1.0
+summerClothes   = 1.0
+winterClothes   = 1.0
+aClothes        = 1.0
+bClothes        = 1.0
+cClothes        = 1.0
+dClothes        = 1.0
+lit             = 1.0   # lit is a weight, alternately "ambient = ..."
+ambient         = 1.0   # ambient is a weight, alternately "lit = ..."
+teamEagles      = 1.0
+teamCowboys     = 1.0
+teamNeutral     = 1.0
+
+action sit1      = 1
+action boo       = 0
+action clap      = 1
+action clap2     = 0.25
+action sit2      = 0
+action stand     = 0
+action standClap = 0.75
+action sit3      = 0
+action sit4      = 0
+
+# for each category, the "action" parameter above will be made 
+# static in the proportion of the static multiplier below
+# for instance if "action clap" is set to 1 and "static clap" 
+# is set to 0.8, 80% of the clappers will be static
+
+static sit1      = 0.5
+static boo       = 0.5
+static clap      = 0.5
+static clap2     = 0.5
+static sit2      = 0.5
+static stand     = 0.5
+static standClap = 0.75
+static sit3      = 0.5
+static sit4      = 0.5
+
+#   Full sprite file filter in case you need it
+#   e.g., isolate one file and not use it
+#         or use more of one you like
+
+## # dial down bad actors and teal shirted sprites
+actor 02        	     = 0.01	# all bobs set to 0.01
+## actor 04        	     = 0.33	# all excited lady set to 0.33
+
+## weight the sprites angles here
+file in_sprite_a000fs = 1
+file in_sprite_k000fs = 1
+file in_sprite_a030cs = 0.75
+file in_sprite_k030cs = 0.75
+file in_sprite_a030cw = 0.75
+file in_sprite_a030fs = 0.75
+#we don't have any of these
+#file in_sprite_k030fs = 0
+
+# sprite multipliers to adjust the color
+file in_sprite_a030cwa16nA01 = 0.6	# red sweatshirt guy
+file in_sprite_a030cwa21eA02 = 0.5	# green winter coat guy with beard
+file in_sprite_a030cwa11eA01 = 0.5	# green winter coat guy 2
+file in_sprite_a030csa43nA09 = 0.5	# light green guy
+file in_sprite_k030csa37nA10 = 0.5 	# light green guy
+file in_sprite_k030csd23nA06 = 0.5	# light green guy
+file in_sprite_k000fsd17nB06 = 0.3	# light green guy
+file in_sprite_k000fsd08nB06 = 0.3	# light green shirt guy
+file in_sprite_a000fsc01nB05 = 0.3	# college boy in red
+file in_sprite_a000fsc04nB04 = 0.2	# green shirt woman
+file in_sprite_a000fsa05nB02 = 0.2	# pink shirt girl
+file in_sprite_k000fsd22nB06 = 0.2	# salmon shirt girl
+file in_sprite_k030csd22nA06 = 0.2	# salmon shirt girl
+file in_sprite_a030cwa21eA02 = 0.2	# green winter guy
+file in_sprite_a000fsc21eB05 = 0.2      # drk green shirt, bearded man with hat
+file in_sprite_a000fsa42nB09 = 0.1      # red shirt guy
+file in_sprite_a030csc23eA05 = 0.02	# green arm waving guy
+
+file in_sprite_a000fsc01nQ05 = 1.35	# new blue shirt, college boy
+file in_sprite_a000fsa29eQ10 = 1.35	# new blue shirt, bald guy
+file in_sprite_a000fsc05nQ04 = 1.35	# new blue shirt, woman with long brown hair
+file in_sprite_a000fsa21eQ03 = 1.35	# new blue shirt person
+file in_sprite_a000fsa42nQ09 = 1.35 	# new blue shirt person
+file in_sprite_a000fsb48nQ11 = 1.35 	# new blue shirt person
+file in_sprite_a000fsc04nQ04 = 1.35 	# new blue shirt person
+file in_sprite_a000fsc10nQ05 = 1.35 	# new blue shirt person
+file in_sprite_a000fsc21eQ05 = 1.35	# new blue shirt person - bearded guy
+file in_sprite_k030cse61nA07 = 1.35	# todd
+file in_sprite_a030csa23nA03 = 1.35 	# guy with hat and yellow shirt
+file in_sprite_a000fsc13cB05 = 1.35	# woman with cowboy hat and yellow shirt
+file in_sprite_a030fsc15nA05 = 1.35 	# man with orange vest
+file in_sprite_k000fsa32nB10 = 1.35	# kid with yellow tee shirt
+file in_sprite_a030csb50nA11 = 1.35 	# scott with orange shirt
+
+
+
+# sprites that we never want to see
+file in_sprite_a000fsc01nT05 = 0        # teal blue shirt, college boy with hat
+file in_sprite_a000fsa04nT02 = 0        # teal blue shirt, too saturated, excited woman
+file in_sprite_a000fsa04nG02 = 0	# teal blue shirt, excited woman
+file in_sprite_a000fsc04nT04 = 0	# teal blue printed shirt, excited woman
+file in_sprite_a000fsa05nT02 = 0 	# teal blue shirt, long black hair
+file in_sprite_a000fsc05nT04 = 0 	# teal blue shirt, long black hair number2
+file in_sprite_a000fsa21eT03 = 0 	# teal blue knit hat, bearded man
+file in_sprite_a000fsc21eT05 = 0        # teal blue shirt, bearded man with baseball hat
+file in_sprite_a000fsa29eT10 = 0        # too saturated ,bald guy 
+file in_sprite_a000fsa29eX10 = 0        # dark teal blue shirt, bald guy
+file in_sprite_a000fsa29eY10 = 0        # light teal blue shirt, bald guy
+file in_sprite_a000fsa42nT09 = 0 	# teal blue shirt, fat guy with open shirt
+file in_sprite_a000fsa05nQ02 = 0	# new blue shirt, woman with long brown hair, doesn't look as good as "Q04"
+

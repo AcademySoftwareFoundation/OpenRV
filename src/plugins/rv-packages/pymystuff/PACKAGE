@@ -1,0 +1,26 @@
+package: Python My Stuff
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+rv: 3.12
+openrv: 1.0.0
+requires: ''
+optional: true
+
+modes: 
+  - file: pymystuff
+    load: immediate
+
+description: |
+
+  <p> This package is used as an example in reference manual (A Simple
+  Package chapter) to explain how to make a simple package for personal
+  customizations (in Python) like key bindings, and a simple menu bar
+  addition </p>
+
+  <p> The package demonstrates two things: </p>
+
+  <ul>
+  <li> Custom key bindings </li>
+  <li> Creating a personal menu bar menu </li>
+  </ul>

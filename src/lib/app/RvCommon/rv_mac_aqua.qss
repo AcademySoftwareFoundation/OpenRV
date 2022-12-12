@@ -1,0 +1,279 @@
+/* Copyright (C) 2012 Tweak Software 
+ * All rights reserved
+ *
+ * USE WITH AQUA, RV_DARK not set
+ */
+
+QListView {
+icon-size: 16px; 
+background-color: rgb(232,235,239);
+font-size: %1pt;
+}
+
+QMenu {
+font-size: %1pt;
+}
+
+QTreeView {
+background-color: rgb(232,235,239);
+}
+
+QToolButton {
+color: rgb(200,200,200);
+border-left: 1px solid rgb(110,110,110);
+border-right: 1px solid rgb(110,110,110);
+border-top: 1px solid rgb(110,110,110);
+border-bottom: 1px solid rgb(110,110,110);
+border-radius: 6px;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 rgb(246,246,246),
+stop: .5 rgb(214,214,214),
+stop: 1 rgb(193,193,193) );
+icon-size: 16px;
+min-width: 24px;
+max-height: 24px;
+min-height: 24px;
+margin: 4px;
+}
+
+
+QToolButton[tbstyle="palette"] {
+max-height: 1000px;
+max-width: 1000px;
+margin: 1px;
+padding: 2px;
+}
+
+QToolButton[tbstyle="left"] {
+border-top-left-radius: 4px;
+border-bottom-left-radius: 4px;
+border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;
+margin-right: 0px;
+margin-left: 10px;
+border: 1px solid black;
+}
+
+QToolButton[tbstyle="interior"] {
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;
+margin: 0px;
+border-right: 1px solid black;
+border-left: 0px solid black;
+border-top: 1px solid black;
+border-bottom: 1px solid black;
+}
+
+QToolButton[tbstyle="interior_menu"] {
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;
+margin-left: 0px;
+margin-right: 0px;
+padding-left: 0;
+padding-right: 8px;
+padding-top: 0px;
+padding-bottom: 0px;
+border-right: 1px solid black;
+border-left: 0px solid black;
+border-top: 1px solid black;
+border-bottom: 1px solid black;
+}
+
+QToolButton[tbstyle="solo_menu"] {
+margin-right: 10px;
+margin-left: 10px;
+padding-left: 0;
+padding-right: 8px;
+padding-top: 0px;
+padding-bottom: 0px;
+border: 1px solid black;
+}
+
+QToolButton[tbstyle="left_menu"] {
+border-top-left-radius: 4px;
+border-bottom-left-radius: 4px;
+border-top-right-radius: 0px;
+border-bottom-right-radius: 0px;
+padding-left: 0;
+padding-right: 8px;
+padding-top: 0px;
+padding-bottom: 0px;
+margin-left: 10px;
+margin-right: 0px;
+border: 1px solid black;
+}
+
+QToolButton[tbstyle="right"] {
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+border-top-right-radius: 4px;
+border-bottom-right-radius: 4px;
+margin-right: 10px;
+margin-left: 0px;
+border-right: 1px solid black;
+border-left: 0px solid black;
+border-top: 1px solid black;
+border-bottom: 1px solid black;
+}
+
+QToolButton[tbstyle="right_menu"] {
+border-top-left-radius: 0px;
+border-bottom-left-radius: 0px;
+border-top-right-radius: 4px;
+border-bottom-right-radius: 4px;
+border-right: 1px solid black;
+margin-right: 10px;
+margin-left: 0px;
+padding-left: 0;
+padding-right: 8px;
+padding-top: 0px;
+padding-bottom: 0px;
+border-right: 1px solid black;
+border-left: 0px solid black;
+border-top: 1px solid black;
+border-bottom: 1px solid black;
+}
+
+QHeaderView {
+font-size: %2pt;
+}
+
+QToolButton:pressed {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 rgb(193,193,193),
+stop: .5 rgb(214,214,214),
+stop: 1 rgb(246,246,246));
+}
+
+QToolButton:checked {
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 rgb(193,193,193),
+stop: .5 rgb(214,214,214),
+stop: 1 rgb(246,246,246));
+}
+
+QToolButton::menu-indicator {
+image: url(":images/button_down_arrow.png");
+position: relative;
+top: 5px;
+right: 0px;
+subcontrol-origin: padding;
+subcontrol-position: right;
+}
+
+QDialog#RvFileDialog QTreeView {
+font-size: %1pt;
+alternate-background-color: rgb(240, 240, 240);
+background-color: rgb(240, 240, 240);
+}
+
+QWidget#sessionManager QWidget {
+font-size: %2pt;
+}
+
+QWidget#sessionManager QAbstractItemView {
+font-size: %2pt;
+selection-background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, 
+stop: 0 rgb(151,163,180), 
+stop: .5 rgb(119,133,145), 
+stop: 1 rgb(90,107,132) );
+selection-color: rgb(255, 255, 255);
+}
+
+
+QWidget#navPanel,
+QWidget#navPanel .QWidget {
+font-size: %1pt;
+border-style: none;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 rgb(234,234,234),
+stop: 1 rgb(190,190,190));
+}
+
+
+QWidget#sessionManager QGroupBox {
+/*qproperty-flat: 1;*/
+margin: 2px; 
+qproperty-title: "";
+/*background-color: rgb(235,235,235);*/
+/*border: 1px none rgb(235,235,235);*/
+}
+
+QWidget#sessionManager QAbstractItemView#uiTreeWidget {
+qproperty-indentation: 0;
+/*qproperty-animated: 1;*/
+font-size: %1pt;
+font-weight: bold;
+background-color: rgb(225,225,225);
+selection-color: rgb(20,20,20);
+}
+
+QWidget#sessionManager QAbstractItemView#uiTreeWidget::item {
+border-top: 1px solid rgb(200,200,200);
+border-left: 1px solid rgb(200,200,200);
+border-right: 1px solid rgb(200,200,200);
+border-bottom: 1px solid rgb(200,200,200);
+border-top-left-radius: .4em;
+border-top-right-radius: .4em;
+border-bottom-left-radius: .4em;
+border-bottom-right-radius: .4em;
+margin-left: .15em;
+margin-right: .1em;
+margin-top: .1em;
+margin-bottom: .1em;
+padding-left: .15em;
+padding-right: 0em;
+padding-top: .15em;
+padding-bottom: .15em;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+stop: 0 rgb(245,245,245),
+stop: .5 rgb(255,255,255),
+stop: .55 rgb(245,245,245),
+stop: 1 rgb(235,235,235));
+}
+
+QWidget#sessionManager QAbstractItemView#uiTreeWidget::item:open {
+margin-bottom: 0em;
+border-bottom-left-radius: 0em;
+border-bottom-right-radius: 0em;
+border-bottom: 1px none rgb(200,200,200);
+}
+
+QWidget#sessionManager QAbstractItemView#uiTreeWidget::item:!has-children {
+margin-top: 0em;
+border-top-left-radius: 0em;
+border-top-right-radius: 0em;
+border-top: 1px none rgb(200,200,200);
+background-color: rgb(235,235,235);
+}
+
+QWidget#annotationTool QPushButton#colorButton {
+border-top: 2px solid rgb(180,180,180);
+border-left: 2px solid rgb(180,180,180);
+border-right: 2px solid rgb(180,180,180);
+border-bottom: 2px solid rgb(180,180,180);
+padding: 1px;
+border-radius: 10px;
+}
+
+QWidget#annotationTool QToolButton {
+border-top: 1px solid rgb(200,200,200);
+border-left: 1px solid rgb(180,180,180);
+border-right: 1px solid rgb(180,180,180);
+border-bottom: 1px solid rgb(180,180,180);
+padding: 1px;
+border-radius: 4px;
+margin: 1px;
+background-color: rgb(220,220,220);
+icon-size: 16px;
+min-width: 32px;
+min-height: 32px;
+}
+
+QWidget#annotationTool QToolButton:checked {
+background-color: rgb(100,100,100);
+}

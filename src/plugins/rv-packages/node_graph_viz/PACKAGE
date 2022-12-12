@@ -1,0 +1,22 @@
+package: Node Graph Viz
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 0.1
+requires: ''
+rv: 7.5.0
+openrv: 1.0.0
+optional: true
+hidden: true
+
+modes: 
+  - file: node_graph_viz.py
+    menu: 'Tools/Node Graph Viz'
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+    <p>
+    Node Graph Vizualizer
+    </p>
+

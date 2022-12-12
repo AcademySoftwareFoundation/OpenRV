@@ -1,0 +1,33 @@
+GTOa (3)
+
+LatLongViewer : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "filter" 
+	string defaultName = "latLongViewer"
+	string creator = "The Mill"
+        string documentation = "LatLong Texture Viewer" 
+	int userVisible = 1
+    }
+
+    render
+    {
+	int intermediate = 0   # usually derived
+    }
+
+    function
+    {
+	string name = "main"
+	string glsl = "file://${HERE}/LatLongViewer.glsl"
+    }
+
+    parameters
+    {
+        float hAperture = 24
+        float vAperture = 0
+        float focalLength = 7
+        float rotateX = 90
+        float rotateY = 180
+    }
+}

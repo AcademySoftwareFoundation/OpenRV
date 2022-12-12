@@ -1,0 +1,60 @@
+GTOa (4)
+
+CDLForACESLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "cdlforaceslinear"
+        string creator = "Tweak Software"
+        string documentation = "CDLForACESLinear"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/CDLForACESLinear.glsl"
+    }
+
+    parameters
+    {
+       float[3] slope  = [ [1.0 1.0 1.0] ]
+       float[3] offset = [ [0.0 0.0 0.0] ]
+       float[3] power  = [ [1.0 1.0 1.0] ]
+       float saturation = [ 1.0 ]
+       float[3] lumaCoefficients = [ [0.2126 0.7152 0.0722] ]
+       float[3] refLow  = [ [0.001185417175293 0.001185417175293 0.001185417175293] ]
+       float[3] refHigh = [ [222.875 222.875 222.875] ]
+       float[16] toACES = [ [ 1.0 0.0 0.0 0.0
+                          0.0 1.0 0.0 0.0
+                          0.0 0.0 1.0 0.0
+                          0.0 0.0 0.0 1.0 ] ]
+
+       float[16] fromACES = [ [ 1.0 0.0 0.0 0.0
+                          0.0 1.0 0.0 0.0
+                          0.0 0.0 1.0 0.0
+                          0.0 0.0 0.0 1.0 ] ]
+
+       float minClamp = [ 0.0 ]
+       float maxClamp = [ 1.0 ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

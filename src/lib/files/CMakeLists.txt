@@ -1,0 +1,12 @@
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+ADD_SUBDIRECTORY(LUT)
+ADD_SUBDIRECTORY(Gto)
+ADD_SUBDIRECTORY(CDL)
+ADD_SUBDIRECTORY(WFObj)
+ADD_SUBDIRECTORY(ZFile)
+ADD_SUBDIRECTORY(Tex)

@@ -1,0 +1,49 @@
+#!/bin/tcsh -f
+
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#
+#   This script sets the APP_HOME environment (if not already set),
+#   makes sure the plugins are the path and launches the actual binary.
+#
+#   NOTE: doesn't properly set APP_HOME if invoked from a link to the script
+#   and APP_HOME is not already set
+#
+
+set noglob
+set name = rvls
+
+if (! $?RV_HOME) then
+    set canonicalName = "`readlink -f $0`"
+    set binName = "$canonicalName:h"
+    setenv RV_HOME "$binName:h"
+endif
+
+set platform = i386
+set bin = "$RV_HOME/bin/$name.bin.$platform"
+
+if (! (-e $bin) ) then
+    set bin = "$RV_HOME/bin/$name.bin"
+endif
+
+if (! (-e $bin) ) then
+    echo "ERROR: binary " $bin " not found"
+    exit(-1)
+endif
+
+unsetenv BUILD_ROOT
+setenv PATH "$RV_HOME/bin:${PATH}"
+
+if ($?LD_LIBRARY_PATH) then
+     setenv LD_LIBRARY_PATH "$RV_HOME/lib:$LD_LIBRARY_PATH"
+else
+     setenv LD_LIBRARY_PATH "$RV_HOME/lib"
+endif
+
+# exec binary
+
+exec $bin $*:q

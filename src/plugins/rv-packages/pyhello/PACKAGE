@@ -1,0 +1,21 @@
+package: Python Example Mode
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+requires: ''
+rv: 3.12.9
+openrv: 1.0.0
+optional: true
+
+modes: 
+  - file: pyhello.py
+    menu: 'Tools/PYHELLO'
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+    <p>
+    This is a simple python package example
+    </p>
+

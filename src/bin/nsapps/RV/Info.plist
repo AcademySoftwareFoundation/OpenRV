@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+   <dict>
+      <key>CFBundleURLTypes</key>
+      <array>
+         <dict>
+            <key>CFBundleURLName</key>
+            <string>rvlink URL</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+               <string>rvlink</string>
+            </array>
+         </dict>
+      </array>
+      <key>CFBundleDevelopementRegion</key>
+      <string>English</string>
+      <key>CFBundleDocumentTypes</key>
+      <array>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>exr</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>OpenEXR Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>EXR</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>tif</string>
+               <string>tiff</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>TIFF Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>TIFF</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>rla</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Wavefront/3DStudio RLA Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>RLA</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>rgbe</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Radiance RGBE Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>RGBE</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>tga</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Targa Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>TGA</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>iff</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>IFF Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>IFF</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>jpg</string>
+               <string>jpeg</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>JPEG Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>JPEG</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>jp2</string>
+               <string>j2k</string>
+               <string>jpc</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>JPEG-2000 Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>JPEG-2000</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>cin</string>
+               <string>cineon</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Cineon Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>CIN</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>dpx</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>DPX Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>DPX</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>gif</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>GIF Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>GIF</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>png</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>PNG Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>PNG</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>psd</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Cineon Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>PSD</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>cr2</string>
+               <string>crw</string>
+               <string>rmf</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Canon Raw Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>Canon Raw</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>nef</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Nikon Raw Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>Nikon Raw</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>xcf</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Gimp Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>XCF</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>mov</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Quicktime Movie</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>MOV</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>dv</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Quicktime Movie</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>DV</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>mp4</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>MPEG4 Movie</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+               <string>MP4</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>avi</string>
+               <string>AVI</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>AVI Movie</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>AVI</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>r3d</string>
+               <string>R3D</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>RED Raw Movie</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>R3D</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>ari</string>
+               <string>ARI</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>ARRI Raw Movie</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>ARI</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>gtv</string>
+               <string>GTV</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>GTV Movie</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>GTV</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>rv</string>
+               <string>RV</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvfile.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>RV Session</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>RV</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>movieproc</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvfile.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>RV Procedural Movie</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>MovieProc</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <false />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>stdinfb</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvfile.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>RV stdin Movie (from frames)</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>StdinFB</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>rv3dlut</string>
+               <string>rvchlut</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>RV LUT</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>RV LUT LUT</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>None</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>.rvclips</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvdir.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>RV Clip Bundle</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>RVClipBundle</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>aiff</string>
+               <string>aif</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvdir.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>AIFF Audio File</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>AIFF</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>aifc</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvdir.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>Apple AIFC Sound File</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>AIFC</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>wav</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvdir.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>Microsoft WAVE Sound File</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>WAV</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>au</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvdir.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>Sun Microsystems AU Sound File</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>AU</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+         <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+               <string>.snd</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>rvdir.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>NeXT Sound File</string>
+            <key>CFBundleTypeOSType</key>
+            <array>
+               <string>AU</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>LSIsAppleDefaultForType</key>
+            <true />
+         </dict>
+      </array>
+      <key>CFBundleExecutable</key>
+      <string>RV</string>
+      <key>CFBundleGetInfoString</key>
+      <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}, Copyright ${RV_VERSION_YEAR} Autodesk, Inc.</string>
+      <key>CFBundleIconFile</key>
+      <string>RV.icns</string>
+      <key>CFBundleIdentifier</key>
+      <string>com.autodesk.RV</string>
+      <key>CFBundleName</key>
+      <string>Open RV</string>
+      <key>CFBundlePackageType</key>
+      <string>APPL</string>
+      <key>CFBundleResourcesFileMapped</key>
+      <true />
+      <key>CFBundleShortVersionString</key>
+      <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
+      <key>CFBundleVersion</key>
+      <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}</string>
+      <key>LSHasLocalizedDisplayName</key>
+      <string>0</string>
+      <key>LSMinimumSystemVersion</key>
+      <string>10.8.0</string>
+      <key>NSAppleScriptEnabled</key>
+      <string>0</string>
+      <key>NSHumanReadableCopyright</key>
+      <string>Copyright ${RV_VERSION_YEAR} Autodesk, Inc.</string>
+      <key>NSMainNibFile</key>
+      <string>MainMenu</string>
+      <key>NSPrincipalClass</key>
+      <string>NSApplication</string>
+   </dict>
+</plist>

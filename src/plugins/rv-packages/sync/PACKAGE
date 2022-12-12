@@ -1,0 +1,15 @@
+package: RV Sync
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.3
+requires: ''
+rv: 7.5.0
+openrv: 1.0.0
+optional: false
+
+modes:
+- file: sync_mode.mu
+  load: immediate
+
+description: |
+  <p>RV Sync.</p>

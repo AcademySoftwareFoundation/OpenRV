@@ -1,0 +1,203 @@
+
+<!-- saved from url=(0067)http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="KEYWORDS" content="INFO: PIC file format">
+<meta name="robots" content="index,follow">
+    <title>INFO: PIC file format - XSI-Wiki</title>
+
+         </head>
+
+ <body class="ns-0">
+
+<div id="globalWrapper">
+
+
+<!-- ******* Start Content ******* -->
+<div id="content">
+
+<!-- ******* Tabs and prefs ******* -->
+			<div id="tabs_bar">
+							</div><!-- tabs_bar close -->
+
+<!-- ******* Main content ******* -->
+			<div id="bodyContent">
+
+
+
+
+
+			<!-- ******* User prefs ******* -->
+											<div class="portlet" id="p-personal"> <div class="pBody">
+				</div></div><!-- pBody & p-personal close -->
+
+
+
+
+
+			<a name="top" id="contentTop"></a>
+
+	  		  <h1 class="firstHeading">INFO: PIC file format</h1>
+
+						<!-- <h3 id="siteSub"></h3> -->
+						<div id="contentSub"></div>
+												
+						<!-- start content -->
+							<p>This document provides an overview of the Softimage® 3D Picture File Format. This format has been used by Softimage 3D and many other application programs for storing true color image data.
+</p><p>The format consists of two parts: file header and image data. The header contains general information about image and specification for each channel. The image data records pixel values.
+</p>
+<table border="0" id="toc"><tbody><tr id="toctitle"><td align="center">
+<b>Table of contents</b> <script type="text/javascript">showTocToggle("show","hide")</script><span class="toctoggle">[<a href="javascript:toggleToc()" class="internal"><span id="showlink" style="display:none;">show</span><span id="hidelink">hide</span></a>]</span>
+</td></tr><tr id="tocinside"><td>
+<div class="tocline"><a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#File_Header">1 File Header</a><br></div>
+<div class="tocindent">
+<p><a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Picture_Info_Section">1.1 Picture Info Section</a><br>
+<a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Channel_Info_Section">1.2 Channel Info Section</a><br>
+</p>
+</div>
+<div class="tocline"><a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Encoding_Type_Codes">2 Encoding Type Codes</a><br></div>
+<div class="tocline"><a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Channel_Codes">3 Channel Codes</a><br></div>
+<div class="tocline"><a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Image_Data">4 Image Data</a><br></div>
+<div class="tocindent">
+<p><a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Uncompress_Data">4.1 Uncompress Data</a><br>
+<a href="http://softimage.wiki.softimage.com/index.php/INFO:_PIC_file_format#Mixed_Run_Length_Compressed_Data">4.2 Mixed Run Length Compressed Data</a><br>
+</p>
+</div>
+</td></tr></tbody></table>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=1" title="INFO: PIC file format">edit</a>]</div><a name="File_Header"></a><h2>File Header</h2>
+<p>The file header can be divided into two sections:
+</p>
+<ul><li> Picture info section
+</li><li> Channel info section
+</li></ul>
+<p><br>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=2" title="INFO: PIC file format">edit</a>]</div><a name="Picture_Info_Section"></a><h3> Picture Info Section</h3>
+<p>This section contains general information about the picture.  It is summarized by the following table.
+</p><p><br>
+</p>
+<table>
+<tbody><tr valign="top"><th align="left"> <strong> Offset</strong> </th> <th align="left"> <strong> Length (in bytes)</strong> </th> <th align="left"> <strong> Name</strong> </th> <th align="left"> <strong> Description</strong> </th> </tr>
+<tr valign="top"> <td align="left"> 0 </td> <td align="left"> 4 </td> <td align="left"> magic </td> <td align="left"> A predefined magic number: BINARY_MAGIC_NUMBER. It is 5380f634 (in hex.). </td> </tr>
+<tr valign="top"> <td align="left"> 4 </td> <td align="left"> 4 </td> <td align="left"> version </td> <td align="left"> Version of format (float). </td> </tr> 
+<tr valign="top"> <td align="left"> 8 </td> <td align="left"> 80 </td> <td align="left"> comment </td> <td align="left"> Prototype description </td> </tr>
+<tr valign="top"> <td align="left"> 88 </td> <td align="left"> 4 </td> <td align="left"> id </td> <td align="left"> "PICT" </td> </tr>
+<tr valign="top"> <td align="left"> 92 </td> <td align="left"> 2 </td> <td align="left"> width </td> <td align="left"> image width, in pixels </td> </tr>
+<tr valign="top"> <td align="left"> 94 </td> <td align="left"> 2 </td> <td align="left"> height </td> <td align="left"> image height, in pixels </td> </tr>
+<tr valign="top"> <td align="left"> 96 </td> <td align="left"> 4 </td> <td align="left"> ratio </td> <td align="left"> Pixel aspect ratio. Corresponds to pixel width / height. In the case of square pixel, this ratio is 1. </td> </tr>
+<tr valign="top"> <td align="left"> 100 </td> <td align="left"> 2 </td> <td align="left"> fields </td> <td align="left"> Indicates the picture field type (depending on the manner of using video scanline). </td> </tr>
+<tr valign="top"> <td align="left"> 102 </td> <td align="left"> 2 </td> <td align="left"> pad </td> <td align="left"> Unused. Should be zero. </td> </tr>
+</tbody></table>
+<p><br>
+The <strong>fields</strong> field can take one of following codes:
+</p>
+<table border="0">
+<tbody><tr valign="top"><th align="left"> <strong> Code</strong> </th> <th align="left"> <strong> Value</strong> </th> <th align="left"> <strong> Description</strong> </th> </tr>
+<tr valign="top"> <td align="left"> NO_FIELD </td> <td align="left"> 0 </td> <td align="left"> No picture </td> </tr>
+<tr valign="top"> <td align="left"> ODD_FIELD </td> <td align="left"> 1 </td> <td align="left"> Odd scanline </td> </tr>
+<tr valign="top"> <td align="left"> EVEN_FIELD </td> <td align="left"> 2 </td> <td align="left"> Even scanline </td> </tr>
+<tr valign="top"> <td align="left"> FULL_FRAME </td> <td align="left"> 3 </td> <td align="left"> Every scanline </td> </tr>
+</tbody></table>
+<p><br>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=3" title="INFO: PIC file format">edit</a>]</div><a name="Channel_Info_Section"></a><h3> Channel Info Section</h3>
+<p>This section contains one or more "channel packet".  Each one describes one or several channels.  For instance, we can use a channel packet to describe the Red, Green, Blue channels, and another one to describe Alpha channel.
+The format of the channel packet is shown in the following table.
+</p>
+<table border="0">
+<tbody><tr valign="top"><th align="left"> <strong> Offset</strong> </th> <th align="left"> <strong> Length</strong> </th> <th align="left"> <strong> Name</strong> </th> <th align="left"> <strong> Description</strong> </th> </tr>
+<tr valign="top"> <td align="left"> 104 </td> <td align="left"> 1 </td> <td align="left"> chained </td> <td align="left"> 0 if last packet 1 if there is another packet after this one. </td> </tr>
+<tr valign="top"> <td align="left"> 105 </td> <td align="left"> 1 </td> <td align="left"> size </td> <td align="left"> Number of bits for each pixel value by channel. Set to 8. </td> </tr>
+<tr valign="top"> <td align="left"> 106 </td> <td align="left"> 1 </td> <td align="left"> type </td> <td align="left"> Data and encoding type. </td> </tr>
+<tr valign="top"> <td align="left"> 107 </td> <td align="left"> 1 </td> <td align="left"> channel </td> <td align="left"> Channel code </td> </tr>
+</tbody></table>
+<p><br>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=4" title="INFO: PIC file format">edit</a>]</div><a name="Encoding_Type_Codes"></a><h2>Encoding Type Codes</h2>
+<p><br>
+</p>
+<table border="0">
+<tbody><tr valign="top"><th align="left"> <strong> Code</strong> </th> <th align="left"> <strong> Value</strong> </th> <th align="left"> <strong> Description</strong> </th> </tr>
+<tr valign="top"> <td align="left"> UNCOMPRESSED </td> <td align="left"> 0x00 </td> <td align="left"> Image is uncompressed </td> </tr>
+<tr valign="top"> <td align="left"> MIXED_RUN_LENGTH </td> <td align="left"> 0x02 </td> <td align="left"> Run Length compression </td> </tr>
+</tbody></table>
+<p><br>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=5" title="INFO: PIC file format">edit</a>]</div><a name="Channel_Codes"></a><h2>Channel Codes</h2>
+<p><br>
+</p>
+<table border="0">
+<tbody><tr valign="top"><th align="left"> <strong> Code</strong> </th> <th align="left"> <strong> Value</strong> </th> <th align="left"> <strong> Description</strong> </th> </tr>
+<tr valign="top"> <td align="left"> RED_CHANNEL </td> <td align="left"> 0x80 </td> <td align="left"> Red channel </td> </tr>
+<tr valign="top"> <td align="left"> GREEN_CHANNEL </td> <td align="left"> 0x40 </td> <td align="left"> Green channel </td> </tr>
+<tr valign="top"> <td align="left"> BLUE_CHANNEL </td> <td align="left"> 0x20 </td> <td align="left"> Blue channel </td> </tr>
+<tr valign="top"> <td align="left"> ALPHA_CHANNEL </td> <td align="left"> 0x10 </td> <td align="left"> Alpha channel </td> </tr>
+</tbody></table>
+<p><br>
+In the Softimage <em>3D</em> standard picture file, we use one or two of the following packets depending on whether or not there is an alpha channel.
+</p>
+<pre>chained = 1 (or 0, if only one packet is used)
+size = 8
+type = MIXED_RUN_LENGTH
+channel = RED_CHANNEL | GREEN_CHANNEL | BLUE_CHANNEL
+</pre>
+<p><br>
+</p>
+<pre>chained = 0
+size = 8
+type = MIXED_RUN_LENGTH
+channel = ALPHA_CHANNEL
+</pre>
+<p>The first packet is for three colors channels, the second, for alpha channel. So the order for encoding each data is:
+</p>
+<ul><li>First, data for three colors are encoded together.
+</li></ul>
+<ul><li>Then, the alpha channel data are encoded.
+</li></ul>
+<p>Image is compressed.  8 bits for each pixel value by channel.  So the pixel value has a range of [0, 255].
+</p><p><br>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=6" title="INFO: PIC file format">edit</a>]</div><a name="Image_Data"></a><h2>Image Data</h2>
+<p>The image data are stored by scanline, from top to bottom, and from left to right.  The order for encoding each channel data is determined in channel packets.  For example, when using the two packets of section 1.2, for a 3x3 (width x height) RGBA image, the data are formatted like this:
+</p>
+<ul><li>(line 0) RGBRGBRGBAAA
+</li></ul>
+<ul><li>(line 1) RGBRGBRGBAAA
+</li></ul>
+<ul><li>(line 2) RGBRGBRGBAAA
+</li></ul>
+<p><br>
+There are two ways to encode data:
+</p><p><br>
+</p>
+<ul><li>Uncompressed
+</li></ul>
+<ul><li>Mixed Run Length Compression
+</li></ul>
+<p><br>
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=7" title="INFO: PIC file format">edit</a>]</div><a name="Uncompress_Data"></a><h3> Uncompress Data</h3>
+<p>Data are actual pixel values.
+</p>
+<div class="editsection" style="float:right;margin-left:5px;">[<a href="http://softimage.wiki.softimage.com/index.php?title=INFO:_PIC_file_format&action=edit&section=8" title="INFO: PIC file format">edit</a>]</div><a name="Mixed_Run_Length_Compressed_Data"></a><h3> Mixed Run Length Compressed Data</h3>
+<p>Two cases are considered: 
+</p><p><br>
+</p>
+<ul><li>Sequences of repeated values (such as "aaaaa").
+</li></ul>
+<ul><li>Sequences of non-repeated values (such as "abcde").
+</li></ul>
+<p><br>
+A sequence of repeated values is denoted by one or two counts (depending on sequence length) and a single value.
+</p><p>If length &lt; 128, a one byte count is used.
+</p>
+<pre>count = length + 127
+</pre>
+<p>For example:
+</p>
+<pre>aaaaa:	132,a
+</pre>
+						<p> </p>
+</div> <!-- global div close -->
+<!-- Served by sixla.px.cz in 0.06 secs. -->
+</html>

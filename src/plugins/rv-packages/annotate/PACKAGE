@@ -1,0 +1,27 @@
+package: Annotation
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.15
+rv: 3.12.15
+openrv: 1.0.0
+requires: ''
+system: true
+hidden: true
+
+modes: 
+  - file: annotate_mode.mu
+    menu: Tools/Annotation
+    shortcut: 'F10' 
+    event: 'key-down--f10'
+    load: delay
+
+description: |
+
+  <p> Annotation mode adds simple drawing with undo/redo per frame. The
+  drawings are stored in the session directly and can be rendered via rvio.
+
+  Annotation can be started via the Tools menu. A drawing palette will be
+  visible and can be optionally attached to the main RV window. The drawing
+  palette consists of three sections: the tool mode, the current color and
+  opacity, and history actions.
+  </p>

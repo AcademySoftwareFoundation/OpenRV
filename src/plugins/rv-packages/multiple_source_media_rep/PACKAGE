@@ -1,0 +1,26 @@
+package: RV Multiple Source Media Representation Management
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.1
+requires: ''
+rv: 2022.0.1
+openrv: 1.0.0
+system: true
+hidden: true
+
+modes: 
+  - file: multiple_source_media_rep.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+
+  <p>This package implements RV's multiple source media representation
+  management such as the default fall back mechanism when one source 
+  media represenation is unavailable. It can be used as is or overloaded
+  with a client's own custom multiple source media representation 
+  management.
+
+

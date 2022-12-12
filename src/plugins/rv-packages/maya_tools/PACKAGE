@@ -1,0 +1,175 @@
+package: Maya Support Tools
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.6
+rv: 3.12.15
+openrv: 1.0.0
+optional: true
+requires: ''
+
+modes: 
+  - file: maya_tools.mu
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+  <p>
+  The Maya integration package requires at least RV version 3.12.15, and
+  has only been tested with Maya 2012.
+  </p>
+  <h2> Linux and Windows Installation </h2>
+  
+  <p>
+  In Maya on Linux and Windows, fill in the Application and Flags to run RV.
+  In Maya open the Preferences, and go to the 'Applications' section (titled
+  "External Applications: Settings").  In the entry marked 'Application Path
+  for Viewing Sequences' enter the complete path to the 'RVPUSH' executable.
+  For example:
+  </p>
+  
+  <p> <i> On LINUX </i> </p>
+  
+  <pre>
+  /usr/local/bin/rv-3.12.15/bin/rvpush
+  </pre>
+  
+  <p> <i> On WINDOWS </i> </p>
+  
+  <pre>
+  C:\Program Files (x86)\Tweak\RV-3.12.15-32\bin\rvpush.exe
+  </pre>
+  
+  <p>
+  Then, in the entry marked 'Optional Flags', type this:
+  </p>
+  
+  <pre>
+  -tag playblast merge %f
+  </pre>
+  
+  <h2> OSX Installation </h2>
+  
+  <p>
+  On OSX, after turning on the Maya integration as described above and
+  restarting RV, you need to install a tiny MEL script to handle the Maya
+  side of the playblasting.  In RV, go to the Maya menu, and select .
+  </p>
+  
+  <p>
+  Then, in Maya open the Preferences, and go to the 'Applications' section
+  (titled "External Applications: Settings").  In the entry marked
+  'Application Path for Viewing Sequences' enter the Following:
+  </p>
+  
+  <pre>
+  playblastWithRV
+  </pre>
+  
+  <p>
+  Then, in the entry marked 'Optional Flags', type this:
+  </p>
+  
+  <pre>
+  %f %r
+  </pre>
+  
+  <p> <i> Done! </i> </p>
+  
+  <h2> Build a Session in RV </h2>
+  
+  <p>
+  The main point to remember about playblasting to RV is that if you leave RV open, each successive playblast will be merged into the RV Session, so you can easily compare the current render with others in the session.
+  </p>
+  
+  <p>
+  Open the Session Manager (from the 'Tools' menu, or by hitting the 'x' key) to see a list your playblasts and view them in different ways.  Each playblast will have a name provided by Maya, plus a timestamp that RV adds to help you track them.   If you want to rename a playblast to something more meaningful, just select it in the Session Manager, and select the 'Edit View Info' button from the right-click menu, or hit the button with the 'I' on it.
+  </p>
+  
+  <p>
+  At any point, you can save your Session to a Session File, so that you can easily pick up where you left off.  When you return, render one playblast to get RV going, them 'File->Merge' to bring in the Session File from the previous session.
+  </p>
+  
+  <h2> Organizing and Comparing your Renders </h2>
+  
+  <p>
+  By default, each new playblast that Maya adds to your session will become the current view.  Note that you can easily switch back and forth between this Render and the previous one with the 'shift-left/right-arrow' keys.
+  </p>
+  
+  <p>
+  The "default" views (see the Session Manager) also let you easily see all your playblasts in a Sequence, in a Layout, or arranged in a Stack (note that you can use the "()" keys to easily cycle the stack, or you can use drag-and-drop in the Inputs section of the Session Manger to easily rearrange a group view.
+  </p>
+  
+  <p>
+  If you'd like to "stick" to the view you've chosen, instead of switching to each new playblast as it arrives, toggle the 'View Latest Playblast' option off on the 'Maya' menu in RV.
+  </p>
+  
+  <h2> Creating New Views </h2>
+  
+  <p>
+  All the usual options in the Session Manager for creating and managing new views are available for managing your playblasts, but there are also a couple of hand shortcuts on the 'Maya' menu.
+  </p>
+  
+  <ul>
+  <li>Wipe Selected Playblasts
+  <p>
+  Select two or more playblasts in the Session Manager and hit this item to
+  arrange them in a Stack, with Wipes mode activated, so that you can grab
+  the edges of the images and slide them over the lower images. Remember
+  that the "()" keys will cycle the stack order, and you can also drag and
+  drop in the Inputs section of the Session Manager to reorder the stack.
+  </p>
+  </li>
+  
+  <li>
+  Tile Selected Playblasts
+  <p>
+  Select two or more playblasts in the Session Manager and hit this item to
+  arrange them in a Tiled Layout.
+  </p>
+  </li>
+  </ul>
+
+  <h2> Rendering into Context </h2>
+  
+  <p>
+  Don't forget that you can also bring in supplementary media to compare or use as reference for your animation.  So for example you might bring in takes of the shots on either side of the one you're animating, and assemble a 3-shot sequence with one of your playblasts in the middle.   But as you work, you'd like that middle shot to be replaced by newer playblasts.  We call that "rendering into context".
+  <p>
+  
+  <p>
+  In general, to prepare to render into context, after you setup your views, you'd
+  <p>
+  
+  <ul>
+  <li> Turn off the 'View Latest Playblast' option in the 'Maya' menu. </li>
+  <li> Select (in the Session Manager) the previously-rendered playblast you want to swap out for new ones </li>
+  <li> Pick the 'Mark Selected as Target' item on the 'Maya' menu. </li>
+  </ul>
+  
+  <p>
+  Henceforth, future playblasts will be swapped into the slot occupied by the one you just marked.  Possible "render into context" workflows include:
+  </p>
+  
+  <ul>
+  <li>
+  Your shot in the cut::
+  <p>
+  Load the shots before and after yours and make a Sequence view.  Note that you can trim shots by adjusting the in/out points on the timeline in the Source view.
+  </p>
+  </li>
+  
+  <li>
+  Wipe between the latest playblast and a previous take, or reference footage::
+  <p>
+  Add one or more sources (or use a previous playblast).  Make a Stack view.  Order the Stack to your liking by dragging and dropping in the Inputs section of the Session Manager.  Turn on Wipes (Tools menu).
+  </p>
+  </li>
+  
+  <li>
+  Tile newest plablast with one or more others, reference footage, etc::
+  <p>
+  Add one or more sources (or use a previous playblast).  Make a Layout view.  Select Tile/Column/Row (or even arrange by hand with the Manual mode) from the 'Layout' menu.  Arrange the Layout to your liking by dragging and dropping in the Inputs section of the Session Manager.
+  </p>
+  </li>
+  </ul>

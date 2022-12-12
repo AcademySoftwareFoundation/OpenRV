@@ -1,0 +1,115 @@
+QWidget, QListView, QLineEdit, QComboBox, QCheckBox, QSpinBox, QRadioButton { 
+background-color: rgb(0,0,0); 
+color: rgb(200,200,200);
+selection-background-color: rgb(70,70,70);
+selection-color: white;
+/*font: normal 10px;*/
+border-color: black;
+}
+ QPushButton {
+     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 #616161, stop: 0.5 #505050,
+                                       stop: 0.6 #434343, stop:1 #656565);
+
+     border-style: outset;
+     border-width: 1px;
+     border-radius: 4px;
+     border-color: rgb(80,80,80);
+     selection-background-color: rgb(70,70,70);
+     font: bold 10px;
+     padding: 2px;
+ }
+
+ QToolButton {
+     background-color: red;
+     border-style: outset;
+     border-width: 1px;
+     border-radius: 4px;
+     border-color: rgb(80,80,80);
+     selection-background-color: rgb(70,70,70);
+     font: bold 10px;
+     padding: 2px;
+ }
+
+ QPushButton:pressed {
+     background-color: rgb(224, 0, 0);
+     border-style: inset;
+ }
+
+
+QGroupBox {
+     border-color: rgb(80,80,80);
+}
+
+
+QLineEdit { 
+background-color: rgb(60,60,60); 
+color: rgb(200,200,200);
+selection-background-color: rgb(70,70,70);
+selection-color: white;
+/*font: normal 10px;*/
+border-color: black;
+}
+
+QLabel { 
+background-color: rgb(20,20,20); 
+color: rgb(200,200,200);
+selection-background-color: rgb(70,70,70);
+selection-color: white;
+font: bold 10px;
+ }
+
+ QHeaderView::section {
+     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 #616161, stop: 0.5 #505050,
+                                       stop: 0.6 #434343, stop:1 #656565);
+     color: white;
+     padding-left: 4px;
+     border: 1px solid #6c6c6c;
+ }
+
+  QScrollBar:vertical {
+      border: 1px solid grey;
+      background: rgb(0,0,0);
+      width: 15px;
+      margin: 22px 0 22px 0;
+  }
+  QScrollBar::handle:vertical {
+     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 rgb(80,80,80), 
+                                       stop: 0.48 rgb(80,80,80),
+                                       stop: 0.5 rgb(200,200,200),
+                                       stop: 0.52 rgb(40,40,40),
+                                       stop: 0.54 rgb(80,80,80),
+                                       stop:1 rgb(80,80,80));
+
+      min-height: 20px;
+  }
+  QScrollBar::add-line:vertical {
+      border: 1px solid grey;
+      background: rgb(80,80,80);
+      height: 20px;
+      subcontrol-position: bottom;
+      subcontrol-origin: margin;
+  }
+
+  QScrollBar::sub-line:vertical {
+      border: 1px solid grey;
+      background: rgb(80,80,80);
+      height: 20px;
+      subcontrol-position: top;
+      subcontrol-origin: margin;
+  }
+  QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+      border: 1px solid grey;
+      width: 3px;
+      height: 3px;
+      background: black;
+      image: url(&quot;:images/arrow.png&quot;);
+  }
+
+  QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+      background: none;
+  }
+
+

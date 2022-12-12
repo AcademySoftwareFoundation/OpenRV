@@ -1,0 +1,25 @@
+package: Window Title
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.6
+rv: 3.12.10
+openrv: 1.0.0
+requires: ''
+system: true
+hidden: true
+
+modes: 
+  - file: window_title
+    load: immediate
+
+description: |
+
+  <p> This package sets the window title to something that indicates the
+  currently viewed media. 
+  </p> 
+
+  <h2>How It Works</h2> 
+
+  <p> The events play-start, play-stop, and frame-changed, are bound to
+  functions which call setWindowTitle(). </p>
+

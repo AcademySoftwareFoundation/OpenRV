@@ -1,0 +1,50 @@
+package: Sequence From File
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.4
+requires: ''
+rv: 3.10.9
+openrv: 1.0.0
+optional: true
+
+modes: 
+  - file: file_sequence_mode.mu
+    menu: File/Options/One File → Sequence
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+
+  <p>
+  Emulates programs which allow the user to specify a single image to infer
+  an image sequence.
+  </p>
+
+  <p>
+  Changes RV so that selecting a single file of a sequence in a file dialog
+  or dropping a single file of a sequence onto the view will cause RV to
+  load the entire sequence (assuming it can infer the correct files). 
+  </p>
+
+  <p>
+  This mode can be toggled on/off via the menu item File/Options/One File → Sequence
+  </p>
+
+  <h3>How It Works</h3>
+
+  <p>
+  The mode binds a method (fixpath) to the "incoming-source-path"
+  event. This event is sent any time new media is being added to a
+  session. The function which binds to it can replace the incoming path
+  with a new path by setting the return value of the event to the new
+  path. 
+  </p>
+
+  <p> The event contents has both a path and a "tag" which indicates where
+  its being generated from. The tag currently has one of three values: ""
+  (nothing), "explicit", or "session". "explicit" indicates that the user
+  intended the file name to remain unchanged. In the case the mode does
+  nothing. "session" indicates that the name is coming from an RV session
+  file so the mode does nothing in that case as well.  
+  </p>

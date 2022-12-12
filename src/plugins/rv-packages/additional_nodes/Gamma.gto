@@ -1,0 +1,42 @@
+GTOa (4)
+
+Gamma : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "gamma"
+        string creator = "Tweak Software"
+        string documentation = "Gamma"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/Gamma.glsl"
+    }
+
+    parameters
+    {
+        float[3] gamma = [ [ 0.4545 0.4545 0.4545 ] ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

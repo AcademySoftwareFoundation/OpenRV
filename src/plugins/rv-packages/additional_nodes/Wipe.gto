@@ -1,0 +1,52 @@
+GTOa (4)
+
+Wipe : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "transition"
+        string defaultName = "wipe"
+        string creator = "Tweak Software"
+        string documentation = "Horizontal Wipe"
+        int userVisible = 1
+        string name = "Wipe"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "b030f3bca5806a8f1e801ee04b8c6a97706d136d"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 1
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "merge"
+        string glsl = "file://${HERE}/Wipe.glsl"
+        int fetches = 2
+    }
+
+    parameters
+    {
+        float startFrame = 40
+        float numFrames = 20
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}

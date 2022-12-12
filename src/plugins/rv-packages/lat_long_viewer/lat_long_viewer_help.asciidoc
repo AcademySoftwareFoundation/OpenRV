@@ -1,0 +1,43 @@
+= LatLong Viewer (v1.0) = 
+
+++++++++++++++++++++++++++
+<style type="text/css">
+    a:link {
+        color: blue;
+        color:#4444dd;
+    }
+    a:visited {
+        color: darkgray; 
+        color: #666666;
+    }
+    a:hover {
+        color: #ff5555;
+    }
+</style>
+++++++++++++++++++++++++++
+
+(C) 2021 https://www.autodesk.com[Autodesk]
+
+=== Introduction ===
+This experimental package provides a custom node that implements a "viewer" for lat-long or spherically-mapped media.  That is, the input to the node is considered to be suitable for mapping onto a sphere, where the x coordinate of the image is "latitude" and the y coordinate is "longitude".  The viewer then implements a perspective view of the sphere from a point in the center, with view direction and "focalLength" determined by properties on the node.
+
+*NOTE* LatLongViewer GLSL shader courtesy of The Mill!
+
+=== Menu Items ===
+Five menu items provide access to various functions of the package:
+
+==== 'Image/LatLong Viewer-Add To Source' ====
+Selecting this menu item will cause RV to examine the currently visible sources, and for each, if it does not already have a LatLongViewer node, add one.  Note that the node will be added "internally" (in the RVColorPipelineGroup within the Source), so the new node will not be visible in the Session Manager, and any view using this Source will see the output of the viewer node.
+
+==== 'Image/LatLong Viewer-Add As Top-Level Node' ====
+Selecting this menu item will cause RV to add a LatLongViewer node at the "top level" where it *will* be visible in the Session Manager, and connect the current view as the Viewer's input.
+
+==== 'Image/LatLong Viewer-Enabled' ====
+This item will appear checked if there is one or more LatLongViewer node in the current evaluation path, and all such nodes are active.  Selecting this item will activate or deactivate all the LatLongViewer nodes in the current evaluation path.  When the viewer node is inactive, it has no effect.
+
+==== 'Image/LatLong Viewer-Adjust Focal Length' ====
+Selecting this item lets you change the focal length parameter to the LatLongViewer shader.  After you select the menu item, just mouse down and drag in view to adjust, like other RV "virtual sliders".
+
+==== 'Image/LatLong Viewer-Adjust View With Shift-Drag' ====
+If this item is checked, holding the Shift key while click-dragging in the main view will change the "view direction" of the viewer.  Please note that the Pixel Inspector also uses shift-drag, so it cannot be used when this item is checked.  This item is stored as a preference.
+

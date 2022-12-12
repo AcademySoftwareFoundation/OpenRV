@@ -1,0 +1,23 @@
+package: EXR Data and Display Window Indicators
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+optional: true
+rv: 4.0.11
+openrv: 1.0.0
+
+modes: 
+  - file: data_display_indicator_mode.py
+    load: delay
+    menu: View/EXR Data and Display Indicators
+
+description: |
+
+  <h2> EXR Data and Display Window Indicators </h2>
+  <p>
+  Draw boxes to indicate the EXR Data/Display Windows (blue for display, red for data).
+  </p>
+  <p>
+  Activate the mode at the bottom of the View menu.
+  </p>
+

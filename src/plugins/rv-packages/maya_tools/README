@@ -1,0 +1,3 @@
+# To rebuild maya_tools_help.html
+
+asciidoc -a data-uri maya_tools_help.asciidoc

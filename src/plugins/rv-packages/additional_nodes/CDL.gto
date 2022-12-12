@@ -1,0 +1,48 @@
+GTOa (4)
+
+CDL : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "cdl"
+        string creator = "Tweak Software"
+        string documentation = "CDL"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/CDL.glsl"
+    }
+
+    parameters
+    {
+       float[3] slope  = [ [1.0 1.0 1.0] ]
+       float[3] offset = [ [0.0 0.0 0.0] ]
+       float[3] power  = [ [1.0 1.0 1.0] ]
+       float saturation = [ 1.0 ]
+       float[3] lumaCoefficients = [ [0.2126 0.7152 0.0722] ]
+       float minClamp = [ 0.0 ]
+       float maxClamp = [ 1.0 ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

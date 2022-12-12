@@ -1,0 +1,18 @@
+package: WebView2
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 0.3
+requires: ''
+rv: 6.2.4
+openrv: 1.0.0
+optional: true
+
+modes:
+ - file: webview2
+   menu: 'Tools/WebView 2'
+   event: ''
+   load: delayed 
+
+description: |
+   <p This package creates one or more docked Qt5 QWebEngineView (Chromium) instances via PySide2 
+   

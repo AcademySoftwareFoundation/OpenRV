@@ -1,0 +1,80 @@
+
+package: Stereo Autoload Right Eye
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.6
+rv: 3.12.18
+openrv: 1.0.0
+requires: ''
+optional: true
+
+modes: 
+  - file: stereo_autoload
+    load: immediate
+
+description: |
+
+  <body class="article">
+  <div id="header">
+  <h1>Autoload Stereo Package (v1.4)</h1>
+  </div>
+  <div id="content">
+  <div id="preamble">
+  <div class="sectionbody">
+  <style type="text/css">
+      a:link {
+          color: blue;
+          color:#4444dd;
+      }
+      a:visited {
+          color: darkgray;
+          color: #666666;
+      }
+      a:hover {
+          color: #ff5555;
+      }
+  </style>
+  </div>
+  </div>
+  <div class="sect2">
+    <h3 id="_introduction">Introduction</h3>
+    <div class="paragraph"><p>This experimental package enables the automatic finding and loading of the right eye component of stereo media.  The process can be triggered manually or automatically, and there is some control over the method used to identify the right eye media from the left eye media.</p></div>
+    </div>
+    <div class="sect2">
+    <h3 id="_menu_items">Menu Items</h3>
+    <div class="paragraph"><p>Four menu items provide access to various functions of the package:</p></div>
+    <div class="sect3">
+    <h4 id="_em_image_stereo_find_and_load_right_eye_em"><em>Image/Stereo/Find and Load Right Eye</em></h4>
+    <div class="paragraph"><p>Selecting this menu item will cause RV to examine the currently visible sources, and for each, if it does not already have right eye media, to search for it and load it if found.</p></div>
+    </div>
+    <div class="sect3">
+    <h4 id="_em_view_stereo_find_and_load_all_right_eyes_em"><em>View/Stereo/Find and Load All Right Eyes</em></h4>
+    <div class="paragraph"><p>This menu item will attempt to identify and load right eye media for all existing sources.</p></div>
+    </div>
+    <div class="sect3">
+    <h4 id="_em_file_options_auto_load_right_eye_for_stereo_in_stereo_view_modes_only_em"><em>File/Options/Auto-load Right Eye for Stereo (in stereo view modes only)</em></h4>
+    <div class="paragraph"><p>If you toggle this option (which will be remembered as a preference), RV will attempt to load corresponding right eye media for any loaded media (that does not already have a right eye view), but only when in a stereo view mode.  This does not affect media loaded from a session file.</p></div>
+    </div>
+    <div class="sect3">
+    <h4 id="_em_file_options_auto_load_right_eye_for_stereo_always_em"><em>File/Options/Auto-load Right Eye for Stereo (always)</em></h4>
+    <div class="paragraph"><p>If you toggle this option (which will be remembered as a preference), RV will attempt to load corresponding right eye media for any loaded media (that does not already have a right eye view), except when the media comes from a session file.</p></div>
+    </div>
+    </div>
+    <div class="sect2">
+    <h3 id="_how_is_the_right_eye_media_identified">How is the Right Eye media identified ?</h3>
+    <div class="paragraph"><p>Media file names (and paths) are considered to be "left eye" if they contain one of the left-eye identifiers separated from the rest of the filename by any mix of these characters: dot, comma, slash, underbar, dash, space.  The default set of left-eye identifiers is "left", "Left", "LEFT", "le", "LE", "l", and "L".  Once a particular filename has been identified as "left", the corresponding right-eye identifiers are swapped in to generate a right-eye media filename.</p></div>
+    <div class="paragraph"><p>The set of left/right identifiers can be configured with the environment variable <em>RV_STEREO_NAME_PAIRS</em>.  For example:</p></div>
+    <div class="listingblock">
+    <div class="content">
+    <pre><code>setenv RV_STEREO_NAME_PAIRS "left:right:gauche:droite:G:D"</code></pre>
+    </div></div>
+    </div>
+    </div>
+    <div id="footnotes"><hr /></div>
+    <div id="footer">
+    <div id="footer-text">
+    Last updated 2014-07-01 17:03:47 PDT
+    </div>
+    </div>
+    </body>
+    </html>

@@ -1,0 +1,254 @@
+package: OTIO Reader
+author: Contributors to the OpenTimelineIO project
+organization: OpenTimelineIO project
+contact: opentimelineio@pixar.com
+version: 1.1
+url: http://opentimeline.io
+rv: 4.0.8
+openrv: 1.0.0
+
+modes: 
+  - file: otio_reader_plugin.py
+    load: immediate
+  - file: otio_reader.py
+    location: Python
+  - file: otio_writer.py
+    location: Python
+  
+files:
+  - file: manifest.json
+    location: SupportFiles/$PACKAGE
+  - file: cdlSchema.py
+    location: SupportFiles/$PACKAGE
+  - file: cdlHook.py
+    location: SupportFiles/$PACKAGE
+  - file: cdlExportHook.py
+    location: SupportFiles/$PACKAGE
+  - file: clipHook.py
+    location: SupportFiles/$PACKAGE
+  - file: effectHook.py
+    location: SupportFiles/$PACKAGE
+  - file: timeWarpHook.py
+    location: SupportFiles/$PACKAGE
+  - file: customTransitionHook.py
+    location: SupportFiles/$PACKAGE
+  - file: retimeExportHook.py
+    location: SupportFiles/$PACKAGE
+  - file: sourcePostExportHook.py
+    location: SupportFiles/$PACKAGE
+  - file: multiRepPostExportHook.py
+    location: SupportFiles/$PACKAGE
+
+description: |
+    <p>
+    This package is based on the
+    <a href="http://opentimeline.io">OTIO</a>
+    project
+    </p>
+
+    <h3>
+    Overview
+    </h3>
+
+    <p>
+    The OTIO Reader is an RV package that will allow an otio file to be imported
+    into RV. The package is installed and loaded by default with support for all
+    OTIO schemas present as of OTIO version 0.14. So no action is required by
+    users to import these through any of the various RV import paths.
+    </p>
+
+    <p>
+    The rest of this section will detail how the import can be customized and
+    how to support custom OTIO schemas or metadata.
+    </p>
+
+    <h3>
+    Package contents
+    </h3>
+
+    <p>
+    The RV package is installed in the usual python package installation location,
+    which is the <code>PlugIns/Python</code> folder in the installation directory. There are
+    also a number of other files used by the package in the
+    <code>Plugins/SupportFiles/otio_reader</code> directory which are detailed below.
+    </p>
+
+    <ul>
+    <li>
+    <p>
+    manifest.json
+    This is used to provide examples schemas and hooks used in the import process.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    cdlHook.py
+    An example of importing a custom CDL effect in OTIO into an RVCDL node.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    cdlSchema.py
+    An example schema of a CDL effect.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    clipHook.py
+    An example of a hook called before importing a clip.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    customTransitionHook.py
+    An example of importing a custom transition in OTIO into RV.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    effectHook.py
+    A helper file for adding and setting RV properties from OTIO.
+    </p>
+    </li>
+    
+    <li>
+    <p>
+    timeWarpHook.py
+    A hook for importing OTIO&#39;s LinearTimeWarp and FreezeFrame schemas.
+    </p>
+    </li>
+    </ul>
+
+    <h3>
+    Using the OTIO hook system
+    </h3>
+
+    <p>
+    The RV package is using the existing OTIO hook system to execute its hooks, so
+    any existing manifest.json in the <code>OTIO_PLUGIN_MANIFEST_PATH</code> environment
+    variable can be modified to work with RV&#39;s hook system, including RV&#39;s own
+    manifest.json.
+    </p>
+
+    <p>
+    There are three types of OTIO hooks that will be called by the RV package:
+    </p>
+
+    <ul>
+    <li>
+    pre- and post-hooks
+    </li>
+    
+    <li>
+    custom schema hooks
+    </li>
+    
+    <li>
+    custom transition hook
+    </li>
+    </ul>
+
+    <p>
+    The pre- and post-hooks are called before each known OTIO schema. They are named
+    <code>pre_hook_[schema_name]</code> and <code>post_hook_[schema_name]</code> and will be called just
+    before and just after processing the schema. For example, a hook can be added
+    named <code>pre_hook_Clip</code> and it will be called just before the 
+    <code>otio_reader</code> has created an RV source based on the Clip. These hooks are 
+    useful for handling custom metadata in schemas. The provided <code>clipHook.py</code> 
+    is an example of this.
+    </p>
+
+    <p>
+    The custom schema hooks are called whenever a schema that is not handled
+    by the <code>otio_reader</code> is encountered. These hooks are named 
+    <code>[schema_name]_to_rv</code>. For example, <code>CDL_to_rv</code> will be called whenever a schema
+    named <code>CDL</code> is found. The provided <code>cdlHook.py</code> is an example of this. This is 
+    most commonly used for custom effects and other schemas that are not provided 
+    by OTIO. 
+    </p>
+
+    <p>
+    The custom transition hook is similar to the custom schema hooks, except instead
+    of being based on the schema name, it is called whenever the <code>transition_type</code> 
+    field of the Transition schema is set to <code>Custom</code>. The
+    <code>customTransitionHook.py</code> is an example of this.
+    </p>
+
+    <h4>
+    Hook file parameters
+    </h4>
+
+    <p>
+    The <code>in_timeline</code> paraemter in the OTIO hook functions will be set to the OTIO
+    schema being processed, not the full timeline.  For example, in <code>cdlHook.py</code>
+    the <code>in_timeline</code> is the CDL effect and in the <code>pre_hook_Clip</code> it is the Clip.
+    </p>
+
+    <p>
+    The <code>argument_map</code> will contain the context that can be helpful when creating 
+    RV nodes.  For example, the following keys can currently be present, depending
+    on which hook is being called:
+    </p>
+
+    <ul>
+    <li>
+    <p><code>transition</code>
+    RV transition output node
+    </p>
+    </li>
+
+    <li>
+    <p><code>stack</code>
+    RVStackGroup output node
+    </p>
+    </li>
+
+    <li>
+    <p><code>sequence</code>
+    RVSequenceGroup output node
+    </p>
+    </li>
+
+    <li>
+    <p><code>source</code>
+    RVSource output node
+    </p>
+    </li>
+
+    <li><p><code>source_group</code>
+    RVSourceGroup output node</p>
+    </li>
+
+    <li>
+    <p><code>track_kind</code>
+    OTIO <code>track_kind</code> property of the OTIO Track currently being processed
+    </p>
+    </li>
+
+    <li>
+    <p><code>global_start_time</code>
+    The <code>global_start_time</code> of the OTIO Timeline.
+    </p>
+    </li>
+    </ul>
+
+    <h4>
+    Hook file return values
+    </h4>
+
+    <p>
+    When RV nodes are being created, such as effects or transitions, the return
+    value should be set to the name of the created node.  The <code>otio_reader</code> will
+    add the node as input at the current location in RV&#39;s node graph. It will also
+    have its metadata added as a new property on the node named <code>otio.metadata</code>.
+    </p>
+     
+    <p>
+    For pre- and post- hooks, no return value is expected.
+    </p>
+

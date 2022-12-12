@@ -1,0 +1,193 @@
+GTOa (3)
+
+"GraphicsMagickPlugin.so" : imageio (1)
+{
+    avs
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    bmp
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    dcm
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    dcx
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    dib
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    fits
+    {
+        string description =  ""
+        int capabilities =  1548
+        string[2] codecs = [ ]
+    }
+
+    gif
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    gif87
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    mat
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    miff
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    pbm
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    pict
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    pix
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    ppm
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    psd
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    rla
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    rle
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    sgi
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    sun
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    tga
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    tim
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    viff
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    wbmp
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    wpg
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    xbm
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+
+    xcf
+    {
+        string description =  ""
+        int capabilities =  4
+        string[2] codecs = [ ]
+    }
+
+    xpm
+    {
+        string description =  ""
+        int capabilities =  524
+        string[2] codecs = [ ]
+    }
+}

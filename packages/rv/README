@@ -1,0 +1,30 @@
+
+ADDING AN IMAGE FILE FORMAT
+---------------------------
+
+RV's built-in JPEG reader/writer is provided as source code in the
+src/io_jpeg_sample directory. 
+You should be able to recompile the plugin yourself.
+
+Use it as a template for your own image formats.
+
+
+ADDING A MOVIE FILE FORMAT
+--------------------------
+
+Because movie file I/O tends to be more complex than image file I/O
+we provide a very simple contrived example in src/mio_moovee_sample.
+
+
+CUSTOMIZING RV'S USER INTERFACE SYSTEM WIDE
+-------------------------------------------
+
+Most of RV's user interface is implemented in the file 
+plugins/Mu/rvui.mu. You can hack this file to change the behavior
+and/or look of RV.
+
+
+PERSONAL CUSTOMIZATION OF RV'S UI
+---------------------------------
+
+Copy scripts/rv/rvrc.mu to ~/.rvrc.mu and hack away.

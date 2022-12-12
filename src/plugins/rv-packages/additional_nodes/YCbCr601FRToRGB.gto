@@ -1,0 +1,37 @@
+GTOa (4)
+
+YCbCr601FRToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycbcr601rftorgb"
+        string creator = "Tweak Software"
+        string documentation = "YCbCr601FRToRGB"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/YCbCr601FRToRGB.glsl"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

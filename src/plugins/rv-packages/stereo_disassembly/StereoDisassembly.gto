@@ -1,0 +1,30 @@
+GTOa (3)
+
+StereoDisassembly : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color" 
+	string defaultName = "stereoDisS"
+	string creator = "Tweak Software"
+        string documentation = "Stereo Disassembly" 
+	int userVisible = 1
+    }
+
+    render
+    {
+	int intermediate = 0   # usually derived
+    }
+
+    function
+    {
+	string name = "main"
+	string glsl = "file://${HERE}/StereoDisassembly.glsl"
+    }
+
+    parameters
+    {
+        int topBottom = 1
+        int swapEyes = 0
+    }
+}

@@ -1,0 +1,5 @@
+#!/bin/tcsh -f
+
+foreach file (*.png)
+    $BUILD_ROOT/bin/rvio_hw $file -o $file:r.tif
+end

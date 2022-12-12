@@ -1,0 +1,36 @@
+package: Export Cuts
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.5
+optional: true
+rv: 3.10.9
+openrv: 1.0.0
+requires: ''
+
+modes: 
+  - file: export_cuts
+    load: immediate
+
+description: |
+
+  <p> 
+  Export a movie/audio clip/file sequence for each region surrounded by
+  marks on the timeline.
+  </p>
+
+  <p>
+  To cut a single movie into lots of pieces: load it into RV, mark the
+  timeline at each cut, and then File->Export->Marked Regions as ...
+  </p> 
+
+  <ul>
+  <li> For movies: navigate to export dir and put something like export.mov
+  <li> For audio: same idea but use export.aiff or export.wav
+  <li> For image sequences: same thing but use e.g. export.#.jpg 
+  </ul>
+
+  <p>
+  There's no way to stop it other than quit RV currently.
+  </p>
+
+

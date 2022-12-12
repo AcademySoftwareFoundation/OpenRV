@@ -1,0 +1,47 @@
+= Autoload Stereo Package (v1.4) = 
+
+++++++++++++++++++++++++++
+<style type="text/css">
+    a:link {
+        color: blue;
+        color:#4444dd;
+    }
+    a:visited {
+        color: darkgray; 
+        color: #666666;
+    }
+    a:hover {
+        color: #ff5555;
+    }
+</style>
+++++++++++++++++++++++++++
+
+(C) 2021 https://www.autodesk.com[Autodesk]
+
+=== Introduction ===
+This experimental package enables the automatic finding and loading of the right eye component of stereo media.  The process can be triggered manually or automatically, and there is some control over the method used to identify the right eye media from the left eye media.
+
+=== Menu Items ===
+Four menu items provide access to various functions of the package:
+
+==== 'Image/Stereo/Find and Load Right Eye' ====
+Selecting this menu item will cause RV to examine the currently visible sources, and for each, if it does not already have right eye media, to search for it and load it if found.
+
+==== 'View/Stereo/Find and Load All Right Eyes' ====
+This menu item will attempt to identify and load right eye media for all existing sources.
+
+==== 'File/Options/Auto-load Right Eye for Stereo (in stereo view modes only)' ====
+If you toggle this option (which will be remembered as a preference), RV will attempt to load corresponding right eye media for any loaded media (that does not already have a right eye view), but only when in a stereo view mode.  This does not affect media loaded from a session file.
+
+==== 'File/Options/Auto-load Right Eye for Stereo (always)' ====
+If you toggle this option (which will be remembered as a preference), RV will attempt to load corresponding right eye media for any loaded media (that does not already have a right eye view), except when the media comes from a session file.
+
+=== How is the Right Eye media identified ? ===
+Media file names (and paths) are considered to be "left eye" if they contain one of the left-eye identifiers separated from the rest of the filename by any mix of these characters: dot, comma, slash, underbar, dash, space.  The default set of left-eye identifiers is "left", "Left", "LEFT", "le", "LE", "l", and "L".  Once a particular filename has been identified as "left", the corresponding right-eye identifiers are swapped in to generate a right-eye media filename.
+
+The set of left/right identifiers can be configured with the environment variable 'RV_STEREO_NAME_PAIRS'.  For example:
+
+-----------------------------------------------
+setenv RV_STEREO_NAME_PAIRS "left:right:gauche:droite:G:D"
+-----------------------------------------------
+

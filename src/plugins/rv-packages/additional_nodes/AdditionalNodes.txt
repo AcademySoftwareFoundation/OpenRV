@@ -1,0 +1,297 @@
+Chapter 17 Additional GLSL Node Reference
+
+This chapter describes the list of GLSL custom nodes that come bundled with RV.
+These nodes are grouped into five sections within this chapter based on the nodes "evaluationType" i.e. color, filter, transition, merge or combine.
+Each sub-section within a section describes a node and its parameters.
+For a complete description of the GLSL custom node itself, refer to the chapter on that topic i.e. "Chapter 3: Writing a Custom 
+GLSL Node".
+
+Where things are.
+The complete collection of GLSL custom nodes that come with each RV distribution are stored in the following two files located at
+<RV install dir>/plugins/Nodes/AdditionalNodes.gto
+<RV install dir>/plugins/Support/additional_nodes/AdditionalNodes.zip
+For OSX,
+<RV install dir>/Contents/PlugIns/Nodes/AdditionalNodes.gto
+<RV install dir>/Contents/PlugIns/Support/additional_nodes/AdditionalNodes.zip
+
+The file "AdditionalNodes.gto" is a GTO formatted text file that contains the definition of all the nodes described in this chapter. All of the node
+definitions found in this file are signed for use by all RV4 versions.
+The GLSL source code that implements the node's functionality is embedded within the node definition's function block as an inlined string.
+In addition, the default values of the node's parameters can be found within the node definition's parameter block.
+The accompaning support file "AdditionalNodes.zip" is a zipped up collection of individually named node ".gto" and ".glsl" files. Users can 
+unzip this package and refer to each node's .gto/.glsl file as examples of custom written RV GLSL nodes. Note the file "AdditionalNodes.zip"
+is not used by RV. Instead RV only uses "AdditionalNodes.gto" which was produced from all the files found in "AdditionalNodes.zip".
+
+These nodes can be applied through the session manager to sources, sequences, stacks, layouts or other nodes.
+First you select a source (for example) and from the session manager "+" pull menu select "New Node by Type" and
+type in the name of the node in the entry box field of the "New Node by Type" window.
+
+
+17.1 Color Nodes
+	This section describes all the GLSL nodes of evaluationType "color" found in "AdditionalNodes.gto".
+
+17.1.1  Matrix3x3
+	This node implements a 3x3 matrix multiplication on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+
+	Input parameters:
+	node.parameters.m33 float[9] [ 1 0 0 0 1 0 0 0 1 ]
+
+17.1.2  Matrix4x4
+	This node implements a 4x4 matrix multiplication on the RGBA channels of the inputImage.
+	The inputImage alpha channel is affected by this node.
+
+	Input parameters:
+	node.parameters.m44 float[16] [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ]
+ 
+
+17.1.3  Premult
+	This node implements the "premultiply by alpha" operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+	
+ 
+17.1.4  UnPremult
+	This node implements the "unpremultiply by alpha" (i.e. divide by alpha) operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.5  Gamma
+	This node implements the gamma (i.e. pixelColor^gamma) operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters:
+	node.parameters.gamma float[3] [ 0.4545 0.4545 0.4545 ]
+
+17.1.6 CDL
+	This node implements the Color Description List operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+
+	Input parameters:
+    node.parameters.slope  float[3] [ 1 1 1 ]
+    node.parameters.offset float[3] [ 0 0 0 ]
+    node.parameters.power  float[3] [ 1 1 1 ]
+
+17.1.7  SRGBToLinear
+	This linearizing node implements the sRGB to linear transfer function operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.8  LinearToSRGB
+	This node implements the linear to sRGB transfer function operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.9  Rec709ToLinear
+	This linearizing node implements the Rec709 to linear transfer function operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.10  LinearToRec709
+	This node implements the linear to Rec709 transfer function operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.11  CineonLogToLinear
+	This linearizing node implements the Cineon Log to linear transfer function operation on the RGB channels of the inputImage.
+	The implementation is based on  Kodak specification "The Cineon Digital Film System". 
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: (values must be specified within the range [0..1023])
+    node.parameters.refBlack float 95
+    node.parameters.refWhite float 685
+    node.parameters.softClip float 0
+
+17.1.12 LinearToCineonLog
+	This node implements the linear to Cineon Log film transfer function operation on the RGB channels of the inputImage.
+	The implementation is based on  Kodak specification "The Cineon Digital Film System". 
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: (values must be specified within the range [0..1023])
+    node.parameters.refBlack float 95
+    node.parameters.refWhite float 685
+
+
+17.1.13 ViperLogToLinear
+	This linearizing node implements the Viper Log to linear transfer function operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.14 LinearToViperLog
+	This node implements the linear to Viper Log transfer function operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.15 RGBToYCrCb601
+	This node implements the RGB to YCbCr 601 conversion operation on the RGB channels of the inputImage.
+	Implementation is based on ITU-R BT.601 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.16 RGBToYCrCb701
+	This node implements the RGB to YCbCr 709 conversion operation on the RGB channels of the inputImage.
+	Implementation is based on ITU-R BT.709 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.17 RGBToYCgCo
+	This node implements the RGB to YCgCo conversion operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.18 YCrCb601ToRGB
+	This node implements the YCbCr 601 to RGB conversion operation on the RGB channels of the inputImage.
+	Implementation is based on ITU-R BT.601 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.19 YCrCb709ToRGB
+	This node implements the YCbCr 709 to RGB conversion operation on the RGB channels of the inputImage.
+	Implementation is based on ITU-R BT.709 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+
+17.1.20 YCgCoToRGB
+	This node implements the YCgCo to RGB conversion operation on the RGB channels of the inputImage.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.21 YCrCb601FRToRGB
+	This node implements the YCbCr 601 "Full Range" to RGB conversion operation on the RGB channels of the inputImage.
+	Implementation is based on ITU-R BT.601 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.22 RGBToYCrCb601FR
+	This node implements the RGB to YCbCr 601 "Full Range" conversion operation on the RGB channels of the inputImage.
+	Implementation is based on ITU-R BT.601 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters: None
+
+17.1.23 AlexaLogCToLinear
+	This node implements the Alexa LogC to linear conversion operation on the RGB channels of the inputImage.
+	Implementation is based on Alexa LogC v3 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters:
+        node.parameters.LogCBlackSignal       float 0.0 
+        node.parameters.LogCEncodingOffset    float 0.385537
+        node.parameters.LogCEncodingGain      float 0.24718
+        node.parameters.LogCGraySignal        float 0.18
+        node.parameters.LogCBlackOffset       float 0.0522723
+        node.parameters.LogCLinearSlope       float 3.90865
+        node.parameters.LogCLinearOffset      float -1.38854
+        node.parameters.LogCCutPoint          float 0.149658
+
+17.1.23 LinearToAlexaLogC
+	This node implements the linear to Alexa LogC conversion operation on the RGB channels of the inputImage.
+	Implementation is based on Alexa LogC v3 specification.
+	The inputImage alpha channel is not affected by this node.
+	
+	Input parameters:
+        node.parameters.LogCBlackSignal       float 0.0 
+        node.parameters.LogCEncodingOffset    float 0.385537
+        node.parameters.LogCEncodingGain      float 0.24718
+        node.parameters.LogCGraySignal        float 0.18
+        node.parameters.LogCBlackOffset       float 0.0522723
+        node.parameters.LogCLinearSlope       float 3.90865
+        node.parameters.LogCLinearOffset      float -1.38854
+        node.parameters.LogCCutPoint          float 0.149658
+
+17.2 Transition Nodes
+	This section describes all the GLSL nodes of evaluationType "transition" found in "AdditionalNodes.gto".
+
+17.2.1 CrossDissolve
+	This node implements a simple cross dissolve transition effect on the RGBA channels of two inputImage sources beginning 
+	from startFrame until (startFrame + numFrames -1).
+	The inputImage alpha channel is affected by this node.
+
+	Input parameters:
+    node.parameters.startFrame float 40
+	node.parameters.numFrames  float 20
+
+17.2.2 Wipe
+	This node implements a simple wipe transition effect on the RGBA channels of two inputImage sources beginning 
+	from startFrame until (startFrame + numFrames -1).
+	The inputImage alpha channel is affected by this node.
+
+	Input parameters:
+    node.parameters.startFrame float 40
+	node.parameters.numFrames  float 20
+
+
+Chapter 16 Node Reference
+
+RVLensWarpNode
+
+The lens warp node can be used to perform radial and/or tangential distortion
+on a frame. It implements the Brown's distortion model (similar to that
+adopted by OpenCV); references are
+http://en.wikipedia.org/wiki/Distortion_%28optics%29
+http://opencv.willowgarage.com/documentation/camera_calibration_and_3d_reconstruction.html
+
+This node can be used to perform operations like lens undistortion or artistic
+lens warp effects.
+
+Property        Type    Size    Description
+warp.k1         float   1       Radial coefficient for r^2 (default 0.0)
+warp.k2         float   1       Radial coefficient for r^4 (default 0.0)
+warp.k3         float   1       Radial coefficient for r^6 (default 0.0)
+warp.p1         float   1       First tangential coefficient (default 0.0)
+warp.p2         float   1       Second tangential coefficient (default 0.0)
+warp.offset     float[2] 1      Position of distortion centre in normalized
+                                values [-1...1] (default [0.0 0.0])
+warp.cropRatioX float   1       Crop ratio of fovX (default 1.0)
+warp.cropRatioY float   1       Crop ratio of fovY (default 1.0)
+
+Example use case: Using OpenCV to determine lens undistort parameters for
+RVLensWarpNode based on GoPro footage.
+
+First capture some footage of a checkboard with your GoPro.
+Then you can use OpenCV on this footage to solve for k1,k2,k3,p1 and p2.
+In OpenCV these numbers are reported back as follows; example
+1920x1440 gopro solve returned
+fx=829.122253 0.000000 cx=969.551819
+0.000000 fy=829.122253 cy=687.480774
+0.000000 0.000000 1.000000
+k1=-0.198361 k2=0.028252 p1=0.000092 p2=-0.000073
+
+These OpenCV camera calibration solve output numbers are then
+translated/normalized to the RVLensWarpNode properties as follows:
+warp.k1 = -k1
+warp.k2 = -k2
+warp.p1 = -p2
+warp.p2 = -p1
+warp.offset = [(2*cx/1920 - 1.0) (2*cy/1440 - 1.0)]
+warp.cropRatioX = 2*fx/1920
+warp.cropRatioY = 2*fy/1920
+
+e.g. mu code (ignoring p1 and p2 since they are small) 
+         set("#RVLensWarp.warp.k1", 0.198361);
+         set("#RVLensWarp.warp.k2", -0.028252);
+         setFloatProperty("#RVLensWarp.warp.offset", float[]{0.01, -0.0452}, true);
+         set("#RVLensWarp.warp.cropRatioX", 0.8637);
+         set("#RVLensWarp.warp.cropRatioY", 0.8637);
+
+
+
+
+
+

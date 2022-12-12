@@ -1,0 +1,9 @@
+[submodule "src/lib/files/WFObj"]
+	path = src/lib/files/WFObj
+	url = https://github.com/shotgunsoftware/openrv-WFObj.git
+[submodule "src/pub"]
+	path = src/pub
+	url = https://github.com/shotgunsoftware/openrv-pub.git
+[submodule "src/lib/oiio"]
+	path = src/lib/oiio
+	url = https://github.com/shotgunsoftware/openrv-oiio.git

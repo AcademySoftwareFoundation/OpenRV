@@ -1,0 +1,21 @@
+//******************************************************************************
+// Copyright (c) 2008 Tweak Inc. 
+// All rights reserved.
+// 
+// SPDX-License-Identifier: Apache-2.0
+// 
+//******************************************************************************
+#ifndef __LUT__AppleColorLUT__h__
+#define __LUT__AppleColorLUT__h__
+#include <LUT/ReadLUT.h>
+
+namespace LUT {
+
+void readAppleColorLUT(const std::string& filename,
+                       const std::string& type,
+                       LUTData& data);
+
+
+} // LUT
+
+#endif // __LUT__AppleColorLUT__h__

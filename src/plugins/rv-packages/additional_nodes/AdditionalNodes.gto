@@ -1,0 +1,1524 @@
+GTOa (4)
+
+ACESLinearToACESccLog : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "aceslineartoacessslog"
+        string creator = "Tweak Software"
+        string documentation = "ACESLinearToACESccLog"
+        int userVisible = 1
+        string name = "ACESLinearToACESccLog"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "ebc4154f71d85473996004ad08fc6094488bc246"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n// This node implement ACEScc color encoding function.\n//\n// See Section 4.4 \"ACEScc\" of spec S-2014-03.\n//\n// It converts ACES linear color values to ACEScc Log\n// values.\n// First a color space gamut conversion is performed\n// that takes the input ACES primaries linear values to ACEScc\n// primaries linear space.\n// Then an ACEScc log encoding is performed.\n//\n\nvec4 main(const in inputImage in0)\n{\n    // ACES to ACEScc gamut conversion matrix.\n    // refer to ACEScc spec S-2014-003.\n    //\n    const mat3 m33 = mat3(\n\t1.4514393161, -0.0765537734,  0.0083161484,\n       -0.2365107469,  1.1762296998, -0.0060324498,\n       -0.2149285693, -0.0996759264,  0.9977163014);\n\n    vec4 P = in0();\n    vec3 acescc = m33 * P.rgb;\n\n    bvec3 t0 = lessThan(acescc, vec3(0.0));\n    bvec3 t1 = lessThan(acescc, vec3(pow( 2.0, -15.0)));\n\n    vec3 two_neg16 = vec3(pow( 2.0, -16.0));\n\n    vec3 acescc1 = mix(acescc, two_neg16 + acescc * vec3(0.5), vec3(t1));\n\n    vec3 acescc2 = mix(acescc1, two_neg16, vec3(t0));\n    \n    vec3 acesccLog = (log2(acescc2) + vec3(9.72)) / vec3(17.52);\n\n    //return vec4(acescc, P.a);  // Output without log encoding; for debugging.\n    return vec4(acesccLog, P.a);\n}\n\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+AlexaLogCToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "alexalogctolinear"
+        string creator = "Tweak Software"
+        string documentation = "AlexaLogCToLinear"
+        int userVisible = 1
+        string name = "AlexaLogCToLinear"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "c31b68ee22e12d1784710e8cec7f64ee4c53b951"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Alexa LogC v3 to Linear\n//\nvec4 main (const in inputImage in0,\n           const in float LogCBlackSignal,\n           const in float LogCEncodingOffset,\n           const in float LogCEncodingGain,\n           const in float LogCGraySignal,\n           const in float LogCBlackOffset,\n           const in float LogCLinearSlope,\n           const in float LogCLinearOffset,\n           const in float LogCCutPoint)\n{\n    float logC_A = 1.0 / LogCEncodingGain;\n    float logC_B = - LogCEncodingOffset / LogCEncodingGain;\n    float logC_C = LogCGraySignal;\n    float logC_D = LogCBlackSignal - LogCBlackOffset * LogCGraySignal;\n    float logC_X = LogCGraySignal / (LogCEncodingGain * LogCLinearSlope);\n    float logC_Y = - (LogCEncodingOffset + \n        LogCEncodingGain * (LogCLinearSlope * (LogCBlackOffset - LogCBlackSignal / LogCGraySignal)\n        + LogCLinearOffset)) * logC_X;\n\n    vec4 P = in0();\n    vec3 c    = P.rgb;\n    vec3 lin  = c * vec3(logC_X) + vec3(logC_Y);\n    vec3 nlin = pow(vec3(10.0), c * vec3(logC_A) + vec3(logC_B)) * vec3(logC_C) + vec3(logC_D);\n    bvec3 t = lessThanEqual(c, vec3(LogCCutPoint));\n    return vec4(mix(nlin, lin, vec3(t)), P.a);\n}\n"
+    }
+
+    parameters
+    {
+        float LogCBlackSignal = 0
+        float LogCEncodingOffset = 0.385537
+        float LogCEncodingGain = 0.24719
+        float LogCGraySignal = 0.18
+        float LogCBlackOffset = 0.052272
+        float LogCLinearSlope = 3.90864
+        float LogCLinearOffset = -1.38854
+        float LogCCutPoint = 0.149658
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+CDL : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "cdl"
+        string creator = "Tweak Software"
+        string documentation = "CDL"
+        int userVisible = 1
+        string name = "CDL"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "db386b6c1cfc1109212a72ec4aaa8c54330c6c9e"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Academy Color Decision List 1.2\n//\n\nvec4 main (const in inputImage in0, \n           const in vec3 slope,\n           const in vec3 offset,\n           const in vec3 power,\n           const in float saturation,\n           const in vec3 lumaCoefficients,\n           const in float minClamp,\n           const in float maxClamp)\n{\n    vec4 P = in0();\n    vec3 cdl = pow(clamp(P.rgb * slope + offset, minClamp, maxClamp), power);\n    vec3 c =   cdl * vec3(saturation) +\n               vec3(cdl.r * lumaCoefficients.r +\n\t            cdl.g * lumaCoefficients.g +\n\t            cdl.b * lumaCoefficients.b) * vec3(1.0 - saturation) ;\n\n    return vec4(clamp(c, minClamp, maxClamp), P.a);\n}\n\n\n"
+    }
+
+    parameters
+    {
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        float[3] lumaCoefficients = [ [ 0.2126 0.7152 0.0722 ] ]
+        float minClamp = 0
+        float maxClamp = 1
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+CDLForACESLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "cdlforaceslinear"
+        string creator = "Tweak Software"
+        string documentation = "CDLForACESLinear"
+        int userVisible = 1
+        string name = "CDLForACESLinear"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "ad343e09d6b432ed95e0cd3d226195599d9a18dd"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Academy Color Decision List 1.2\n//\n//  For CDL in ACES linear space\n//\n\nvec4 main (const in inputImage in0, \n           const in vec3 slope,\n           const in vec3 offset,\n           const in vec3 power,\n           const in float saturation,\n           const in vec3 lumaCoefficients,\n           const in vec3 refLow,\n           const in vec3 refHigh,\n           const in mat4 toACES,\n           const in mat4 fromACES,\n           const in float minClamp,\n           const in float maxClamp)\n{\n    vec4 P = in0();\n    vec4 aces = toACES * vec4(P.rgb, 1.0);\n\n    vec3 cdl = (aces.rgb - refLow) / (refHigh - refLow);\n\n    cdl = pow(clamp(cdl * slope + offset, minClamp, maxClamp), power);\n\n    cdl = cdl * vec3(saturation) +\n                 vec3(cdl.r * lumaCoefficients.r +\n                      cdl.g * lumaCoefficients.g +\n                      cdl.b * lumaCoefficients.b) * vec3(1.0 - saturation) ;\n\n    cdl = refLow + cdl * (refHigh - refLow);\n\n    aces = fromACES * vec4(cdl, 1.0);\n\n    return vec4(aces.rgb, P.a);\n}\n\n\n"
+    }
+
+    parameters
+    {
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        float[3] lumaCoefficients = [ [ 0.2126 0.7152 0.0722 ] ]
+        float[3] refLow = [ [ 0.00118541718 0.00118541718 0.00118541718 ] ]
+        float[3] refHigh = [ [ 222.875 222.875 222.875 ] ]
+        float[16] toACES = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] fromACES = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float minClamp = 0
+        float maxClamp = 1
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+CDLForACESLog : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "cdlforaceslog"
+        string creator = "Tweak Software"
+        string documentation = "CDLForACESLog"
+        int userVisible = 1
+        string name = "CDLForACESLog"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "9bfdb71bc4189296b17076cd29e137dfd86d7c00"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Academy Color Decision List 1.2\n//\n//\n//  For CDL in ACES Log space\n//\n\nvec3 LinearToACESLog (const in vec3 aces)\n{\n    const vec3 aceslog_unity = vec3(32768.0);\n    const vec3 aceslog_xperstop = vec3(2048.0);\n    vec3 aces_denorm_trans = vec3(pow( 2.0, -15.0));\n    vec3 aces_denorm_fake0 = vec3(pow( 2.0, -16.0));\n\n    bvec3 t0 = lessThan(aces, vec3(0.0));\n    bvec3 t1 = lessThan(aces, aces_denorm_trans);\n  \n    /* compress denorms into 1 stop below last norm stop */\n    vec3 c1 = aces_denorm_fake0 + ( aces / 2.0);\n    c1 = mix(aces, c1, vec3(t1));\n\n    vec3 acesLog = log2(c1) * aceslog_xperstop + aceslog_unity;\n  \n    return mix(acesLog, vec3(0.0), vec3(t0));\n}\n\n\nvec3 ACESLogToLinear (const in vec3 aceslog)\n{\n    const vec3 aceslog_unity = vec3(32768.0);\n    const vec3 aceslog_xperstop = vec3(2048.0);\n    vec3 aces_denorm_trans = vec3(pow( 2.0, -15.0));\n    vec3 aces_denorm_fake0 = vec3(pow( 2.0, -16.0));\n\n    vec3 aces = pow( vec3(2.0), (aceslog - aceslog_unity) / aceslog_xperstop);\n  \n    // if (aces < aces_denorm_trans) \n    bvec3 t = lessThan(aces, aces_denorm_trans);\n\n    vec3 c1 = (aces - aces_denorm_fake0) * 2.0;\n    return mix(aces, c1, vec3(t));\n}\n\nvec4 main (const in inputImage in0, \n           const in vec3 slope,\n           const in vec3 offset,\n           const in vec3 power,\n           const in float saturation,\n           const in vec3 lumaCoefficients,\n           const in vec3 refLow,\n           const in vec3 refHigh,\n           const in mat4 toACES,\n           const in mat4 fromACES,\n           const in float minClamp,\n           const in float maxClamp)\n{\n    vec4 P = in0();\n    vec4 aces = toACES * vec4(P.rgb, 1.0);\n    vec3 aceslog = LinearToACESLog(max(aces.rgb, vec3(0.0)));\n\n    vec3 cdl = (aceslog - refLow) / (refHigh - refLow);\n\n    cdl = pow(clamp(cdl * slope + offset, minClamp, maxClamp), power);\n\n    aceslog = refLow + cdl * (refHigh - refLow);\n\n    cdl = ACESLogToLinear(aceslog);\n\n    cdl = cdl * vec3(saturation) +\n                    vec3(cdl.r * lumaCoefficients.r +\n\t                 cdl.g * lumaCoefficients.g +\n\t                 cdl.b * lumaCoefficients.b) * vec3(1.0 - saturation) ;\n\n\n    aces = fromACES * vec4(cdl, 1.0);\n\n    return vec4(aces.rgb, P.a);\n}\n\n\n"
+    }
+
+    parameters
+    {
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        float[3] lumaCoefficients = [ [ 0.2126 0.7152 0.0722 ] ]
+        float[3] refLow = [ [ 12860.6426 12860.6426 12860.6426 ] ]
+        float[3] refHigh = [ [ 48742.5859 48742.5859 48742.5859 ] ]
+        float[16] toACES = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] fromACES = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float minClamp = 0
+        float maxClamp = 1
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+CineonLogToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "cineonlogtolinear"
+        string creator = "Tweak Software"
+        string documentation = "CineonLogToLinear"
+        int userVisible = 1
+        string name = "CineonLogToLinear"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "43bc177c67e9d1e8ad6b7bdd7652ce6e51faf327"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "\n//\n//  Cineon Log to Linear\n//\n//  NB: refBlack, refWhite and softClip are specified in the range [0..1023];\n// \n\n// 0.003333333333 = 0.002/0.6\n \nvec4 main (const in inputImage in0,\n           const in float refBlack,\n           const in float refWhite,\n           const in float softClip)\n{\n    vec4 P = in0();\n    vec3 nP = min(P.rgb,1.0) * vec3(1023.0);\n    float black = pow(10.0, refBlack * 0.003333333333);\n    float whiteBlackDiff = pow(10.0, refWhite * 0.003333333333) - black;\n    // Compute normalized Cineon 10bit to linear between refBlack and breakpoint\n    vec3 c = max((pow(vec3(10.0), nP * vec3(0.003333333333)) - vec3(black)), vec3(0.0)) / vec3(whiteBlackDiff);\n\n    if (softClip != 0.0)\n    {\n        float breakpoint = refWhite - softClip;\n        float kneeOffset = (pow(10.0, breakpoint * 0.003333333333) - black) / whiteBlackDiff;\n        float kneeGain = (1.0 - kneeOffset)/pow(5.0*softClip,softClip*0.01);\n\n        // Compute normalized Cineon 10bit to linear between breakpoint and 1.0; softclip zone.\n        vec3 cSoftClipped = pow(abs(nP - vec3(breakpoint)), vec3(softClip*0.01)) * vec3(kneeGain) + vec3(kneeOffset); \n\n        // \n        // Test for values above breakpoint.\n        //\n        bvec3 useSoftClip = greaterThanEqual(nP, vec3(breakpoint));\n\n        return vec4(mix(c, cSoftClipped, vec3(useSoftClip)), P.a);\n    }\n    else\n    {\n        return vec4(c, P.a );\n    }\n}\n\n\n"
+    }
+
+    parameters
+    {
+        float refBlack = 95
+        float refWhite = 685
+        float softClip = 0
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+CrossDissolve : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "transition"
+        string defaultName = "crossDissolve"
+        string creator = "Tweak Software"
+        string documentation = "Cross Dissolve"
+        int userVisible = 1
+        string name = "CrossDissolve"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "2d1193c7e994834179111638cfd87276b3493cd6"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 1
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "merge"
+        string glsl = "//\n//  Cross Dissolve between (pixels)\n//\n\nvec4 main (const in inputImage in0, \n           const in inputImage in1,\n           const in float startFrame,\n           const in float numFrames,\n           const in float frame)\n{\n    //\n    //  Make sure that first visible effect is on startFrame, and last visible\n    //  effect is on startFrame + numFrames - 1, so that effect is on screen\n    //  for numFrames.\n    //\n    \n    float t = (frame - startFrame + 1.0) / (numFrames + 1.0);\n    return mix(in0(), in1(), vec4(clamp(t, 0.0, 1.0)));\n}\n\n"
+        int fetches = 2
+    }
+
+    parameters
+    {
+        float startFrame = 40
+        float numFrames = 20
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Gamma : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "gamma"
+        string creator = "Tweak Software"
+        string documentation = "Gamma"
+        int userVisible = 1
+        string name = "Gamma"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "f0b09822f880fd92b586dcc9a87f014e8fb531fc"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Std Gamma Curve.\n//\n\nvec4 main (const in inputImage in0, const in vec3 gamma)\n{\n    vec4 P = in0();\n    return vec4(pow(max(P.rgb, vec3(0.0)), gamma), P.a);\n}\n"
+    }
+
+    parameters
+    {
+        float[3] gamma = [ [ 0.4545 0.4545 0.4545 ] ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+LinearToAlexaLogC : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "lineartoalexalogc"
+        string creator = "Tweak Software"
+        string documentation = "LinearToAlexaLogC"
+        int userVisible = 1
+        string name = "LinearToAlexaLogC"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "ea32f25da203bc52096067c4eb862c096ea6c861"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Linear to Alexa LogC v3\n//\n\nvec4 main (const in inputImage in0,\n           const in float LogCBlackSignal,\n const in float LogCEncodingOffset,\n           const in float LogCEncodingGain,\n           const in float LogCGraySignal,\n const in float LogCBlackOffset,\n           const in float LogCLinearSlope,\n           const in float LogCLinearOffset,\n const in float LogCCutPoint)\n{\n    vec4 P = in0();\n    vec3 xr = (P.rgb - vec3(LogCBlackSignal)) / vec3(LogCGraySignal) + vec3(LogCBlackOffset);\n    vec3 nlin = (log(max(xr, vec3(LogCCutPoint))) / log(10.0)) * vec3(LogCEncodingGain) + vec3(LogCEncodingOffset);\n    vec3 lin = (xr * vec3(LogCLinearSlope) + vec3(LogCLinearOffset)) * vec3(LogCEncodingGain) + vec3(LogCEncodingOffset);\n    bvec3 t = lessThanEqual(xr, vec3(LogCCutPoint));\n    return vec4(mix(nlin, lin, vec3(t)), P.a);\n}\n"
+    }
+
+    parameters
+    {
+        float LogCBlackSignal = 0
+        float LogCEncodingOffset = 0.385537
+        float LogCEncodingGain = 0.24719
+        float LogCGraySignal = 0.18
+        float LogCBlackOffset = 0.052272
+        float LogCLinearSlope = 3.90864
+        float LogCLinearOffset = -1.38854
+        float LogCCutPoint = 0.111111
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+LinearToCineonLog : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "lineartocineonlog"
+        string creator = "Tweak Software"
+        string documentation = "LinearToCineonLog"
+        int userVisible = 1
+        string name = "LinearToCineonLog"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "45395f0bc01c174770802e9966d4e84c22ce08d4"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "\n//\n//  Linear to Cineon Log\n//\n//  NB: refBlack, refWhite are specified in the range [0..1023];\n// \n\n// 0.003333333333 = 0.002/0.6\n// 7.85181516711 = 1023.0 * log(10.0) * 0.002/0.6\n \nvec4 main (const in inputImage in0,\n           const in float refBlack,\n           const in float refWhite)\n{\n    vec4 P = in0();\n    float gain = 1.0 - pow(10.0, (refBlack-refWhite) * 0.003333333333);\n    return vec4(vec3(refWhite/1023.0) + log((P.rgb - 1.0) * vec3(gain) + vec3(1.0)) / vec3(7.85181516711),\n                 P.a);}\n\n\n"
+    }
+
+    parameters
+    {
+        float refBlack = 95
+        float refWhite = 685
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+LinearToRec709 : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "linearTorec709"
+        string creator = "Tweak Software"
+        string documentation = "LinearToRec709"
+        int userVisible = 1
+        string name = "LinearToRec709"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "304c433380dbc1f18024a7b0c82a7b2d0c3387fc"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from linear to Rec709 \n//\n//  NOTE: this code is manually vectorized.\n//\n\nvec4 main (const in inputImage in0)\n{\n    vec4 P = in0();\n    const vec3 q = vec3(0.018);\n    const vec3 a0 = vec3(0.099);\n    const vec3 a1 = vec3(1.099);\n    const vec3 b = vec3(4.5);\n    const vec3 g = vec3(0.45);\n\n    vec3  c = max(P.rgb, vec3(0.0));\n    bvec3 t = lessThanEqual(c, q);\n    vec3 c0 = c * b;\n    vec3 c1 = a1 * pow(c, g) - a0;\n    return vec4(mix(c1, c0, vec3(t)), P.a);\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+LinearToSRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "lineartosrgb"
+        string creator = "Tweak Software"
+        string documentation = "LinearToSRGB"
+        int userVisible = 1
+        string name = "LinearToSRGB"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "59988bf2c0c4e698c016b08699915f100d33f30a"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from linear to sRGB \n//\n\nvec4 main (const in inputImage in0)\n{\n    vec4 P = in0();\n    const vec3 q = vec3(0.0031308);\n    const vec3 a0 = vec3(0.055);\n    const vec3 a1 = vec3(1.055);\n    const vec3 b = vec3(12.92);\n    const vec3 g = vec3(1.0 / 2.4);\n\n    vec3  c = max(P.rgb, vec3(0.0));\n    bvec3 t = lessThanEqual(c, q);\n    vec3 c0 = c * b;\n    vec3 c1 = a1 * pow(c, g) - a0;\n    return vec4(mix(c1, c0, vec3(t)), P.a);\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+LinearToViperLog : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "lineartoviperlog"
+        string creator = "Tweak Software"
+        string documentation = "LinearToViperLog"
+        int userVisible = 1
+        string name = "LinearToViperLog"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "16ca82218817dca49109f3ca536f258fb6737bb7"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Linear to Viper Log\n//\n\nvec4 main (const in inputImage in0)\n{\n    vec4 P = in0();\n    return vec4(log(P.rgb * vec3(1.0/0.0359824060427)) * vec3(1.0/(log(10.0)*2.048)), P.a);\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Matrix3x3 : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "matrix3x3"
+        string creator = "Tweak Software"
+        string documentation = "Matrix3x3"
+        int userVisible = 1
+        string name = "Matrix3x3"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "392c66bbb778ff3a11a9f8250406d6f34a22a45e"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n// This is 3x3 matrix operation.\n//\n\nvec4 main(const in inputImage in0, const in mat3 m33)\n{\n    vec4 P = in0();\n    return vec4(m33 * P.rgb, P.a);\n}\n\n"
+    }
+
+    parameters
+    {
+        float[9] m33 = [ [ 1 0 0 0 1 0 0 0 1 ] ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Matrix4x4 : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "matrix4x4"
+        string creator = "Tweak Software"
+        string documentation = "Matrix4x4"
+        int userVisible = 1
+        string name = "Matrix4x4"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "6f69171e3ad63241a59751af05ad6319c7a1f8e4"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n// This is 4x4 matrix operation.\n//\n\nvec4 main(const in inputImage in0, const in mat4 m44)\n{\n    return m44 * in0();\n}\n\n"
+    }
+
+    parameters
+    {
+        float[16] m44 = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Premult : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "premult"
+        string creator = "Tweak Software"
+        string documentation = "Premult"
+        int userVisible = 1
+        string name = "Premult"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "29c167ebd098c80c09824acdfa753c56b766a5ce"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n// This is premult operation.\n//\n\nvec4 main(const in inputImage in0)\n{ \n    vec4 P = in0();\n    return vec4 (P.rgb * P.aaa, P.a);\n}\n\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+RGBToYCbCr601 : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "rgbtoycbcr601"
+        string creator = "Tweak Software"
+        string documentation = "RGBToYCbCr601"
+        int userVisible = 1
+        string name = "RGBToYCbCr601"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "26980e711c1f45c1a308fc445be61e80b74f092f"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from RGB to YCbCr 601\n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       2.567883e-01,  -1.482229e-01,   4.392157e-01,   0.000000e+00,\n       5.041294e-01,  -2.909928e-01,  -3.677883e-01,   0.000000e+00,\n       9.790588e-02,   4.392157e-01,  -7.142738e-02,   0.000000e+00,\n       6.274512e-02,   5.019608e-01,   5.019608e-01,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+RGBToYCbCr601FR : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "rgbtoycbcr601fr"
+        string creator = "Tweak Software"
+        string documentation = "RGBToYCbCr601FR"
+        int userVisible = 1
+        string name = "RGBToYCbCr601FR"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "8148976fd28af53c3996d2482591c2cf660c7ce5"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from RGB to YCbCr 601 Full Range\n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       2.990000e-01,  -1.687359e-01,   5.000001e-01,   0.000000e+00,\n       5.870001e-01,  -3.312642e-01,  -4.186876e-01,   0.000000e+00,\n       1.140000e-01,   5.000000e-01,  -8.131242e-02,   0.000000e+00,\n       0.000000e+00,   5.019608e-01,   5.019608e-01,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+RGBToYCbCr709 : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "rgbtoycbcr709"
+        string creator = "Tweak Software"
+        string documentation = "RGBToYCbCr709"
+        int userVisible = 1
+        string name = "RGBToYCbCr709"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "a2fdd54e549edc1df19fb202dc70260298246d43"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from RGB to YCbCr 709\n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       1.825858e-01,  -1.006437e-01,   4.392157e-01,   0.000000e+00,\n       6.142306e-01,  -3.385720e-01,  -3.989422e-01,   0.000000e+00,\n       6.200706e-02,   4.392157e-01,  -4.027352e-02,   0.000000e+00,\n       6.274501e-02,   5.019609e-01,   5.019609e-01,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+RGBToYCbCr709FR : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "rgbtoycbcr709fr"
+        string creator = "Tweak Software"
+        string documentation = "RGBToYCbCr709FR"
+        int userVisible = 1
+        string name = "RGBToYCbCr709FR"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "6c766a604092c8f67ed0dc4409d34c1ea50f4d51"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from RGB to YCbCr 709 Full Range\n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       2.126001e-01,  -1.145722e-01,   5.000000e-01,   0.000000e+00,\n       7.152000e-01,  -3.854279e-01,  -4.541529e-01,   0.000000e+00,\n       7.220000e-02,   5.000000e-01,  -4.584708e-02,   0.000000e+00,\n       0.000000e+00,   5.019608e-01,   5.019608e-01,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+RGBToYCgCo : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "rgbtoycgco"
+        string creator = "Tweak Software"
+        string documentation = "RGBToYCgCo"
+        int userVisible = 1
+        string name = "RGBToYCgCo"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "b62e08a1c80704fb120a929c209fed062aec733d"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from RGB to YCgCo\n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(0.25, -0.25, 0.5, 0.0,\n                        0.5, 0.5, 0.0, 0.0,\n                        0.25, -0.25, -0.5, 0.0,\n                        0.0, 0.0, 0.0, 1.0);\n    const vec4 offset = vec4(0, 0.5, 0.5, 0.0);\n\n    return (offset + m * in0());\n\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Rec709ToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "rec709tolinear"
+        string creator = "Tweak Software"
+        string documentation = "Rec709ToLinear"
+        int userVisible = 1
+        string name = "Rec709ToLinear"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "ed42ad5acbf7131744848a95d1789641caae5e52"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from Rec709 to linear \n//\n\nvec4 main (const in inputImage in0)\n{\n    vec4 P = in0();\n    const vec3 a0 = vec3(0.099);\n    const vec3 a1 = vec3(1.099);\n    const vec3 b = vec3(4.5);\n    const vec3 p = vec3(0.081);\n    const vec3 g = vec3(1.0 / 0.45);\n\n    vec3  c = max(P.rgb, vec3(0.0));\n    bvec3 t = lessThanEqual(c, p);\n    vec3 c0 = c / b;\n    vec3 c1 = pow((c + a0) / a1, g);\n    return vec4(mix(c1, c0, vec3(t)), P.a);\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+SRGBToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "srgbtolinear"
+        string creator = "Tweak Software"
+        string documentation = "SRGBToLinear"
+        int userVisible = 1
+        string name = "SRGBToLinear"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "d9e9094ab0c8facc1688700045e56497b73468d6"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from sRGB to linear \n//  This and Rec709 could be done using the \"4 value model\" but this is\n//  fine now.\n//\n\nvec4 main (const in inputImage in0)\n{\n    vec4 P = in0();\n    const vec3 a0 = vec3(0.055);\n    const vec3 a1 = vec3(1.055);\n    const vec3 b = vec3(12.92);\n    const vec3 p = vec3(0.04045);\n    const vec3 g = vec3(2.4);\n\n    vec3  c = max(P.rgb, vec3(0.0));\n    bvec3 t = lessThanEqual(c, p);\n    vec3 c0 = c / b;\n    vec3 c1 = pow((c + a0) / a1, g);\n    return vec4(mix(c1, c0, vec3(t)), P.a);\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Saturation : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "saturation"
+        string creator = "Tweak Software"
+        string documentation = "Saturation"
+        int userVisible = 1
+        string name = "Saturation"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "1da8d133126b1e970f68f43d7b52d7f1508cb64e"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Saturation.\n//  Default Rec709 lumaCoeffs.\n//\n\nvec4 main (const in inputImage in0, \n           const in float saturation,\n           const in vec3 lumaCoefficients,\n           const in float minClamp,\n           const in float maxClamp)\n{\n    vec4 P = in0();\n    vec3 c =   P.rgb * vec3(saturation) +\n               vec3(P.r * lumaCoefficients.r +\n\t            P.g * lumaCoefficients.g +\n\t            P.b * lumaCoefficients.b) * vec3(1.0 - saturation) ;\n\n    return vec4(clamp(c, minClamp, maxClamp), P.a);\n}\n\n\n"
+    }
+
+    parameters
+    {
+        float saturation = 1
+        float[3] lumaCoefficients = [ [ 0.2126 0.7152 0.0722 ] ]
+        float minClamp = 0
+        float maxClamp = 1
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+UnPremult : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "unpremult"
+        string creator = "Tweak Software"
+        string documentation = "UnPremult"
+        int userVisible = 1
+        string name = "UnPremult"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "c8dc221520dfb4801539e4290da19c2a5be008ab"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n// This is unpremult operation.\n//\n\nvec4 main(const in inputImage in0)\n{\n    vec4 P = in0();\n    return P.a > 0.0 ? vec4(P.rgb / P.a, P.a) : P;\n}\n\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+ViperLogToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "viperlogtolinear"
+        string creator = "Tweak Software"
+        string documentation = "ViperLogToLinear"
+        int userVisible = 1
+        string name = "ViperLogToLinear"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "446982050b36bbbf89f42523e5756444652d0924"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Viper Log to Linear\n//\n\nvec4 main (const in inputImage in0)\n{\n    vec4 P = in0();\n    return vec4(pow(vec3(10.0), min(P.rgb, 1.0) * vec3(2.048)) * vec3(0.0359824060427), P.a);\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+Wipe : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "transition"
+        string defaultName = "wipe"
+        string creator = "Tweak Software"
+        string documentation = "Horizontal Wipe"
+        int userVisible = 1
+        string name = "Wipe"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "9face173547fe05105edd410c9f5a25164d6d22a"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 1
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "merge"
+        string glsl = "//\n//  Wipe over 1080 X size\n//\n\nvec4 main (const in inputImage in0,\n           const in inputImage in1,\n           const in float startFrame,\n           const in float numFrames,\n           const in float frame)\n{\n    //\n    //  Make sure that first visible effect is on startFrame, and last visible\n    //  effect is on startFrame + numFrames - 1, so that effect is on screen\n    //  for numFrames.\n    //\n    \n    float p = (frame - startFrame + 1.0) / (numFrames + 1.0);\n    bool  b = (p >= 1.0);\n    float s = mix(in0.s / in0.size().x, 0.0, float(b));\n    float u = (p * 50.0 - s * 50.0); \n    return mix(in0(), in1(), vec4(clamp(u, 0.0, 1.0)));\n}\n\n"
+        int fetches = 2
+    }
+
+    parameters
+    {
+        float startFrame = 40
+        float numFrames = 20
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+YCbCr601FRToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycbcr601rftorgb"
+        string creator = "Tweak Software"
+        string documentation = "YCbCr601FRToRGB"
+        int userVisible = 1
+        string name = "YCbCr601FRToRGB"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "4edeb57dfe16dccc23b2a12c9be1cf3319061f4c"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from YCbCr 601 Full Range to RGB \n//\n//\n\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       1.000000e+00,   1.000000e+00,   1.000000e+00,   0.000000e+00,\n       0.000000e+00,  -3.441363e-01,   1.772000e+00,   0.000000e+00,\n       1.402000e+00,  -7.141362e-01,   0.000000e+00,   0.000000e+00,\n      -7.037491e-01,   5.312113e-01,  -8.894745e-01,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+YCbCr601ToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycbcr601torgb"
+        string creator = "Tweak Software"
+        string documentation = "YCbCr601ToRGB"
+        int userVisible = 1
+        string name = "YCbCr601ToRGB"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "22eafdf3698b9bcf844b0fe0a39adfaed0286887"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from YCbCr 601 to RGB \n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       1.164384e+00,   1.164384e+00,   1.164384e+00,   0.000000e+00,\n       0.000000e+00,  -3.917623e-01,   2.017232e+00,   0.000000e+00,\n       1.596027e+00,  -8.129675e-01,   0.000000e+00,   0.000000e+00,\n      -8.742022e-01,   5.316678e-01,  -1.085631e+00,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+YCbCr709FRToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycbcr709frtorgb"
+        string creator = "Tweak Software"
+        string documentation = "YCbCr709FRToRGB"
+        int userVisible = 1
+        string name = "YCbCr709FRToRGB"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "f58d9d73a8a0a1e8b6f6b59fba8bad72b59c1ae6"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from YCbCr 709 Full Range to RGB \n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       1.000000e+00,   1.000000e+00,   1.000000e+00,   0.000000e+00,\n       0.000000e+00,  -1.873243e-01,   1.855600e+00,   0.000000e+00,\n       1.574800e+00,  -4.681243e-01,   0.000000e+00,   0.000000e+00,\n      -7.904879e-01,   3.290095e-01,  -9.314385e-01,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+YCbCr709ToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycbcr709torgb"
+        string creator = "Tweak Software"
+        string documentation = "YCbCr709ToRGB"
+        int userVisible = 1
+        string name = "YCbCr709ToRGB"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "8a78798a459d4c99bbfb91448dce3eb8cffdd3f8"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from YCbCr 709 to RGB \n//\n//\n\nvec4 main (const in inputImage in0)\n{\n    const mat4 m = mat4(\n       1.164384e+00,   1.164384e+00,   1.164384e+00,   0.000000e+00,\n       0.000000e+00,  -2.132486e-01,   2.112402e+00,   0.000000e+00,\n       1.792741e+00,  -5.329093e-01,   0.000000e+00,   0.000000e+00,\n      -9.729452e-01,   3.014827e-01,  -1.133402e+00,   1.000000e+00);\n\n    vec4 P = in0();\n    vec4 cout = m * vec4(P.rgb, 1.0);\n    return vec4( cout.rgb, P.a );\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+
+YCgCoToRGB : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "ycgcotorgb"
+        string creator = "Tweak Software"
+        string documentation = "YCgCoToRGB"
+        int userVisible = 1
+        string name = "YCgCoToRGB"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "5da0c2fe5db0e7534e641f3202088e6d5e37e592"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "//\n//  Convert from YCgCo to RGB \n//\n//\n\n\nvec4 main (const in inputImage in0)\n{\n    const vec4 offset = vec4(0.0, 0.5, 0.5, 0.0);\n    const mat4 m = mat4(1.0, 1.0, 1.0, 0,\n                        -1.0, 1.0, -1.0, 0,\n                        1.0, 0.0, -1.0, 0,\n                        0, 0, 0, 1.0);\n\n    return ( m * (in0() - offset));\n}\n"
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}

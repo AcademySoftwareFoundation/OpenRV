@@ -1,0 +1,37 @@
+package: Nuke Integration
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.12
+rv: 4.0.12
+openrv: 1.0.0
+optional: true
+requires: ''
+
+modes: 
+  - file: rvnuke_mode.mu
+    menu: Tools/Nuke
+    shortcut: ''
+    event: ''
+    load: delay
+
+files:
+  - file: menu.py
+    location: SupportFiles/$PACKAGE
+  - file: rvNuke.py
+    location: SupportFiles/$PACKAGE
+  - file: rvNetwork.py
+    location: SupportFiles/$PACKAGE
+  - file: rvnuke_help.html
+    location: SupportFiles/$PACKAGE
+  - file: rvNuke.png
+    location: SupportFiles/$PACKAGE
+  - file: rvNukeCheck.png
+    location: SupportFiles/$PACKAGE
+  - file: rvNukeGear.png
+    location: SupportFiles/$PACKAGE
+
+description: |
+
+  <p> 
+  </p>
+

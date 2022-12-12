@@ -1,0 +1,21 @@
+package: PySide Example
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+requires: ''
+rv: 6.2.4
+openrv: 1.0.0
+optional: true
+
+modes: 
+  - file: pyside_example.py
+    menu: 'Tools/PySide Example'
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+    <p>
+    This is a simple python package that uses PySide and PyOpenGL.
+    </p>
+

@@ -1,0 +1,40 @@
+package: Scrub Range Offset
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.6
+requires: 
+rv: 3.12.15
+openrv: 1.0.0
+optional: true
+
+modes: 
+  - file: scrub_offset.mu
+    menu: Edit/Scrub Range Offset
+    shortcut: 'O'
+    event: 'key-down--O'
+    load: delay
+
+description: |
+
+  <h2>Scrub Range Offset in Layout or Stack</h2>
+  <p>
+  For media with frame numbers (timecode or frame numbers in the filename of
+  images in a sequence), those frame numbers determine the media's initial
+  "local to global" frame number mapping.  The "range offset" property of a
+  source can be used to adjust this mapping.
+  <p>
+  Suppose you want to compare two movies of two takes of the same shot in a
+  tiled Layout, but the movies are renders of different frame ranges.  If the
+  movies contain timecode, RV will line them up for you automatically, but if
+  not, you can adjust the range offset to line them up.
+  
+  <h3>Usage</h3>
+  <p>
+  In the above example, suppose you know that both movies contain frame 38
+  Scrub the timeline frame so that you can see frame 38 in movie.  Then select
+  the menu item "Edit/ScrubRangeOffset", or hit "Shift-O", then mouse-down on
+  the movie that is not showing frame 38 and scrub until it does.
+  <p>
+  You can use this in a Layout or a Stack (where you have used Wipes to expost
+  some of the "lower" Sources), and in both cases on any number of Sources.
+

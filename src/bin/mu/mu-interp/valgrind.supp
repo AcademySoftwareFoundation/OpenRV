@@ -1,0 +1,132 @@
+{
+   MoreGarbage1
+   Memcheck:Value4
+   fun:_ZNK2Mu6Object4typeEv
+   fun:_ZN2Mu16GarbageCollector4markEPKNS_7ProcessE
+}
+
+{
+   ClassInstanceGrabage1
+   Memcheck:Value4
+   fun:_ZN2Mu13ClassInstance9structureEv
+   fun:_ZNK2Mu5Class13markRecursiveEPNS_6ObjectEb
+}
+
+{
+   ClassGarbage1
+   Memcheck:Cond
+   fun:_ZNK2Mu5Class13markRecursiveEPNS_6ObjectEb
+   fun:_ZN2Mu6Object13markRecursiveEb
+}
+
+{
+   MuGarbageAllocationTest7
+   Memcheck:Value4
+   fun:_ZNK7stl_ext16markable_pointer4markEv
+   fun:_ZN2Mu6Object13markRecursive*
+}
+
+{
+   MuGarbageAllocationTest6
+   Memcheck:Value4
+   fun:_ZNK2Mu6Object4typeEv
+   fun:_ZN2Mu6Object13markRecursiveEb
+}
+
+{
+   MuGarbageAllocationTest5
+   Memcheck:Value4
+   fun:_ZN7stl_ext16markable*
+   fun:_ZN2Mu6Object13markRecursiveEb
+}
+
+{
+   MuGarbageAllocationTest3
+   Memcheck:Value4
+   fun:_ZNK2Mu6Object4typeEv
+   fun:_ZN2Mu16GarbageCollector4markEPKNS_7ProcessE
+   fun:_ZN2Mu16GarbageCollector7collectEv
+   fun:_ZN2Mu14arenaCollectorEPN7stl_ext17block_alloc_arenaE
+}
+
+{
+   MuGarbageAllocationTest2
+   Memcheck:Cond
+   fun:_ZNK7stl_ext17fixed_block_arena12is_allocatedEPKv
+   fun:_ZNK7stl_ext17block_alloc_arena12is_allocatedEPKv
+   fun:_ZN2Mu16GarbageCollector4markEPKNS_7ProcessE
+   fun:_ZN2Mu16GarbageCollector7collectEv
+}
+
+{
+   MuGarbageAllocationTest
+   Memcheck:Cond
+   fun:_ZNK7stl_ext21fixed_block_allocator12is_allocatedEPKv
+   fun:_ZNK7stl_ext17fixed_block_arena12is_allocatedEPKv
+   fun:_ZNK7stl_ext17block_alloc_arena12is_allocatedEPKv
+   fun:_ZN2Mu16GarbageCollector4markEPKNS_7ProcessE
+}
+
+{
+   GarbageCollectorStackCrawl
+   Memcheck:Cond
+   fun:_ZN2Mu16GarbageCollector4markEPKNS_7ProcessE
+   fun:_ZN2Mu16GarbageCollector7collectEv
+   fun:_ZN2Mu14arenaCollectorEPN7stl_ext17block_alloc_arenaE
+   fun:_ZN7stl_ext17block_alloc_arena8allocateEj
+}
+
+{
+   ExceptionBacktrace
+   Memcheck:Cond
+   fun:_ZNK2Mu6Thread9backtraceERSt6vectorIPNS_4NodeESaIS3_EE
+   fun:_ZN2Mu9ExceptionC2ERNS_6ThreadEPKcPNS_6ObjectE
+   fun:*
+}
+
+{
+   ExceptionBacktrace2_Questionable
+   Memcheck:Cond
+   fun:_ZNK7stl_ext21fixed_block_allocator12is_allocatedEPKv
+   fun:_ZNK7stl_ext17fixed_block_arena12is_allocatedEPKv
+   fun:_ZNK7stl_ext17block_alloc_arena12is_allocatedEPKv
+   fun:_ZNK2Mu6Thread9backtraceERSt6vectorIPNS_4NodeESaIS3_EE
+}
+
+
+{
+   GL
+   Memcheck:Param
+   ioctl(generic)
+   fun:ioctl
+   obj:/usr/lib/libGL.so.1.0.8174
+}
+
+{
+   GLCond
+   Memcheck:Cond
+   obj:/usr/lib/libGLcore.so.1.0.8174
+}
+
+{
+   GLCond2
+   Memcheck:Cond
+   fun:_nv000026gl
+   obj:/usr/lib/libGLcore.so.1.0.8174
+   obj:*
+}
+
+{
+   NVGLCond
+   Memcheck:Cond
+   fun:_nv000025gl
+   obj:/usr/lib/libGLcore.so.1.0.8174
+}
+
+{
+   GLstrcat
+   Memcheck:Cond
+   fun:strcat
+   obj:/usr/lib/libGLcore.so.1.0.8174
+}
+

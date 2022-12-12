@@ -1,0 +1,49 @@
+GTOa (4)
+
+AlexaLogCToLinear : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "alexalogctolinear"
+        string creator = "Tweak Software"
+        string documentation = "AlexaLogCToLinear"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/AlexaLogCToLinear.glsl"
+    }
+
+    parameters
+    {
+        float LogCBlackSignal       = [ 0.0 ] 
+        float LogCEncodingOffset    = [ 0.385537 ]
+        float LogCEncodingGain      = [ 0.24719 ]
+        float LogCGraySignal        = [ 0.18 ]
+        float LogCBlackOffset       = [ 0.052272 ]
+        float LogCLinearSlope       = [ 3.90864 ]
+        float LogCLinearOffset      = [ -1.38854 ]
+        float LogCCutPoint          = [ 0.149658 ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

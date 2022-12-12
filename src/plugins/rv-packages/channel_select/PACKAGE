@@ -1,0 +1,41 @@
+package: Color Channel Selection
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.3
+requires: ''
+rv: 4.0.8
+openrv: 1.0.0
+optional: true
+
+modes: 
+  - file: channel_select.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+
+    <h2>Channel Selection</h2>
+    <p>
+    This package adds a "user-defined" ColorChannel node to the View pipeline.
+    You can find the node definition in Nodes/ColorSelect.gto, and the GLSL
+    source code in Nodes/ColorSelect.glsl.  It's intended as a simple example
+    of how a new node type can be incorporated into standard workflows without
+    making the node visible to the user (by using the PipelineGroups).  From
+    the user's point of view, they have new functionality, but no new "objects"
+    in the session that they need to keep track of.
+    <p>
+    The ChannelSelect node is handy when the built-in channel selection on the
+    View menu has been broken by replacing the DisplayColor node with an OCIO
+    node, or when using in conjunction with the anaglyph stereo display mode.
+    <p>
+    By, default, the channel selection happens in the ViewPipeline, that is
+    <b>before</b> the per-display device conditioning.  If for any reason you
+    want to to happen _after_ conditioning for display, check the "Post-Display
+    Channel Selection" item in the View menu.  This setting will be remembered
+    as a preference.
+    <p>
+    Note that this package does not affect the "Channel Display" items on the View menu, just the hotkeys (r, g, b, a, c, l).
+
+

@@ -1,0 +1,116 @@
+package: OpenColorIO Basic Color Management
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 2.4
+requires: ''
+rv: 4.0
+openrv: 1.0.0
+optional: true
+system: true
+hidden: false
+
+modes: 
+  - file: ocio_source_setup.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+    <p>
+    This mode is intended as a starting point for facility specific
+    OpenColorIO workflows. 
+    </p>
+
+    <p>
+    This mode integrates both with the base RV source_setup package and
+    OCIO. The idea is that incoming source media is first examined by the
+    base setup package then when appropriate, this package will switch the
+    source to use OCIO. If any source uses OCIO, then we attempt to use OCIO
+    with the display.
+    </p>
+
+    <p>
+    Display and view changes are applied independently to each displays under
+    the appropriate menu for each device. 
+    </p>
+
+    <p>
+    By default this package will use GetCurrentConfig() to find your OCIO
+    config from the environment and then use config.parseColorSpaceFromString()
+    on individual sources to lookup colorspace transforms.
+    </p>
+
+    <p>
+    If you want to customize this behavior without rewriting the timing or
+    RV OCIONode setting specifics you can instead author a rv_ocio_setup.py
+    Python file and put that in any of the Python directories on the
+    $RV_SUPPORT_PATH. Then ocio_source_setup.py will locate that file and look
+    for two potential functions defined within; ocio_config_from_media, and/or
+    ocio_node_from_media
+    </p>
+
+    <p>
+    If either of these functions are found during the search they will be used
+    in place of the default implementations found at the top of the 
+    ocio_source_setup.py file. However you can define both, either, or neither
+    and ocio_source_setup.py will just fall back to the default as needed.
+    </p>
+
+    <p>ocio_config_from_media</p>
+    <p>inputs</p>
+    <ul>
+    <li>media: media from RVFileSource</li>
+    <li>attributes: dictionary of RV collected metadata</li>
+    </ul>
+    <p>returns</p>
+    <ul>
+    <li>config: OCIO config object</li>
+    </ul>
+    <p>
+    This function is called when ocio_source_setup.py is looking for the OCIO
+    config you want to use. It is called with input media and any metadata
+    known about that source, and expects in return the OCIO config. The default
+    implementation of this function (which you can see at the top of
+    ocio_source_setup.py) is to check for the config from the $OCIO environment
+    variable.
+    </p>
+
+    <p>ocio_node_from_media</p>
+    <p>inputs</p>
+    <ul>
+    <li>config: OCIO config object</li>
+    <li>node: instance name of the pipeline group node being evaluated</li>
+    <li>default: a list of the nodes normally found in this pipeline group</li>
+    <li>[optional] media: media from RVFileSource</li>
+    <li>[optional] attributes: dictionary of RV collected metadata</li>
+    </ul>
+    <p>returns</p>
+    <ul>
+    <li>An ordered list of dictionaries with the following keys:
+        <ul>
+        <li>nodeType: type of node at this index of the new pipeline (Usually
+        one of the OCIO types)</li>
+        <li>context: dictionary of key/value pairs that will be set in the OCIO
+        context</li>
+        <li>properties: dictionary of ocio.PROP/value pairs that will be
+        updated on the OCIO node</li>
+        </ul>
+    </li>
+    </ul>
+    <p>
+    This function is called when ocio_source_setup.py is attempting to update
+    the settings for the display, source look, or source linearization pipeline
+    groups with OCIO implementations. Given the OCIO config, pipeline node, and
+    the default pipeline membership (as well as the media and its source
+    attributes when avaialble) this function should inform the setup process as
+    to how the OCIO node properties and context should be set as well as
+    provied the new pipeline membership.
+    </p>
+
+    <p>
+    Please read the top of ocio_source_setup.py for default implementations of
+    both functions.
+    </p>
+
+

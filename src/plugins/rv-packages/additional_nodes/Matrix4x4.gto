@@ -1,0 +1,45 @@
+GTOa (4)
+
+Matrix4x4 : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "matrix4x4"
+        string creator = "Tweak Software"
+        string documentation = "Matrix4x4"
+        int userVisible = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "color"
+        string glsl = "file://${HERE}/Matrix4x4.glsl"
+    }
+
+    parameters
+    {
+        float[16] m44 = [ [ 1.0 0.0 0.0 0.0
+                          0.0 1.0 0.0 0.0
+                          0.0 0.0 1.0 0.0
+                          0.0 0.0 0.0 1.0 ] ]
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

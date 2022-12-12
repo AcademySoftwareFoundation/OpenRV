@@ -1,0 +1,51 @@
+GTOa (4)
+
+ChannelSelect : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "color"
+        string defaultName = "channelSelect"
+        string creator = "Tweak Software"
+        string documentation = "Channel Selection"
+        int userVisible = 1
+        string name = "ChannelSelect"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "c5b52eef2df5978e9edd13d2f949a54390ebdd76"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 0
+    }
+
+    function
+    {
+        string name = "ChannelSelect"
+        string type = "color"
+        string glsl = "file://${HERE}/ChannelSelect.glsl"
+    }
+
+    parameters
+    {
+        int channel = 6
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}
+

@@ -1,0 +1,12 @@
+package: rvio_basic_scripts
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.2
+rv: 3.8
+openrv: 1.0.0
+requires: ''
+
+description: |
+
+  <p> This package contains the basic rvio scripts for frameburn,
+  watermark, simpleslate, matte, and bug rendering</p>

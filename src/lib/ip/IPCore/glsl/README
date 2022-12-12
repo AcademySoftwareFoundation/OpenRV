@@ -1,0 +1,20 @@
+
+Some notes on GLSL shader programming style
+
+ * Most functions should start with "PixelObject P" as a parameter. "P"
+   contains the current working fragment color and any other important
+   state (like the incoming texture coordinates).
+ 
+ * If you want an image sampler use the name of the FB channels
+   contantenated together. For example and RGBA four channel FB would
+   require you to access it as RGBA_sampler. Individual image planes are
+   separate samples. So Y, RY, BY planes become Y_sampler, RY_sampler,
+   BY_sampler unless they are interleaved in which case there is a single
+   YRYBY_sampler. 
+
+ * Try and write your code vectorized. A good example is sRGB or Rec709
+   shaders. These avoid if statements (which are always scalar) and compute
+   three channels at once. mix() is used in place of the
+   if-then-else. Think of vector code as being 3 to 1 in speed compared to
+   scalar code.
+

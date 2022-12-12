@@ -1,0 +1,47 @@
+package: Session Manager
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.8
+rv: 3.12.15
+openrv: 1.0.0
+requires: ''
+system: true
+hidden: true
+
+modes: 
+  - file: session_manager
+    menu: Tools/Session Manager
+    shortcut: 'x' 
+    event: 'key-down--x'
+    load: delay
+  - file: StackGroup_edit_mode
+    load: delay
+  - file: SwitchGroup_edit_mode
+    load: delay
+  - file: FolderGroup_edit_mode
+    load: delay
+  - file: Stack_edit_mode
+    load: delay
+  - file: Switch_edit_mode
+    load: delay
+  - file: Composite_edit_mode
+    load: delay
+  - file: SequenceGroup_edit_mode
+    load: delay
+  - file: SourceGroup_edit_mode
+    load: delay
+  - file: LayoutGroup_edit_mode
+    load: delay
+  - file: RetimeGroup_edit_mode
+    load: delay
+  - file: transform_manip
+    load: delay
+
+description: |
+
+  <p> The session manager is part of RV's base user interface. See
+  <a
+  href="https://www.shotgridsoftware.com/rv">
+  Chapter 5 of RV User's Manual</a>
+  </p> 
+

@@ -1,0 +1,30 @@
+GTOa (3)
+
+StereoDisassemblyFramePacked : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "merge" 
+	string defaultName = "stereoDisFP"
+	string creator = "Tweak Software"
+        string documentation = "Stereo Disassembly" 
+	int userVisible = 1
+    }
+
+    render
+    {
+	int intermediate = 0   # usually derived
+    }
+
+    function
+    {
+	string name = "main"
+	string glsl = "file://${HERE}/StereoDisassemblyFramePacked.glsl"
+    }
+
+    parameters
+    {
+        int topBottom = 1
+        int swapEyes = 0
+    }
+}

@@ -1,0 +1,87 @@
+#!/bin/tcsh -f
+
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#
+#   This script sets the RV_HOME environment (if not already set),
+#   makes sure the plugins are the path and launches the actual binary.
+#
+#   NOTE: doesn't properly set RV_HOME if invoked from a link to the script
+#   and RV_HOME is not already set
+#
+
+set noglob
+
+#
+#   Uncomment this if you want to use the pulseaudio/libsndfile package mismatch
+#   workaround below.
+#
+#setenv RV_USE_PULSEAUDIO_WORKAROUND 1
+
+#
+#   Workaround for pulseaudio/libsndfile package mismatch on FC/Cent that causes
+#   crash when accessing preferences.
+#
+if ((-e /usr/bin/padsp) && $?RV_USE_PULSEAUDIO_WORKAROUND) then 
+    setenv OPTIONAL_PADSP /usr/bin/padsp 
+else 
+    setenv OPTIONAL_PADSP "" 
+endif
+
+if ($?QT_PLUGIN_PATH) then 
+    echo "INFO: warning: QT_PLUGIN_PATH is set, which can cause RV to load the wrong Qt libraries/plugins.  Unsetting..."
+    unsetenv QT_PLUGIN_PATH
+endif
+
+#
+#   Uncomment this if you're on an older linux distro and RV is hanging in
+#   the Audio preferences or on startup with audio sources
+#
+#setenv PA_ALSA_EXCLUDE_DMIX_DEFAULT 1
+
+#
+#   For unknown reasons, LANG causes problems when set to
+#   interesting values (like fr_FR.UTF-8).
+#
+unsetenv LANG
+
+if (! $?RV_HOME) then
+    set canonicalName = "`readlink -f $0`"
+    set binName = "$canonicalName:h"
+    setenv RV_HOME "$binName:h"
+endif
+
+set platform = i386
+set rvbin = "$RV_HOME/bin/rv.bin.$platform"
+
+if (! (-e $rvbin) ) then
+    set rvbin = "$RV_HOME/bin/rv.bin"
+endif
+
+unsetenv BUILD_ROOT
+setenv PATH "$RV_HOME/bin:${PATH}"
+
+if ($?LD_LIBRARY_PATH) then
+     setenv LD_LIBRARY_PATH "$RV_HOME/lib:$LD_LIBRARY_PATH"
+else
+     setenv LD_LIBRARY_PATH "$RV_HOME/lib"
+endif
+
+# exec RV
+
+
+if ("x$1" == "x") then
+    # No parameter supplied, just execute app
+    exec $OPTIONAL_PADSP $rvbin $*:q
+else
+    if ( "$1" == "-d" || "$1" == "--debug") then
+	    shift  # skip '-d / --debug'
+        gdb $OPTIONAL_PADSP $rvbin $*:q
+    else
+        exec $OPTIONAL_PADSP $rvbin $*:q
+    endif
+endif

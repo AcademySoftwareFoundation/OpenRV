@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Reorder Rows with Drag and Drop</title>
+
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+
+<link rel="stylesheet" type="text/css" href="fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="datatable.css" />
+<link rel="stylesheet" type="text/css" href="button.css" />
+<script type="text/javascript" src="yahoo-dom-event.js"></script>
+<script type="text/javascript" src="dragdrop-min.js"></script>
+<script type="text/javascript" src="element-min.js"></script>
+<script type="text/javascript" src="datasource-min.js"></script>
+<script type="text/javascript" src="event-delegate-min.js"></script>
+<script type="text/javascript" src="datatable-min.js"></script>
+<script type="text/javascript" src="button-min.js"></script>
+<script type="text/javascript" src="dom-min.js"></script>
+
+<script type="text/javascript">
+function fullscreen ()
+{
+    rvsession.evaluate("extra_commands.toggleFullScreen()");
+}
+function play ()
+{
+    rvsession.evaluate("play()");
+}
+function stop ()
+{
+    rvsession.evaluate("stop()");
+}
+
+function callback_string (name, contents, sender)
+{
+    rvsession.evaluate("require extra_commands; extra_commands.sourceFrame(frame());", function(f) {
+        document.getElementById('frameLabel').innerHTML = f;});
+}
+
+document.addEventListener("rvsession-ready", function(e)
+{
+    console.log("ready");
+    rvsession.eventString.connect(callback_string);
+
+    if (!rvsession.hasBinding("frame-changed")) 
+    {
+        rvsession.bindToRegex("frame-changed");
+    }
+});
+
+</script>
+
+<!--begin custom header content for this example-->
+<style type="text/css">
+/* custom styles for this example */
+.custom-class {
+        opacity: 0.6;filter:alpha(opacity=60);
+        color:blue;
+        border: 2px solid gray;
+}
+
+#datatable tr {
+         cursor: pointer;
+}
+</style>
+
+<!--end custom header content for this example-->
+
+</head>
+
+<body class="yui-skin-sam",  bgcolor="Silver">
+
+<h1>RV Javascript Playlist</h1>
+<p>Select shots with checkboxes.</p>
+                        
+</div>
+<!--BEGIN SOURCE CODE FOR EXAMPLE =============================== -->
+
+<div id="datatable"></div>
+
+<script type="text/javascript" src="data.js"></script>
+<script type="text/javascript">
+YAHOO.util.Event.addListener(window, "load", function() {
+    YAHOO.example.ReorderRows = function() {
+        var Dom = YAHOO.util.Dom,
+            Event = YAHOO.util.Event,
+            DDM = YAHOO.util.DragDropMgr,
+            myColumnDefs = [
+                {key:"id"},
+                {key:"checkbox",formatter:YAHOO.widget.DataTable.formatCheckbox}
+            ],
+            myDataSource = new YAHOO.util.LocalDataSource(
+                YAHOO.example.Data.rvshots,
+                {responseSchema: {fields: ["id","checkbox", "path"]}}
+            ),
+
+            myDataTable = new YAHOO.widget.DataTable("datatable", myColumnDefs, myDataSource, {caption:"RV Shotlist"}),
+
+            onRowSelect = function(ev) {
+                    var par = myDataTable.getTrEl(Event.getTarget(ev)),
+                        srcData,
+                        srcIndex,
+                        tmpIndex = null,
+                        ddRow = new YAHOO.util.DDProxy(par.id);
+
+                    ddRow.handleMouseDown(ev.event);
+
+                    myDataTable.subscribe('checkboxClickEvent', function(oArgs){
+                        Event.preventDefault(oArgs.event);
+                        var elCheckbox = oArgs.target;
+                        var newValue = elCheckbox.checked;
+                        var record = this.getRecord(elCheckbox);
+                        var column = this.getColumn(elCheckbox);
+                        var recordIndex = this.getRecordIndex(record);
+                        var path = record.getData('path');
+                        var data = record.getData();
+                        data[column.key] = newValue;
+                        myDataTable.updateRow(recordIndex,data);
+
+                        var rs = myDataTable.getRecordSet();
+                        var recs = rs.getRecords() ;
+                        var l = rs.getLength();
+
+                        var i = 0;
+                        for(i=0; i<=l; i++)
+                        {  
+                            if(recs[i].getData('checkbox') == true)
+                            {
+                                rvsession.evaluate("require webview; webview.theMode().addOrRemoveIfNeeded(\"" + 
+                                        recs[i].getData('id') + "\", \"" +
+                                        recs[i].getData('path') + "\", true);");
+                            }
+                            else
+                            {
+                                rvsession.evaluate("require webview; webview.theMode().addOrRemoveIfNeeded(\"" + 
+                                        recs[i].getData('id') + "\", \"" +
+                                        recs[i].getData('path') + "\", false);");
+                            }
+                        }
+                         
+                    });
+
+                    /**
+                    * Once we start dragging a row, we make the proxyEl look like the src Element. We get also cache all the data related to the
+                    * @return void
+                    * @static
+                    * @method startDrag
+                    */
+                    ddRow.startDrag = function () {
+                        proxyEl  = this.getDragEl();
+                        srcEl = this.getEl();
+                        srcData = myDataTable.getRecord(srcEl).getData();
+                        srcIndex = srcEl.sectionRowIndex;
+                        // Make the proxy look like the source element
+                        Dom.setStyle(srcEl, "visibility", "hidden");
+                        proxyEl.innerHTML = "<table><tbody>"+srcEl.innerHTML+"</tbody></table>";
+                    };
+
+                    /**
+                    * Once we end dragging a row, we swap the proxy with the real element.
+                    * @param x : The x Coordinate
+                    * @param y : The y Coordinate
+                    * @return void
+                    * @static
+                    * @method endDrag
+                    */
+                    ddRow.endDrag = function(x,y) {
+                        Dom.setStyle(proxyEl, "visibility", "hidden");
+                        Dom.setStyle(srcEl, "visibility", "");
+                    };
+
+
+                    /**
+                    * This is the function that does the trick of swapping one row with another.
+                    * @param e : The drag event
+                    * @param id : The id of the row being dragged
+                    * @return void
+                    * @static
+                    * @method onDragOver
+                    */
+                    ddRow.onDragOver = function(e, id) {
+                        // Reorder rows as user drags
+
+                        var destEl = Dom.get(id),
+                            destIndex = destEl.sectionRowIndex;
+
+                        if (destEl.nodeName.toLowerCase() === "tr") 
+                        {
+                            if(tmpIndex !==null) {
+                                myDataTable.deleteRow(tmpIndex);
+                            }
+                            else {
+                                myDataTable.deleteRow(srcIndex);
+                            }
+
+                            myDataTable.addRow(srcData, destIndex);
+                            tmpIndex = destIndex;
+
+                            DDM.refreshCache();
+                        }
+                    };
+            };
+
+
+            myDataTable.subscribe('cellMousedownEvent', onRowSelect);
+
+        //////////////////////////////////////////////////////////////////////////////
+        // Create DDTarget instances when DataTable is initialized
+        //////////////////////////////////////////////////////////////////////////////
+        myDataTable.subscribe("initEvent", function() {
+
+            var i, id,
+                allRows = this.getTbodyEl().rows;
+
+
+            for(i=0; i<allRows.length; i++) {
+                id = allRows[i].id;
+                // Clean up any existing Drag instances
+                if (myDTDTargets[id]) {
+                     myDTDTargets[id].unreg();
+                     delete myDTDTargets[id];
+                }
+                // Create a Drag instance for each row
+                myDTDTargets[id] = new YAHOO.util.DDTarget(id);
+            }
+        });
+
+        //////////////////////////////////////////////////////////////////////////////
+        // Create DDTarget instances when new row is added
+        //////////////////////////////////////////////////////////////////////////////
+        myDataTable.subscribe("rowAddEvent",function(e){
+            var id = e.record.getId();
+
+            myDTDTargets[id] = new YAHOO.util.DDTarget(id);
+        });
+    }();
+});
+</script>
+
+<!--END SOURCE CODE FOR EXAMPLE =============================== -->
+<p>              <a href="javascript:play()">Play</a></p>
+<p>              <a href="javascript:stop()">Stop</a></p>
+<p>              <a href="javascript:fullscreen()">Toggle Fullscreen</a></p>
+<p> Callback to JavaScript example:<br>Current frame: <b><font size="5" color="red"><label id=frameLabel></label></font></b></p>
+
+</body>
+</html>

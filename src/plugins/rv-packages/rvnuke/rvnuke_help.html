@@ -1,0 +1,1331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 10.2.0" />
+<title>RV/Nuke Integration (v1.10)</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overridden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+}
+asciidoc.install(4);
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>RV/Nuke Integration (v1.10)</h1>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<style type="text/css">
+    a:link {
+        color: blue;
+        color:#4444dd;
+    }
+    a:visited {
+        color: darkgray;
+        color: #666666;
+    }
+    a:hover {
+        color: #ff5555;
+    }
+</style>
+<div class="paragraph"><p>&#169; 2021 <a href="https://www.autodesk.com">Autodesk</a></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Rather than just attach a &#8220;flipbook&#8221; to Nuke, the goal of this integration
+effort is to provide compositors with a unified framework in which RV&#8217;s core
+media functionality (playback, browsing, arranging, editing, etc) is always
+instantly available to augment and enhance Nuke&#8217;s own capabilities.</p></div>
+<div class="paragraph"><p>Key features include:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Checkpointing: Save a rendered frame with a copy of the current nuke script
+</p>
+</li>
+<li>
+<p>
+Rendering: Save a rendered sequence with a copy of the current nuke script
+</p>
+</li>
+<li>
+<p>
+Background rendering in Nuke 6.2 <strong>and</strong> 6.1
+</p>
+</li>
+<li>
+<p>
+Live update of RV during renders, showing the latest frame rendered
+</p>
+</li>
+<li>
+<p>
+Rendered frames visible in RV as soon as they are written
+</p>
+</li>
+<li>
+<p>
+Rendered frames from canceled renders are visible
+</p>
+</li>
+<li>
+<p>
+Render directly into a slap comp or sequence in RV
+</p>
+</li>
+<li>
+<p>
+Full checkpoints: copies of entire ranges of frames, for comparison
+</p>
+</li>
+<li>
+<p>
+Visual browsing of checkpoints and renders
+</p>
+</li>
+<li>
+<p>
+Visual comparison (wipes, tiled) of checkpoints and renders
+</p>
+</li>
+<li>
+<p>
+Restoring the script to the state of any checkpoint or render
+</p>
+</li>
+<li>
+<p>
+Read and Write nodes in the script dynamically mirrored as sources in RV
+</p>
+</li>
+<li>
+<p>
+Read/Write node path, frame range, color space dynamically synced to RV
+</p>
+</li>
+<li>
+<p>
+Node selection dynamically synced to the View in RV
+</p>
+</li>
+<li>
+<p>
+Frame changes in Nuke dynamically synced to RV frame
+</p>
+</li>
+<li>
+<p>
+RV Sources can be used to create the corresponding Nuke Read node
+</p>
+</li>
+<li>
+<p>
+All Render/Checkpoint context retained in session file on disk
+</p>
+</li>
+<li>
+<p>
+Support for <code>%V</code>-style stereoscopic Reads, Writes, renders, and checkpoints.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_updating_an_existing_installation">Updating an Existing Installation</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>To use a newer version of this Package, in addition to the new code on the &#8220;RV
+side&#8221; (which probably was installed with the RV distribution), you need to
+update the Python code on the &#8220;Nuke side&#8221;.  To do so, just follow the Installation instructions below.</p></div>
+<div class="paragraph"><p>If the RV and Nuke components of the integration package are mis-matched,
+you&#8217;ll get an error dialog when you start RV from Nuke.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation">Installation</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Note that the first ingredient of a successful install is RV 3.12.12 or later,
+and Nuke 6.1v1 or later.  Once you have those installed, the rest of the installation goes like this:</p></div>
+<div class="sect2">
+<h3 id="_personal_installation">Personal Installation</h3>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Start RV and go to the <em>Packages</em> tab of the <em>Preferences</em> dialog
+</p>
+</li>
+<li>
+<p>
+Find <em>Nuke Integration</em> in the Package list and click the <em>Load</em> toggle next to it.
+</p>
+</li>
+<li>
+<p>
+Restart RV
+</p>
+</li>
+<li>
+<p>
+Click the <em>Nuke</em> item on the <em>Tools</em> menu
+</p>
+</li>
+<li>
+<p>
+From the <em>Nuke</em> menu, select the <em>Install Nuke Support Files</em> item and follow the directions.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>To confirm that the Nuke support files are properly installed, start Nuke.  You should
+see an <em>RV</em> menu on the main menubar, and if you select <em>RV/Preferences&#8230;</em>,
+you should get the appropriate dialog.</p></div>
+<div class="paragraph"><p>That&#8217;s it for installation!</p></div>
+</div>
+<div class="sect2">
+<h3 id="_site_wide_installation">Site-wide Installation</h3>
+<div class="paragraph"><p>In what follows we suppose that you&#8217;ve installed RV in <code>/usr/local/tweak/rv-3.12.12</code>, and that you keep your Nuke scripts in subdirectories of <code>/usr/local/nuke/scripts</code>.  If you do otherwise please adjust the paths below appropriately.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Make a subdir in your Nuke scripts area for the rvnuke support files:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>% mkdir /usr/local/nuke/scripts/rvnuke</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Copy the Nuke support files into place
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>% cp /usr/local/tweak/rv-3.12.12/plugins/SupportFiles/rvnuke/* /usr/local/nuke/scripts/rvnuke</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Edit the <code>init.py</code> file in <code>/usr/local/nuke/scripts</code> to include this line:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>nuke.pluginAddPath('./rvnuke')</code></pre>
+</div></div>
+</li>
+</ol></div>
+<div class="paragraph"><p>Done!</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_started">Getting Started</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_rv_preferences">RV Preferences</h3>
+<div class="paragraph"><p>In order to launch RV from Nuke, Nuke needs to know where the RV executable is.
+To set this, start Nuke and select the <em>RV/Preferences&#8230;</em> menu item.
+Navigate to the RV executable you want to use with Nuke and hit <em>OK</em>.</p></div>
+<div class="paragraph"><p>This setting is stored and used across all future Nuke sessions.</p></div>
+<div class="paragraph"><p>You can also specify any additional default command line arguments for RV in the
+<em>RV Preferences</em> dialog.</p></div>
+<div class="paragraph"><p>If you have a RAID or other fast storage device you may want to configure the RV/Nuke integration to use a directory on this device as the base for all Session directories (see below).  If so set the "Default Session Dir Base" preference accordingly.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_rv_project_settings">RV Project Settings</h3>
+<div class="paragraph"><p>There are several settings that the integration uses that may be different for
+different Nuke projects.  Once you have a script loaded, select the <em>RV/Project
+Settings&#8230;</em> menu item, and then the <em>RV</em> tab of the Project Settings.</p></div>
+<div class="paragraph"><p>The table below lists all the RV Project Settings, with explanations, but the
+most important is the &#8220;Session Directory.&#8221;  This directory is where all media,
+script versions, and other information is stored for this Nuke
+script/project.  It <strong>must</strong> be unique for each project.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Session Directory
+</dt>
+<dd>
+<p>
+    The root directory for all media, scripts and other information related to this project.  It will be created if it does not exist.  Since media will be stored under this directory, you may want to put it on a device with fast IO.   This name <strong>must</strong> be uniqe across all projects.
+</p>
+<div class="paragraph"><p>You can set "Default Session Dir Base" in the RV Preferences (see above) so
+that by default all Session directories are created on your fast IO device.</p></div>
+</dd>
+<dt class="hdlist1">
+Render File Format
+</dt>
+<dd>
+<p>
+    The format of all media files created by rendering and checkpointing.
+</p>
+</dd>
+<dt class="hdlist1">
+Nuke Node Selection &#8594; RV Current View
+</dt>
+<dd>
+<p>
+    If this box is checked, every time you select a node in nuke, if RV is connected, the current RV view node will be set to the corresponding view.  This lets you quickly view or play media, either input media associated with a Read node, or rendered media associated with any node that has been checkpointed or rendered.
+</p>
+</dd>
+<dt class="hdlist1">
+Nuke Frame &#8594; RV Frame
+</dt>
+<dd>
+<p>
+    If this box is checked, frame changes in Nuke will force the corresponding frame change in RV.
+</p>
+</dd>
+<dt class="hdlist1">
+Nuke Read Node Changes &#8594; RV Sources
+</dt>
+<dd>
+<p>
+    If this box is checked, the total set of Read nodes in the project will be dynamically synced to RV.  That is, for every Read node in the project, there will be a corresponding Source in RV with the same media, available for playback on demand.  Adding or Deleteing a Read node in Nuke will trigger the corresponding action in RV.  Changes to Read node file path, frame range, and color space will also be reflected in RV.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_quick_start_summary">Quick Start Summary</h3>
+<div class="paragraph"><p>You must set the RV executable path using the <em>RV/Preferences..</em> menu item before you use RV with Nuke at all, and whenever you
+start work on a new project/script, use <em>RV/Project Settings&#8230;</em> to make
+sure that the <em>Session Directory</em> is set to something reasonable before you
+start RV from that script for the first time.  See above for details.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_rv_toolbar">RV Toolbar</h3>
+<div class="paragraph"><p>Note that all the items on the RV menu are also available on the RV toolbar, which you can find in the Panes submenu.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_read_write_nodes">Read/Write Nodes</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Once you&#8217;ve set the RV path and Session Dir as described above, and have an
+interesting Nuke script loaded, try starting up RV with the <em>RV/Start RV</em> menu
+item.  Assuming you have the <em>Sync Read Changes</em> setting active, as soon as RV
+starts you should see all the Read nodes in the script reflected as media
+Sources in RV.</p></div>
+<div class="paragraph"><p>If you don&#8217;t see the Session Manager, try hitting the <em>x</em> to bring it up.  In
+the Session Manager, You&#8217;ll see a Folder called &#8220;Read Nodes&#8221; with a Source
+for each Read node in the script.  Each source is labeled with the name of the
+corresponding Read node, and a timestamp for when it was last modified.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="paragraph"><p>The Session Manager behavior at RV start-up can be set to "aways shown", "always hidden"
+or "remember previous state" using the "wrench" menu on the Session Manager.</p></div>
+</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>You can double-click on each Source to play just that one, or on the &#8220;Read
+Nodes&#8221; folder to see them all.</p></div>
+<div class="paragraph"><p>Back in Nuke, note that if you edit the Path, Frame Range, or Color Space
+attributes of a Read node, the changes are reflected in the corresponding
+Source in RV.</p></div>
+<div class="paragraph"><p>If the <em>Sync Selection</em> setting is active, as you select various Read nodes in
+Nuke, the RV current view switches to the corresponding Source.</p></div>
+<div class="paragraph"><p>Also, if the <em>Sync Frame</em> setting is active, frame changes in the Nuke viewer
+will be reflected in RV.</p></div>
+<div class="paragraph"><p>Note that if you don&#8217;t want all Read Nodes to be synced automatically, you can
+still sync some (or all) of them when you want to with the appropriate items on
+the <em>RV</em> menu.</p></div>
+<div class="paragraph"><p>Pretty much all the above applies to Write nodes as well.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_checkpoints_and_renders">Checkpoints and Renders</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>As with Read nodes, Checkpoints and Renders are representations in RV of
+particular nodes in Nuke.  So the Frame and Selection syncing described in the
+Read Nodes section applies to Checkpoints and Renders as well.</p></div>
+<div class="paragraph"><p>Unlike Read nodes, the media associated with Checkpoints and Renders are
+generated from the Nuke script and so reflect the state of the script at the
+time of rendering.</p></div>
+<div class="sect2">
+<h3 id="_checkpoints">Checkpoints</h3>
+<div class="paragraph"><p>The point of a Checkpoint is to to visually label a particular point in your
+projects development, so that you can easily return to that point if you want
+to.   When you&#8217;ve made some changes in your script, and reach a point where you
+want to go in another direction, or try something out, or work on a different
+aspect of the project, that&#8217;s a good time to &#8220;bookmark&#8221; your work with a Checkpoint.</p></div>
+<div class="paragraph"><p>To make a Checkpoint, select a node that visually reflects the state of the
+script and select <em>RV/Create Checkpoint</em>.  You&#8217;ll see a new Source
+appear in RV, in a Folder named for the node you selected, with a single
+rendered frame from that node.</p></div>
+<div class="paragraph"><p>As you work on a particular aspect of your project, you may want to make many
+Checkpoints of a particular node, so that you can easily compare the visual
+effect of different parameter settings.  They&#8217;ll all be collected in a single
+folder in the Session Manager, and as with Read nodes, you can double click on
+a single one to view it, or double click on the folder itself to see them all.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_rendering">Rendering</h3>
+<div class="paragraph"><p>A Render is similar to a Checkpoint, but involves rendering a sequence of
+frames, instead of just one.  To render, select the node of interest, then
+select <em>RV/Render to RV</em>.  You&#8217;ll get a dialog with some parameters:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Output Node
+</dt>
+<dd>
+<p>
+    The name of the node to be rendered.
+</p>
+</dd>
+<dt class="hdlist1">
+Use Selected
+</dt>
+<dd>
+<p>
+    If checked, the output node will always be equal to whatever node is
+selected when the dialog is shown.  If unchecked, the output node will
+&#8220;stick&#8221; and not be affected by the selection.
+</p>
+</dd>
+<dt class="hdlist1">
+First Frame
+</dt>
+<dd>
+<p>
+    The first frame in the sequence to be rendered.
+</p>
+</dd>
+<dt class="hdlist1">
+Last Frame
+</dt>
+<dd>
+<p>
+    The last frame in the sequence to be rendered.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Since Renders can occupy significant disk space, successive renders of the same
+node overwrite any pre-existing render.  But each render also automatically
+generates a single-frame Checkpoint of the same Nuke state.  Also, deleting a Render or
+Checkpoint in the Session Manager (with the Trash Can button), also removes the
+corresponding media from disk.</p></div>
+<div class="paragraph"><p>During a Render, RV updates dynamically to show you all the frames rendered so
+far.  If the render is canceled, you still see in RV any frames that completed
+before the cancel.  RV Sources from renders go into the same Folder as
+Checkpoints from the same node.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_full_checkpoints">Full Checkpoints</h3>
+<div class="paragraph"><p>A Full Checkpoint is just like a regular checkpoint except that an entire
+sequence of frames is saved.   To create a Full Checkpoint, select a Render in
+the RV Session Manager and then select <em>Create Full Checkpoint</em> from the <em>Nuke</em>
+menu in RV.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_working_with_media_in_rv">Working with Media in RV</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>There&#8217;s lots of useful info online on this topic in the
+<a href="https://www.shotgridsoftware.com/rv">RV User Manual</a>.
+Paricularly relevant here is the chapter on the
+<a href="https://www.shotgridsoftware.com/rv">Session Manager</a>
+and the section on
+<a href="https://www.shotgridsoftware.com/rv">navigation</a></p></div>
+<div class="sect2">
+<h3 id="_folders">Folders</h3>
+<div class="paragraph"><p>Folders are new in RV 3.10.9 and open up lots of organizational possibilities.
+The Nuke integration makes use of Folders to organize your media.  You&#8217;ll have
+a folder for all your Read nodes, a folder of checkpoints and renders for each
+rendered node, and a catch-all folder called &#8220;Other&#8221; to collect the rest.
+All folders are viewable and make for a handy &#8220;browsing&#8221; interface.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_comparisons">Comparisons</h3>
+<div class="paragraph"><p>You can easily Compare two or more renders or checkpoints (or any views,
+actually).  Just select the views of interest in the Session Managerand select
+on the comparison items on RV&#8217;s <em>Nuke</em> menu: <em>Nuke/Wipe Selected Views</em> or
+<em>Nuke/Tile Selected Views</em>.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_modifying_the_nuke_project_from_rv">Modifying the Nuke Project from RV</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_restoring_checkpoints">Restoring Checkpoints</h3>
+<div class="paragraph"><p>Any Checkpoint (or Render) can provide a source from which the Nuke project can
+be restored to the state it was in when the Checkpoint&#8217;s media was rendered.
+To restore a Checkpoint, select it in the RV Session Manager, and choose <em>Nuke/Restore Checkpoint</em>.
+After a confirmation dialog, the Nuke script will be restored.</p></div>
+<div class="paragraph"><p>The navigation techniques referenced above combine with checkpoint restoration to produce some nice workflows (I think).  For example:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+After lots of rendering and checkpointing of node <em>FinalMerge</em>, double-click on the <em>Renders of FinalMege</em> folder to see a layout of all the checkpoints and renders.
+</p>
+</li>
+<li>
+<p>
+Bring up the Image Info widget to mouse around and see the names and timestamps of all the views in the layout.
+</p>
+</li>
+<li>
+<p>
+Double click on one if the tiles to examine that checkpoint more closely.
+</p>
+</li>
+<li>
+<p>
+Decide to restore this checkpoint, it&#8217;s alread selected, so just hit <em>Nuke/Restore Checkpoint</em>
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Also note that the Restore operation is undo-able, from the Nuke <em>Edit</em> menu.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_adding_read_nodes">Adding Read Nodes</h3>
+<div class="paragraph"><p>Of course you can still view media that&#8217;s unconnected to the Nuke project in a
+connected RV.  So you can for example browse an element library.  Once you have
+media that you&#8217;d like to include in your project, just select the Sources in
+the Session Manager and choose <em>Nuke/Create Nuke Read Node</em>.  The corresponding
+Read node will be created in Nuke.  Actually you can create any number at once
+by just selecting however many you want.</p></div>
+<div class="paragraph"><p><a id="planned-work"></a></p></div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_10_released_9_29_14_with_rv_4_0_13">Version 1.10, released 9/29/14, with RV 4.0.13</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Further updates for RV v4.0.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_appendix_release_notes">Appendix: Release Notes</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_version_1_9_released_12_17_13_with_rv_4_0_10">Version 1.9, released 12/17/13, with RV 4.0.10</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Updated for RV v4.0.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_7_released_10_19_11_with_rv_3_12_12">Version 1.7, released 10/19/11, with RV 3.12.12</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Bracket all RV media changes with caching threads halt/restart, which prevents at least one crash.
+</p>
+</li>
+<li>
+<p>
+Handle case of "offset" frame ranges in Read node with synced corresponding rangeOffset on RV side.
+</p>
+</li>
+<li>
+<p>
+Don&#8217;t restrict render frame range to that of node, since it seems the global range is often more correct (in future need choice).
+</p>
+</li>
+<li>
+<p>
+Get better frame ranges for Read/Write viewing to prevent single-frame source on RV side.
+</p>
+</li>
+<li>
+<p>
+Cleaner disconnect in the case where RV shuts down first.
+</p>
+</li>
+<li>
+<p>
+Don&#8217;t restart RV automatically after crash or other unexpected exit.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_6_released_9_26_11_with_rv_3_12_11">Version 1.6, released 9/26/11, with RV 3.12.11</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Update for python-enabled RV 3.12.11
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_5_released_5_8_11">Version 1.5, released 5/8/11</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Support for proxy-mode output for checkpoints and renders.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_4_released_4_7_11_with_rv_3_10_13">Version 1.4, released 4/7/11, with RV 3.10.13</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Full support for <code>%Vv</code>-style stereoscopy, including checkpoints and renders.
+</p>
+</li>
+<li>
+<p>
+View Write nodes similarly to Read nodes.
+</p>
+</li>
+<li>
+<p>
+Better error handling during batch render, disconnect.
+</p>
+</li>
+<li>
+<p>
+<em>Session Dir Base</em> preference to specify root directory for new session directories.
+</p>
+</li>
+<li>
+<p>
+Newlines in labels no longer cause a problem for checkpointing.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_version_1_3_released_2_28_11_with_rv_3_10_11">Version 1.3, released 2/28/11, with RV 3.10.11</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+R3D files no longer crash RV.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_appendix_known_issues_and_planned_work">Appendix: Known Issues and Planned Work</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_known_issues">Known Issues</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Duplicate Nuke node names confuse RV (but they confuse Nuke too &#8230;)
+</p>
+</li>
+<li>
+<p>
+There are several "frame number mapping" problems that we&#8217;re investigating.
+</p>
+</li>
+</ul></div>
+<div class="sect2">
+<h3 id="_next_round">Next Round</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Hotkeys for appropriate RV menu items in Nuke
+</p>
+</li>
+<li>
+<p>
+"Redo Last Checkpoint" item/button
+</p>
+</li>
+<li>
+<p>
+"Redo Last Render" item/button
+</p>
+</li>
+<li>
+<p>
+Checkpoint/Render multiple nodes
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_future_work">Future Work</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+Add sorting in session-manager, to sort by timestamp/type
+</p>
+</li>
+<li>
+<p>
+RV core: add reload only new/changed frames, use during render updates
+</p>
+</li>
+<li>
+<p>
+Set RV display color settings from Nuke viewer color settings
+</p>
+</li>
+<li>
+<p>
+Per render-node prefs (audio or not, stereo, frame-range)
+</p>
+</li>
+<li>
+<p>
+Store audio file / offset in Nuke project settings
+</p>
+</li>
+<li>
+<p>
+Copy input color (linearizing) settings from RV sources to created   Read nodes in Nuke
+</p>
+</li>
+<li>
+<p>
+Nuke panel (not dialog) with sync controls, quick checkpoint button, ?
+</p>
+</li>
+<li>
+<p>
+Optionally push current frame number from RV to Nuke
+</p>
+</li>
+<li>
+<p>
+Set viewer input in Nuke from current view in RV
+</p>
+</li>
+<li>
+<p>
+Optionally restore checkpoint to a new Nuke session
+</p>
+</li>
+<li>
+<p>
+Handle creating stereo Reads in Nuke from "browsed" stereo sources   in RV
+</p>
+</li>
+<li>
+<p>
+Mark/group checkpoints that are associated with same Nuke script
+</p>
+</li>
+<li>
+<p>
+Popup warning dialog when render/checkpoint (and media) is deleted
+</p>
+</li>
+<li>
+<p>
+Adjust audio offset in renders with audio according to frame range
+</p>
+</li>
+<li>
+<p>
+Create pre-comps in RV, transfer to Nuke
+</p>
+</li>
+<li>
+<p>
+Color adjustments in RV, transfer to Nuke
+</p>
+</li>
+<li>
+<p>
+Manage (proxy of) final comp (over) in RV
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated
+ 2022-10-27 14:33:59 EDT
+</div>
+</div>
+</body>
+</html>

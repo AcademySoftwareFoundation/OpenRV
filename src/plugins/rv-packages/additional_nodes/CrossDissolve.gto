@@ -1,0 +1,52 @@
+GTOa (4)
+
+CrossDissolve : IPNodeDefinition (1)
+{
+    node
+    {
+        string evaluationType = "transition"
+        string defaultName = "crossDissolve"
+        string creator = "Tweak Software"
+        string documentation = "Cross Dissolve"
+        int userVisible = 1
+        string name = "CrossDissolve"
+        int version = 1
+        int isGroup = 0
+        string author = ""
+        string company = ""
+        string comment = ""
+        string date = ""
+        string signature = "340c8ea3897ae27691d40e4189618b76b2b0bb12"
+        int signatureVersion = 1
+    }
+
+    render
+    {
+        int intermediate = 1
+    }
+
+    function
+    {
+        string name = "main"
+        string type = "merge"
+        string glsl = "file://${HERE}/CrossDissolve.glsl"
+        int fetches = 2
+    }
+
+    parameters
+    {
+        float startFrame = 40
+        float numFrames = 20
+    }
+
+    documentation
+    {
+        string summary = ""
+        string html = ""
+    }
+
+    icon
+    {
+        byte RGBA = [ ]
+    }
+}

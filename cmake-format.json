@@ -1,0 +1,11 @@
+{
+  "line_width": 160,
+  "tab_size": 2,
+  "max_subgroups_hwrap": 1,
+  "dangle_parens": true,
+  "separate_ctrl_name_with_space": false,
+  "separate_fn_name_with_space": false,
+  "enable_sort": true,
+  "keyword_case": "upper",
+  "command_case": "upper"
+}
