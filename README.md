@@ -17,7 +17,7 @@ You can build Open RV for Linux, Windows, and macOS. You build it from scratch u
 
 #### Build Aliases
 
-You can use `source rvmds.sh` to add common build aliases into your shell. After the first download following the installation of the required dependencies, use `rvbootstrap` to set up, configure, and build Open RV with the default options.
+You can use `source rvcmds.sh` to add common build aliases into your shell. After the first download following the installation of the required dependencies, use `rvbootstrap` to set up, configure, and build Open RV with the default options.
 
 After the setup, you can use `rvmk` to build.
 
