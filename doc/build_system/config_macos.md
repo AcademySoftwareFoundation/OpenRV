@@ -56,7 +56,7 @@ From the root of the repository, execute `cmake` specifying the path to an arbit
 For example:
 
 ```bash
-cmake -B cmake-build -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=$HOME/Qt5.15.11/5.15.11/clang_64
+cmake -B cmake-build -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=$HOME/Qt/5.15.2/clang_64
 ```
 
 ### Custom generator
