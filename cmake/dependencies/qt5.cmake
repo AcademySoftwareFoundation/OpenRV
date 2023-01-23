@@ -20,6 +20,15 @@ IF(NOT RV_DEPS_QT5_LOCATION
   )
 ENDIF()
 
+SET(RV_DEPS_QT5_RESOURCES_FOLDER
+    "${RV_DEPS_QT5_LOCATION}/resources"
+    CACHE STRING "Path to the Qt resources files folder"
+)
+SET(RV_DEPS_QT5_TRANSLATIONS_FOLDER
+    "${RV_DEPS_QT5_LOCATION}/translations"
+    CACHE STRING "Path to the Qt translations files folder"
+)
+
 FILE(GLOB QT5_CMAKE_DIRS ${RV_DEPS_QT5_LOCATION}/lib/cmake/*)
 FOREACH(
   QT5_CMAKE_DIR
@@ -125,13 +134,13 @@ IF(RV_TARGET_LINUX)
 
   MESSAGE(STATUS "Copying Qt resources files ...")
   FILE(
-    COPY "${RV_DEPS_QT5_LOCATION}/resources"
+    COPY "${RV_DEPS_QT5_RESOURCES_FOLDER}"
     DESTINATION "${RV_STAGE_ROOT_DIR}"
   )
 
   MESSAGE(STATUS "Copying Qt translations files ...")
   FILE(
-    COPY "${RV_DEPS_QT5_LOCATION}/translations"
+    COPY "${RV_DEPS_QT5_TRANSLATIONS_FOLDER}"
     DESTINATION "${RV_STAGE_ROOT_DIR}"
   )
 ENDIF()
