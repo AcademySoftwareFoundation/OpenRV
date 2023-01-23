@@ -35,36 +35,19 @@ SET(_install_dir
 )
 
 SET(_boost_libs
-    atomic
     chrono
-    container
-    context
-    contract
-    coroutine
     date_time
     filesystem
     graph
     iostreams
     locale
-    log
-    log_setup
-    numpy39
-    prg_exec_monitor
     program_options
-    python39
     random
     regex
     serialization
-    stacktrace_addr2line
-    stacktrace_basic
-    stacktrace_noop
     system
     thread
     timer
-    type_erasure
-    unit_test_framework
-    wave
-    wserialization
 )
 
 SET(_lib_dir
@@ -193,6 +176,12 @@ ENDIF()
 
 STRING(TOLOWER ${CMAKE_BUILD_TYPE} _boost_variant)
 
+LIST(
+  TRANSFORM _boost_libs
+  PREPEND "--with-"
+          OUTPUT_VARIABLE _boost_with_list
+)
+
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS Python::Python
@@ -208,8 +197,7 @@ EXTERNALPROJECT_ADD(
     # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
     # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
     ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=x86 address-model=64
-    --with-chrono --with-date_time --with-filesystem --with-graph --with-iostreams --with-locale --with-program_options --with-random --with-regex
-    --with-serialization --with-system --with-thread --with-timer ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
+    ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
   INSTALL_COMMAND echo "Boost was both built and installed in the build stage"
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
