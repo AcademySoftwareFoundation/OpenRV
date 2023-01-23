@@ -85,7 +85,8 @@ def prepare() -> None:
     if os.path.exists(libclang_zip) is False:
         download_file(libclang_url, libclang_zip)
     # if we have a failed download, clean it up and redownload.
-    elif not verify_7z_archive(libclang_zip):
+    # checking for False since it can return None when archive doesn't have a CRC
+    elif verify_7z_archive(libclang_zip) is False:
         os.remove(libclang_zip)
         download_file(libclang_url, libclang_zip)
 
