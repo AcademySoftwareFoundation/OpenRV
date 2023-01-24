@@ -52,6 +52,7 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
+#include <thread>
 #include <signal.h>
 #include <stdlib.h>
 #include <stl_ext/thread_group.h>

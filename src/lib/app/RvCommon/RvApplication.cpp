@@ -38,6 +38,7 @@
 //#include <qglobal.h>
 #include <iostream>
 #include <iterator>
+#include <thread>
 #include <stl_ext/stl_ext_algo.h>
 #include <arg.h>
 #include <boost/algorithm/string.hpp>

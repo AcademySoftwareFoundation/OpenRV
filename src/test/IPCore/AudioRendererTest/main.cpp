@@ -10,6 +10,7 @@
 #include <IPCore/Application.h>
 #include <IPCore/AudioRenderer.h>
 #include <IPCore/Session.h>
+#include <thread>
 
 using namespace std;
 using namespace IPCore;
