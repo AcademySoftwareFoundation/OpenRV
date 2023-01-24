@@ -18,7 +18,7 @@
 #endif
 #include <windows.h>
 #include <assert.h>
-#else
+#elif __APPLE__
 #include <sys/sysctl.h>
 #endif
 
