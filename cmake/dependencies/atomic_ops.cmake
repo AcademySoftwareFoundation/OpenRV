@@ -15,17 +15,13 @@ SET(_version
     "7.7.0"
 )
 
-# Download the latest version because the feature we need (--disable-gpl)
-# has not been released nor tagged yet
-# SET(_download_url
-#     "https://github.com/ivmai/libatomic_ops/archive/refs/tags/v${_version}.zip"
-# )
+# Download a recent version that includes the feature we need (--disable-gpl) which hasn't been released nor tagged yet.
 SET(_download_url
-     "https://github.com/ivmai/libatomic_ops/archive/refs/heads/master.zip"
+    "https://github.com/ivmai/libatomic_ops/archive/044573903530c4a8e8318e20a830d4a0531b2035.zip"
 )
 
 SET(_download_hash
-      8da38242d61d746e070e021a735798b9
+    cc7fad1e71b3064abe1ea821ae9a9a6e
 )
 
 SET(_install_dir
@@ -111,7 +107,7 @@ SET_PROPERTY(
 )
 
 SET(_include_dir
-  ${_install_dir}/include
+    ${_install_dir}/include
 )
 FILE(MAKE_DIRECTORY ${_include_dir})
 TARGET_INCLUDE_DIRECTORIES(
