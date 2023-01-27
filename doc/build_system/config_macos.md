@@ -45,6 +45,10 @@ python3 -m pip install -r requirements.txt
 
 Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
 
+
+WARNING: If you decide fetch Qt from another source, make sure to build it with SSL support and that  it contains everything required to build PySide2 and that the file structure is similar to the official package.
+FYI. Qt5 from homebrew is known to not work well with OpenRV.
+
 ## Configure
 
 The project uses CMake and requires a configure step before building. It is during the configure step that you provide your Qt package.
