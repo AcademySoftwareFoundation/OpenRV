@@ -21,7 +21,7 @@ sudo yum install sudo wget git
 
 ## Install devtoolset-9
 
-By default the CentOS 7.9 built-in tools won't match the requirements we have to build RV. Install [devtoolset-9](https://www.softwarecollections.org/en/scls/rhscl/devtoolset-9/] to remedy the situation.
+By default the CentOS 7.9 built-in tools won't match the requirements we have to build RV. Install devtoolset-9 to remedy the situation.
 
 ```bash
 sudo yum install centos-release-scl
