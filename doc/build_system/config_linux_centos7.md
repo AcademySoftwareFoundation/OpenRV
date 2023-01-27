@@ -81,9 +81,9 @@ sudo make install
 
 ## Install Qt
 
-A full distribution of Qt 5.15 is required to build RV. You can download Qt 5.15.2 from the [Qt page](https://www.qt.io/download) (an account might be required).
+Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
 
-From the online installer, select everything under 5.15.2 except Logs, and Android.
+WARNING: If you decide fetch Qt from another source, make sure to build it with SSL support and that  it contains everything required to build PySide2 and that the file structure is similar to the official package.
 
 ## Configure
 

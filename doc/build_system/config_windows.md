@@ -25,9 +25,12 @@ Note: The current version of PySide2 required by RV (5.15.2.1) cannot be built w
 
 ## 2. Install Qt
 
-Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://account.qt.io/s/downloads) (an account might be required).
+Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
 
-Note: If you do have jom installed you will need it to build. You can download it from here: https://download.qt.io/official_releases/jom/.  The contents of the package need to be copied into the QT installation directory under Tools/QtCreator/bin/jom.
+Note: You will also need `jom`, and it is included with Qt Creator (available from the Qt online installer). If you do not want to install Qt Creator, you can download it from [here](https://download.qt.io/official_releases/jom/) and copy the executable into the QT installation root directory under Tools/QtCreator/bin/jom.
+
+WARNING: If you decide fetch Qt from another source, make sure to build it with SSL support and that  it contains everything required to build PySide2 and that the file structure is similar to the official package. 
+FYI. Qt from MSYS2 is missing QtWebEngine.
 
 ## 3. Install Strawberry Perl
 
