@@ -391,15 +391,16 @@ def _create_collection(collection, context=None):
         return results[0]
 
 
-def _create_media(media_ref, context=None):
+def _create_media(media_ref, trimmed_range, context=None):
     context = context or {}
+    media_range = media_ref.available_range or trimmed_range
 
     if isinstance(media_ref, otio.schema.ExternalReference):
         media = [_get_media_path(str(media_ref.target_url), context)]
 
         if context.get("track_kind", None) == otio.schema.TrackKind.Audio:
             # Create blank video media to accompany audio for valid source
-            blank = _create_movieproc(media_ref.available_range)
+            blank = _create_movieproc(media_range)
             # Appending blank to media promotes name of audio file in RV
             media.append(blank)
         return media
@@ -415,12 +416,12 @@ def _create_media(media_ref, context=None):
                 context,
             )
         ]
-    return [_create_movieproc(media_ref.available_range, "smptebars")]
+    return [_create_movieproc(media_range, "smptebars")]
 
 
 def _create_sources(item, context=None):
     def add_media(media_ref, active_key, cmd, *cmd_args):
-        media = _create_media(media_ref, context)
+        media = _create_media(media_ref, item.trimmed_range(), context)
 
         if active_key:
             media += ["+mediaRepName", active_key]

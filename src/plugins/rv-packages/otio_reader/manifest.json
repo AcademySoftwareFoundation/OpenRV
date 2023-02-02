@@ -17,6 +17,12 @@
         }, 
         {
            "OTIO_SCHEMA" : "HookScript.1",
+           "name" : "create_effect",
+           "execution_scope" : "in_process",
+           "filepath" : "genericEffectHook.py"
+        }, 
+        {
+           "OTIO_SCHEMA" : "HookScript.1",
            "name" : "export_cdl",
            "execution_scope" : "in_process",
            "filepath" : "cdlExportHook.py"
@@ -33,7 +39,6 @@
            "execution_scope" : "in_process",
            "filepath" : "retimeExportHook.py"
         },
-
         {
             "OTIO_SCHEMA" : "HookScript.1",
             "name" : "clip",
@@ -62,6 +67,7 @@
     ],
     "hooks" : {
         "CDL_to_rv" : ["create_cdl"],
+        "Effect_to_rv" : ["create_effect"],
         "export_RVLinearize" : ["export_cdl"],
         "FreezeFrame_to_rv": ["create_timewarp"],
         "LinearTimeWarp_to_rv": ["create_timewarp"],
