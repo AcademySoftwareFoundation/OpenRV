@@ -28,6 +28,8 @@ files:
     location: SupportFiles/$PACKAGE
   - file: effectHook.py
     location: SupportFiles/$PACKAGE
+  - file: genericEffectHook.py
+    location: SupportFiles/$PACKAGE
   - file: timeWarpHook.py
     location: SupportFiles/$PACKAGE
   - file: customTransitionHook.py
@@ -116,6 +118,13 @@ description: |
     </p>
     </li>
     
+    <li>
+    <p>
+    genericEffectHook.py
+    A for handling the Effect schema.
+    </p>
+    </li>
+
     <li>
     <p>
     timeWarpHook.py
