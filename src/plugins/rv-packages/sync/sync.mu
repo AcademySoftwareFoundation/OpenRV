@@ -25,8 +25,9 @@ use io;
 use mode_manager;
 require sync_mode;
 
-global int version = 4;
-global string minRVVersion = "2021.0.2";
+global int SYNC_VERSION_CURRENT = 5;
+global int SYNC_VERSION_WITH_CHECK_SYNC_VERSION_SUPPORT = 5;
+global int SYNC_VERSION_MIN_COMPATIBLE = 4;
 global float POINTER_TIME_TO_LIVE = 10.0;
 
 \: deb(void; string s) 
@@ -779,7 +780,7 @@ class: RemoteSync : MinorMode
 
             remoteSendEvent("remote-sync-version",
                             s,
-                            "%d|%s" % (version, sessionName()),
+                            "%d|%s" % (SYNC_VERSION_CURRENT, sessionName()),
                             string[] {c});
 
             if (_contacts.size() == 1 && ! remoteConnectionIsIncoming(c))
@@ -863,7 +864,7 @@ class: RemoteSync : MinorMode
         if (c neq nil)
         {
             c._version = int(contents);
-            if (c._version < version) _hasOlderContactVersions = true;
+            if (c._version < SYNC_VERSION_CURRENT) _hasOlderContactVersions = true;
         }
         else
         {
@@ -883,15 +884,7 @@ class: RemoteSync : MinorMode
             _firstConnect = nil;
         }
 
-        //
-        //  This is kinda convoluted because it must work with sync partners with
-        //  old versions of RV, so can't rely on any particular sync code.
-        //
-
-        remoteSendEvent("remote-eval", "*", """
-            require system; remoteSendEvent("remote-eval", "*", 
-                "require sync; sync.checkRVVersion(\\"%s\\");" % system.getenv("TWK_APP_VERSION"));
-            """);
+        checkSyncVersion(c._version);
 
         event.reject();
     }
@@ -2864,30 +2857,22 @@ class: RemoteSync : MinorMode
 
 \: remoteStartUp (void;) { startUp(); }
 
-\: checkRVVersion (void; string remoteVersion)
+\: checkSyncVersion (void; int remoteVersion)
 {
-    let parts    = remoteVersion.split("."),
-        minParts = minRVVersion.split(".");
-
-    for_index (i; parts)
+    if (remoteVersion < SYNC_VERSION_MIN_COMPATIBLE)
     {
-        if (int(parts[i]) > int(minParts[i])) break;
-        else
-        if (int(parts[i]) < int(minParts[i]))
-        {
-            alertPanel(true,
-                    ErrorAlert,
-                    "ERROR: Sync version mismatch. Shutting down sync.",
-                    "Remote version = %s, we require version %s or above." 
-                        % (remoteVersion, minRVVersion),
-                    "Ok", nil, nil);
+        alertPanel(true,
+                ErrorAlert,
+                "ERROR: Sync version mismatch. Shutting down sync.",
+                "Remote version = %s, we require version %s or above." 
+                    % (remoteVersion, SYNC_VERSION_MIN_COMPATIBLE),
+                "Ok", nil, nil);
 
-            State state = data();
-            if (state.sync neq nil && state.sync._active) 
-            {
-                RemoteSync s = state.sync;
-                s.disconnect();
-            }
+        State state = data();
+        if (state.sync neq nil && state.sync._active) 
+        {
+            RemoteSync s = state.sync;
+            s.disconnect();
         }
     }
 }
