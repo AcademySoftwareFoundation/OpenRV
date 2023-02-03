@@ -43,6 +43,7 @@ SwitchIPNode::SwitchIPNode(const std::string& name,
     m_outputSize->back() = 480;
 
     m_useCutInfo       = declareProperty<IntProperty>("mode.useCutInfo", 1);
+    m_autoEDL = declareProperty<IntProperty>("mode.autoEDL", 1);
     m_alignStartFrames = declareProperty<IntProperty>("mode.alignStartFrames", 0);
     m_autoSize         = declareProperty<IntProperty>("output.autoSize", 1);
     m_activeInput      = declareProperty<StringProperty>("output.input", "");
@@ -104,7 +105,7 @@ SwitchIPNode::propertyChanged(const Property* p)
 {
     if (!isDeleting())
     {
-        if (p == m_useCutInfo || p == m_alignStartFrames || p == m_outputFPS)
+        if (p == m_useCutInfo || p == m_alignStartFrames || p == m_outputFPS || p == m_autoEDL)
         {
             lock();
             m_rangeInfoDirty = true;
@@ -200,6 +201,7 @@ SwitchIPNode::computeRanges()
 
     const bool useCutInfo = m_useCutInfo->front();
     const bool alignStartFrames = m_alignStartFrames->front();
+    const bool autoEDL= m_autoEDL->front();
 
     for (size_t i = 0; i < ninputs; i++)
     {
@@ -259,7 +261,7 @@ SwitchIPNode::computeRanges()
 
     m_info.cutIn = m_info.start;
     m_info.cutOut = m_info.end;
-    m_offset = m_info.start - 1;
+    m_offset = autoEDL ? m_info.start - 1 : 0;
 
     if (m_outputFPS->front() == 0.0 && !m_rangeInfos.empty())
     {

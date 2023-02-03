@@ -94,6 +94,7 @@ private:
     FloatProperty*              m_outputFPS;
     IntProperty*                m_outputSize;
     IntProperty*                m_autoSize;
+    IntProperty*                m_autoEDL;
 };
 
 } // Rv
