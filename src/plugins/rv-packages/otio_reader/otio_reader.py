@@ -470,6 +470,9 @@ def _create_sources(item, context=None):
                 )
 
         switch_group = commands.nodeConnections(source_group)[1][0]
+        switch = extra_commands.nodesInGroupOfType(switch_group, 'RVSwitch')[0]
+        commands.setIntProperty('{}.mode.autoEDL'.format(switch), [0])
+
         return switch_group, active_source
 
     return source_group, active_source
