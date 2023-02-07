@@ -48,6 +48,7 @@
 #endif
 
 #include <QtCore/qlogging.h>
+#include <QtCore/QStandardPaths>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QGridLayout>
@@ -1470,7 +1471,7 @@ RvApplication::initializeQSettings(string altPath)
         QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, config);
         QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, config);
     #elif defined(PLATFORM_WINDOWS)
-        QString config(home + "/Application Data");
+        QString config = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if (altPath.size()) config = altPath.c_str();
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, config);
         QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, config);
