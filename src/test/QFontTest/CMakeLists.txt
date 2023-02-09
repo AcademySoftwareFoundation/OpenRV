@@ -10,10 +10,10 @@ SET(CMAKE_AUTORCC
     ON
 )
 SET(_font_qrc
-    ${CMAKE_SOURCE_DIR}/src/lib/app/RvCommon/qrc/RvCommon.qrc
+    ${PROJECT_SOURCE_DIR}/src/lib/app/RvCommon/qrc/RvCommon.qrc
 )
 SET(_font_path
-    ${CMAKE_SOURCE_DIR}/src/lib/app/RvCommon/qrc/fonts/fontawesome-webfont.ttf
+    ${PROJECT_SOURCE_DIR}/src/lib/app/RvCommon/qrc/fonts/fontawesome-webfont.ttf
 )
 FIND_PACKAGE(
   Qt5

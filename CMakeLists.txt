@@ -5,6 +5,25 @@
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 3.24)
 
+SET(RV_MAJOR_VERSION
+    "1"
+    CACHE STRING "RV's version major"
+)
+SET(RV_MINOR_VERSION
+    "0"
+    CACHE STRING "RV's version minor"
+)
+SET(RV_REVISION_NUMBER
+    "0"
+    CACHE STRING "RV's revision number"
+)
+
+PROJECT(
+  open-rv
+  VERSION "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"
+  LANGUAGES CXX C
+)
+
 SET(CMAKE_CONFIGURATION_TYPES
     "Debug;Release"
     CACHE STRING "" FORCE
@@ -29,10 +48,12 @@ SET(CMAKE_BUILD_TYPE
 
 MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+MESSAGE("PROJECT DIR ${PROJECT_SOURCE_DIR}")
+
 # Specify our own CMake modules so we can include them right after.
 SET(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/defaults ${CMAKE_SOURCE_DIR}/cmake/dependencies ${CMAKE_SOURCE_DIR}/cmake/globals
-    ${CMAKE_SOURCE_DIR}/cmake/macros
+    ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/defaults ${PROJECT_SOURCE_DIR}/cmake/dependencies ${PROJECT_SOURCE_DIR}/cmake/globals
+    ${PROJECT_SOURCE_DIR}/cmake/macros
 )
 
 SET(CMAKE_OSX_DEPLOYMENT_TARGET
@@ -40,11 +61,6 @@ SET(CMAKE_OSX_DEPLOYMENT_TARGET
 )
 INCLUDE(rv_version) # RV's build system global variables
 
-PROJECT(
-  open-rv
-  VERSION ${RV_VERSION_STRING}
-  LANGUAGES CXX C
-)
 
 INCLUDE(rv_options) # RV's build options
 INCLUDE(rv_targets) # RV's build platform definitions

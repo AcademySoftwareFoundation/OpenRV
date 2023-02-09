@@ -48,7 +48,7 @@ SET(_download_hash
 )
 
 SET(_make_command_script
-    "${CMAKE_SOURCE_DIR}/src/build/make_openssl.py"
+    "${PROJECT_SOURCE_DIR}/src/build/make_openssl.py"
 )
 SET(_make_command
     python3 "${_make_command_script}"

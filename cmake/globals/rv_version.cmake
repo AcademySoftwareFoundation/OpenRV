@@ -3,26 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-
 SET(RV_VERSION_YEAR
     "2023"
     CACHE STRING "RV's year of release."
-)
-SET(RV_MAJOR_VERSION
-    "1"
-    CACHE STRING "RV's version major"
-)
-SET(RV_MINOR_VERSION
-    "0"
-    CACHE STRING "RV's version minor"
-)
-SET(RV_REVISION_NUMBER
-    "0"
-    CACHE STRING "RV's revision number"
-)
-
-SET(RV_VERSION_STRING
-    "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"
 )
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")

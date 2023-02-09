@@ -61,7 +61,7 @@ SET(_make_command
 
 IF(${RV_OSX_EMULATION})
   SET(_meson_cross_file
-      "${CMAKE_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
+      "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
   )
   SET(_configure_command
       ${_configure_command} "--cross-file" ${_meson_cross_file}
