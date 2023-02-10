@@ -5,7 +5,6 @@
 #
 
 INCLUDE(rv_git)
-INCLUDE(rv_version)
 
 SET(RV_DEPS_DOWNLOAD_DIR
     "${RV_DEPS_BASE_DIR}/downloads"

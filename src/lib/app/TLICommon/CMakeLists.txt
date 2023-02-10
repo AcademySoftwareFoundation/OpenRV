@@ -29,8 +29,8 @@ FIND_PACKAGE(
 )
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}
-  PUBLIC .. ${CMAKE_SOURCE_DIR}/src/lib/geometry/TwkContainer ${CMAKE_SOURCE_DIR}/src/lib/files/Gto ${CMAKE_SOURCE_DIR}/src/lib/base/TwkLM
-         ${CMAKE_SOURCE_DIR}/src/lib/app/TwkApp ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC .. ${PROJECT_SOURCE_DIR}/src/lib/geometry/TwkContainer ${PROJECT_SOURCE_DIR}/src/lib/files/Gto ${PROJECT_SOURCE_DIR}/src/lib/base/TwkLM
+         ${PROJECT_SOURCE_DIR}/src/lib/app/TwkApp ${CMAKE_CURRENT_PROJECT_DIR}
 )
 
 TARGET_LINK_LIBRARIES(

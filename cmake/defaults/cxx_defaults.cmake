@@ -16,8 +16,6 @@ IF(NOT RV_C_STANDARD
   MESSAGE(FATAL_ERROR "The RV_C_STANDARD variable is not defined")
 ENDIF()
 
-INCLUDE(rv_version)
-
 # specify the C/C++ standard
 SET(CMAKE_CXX_STANDARD
     ${RV_CPP_STANDARD}

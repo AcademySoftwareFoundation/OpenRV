@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-FIND_PROGRAM(_quote_file quoteFile HINT ${CMAKE_SOURCE_DIR}/src/build/quoteFile.py NO_CACHE REQUIRED)
+FIND_PROGRAM(_quote_file quoteFile HINT ${PROJECT_SOURCE_DIR}/src/build/quoteFile.py NO_CACHE REQUIRED)
 
 FUNCTION(quote_files OUTPUT_LIST)
 

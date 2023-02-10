@@ -86,7 +86,7 @@ FETCHCONTENT_DECLARE(
 FETCHCONTENT_MAKEAVAILABLE(${_pyside2_target})
 
 SET(_python3_make_command_script
-    "${CMAKE_SOURCE_DIR}/src/build/make_python.py"
+    "${PROJECT_SOURCE_DIR}/src/build/make_python.py"
 )
 SET(_python3_make_command
     python3 "${_python3_make_command_script}"
@@ -111,7 +111,7 @@ IF(${RV_OSX_EMULATION})
 ENDIF()
 
 SET(_pyside2_make_command_script
-    "${CMAKE_SOURCE_DIR}/src/build/make_pyside.py"
+    "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
 )
 SET(_pyside2_make_command
     python3 "${_pyside2_make_command_script}"
@@ -187,7 +187,7 @@ ELSE() # Not WINDOWS
 ENDIF()
 
 SET(_requirements_file
-    "${CMAKE_SOURCE_DIR}/src/build/requirements.txt"
+    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt"
 )
 SET(_requirements_install_command
     "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
@@ -232,7 +232,7 @@ ADD_CUSTOM_COMMAND(
   COMMENT "Building PySide2 using ${_pyside2_make_command_script}"
   OUTPUT ${${_pyside2_target}-build-flag}
   # First PySide build script on Windows which doesn't respect '--debug' option
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
           ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
   COMMAND ${_pyside2_make_command} --prepare --build
   COMMAND cmake -E touch ${${_pyside2_target}-build-flag}
