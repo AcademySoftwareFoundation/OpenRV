@@ -158,7 +158,7 @@ void
 VisMainWindow::openFile()
 {
     QString filename = 
-        QFileDialog::getOpenFileName(this, "Select File", ".", "Open RV Profile Data (*.rvprof *.timedata)");
+        QFileDialog::getOpenFileName(this, "Select File", ".", UI_APPLICATION_NAME " Profile Data (*.rvprof *.timedata)");
 
     readFile(filename);
 }
@@ -183,7 +183,7 @@ VisMainWindow::readFile(const QString& filename)
     }
 
     QFileInfo info(filename);
-    setWindowTitle(QString("Open RV Profile Viewer -- %1").arg(info.baseName()));
+    setWindowTitle(QString(UI_APPLICATION_NAME " Profile Viewer -- %1").arg(info.baseName()));
 
     DataVector data;
 

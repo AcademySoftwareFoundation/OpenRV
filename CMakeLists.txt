@@ -18,7 +18,6 @@ SET(RV_REVISION_NUMBER
     CACHE STRING "RV's revision number"
 )
 
-#
 SET(RV_VERSION_YEAR
     "2023"
     CACHE STRING "RV's year of release."
@@ -47,6 +46,10 @@ ELSE()
   )
 ENDIF()
 
+SET(RV_UI_APPLICATION_NAME
+    "Open RV"
+    CACHE STRING "RV's UI application name"
+)
 SET(RV_INTERNAL_APPLICATION_NAME
     "OpenRV"
     CACHE STRING "RV's internal application name"

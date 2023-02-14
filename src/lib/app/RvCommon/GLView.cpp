@@ -143,7 +143,7 @@ GLView::GLView(QWidget* parent,
     setObjectName((m_doc->session()) ?  m_doc->session()->name().c_str() : "no session");
     //m_frameBuffer = new QTFrameBuffer( this );
     ostringstream str;
-    str << "Open RV Main Window" << "/" << m_doc;
+    str << UI_APPLICATION_NAME " Main Window" << "/" << m_doc;
     m_videoDevice = new QTGLVideoDevice(0, str.str(), this);
     m_activityTimer.start();
     setMouseTracking(true);

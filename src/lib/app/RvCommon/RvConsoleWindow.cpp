@@ -102,7 +102,7 @@ RvConsoleWindow::RvConsoleWindow(QWidget* parent)
     //
     m_ui.showComboBox->setFocus();
 
-    setWindowTitle("Open RV Console");
+    setWindowTitle(UI_APPLICATION_NAME " Console");
     setSizeGripEnabled(true);
     bool doRedirect = (getenv("RV_NO_CONSOLE_REDIRECT") == 0);
     //setAttribute(Qt::WA_MacBrushedMetal);

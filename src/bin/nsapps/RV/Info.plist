@@ -587,7 +587,7 @@
       <key>CFBundleIdentifier</key>
       <string>com.autodesk.RV</string>
       <key>CFBundleName</key>
-      <string>Open RV</string>
+      <string>${RV_UI_APPLICATION_NAME}</string>
       <key>CFBundlePackageType</key>
       <string>APPL</string>
       <key>CFBundleResourcesFileMapped</key>
