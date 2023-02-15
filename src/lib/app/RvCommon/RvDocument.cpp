@@ -573,7 +573,7 @@ RvDocument::receive( Notifier *originator,
     else if (m == IPCore::Session::audioUnavailbleMessage())
     {
         QMessageBox box(this);
-        box.setWindowTitle(tr("Open RV: Audio Failure"));
+        box.setWindowTitle(tr(UI_APPLICATION_NAME ": Audio Failure"));
         QString baseText = tr("Audio Device is Currently Unavailable");
         QString detailedText = tr("Another program (maybe another copy of RV?) "
                                "is blocking use of the audio device. "
@@ -619,11 +619,11 @@ void
 RvDocument::resetGLStateAndPrefs()
 {
     QMessageBox box(this);
-    box.setWindowTitle(tr("Open RV: Invalid Display Configuration"));
+    box.setWindowTitle(tr(UI_APPLICATION_NAME ": Invalid Display Configuration"));
     QString baseText = tr("Display Configuration is Invalid");
     QString detailedText = tr("The display configuration in the preferences is\n"
                            "incompatible with this driver and/or graphics hardware.\n"
-                           "Open RV will use the default display configuration to continue.\n"
+                           UI_APPLICATION_NAME " will use the default display configuration to continue.\n"
 #ifdef PLATFORM_LINUX
                            "You can check available display possibilities\n"
                            "using the glxinfo command with the -t option from a shell\n"
@@ -1708,7 +1708,7 @@ RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
 #if !defined(PLATFORM_DARWIN)
     if (!m_rvMenu || !workAroundActionLeak)
     {
-        m_rvMenu = mb()->addMenu("Open RV");
+        m_rvMenu = mb()->addMenu(UI_APPLICATION_NAME);
         m_rvMenu->addAction(RvApp()->aboutAction());
         m_rvMenu->addSeparator();
         m_rvMenu->addAction(RvApp()->prefAction());
@@ -1717,7 +1717,7 @@ RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
         m_rvMenu->addSeparator();
         m_rvMenu->addAction(RvApp()->quitAction());
         m_rvMenu->menuAction()->font().setBold(true);
-        m_rvMenu->setObjectName("Open RV Menu");
+        m_rvMenu->setObjectName(UI_APPLICATION_NAME " Menu");
     }
 #endif
 
@@ -1956,14 +1956,14 @@ RvDocument::checkDriverVSync()
     if (queryDriverVSync() && opts.vsync > 0)
     {
         QMessageBox box(this);
-        box.setWindowTitle(tr("Open RV: VSync Conflict"));
+        box.setWindowTitle(tr(UI_APPLICATION_NAME ": VSync Conflict"));
         QString baseText = tr("Both the graphics driver and RV v-sync are ON. "
-                       "Open RV vsync is being disabled.");
+                      UI_APPLICATION_NAME " vsync is being disabled.");
         QString detailedText("RV's vsync is being disabled for this session because "
                                     "the graphics driver's vsync is also ON. "
                                     "You can change this in the nvidia-settings or "
-                                    "in Open RV's preferences. "
-                                    "Running RV with both vsyncs enabled causes incorrect "
+                                    "in " UI_APPLICATION_NAME "'s preferences. "
+                                    "Running " UI_APPLICATION_NAME " with both vsyncs enabled causes incorrect "
                                     "playback. ");
         box.setText(baseText + "\n\n" + detailedText);
         box.setWindowModality(Qt::WindowModal);
@@ -1983,12 +1983,12 @@ RvDocument::warnOnDriverVSync()
     if (queryDriverVSync())
     {
         QMessageBox box(this);
-        box.setWindowTitle(tr("Open RV: Driver VSync Conflict"));
+        box.setWindowTitle(tr(UI_APPLICATION_NAME ": Driver VSync Conflict"));
         QString baseText = tr("The graphics driver v-sync is ON. "
                        "This can result in bad playback performance in presentation mode.");
         QString detailedText("The graphics driver's vsync is ON. "
                                     "You can change this in the nvidia-settings OpenGL section. "
-                                    "Running Open RV in presentation mode with the driver "
+                                    "Running " UI_APPLICATION_NAME " in presentation mode with the driver "
                                     "vsync enabled will cause incorrect "
                                     "playback. ");
         box.setWindowModality(Qt::WindowModal);

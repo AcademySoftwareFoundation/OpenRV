@@ -257,7 +257,7 @@ RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
     m_webManager(0),
     m_presentationMode(false),
     m_presentationDevice(0),
-    m_executableNameCaps("Open RV"),
+    m_executableNameCaps(UI_APPLICATION_NAME),
     m_deviceCreationFunc(F),
     m_desktopModule(0),
     m_dispatchAtomicInt(0)
@@ -291,8 +291,8 @@ RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
     m_lazyBuildTimer->setSingleShot(true);
     m_lazyBuildTimer->start();
 
-    m_aboutAct = new QAction(tr("About Open RV..."), this);
-    m_aboutAct->setStatusTip(tr("Information about this version of Open RV"));
+    m_aboutAct = new QAction(tr("About " UI_APPLICATION_NAME "..."), this);
+    m_aboutAct->setStatusTip(tr("Information about this version of " UI_APPLICATION_NAME));
     m_aboutAct->setMenuRole(QAction::AboutRole);
     connect(m_aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
@@ -310,24 +310,24 @@ RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
     sep2->setSeparator(true);
 
     m_networkAct = new QAction(tr("Network..."), this);
-    m_networkAct->setStatusTip(tr("Allow remote communication with this Open RV"));
+    m_networkAct->setStatusTip(tr("Allow remote communication with this " UI_APPLICATION_NAME));
     m_networkAct->setMenuRole(QAction::ApplicationSpecificRole);
     connect(m_networkAct, SIGNAL(triggered()), this, SLOT(showNetworkDialog()));
 
-    m_quitAct = new QAction(tr("Quit Open RV"), this);
+    m_quitAct = new QAction(tr("Quit " UI_APPLICATION_NAME), this);
     #ifndef PLATFORM_DARWIN
         m_quitAct->setShortcut(QKeySequence("Ctrl+Q"));
     #endif
-    m_quitAct->setStatusTip(tr("Exit all Open RV Sessions"));
+    m_quitAct->setStatusTip(tr("Exit all " UI_APPLICATION_NAME " Sessions"));
     m_quitAct->setMenuRole(QAction::QuitRole);
     connect(m_quitAct, SIGNAL(triggered()), this, SLOT(quitAll()));
 
 
 #if defined(PLATFORM_DARWIN)
     m_macMenuBar = new QMenuBar(0);
-    // NOTE: the 'Open RV' string below isn't what's visible as main menu.
+    // NOTE: the UI_APPLICATION_NAME string below isn't what's visible as main menu.
     // The main menu visible string comes from the 'src/bin/nsapp/RV/Info.plist' file.
-    m_macRVMenu = m_macMenuBar->addMenu("Open RV");
+    m_macRVMenu = m_macMenuBar->addMenu(UI_APPLICATION_NAME);
     m_macRVMenu->addAction(m_aboutAct);
     if (m_networkAct) m_macRVMenu->addAction(m_networkAct);
     m_macRVMenu->addAction(m_prefAct);
@@ -500,19 +500,22 @@ RvApplication::about()
     vector<char> temp;
     temp.reserve(2048);
     sprintf(temp.data(),
-            "<h1>Open RV</h1><h2>%d.%d.%d (%s)</h2> %s <p>Open RV Copyright contributors to the Open Review Initiative project. </p>",
+            "<h1>%s</h1><h2>%d.%d.%d (%s)</h2> %s <p>%s %s </p>",
+            UI_APPLICATION_NAME,
             TWK_DEPLOY_MAJOR_VERSION(),
             TWK_DEPLOY_MINOR_VERSION(),
             TWK_DEPLOY_PATCH_LEVEL(),
              GIT_HEAD,
-            headerComment.str().c_str());
+            headerComment.str().c_str(),
+            UI_APPLICATION_NAME,
+            COPYRIGHT_TEXT);
 
     const TwkApp::Document* doc = TwkApp::Document::activeDocument();
     QWidget* parent = 0;
     if (doc) parent = (RvDocument *)doc->opaquePointer();
 
     QMessageBox *msgBox =
-        new QMessageBox("About Open RV", QString(temp.data()), QMessageBox::Information, 0, 0, 0, parent,
+        new QMessageBox("About " UI_APPLICATION_NAME, QString(temp.data()), QMessageBox::Information, 0, 0, 0, parent,
                         Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
     msgBox->setAttribute(Qt::WA_DeleteOnClose);
     QIcon icon = msgBox->windowIcon();
@@ -974,7 +977,7 @@ RvApplication::prefs()
         QWidget* parent = 0;
         if (doc) parent = (RvDocument *)doc->opaquePointer();
         QMessageBox box(parent);
-        box.setWindowTitle(tr("Open RV: Preferences"));
+        box.setWindowTitle(tr(UI_APPLICATION_NAME ": Preferences"));
         box.setText(tr("Presentation Mode is Enabled -- Preferences cannot be shown.\nDisable Presentation Mode?"));
         // the detailed box mess up the buttons on OS X with CSS
         // just getting rid of it fixes it
@@ -1572,10 +1575,10 @@ RvApplication::setPresentationMode(bool value)
                     QWidget* parent = 0;
                     if (doc) parent = (RvDocument *)doc->opaquePointer();
                     QMessageBox box(parent);
-                    box.setWindowTitle(tr("Open RV: Presentation Mode"));
+                    box.setWindowTitle(tr(UI_APPLICATION_NAME ": Presentation Mode"));
 		    QString baseText = QString("The presentation device (%1/%2) is busy or cannot be opened.")
                                 .arg(d->module()->name().c_str()).arg(d->name().c_str());
-                    QString detailedText = QString("Open RV failed to open or bind the presentation device (%1/%2)."
+                    QString detailedText = QString(UI_APPLICATION_NAME " failed to open or bind the presentation device (%1/%2)."
                                                 " Check to see if another program is using the device"
                                                 " and that the parameters are valid in the preferences."
                                                 " You can start RV with -noPrefs or -resetPrefs if you"
@@ -1597,7 +1600,7 @@ RvApplication::setPresentationMode(bool value)
                 QWidget* parent = 0;
                 if (doc) parent = (RvDocument *)doc->opaquePointer();
                 QMessageBox box(parent);
-                box.setWindowTitle(tr("Open RV: Presentation Mode"));
+                box.setWindowTitle(tr(UI_APPLICATION_NAME ": Presentation Mode"));
                 QString baseText = QString("The presentation device (%1/%2) failed to open.")
                             .arg(d->module()->name().c_str()).arg(d->name().c_str());
 		box.setText(baseText + "\n\n" + exc.what());

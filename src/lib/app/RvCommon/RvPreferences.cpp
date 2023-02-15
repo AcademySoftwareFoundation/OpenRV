@@ -126,7 +126,7 @@ RvPreferences::RvPreferences(QWidget* parent)
             this, SLOT(exrAutoThreads(int)));
     connect(m_ui.exrNumThreadsEdit, SIGNAL(textChanged(const QString&)),
             this, SLOT(exrThreadNumChanged(const QString&)));
-    setWindowTitle("Open RV Preferences");
+    setWindowTitle(UI_APPLICATION_NAME " Preferences");
 
 #ifndef PLATFORM_DARWIN
     m_ui.appleClientStorageToggle->setEnabled(false);

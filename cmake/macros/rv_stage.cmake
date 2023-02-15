@@ -620,7 +620,7 @@ FUNCTION(rv_stage)
         PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${RV_APP_ROOT}"
                    MACOSX_BUNDLE TRUE
                    OUTPUT_NAME ${_target}
-                   MACOSX_BUNDLE_BUNDLE_NAME ${_target}
+                   MACOSX_BUNDLE_BUNDLE_NAME "${RV_UI_APPLICATION_NAME}"
                    MACOSX_BUNDLE_EXECUTABLE_NAME ${_target}
                    RESOURCE "${arg_FILES}"
                    MACOSX_BUNDLE_GUI_IDENTIFIER "com.autodesk.${_target}"
