@@ -19,7 +19,7 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: Also tell us, what did you expect to happen?
+      description: When possible, include steps to reproduce the bug. Also, what behaviour did you expect?
       placeholder: Tell us what you see!
       value: "A bug happened!"
     validations:
@@ -28,7 +28,8 @@ body:
   - type: input
     id: operating-system-version
     attributes:
-      label: On what operating system(s) version(s) (and distribution, if Linux) is this happening?
+      label: List all the operating systems versions where this is happening
+      placeholder: Windows 10, macOS 12, macOS 13.2.1, RHEL 7.6
     validations:
       required: true
 
