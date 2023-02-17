@@ -1,0 +1,57 @@
+name: Bug Report
+
+description: File a bug report
+
+title: "[Bug]: "
+
+labels: ["bug"]
+
+assignees:
+  - AcademySoftwareFoundation/rvos-committers
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please make sure that's it's not already covered by another issue (open or closed).
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+
+  - type: input
+    id: operating-system-version
+    attributes:
+      label: On what operating system(s) version(s) (and distribution, if Linux) is this happening?
+    validations:
+      required: true
+
+  - type: input
+    id: hardware
+    attributes:
+      label: On what computer hardware is this happening?
+      description: GPU, CPU, Storage, Memory, Monitor, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant console log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
