@@ -2,7 +2,7 @@ name: Bug Report
 
 description: File a bug report
 
-title: "[Bug]: "
+title: "[Bug]: <title>"
 
 labels: ["bug"]
 
@@ -44,8 +44,20 @@ body:
     id: logs
     attributes:
       label: Relevant console log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      description: Please copy and paste any relevant log output. This will be automatically formatted, so no need for backticks.
       render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment variables
+      description: Please copy and paste any relevant environment variables. They can be accessed through the "Help / Show environment" menu.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra information
+      description: Please share anything else that might be relevant. RV Preference override? Significant behavior change because of a package?
 
   - type: checkboxes
     id: terms
