@@ -37,7 +37,7 @@ body:
     id: hardware
     attributes:
       label: On what computer hardware is this happening?
-      description: GPU, CPU, Storage, Memory, Monitor, etc.
+      description: Workstation type, GPU type, CPU + Number of Cores, Memory / RAM, Storage type, etc.
     validations:
       required: true
 
