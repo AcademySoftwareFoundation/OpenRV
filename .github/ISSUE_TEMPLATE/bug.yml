@@ -13,7 +13,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report! Please make sure that's it's not already covered by another issue (open or closed).
+        Thanks for taking the time to fill out this bug report! Before submitting it, please make sure it's not already covered by another issue (open or closed).
 
   - type: textarea
     id: what-happened
