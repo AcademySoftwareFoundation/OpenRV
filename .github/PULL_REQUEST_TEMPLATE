@@ -17,7 +17,7 @@ OR
 <!--
 Link the Issue(s) this Pull Request is related to.
 
-Each PR should link at least one issue, in the form:
+Each PR should link to at least one issue, in the form:
 
 Use one line for each Issue. This allows auto-closing the related issue when the fix is merged.
 
