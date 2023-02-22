@@ -7,9 +7,7 @@
 1. [Install Strawberry Perl](#3-install-strawberry-perl)
 1. [Install MSYS2](#4-install-msys2)
 1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](#5-install-required-msys2-pacman-packages)
-1. [Install the Python requirements (from an MSYS2-MinGW64 shell)](#6-install-the-python-requirements)
-1. [Clone the RV repo (from an MSYS2-MinGW64 shell)](#7-clone-the-rv-repo)
-1. [Invoke CMake](#8-invoke-cmake)
+
 
 ## 1. Install Microsoft Visual Studio
 
@@ -27,10 +25,11 @@ Note: The current version of PySide2 required by RV (5.15.2.1) cannot be built w
 
 Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
 
-Note: You will also need `jom`, and it is included with Qt Creator (available from the Qt online installer). If you do not want to install Qt Creator, you can download it from [here](https://download.qt.io/official_releases/jom/) and copy the executable into the QT installation root directory under Tools/QtCreator/bin/jom.
+Note: You will also need `jom`, and it is included with Qt Creator (available from the Qt online installer). If you do not want to install Qt Creator, you can download it from [here](https://download.qt.io/official_releases/jom/) and copy the executable and other files into the QT installation root directory under the Tools/QtCreator/bin/jom folder.
 
-WARNING: If you decide fetch Qt from another source, make sure to build it with SSL support and that  it contains everything required to build PySide2 and that the file structure is similar to the official package. 
-FYI. Qt from MSYS2 is missing QtWebEngine.
+WARNING: If you fetch Qt from another source, make sure to build it with SSL support, that it contains everything required to build PySide2, and that the file structure is similar to the official package. 
+
+Note: Qt from MSYS2 is missing QtWebEngine.
 
 ## 3. Install Strawberry Perl
 
@@ -74,48 +73,10 @@ pacman -S --needed \
         zip
 ```
 
-## 6. Install the Python requirements
 
-From an MSYS2-MinGW64 shell, install the required python dependencies using:
-
-```shell
-python3 -m pip install --user -r requirements.txt
-```
-
-Note: Enter the following command from the same MSYS2-MinGW64 shell if you encounter an error when installing the py7zr python requirement as it seems to be an issue with the latest version of MSYS2:
-
-```shell
-SETUPTOOLS_USE_DISTUTILS=stdlib pip install py7zr
-```
-
-Note that to successfully build Open RV in debug on Windows, you must also install python3 ([download page](https://www.python.org/downloads/)) as it is required to build the opentimelineio python wheel in debug.
+To successfully build Open RV in debug on Windows, you must also install a Windows-native python3 ([download page](https://www.python.org/downloads/)) as it is required to build the opentimelineio python wheel in debug.
 
 This step is not required if you do not intend to build the debug version of RV.
 
-## 7. Clone the RV repo
-
-From an MSYS2-MinGW64 shell:
-
-```shell
-cd /c
-git clone git@github.com:AcademySoftwareFoundation/OpenRV.git
-
-OR
-
-git clone https://github.com/AcademySoftwareFoundation/OpenRV.git
-```
-
 NOTE: Even as of Windows 11, for legacy reason, a default system path length is still limited to 254 bytes long.
 For that reason we strongly suggest cloning `OpenRV` into drive's root directory e.g.: `C:\`
-
-## 8. Invoke CMake
-
-From an MSYS2-MinGW64 shell:
-
-```shell
-cmake -B cmake-build -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_WIN_PERL_ROOT=/c/Strawberry/perl/bin -DRV_DEPS_QT5_LOCATION=/c/Qt/Qt5.15.11/5.15.11/msvc2019_64
-cmake --build cmake-build --config Release --target rv -j8 
-cmake --install cmake-build --config Release
-```
-
-NOTE: It is recommanded to use Unix-like syntax with the`RV_DEPS_QT5_LOCATION` defininition, otherwise one might use the Windows-like syntax such as `C:\\QT\\5.15.11...` note of the escaping of the backslash characters.

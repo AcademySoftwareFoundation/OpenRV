@@ -168,11 +168,11 @@ class: HelpMinorMode : MinorMode
 
         Menu menuList = Menu {
                 {"Online Resources",    nil, nil, inactiveState},
-                {"   RV User's Manual",   opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-user-manual.md"), nil},
-                {"   RV Reference Manual", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-reference-manual.md"), nil},
-                {"   Mu User's Manual",    opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-mu-programming.md"), nil},
+                {"   RV User's Manual",   opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-user-manual.md"), nil},
+                {"   RV Reference Manual", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-reference-manual.md"), nil},
+                {"   Mu User's Manual",    opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), nil},
                 {"_",                   nil},
-                {"   GTO File Format (.rv files)", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-gto.md"), nil},
+                {"   GTO File Format (.rv files)", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), nil},
                 {"_",                   nil},
                 {"   Academy Software Foundation Open RV", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV"), nil},
                 {"_",                   nil},
