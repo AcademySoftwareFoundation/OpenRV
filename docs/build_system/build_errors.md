@@ -95,7 +95,7 @@ Call Stack (most recent call first):
 
 The newer Ubuntu, Centos & Rocky system usually won't have `python` out of the box, they have a `python3` interpreter.
 
-One solution is to instyall `pipenv` and start a local virtual environment. That will give you a `p[ython` command.
+One solution is to instyall `pipenv` and start a local virtual environment. That will give you a `python` command.
 
 ### (Linux)  pyconfig.h: No such file or directory
 

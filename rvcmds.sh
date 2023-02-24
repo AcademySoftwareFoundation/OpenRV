@@ -20,21 +20,19 @@ fi
 QT_VERSION="${QT_VERSION:-5.15.2}"
 if [[ "$OSTYPE" == "linux"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
-  QT_HOME="${QT_HOME:-$HOME/Qt${QT_VERSION}/${QT_VERSION}/gcc_64}"
-  RV_TARGET=rv
+  QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/gcc_64}"
   SCRIPT_HOME=`readlink -f $(dirname $0)`
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
-  QT_HOME="${QT_HOME:-$HOME/Qt${QT_VERSION}/${QT_VERSION}/clang_64}"
-  RV_TARGET=RV
+  QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/clang_64}"
   SCRIPT_HOME=`readlink -f $(dirname $0)`
 elif [[ "$OSTYPE" == "msys"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Visual Studio 16 2019}"
-  QT_HOME="${QT_HOME:-c:/Qt/Qt${QT_VERSION}/${QT_VERSION}/msvc2019_64}"
+  QT_HOME="${QT_HOME:-c:/Qt/Qt/${QT_VERSION}/msvc2019_64}"
   WIN_PERL="${WIN_PERL:-c:/Strawberry/perl/bin}"
   CMAKE_WIN_ARCH="${CMAKE_WIN_ARCH:--A x64}"
-  RV_TARGET=rv
   SCRIPT_HOME=`readlink -f $(dirname ${BASH_SOURCE[0]})`
+  SETUPTOOLS_USE_DISTUTILS=stdlib
 else
   echo "OS does not seem to be linux, darwin or msys. Exiting."
   exit 1
@@ -43,17 +41,17 @@ fi
 # VARIABLES
 RV_HOME="${RV_HOME:-$SCRIPT_HOME}"
 RV_BUILD="${RV_BUILD:-${RV_HOME}/_build}"
-RV_INST="${RV_INST:-${RV_HOME}/install}"
+RV_INST="${RV_INST:-${RV_HOME}/_install}"
 
 # ALIASES: Basic commands
 
 alias rvsetup="python3 -m pip install --user --upgrade -r ${RV_HOME}/requirements.txt"
 alias rvcfg="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvcfgd="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvbuild="cmake --build ${RV_BUILD} --config Release --target ${RV_TARGET} --parallel -v"
-alias rvbuildd="cmake --build ${RV_BUILD} --config Debug --target ${RV_TARGET} --parallel -v"
-alias rvbuildt="cmake --build ${RV_BUILD} --config Release --target "
-alias rvbuildtd="cmake --build ${RV_BUILD} --config Debug --target "
+alias rvbuildt="cmake --build ${RV_BUILD} --config Release -v --parallel=8 --target "
+alias rvbuildtd="cmake --build ${RV_BUILD} --config Debug -v --parallel=8 --target "
+alias rvbuild="rvbuildt main_executable"
+alias rvbuildd="rvbuildtd main_executable"
 alias rvtest="ctest --test-dir ${RV_BUILD} --extra=verbose"
 alias rvinst="cmake --install ${RV_BUILD} --prefix ${RV_INST}"
 alias rvclean="rm -rf ${RV_BUILD}"

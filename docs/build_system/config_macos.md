@@ -7,8 +7,6 @@
 1. [Install tools and build dependencies](#install-tools-and-build-dependencies)
 1. [Install the python requirements](#install-the-python-requirements)
 1. [Install Qt](#install-qt)
-1. [Configure CMake](#configure)
-1. [Invoke CMake](#build-including-incremental-builds)
 
 ## Install XCode
 
@@ -46,31 +44,6 @@ python3 -m pip install -r requirements.txt
 Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
 
 
-WARNING: If you decide fetch Qt from another source, make sure to build it with SSL support and that  it contains everything required to build PySide2 and that the file structure is similar to the official package.
-FYI. Qt5 from homebrew is known to not work well with OpenRV.
+WARNING: If you fetch Qt from another source, make sure to build it with SSL support, that it contains everything required to build PySide2, and that the file structure is similar to the official package.
 
-## Configure
-
-The project uses CMake and requires a configure step before building. It is during the configure step that you provide your Qt package.
-
-From the root of the repository, execute `cmake` specifying the path to an arbitrary build folder and the path to your QT5 package.
-
-For example:
-
-```bash
-cmake -B cmake-build -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=$HOME/Qt/5.15.2/clang_64
-```
-
-### Custom generator
-
-You can decide to build with another generator. Ninja is known to work well with the build. If you desire to build with Ninja, you can set`-G Ninja`
-
-## Build (including incremental builds)
-
-Invoke the build tool using cmake (recommended).
-
-For example
-
-```bash
-cmake --build cmake-build --target RV
-```
+Note: Qt5 from homebrew is known to not work well with OpenRV.

@@ -15,6 +15,7 @@ MACRO(ADD_SHARED_LIBRARY_LIST new_entry)
   )
 ENDMACRO()
 
+ADD_CUSTOM_TARGET(main_executable)
 ADD_CUSTOM_TARGET(executables)
 ADD_CUSTOM_TARGET(executables_with_plugins)
 ADD_CUSTOM_TARGET(shared_libraries)
@@ -613,6 +614,8 @@ FUNCTION(rv_stage)
     IF(NOT _native_target_type STREQUAL "EXECUTABLE")
       MESSAGE(FATAL_ERROR "\"${arg_TARGET}\" ${arg_TYPE} should be a EXECUTABLE, not a ${_native_target_type}")
     ENDIF()
+
+    ADD_DEPENDENCIES(main_executable ${arg_TARGET})
 
     IF(RV_TARGET_DARWIN)
       SET_TARGET_PROPERTIES(

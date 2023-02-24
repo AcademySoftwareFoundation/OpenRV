@@ -9,14 +9,14 @@ The "standard" windows registry files here are:
 
         Register RV as the handler for the "rvlink://" custom protocol.  Docs on the rvlink protocol here:
 
-            https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-user-manual/rv-user-manual-chapter-c.md
+            https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-user-manual/rv-user-manual-chapter-c.md
 
 
 The "rvpush" .reg files are alternates to support different workflows.  RVPUSH
 is an executable we provide that allows you to communicate with a running RV
 from the command line.  Docs here:
 
-    https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/doc/rv-manuals/rv-user-manual/rv-user-manual-chapter-eighteen.md
+    https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-user-manual/rv-user-manual-chapter-eighteen.md
 
 It's a general utility, but it's used here in the .reg files to avoid the RV
 startup time when loading media by using a running RV if one is available.
