@@ -32,15 +32,15 @@ using namespace boost;
 //
 
 static const char* disallowedCodecsArray[] = {
-    "ac3",
-    "hevc",
-    "mpeg2video",
-    "prores",
-    "prores_aw",
-    "prores_ks",
-    "prores_lgpl",
-    "svq1",
-    "svq3",
+//    "ac3",
+//    "hevc",
+//    "mpeg2video",
+//    "prores",
+//    "prores_aw",
+//    "prores_ks",
+//    "prores_lgpl",
+//    "svq1",
+//    "svq3",
     0 };
 
 extern "C" {
