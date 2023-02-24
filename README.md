@@ -75,11 +75,11 @@ From the root of the repository, execute `cmake` and specify the path to an arbi
 
 #### Common build alias
 
-Use the `rvcfg` (the common build alias) to run the configuration step. You can also use `rvcfgd` to configure in Debug. 
+Use the `rvcfg` (the common build alias) to run the configuration step. You can also use `rvcfgd` to configure in Debug.
 
 #### Manually
 
-##### Windows 
+##### Windows
 
 On Windows, you must specify the path to Strawberry perl for the OpenSSL build.
 
@@ -106,8 +106,7 @@ Invoke the previously specified generator tool using cmake to run the `build` st
 
 #### Common build alias
 
-You can use the `rvbuild` common build alias to run the build step (`rvbuildd` to build in Debug).
-Use the `rvbuild` (the common build alias) to run the build step. You can also use `rvbuildd` to build in Debug. 
+Use the `rvbuild` (the common build alias) to run the build step. You can also use `rvbuildd` to build in Debug.
 
 #### Manually
 
