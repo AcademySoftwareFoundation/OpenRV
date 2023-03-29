@@ -30,18 +30,15 @@ ELSE()
 ENDIF()
 
 # Common options
-ADD_COMPILE_OPTIONS(
-  ${_verbose_invocation}
-  -Wall
-  -Wnonportable-include-path
-  -stdlib=libc++
-  # not sure we need to actually set '-std' I would assume CMake does it for us.
-  -std=${_clang_cxx_standard}
-  -msse
-  -msse2
-  -msse3
-  -mmmx
-)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
+  ${_verbose_invocation} \
+  -Wall \
+  -Wnonportable-include-path \
+  -msse \
+  -msse2 \
+  -msse3 \
+  -mmmx")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=${_clang_cxx_standard}")
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
   # Release build specific options
