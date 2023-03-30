@@ -33,8 +33,13 @@ SET(_download_hash
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
+message(WARNING "TODO: IBR Should use CREATE_DEPS_VAR MACRO HERE")
+SET(${_target}_ROOT_DIR
+  ${_install_dir}
+)
 
 SET(_boost_libs
+    atomic
     chrono
     date_time
     filesystem

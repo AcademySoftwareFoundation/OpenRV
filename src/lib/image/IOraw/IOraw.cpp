@@ -176,7 +176,9 @@ IOraw::readImage(FrameBuffer& fb, const std::string& filename,
     //
 
     LibRaw iProcessor;
-    iProcessor.set_no_of_threads(m_threadCount);
+    // No longer exists in newer API
+    // TODO: find equivalent 
+    //iProcessor.set_no_of_threads(m_threadCount);
 
     //
     // Default options to use with dcraw
@@ -326,7 +328,9 @@ IOraw::getImageInfo(const std::string& filename, FBInfo& info) const
     //
 
     LibRaw iProcessor;
-    iProcessor.set_no_of_threads(m_threadCount);
+    // No longer exists in newer API
+    // TODO: find equivalent 
+    //iProcessor.set_no_of_threads(m_threadCount);
     iProcessor.open_file(UNICODE_C_STR(filename.c_str()));
 
     //

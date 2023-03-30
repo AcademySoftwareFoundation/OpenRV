@@ -4,6 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+INCLUDE(rv_create_std_deps_vars)
+INCLUDE(rv_make_std_lib_name)
+INCLUDE(rv_copy_lib_bin_folders)
+
 ADD_CUSTOM_TARGET(dependencies)
 SET(RV_DEPS_LIST
     ""
@@ -49,9 +53,20 @@ IF(RV_TARGET_DARWIN
 ENDIF()
 INCLUDE(imath)
 INCLUDE(zlib)
-INCLUDE(openexr)
 INCLUDE(ffmpeg)
 INCLUDE(doctest)
+INCLUDE(jpegturbo) # jpegturbo huge advantage over jpeg is that it does come with CMake support!
+INCLUDE(png)
+INCLUDE(tiff)  # depends on jpeg, jpegturbo
+INCLUDE(raw)   # depends on jpeg, zlib
+INCLUDE(openjpeg) # depends on zlib, tiff, png
+INCLUDE(webp)
+INCLUDE(ocio)
+INCLUDE(openexr)  # depends on ocio
+INCLUDE(oiio)  # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
+IF(NOT RV_USE_OCIO_YAMP_CPP)
+  INCLUDE(yaml-cpp)  # depends on OCIO
+ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_DEPS_LIST)
 SET(RV_DEPS_LIST
@@ -59,6 +74,7 @@ SET(RV_DEPS_LIST
     CACHE INTERNAL ""
 )
 
+MESSAGE(STATUS "Using atomic_ops:   ${RV_DEPS_ATOMIC_OPS_VERSION}")
 MESSAGE(STATUS "Using Boost:        ${RV_DEPS_BOOST_VERSION}")
 MESSAGE(STATUS "Using Dav1d:        ${RV_DEPS_DAV1D_VERSION}")
 MESSAGE(STATUS "Using FFMPEG:       ${RV_DEPS_FFMPEG_VERSION}")
@@ -72,8 +88,25 @@ IF(RV_TARGET_DARWIN
   MESSAGE(STATUS "Using GLEW:         ${RV_DEPS_GLEW_VERSION}")
 ENDIF()
 MESSAGE(STATUS "Using Imath:        ${RV_DEPS_IMATH_VERSION}")
-MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION}")
+MESSAGE(STATUS "Using JpegTurbo:    ${RV_DEPS_JPEGTURBO_VERSION}")
+IF(RV_USE_OCIO_OPENEXR)
+  MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION} (Using OCIO's own copy)")
+ELSE()
+  MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION} (Using RV's own copy)")
+ENDIF()
+MESSAGE(STATUS "Using OpenColorIO   ${RV_DEPS_OCIO_VERSION}")
+MESSAGE(STATUS "Using OpenImageIO   ${RV_DEPS_OIIO_VERSION}")
+MESSAGE(STATUS "Using OpenJpeg:     ${RV_DEPS_OPENJPEG_VERSION}")
+MESSAGE(STATUS "Using PNG:          ${RV_DEPS_PNG_VERSION}")
 MESSAGE(STATUS "Using Python3:      ${RV_DEPS_PYTHON3_VERSION}")
 MESSAGE(STATUS "Using PySide2:      ${RV_DEPS_PYSIDE2_VERSION}")
 MESSAGE(STATUS "Using Qt5:          ${RV_DEPS_QT5_VERSION}")
+MESSAGE(STATUS "Using Raw:          ${RV_DEPS_RAW_VERSION}")
+MESSAGE(STATUS "Using Tiff:         ${RV_DEPS_TIFF_VERSION}")
+MESSAGE(STATUS "Using WebP:         ${RV_DEPS_WEBP_VERSION}")
+IF(RV_USE_OCIO_YAML_CPP)
+  MESSAGE(STATUS "Using Yaml-CPP:     ${RV_DEPS_YAML_CPP_VERSION} (Using OCIO's own copy)")
+ELSE()
+  MESSAGE(STATUS "Using Yaml-CPP:     ${RV_DEPS_YAML_CPP_VERSION} (Using RV's own copy)")
+ENDIF()
 MESSAGE(STATUS "Using zlib:         ${RV_DEPS_ZLIB_VERSION}")

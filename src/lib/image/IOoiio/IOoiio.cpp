@@ -18,7 +18,7 @@
 namespace TwkFB {
 using namespace std;
 using namespace TwkUtil;
-using namespace OpenImageIO;
+using namespace OpenImageIO_v2_4;
 
 IOoiio::IOoiio() : FrameBufferIO("IOoiio", "n") // OIIO after any defaults of ours
 {
@@ -191,7 +191,7 @@ IOoiio::getImageInfo(const std::string& filename, FBInfo& fbi) const
     }
 #endif
 
-    if (ImageInput* in = ImageInput::create(filename))
+    if (std::unique_ptr<ImageInput> in = ImageInput::create(filename))
     {
         ImageSpec spec;
         in->open(filename, spec);
@@ -346,7 +346,7 @@ IOoiio::getImageInfo(const std::string& filename, FBInfo& fbi) const
     {
         TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" 
                          << filename << "\" for reading. " <<
-                         OpenImageIO::geterror());
+                         OpenImageIO_v2_4::geterror());
     }
 }
 
@@ -355,7 +355,7 @@ IOoiio::readImage(FrameBuffer& fb,
                   const std::string& filename,
                   const ReadRequest& request) const
 {
-    if (ImageInput* in = ImageInput::create(filename))
+    if (std::unique_ptr<ImageInput> in = ImageInput::create(filename))
     {
         bool useLayers = subimagesAsLayers(in->format_name());
 
@@ -457,13 +457,13 @@ IOoiio::readImage(FrameBuffer& fb,
         }
 
         in->close();
-        delete in;
+        in.reset();
     }
     else
     {
         TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" 
                          << filename << "\" for reading. " <<
-                         OpenImageIO::geterror());
+                         OpenImageIO_v2_4::geterror());
     }
 }
 
