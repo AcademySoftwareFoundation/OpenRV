@@ -25,7 +25,7 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC TwkFB openjpeg
+  PUBLIC TwkFB OpenJpeg::OpenJpeg
   PRIVATE TwkUtil
 )
 

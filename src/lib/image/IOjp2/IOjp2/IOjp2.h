@@ -37,7 +37,8 @@ public:
     mutable bool m_error;
 
 private:
-    mutable opj_event_mgr_t m_eventMgr;
+    
+    // mutable opj_event_mgr_t m_eventMgr;
 };
 
 } // TwkFB

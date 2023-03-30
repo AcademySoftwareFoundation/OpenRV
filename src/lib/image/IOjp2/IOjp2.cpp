@@ -86,9 +86,10 @@ IOjp2::IOjp2() : FrameBufferIO("IOjp2", "mz"), m_error(false)
 
 
     // configure the event callbacks (not required)
-    m_eventMgr.error_handler = jp2_error_callback;
-    m_eventMgr.warning_handler = jp2_warning_callback;
-    m_eventMgr.info_handler = NULL; // jp2_info_callback;
+    // TODO: Usage of newer OpenJpeg require some work
+    //m_eventMgr.error_handler = jp2_error_callback;
+    //m_eventMgr.warning_handler = jp2_warning_callback;
+    //m_eventMgr.info_handler = NULL; // jp2_info_callback;
 }
 
 IOjp2::~IOjp2() {}
@@ -98,7 +99,9 @@ string
 IOjp2::about() const
 { 
     ostringstream str;
+#if 0
     str << "JP2 (OpenJPEG " <<  opj_version() << ")";
+#endif
     return str.str();
 }
 
@@ -117,6 +120,7 @@ IOjp2::throwIfError(const std::string& filename) const
 void
 IOjp2::getImageInfo(const std::string& filename, FBInfo& fbi) const
 {
+#if 0
     opj_dparameters_t decodeParams;
     opj_set_default_decoder_parameters( &decodeParams );
     
@@ -125,9 +129,9 @@ IOjp2::getImageInfo(const std::string& filename, FBInfo& fbi) const
 
     opj_dinfo_t* decompressorHandle;
     const std::string ext = TwkUtil::lc( TwkUtil::extension( filename ) );
-    if ( ext == "j2k" || ext == "j2c" ) decompressorHandle = opj_create_decompress( CODEC_J2K );
-    else if ( ext == "jpt" ) decompressorHandle = opj_create_decompress( CODEC_JPT );
-    else if ( ext == "jp2" ) decompressorHandle = opj_create_decompress( CODEC_JP2 );
+    if ( ext == "j2k" || ext == "j2c" ) decompressorHandle = opj_create_decompress( OPJ_CODEC_J2K );
+    else if ( ext == "jpt" ) decompressorHandle = opj_create_decompress( OPJ_CODEC_JPT );
+    else if ( ext == "jp2" ) decompressorHandle = opj_create_decompress( OPJ_CODEC_JP2 );
     else TWK_THROW_STREAM(IOException, "JP2: unrecognized extension " << filename);
 
     opj_set_event_mgr( (opj_common_ptr)decompressorHandle, &m_eventMgr, (void *)this );
@@ -164,19 +168,19 @@ IOjp2::getImageInfo(const std::string& filename, FBInfo& fbi) const
 
     switch (image->color_space)
     {
-      case CLRSPC_SRGB:
+      case OPJ_CLRSPC_SRGB:
           fbi.proxy.setPrimaryColorSpace(ColorSpace::Rec709());
           fbi.proxy.setTransferFunction(ColorSpace::sRGB());
           break;
-      case CLRSPC_GRAY:
+      case OPJ_CLRSPC_GRAY:
           fbi.proxy.setPrimaryColorSpace(ColorSpace::Rec709());
           fbi.proxy.setTransferFunction(ColorSpace::Linear());
           break;
-      case CLRSPC_SYCC:
+      case OPJ_CLRSPC_SYCC:
           fbi.proxy.setPrimaryColorSpace(ColorSpace::Rec709());
           fbi.proxy.setTransferFunction(ColorSpace::Rec601());
           break;
-      case CLRSPC_UNSPECIFIED:
+      case OPJ_CLRSPC_UNSPECIFIED:
           fbi.proxy.attribute<string>("IOjp2/Note") = "Assuming XYZ primaries";
           fbi.proxy.attribute<string>("ColorSpace/Transfer") = "Gamma 2.6";
           fbi.proxy.setPrimaryColorSpace("UNSPECIFIED");
@@ -185,7 +189,7 @@ IOjp2::getImageInfo(const std::string& filename, FBInfo& fbi) const
                                  0.0f, 1.0f,
                                  0.0f, 0.0f);
           break;
-      case CLRSPC_UNKNOWN:
+      case OPJ_CLRSPC_UNKNOWN:
           fbi.proxy.setPrimaryColorSpace("UNKNOWN");
           break;
       default:
@@ -196,6 +200,7 @@ IOjp2::getImageInfo(const std::string& filename, FBInfo& fbi) const
 
     opj_destroy_decompress( decompressorHandle );
     opj_image_destroy( image );
+#endif
 }
 
 
@@ -204,6 +209,7 @@ IOjp2::readImage(FrameBuffer& fb,
                   const std::string& filename,
                   const ReadRequest& request) const
 {
+#if 0
     //
     //  Buffering should work on all platforms, all filesystems
     //
@@ -216,9 +222,9 @@ IOjp2::readImage(FrameBuffer& fb,
 
     opj_dinfo_t* decompressorHandle;
     const std::string ext = TwkUtil::lc( TwkUtil::extension( filename ) );
-    if ( ext == "j2k" || ext == "j2c" ) decompressorHandle = opj_create_decompress( CODEC_J2K );
-    else if ( ext == "jpt" ) decompressorHandle = opj_create_decompress( CODEC_JPT );
-    else if ( ext == "jp2" ) decompressorHandle = opj_create_decompress( CODEC_JP2 );
+    if ( ext == "j2k" || ext == "j2c" ) decompressorHandle = opj_create_decompress( OPJ_CODEC_J2K );
+    else if ( ext == "jpt" ) decompressorHandle = opj_create_decompress( OPJ_CODEC_JPT );
+    else if ( ext == "jp2" ) decompressorHandle = opj_create_decompress( OPJ_CODEC_JP2 );
     else TWK_THROW_STREAM(IOException, "JP2: unrecognized extension " << filename);
 
     opj_set_event_mgr( (opj_common_ptr)decompressorHandle, &m_eventMgr, (void *)this );
@@ -239,7 +245,7 @@ IOjp2::readImage(FrameBuffer& fb,
     vector<string> planeNames;
     static const char* rgbNames[] = {"R", "G", "B", "A"};
     static const char* yuvNames[] = {"Y", "U", "V", "A"};
-    const bool yuv = image->color_space == CLRSPC_SYCC || image->color_space == CLRSPC_GRAY; 
+    const bool yuv = image->color_space == OPJ_CLRSPC_SYCC || image->color_space == OPJ_CLRSPC_GRAY; 
           
     throwIfError( filename );
 
@@ -309,20 +315,20 @@ IOjp2::readImage(FrameBuffer& fb,
 
     switch (image->color_space)
     {
-      case CLRSPC_SRGB:
+      case OPJ_CLRSPC_SRGB:
           fb.setPrimaryColorSpace(ColorSpace::Rec709());
           fb.setTransferFunction(ColorSpace::sRGB());
           break;
-      case CLRSPC_GRAY:
+      case OPJ_CLRSPC_GRAY:
           fb.setPrimaryColorSpace(ColorSpace::Rec709());
           fb.setTransferFunction(ColorSpace::Linear());
           planeNames.resize(1);
           break;
-      case CLRSPC_SYCC:
+      case OPJ_CLRSPC_SYCC:
           fb.setPrimaryColorSpace(ColorSpace::Rec709());
           fb.setTransferFunction(ColorSpace::Rec601());
           break;
-      case CLRSPC_UNSPECIFIED:
+      case OPJ_CLRSPC_UNSPECIFIED:
           fb.attribute<string>("IOjp2/Note") = "Assuming X'Y'Z' primaries";
           fb.setPrimaryColorSpace("UNSPECIFIED");
           fb.setPrimaries(0.333333333f, 0.333333333f,
@@ -330,7 +336,7 @@ IOjp2::readImage(FrameBuffer& fb,
                           0.0f, 1.0f,
                           0.0f, 0.0f);
           break;
-      case CLRSPC_UNKNOWN:
+      case OPJ_CLRSPC_UNKNOWN:
           fb.setPrimaryColorSpace("UNKNOWN");
           break;
       default:
@@ -343,6 +349,7 @@ IOjp2::readImage(FrameBuffer& fb,
 
     opj_destroy_decompress( decompressorHandle );
     opj_image_destroy( image );
+#endif
 }
 
 
