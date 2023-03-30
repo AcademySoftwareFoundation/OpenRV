@@ -20,6 +20,8 @@ SET(_python3_version
     "3.9.15"
 )
 
+SET(RV_DEPS_PYTHON_VERSION_SHORT "3.9")
+
 SET(_opentimelineio_version
     "0.15"
 )

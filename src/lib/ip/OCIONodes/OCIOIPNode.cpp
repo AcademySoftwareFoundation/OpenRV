@@ -38,7 +38,10 @@ struct OCIOState
 };
 
 namespace {
-OCIO::GpuLanguage GPULanaguage = OCIO::GPU_LANGUAGE_UNKNOWN;
+// The OCIO::GPU_LANGUAGE_UNKNOWN no longer exists
+// and the value of zero is used by Nvidia Cg shader
+#define GPU_LANGUAGE_UNKNOWN -1
+OCIO::GpuLanguage GPULanguage = (OCIO::GpuLanguage)GPU_LANGUAGE_UNKNOWN;
 }
 
 string
@@ -108,7 +111,7 @@ OCIOIPNode::OCIOIPNode(const string& name,
 
     updateConfig();
 
-    if (GPULanaguage == OCIO::GPU_LANGUAGE_UNKNOWN)
+    if (GPULanguage == GPU_LANGUAGE_UNKNOWN)
     {
         IPNode* session = graph->sessionNode();
         int major = session->property<IntProperty>("opengl.glsl.majorVersion")->front();
@@ -116,11 +119,13 @@ OCIOIPNode::OCIOIPNode(const string& name,
 
         if (major == 1 && minor < 30)
         {
-            GPULanaguage = OCIO::GPU_LANGUAGE_GLSL_1_0;
+            //GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_0;
+            // The lowest available value in newer OCIO is now 1.2
+            GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_2;
         }
         else
         {
-            GPULanaguage = OCIO::GPU_LANGUAGE_GLSL_1_3;
+            GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_3;
         }
     }
 }
@@ -321,7 +326,7 @@ OCIOIPNode::evaluate(const Context& context)
             //
 
             OCIO::LookTransformRcPtr   transform = OCIO::LookTransform::Create();
-            OCIO::TransformDirection   direction = OCIO::TRANSFORM_DIR_UNKNOWN;
+            OCIO::TransformDirection   direction;
             string                     looksName = stringProp("ocio_look.look", "");
             string                     outName   = stringProp("ocio_look.outColorSpace", m_state->linear);
             bool                       reverse   = intProp("ocio_look.direction", 0) == 1;
@@ -357,11 +362,13 @@ OCIOIPNode::evaluate(const Context& context)
             //  Emulate the nuke OCIODisplay node
             //
 
-            OCIO::DisplayTransformRcPtr transform = OCIO::DisplayTransform::Create();
+            OCIO::DisplayViewTransformRcPtr transform = OCIO::DisplayViewTransform::Create();
             string                      display   = stringProp("ocio_display.display", "");
             string                      view      = stringProp("ocio_display.view", "");
 
+#if 0
             transform->setInputColorSpaceName(inName.c_str());
+#endif
             transform->setDisplay(display.c_str());
             transform->setView(view.c_str());
             processor = m_state->config->getProcessor(m_state->context, 
@@ -371,9 +378,9 @@ OCIOIPNode::evaluate(const Context& context)
             size_t hashValue = string_hash(inName + display + view);
             shaderName << "OCIO_d_" << shaderLegal(display) << "_" << shaderLegal(view) << "_" << name() << "_" << hex << hashValue;
         }
-
+#if 0
         OCIO::GpuShaderDesc shaderDesc;
-        shaderDesc.setLanguage(GPULanaguage);
+        shaderDesc.setLanguage(GPULanguage);
         shaderDesc.setFunctionName(shaderName.str().c_str());
         shaderDesc.setLut3DEdgeLen(lutSize);
 
@@ -468,7 +475,7 @@ OCIOIPNode::evaluate(const Context& context)
         }
 
         pthread_mutex_unlock(&m_lock);
-
+#endif
         const Shader::Function* F = m_state->function;
         Shader::ArgumentVector args(F->parameters().size());
 
