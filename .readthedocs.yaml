@@ -1,0 +1,20 @@
+version: 2
+
+build:
+  os: "ubuntu-20.04"
+  tools:
+    python: "3.8"
+    
+python:
+  # Install our python package before building the docs
+  install:
+    - method: pip
+      path: .
+    - requirements: docs/requirements.txt
+   
+sphinx:
+  fail_on_warning: true
+  
+formats:
+  - pdf
+  - epub
