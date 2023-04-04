@@ -1,1 +1,1 @@
-myst-parser
+myst-parser    # License: MIT License (MIT)
