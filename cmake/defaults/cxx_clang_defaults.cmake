@@ -13,32 +13,16 @@ ELSE()
   )
 ENDIF()
 
-#
-# Ref.: https://clang.llvm.org/docs/CommandGuide/clang.html
-IF(${RV_CPP_STANDARD} STREQUAL "14")
-  # Why not CMake's default gnu++14 ???
-  SET(_clang_cxx_standard
-      "c++14"
-  )
-ELSEIF(${RV_CPP_STANDARD} STREQUAL "17")
-  # Why not CMake's default gnu++17 ???
-  SET(_clang_cxx_standard
-      "c++17"
-  )
-ELSE()
-  MESSAGE(FATAL_ERROR "Unexpected RV_CPP_STANDARD: '${RV_CPP_STANDARD}'")
-ENDIF()
-
 # Common options
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} \
-  ${_verbose_invocation} \
-  -Wall \
-  -Wnonportable-include-path \
-  -msse \
-  -msse2 \
-  -msse3 \
-  -mmmx")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=${_clang_cxx_standard}")
+ADD_COMPILE_OPTIONS(
+  ${_verbose_invocation}
+  -Wall
+  -Wnonportable-include-path
+  -msse
+  -msse2
+  -msse3
+  -mmmx
+)
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
   # Release build specific options
