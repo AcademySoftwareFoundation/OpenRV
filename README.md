@@ -2,7 +2,7 @@
 Open RV is an image and sequence viewer for VFX and animation artists.
 Open RV is high-performant, hardware accelerated, and pipeline-friendly.
 
-[RV Documentation](docs/rv-manuals.md)
+[Open RV Documentation on Read the Docs](https://aswf-openrv.readthedocs.io/en/latest/)
 
 ## Cloning the repository
 
