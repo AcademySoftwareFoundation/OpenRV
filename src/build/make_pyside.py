@@ -125,6 +125,23 @@ def prepare() -> None:
     print(f"Installing numpy with {install_numpy_args}")
     subprocess.run(install_numpy_args).check_returncode()
 
+    cmakelist_path = os.path.join(
+        SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt"
+    )
+    old_cmakelist_path = os.path.join(
+        SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt.old"
+    )
+    os.rename(cmakelist_path, old_cmakelist_path)
+    with open(old_cmakelist_path) as old_cmakelist:
+        with open(cmakelist_path, "w") as cmakelist:
+            for line in old_cmakelist:
+                new_line = line.replace(
+                    " set(HAS_LIBXSLT 1)",
+                    " #set(HAS_LIBXSLT 1)",
+                )
+
+                cmakelist.write(new_line)
+
 
 def remove_broken_shortcuts(python_home: str) -> None:
     """
@@ -176,6 +193,7 @@ def build() -> None:
         f"--openssl={os.path.join(OPENSSL_OUTPUT_DIR, 'bin')}",
         "--verbose-build",
         f"--parallel={os.cpu_count() or 1}",
+        "--skip-docs",
     ]
 
     # PySide2 v5.15.2.1 builds with errors on Windows using Visual Studio 2019.
