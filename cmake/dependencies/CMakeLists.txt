@@ -64,7 +64,7 @@ INCLUDE(webp)
 INCLUDE(ocio)
 INCLUDE(openexr)  # depends on ocio
 INCLUDE(oiio)  # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
-IF(NOT RV_USE_OCIO_YAMP_CPP)
+IF(RV_USE_OCIO_YAML_CPP)
   INCLUDE(yaml-cpp)  # depends on OCIO
 ENDIF()
 
