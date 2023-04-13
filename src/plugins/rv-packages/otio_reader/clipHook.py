@@ -15,10 +15,7 @@ def hook_function(in_timeline, argument_map=None):
         )
 
         if related_assets_str:
-            media_references = {}
-
-            active_key = in_timeline.active_media_reference_key
-            media_references[active_key] = in_timeline.media_reference
+            media_references = in_timeline.media_references()
 
             for asset_pair in related_assets_str.split(';'):
                 name, location = asset_pair.split("|")
@@ -26,8 +23,10 @@ def hook_function(in_timeline, argument_map=None):
                     media_references[name] = otio.schema.ExternalReference(
                         target_url=location,
                     )
-                    media_references[name] = media_reference 
-                     
-            in_timeline.set_media_references(media_references, active_key)
+
+            in_timeline.set_media_references(
+                media_references,
+                in_timeline.active_media_reference_key,
+            )
 
     return in_timeline
