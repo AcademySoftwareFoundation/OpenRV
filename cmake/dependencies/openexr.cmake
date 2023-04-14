@@ -20,12 +20,6 @@ IF(RV_USE_OCIO_OPENEXR)
   #
   SET(_target "RV_DEPS_OPENEXR")  
   SET(_lib_type STATIC)
-  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    SET(_debug_postfix "_d")
-    MESSAGE(DEBUG "Using debug postfix: '${_debug_postfix}'")
-  ELSE()
-    SET(_debug_postfix "")
-  ENDIF()
   
   SET(_iex_name "Iex-3_1")
   SET(_ilmthread_name "IlmThread-3_1")
@@ -45,9 +39,9 @@ IF(RV_USE_OCIO_OPENEXR)
       SET(_lib_dir "${RV_DEPS_OCIO_DIST_DIR}/lib")
     ENDIF()
 
-    SET(_ilmthread_lib "${_lib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${_debug_postfix}.a")
-    SET( _iex_lib "${_lib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_iex_name}${_debug_postfix}.a")
-    SET(_openexr_lib "${_lib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_openexrcore_name}${_debug_postfix}.a")
+    SET(_ilmthread_lib "${_lib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${RV_DEBUG_POSTFIX}.a")
+    SET( _iex_lib "${_lib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_iex_name}${RV_DEBUG_POSTFIX}.a")
+    SET(_openexr_lib "${_lib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_openexrcore_name}${RV_DEBUG_POSTFIX}.a")
   ENDIF()
 
   # Add our OpenEXR virtual target which depens on OpenColorIO build
