@@ -11,6 +11,7 @@
 import argparse
 import glob
 import os
+import re
 import pathlib
 import shutil
 import subprocess
@@ -36,12 +37,7 @@ QT_OUTPUT_DIR = ""
 PYTHON_OUTPUT_DIR = ""
 OPENSSL_OUTPUT_DIR = ""
 
-LIBCLANG_URL = {
-    "Darwin": "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_80-based-mac.7z",
-    "Linux": "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_80-based-linux-Rhel7.2-gcc5.3-x86_64.7z",
-    "Windows": "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_80-based-windows-vs2017_64.7z",
-}
-
+LIBCLANG_URL_BASE = "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_"
 
 def test_python_distribution(python_home: str) -> None:
     """
@@ -80,15 +76,39 @@ def prepare() -> None:
     if os.path.exists(TEMP_DIR) is False:
         os.makedirs(TEMP_DIR)
 
-    libclang_url = LIBCLANG_URL[platform.system()]
+    # PySide2 5.15.x recommends building with clang version 8.
+    # But clang 8 headers are not compatible with Mac SDK 13.3+ headers.
+    # To workaround it, since Mac is clang-based, we'll detect the OS clang 
+    # version and download the matching headers to build PySide.
+    clang_filename_suffix = ""
+   
+    system = platform.system()
+    if system == "Darwin":
+        clang_version_search = re.search(
+           "version (\d+)\.(\d+)",
+           os.popen('clang --version').read(),
+        )
+        clang_version_str = ''.join(clang_version_search.groups())
+        clang_version_int = int(clang_version_str) 
+
+        if clang_version_int <= 120:
+            clang_filename_suffix = clang_version_str + "-based-mac.7z"
+        else:
+            clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
+    elif system == "Linux":
+        clang_filename_suffix = "80-based-linux-Rhel7.2-gcc5.3-x86_64.7z"
+    elif system ==  "Windows":
+        clang_filename_suffix = "80-based-windows-vs2017_64.7z"
+
+    download_url = LIBCLANG_URL_BASE + clang_filename_suffix
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
     if os.path.exists(libclang_zip) is False:
-        download_file(libclang_url, libclang_zip)
+        download_file(download_url, libclang_zip)
     # if we have a failed download, clean it up and redownload.
     # checking for False since it can return None when archive doesn't have a CRC
     elif verify_7z_archive(libclang_zip) is False:
         os.remove(libclang_zip)
-        download_file(libclang_url, libclang_zip)
+        download_file(download_url, libclang_zip)
 
     # clean up previous failed extraction
     libclang_tmp = os.path.join(TEMP_DIR, "libclang-tmp")
