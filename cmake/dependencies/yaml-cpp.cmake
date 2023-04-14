@@ -11,6 +11,7 @@ IF(RV_USE_OCIO_YAML_CPP)
     ADD_LIBRARY(yaml_cpp STATIC IMPORTED GLOBAL)
     ADD_DEPENDENCIES(yaml_cpp RV_DEPS_OCIO)
     IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+        # Here the postfix is "d" and not "_d": the postfix inside OCIO is: "d".
         SET(_debug_postfix "d")
         MESSAGE(DEBUG "Using debug postfix: '${_debug_postfix}'")
     ELSE()

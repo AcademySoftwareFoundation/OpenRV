@@ -13,6 +13,14 @@ RV_SHOW_STANDARD_DEPS_VARIABLES()
 # The folder OCIO is building it's own dependencies
 SET(RV_DEPS_OCIO_DIST_DIR ${_build_dir}/ext/dist)
 
+IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    # Here the postfix is "d" and not "_d": the postfix inside OCIO is: "d".
+    SET(_ocio_debug_postfix "d")
+    MESSAGE(DEBUG "Using debug postfix: '${_ocio_debug_postfix}'")
+ELSE()
+    SET(_ocio_debug_postfix "")
+ENDIF()
+
 SET(_download_hash "372d6982cf01818a21a12f9628701a91")
 
 SET(_download_url
@@ -42,16 +50,17 @@ ELSE()
   SET(_ociolib_dir "${RV_DEPS_OCIO_DIST_DIR}/lib")
 ENDIF()
 
-SET(_ilmthread_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${_debug_postfix}.a")
-SET( _iex_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_iex_name}${_debug_postfix}.a")
-SET(_openexr_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_openexrcore_name}${_debug_postfix}.a")
+SET(_ilmthread_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${RV_DEBUG_POSTFIX}.a")
+SET( _iex_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_iex_name}${RV_DEBUG_POSTFIX}.a")
+SET(_openexr_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_openexrcore_name}${RV_DEBUG_POSTFIX}.a")
 LIST(APPEND _byproducts "${_ilmthread_lib}")
 LIST(APPEND _byproducts "${_iex_lib}")
 LIST(APPEND _byproducts "${_openexr_lib}")
 
 #
 # Now, also add yaml-cpp as by-product
-LIST(APPEND _byproducts "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}yaml-cpp.a")
+SET(_yaml_cpp_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}yaml-cpp${_ocio_debug_postfix}.a")
+LIST(APPEND _byproducts "${_yaml_cpp_lib}")
 
 #
 # and finally the PyOpenColorIO library
