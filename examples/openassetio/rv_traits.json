@@ -21,6 +21,17 @@
 					}
 				}
 			]
+		},
+		"rv_asset3": {
+			"versions": [
+				{
+					"traits": {
+						"openassetio-mediacreation:content.LocatableContent": { 
+							"location": "${RV_ASSET_3}" 
+						}
+					}
+				}
+			]
 		}
 	}
 }

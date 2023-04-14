@@ -98,7 +98,7 @@ class OpenAssetIOPlugin(MinorMode):
 
         # TODO: resolve related from URI in event.contents() and 
         # return them in a delminited string in event.setReturnContent()
-        #event.setReturnContent("asset1|bal:///rv_asset1;asset2|bal:///rvasset2")
+        event.setReturnContent("asset2|bal:///rv_asset2;asset3|bal:///rv_asset3")
 
 def createMode():
     return OpenAssetIOPlugin()
