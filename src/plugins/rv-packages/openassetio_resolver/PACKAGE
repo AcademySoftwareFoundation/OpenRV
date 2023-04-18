@@ -1,0 +1,10 @@
+package: OpenAssetIO Resolver
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.0
+openrv: 1.0.0
+description: |
+
+modes: 
+  - file: openassetio_resolver.py
+    load: immediate

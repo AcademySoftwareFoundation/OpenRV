@@ -1,12 +1,16 @@
 # This file contains all the packages that will be packaged with RV. Please add the license next to the package.
 
-pip                     # License: MIT License (MIT)
-setuptools              # License: MIT License
-OpenTimelineIO          # License: Other/Proprietary License (Modified Apache 2.0 License)
-matplotlib              # License: Python Software Foundation License (PSF)
-networkx                # License: BSD License
-PyOpenGL                # License: BSD License (BSD)
-PyOpenGL_accelerate     # License: BSD License (BSD)
+pip                       # License: MIT License (MIT)
+setuptools                # License: MIT License
+OpenTimelineIO            # License: Other/Proprietary License (Modified Apache 2.0 License)
+matplotlib                # License: Python Software Foundation License (PSF)
+networkx                  # License: BSD License
+PyOpenGL                  # License: BSD License (BSD)
+PyOpenGL_accelerate       # License: BSD License (BSD)
+openassetio               # License: Apache Software License (Apache 2.0)
+openassetio-mediacreation # License: Apache Software License (Apache 2.0)
+openassetio-manager-bal   # License: Apache Software License (Apache 2.0)
+
 
 
 # Those are installed by the src/build/make_python.py script, adding them here to list their licenses.
