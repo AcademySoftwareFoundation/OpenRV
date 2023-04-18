@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2022 The Foundry Visionmongers Ltd
+
+[manager]
+identifier = "org.openassetio.examples.manager.bal"
+
+[manager.settings]
+library_path = "/Users/nelsonr/git/public/OpenRV/examples/openassetio/rv_traits.json"

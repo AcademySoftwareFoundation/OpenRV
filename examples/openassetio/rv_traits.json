@@ -1,0 +1,37 @@
+{
+	"entities": {
+		"rv_asset1": {
+			"versions": [
+				{
+					"traits": {
+						"openassetio-mediacreation:content.LocatableContent": {
+							"location": "${RV_ASSET_1}" 
+						}
+					}
+				}
+			]
+		},
+		"rv_asset2": {
+			"versions": [
+				{
+					"traits": {
+						"openassetio-mediacreation:content.LocatableContent": { 
+							"location": "${RV_ASSET_2}" 
+						}
+					}
+				}
+			]
+		},
+		"rv_asset3": {
+			"versions": [
+				{
+					"traits": {
+						"openassetio-mediacreation:content.LocatableContent": { 
+							"location": "${RV_ASSET_3}" 
+						}
+					}
+				}
+			]
+		}
+	}
+}

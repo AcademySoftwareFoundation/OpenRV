@@ -1,0 +1,50 @@
+{
+    "tracks": {
+        "OTIO_SCHEMA": "Stack.1",
+        "children": [
+            {
+                "name": "video",
+                "OTIO_SCHEMA": "Track.1",
+                "children": [
+                    {
+                        "name": "rv_asset1",
+                        "OTIO_SCHEMA": "Clip.1",
+                        "source_range": {
+                            "start_time": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "value": 1.0,
+                                "rate": 24.0
+                            },
+                            "duration": {
+                                "OTIO_SCHEMA": "RationalTime.1",
+                                "value": 49.0,
+                                "rate": 24.0
+                            },
+                            "OTIO_SCHEMA": "TimeRange.1"
+                        },
+                        "media_reference": {
+                            "OTIO_SCHEMA": "ExternalReference.1",
+                            "available_range": {
+                                "start_time": {
+                                    "OTIO_SCHEMA": "RationalTime.1",
+                                    "value": 1.0,
+                                    "rate": 24.0
+                                },
+                                "duration": {
+                                    "OTIO_SCHEMA": "RationalTime.1",
+                                    "value": 49.0,
+                                    "rate": 24.0
+                                },
+                                "OTIO_SCHEMA": "TimeRange.1"
+                            },
+                            "target_url": "bal:///rv_asset1"
+                        }
+                    }
+                ],
+                "kind": "Video"
+            }
+        ]
+    },
+    "name": "demo",
+    "OTIO_SCHEMA": "Timeline.1"
+}
