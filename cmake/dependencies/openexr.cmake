@@ -9,7 +9,7 @@ SET(_target
 )
 
 SET(_version
-    "3.1.5"
+    "3.1.7"
 )
 
 IF(RV_USE_OCIO_OPENEXR)
@@ -61,7 +61,7 @@ ELSE()
   )
 
   SET(_download_hash
-      "a211c5c9f0796ad5c895fe0d2ce6a3f8"
+    "a278571601083a74415d40d2497d205c"
   )
 
   SET(_install_dir
