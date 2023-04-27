@@ -162,6 +162,17 @@ ELSE()
     BUILD_BYPRODUCTS ${_libpath}
     USES_TERMINAL_BUILD TRUE
   )  
+
+  # Only tested on Mac; Linux might have different header locations
+  # Adding missing files that was there in src/pub/tiff and that IOTiff needs
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Installing ${_target}'s missing headers"
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/build/libtiff/tif_config.h ${_include_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/src/libtiff/tiffiop.h ${_include_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/src/libtiff/tif_dir.h ${_include_dir}
+  )
 ENDIF()
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless

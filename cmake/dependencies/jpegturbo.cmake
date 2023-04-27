@@ -5,7 +5,6 @@ include(ProcessorCount)  # require CMake 3.15+
 ProcessorCount(_cpu_count)
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "2.1.4" "make" "")
-# RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/${_version}.tar.gz")
 
@@ -19,12 +18,20 @@ SET(_libjpegname ${_libname})
 SET(_libjpegpath ${_libpath})
 
 # CMake is not generating debug postfix for JpegTurbo
+# Note: This library is added by one of our DEP (TIFF or a JPEG DEP) and thus we're copying it. Ideally, we should use the above and remove this one.
+RV_MAKE_STANDARD_LIB_NAME("jpeg" "62" "SHARED" "")
+SET(_libjpeg62name ${_libname})
+SET(_libjpeg62path ${_libpath})
+
+# CMake is not generating debug postfix for JpegTurbo
 RV_MAKE_STANDARD_LIB_NAME("turbojpeg" "0.2.0" "SHARED" "")
 SET(_libturbojpegname ${_libname})
 SET(_libturbojpegpath ${_libpath})
 
+# RV_MAKE_STANDARD_LIB_NAME overwrites _byproducts at each call, so we set it properly here with both libs.
 SET(_byproducts "")
 LIST(APPEND _byproducts ${_libjpegpath})
+LIST(APPEND _byproducts ${_libjpeg62path})
 LIST(APPEND _byproducts ${_libturbojpegpath})
 
 IF(RV_TARGET_WINDOWS)
@@ -78,6 +85,14 @@ EXTERNALPROJECT_ADD( ${_target}
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
 RV_COPY_LIB_BIN_FOLDERS()
+
+# RV_COPY_LIB_BIN_FOLDERS doesn't copy symlinks so this command is used for _libjpeg62path}
+ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Copying jpegturbo's libjpeg to '${RV_STAGE_LIB_DIR}'."
+    COMMAND ${CMAKE_COMMAND} -E copy ${_libjpeg62path} ${RV_STAGE_LIB_DIR}
+)
 
 #
 # --- JpegTurbo::Jpeg Library
