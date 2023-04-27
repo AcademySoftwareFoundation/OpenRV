@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Mu MuLang
-  PRIVATE cv tiff
+  PRIVATE cv Tiff::Tiff
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
