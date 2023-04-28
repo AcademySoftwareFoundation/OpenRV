@@ -246,6 +246,9 @@ class IPImage
     static IPImageID* newNoImageID();
     static IPImageID* newErrorImageID();
 
+    static BlendMode getBlendModeFromString( const char* blendModeString );
+
+
     //
     //  These will only return true if the image was made using the
     //  above special image constructors. 
@@ -445,6 +448,9 @@ class IPImage
     size_t           cropEndY;
     
     std::string      source;
+
+    bool supportReversedOrderBlending;
+ 
   private:
     void clear();
     bool renderIDNeedsCompute() const { return m_renderID == ""; }

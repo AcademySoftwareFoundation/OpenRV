@@ -126,6 +126,8 @@ private:
     FloatProperty*     m_outputFPS;
     IntProperty*       m_outputSize;
     IntProperty*       m_interactiveSize;
+    StringProperty*    m_inputsBlendingModes;
+    IntProperty*       m_supportReversedOrderBlending;
 
     /// this signal is called before all state change
     VoidSignal         m_changingSignal;
