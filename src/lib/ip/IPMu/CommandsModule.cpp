@@ -356,7 +356,9 @@ NODE_IMPLEMENTATION(setMargins, void)
 {
     Vector4f m = NODE_ARG (0, Vector4f);
     const bool allDevices = NODE_ARG(1, bool);
-    Session::currentSession()->setMargins(m[0], m[1], m[2], m[3], allDevices);
+    Session* s = Session::currentSession();
+    s->setMargins(m[0], m[1], m[2], m[3], allDevices);
+    s->askForRedraw(true /*force*/);
 }
 
 NODE_IMPLEMENTATION(margins, Mu::Vector4f)
