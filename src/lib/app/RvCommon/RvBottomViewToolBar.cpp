@@ -383,8 +383,26 @@ RvBottomViewToolBar::receiveEvent(const Event& event)
             bb->setIcon(QIcon(":/images/control_bplay.png"));
             bf->setIcon(QIcon(":/images/control_play.png"));
         }
+        else if (name == "play-mode-changed")
+        {
+            if (QToolButton*b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
+            {
+                switch (m_session->playMode())
+                {
+                    case 0: // Session::PlayLoop
+                        b->setIcon(m_playModeLoopIcon);
+                        break;
+                    case 1: // Session::PlayOnce
+                        b->setIcon(m_playModeOnceIcon);
+                        break;
+                    case 2: // Session::PlayPingPong
+                        b->setIcon(m_playModePingPongIcon);
+                        break;
+                }
+            }
+        }
     }
-    
+
     return EventAcceptAndContinue;
 }
 //

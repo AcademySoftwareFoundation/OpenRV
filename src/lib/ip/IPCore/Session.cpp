@@ -1748,7 +1748,7 @@ Session::setPlayMode(PlayMode mode)
     {
         m_playMode = mode;
         updateGraphInOut();
-        userGenericEvent("play-mode-changed", "");
+        userGenericEvent("play-mode-changed", std::to_string((int) mode));
         m_playModeChangedSignal();
     }
 }
@@ -2173,6 +2173,11 @@ Session::reload(int start, int end)
 
     graph().flushRange(start, end);
     clearVideoDeviceCaches();
+
+    // We need to manually free the already uploaded textures here because
+    // their content risks of no longer matching the reloaded media.
+    if (m_renderer) m_renderer->freeUploadedTextures();
+
     updateGraphInOut();
     askForRedraw();
 }
@@ -4462,7 +4467,10 @@ Session::userGenericEvent(const string& eventName,
                     contents == "rvui.previousMarkedFrame()" ||
                     contents == "rvui.nextMarkedFrame()" ||
                     contents == "extra_commands.stepForward(1)" ||
-                    contents == "extra_commands.stepBackward(1)"
+                    contents == "extra_commands.stepBackward(1)" ||
+                    contents == "commands.setPlayMode(PlayOnce)" ||
+                    contents == "commands.setPlayMode(PlayPingPong)" ||
+                    contents == "commands.setPlayMode(PlayLoop)"
                 )
             )
         )
