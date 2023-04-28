@@ -1886,10 +1886,12 @@ std::string RvSession::sourceMediaRep(
 // Finds and returns the Source Media Representation names available
 void RvSession::sourceMediaReps(
     const string& srcNodeOrSwitchNodeName,
-    StringVector &sourceMediaReps
+    StringVector& sourceMediaReps,
+    StringVector* sourceNodes /* = nullptr */
 )
 {
     sourceMediaReps.clear();
+    if (sourceNodes) sourceNodes->clear();
 
     // Find the Switch node associated with the specified switch or source node if any
     SwitchIPNode* switchNode = this->switchNode(srcNodeOrSwitchNodeName);
@@ -1910,6 +1912,7 @@ void RvSession::sourceMediaReps(
         if (srcNode)
         {
             sourceMediaReps.push_back(srcNode->mediaRepName());
+            if (sourceNodes) sourceNodes->push_back(srcNode->name());
         }
         return;
     }
@@ -1919,6 +1922,7 @@ void RvSession::sourceMediaReps(
         if (SourceIPNode* srcNode = sourceFromSwitchInput(switchNode->inputs()[i]))
         {
             sourceMediaReps.push_back(srcNode->mediaRepName());
+            if (sourceNodes) sourceNodes->push_back(srcNode->name());
         }
     }
 }
