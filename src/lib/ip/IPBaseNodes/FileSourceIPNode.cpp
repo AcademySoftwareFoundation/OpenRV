@@ -1325,13 +1325,21 @@ FileSourceIPNode::evaluate(const Context& context)
                         static_cast<float>(tilingInfo.numTiles) *
                         static_cast<float>(aFullPlaneFB->height()) + 0.5f);
 
-                    const int tileSizeX = static_cast<int>(1.0f /
+                    int tileSizeX = static_cast<int>(1.0f /
                         static_cast<float>(tilingInfo.numTiles) *
                         static_cast<float>(aFullPlaneFB->width()) + 0.5f);
 
-                    const int tileSizeY = static_cast<int>(1.0f /
+                    int tileSizeY = static_cast<int>(1.0f /
                         static_cast<float>(tilingInfo.numTiles) *
                         static_cast<float>(aFullPlaneFB->height()) + 0.5f);
+
+                    // Make sure that the last tiles doe not overshoot the full
+                    // plane which would cause an access violation.
+                    // Note that this can happen because of the round up in the
+                    // previous float to integer conversion.
+                    // Example: numTiles=6, aFullPlaneFB->height=94605
+                    tileSizeX = std::min(tileSizeX, aFullPlaneFB->width()-tilePosX);
+                    tileSizeY = std::min(tileSizeY, aFullPlaneFB->height()-tilePosY);
 
                     unsigned char* tilePixels = 
                         ( aFullPlaneFB->pixels<unsigned char>() +
