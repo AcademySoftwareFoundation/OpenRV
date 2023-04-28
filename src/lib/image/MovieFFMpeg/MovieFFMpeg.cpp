@@ -1109,10 +1109,8 @@ MovieFFMpegReader::open(const string &filename,
 bool
 MovieFFMpegReader::openAVFormat()
 {
-    bool fileExists = boost::filesystem::exists(UNICODE_STR(m_filename));
-
-    // Look for current timing information in the MovieInfo
     const bool filepathIsURL = TwkUtil::pathIsURL(m_filename);
+    const bool fileExists = !filepathIsURL && boost::filesystem::exists(UNICODE_STR(m_filename));
     if (!filepathIsURL && !fileExists)
     {
         TWK_THROW_EXC_STREAM(
