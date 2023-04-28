@@ -14,6 +14,12 @@ import PyOpenColorIO as OCIO
 
 DEFAULT_PIPE = {}
 
+DEFAULT_RV_PIPE = {
+    "RVLinearizePipelineGroup": ["RVLinearize", "RVLensWarp"],
+    "RVLookPipelineGroup": ["RVLookLUT"],
+    "RVDisplayPipelineGroup": ["RVDisplayColor"],
+}
+
 OCIO_ROLES = {"OCIOFile": "RVLinearizePipelineGroup", "OCIOLook": "RVLookPipelineGroup"}
 
 OCIO_DEFAULTS = {}
@@ -298,8 +304,20 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         try:
             if pipeSlot not in DEFAULT_PIPE:
-                default = commands.getStringProperty(srcPipeline + ".pipeline.nodes")
-                DEFAULT_PIPE[pipeSlot] = default
+                currentPipelineNodes = commands.getStringProperty(
+                    srcPipeline + ".pipeline.nodes"
+                )
+
+                # We need to handle the following special case here:
+                # We might be in the process of reloading an RV session that
+                # is already OCIO color corrected in which case we do not
+                # want this pipeline to be considered the default (non OCIO).
+                # Example: srcPipelineNodes = [ "OCIOFile" "RVLensWarp" ]
+                # We will use the RV default instead in that special case.
+                if nodeType in currentPipelineNodes and pipeSlot in DEFAULT_RV_PIPE:
+                    DEFAULT_PIPE[pipeSlot] = DEFAULT_RV_PIPE[pipeSlot]
+                else:
+                    DEFAULT_PIPE[pipeSlot] = currentPipelineNodes
             pipelineList = ocio_node_from_media(
                 self.config, srcPipeline, DEFAULT_PIPE[pipeSlot], media, attrDict
             )
@@ -375,8 +393,22 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         try:
             dpipeline = groupMemberOfType(group, groupName)
             if groupName not in DEFAULT_PIPE:
-                default = commands.getStringProperty(dpipeline + ".pipeline.nodes")
-                DEFAULT_PIPE[groupName] = default
+                currentPipelineNodes = commands.getStringProperty(
+                    dpipeline + ".pipeline.nodes"
+                )
+
+                # We need to handle the following special case here:
+                # We might be in the process of reloading an RV session that
+                # is already OCIO color corrected in which case we do not
+                # want this pipeline to be considered the default (non OCIO).
+                # We will use the RV default instead in that special case.
+                if (
+                    "OCIODisplay" in currentPipelineNodes
+                    and groupName in DEFAULT_RV_PIPE
+                ):
+                    DEFAULT_PIPE[groupName] = DEFAULT_RV_PIPE[groupName]
+                else:
+                    DEFAULT_PIPE[groupName] = currentPipelineNodes
             pipelineList = ocio_node_from_media(
                 self.config, dpipeline, DEFAULT_PIPE[groupName]
             )
