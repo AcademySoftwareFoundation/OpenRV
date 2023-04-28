@@ -799,14 +799,6 @@ Session::setAudioTimeShift(double d, double sensitivity)
 void
 Session::playAudio()
 {
-    // we need to clear the cache if the view node has been
-    // changed since last audio play
-    if (m_viewNodeChanged)
-    {
-        graph().requestClearAudioCache();
-        m_viewNodeChanged = false;
-    }
-
     m_audioPlay = true;
     setAudioTimeShift(std::numeric_limits<double>::max());
     if (audioRenderer()) audioRenderer()->play(this);
@@ -1295,7 +1287,10 @@ Session::setViewNode(const std::string& nodeName, bool force)
             if (node != oldNode) setSessionStateFromNode(graph().viewNode());
             userGenericEvent("after-graph-view-change", nodeName);
             m_afterGraphViewChangeSignal(node);
-            m_viewNodeChanged = true;
+
+            // We need to clear the audio cache if the view node has been
+            // changed since the last audio play
+            graph().requestClearAudioCache();
         }
 
         return true;

@@ -2991,7 +2991,12 @@ IPGraph::audioConfigure(const AudioConfiguration& config)
     }
 
     if ( m_clearAudioCacheRequested.exchange(false) )
+    {
         m_audioCache.clear();
+        lockAudioInternal();
+        m_audioCacheComplete = false;
+        unlockAudioInternal();
+    }
 
     m_audioCache.unlock();
 

@@ -1078,7 +1078,6 @@ class Session : public TwkApp::Document
     mutable bool          m_framePatternFail;
     mutable int           m_framePatternFailCount;
     mutable FdataDeque    m_lastFData;
-    bool                  m_viewNodeChanged {false};
   public:
     static Session*      m_currentSession;
 };
