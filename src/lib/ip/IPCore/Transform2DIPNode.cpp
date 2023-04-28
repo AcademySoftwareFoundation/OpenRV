@@ -15,6 +15,7 @@
 #include <TwkMath/Iostream.h>
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/Operations.h>
+#include <IPBaseNodes/SwitchIPNode.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <iostream>
 #include <cmath>
@@ -226,6 +227,16 @@ Transform2DIPNode::evaluate(const Context& context)
     {
         root->stencilBox.min = Vec2f(x0, y0);
         root->stencilBox.max = Vec2f(x1, y1);
+
+        // Propagate the stencil to the source group if separated by a switch node (MMR)
+        if (dynamic_cast<const SwitchIPNode*>(root->node))
+        {
+            for (IPImage* child = root->children; child; child = child->next)
+            {
+                child->stencilBox.min = root->stencilBox.min;
+                child->stencilBox.max = root->stencilBox.max;
+            }
+        }
     }
     else
     {
