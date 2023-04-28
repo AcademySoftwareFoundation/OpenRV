@@ -160,6 +160,26 @@ bool MuQt_QFile::atEnd() const
     }
 }
 
+bool MuQt_QFile::open(OpenMode mode) 
+{
+    if (!_env) return QFile::open(mode);
+    MuLangContext* c = (MuLangContext*)_env->context();
+    const MemberFunction* F0 = _baseType->_func[8];
+    const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
+    if (F != F0) 
+    {
+        Function::ArgumentVector args(2);
+        args[0] = Value(Pointer(_obj));
+        args[1] = Value(mode);
+        Value rval = _env->call(F, args);
+        return (bool)(rval._bool);
+    }
+    else
+    {
+        return QFile::open(mode);
+    }
+}
+
 void MuQt_QFile::close() 
 {
     if (!_env) { QFile::close(); return; }
@@ -389,6 +409,14 @@ bool qt_QFile_atEnd_bool_QFile(Mu::Thread& NODE_THREAD, Pointer param_this)
     return isMuQtObject(arg0) ? arg0->QFile::atEnd() : arg0->atEnd();
 }
 
+bool qt_QFile_open_bool_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QFile* arg0 = object<QFile>(param_this);
+    QIODevice::OpenModeFlag arg1 = (QIODevice::OpenModeFlag)(param_mode);
+    return isMuQtObject(arg0) ? arg0->QFile::open(arg1) : arg0->open(arg1);
+}
+
 void qt_QFile_close_void_QFile(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -557,6 +585,11 @@ static NODE_IMPLEMENTATION(_n_atEnd0, bool)
     NODE_RETURN(qt_QFile_atEnd_bool_QFile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
+static NODE_IMPLEMENTATION(_n_open0, void)
+{
+    qt_QFile_open_bool_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+}
+
 static NODE_IMPLEMENTATION(_n_close0, void)
 {
     qt_QFile_close_void_QFile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
@@ -678,7 +711,6 @@ addSymbols(
     new Function(c, "setFileName", _n_setFileName0, None, Compiled, qt_QFile_setFileName_void_QFile_string, Return, "void", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "string"), End),
     new Function(c, "symLinkTarget", _n_symLinkTarget0, None, Compiled, qt_QFile_symLinkTarget_string_QFile, Return, "string", Parameters, new Param(c, "this", "qt.QFile"), End),
     _func[0] = new MemberFunction(c, "fileName", _n_fileName0, None, Compiled, qt_QFile_fileName_string_QFile, Return, "string", Parameters, new Param(c, "this", "qt.QFile"), End),
-    // MISSING: open (bool; QFile this, "OpenMode" mode)
     // MISSING: permissions ("Permissions"; QFile this)
     _func[1] = new MemberFunction(c, "resize", _n_resize0, None, Compiled, qt_QFile_resize_bool_QFile_int64, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "sz", "int64"), End),
     // MISSING: setPermissions (bool; QFile this, "Permissions" permissions)
@@ -688,6 +720,7 @@ addSymbols(
     _func[5] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QFile_isSequential_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
     _func[6] = new MemberFunction(c, "pos", _n_pos0, None, Compiled, qt_QFile_pos_int64_QFile, Return, "int64", Parameters, new Param(c, "this", "qt.QFile"), End),
     _func[7] = new MemberFunction(c, "seek", _n_seek0, None, Compiled, qt_QFile_seek_bool_QFile_int64, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "pos", "int64"), End),
+    _func[8] = new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QFile_open_bool_QFile_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "mode", "int"), End),
     // MISSING: readData (int64; QFile this, "char *" data, int64 len) // protected
     // MISSING: readLineData (int64; QFile this, "char *" data, int64 maxlen) // protected
     // MISSING: writeData (int64; QFile this, "const char *" data, int64 len) // protected
