@@ -75,6 +75,7 @@
 #include <iterator>
 #include <sstream>
 #include <stl_ext/string_algo.h>
+#include <unordered_set>
 
 namespace IPMu {
 using namespace TwkApp;
@@ -1867,17 +1868,20 @@ NODE_IMPLEMENTATION(sourcesAtFrame, Pointer)
     DynamicArray*           array = new DynamicArray(atype, 1);
 
     IPNode::MetaEvalInfoVector infos;
-    vector<SourceIPNode*> sources;
     IPNode::MetaEvalInfoCollectorByType<SourceIPNode> collector(infos);
     s->graph().root()->metaEvaluate(s->graph().contextForFrame(frame), collector);
-    
-    array->resize(infos.size());
 
-    for (size_t i = 0; i < infos.size(); i++)
+    // Add unique sources to the list while making sure to respect the same order
+    array->resize(infos.size());
+    std::unordered_set<std::string> uniqueSources;
+    for( size_t i = 0, size = infos.size(), pos = 0; i < size; ++i)
     {
-        array->element<StringType::String*>(i) = 
-            stype->allocate(infos[i].node->name());
+        if( auto ret = uniqueSources.insert(infos[i].node->name()); ret.second )
+        {
+            array->element<StringType::String*>(pos++) = stype->allocate(infos[i].node->name());
+        }
     }
+    array->resize(uniqueSources.size());
 
     NODE_RETURN(array);
 }
