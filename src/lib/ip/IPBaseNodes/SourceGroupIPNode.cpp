@@ -143,6 +143,12 @@ SourceGroupIPNode::setUINameFromMedia(int index)
 	}
     }
 
+    // Append the media representation's name if any
+    if (!m_sourceNode->mediaRepName().empty())
+    {
+        uiname += " (" + m_sourceNode->mediaRepName() + ")";
+    }
+
     NameSet existingNames;
 
     for (IPGraph::NodeMap::const_iterator i = graph()->viewableNodes().begin();

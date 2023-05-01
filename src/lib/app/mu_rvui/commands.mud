@@ -832,6 +832,19 @@ current frame is used to determine the available media representations.
 
 """
 
+sourceMediaRepsAndNodes() """
+
+Returns an array of (mediaRepName, mediaRepSourceNode) pairs available for the
+switch node specified as parameter containing the media representations.
+Each pair consists of firstly the name of the media representation, and secondly
+of the source node of that media representation.
+Note that for convenience, a source node can be specified instead of the switch 
+node, in which case the associated switch node will be inferred.
+
+Returns an empty array if no media representations are found.
+
+"""
+
 sourceMediaRepSwitchNode() """
 
 Returns the name of the switch node associated with the given source node if any.
