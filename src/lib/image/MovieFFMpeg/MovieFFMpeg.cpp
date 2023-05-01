@@ -3424,6 +3424,58 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
     }
 
     //
+    // Find the best suitable frame
+    //
+
+    #if DB_TIMING & DB_LEVEL
+        m_timingDetails->startTimer("decode");
+    #endif
+
+    const bool frameFinished = useNewVideoDecodingApi
+        ? findImageWithBestTimestamp(inframe, frameDur, videoStream, track)
+        : findImageWithBestTimestamp_legacy(inframe, frameDur, videoStream, track);
+
+    // Remove earlier timestamps
+    int64_t prune = (inframe - 2) * frameDur;
+    set<int64_t>::iterator pruneIT;
+    for (pruneIT = track->tsSet.begin(); pruneIT != track->tsSet.end();
+        pruneIT++)
+    {
+        if (*pruneIT > prune)
+        {
+            if (pruneIT != track->tsSet.begin()) pruneIT--;
+            break;
+        }
+    }
+    track->tsSet.erase(track->tsSet.begin(), pruneIT);
+
+    #if DB_TIMING & DB_LEVEL
+        double decodeDuration = m_timingDetails->pauseTimer("decode");
+        DBL (DB_TIMING, "frame: " << inframe
+                     << " decodeTime: " << decodeDuration);
+    #endif
+
+    const int width = (track->rotate) ? m_info.height : m_info.width;
+    const int height = (track->rotate) ? m_info.width : m_info.height;
+
+    // Did we get what we came here for?
+    if (!frameFinished ||
+        track->videoFrame->width < width ||
+        track->videoFrame->height < height)
+    {
+        TWK_THROW_EXC_STREAM("Unable to get frame at: " << inframe);
+    }
+
+    //
+    // Either we got something we can handle natively or we need to scale or
+    // convert it
+    //
+
+    snagVideoFrameType(track);
+
+
+
+    //
     // track->videoFrame - AVFrame to read the track->videoPacket into
     // outFrame          - AVFrame linked to output FrameBuffer to copy into
     //
@@ -3441,8 +3493,6 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
     AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
     const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
     int bitSize = desc->comp[0].depth_minus1 + 1 - desc->comp[0].shift;
-    int width = (track->rotate) ? m_info.height : m_info.width;
-    int height = (track->rotate) ? m_info.width : m_info.height;
     int numPlanes = 0;
     bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
     bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
@@ -3526,67 +3576,24 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
         outFrame->data[p] = fb->pixels<unsigned char>();
     }
 
-    //
-    // Find the best suitable frame
-    //
-
-    #if DB_TIMING & DB_LEVEL
-        m_timingDetails->startTimer("decode");
-    #endif
-
-    const bool frameFinished = useNewVideoDecodingApi
-        ? findImageWithBestTimestamp(inframe, frameDur, videoStream, track)
-        : findImageWithBestTimestamp_legacy(inframe, frameDur, videoStream, track);
-
-    // Remove earlier timestamps
-    int64_t prune = (inframe - 2) * frameDur;
-    set<int64_t>::iterator pruneIT;
-    for (pruneIT = track->tsSet.begin(); pruneIT != track->tsSet.end();
-        pruneIT++)
-    {
-        if (*pruneIT > prune)
-        {
-            if (pruneIT != track->tsSet.begin()) pruneIT--;
-            break;
-        }
-    }
-    track->tsSet.erase(track->tsSet.begin(), pruneIT);
-
-    #if DB_TIMING & DB_LEVEL
-        double decodeDuration = m_timingDetails->pauseTimer("decode");
-        DBL (DB_TIMING, "frame: " << inframe
-                     << " decodeTime: " << decodeDuration);
-    #endif
-
-    // Did we get what we came here for?
-    if (!frameFinished ||
-        track->videoFrame->width < width ||
-        track->videoFrame->height < height)
-    {
-        TWK_THROW_EXC_STREAM("Unable to get frame at: " << inframe);
-    }
-
-    //
-    // Either we got something we can handle natively or we need to scale or
-    // convert it
-    //
-
-    snagVideoFrameType(track);
     if (convertFormat)
     {
         DBL (DB_VIDEO, "Converting video format");
 
-        if (track->imgConvertContext == 0)
+        // Reuse or allocate a new image conversion context
+        AVPixelFormat original = videoCodecContext->pix_fmt;
+        AVPixelFormat conv = getBestRVFormat(original);
+        HOP_PROF("sws_getCachedContext()");
+        // Note: If track->imgConvertContext is NULL, sws_getCachedContext just
+        // calls sws_getContext() to get a new context. Otherwise, it checks if
+        // the parameters are the ones already saved in context. If that is the 
+        // case, it returns the current context. Otherwise, it frees context and
+        // gets a new context with the new parameters.
+        track->imgConvertContext = sws_getCachedContext(track->imgConvertContext, width, height,
+            original, width, height, conv, SWS_BICUBIC, 0, 0, 0);
+        if (track->imgConvertContext == 0) 
         {
-            AVPixelFormat original = videoCodecContext->pix_fmt;
-            AVPixelFormat conv = getBestRVFormat(original);
-            HOP_PROF("sws_getCachedContext()");
-            track->imgConvertContext = sws_getCachedContext(NULL, width, height,
-                original, width, height, conv, SWS_BICUBIC, 0, 0, 0);
-            if (track->imgConvertContext == 0)
-            {
-                TWK_THROW_EXC_STREAM("Can't initialize conversion context!");
-            }
+            TWK_THROW_EXC_STREAM("Can't initialize conversion context!");
         }
 
         HOP_PROF("sws_scale()");
