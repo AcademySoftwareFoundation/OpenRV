@@ -50,7 +50,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
 
         # Using a layout to position the labels.
         layout = QtWidgets.QHBoxLayout(widget)
-        layout.setContentsMargins(2, 11, 2, 2)
+        layout.setContentsMargins(2, 6, 2, 2)
         layout.setAlignment(QtCore.Qt.AlignLeft)
 
         # Using a label to mimic the QAction's tick on the left side
@@ -86,13 +86,15 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
         widget.setLayout(layout)
         self.setDefaultWidget(widget)
 
-    def set_values(self, rep, resolution, extension):
+    def set_values(self, rep, resolution, extension, switch_nodes):
         rep_txt = "<font color='DarkGray'>%s</font>" % rep
-        ext_txt = "<font color='Gray'>%s</color>" % extension
         res_txt = "<font color='DarkGray' size='0.6em'>%s</font>" % resolution
-        self._label.setText("%s %s<br>%s" % (rep_txt, ext_txt, res_txt))
+        ext_txt = "<font color='DarkGray' size='0.6em'>%s</font>" % extension
+        self._label.setText(
+            "%s<br>%s&nbsp;&nbsp;&nbsp;%s" % (rep_txt, res_txt, ext_txt)
+        )
 
-        self.setData(rep)
+        self.setData({"rep": rep, "switch_nodes": switch_nodes})
 
     def mousePressEvent(self, _):
         self._action.trigger()
@@ -126,8 +128,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
     """
 
     # Caching current source to avoid useless refresh
-    _current_source = None
-    _current_switch_node = None
+    _current_sources = []
     _current_media_rep_name = None
 
     # Media representation widgets
@@ -264,7 +265,9 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         It calls the 'setActiveSourceMediaRep' RV commands to set the active input to
         the newly selected media representation specified.
         """
-        rvc.setActiveSourceMediaRep(self._current_switch_node, action.data())
+        for switch_node in action.data()["switch_nodes"]:
+            if action.data()["rep"] in rvc.sourceMediaReps(switch_node):
+                rvc.setActiveSourceMediaRep(switch_node, action.data()["rep"])
 
     def _on_media_rep_about_to_show(self):
         """
@@ -283,10 +286,6 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         #        Note: We do not have issue when switching the media rep one by one
         #        from the first to the last added.
         self._update_media_rep_menu()
-
-        for action in self._media_representation_btn.menu().actions():
-            if action.isEnabled():
-                action.setChecked(action.data() == self._current_media_rep_name)
 
     def _build_media_representation_widgets(self):
         """
@@ -338,63 +337,78 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
             playback_style_action, self._media_extension_lbl
         )
 
-    def _populate_media_rep_menu(self, reps, infos):
+    def _populate_media_rep_menu(self, menu, switch_nodes):
         """
         Populates the media rep drop down menu with the available media representations
         and their associated media infos.
         """
-        # TODO Reuse old actions instead of clearing and creating all anew
-        menu = self._media_representation_btn.menu()
-        menu.clear()
 
-        # Menu title.
-        title = QtWidgets.QAction("Media Playback", menu)
-        title.setEnabled(False)
-        menu.addAction(title)
+        active_rep = utils.get_media_rep(switch_nodes)
 
+        # Calculate the union of all the media reps along with their associated source nodes
+        reps_and_source_nodes = {}
+        for switch_node in switch_nodes:
+            reps_and_nodes = rvc.sourceMediaRepsAndNodes(switch_node)
+            for (rep, source_node) in reps_and_nodes:
+                if rep in reps_and_source_nodes.keys():
+                    reps_and_source_nodes[rep].append(source_node)
+                else:
+                    reps_and_source_nodes[rep] = [source_node]
+
+        # Fetch the resolution and extension for all the media reps.
         # The menu items are composed of the media rep name, the extension and
         # the resolution.
-        for rep in reps:
-            resolution = ""
-            extension = ""
-
-            if rep in infos and infos[rep]:
-                if "width" in infos[rep]:
-                    resolution = "%s x %s" % (infos[rep]["width"], infos[rep]["height"])
-                if "file" in infos[rep]:
-                    extension = (
-                        "URL"
-                        if utils.is_url(infos[rep]["file"])
-                        else infos[rep]["file"].split(".")[-1].upper()
-                    )
+        for rep in reps_and_source_nodes.keys():
+            source_media_infos = utils.get_common_source_media_infos(
+                reps_and_source_nodes[rep]
+            )
 
             action = MediaRepresentationItem(menu)
-            action.set_values(rep, resolution, extension)
+            action.set_values(
+                rep,
+                source_media_infos.resolution,
+                source_media_infos.extension,
+                switch_nodes,
+            )
             menu.addAction(action)
-
-        return menu
+            action.setChecked(rep == active_rep)
 
     def _update_media_rep_menu(self):
         """
         Updates the dropdown menu based on the available media reps of the
         current source.
         """
-        media_reps = rvc.sourceMediaReps(self._current_switch_node)
 
-        # Fetch the resolution and extension for all the media reps.
-        infos = {k: {} for k in media_reps}
-        for s in utils.get_media_reps_sources(self._current_switch_node):
-            try:
-                rep = rvc.getStringProperty(s + ".media.repName")[0]
-                infos[rep] = utils.get_source_media_info(s)
+        menu = self._media_representation_btn.menu()
+        menu.clear()
 
-            except:
-                # Source node is not ready. Ignore that issue since the
-                # information will be gather later on if needed.
-                continue
+        switch_nodes = utils.get_switch_nodes_at_current_frame()
+        if not switch_nodes:
+            return
+
+        # Menu title.
+        title = QtWidgets.QAction("Media Playback", menu)
+        title.setEnabled(False)
+        menu.addAction(title)
+        menu.addSeparator()
 
         # Populate the menu with the updated information.
-        self._populate_media_rep_menu(media_reps, infos)
+        if len(switch_nodes) == 1:
+            # There is only one source at the current frame
+            # Add that source's media representations to the menu
+            self._populate_media_rep_menu(menu, switch_nodes)
+        else:
+            # There are multiple sources at the current frame
+            # Add the union of all the sources's media representations to the menu
+            self._populate_media_rep_menu(menu, switch_nodes)
+
+            menu.addSeparator()
+
+            # Then add each source's media representations to the menu
+            for switch_node in switch_nodes:
+                src_menu = menu.addMenu(rve.uiName(switch_node))
+                self._populate_media_rep_menu(src_menu, [switch_node])
+                menu.addSeparator()
 
     def _show_media_representation(self, show):
         """
@@ -409,7 +423,6 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         Update the label of the media rep drop down menu and sets
         its visibility.
         """
-        has_media_rep = False
 
         # Ensure that there is a RVSwitchGroup in evaluation path.
         # Note: Current source might be part of a RVSwitchGroup, but
@@ -417,39 +430,28 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # the evaluation path.
         # RVSwitchGroup node is NOT present if view node is the source
         # node itself.
-        rep = ""
-        if self._current_switch_node:
-            media_reps = rvc.sourceMediaReps(self._current_switch_node)
-
-            if media_reps and media_reps[0]:
-                rep = rvc.sourceMediaRep(self._current_switch_node)
-
-                # The name must have a maximum of 20 characters.
-                label = rep if len(rep) <= 20 else "%s..." % rep[0:17]
-                self._media_representation_btn.setText(label)
+        rep = utils.get_media_rep_at_current_frame()
+        if rep:
+            # The name must have a maximum of 20 characters.
+            label = rep if len(rep) <= 20 else f"{rep[0:17]}..."
+            self._media_representation_btn.setText(label)
 
         self._current_media_rep_name = rep
         self._show_media_representation(rep != "")
 
     def _update_resolution_and_extension(self):
         """
-        Updates the resolution and extension labels based on the
-        media info of the current source.
+        Updates the resolution and extension labels based on the media info of
+        the current sources.
+        Note: when there are multiple sources at the current frame then the
+        resolution and extension is only shown when they are common to all
         """
-        infos = utils.get_source_media_info(self._current_source)
-        if infos:
-            resolution = "%s x %s" % (infos["width"], infos["height"])
-            extension = (
-                "URL"
-                if utils.is_url(infos["file"])
-                else infos["file"].split(".")[-1].upper()
-            )
-        else:
-            resolution = ""
-            extension = ""
+        common_source_media_infos = utils.get_common_source_media_infos(
+            self._current_sources
+        )
 
-        self._media_resolution_lbl.setText(resolution)
-        self._media_extension_lbl.setText(extension)
+        self._media_resolution_lbl.setText(common_source_media_infos.resolution)
+        self._media_extension_lbl.setText(common_source_media_infos.extension)
 
     def _update_media_info(self, event):
         """
@@ -466,14 +468,13 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         if self._in_progressive_loading:
             return
 
-        # Important: Skip update if same source as current.
-        source = utils.get_source_at_current_frame()
-        if source == self._current_source and not self._force_update_media_info:
+        # Important: Skip update if same sources as current.
+        sources = rvc.sourcesAtFrame(rvc.frame())
+        if sources == self._current_sources and not self._force_update_media_info:
             return
 
-        # Update current source and UI.
-        self._current_source = source
-        self._current_switch_node = utils.get_switch_node(source)
+        # Update current sources and UI.
+        self._current_sources = sources
         self._force_update_media_info = False
 
         self._update_media_representation()
@@ -509,12 +510,14 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # cached. However, we need to reset the cached source if it gets deleted,
         # otherwise the UI might not reflect the state of a new source if it
         # happens to have the same name
-        if self._current_source is None:
+        # Note that the source about to be deleted could be either a source or a
+        # source group.
+        if self._current_sources is None:
             return
-        if (self._current_source == source_deleted) or (
-            source_deleted == rvc.nodeGroup(self._current_source)
+        if (source_deleted in self._current_sources) or (
+            source_deleted + "_source" in self._current_sources
         ):
-            self._current_source = None
+            self._current_sources = None
 
     def _on_force_update_media_info(self, event):
         """
@@ -551,24 +554,6 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         event.reject()
         self._force_update_media_info = True
 
-    def _on_new_node(self, event):
-        """
-        This method is bound to the new-node event.
-        It forces an UI update if a SwitchGroup just got inserted in the
-        evaluation path of the current source node.
-        Note: When a new node is added for media rep, a SwitchGroup gets
-        inserted to connect the different source media representations.
-        Note:
-        """
-        package_logger.debug("%s in _on_new_node" % event.name())
-
-        event.reject()
-
-        if self._current_source and not self._current_switch_node:
-            if utils.get_switch_node(self._current_source):
-                self._force_update_media_info = True
-                self._update_media_info(event)
-
     def __init__(self):
         self._readingSession = False
 
@@ -596,11 +581,15 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
                 ("media-relocated", self._on_postpone_force_update_media_info, ""),
                 (
                     "source-media-rep-activated",
-                    self._update_media_info,
+                    self._on_force_update_media_info,
                     "",
                 ),
                 ("after-graph-view-change", self._on_force_update_media_info, ""),
-                ("new-node", self._on_new_node, ""),
+                (
+                    "multiple-source-media-rep-update-ui",
+                    self._on_force_update_media_info,
+                    "",
+                ),
             ],
             None,
             "multiple_source_media_rep",
