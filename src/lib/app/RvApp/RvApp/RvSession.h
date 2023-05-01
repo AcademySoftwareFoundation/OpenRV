@@ -213,11 +213,13 @@ class RvSession : public IPCore::Session
 
     //
     //  Returns the names of the media representations available for the Switch 
-    //  Group corresponding to the given RVFileSource node.
+    //  Group corresponding to the given RVFileSource node or RVSwitch node.
+    //  Also optionally returns the source nodes associated with these media reps.
     //
 
     void sourceMediaReps(const std::string& srcNodeOrSwitchNodeName, 
-                         StringVector& sourceMediaReps);
+                         StringVector& sourceMediaReps, 
+                         StringVector* sourceNodes = nullptr);
   
 
     //
