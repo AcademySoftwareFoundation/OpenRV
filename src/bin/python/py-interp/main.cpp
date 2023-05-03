@@ -36,8 +36,8 @@ main(int argc, char **argv)
     bundle.initializeAfterQApplication(); // cause init() to be called
 #endif
 
-    Py_InitializeEx( 1 );
     Py_SetProgramName( Py_DecodeLocale( argv[0], nullptr ) );
+    Py_InitializeEx( 1 );
 
     static wchar_t delim = L'\0';
 
