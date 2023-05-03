@@ -3934,6 +3934,21 @@ ImageRenderer::freeOldTextures()
     }
 }
 
+void
+ImageRenderer::freeUploadedTextures()
+{
+    for (FBToTextureMap::iterator it = m_uploadedTextures.begin();
+         it != m_uploadedTextures.end();
+         it++)
+    {
+        m_glState->deleteGLTexture(it->second->id);
+        if (it->second->bufferId) glDeleteBuffers(1, &it->second->bufferId);
+        delete it->second;
+    }
+    m_uploadedTextures.clear();
+}
+
+
 bool
 ImageRenderer::compatible(const FrameBuffer* fb,
                           const TextureDescription* tex) const
