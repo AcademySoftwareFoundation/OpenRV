@@ -2618,34 +2618,34 @@ FileSourceIPNode::openMovieTask(const string& filename,
 string 
 FileSourceIPNode::cacheHash(const string& filename, const string& prefix)
 {
-    boost::filesystem::path p(UNICODE_STR(filename));
     string hashString;
 
-    if (boost::filesystem::exists(p))
+    const bool filepathIsURL = TwkUtil::pathIsURL(filename);
+    if (!filepathIsURL)
     {
-        try
+        boost::filesystem::path p(UNICODE_STR(filename));
+        if (boost::filesystem::exists(p))
         {
-            boost::uintmax_t size = boost::filesystem::file_size(p);
-            time_t modtime = boost::filesystem::last_write_time(p);
+            try
+            {
+                const auto size = boost::filesystem::file_size(p);
 
-            //
-            //  not sure if last_write_time is really what we want. does it
-            //  change when touched or the file is copied?
-            //
-            //  should this function be hashing the first 256 bytes or so of
-            //  the file to be safe?
-            //
+                //
+                //  should this function be hashing the first 256 bytes or so of
+                //  the file to be safe?
+                //
 
-            ostringstream name;
-            boost::hash<string> string_hash;
-            name << filename << "::" << size; 
-            ostringstream fullHash;
-            fullHash << prefix << hex << string_hash(name.str()) << dec;
-            hashString = fullHash.str();
-        }
-        catch (...)
-        {
-            // nothing
+                ostringstream name;
+                boost::hash<string> string_hash;
+                name << filename << "::" << size; 
+                ostringstream fullHash;
+                fullHash << prefix << hex << string_hash(name.str()) << dec;
+                hashString = fullHash.str();
+            }
+            catch (...)
+            {
+                // nothing
+            }
         }
     }
 
