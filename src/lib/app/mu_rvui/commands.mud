@@ -611,6 +611,7 @@ The PixelImageInfo objects will be in order of front to back.
 sourcesAtFrame """
 Returns an array of the names of source nodes (RVFileSource or
 RVImageSource) which would be evaluated at the given frame.
+The array is guaranteed to contain only unique names (no duplicates).
 """
 
 renderedImages """
