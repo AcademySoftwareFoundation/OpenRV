@@ -261,6 +261,17 @@ int main(int argc, char *argv[])
     // if GLView is changed to inherit from QOpenGLWidget.
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
+    const bool noHighDPISupport = getenv("RV_QT_HDPI_SUPPORT") == nullptr;
+    if (noHighDPISupport)
+    {
+        unsetenv("QT_SCALE_FACTOR");
+        unsetenv("QT_SCREEN_SCALE_FACTORS");
+        unsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");
+        unsetenv("QT_ENABLE_HIGHDPI_SCALING");
+        unsetenv("QT_SCALE_FACTOR_ROUNDING_POLICY");
+        unsetenv("QT_DEVICE_PIXEL_RATIO");
+    }
+
     const char* pythonPath = getenv("PYTHONPATH");
     if (pythonPath) pythonPath = strdup(pythonPath);
 

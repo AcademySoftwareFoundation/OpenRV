@@ -102,6 +102,8 @@
 #include <QtGui/QtGui>
 #include <RvCommon/RvDocument.h>
 
+#include <QtGlobal>
+
 extern const char* rv_linux_dark;
 
 //
@@ -203,6 +205,17 @@ utf8Main(int argc, char *argv[])
 #ifdef PLATFORM_LINUX
     XInitThreads();
 #endif
+
+    const bool noHighDPISupport = getenv("RV_QT_HDPI_SUPPORT") == nullptr;
+    if (noHighDPISupport)
+    {
+        qunsetenv("QT_SCALE_FACTOR");
+        qunsetenv("QT_SCREEN_SCALE_FACTORS");
+        qunsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");
+        qunsetenv("QT_ENABLE_HIGHDPI_SCALING");
+        qunsetenv("QT_SCALE_FACTOR_ROUNDING_POLICY");
+        qunsetenv("QT_DEVICE_PIXEL_RATIO");
+    }
 
     const char* pythonPath = getenv("PYTHONPATH");
     const char* pythonHome = getenv("PYTHONHOME");
