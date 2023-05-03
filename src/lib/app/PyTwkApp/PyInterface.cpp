@@ -274,6 +274,23 @@ namespace TwkApp
 
     Mu::Module* python = new Mu::PyModule( muContext(), "python" );
     muContext()->globalScope()->addSymbol( python );
+
+    //
+    //  Set python3 as multiprocessing executable
+    //
+
+    evalPython(""
+        "import multiprocessing, os, sys\n"
+        "bin_dir, bin_name = os.path.split(sys.executable)\n"
+        "bin_name, bin_ext = os.path.splitext(bin_name)\n"
+        "for python_process in ('python', 'python3', 'py-interp'):\n"
+        "  python_exe = os.path.join(bin_dir, python_process + bin_ext)\n"
+        "  if os.path.exists(python_exe):\n"
+        "    multiprocessing.set_executable(python_exe)\n"
+        "    break\n"
+        ""
+    );
+
   }
 
   void finalizePython()
