@@ -137,9 +137,16 @@ RvGraph::initializeIPTree(const VideoModules& modules)
     }
 
     //
-    //  Delete all nodes until none are left.
+    //  Delete all nodes until none are left, but first set the view node
+    //  to the last node.  If we don't do this, once we delete the view node
+    //  we will reset it to the next node and repeat that until we reach 
+    //  the end. Each time we do this is will re-evaluate the graph, which
+    //  is needlessly costly since we are about to delete all nodes.
     //
-
+    if (!m_viewNodeMap.empty())
+    {
+       setViewNode(m_viewNodeMap.rbegin()->second);
+    }
     while (!m_viewNodeMap.empty())
     {
         IPNode* n = m_viewNodeMap.begin()->second;
