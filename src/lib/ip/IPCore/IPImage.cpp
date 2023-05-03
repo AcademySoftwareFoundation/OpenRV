@@ -38,38 +38,39 @@ const char* IPImage::waveformTagValue() { return "_waveform"; }
 void
 IPImage::init()
 {
-    fb              = 0;
-    noIntermediate  = false;
-    next            = 0;
-    children        = 0;
-    info            = 0;
-    dataType        = NoInternalDataType;
-    pixelAspect     = 0.0;      // ignore if 0
-    initPixelAspect = 0.0;
-    minMax          = false;
-    blendMode       = UnspecifiedBlendMode;
-    renderType      = BlendRenderType;
-    ignore          = false;
-    missing         = false;
-    invalid         = false;
-    useBackground   = false;
-    destination     = CurrentFrameBuffer;
-    shaderExpr      = 0;
-    mergeExpr       = 0;
-    branchCount     = 0;
-    m_coordID       = size_t(-1);
-    device          = 0;
-    unpremulted     = false;
-    m_renderIDHash  = 0;
-    imageNum        = -1;
-    samplerType     = Rect2DSampler;
-    hashCount       = 0;
-    isHistogram     = false;
-    isCropped       = false;
-    cropStartX      = 0;
-    cropStartY      = 0;
-    cropEndX        = 0;
-    cropEndY        = 0;
+    fb                           = 0;
+    noIntermediate               = false;
+    next                         = 0;
+    children                     = 0;
+    info                         = 0;
+    dataType                     = NoInternalDataType;
+    pixelAspect                  = 0.0;      // ignore if 0
+    initPixelAspect              = 0.0;
+    minMax                       = false;
+    blendMode                    = UnspecifiedBlendMode;
+    renderType                   = BlendRenderType;
+    ignore                       = false;
+    missing                      = false;
+    invalid                      = false;
+    useBackground                = false;
+    destination                  = CurrentFrameBuffer;
+    shaderExpr                   = 0;
+    mergeExpr                    = 0;
+    branchCount                  = 0;
+    m_coordID                    = size_t(-1);
+    device                       = 0;
+    unpremulted                  = false;
+    m_renderIDHash               = 0;
+    imageNum                     = -1;
+    samplerType                  = Rect2DSampler;
+    hashCount                    = 0;
+    isHistogram                  = false;
+    isCropped                    = false;
+    cropStartX                   = 0;
+    cropStartY                   = 0;
+    cropEndX                     = 0;
+    cropEndY                     = 0;
+    supportReversedOrderBlending = true;
 }
 
 IPImage::IPImage(const IPNode* n) : node(n) { init(); }
@@ -306,6 +307,22 @@ IPImage::newErrorImageID()
     IPImageID* id = new IPImageID(fb->identifier());
     delete fb;
     return id;
+}
+
+IPImage::BlendMode
+IPImage::getBlendModeFromString( const char* blendModeString )
+{
+    IPImage::BlendMode blendMode = IPImage::Over;
+
+    if      (!strcmp(blendModeString, "over"))         blendMode = IPImage::Over;
+    else if (!strcmp(blendModeString, "add"))          blendMode = IPImage::Add;
+    else if (!strcmp(blendModeString, "difference"))   blendMode = IPImage::Difference;
+    else if (!strcmp(blendModeString, "-difference"))  blendMode = IPImage::ReverseDifference;
+    else if (!strcmp(blendModeString, "dissolve"))     blendMode = IPImage::Dissolve;
+    else if (!strcmp(blendModeString, "replace"))      blendMode = IPImage::Replace;
+    else if (!strcmp(blendModeString, "topmost"))      blendMode = IPImage::Replace;
+
+    return blendMode;
 }
 
 bool 
