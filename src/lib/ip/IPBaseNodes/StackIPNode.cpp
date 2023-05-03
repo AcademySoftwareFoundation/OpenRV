@@ -64,6 +64,7 @@ StackIPNode::StackIPNode(const std::string& name,
     m_activeAudioInput  = declareProperty<StringProperty>("output.chosenAudioInput", ".all.");
     m_strictFrameRanges = declareProperty<IntProperty>("mode.strictFrameRanges", 0);
     m_interactiveSize   = declareProperty<IntProperty>("output.interactiveSize", 0);
+    m_supportReversedOrderBlending = declareProperty<IntProperty>("mode.supportReversedOrderBlending", 1);
 
     if (m_defaultCompType == "layer")
     {
@@ -481,18 +482,11 @@ StackIPNode::evaluate(const Context& context)
         if (sp->size()) comp = sp->front().c_str();
     }
 
-    IPImage::BlendMode mode  = IPImage::Over;
-    bool topmostOnly = false;
+    const IPImage::BlendMode mode = IPImage::getBlendModeFromString( comp );
 
-    if      (!strcmp(comp, "over"))         mode = IPImage::Over;
-    else if (!strcmp(comp, "add"))          mode = IPImage::Add;
-    else if (!strcmp(comp, "difference"))   mode = IPImage::Difference;
-    else if (!strcmp(comp, "-difference"))  mode = IPImage::ReverseDifference;
-    else if (!strcmp(comp, "dissolve"))     mode = IPImage::Dissolve;
-    else if (!strcmp(comp, "replace"))      mode = IPImage::Replace;
-    else if (!strcmp(comp, "topmost"))     {mode = IPImage::Replace; topmostOnly = true;}
+    const bool topmostOnly = !strcmp(comp, "topmost");
 
-    bool localUseMerge = useMerge || (mode == IPImage::Replace && !topmostOnly && useMergeForReplace);
+    const bool localUseMerge = useMerge || (mode == IPImage::Replace && !topmostOnly && useMergeForReplace);
 
     IPImage* root = 0;
 
@@ -513,6 +507,11 @@ StackIPNode::evaluate(const Context& context)
                             vh,
                             1.0);
     }
+
+    // Make sure to disable reverse-order blending if required.
+    // See ImageRenderer::renderAllChildren for more details on this mode.
+    root->supportReversedOrderBlending =
+        m_supportReversedOrderBlending->front() != 0;
     
     if (nodes.empty()) return root;
 

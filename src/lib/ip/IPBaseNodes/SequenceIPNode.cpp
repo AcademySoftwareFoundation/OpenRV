@@ -80,6 +80,21 @@ SequenceIPNode::SequenceIPNode(const std::string& name,
     m_useCutInfo      = declareProperty<IntProperty>("mode.useCutInfo", 1);
     m_autoSize        = declareProperty<IntProperty>("output.autoSize", 1);
 
+    // SequenceIPNode can optionally provide per-input blend modes. Those
+    // are stored in a container that is indexed with the source indices,
+    // just like any other per-input EDL information.
+    m_inputsBlendingModes = declareProperty<StringProperty>(
+        "composite.inputBlendModes", "", 0 , false);
+    // since it is per input, make sure the property contains is emptied at
+    // creation time
+    m_inputsBlendingModes->erase(0,1);
+
+    // By default, the output of this node support reverse-order blending.
+    // this is mainly kept for backward compatibility reason.
+    // See ImageRenderer::renderAllChildren for more details on this mode.
+    m_supportReversedOrderBlending = 
+        declareProperty<IntProperty>("mode.supportReversedOrderBlending", 1);
+
     setHasLinearTransform(true); // fits to aspect
 }
 
@@ -291,99 +306,104 @@ SequenceIPNode::evaluate(const Context& context)
 
     if (ins.empty()) return IPImage::newNoImage(this, "No Inputs");
 
+    EvalPoint ep         = evaluationPoint(frame);
+    const int source     = ep.sourceIndex;
+    Context   newContext = context;
+
+    IPImageVector images(1);
+    IPImageSet modifiedImages;
+    Shader::ExpressionVector inExpressions;
+    newContext.frame = ep.sourceFrame;
+    
+    if (source < 0 || source >= ins.size())
+    {
+        TWK_THROW_STREAM(SequenceOutOfBoundsExc,
+                         "Bad Sequence EDL source number "
+                         << source << " is not in range [0," << ins.size()-1
+                         << "]");
+    }
+
     IPImage* root = new IPImage(this,
                                 IPImage::BlendRenderType,
                                 vw,
                                 vh,
                                 1.0);
 
-
-    if (ins.size() > 0)
+    // if we have per-input blending modes, now is the time to use them
+    if ( source >= 0 && source < m_inputsBlendingModes->size() )
     {
-        EvalPoint ep         = evaluationPoint(frame);
-        const int source     = ep.sourceIndex;
-        Context   newContext = context;
+        string blendModeString = (*m_inputsBlendingModes)[source];
+        root->blendMode = 
+            IPImage::getBlendModeFromString( blendModeString.c_str() );
+    }
 
-        IPImageVector images(1);
-        IPImageSet modifiedImages;
-        Shader::ExpressionVector inExpressions;
-        newContext.frame = ep.sourceFrame;
-        
-        if (source < 0 || source >= ins.size())
+    // Make sure to disable reverse-order blending if required.
+    // See ImageRenderer::renderAllChildren for more details on this mode.
+    root->supportReversedOrderBlending =
+        m_supportReversedOrderBlending->front() != 0;
+
+    //
+    //  If we pull multiple inputs simultaneously we'll need to
+    //  check for caching errors and check in partially evaluated
+    //  frames. Currently we don't have to worry about that
+    //  because SequenceIPNode only evals one of its inputs.  (See
+    //  StackIPNode)
+    //
+
+    IPImage* child = ins[ep.sourceIndex]->evaluate(newContext); 
+
+    //
+    //  Uncrop the child into our output image: this is done by
+    //  modifying its transform
+    //
+
+    child->fitToAspect(aspect);
+
+    images[0] = child;
+
+    convertBlendRenderTypeToIntermediate(images, modifiedImages);
+
+    balanceResourceUsage(IPNode::filterAccumulate,
+                         images,
+                         modifiedImages,
+                         8, 8, 81);
+
+    //
+    //  Put adaptive resize on child
+    //
+
+    //Shader::installAdaptiveBoxResizeRecursive(root);
+
+    root->appendChild(child);
+
+    if (    m_clipCaching && 
+            context.thread == CacheEvalThread && 
+            context.frame == context.baseFrame &&
+            !context.cacheNode)
+    {
+        //
+        //  Force eval point for "clip of display frame", only if frame is
+        //  "outside clip".  This allows caching of framebuffers that are
+        //  needed by the current view, but _will_ be needed if we extend
+        //  the part of the current clip visible in the sequence.
+        //
+
+        EvalPoint dispP = evaluationPoint(graph()->cache().displayFrame());
+
+        if (ep.sourceIndex != dispP.sourceIndex)
         {
-            TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                             "Bad Sequence EDL source number "
-                             << source << " is not in range [0," << ins.size()-1
-                             << "]");
-        }
+            EvalPoint clipP       = evaluationPoint(frame, dispP.inputIndex);
 
-        //
-        //  If we pull multiple inputs simultaneously we'll need to
-        //  check for caching errors and check in partially evaluated
-        //  frames. Currently we don't have to worry about that
-        //  because SequenceIPNode only evals one of its inputs.  (See
-        //  StackIPNode)
-        //
-
-        IPImage* child = ins[ep.sourceIndex]->evaluate(newContext); 
-
-        //
-        //  Uncrop the child into our output image: this is done by
-        //  modifying its transform
-        //
-
-        child->fitToAspect(aspect);
-
-        images[0] = child;
-
-        convertBlendRenderTypeToIntermediate(images, modifiedImages);
-
-        balanceResourceUsage(IPNode::filterAccumulate,
-                             images,
-                             modifiedImages,
-                             8, 8, 81);
-
-        //
-        //  Put adaptive resize on child
-        //
-
-        //Shader::installAdaptiveBoxResizeRecursive(root);
-
-        root->appendChild(child);
-
-        if (    m_clipCaching && 
-                context.thread == CacheEvalThread && 
-                context.frame == context.baseFrame &&
-                !context.cacheNode)
-        {
-            //
-            //  Force eval point for "clip of display frame", only if frame is
-            //  "outside clip".  This allows caching of framebuffers that are
-            //  needed by the current view, but _will_ be needed if we extend
-            //  the part of the current clip visible in the sequence.
-            //
-
-            EvalPoint dispP = evaluationPoint(graph()->cache().displayFrame());
-
-            if (ep.sourceIndex != dispP.sourceIndex)
+            if (clipP.sourceFrame >= m_rangeInfos[dispP.inputIndex].start && 
+                clipP.sourceFrame <= m_rangeInfos[dispP.inputIndex].end)
             {
-                EvalPoint clipP       = evaluationPoint(frame, dispP.inputIndex);
+                Context clipContext = context;
+                clipContext.frame   = clipP.sourceFrame;
 
-                if (clipP.sourceFrame >= m_rangeInfos[dispP.inputIndex].start && 
-                    clipP.sourceFrame <= m_rangeInfos[dispP.inputIndex].end)
-                {
-                    Context clipContext = context;
-                    clipContext.frame   = clipP.sourceFrame;
-
-                    //  cerr << "clipCaching: evaluating source frame " << clipP.sourceFrame << endl;
-                    root->appendChild(ins[clipP.sourceIndex]->evaluate(clipContext));
-                }
+                //  cerr << "clipCaching: evaluating source frame " << clipP.sourceFrame << endl;
+                root->appendChild(ins[clipP.sourceIndex]->evaluate(clipContext));
             }
         }
-    }
-    else
-    {
-        root->appendChild(IPNode::evaluate(context));
     }
 
     //
