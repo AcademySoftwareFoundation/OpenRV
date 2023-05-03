@@ -14,6 +14,7 @@
 #include <OpenColorIO/OpenColorIO.h>
 #include <boost/functional/hash.hpp>
 #include <algorithm>
+#include <regex>
 
 namespace OCIO = OCIO_NAMESPACE;
 
@@ -38,10 +39,8 @@ struct OCIOState
 };
 
 namespace {
-// The OCIO::GPU_LANGUAGE_UNKNOWN no longer exists
-// and the value of zero is used by Nvidia Cg shader
-#define GPU_LANGUAGE_UNKNOWN -1
-OCIO::GpuLanguage GPULanguage = (OCIO::GpuLanguage)GPU_LANGUAGE_UNKNOWN;
+#define GPU_LANGUAGE_UNKNOWN OCIO::GpuLanguage::GPU_LANGUAGE_CG
+OCIO::GpuLanguage GPULanguage = GPU_LANGUAGE_UNKNOWN;
 }
 
 string
@@ -119,8 +118,7 @@ OCIOIPNode::OCIOIPNode(const string& name,
 
         if (major == 1 && minor < 30)
         {
-            //GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_0;
-            // The lowest available value in newer OCIO is now 1.2
+            // Note: 1.2 is currently the lowest available value in OCIO
             GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_2;
         }
         else
@@ -154,7 +152,7 @@ OCIOIPNode::updateConfig()
     catch (std::exception& exc)
     {
         delete m_state;
-        cout << "ERROR: OCIOIPNode updateConfig caught: " << exc.what() << endl;
+        cerr << "ERROR: OCIOIPNode updateConfig caught: " << exc.what() << endl;
         m_state = 0;
         throw;
     }
@@ -224,6 +222,19 @@ shaderLegal(const string& s)
     transform(s.begin(), s.end(), ns.begin(), op_shaderLegal);
 
     return ns;
+}
+
+// Add the 3D LUT uniform as a shader function parameter to leverage RV's current 
+// shader variables binding mechanism which rely on shader variables being passed 
+// as function arguments for all its shaders.
+// Note that the OCIOv2 generated shader no longer passes the LUTs as function 
+// arguments.
+void 
+shaderAdd3DLutAsParameter(std::string& inout_glsl, const std::string& lutSamplerName)
+{
+    const std::string from = "vec4 inPixel";
+    std::string to = from + std::string(", sampler3D ") + lutSamplerName;
+    inout_glsl = std::regex_replace( inout_glsl, std::regex(from), to );
 }
 
 };
@@ -326,7 +337,7 @@ OCIOIPNode::evaluate(const Context& context)
             //
 
             OCIO::LookTransformRcPtr   transform = OCIO::LookTransform::Create();
-            OCIO::TransformDirection   direction;
+            OCIO::TransformDirection   direction = OCIO::TRANSFORM_DIR_FORWARD;
             string                     looksName = stringProp("ocio_look.look", "");
             string                     outName   = stringProp("ocio_look.outColorSpace", m_state->linear);
             bool                       reverse   = intProp("ocio_look.direction", 0) == 1;
@@ -363,12 +374,10 @@ OCIOIPNode::evaluate(const Context& context)
             //
 
             OCIO::DisplayViewTransformRcPtr transform = OCIO::DisplayViewTransform::Create();
-            string                      display   = stringProp("ocio_display.display", "");
-            string                      view      = stringProp("ocio_display.view", "");
+            string                          display   = stringProp("ocio_display.display", "");
+            string                          view      = stringProp("ocio_display.view", "");
 
-#if 0
-            transform->setInputColorSpaceName(inName.c_str());
-#endif
+            transform->setSrc(inName.c_str());
             transform->setDisplay(display.c_str());
             transform->setView(view.c_str());
             processor = m_state->config->getProcessor(m_state->context, 
@@ -378,48 +387,31 @@ OCIOIPNode::evaluate(const Context& context)
             size_t hashValue = string_hash(inName + display + view);
             shaderName << "OCIO_d_" << shaderLegal(display) << "_" << shaderLegal(view) << "_" << name() << "_" << hex << hashValue;
         }
-#if 0
-        OCIO::GpuShaderDesc shaderDesc;
-        shaderDesc.setLanguage(GPULanguage);
-        shaderDesc.setFunctionName(shaderName.str().c_str());
-        shaderDesc.setLut3DEdgeLen(lutSize);
+
+        OCIO::ConstGPUProcessorRcPtr legacyGPUProcessor = processor->getOptimizedLegacyGPUProcessor(OCIO::OPTIMIZATION_NONE, lutSize);
+        OCIO::GpuShaderDescRcPtr shaderDesc = OCIO::GpuShaderDesc::CreateShaderDesc();
+        shaderDesc->setLanguage(GPULanguage);
+        shaderDesc->setFunctionName(shaderName.str().c_str());
+
+        // Fills the shaderDesc from the proc.
+        legacyGPUProcessor->extractGpuShaderInfo(shaderDesc);
+
+        // When using getOptimizedLegacyGPUProcessor, getNumTextures(), which is for any Lut1Ds, 
+        // should always be 0 and getNum3DTextures() should never be more than 1/
+        if (shaderDesc->getNumTextures() != 0 && shaderDesc->getNum3DTextures() > 1)
+        {
+            cerr << "OCIO IP Node error: " << "Unknown case about number of textures in Nuke node transform." 
+                 << "num text: " << shaderDesc->getNumTextures() 
+                 << ", num 3d tex: " << shaderDesc->getNum3DTextures()
+                 << endl;
+            return nullptr;
+        }
 
         pthread_mutex_lock(&m_lock);
 
-        //
-        // The story so far: We always thought OCIO _always_ produced hw
-        // shading that required a 3D LUT of some kind.  This is (mostly) not
-        // true.
-        //
-        // The Processor holds 3 vectors of "Ops": those that happen before any
-        // LUT (m_gpuOpsHwPreProcess), those that must be implmented in a LUT
-        // (m_gpuOpsCpuLatticeProcess), and those that happen after the LUT
-        // (m_gpuOpsHwPostProcess).  These lists are created by
-        // PartitionGPUOps() and if all the incoming Ops are analytical (have
-        // direct GPU implementation) then all the ops will go into the first
-        // list and the others will be empty.  In this case, OCIO will not
-        // (need not) generate a 3D LUT at all.  AND the "3DLUT ID" generated
-        // by getGpuLut3DCacheID() will be "<NULL>".  As far as I can tell,
-        // there's no other way for calling code to tell that a 3DLUT is
-        // unnecessary
-        //
-        // BUT, there is hack in OCIO code (to prevent segfault, comment says)
-        // so that on Mac only, it _always_ generates a 3D LUT.  When the LUT
-        // is not necessary, it will be an identity LUT, although the ID is
-        // still "<NULL>".
-        //
-        // ALSO BUT, the shader that OCIO generates _always_ has LUT argument,
-        // whether it is going to use it or not.
-        //
-        // Now we only add a lut FB if one is needed; NOTE that core OCIO code
-        // has also been changed to support this (now it only produces a shader
-        // with a LUT parameter IF it needs one.
-        //
-
-        string lut3dCacheID  = processor->getGpuLut3DCacheID(shaderDesc);
-        string shaderCacheID = processor->getGpuShaderTextCacheID(shaderDesc);
-
-        if (m_state->lutID != lut3dCacheID)
+        string lut3dCacheID  = legacyGPUProcessor->getCacheID();
+        string shaderCacheID = lut3dCacheID;
+        if (m_state->lutID != lut3dCacheID && 1 == shaderDesc->getNum3DTextures())
         {
             if (m_lutfb)
             {
@@ -438,13 +430,31 @@ OCIOIPNode::evaluate(const Context& context)
                 channels[2] = "B";
 
                 m_lutfb = new TwkFB::FrameBuffer(FrameBuffer::NormalizedCoordinates,
-                                                 lutSize, lutSize, lutSize, 3, FrameBuffer::FLOAT, 
+                                                 lutSize, lutSize, lutSize, 3, FrameBuffer::FLOAT,
                                                  0, &channels, FrameBuffer::BOTTOMLEFT,
                                                  true);
 
 		        m_lutfb->staticRef();
                 m_lutfb->setIdentifier(lut3dCacheID);
-                processor->getGpuLut3D(m_lutfb->pixels<float>(), shaderDesc);
+
+                const char* tex_name = nullptr;
+                const char* sampler_name = nullptr;
+                unsigned int lut3DTexEdgeLen = 0;
+                OCIO::Interpolation lut3DInterpolation = OCIO::INTERP_BEST;
+                shaderDesc->get3DTexture(0, tex_name, sampler_name, lut3DTexEdgeLen, lut3DInterpolation);
+                m_lutSamplerName = sampler_name;
+
+                if (lut3DTexEdgeLen == lutSize)
+                {
+                    const float * temp = nullptr;
+                    shaderDesc->get3DTextureValues(0, temp);
+                    memcpy(m_lutfb->pixels<float>(), temp, 3*sizeof(float)*lutSize*lutSize*lutSize);
+                }                
+                else
+                {
+                    cerr << "ERROR: OCIONode: "<< name() << " - Expected 3D LUT Size = " << lutSize 
+                         << ", Found = " << lut3DTexEdgeLen << endl;
+                }
             }
             m_state->lutID = lut3dCacheID;
 
@@ -458,11 +468,16 @@ OCIOIPNode::evaluate(const Context& context)
         {
             if (m_state->function) m_state->function->retire();
 
-            ostringstream glsl;
-            glsl << processor->getGpuShaderText(shaderDesc);
+            string glsl(shaderDesc->getShaderText());
+
+            // Add the 3D LUT uniform as a shader function parameter if any
+            if (m_lutfb)
+            {
+                shaderAdd3DLutAsParameter(glsl, m_lutSamplerName);
+            }
 
             m_state->function = new Shader::Function(shaderName.str(), 
-                                                     glsl.str(),
+                                                     glsl,
                                                      Shader::Function::Color,
                                                      1);
             m_state->shaderID = shaderCacheID;
@@ -470,12 +485,12 @@ OCIOIPNode::evaluate(const Context& context)
             if (Shader::debuggingType() != Shader::NoDebugInfo)
             {
                 cerr << "OCIONode: " << name() << " new shaderID " << shaderCacheID << endl <<
-                        "OCIONode:     new Shader '" << shaderName.str() << "':" << endl << glsl.str() << endl;
+                        "OCIONode:     new Shader '" << shaderName.str() << "':" << endl << glsl << endl;
             }
         }
 
         pthread_mutex_unlock(&m_lock);
-#endif
+
         const Shader::Function* F = m_state->function;
         Shader::ArgumentVector args(F->parameters().size());
 
@@ -499,7 +514,7 @@ OCIOIPNode::evaluate(const Context& context)
     }
     catch (std::exception& exc)
     {
-        cout << "ERROR: OCIOIPNode: " << exc.what() << endl;
+        cerr << "ERROR: OCIOIPNode: " << exc.what() << endl;
     }
 
     return image;

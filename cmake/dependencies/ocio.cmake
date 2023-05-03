@@ -112,13 +112,11 @@ IF(NOT RV_USE_OCIO_OPENEXR)
   #LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 ENDIF()
 
-#MESSAGE(FATAL_ERROR "RV_DEPS_IMATH_ROOT_DIR='${RV_DEPS_IMATH_ROOT_DIR}'")
-#GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
-#GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
+LIST(APPEND _configure_options "-DImath_LIBRARY=${_imath_library}")
+LIST(APPEND _configure_options "-DImath_INCLUDE_DIR=${_imath_include_dir}/..")
 LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
-#LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}")
-#LIST(APPEND _configure_options "-DIMATH_LIBRARY=${_imath_library}")
-#LIST(APPEND _configure_options "-DIMATH_INCLUDE_DIR=${_imath_include_dir}")
 
 MESSAGE(WARNING "OCIO: We would like to compile against own OIIO, but OIIO uses OCIO's own OpenEXR")
 IF(FALSE)
@@ -145,129 +143,36 @@ LIST(APPEND _configure_options "-DOPENIMAGEIO_ROOT_DIR=${_oiio_install_dir}")
 
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
+LIST(APPEND _configure_options "-DOCIO_BUILD_APPS=OFF")
+
 MESSAGE(WARNING "TODO: ${_target}: figure out how to run tests???")
+EXTERNALPROJECT_ADD(
+  ${_target}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
+  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  SOURCE_DIR ${_source_dir}
+  BINARY_DIR ${_build_dir}
+  INSTALL_DIR ${_install_dir}
+  DEPENDS ${_depends_oiio} Boost::headers Python::Python Imath::Imath ZLIB::ZLIB
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+  INSTALL_COMMAND ${_make_command} install
+  BUILD_IN_SOURCE FALSE
+  BUILD_ALWAYS FALSE
+  BUILD_BYPRODUCTS ${_byproducts}
+  USES_TERMINAL_BUILD TRUE
+)
 
-IF(NOT RV_TARGET_WINDOWS)
-  EXTERNALPROJECT_ADD(
-    ${_target}
-      URL ${_download_url}
-      URL_MD5 ${_download_hash}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${_source_dir}
-    BINARY_DIR ${_build_dir}
-    INSTALL_DIR ${_install_dir}
-    DEPENDS ${_depends_oiio} Boost::headers Python::Python Imath::Imath ZLIB::ZLIB
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
-    INSTALL_COMMAND ${_make_command} install
-    BUILD_IN_SOURCE FALSE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_byproducts}
-    USES_TERMINAL_BUILD TRUE
-  )
-ELSE()
-  GET_TARGET_PROPERTY(_vcpkg_location VCPKG::VCPKG IMPORTED_LOCATION)
-  GET_FILENAME_COMPONENT(_vcpkg_path ${_vcpkg_location} DIRECTORY)
-
-  # Some options are not multi-platform so we start clean.
-  SET(_configure_options "")
-  LIST(APPEND _configure_options
-    "-G ${CMAKE_GENERATOR}"                   # Ninja doesn't build due to Minizip include bad style, VS uses search paths even for dbl-quotes includes.
-    "-DCMAKE_INSTALL_PREFIX=${_install_dir}"
-    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    "-DGLEW_ROOT=${_vcpkg_path}/packages/glew_x64-windows"   # Still unknown if GLEW_ROOT, GLUT_ROOT and Oiio_ROOT is needed but at least: *they are used by OCIO in CMake*
-    "-DGLUT_ROOT=${_vcpkg_path}/packages/freeglut_x64-windows"   # However, not passing them doesn't seem to cause the build to fail.
-    "-DOpenImageIO_ROOT=${_oiio_install_dir}"         # And the Dev (cfuoco) said that we need to pass them.
-    "-DOCIO_BUILD_PYTHON=ON"
-    "-DOCIO_INSTALL_EXT_PACKAGES=ALL"
-    "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3.exe"
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DOCIO_BUILD_APPS=ON"
-    "-DOCIO_BUILD_TESTS=OFF"
-    "-DOCIO_BUILD_GPU_TESTS=OFF"
-    "-DOCIO_BUILD_DOCS=OFF"
-    "-DOCIO_USE_SSE=ON"
-    "-DOCIO_WARNING_AS_ERROR=OFF"
-    "-DOCIO_BUILD_JAVA=OFF"
-    "-S ${_source_dir}"
-    "-B ${_build_dir}"
-  )
-
-  # TODO_IBR: Both Build & Install & possibly Configure do not Honor CMAKE_BUILD_TYPE
-  LIST(APPEND _ocio_build_options
-    "--build"
-    "${_build_dir}"
-    "--config"
-    "${CMAKE_BUILD_TYPE}"
-    # "--parallel"    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib.
-    # "${_cpu_count}"   # Moreover, our Zlib isn't compatible with OCIO: tons of STD C++ missing symbols errors.
-  )
-  LIST(APPEND _ocio_install_options
-    "--install"
-    "${_build_dir}"
-    "--prefix"
-    "${_install_dir}"
-    "--config"
-    "${CMAKE_BUILD_TYPE}"   # for --config
-  )
-
-  # Minizip-ng fails to find "zlib.h": if you get this error, try to rebuild again; it's a race time condition in CMake build stage
-
-  # TODO_IBR: No idea yet what are the _byproducts
-  EXTERNALPROJECT_ADD(
-    ${_target}
-      URL ${_download_url}
-      URL_MD5 ${_download_hash}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${_source_dir}
-    BINARY_DIR ${_build_dir}
-    INSTALL_DIR ${_install_dir}
-    DEPENDS ${_depends_oiio} Boost::headers Python::Python Imath::Imath VCPKG::VCPKG ZLIB::ZLIB
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${CMAKE_COMMAND} ${_ocio_build_options}
-    INSTALL_COMMAND ${CMAKE_COMMAND} ${_ocio_install_options}
-    BUILD_IN_SOURCE FALSE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_byproducts}
-    USES_TERMINAL_BUILD TRUE
-  )
-
-  SET(_vcpkg_manifest "${RV_PKGMANCONFIG_DIR}/ocio_vcpkg.json")
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} add_vcpkg_manifest
-    COMMENT "Copying the VCPKG manifest"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_vcpkg_manifest} "${_source_dir}/vcpkg.json"
-    DEPENDERS configure
-  )
-
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} install_vcpkg_manifest
-    COMMENT "Installing OCIO dependencies via VCPKG"
-    COMMAND ${_vcpkg_location} install --triplet x64-windows
-    DEPENDEES add_vcpkg_manifest
-    DEPENDERS configure
-    WORKING_DIRECTORY "${_source_dir}"
-  )
-
-  # TODO_IBR: Add a step to copy build/src/bindings here but exclure the .pyd file (total 3 files, 1 excluded.)
-  # TODO_IBR: Then make sure to review all _byproducts and ensure they are on the EXTERNALPROJECT_ADD call.
-
-ENDIF()
-
-IF(RV_TARGET_DARWIN OR
-    RV_TARGET_LINUX)
-  ADD_CUSTOM_COMMAND(
-      TARGET ${_target}
-      POST_BUILD
-      COMMENT "Copying PyOpenColorIO lib into '${_pyocio_dest_dir}'."
-      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_pyocio_dest_dir}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  )
-ENDIF()
+ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
+    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${RV_STAGE_PLUGINS_PYTHON_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+)
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
 RV_COPY_LIB_BIN_FOLDERS()

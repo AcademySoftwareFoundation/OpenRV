@@ -67,8 +67,8 @@ RV_COPY_LIB_BIN_FOLDERS()
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
-add_library(OpenJpeg::OpenJpeg SHARED IMPORTED GLOBAL)
-set_property(
+ADD_LIBRARY(OpenJpeg::OpenJpeg SHARED IMPORTED GLOBAL)
+SET_PROPERTY(
     TARGET OpenJpeg::OpenJpeg
     PROPERTY IMPORTED_LOCATION ${_libpath}
 )
