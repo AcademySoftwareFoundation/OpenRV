@@ -27,6 +27,7 @@ LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0")  # this on would requireextra pybind11 package
 #LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_INSTALL_DIR}")
 LIST(APPEND _configure_options "-DUSE_OCIO=0")
+LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
 #GET_TARGET_PROPERTY(_boost_include_dir Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DBoost_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
@@ -36,7 +37,12 @@ LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 #LIST(APPEND _configure_options "-DOPENEXR_LIBRARY=${_openexr_library}")
 #LIST(APPEND _configure_options "-DOPENEXR_INCLUDE_DIR=${_openexr_include_dir}")
 
-LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
+GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
+LIST(APPEND _configure_options "-DImath_LIBRARY=${_imath_library}")
+LIST(APPEND _configure_options "-DImath_INCLUDE_DIR=${_imath_include_dir}/..")
+GET_FILENAME_COMPONENT(_imath_library_path ${_imath_library} DIRECTORY)
+LIST(APPEND _configure_options "-DImath_DIR=${_imath_library_path}/cmake/Imath")
 
 GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
@@ -54,13 +60,29 @@ LIST(APPEND _configure_options "-DJPEGTURBO_LIBRARY=${_jpegturbo_library}")
 LIST(APPEND _configure_options "-DJPEGTURBO_INCLUDE_DIR=${_jpegturbo_include_dir}")
 
 LIST(APPEND _configure_options "-DOpenJPEG_ROOT=${RV_DEPS_OPENJPEG_ROOT_DIR}")
+GET_TARGET_PROPERTY(_openjpeg_library OpenJpeg::OpenJpeg IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_DIRECTORIES)
+LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
+LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
 
 GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
 LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
 
-LIST(APPEND _configure_options "-DFFmpeg_ROOT=${RV_DEPS_FFMPEG_ROOT_DIR}")
+GET_TARGET_PROPERTY(_ffmpeg_include_dir ffmpeg::avcodec INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_LOCATION)
+LIST(APPEND _configure_options "-DFFMPEG_INCLUDE_DIR=${_ffmpeg_include_dir}")
+LIST(APPEND _configure_options "-DFFMPEG_INCLUDES=${_ffmpeg_include_dir}")
+LIST(APPEND _configure_options "-DFFMPEG_AVCODEC_INCLUDE_DIR=${_ffmpeg_include_dir}")
+LIST(APPEND _configure_options "-DFFMPEG_LIBRARIES=${_ffmpeg_libavcodec} ${_ffmpeg_libavformat} ${_ffmpeg_libavutil} ${_ffmpeg_libswscale}")
+LIST(APPEND _configure_options "-DFFMPEG_LIBAVCODEC=${_ffmpeg_libavcodec}")
+LIST(APPEND _configure_options "-DFFMPEG_LIBAVFORMAT=${_ffmpeg_libavformat}")
+LIST(APPEND _configure_options "-DFFMPEG_LIBAVUTIL=${_ffmpeg_libavutil}")
+LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
@@ -100,7 +122,7 @@ EXTERNALPROJECT_ADD( ${_target}
   SOURCE_DIR ${_source_dir}
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
-    DEPENDS ${_depends_freetype} jpeg-turbo::jpeg Tiff::Tiff RV_DEPS_OCIO OpenEXR::OpenEXR OpenJpeg::OpenJpeg jpeg-turbo::turbojpeg PNG::PNG Boost::headers Boost::thread Boost::filesystem Imath::Imath Webp::Webp Raw::Raw ffmpeg::swresample ffmpeg::swscale ffmpeg::avcodec ffmpeg::swresample ZLIB::ZLIB
+    DEPENDS ${_depends_freetype} jpeg-turbo::jpeg Tiff::Tiff RV_DEPS_OCIO OpenEXR::OpenEXR RV_DEPS_OPENJPEG jpeg-turbo::turbojpeg PNG::PNG Boost::headers Boost::thread Boost::filesystem Imath::Imath Webp::Webp Raw::Raw ffmpeg::swresample ffmpeg::swscale ffmpeg::avcodec ffmpeg::swresample ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
     INSTALL_COMMAND ${_make_command} install

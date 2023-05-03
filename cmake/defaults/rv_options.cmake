@@ -12,7 +12,7 @@ OPTION(RV_SHOW_ALL_VARIABLES "Displays all build variables." ON)
 #
 # General build options
 
-OPTION(RV_USE_OCIO_OPENEXR "Uses OpenColorIO's own copy of OpenEXR." ON)
+OPTION(RV_USE_OCIO_OPENEXR "Uses OpenColorIO's own copy of OpenEXR." OFF)
 OPTION(RV_USE_OCIO_YAML_CPP "Uses OpenColorIO's own copy of Yaml-Cpp." ON)
 
 SET(RV_DEPS_BASE_DIR

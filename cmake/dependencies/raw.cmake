@@ -29,7 +29,11 @@ RV_MAKE_STANDARD_LIB_NAME("raw" "23" "SHARED" "")
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 SET(_configure_options "")  # Overrides defaults set in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 LIST(APPEND _configure_options "--prefix=${_install_dir}")
-LIST(APPEND _configure_options "--enable-lcms")  # The lcms library was linked against in our legacy build system.
+LIST(APPEND _configure_options "--enable-lcms")
+
+GET_TARGET_PROPERTY(_lcms_include_dir lcms INTERFACE_INCLUDE_DIRECTORIES)
+SET(_lcms2_flags "-I${_lcms_include_dir}") 
+SET(_lcms2_libs "-L${RV_STAGE_LIB_DIR} -llcms") 
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -41,10 +45,10 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${_source_dir}
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
-  #DEPENDS ZLIB::ZLIB lcms 
-  DEPENDS ZLIB::ZLIB
-  CONFIGURE_COMMAND ${_configure_command} ${_configure_options}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+  DEPENDS ZLIB::ZLIB lcms
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' 
+  ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
+  ${_configure_command} ${_configure_options} BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE

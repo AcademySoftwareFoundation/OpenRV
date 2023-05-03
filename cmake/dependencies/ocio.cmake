@@ -106,13 +106,11 @@ IF(NOT RV_USE_OCIO_OPENEXR)
   #LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 ENDIF()
 
-#MESSAGE(FATAL_ERROR "RV_DEPS_IMATH_ROOT_DIR='${RV_DEPS_IMATH_ROOT_DIR}'")
-#GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
-#GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
+LIST(APPEND _configure_options "-DImath_LIBRARY=${_imath_library}")
+LIST(APPEND _configure_options "-DImath_INCLUDE_DIR=${_imath_include_dir}/..")
 LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
-#LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}")
-#LIST(APPEND _configure_options "-DIMATH_LIBRARY=${_imath_library}")
-#LIST(APPEND _configure_options "-DIMATH_INCLUDE_DIR=${_imath_include_dir}")
 
 MESSAGE(WARNING "OCIO: We would like to compile against own OIIO, but OIIO uses OCIO's own OpenEXR")
 IF(FALSE)
@@ -135,6 +133,8 @@ LIST(APPEND _configure_options "-DOPENIMAGEIO_VERSION=${RV_DEPS_OIIO_VERSION}")
 LIST(APPEND _configure_options "-DOPENIMAGEIO_ROOT_DIR=${_oiio_install_dir}")
 
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
+
+LIST(APPEND _configure_options "-DOCIO_BUILD_APPS=OFF")
 
 MESSAGE(WARNING "TODO: ${_target}: figure out how to run tests???")
 EXTERNALPROJECT_ADD(
@@ -160,8 +160,8 @@ EXTERNALPROJECT_ADD(
 ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
-    COMMENT "Copying PyOpenColorIO lib into '${_pyocio_dest_dir}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_pyocio_dest_dir}
+    COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
+    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${RV_STAGE_PLUGINS_PYTHON_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
 )
 

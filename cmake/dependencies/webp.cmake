@@ -43,6 +43,9 @@ GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
 LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
 
+LIST(APPEND _configure_options "-DWEBP_BUILD_GIF2WEBP=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_ANIM_UTILS=OFF")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}
