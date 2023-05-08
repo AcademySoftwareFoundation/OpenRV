@@ -36,6 +36,7 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/sgcHopTools.h>
 #include <TwkMediaLibrary/Library.h>
+#include <IPCore/Session.h>
 
 #include <algorithm>
 #include <iterator>
@@ -2574,6 +2575,13 @@ FileSourceIPNode::openMovieTask(const string& filename,
                 m_inparams.push_back(StringPair("cookies", cookieStm.str()));
             }
         }
+    }
+
+    Session* session = Session::currentSession();
+    std::string token = session->userGenericEvent("url-get-bearer-token", file);
+    if (!token.empty()) {
+        std::string headers = "Authorization: Bearer " + token + "\r\n";
+        m_inparams.push_back(StringPair("headers", headers));
     }
 
     Movie* mov = 0;

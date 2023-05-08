@@ -7,7 +7,7 @@ matplotlib                # License: Python Software Foundation License (PSF)
 networkx                  # License: BSD License
 PyOpenGL                  # License: BSD License (BSD)
 PyOpenGL_accelerate       # License: BSD License (BSD)
-openassetio               # License: Apache Software License (Apache 2.0)
+openassetio==1.0.0a12     # License: Apache Software License (Apache 2.0)
 openassetio-mediacreation # License: Apache Software License (Apache 2.0)
 openassetio-manager-bal   # License: Apache Software License (Apache 2.0)
 
