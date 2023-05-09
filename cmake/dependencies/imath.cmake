@@ -31,8 +31,6 @@ SET(_include_dir
 )
 SET(RV_DEPS_IMATH_ROOT_DIR ${_install_dir})
 
-SET(RV_DEPS_IMATH_ROOT_DIR ${_install_dir})
-
 SET(_make_command
     make
 )
