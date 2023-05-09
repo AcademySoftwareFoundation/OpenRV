@@ -37,6 +37,9 @@ IF(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/pub/CMakeLists.txt")
   MESSAGE(FATAL_ERROR "Unable to find required git submodules. GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 ENDIF()
 
+IF(RV_TARGET_WINDOWS)
+  INCLUDE(vcpkg)
+ENDIF()
 INCLUDE(qt5)
 INCLUDE(openssl) # Python3 requirement
 INCLUDE(python3)

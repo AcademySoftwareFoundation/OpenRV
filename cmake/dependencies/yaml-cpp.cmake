@@ -28,10 +28,10 @@ IF(RV_USE_OCIO_YAML_CPP)
         )
     ENDIF()
 
+    SET(_ocio_yaml_cpp_libpath ${_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${_debug_postfix}${CMAKE_STATIC_LIBRARY_SUFFIX})
     SET_PROPERTY(
         TARGET yaml_cpp
-        # Why is it building yaml-cpp debug ?
-        PROPERTY IMPORTED_LOCATION ${_lib_dir}/libyaml-cpp${_debug_postfix}.a
+        PROPERTY IMPORTED_LOCATION ${_ocio_yaml_cpp_libpath}
     )
 
     # It is required to force directory creation at configure time

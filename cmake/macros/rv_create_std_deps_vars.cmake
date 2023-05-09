@@ -80,7 +80,7 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
     # Finally add a clean-<target-name> target
     # 
     ADD_CUSTOM_TARGET(clean-${target_name}
-        COMMENT "Cleanning '${target_name}' ..."
+        COMMENT "Cleaning '${target_name}' ..."
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
     )    

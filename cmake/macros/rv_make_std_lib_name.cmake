@@ -23,21 +23,26 @@ MACRO(RV_MAKE_STANDARD_LIB_NAME base_name version lib_type debug_postfix)
     )
   ENDIF()
 
-  SET(_libpath
-      ${_lib_dir}/${_libname}
-  )
-
-  SET( _byproducts ${_libpath})
-
   IF(RV_TARGET_WINDOWS)
+    SET(_libpath
+      ${_bin_dir}/${_libname}
+    )
+
+    GET_FILENAME_COMPONENT(_binlibnamenoext ${_libname} NAME_WE)
     SET(_implibname
-        ${CMAKE_IMPORT_LIBRARY_PREFIX}${_libname}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+        ${CMAKE_IMPORT_LIBRARY_PREFIX}${_binlibnamenoext}${CMAKE_IMPORT_LIBRARY_SUFFIX}
     )
     SET(_implibpath
         ${_lib_dir}/${_implibname}
     )
     LIST(APPEND _byproducts ${_implibpath})
+  ELSE()
+      SET(_libpath
+      ${_lib_dir}/${_libname}
+    )
   ENDIF()
+
+  SET( _byproducts ${_libpath})
 
   MESSAGE(DEBUG "RV_MAKE_STANDARD_LIB_NAME:")
   MESSAGE(DEBUG "  _libname      ='${_libname}'")
