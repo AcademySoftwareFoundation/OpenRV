@@ -43,7 +43,7 @@ def ocio_node_from_media(config, node, default, media=None, attributes={}):
                 "context": {},
                 "properties": {
                     "ocio.function": "display",
-                    "ocio.inColorSpace": OCIO.Constants.ROLE_SCENE_LINEAR,
+                    "ocio.inColorSpace": OCIO.ROLE_SCENE_LINEAR,
                     "ocio_display.view": config.getDefaultView(display),
                     "ocio_display.display": display,
                 },
@@ -62,7 +62,7 @@ def ocio_node_from_media(config, node, default, media=None, attributes={}):
                     "properties": {
                         "ocio.function": "color",
                         "ocio.inColorSpace": inspace,
-                        "ocio_color.outColorSpace": OCIO.Constants.ROLE_SCENE_LINEAR,
+                        "ocio_color.outColorSpace": OCIO.ROLE_SCENE_LINEAR,
                     },
                 },
                 {"nodeType": "RVLensWarp", "context": {}, "properties": {}},
@@ -78,7 +78,7 @@ def ocio_node_from_media(config, node, default, media=None, attributes={}):
         #      "context"    : {"SHOT" : os.environ.get("SHOT", "def123")}
         #      "properties" : {
         #          "ocio.function"     : "look",
-        #          "ocio.inColorSpace" : OCIO.Constants.ROLE_SCENE_LINEAR,
+        #          "ocio.inColorSpace" : OCIO.ROLE_SCENE_LINEAR,
         #          "ocio_look.look"    : "shot_specific_look"}}]
 
         look = attributes.get("default_setting", "")
