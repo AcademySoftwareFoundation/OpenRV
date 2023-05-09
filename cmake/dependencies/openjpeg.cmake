@@ -76,6 +76,12 @@ SET_PROPERTY(
   TARGET OpenJpeg::OpenJpeg
   PROPERTY IMPORTED_SONAME ${_libname}
 )
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET OpenJpeg::OpenJpeg
+    PROPERTY IMPORTED_IMPLIB ${_implibpath}
+  )
+ENDIF()
 
 # It is required to force directory creation at configure time
 # otherwise CMake complains about importing a non-existing path

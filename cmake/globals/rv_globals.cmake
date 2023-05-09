@@ -5,6 +5,8 @@
 #
 
 INCLUDE(rv_git)
+SET(RV_PATCHES_DIR "${CMAKE_SOURCE_DIR}/cmake/patches")
+SET(RV_PKGMANCONFIG_DIR "${CMAKE_SOURCE_DIR}/cmake/packman")
 
 SET(RV_DEPS_DOWNLOAD_DIR
     "${RV_DEPS_BASE_DIR}/downloads"
