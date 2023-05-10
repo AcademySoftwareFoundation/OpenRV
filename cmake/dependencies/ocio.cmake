@@ -30,6 +30,12 @@ SET(_download_url
 # Another project that isn't adding a debug postfix
 RV_MAKE_STANDARD_LIB_NAME("OpenColorIO" "${_version}" "SHARED" "")
 
+IF(RV_TARGET_WINDOWS)
+  SET(_byproducts "")   # Empty out the List as it has the wrong DLL name: it doesn't have the version suffix
+  SET(_ocio_win_sharedlibname OpenColorIO_2_2.dll)
+  SET(_ocio_win_sharedlib_path ${_bin_dir}/${_ocio_win_sharedlibname})
+  LIST(APPEND _byproducts ${_ocio_win_sharedlib_path})
+ENDIF()
 # 
 # Also add OpenExr libraries to _byproduct
 #
@@ -50,9 +56,9 @@ ELSE()
   SET(_ociolib_dir "${RV_DEPS_OCIO_DIST_DIR}/lib")
 ENDIF()
 
-SET(_ilmthread_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${RV_DEBUG_POSTFIX}.a")
-SET( _iex_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_iex_name}${RV_DEBUG_POSTFIX}.a")
-SET(_openexr_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_openexrcore_name}${RV_DEBUG_POSTFIX}.a")
+SET(_ilmthread_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${RV_DEBUG_POSTFIX}${CMAKE_${_lib_type}_LIBRARY_SUFFIX}")
+SET( _iex_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_iex_name}${RV_DEBUG_POSTFIX}${CMAKE_${_lib_type}_LIBRARY_SUFFIX}")
+SET(_openexr_lib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_openexrcore_name}${RV_DEBUG_POSTFIX}${CMAKE_${_lib_type}_LIBRARY_SUFFIX}")
 LIST(APPEND _byproducts "${_ilmthread_lib}")
 LIST(APPEND _byproducts "${_iex_lib}")
 LIST(APPEND _byproducts "${_openexr_lib}")
@@ -64,8 +70,13 @@ LIST(APPEND _byproducts "${_yaml_cpp_lib}")
 
 #
 # and finally the PyOpenColorIO library
-SET(_pyocio_lib_dir "${_lib_dir}/python${RV_DEPS_PYTHON_VERSION_SHORT}/site-packages")
-SET(_pyocio_libname PyOpenColorIO.so)
+IF(RV_TARGET_WINDOWS)
+  SET(_pyocio_lib_dir "${_lib_dir}/site-packages")
+  SET(_pyocio_libname PyOpenColorIO.pyd)
+ELSE()
+  SET(_pyocio_lib_dir "${_lib_dir}/python${RV_DEPS_PYTHON_VERSION_SHORT}/site-packages")
+  SET(_pyocio_libname PyOpenColorIO.so)
+ENDIF()
 SET(_pyocio_lib "${_pyocio_lib_dir}/${_pyocio_libname}")
 SET(_pyocio_dest_dir ${RV_STAGE_LIB_DIR}/python${RV_DEPS_PYTHON_VERSION_SHORT})
 LIST(APPEND _byproducts "${_pyocio_lib}")
@@ -85,10 +96,11 @@ LIST(APPEND _configure_options "-DBOOST_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
 LIST(APPEND _configure_options "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
 IF(RV_TARGET_WINDOWS)
   # Python path on Windows: python3.9.exe doesn't exist. Moreover, the executable needs the EXE extension otherwise find_package fails
-  # TODO_IBR: Don't hardcode the major Python version here: use or make RV_DEPS_PYTHON_VERSION_MAJOR
-  LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3.exe")
+  SET(OCIO_PYTHON_PATH ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_MAJOR}.exe)
+  LIST(APPEND _configure_options "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}")
 ELSE()
-  LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT}")
+  SET(OCIO_PYTHON_PATH ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT})
+  LIST(APPEND _configure_options "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}")
 ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
@@ -182,7 +194,7 @@ ELSE()
     "-DOpenImageIO_ROOT=${_oiio_install_dir}"         # And the Dev (cfuoco) said that we need to pass them.
     "-DOCIO_BUILD_PYTHON=ON"
     "-DOCIO_INSTALL_EXT_PACKAGES=ALL"
-    "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3.exe"
+    "-DPython_ROOT=${OCIO_PYTHON_PATH}"
     "-DBUILD_SHARED_LIBS=ON"
     "-DOCIO_BUILD_APPS=ON"
     "-DOCIO_BUILD_TESTS=OFF"
@@ -213,9 +225,6 @@ ELSE()
     "${CMAKE_BUILD_TYPE}"   # for --config
   )
 
-  # Minizip-ng fails to find "zlib.h": if you get this error, try to rebuild again; it's a race time condition in CMake build stage
-
-  # TODO_IBR: No idea yet what are the _byproducts
   EXTERNALPROJECT_ADD(
     ${_target}
       URL ${_download_url}
@@ -266,6 +275,15 @@ IF(RV_TARGET_DARWIN OR
     COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
     COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${RV_STAGE_PLUGINS_PYTHON_DIR}
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  )
+ELSE()
+  ADD_CUSTOM_COMMAND(
+      TARGET ${_target}
+      POST_BUILD
+    COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
+    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${RV_STAGE_PLUGINS_PYTHON_DIR}
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_ocio_win_sharedlib_path} ${RV_STAGE_PLUGINS_PYTHON_DIR}
   )
 ENDIF()
 
