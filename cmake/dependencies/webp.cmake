@@ -42,7 +42,12 @@ GET_TARGET_PROPERTY(_jpeg_include_dir jpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTO
 LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
 LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
 
-GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
+IF(RV_TARGET_WINDOWS)
+  # WebP is static so we can use the Static lib from Tiff
+  GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_IMPLIB)
+ELSE()
+  GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
+ENDIF()
 GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
 LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
