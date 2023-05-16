@@ -22,7 +22,12 @@ SET(_download_hash
 )
 
 IF(NOT RV_TARGET_WINDOWS)
-  RV_MAKE_STANDARD_LIB_NAME("tiff" "${_version}" "SHARED" "d")
+  IF(RV_TARGET_DARWIN)
+    # Mac: Use the unversionned .dylib LINK which points to the proper file (which has a diff version number)
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "d")
+  ELSE()
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "${_version}" "SHARED" "d")
+  ENDIF()
 ELSE()
   # The current CMake build code via NMake doesn't create a Debug lib named "libtiffd.lib"
   RV_MAKE_STANDARD_LIB_NAME("libtiff" "${_version}" "SHARED" "")
