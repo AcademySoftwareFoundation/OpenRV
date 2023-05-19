@@ -20,12 +20,12 @@ Here is a list of the people who've contributed code to the Open RV project, sor
 
 A special recognition to the Tweak Software original founders, and to all the developers who contributed to RV before it became Open RV. Their passion, dedication, and hard work have shaped RV into the powerful media review and playback software it is today.
 
-Andrew Gardner
-Jim Hourihan
-Alan Trombla
-Jon Morley
-Arkell Rasiah
-Danielle Ann
-Louise Rasmussen
-Chris Horvath
-Seth Rosenthal
+* Andrew Gardner
+* Jim Hourihan
+* Alan Trombla
+* Jon Morley
+* Arkell Rasiah
+* Danielle Ann
+* Louise Rasmussen
+* Chris Horvath
+* Seth Rosenthal
