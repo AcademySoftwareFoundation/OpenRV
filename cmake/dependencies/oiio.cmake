@@ -130,8 +130,11 @@ ENDIF()
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
 IF(RV_TARGET_LINUX)
-  MESSAGE(WARNING "TODO: Temporary hack allowing OIIO's internal tools to find our librairies...")
-  SET(ENV{LD_LIBRARY_PATH ${RV_STAGE_LIB_DIR})
+  # OIIO's libUtils Tools & Tests USES a different Link Flags which is 'hidden' and isn't set by us.
+  LIST(APPEND _configure_options
+    "-DOIIO_BUILD_TOOLS=OFF"
+    "-DOIIO_BUILD_TESTS=OFF"
+  )
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
