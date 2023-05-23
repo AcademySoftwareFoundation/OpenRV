@@ -24,6 +24,7 @@ OUTPUT_DIR = ""
 ARCH = ""
 PERL_ROOT = ""
 
+
 def get_openssl_args(root) -> List[str]:
     """
     Return the path to the openssl binary given a package root.
@@ -182,7 +183,6 @@ def configure() -> None:
     else:
         configure_args.append("linux-x86_64")
 
-    configure_args.append("no-asm")
     configure_args.append(f"--prefix={OUTPUT_DIR}")
     configure_args.append(f"--openssldir={OUTPUT_DIR}")
 
@@ -229,6 +229,7 @@ def install() -> None:
     patch_openssl_distribution()
     test_openssl_distribution()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -241,7 +242,9 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)
 
     parser.add_argument("--arch", dest="arch", type=str, required=False, default="")
-    parser.add_argument("--perlroot", dest="perlroot", type=str, required=False, default="")
+    parser.add_argument(
+        "--perlroot", dest="perlroot", type=str, required=False, default=""
+    )
 
     parser.set_defaults(clean=False, configure=False, build=False, install=False)
 
