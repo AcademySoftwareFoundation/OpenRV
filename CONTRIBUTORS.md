@@ -29,3 +29,4 @@ A special recognition to the Tweak Software original founders, and to all the de
 * Louise Rasmussen
 * Chris Horvath
 * Seth Rosenthal
+* Michael S. Root
