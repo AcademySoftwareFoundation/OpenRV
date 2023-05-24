@@ -1,7 +1,7 @@
 package: Annotation
 author: Autodesk, Inc.
 organization: Autodesk, Inc.
-version: 1.15
+version: 1.16
 rv: 3.12.15
 openrv: 1.0.0
 requires: ''
