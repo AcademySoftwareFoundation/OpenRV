@@ -166,6 +166,8 @@ class: AnnotateMinorMode : MinorMode
 
     char              _cursorChar;
 
+    int              _hideDrawPane;
+
     \: colorToArray (float[]; Color c) { float[] {c.x, c.y, c.z, c.w}; }
     \: arrayToColor (Color; float[] a) { Color(a[0], a[1], a[2], a[3]); }
     method: encodedName (string; string name) { regex.replace("\.", _user, "+"); }
@@ -1529,12 +1531,14 @@ class: AnnotateMinorMode : MinorMode
         if (_currentDrawMode eq _selectDrawMode)
         {
             _leaveUiVisible = true;
+            _hideDrawPane = _hideDrawPane + 1;
             if (_active) toggle();
         }
         else
         {
             if (!_active) toggle();
             _leaveUiVisible = false;
+            _hideDrawPane = 0;
         }
 
         if (_activeSampleColor)
@@ -2192,10 +2196,11 @@ class: AnnotateMinorMode : MinorMode
 
     method: deactivate (void;)
     {
-        if (!_leaveUiVisible)
+        if (_hideDrawPane > 1 || !_leaveUiVisible)
         {
             if (_manageDock neq nil) _manageDock.hide();
             if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
         }
 
         setCursor(CursorDefault);
