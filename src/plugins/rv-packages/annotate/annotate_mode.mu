@@ -141,7 +141,6 @@ class: AnnotateMinorMode : MinorMode
     QToolBar          _toolBar;
     QLabel            _toolSliderLabel;
     QtColorTriangle   _colorTriangle;
-    bool              _leaveUiVisible;
     bool              _setColorLock;
     bool              _activeSampleColor;
     Color             _sampleColor;
@@ -165,6 +164,8 @@ class: AnnotateMinorMode : MinorMode
     char[]            _textBuffer;
 
     char              _cursorChar;
+
+    int              _hideDrawPane;
 
     \: colorToArray (float[]; Color c) { float[] {c.x, c.y, c.z, c.w}; }
     \: arrayToColor (Color; float[] a) { Color(a[0], a[1], a[2], a[3]); }
@@ -1528,13 +1529,13 @@ class: AnnotateMinorMode : MinorMode
     {
         if (_currentDrawMode eq _selectDrawMode)
         {
-            _leaveUiVisible = true;
+            _hideDrawPane = _hideDrawPane + 1;
             if (_active) toggle();
         }
         else
         {
             if (!_active) toggle();
-            _leaveUiVisible = false;
+            _hideDrawPane = 0;
         }
 
         if (_activeSampleColor)
@@ -1671,7 +1672,6 @@ class: AnnotateMinorMode : MinorMode
         _textPlacementMode = false;
         _machine           = "computer";
         _user              = remoteLocalContactName();
-        _leaveUiVisible    = false;
         _setColorLock      = false;
         _activeSampleColor = false;
         _sampleCount       = 0;
@@ -1681,6 +1681,7 @@ class: AnnotateMinorMode : MinorMode
         _syncAutoStart     = false;
         _cursorChar        = char(0x1);
         _autoSave          = true;
+        _hideDrawPane      = 0;
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
@@ -2192,10 +2193,11 @@ class: AnnotateMinorMode : MinorMode
 
     method: deactivate (void;)
     {
-        if (!_leaveUiVisible)
+        if (_hideDrawPane != 1)
         {
             if (_manageDock neq nil) _manageDock.hide();
             if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
         }
 
         setCursor(CursorDefault);
