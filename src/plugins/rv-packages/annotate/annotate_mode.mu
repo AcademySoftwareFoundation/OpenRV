@@ -1685,6 +1685,7 @@ class: AnnotateMinorMode : MinorMode
         _syncAutoStart     = false;
         _cursorChar        = char(0x1);
         _autoSave          = true;
+        _hideDrawPane      = 0;
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
