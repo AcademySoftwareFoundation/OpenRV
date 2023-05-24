@@ -1,4 +1,4 @@
-# Building Open RV on CentOS 7
+# Building Open RV on Rocky 9
 
 ## Summary
 
