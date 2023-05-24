@@ -141,7 +141,6 @@ class: AnnotateMinorMode : MinorMode
     QToolBar          _toolBar;
     QLabel            _toolSliderLabel;
     QtColorTriangle   _colorTriangle;
-    bool              _leaveUiVisible;
     bool              _setColorLock;
     bool              _activeSampleColor;
     Color             _sampleColor;
@@ -1530,14 +1529,12 @@ class: AnnotateMinorMode : MinorMode
     {
         if (_currentDrawMode eq _selectDrawMode)
         {
-            _leaveUiVisible = true;
             _hideDrawPane = _hideDrawPane + 1;
             if (_active) toggle();
         }
         else
         {
             if (!_active) toggle();
-            _leaveUiVisible = false;
             _hideDrawPane = 0;
         }
 
@@ -1675,7 +1672,6 @@ class: AnnotateMinorMode : MinorMode
         _textPlacementMode = false;
         _machine           = "computer";
         _user              = remoteLocalContactName();
-        _leaveUiVisible    = false;
         _setColorLock      = false;
         _activeSampleColor = false;
         _sampleCount       = 0;
@@ -2197,7 +2193,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: deactivate (void;)
     {
-        if (_hideDrawPane > 1 || !_leaveUiVisible)
+        if (_hideDrawPane != 1)
         {
             if (_manageDock neq nil) _manageDock.hide();
             if (_drawDock neq nil) _drawDock.hide();
