@@ -55,7 +55,7 @@ class QFileType : public Class
 
     virtual void load();
 
-    MemberFunction* _func[8];
+    MemberFunction* _func[9];
 };
 
 // Inheritable object
@@ -71,6 +71,7 @@ class MuQt_QFile : public QFile
     virtual bool resize(qint64 sz) ;
     virtual qint64 size() const;
     virtual bool atEnd() const;
+    virtual bool open(OpenMode mode) ;
     virtual void close() ;
     virtual bool isSequential() const;
     virtual qint64 pos() const;

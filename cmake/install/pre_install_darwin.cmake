@@ -83,6 +83,6 @@ FUNCTION(after_copy_platform FILE_PATH)
     RETURN()
   ENDIF()
 
-  EXECUTE_PROCESS(COMMAND python3 ${PROJECT_SOURCE_DIR}/src/build/remove_absolute_rpath.py --target ${FILE_PATH} COMMAND_ERROR_IS_FATAL ANY)
+  EXECUTE_PROCESS(COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../../src/build/remove_absolute_rpath.py --target ${FILE_PATH} COMMAND_ERROR_IS_FATAL ANY)
 
 ENDFUNCTION()

@@ -240,6 +240,7 @@ TARGET_LINK_LIBRARIES(
           Mu
           Boost::filesystem
           ${CMAKE_DL_LIBS}
+          IPBaseNodes
 )
 
 IF(RV_TARGET_WINDOWS)

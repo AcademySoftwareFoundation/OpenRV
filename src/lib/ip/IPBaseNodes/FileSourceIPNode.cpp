@@ -1325,13 +1325,21 @@ FileSourceIPNode::evaluate(const Context& context)
                         static_cast<float>(tilingInfo.numTiles) *
                         static_cast<float>(aFullPlaneFB->height()) + 0.5f);
 
-                    const int tileSizeX = static_cast<int>(1.0f /
+                    int tileSizeX = static_cast<int>(1.0f /
                         static_cast<float>(tilingInfo.numTiles) *
                         static_cast<float>(aFullPlaneFB->width()) + 0.5f);
 
-                    const int tileSizeY = static_cast<int>(1.0f /
+                    int tileSizeY = static_cast<int>(1.0f /
                         static_cast<float>(tilingInfo.numTiles) *
                         static_cast<float>(aFullPlaneFB->height()) + 0.5f);
+
+                    // Make sure that the last tiles doe not overshoot the full
+                    // plane which would cause an access violation.
+                    // Note that this can happen because of the round up in the
+                    // previous float to integer conversion.
+                    // Example: numTiles=6, aFullPlaneFB->height=94605
+                    tileSizeX = std::min(tileSizeX, aFullPlaneFB->width()-tilePosX);
+                    tileSizeY = std::min(tileSizeY, aFullPlaneFB->height()-tilePosY);
 
                     unsigned char* tilePixels = 
                         ( aFullPlaneFB->pixels<unsigned char>() +
@@ -2610,34 +2618,34 @@ FileSourceIPNode::openMovieTask(const string& filename,
 string 
 FileSourceIPNode::cacheHash(const string& filename, const string& prefix)
 {
-    boost::filesystem::path p(UNICODE_STR(filename));
     string hashString;
 
-    if (boost::filesystem::exists(p))
+    const bool filepathIsURL = TwkUtil::pathIsURL(filename);
+    if (!filepathIsURL)
     {
-        try
+        boost::filesystem::path p(UNICODE_STR(filename));
+        if (boost::filesystem::exists(p))
         {
-            boost::uintmax_t size = boost::filesystem::file_size(p);
-            time_t modtime = boost::filesystem::last_write_time(p);
+            try
+            {
+                const auto size = boost::filesystem::file_size(p);
 
-            //
-            //  not sure if last_write_time is really what we want. does it
-            //  change when touched or the file is copied?
-            //
-            //  should this function be hashing the first 256 bytes or so of
-            //  the file to be safe?
-            //
+                //
+                //  should this function be hashing the first 256 bytes or so of
+                //  the file to be safe?
+                //
 
-            ostringstream name;
-            boost::hash<string> string_hash;
-            name << filename << "::" << size; 
-            ostringstream fullHash;
-            fullHash << prefix << hex << string_hash(name.str()) << dec;
-            hashString = fullHash.str();
-        }
-        catch (...)
-        {
-            // nothing
+                ostringstream name;
+                boost::hash<string> string_hash;
+                name << filename << "::" << size; 
+                ostringstream fullHash;
+                fullHash << prefix << hex << string_hash(name.str()) << dec;
+                hashString = fullHash.str();
+            }
+            catch (...)
+            {
+                // nothing
+            }
         }
     }
 

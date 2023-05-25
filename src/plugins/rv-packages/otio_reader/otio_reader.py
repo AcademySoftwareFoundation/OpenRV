@@ -111,7 +111,6 @@ def create_rv_node_from_otio(otio_obj, context=None):
 
 
 def _retime_trx_input(pre_item, post_item, context=None):
-
     post_item_rv = create_rv_node_from_otio(post_item, context)
 
     node_to_insert = post_item_rv
@@ -214,6 +213,12 @@ def _create_stack(in_stack, context=None):
     _add_markers(in_stack, new_stack)
     _add_metadata_to_node(in_stack, new_stack)
 
+    # disable reversed order blending so the top node is on top
+    stack_node = extra_commands.nodesInGroupOfType(new_stack, "RVStack")[0]
+    commands.setIntProperty(
+        "{}.mode.supportReversedOrderBlending".format(stack_node), [0]
+    )
+
     return new_stack
 
 
@@ -263,21 +268,30 @@ def _create_track(in_seq, context=None):
         _add_markers(in_seq, new_seq)
         _add_metadata_to_node(in_seq, new_seq)
 
+        # disable reversed order blending so the top node is on top
+        commands.setIntProperty(
+            "{}.mode.supportReversedOrderBlending".format(seq_node), [0]
+        )
+
     return new_seq
 
 
 def _get_global_transform(tl):
-    # since there's no global scale in otio, use the first source with
-    # bounds as the global bounds
+    # since there's no global scale in otio, calculate the minimum box size
+    # that can contain all clips
     def find_display_bounds(tl):
+        display_bounds = None
         for clip in tl.clip_if():
             try:
                 bounds = clip.media_reference.available_image_bounds
                 if bounds:
-                    return bounds
+                    if display_bounds:
+                        display_bounds.extendBy(bounds)
+                    else:
+                        display_bounds = bounds
             except AttributeError:
                 continue
-        return None
+        return display_bounds
 
     bounds = find_display_bounds(tl)
     if bounds is None:
@@ -343,7 +357,6 @@ def _get_in_out_frame(it, range_to_read):
             isinstance(it.media_reference, otio.schema.ImageSequenceReference)
             and it.media_reference.available_range
         ):
-
             in_frame, out_frame = it.media_reference.frame_range_for_time_range(
                 range_to_read
             )
@@ -470,8 +483,8 @@ def _create_sources(item, context=None):
                 )
 
         switch_group = commands.nodeConnections(source_group)[1][0]
-        switch = extra_commands.nodesInGroupOfType(switch_group, 'RVSwitch')[0]
-        commands.setIntProperty('{}.mode.autoEDL'.format(switch), [0])
+        switch = extra_commands.nodesInGroupOfType(switch_group, "RVSwitch")[0]
+        commands.setIntProperty("{}.mode.autoEDL".format(switch), [0])
 
         return switch_group, active_source
 

@@ -799,14 +799,6 @@ Session::setAudioTimeShift(double d, double sensitivity)
 void
 Session::playAudio()
 {
-    // we need to clear the cache if the view node has been
-    // changed since last audio play
-    if (m_viewNodeChanged)
-    {
-        graph().requestClearAudioCache();
-        m_viewNodeChanged = false;
-    }
-
     m_audioPlay = true;
     setAudioTimeShift(std::numeric_limits<double>::max());
     if (audioRenderer()) audioRenderer()->play(this);
@@ -1295,7 +1287,10 @@ Session::setViewNode(const std::string& nodeName, bool force)
             if (node != oldNode) setSessionStateFromNode(graph().viewNode());
             userGenericEvent("after-graph-view-change", nodeName);
             m_afterGraphViewChangeSignal(node);
-            m_viewNodeChanged = true;
+
+            // We need to clear the audio cache if the view node has been
+            // changed since the last audio play
+            graph().requestClearAudioCache();
         }
 
         return true;
@@ -1753,7 +1748,7 @@ Session::setPlayMode(PlayMode mode)
     {
         m_playMode = mode;
         updateGraphInOut();
-        userGenericEvent("play-mode-changed", "");
+        userGenericEvent("play-mode-changed", std::to_string((int) mode));
         m_playModeChangedSignal();
     }
 }
@@ -2178,6 +2173,11 @@ Session::reload(int start, int end)
 
     graph().flushRange(start, end);
     clearVideoDeviceCaches();
+
+    // We need to manually free the already uploaded textures here because
+    // their content risks of no longer matching the reloaded media.
+    if (m_renderer) m_renderer->freeUploadedTextures();
+
     updateGraphInOut();
     askForRedraw();
 }
@@ -4467,7 +4467,10 @@ Session::userGenericEvent(const string& eventName,
                     contents == "rvui.previousMarkedFrame()" ||
                     contents == "rvui.nextMarkedFrame()" ||
                     contents == "extra_commands.stepForward(1)" ||
-                    contents == "extra_commands.stepBackward(1)"
+                    contents == "extra_commands.stepBackward(1)" ||
+                    contents == "commands.setPlayMode(PlayOnce)" ||
+                    contents == "commands.setPlayMode(PlayPingPong)" ||
+                    contents == "commands.setPlayMode(PlayLoop)"
                 )
             )
         )

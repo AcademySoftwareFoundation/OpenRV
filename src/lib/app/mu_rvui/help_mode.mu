@@ -168,8 +168,8 @@ class: HelpMinorMode : MinorMode
 
         Menu menuList = Menu {
                 {"Online Resources",    nil, nil, inactiveState},
-                {"   RV User's Manual",   opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-user-manual.md"), nil},
-                {"   RV Reference Manual", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-reference-manual.md"), nil},
+                {"   RV User's Manual",   opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), nil},
+                {"   RV Reference Manual", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-reference-manual/rv-reference-manual-chapter-one.html"), nil},
                 {"   Mu User's Manual",    opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), nil},
                 {"_",                   nil},
                 {"   GTO File Format (.rv files)", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), nil},

@@ -1516,6 +1516,46 @@ NODE_IMPLEMENTATION(sourceMediaReps, Pointer)
     NODE_RETURN(names);
 }
 
+NODE_IMPLEMENTATION(sourceMediaRepsAndNodes, Pointer)
+{
+    RvSession* s = RvSession::currentRvSession();
+    StringType::String* sourceOrSwitchNode = NODE_ARG_OBJECT(0, StringType::String);
+    Process* p = NODE_THREAD.process();
+    MuLangContext* c = static_cast<MuLangContext*>(p->context());
+    const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+    const TupleType* ttype = static_cast<const TupleType*>(atype->elementType());
+    const StringType* stype = c->stringType();
+
+    if (!sourceOrSwitchNode) throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source or switch node arg");
+
+    Session::StringVector mediaRepNames;
+    Session::StringVector mediaRepSrcNodes;
+    s->sourceMediaReps(sourceOrSwitchNode->c_str(), mediaRepNames, &mediaRepSrcNodes);
+
+    if (mediaRepNames.empty() || (mediaRepNames.size() != mediaRepSrcNodes.size())) NODE_RETURN(0);
+
+    struct STuple
+    {
+        const StringType::String* mediaRepName;
+        const StringType::String* mediaRepSrcNode;
+    };
+
+    DynamicArray* array = new DynamicArray(atype, 1);
+    array->resize(mediaRepNames.size());
+
+    for (int i=0; i < mediaRepNames.size(); i++)
+    {
+        ClassInstance* tuple = ClassInstance::allocate(ttype);
+        STuple* st = reinterpret_cast<STuple*>(tuple->structure());
+        st->mediaRepName = stype->allocate(mediaRepNames[i]);
+        st->mediaRepSrcNode = stype->allocate(mediaRepSrcNodes[i]);
+        
+        array->element<ClassInstance*>(i) = tuple;
+    }
+
+    NODE_RETURN(array);
+}
+
 NODE_IMPLEMENTATION(sourceMediaRepSwitchNode, Pointer)
 {
     RvSession* s = RvSession::currentRvSession();
@@ -2065,6 +2105,12 @@ void initCommands(Mu::MuLangContext* context)
                                       Return, "string[]",
                                       Parameters,
                                       new Param(c, "sourceNode", "string"),
+                                      End),
+
+                         new Function(c, "sourceMediaRepsAndNodes", sourceMediaRepsAndNodes, None,
+                                      Return, "(string,string)[]",
+                                      Parameters,
+                                      new Param(c, "sourceOrSwitchNode", "string"),
                                       End),
 
                          new Function(c, "sourceMediaRepSwitchNode", sourceMediaRepSwitchNode, None,

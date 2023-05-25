@@ -101,6 +101,7 @@ class StackIPNode : public IPNode
     IntProperty*                m_outputSize;
     IntProperty*                m_autoSize;
     IntProperty*                m_interactiveSize;
+    IntProperty*                m_supportReversedOrderBlending;
 
   private:
     static std::string m_defaultCompType;

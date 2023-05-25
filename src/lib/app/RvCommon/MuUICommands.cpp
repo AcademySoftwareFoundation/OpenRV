@@ -1740,7 +1740,7 @@ NODE_IMPLEMENTATION(httpGet, void)
     StringType::String* authEvent  = NODE_ARG_OBJECT(3, StringType::String);
     StringType::String* progEvent  = NODE_ARG_OBJECT(4, StringType::String);
     bool                ignore     = NODE_ARG(5, bool);
-    bool                urlIsEncoded = NODE_ARG(7, bool);
+    bool                urlIsEncoded = NODE_ARG(6, bool);
 
     RvWebManager::HeaderList headers;
 
