@@ -697,6 +697,8 @@ public:
     void                       setDrawReady(bool v);
     void                       setUploadReady(bool v);
     void                       notifyUpload();
+    void                       freeUploadedTextures();
+    
 
     // resets node ptr on all rendered image links to this node
     void                       unlinkNode(IPCore::IPNode * node); 
@@ -815,9 +817,8 @@ public:
     //  Same fb identifier different pixel aspect means a new upload
     std::string logicalImageHash(const IPImage*) const;
 
-    void clearImages();
     void freeOldTextures();
-    
+
     void uploadAuxImage(LogicalImage*,
                         const FrameBuffer*);
     

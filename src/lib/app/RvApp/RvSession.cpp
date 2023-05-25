@@ -1752,6 +1752,13 @@ RvSession::addSourceMediaRep(const std::string& srcNodeName,
     return result;
 }
 
+// Returns true if the switch node as parameter belongs to an RVSwitchGroup
+static bool isGroupedSwitchNode( SwitchIPNode const * const switchNode)
+{
+    return switchNode && switchNode->group()!=nullptr &&
+           switchNode->group()->protocol() == "RVSwitchGroup";
+}
+
 // Find and return the Switch node(s) associated with the specified source node name if any
 vector<SwitchIPNode*>
 RvSession::findSwitchIPNodes(const string& srcNodeOrSwitchNodeName)
@@ -1776,7 +1783,8 @@ RvSession::findSwitchIPNodes(const string& srcNodeOrSwitchNodeName)
                 graph().findNodeAssociatedWith(srcNode->group(), "RVSwitch"));
         }
 
-        if (switchNode)
+        // Make sure that the switch node (if any) is part of a switch group
+        if (switchNode && isGroupedSwitchNode(switchNode))
         {
             switchNodes.push_back(switchNode);
         }
@@ -1784,7 +1792,9 @@ RvSession::findSwitchIPNodes(const string& srcNodeOrSwitchNodeName)
 
     for (NodeVector::iterator i = nodes.begin(); i != nodes.end(); ++i)
     {
-        if (SwitchIPNode* switchNode = dynamic_cast<SwitchIPNode*>(*i))
+        // Make sure that the switch node (if any) is part of a switch group
+        SwitchIPNode* switchNode = dynamic_cast<SwitchIPNode*>(*i);
+        if (switchNode && isGroupedSwitchNode(switchNode))
         {
             switchNodes.push_back(switchNode);
         }
@@ -1886,10 +1896,12 @@ std::string RvSession::sourceMediaRep(
 // Finds and returns the Source Media Representation names available
 void RvSession::sourceMediaReps(
     const string& srcNodeOrSwitchNodeName,
-    StringVector &sourceMediaReps
+    StringVector& sourceMediaReps,
+    StringVector* sourceNodes /* = nullptr */
 )
 {
     sourceMediaReps.clear();
+    if (sourceNodes) sourceNodes->clear();
 
     // Find the Switch node associated with the specified switch or source node if any
     SwitchIPNode* switchNode = this->switchNode(srcNodeOrSwitchNodeName);
@@ -1910,6 +1922,7 @@ void RvSession::sourceMediaReps(
         if (srcNode)
         {
             sourceMediaReps.push_back(srcNode->mediaRepName());
+            if (sourceNodes) sourceNodes->push_back(srcNode->name());
         }
         return;
     }
@@ -1919,6 +1932,7 @@ void RvSession::sourceMediaReps(
         if (SourceIPNode* srcNode = sourceFromSwitchInput(switchNode->inputs()[i]))
         {
             sourceMediaReps.push_back(srcNode->mediaRepName());
+            if (sourceNodes) sourceNodes->push_back(srcNode->name());
         }
     }
 }

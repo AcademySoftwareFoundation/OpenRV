@@ -3,35 +3,36 @@
 SOURCED=0
 if [ -n "$ZSH_EVAL_CONTEXT" ]; then
   [[ $ZSH_EVAL_CONTEXT =~ :file$ ]] && SOURCED=1
+  SCRIPT=$0
 elif [ -n "$KSH_VERSION" ]; then
   [[ "$(cd $(dirname -- $0) && pwd -P)/$(basename -- $0)" != "$(cd $(dirname -- ${.sh.file}) && pwd -P)/$(basename -- ${.sh.file})" ]] && SOURCED=1
+  SCRIPT=$0
 elif [ -n "$BASH_VERSION" ]; then
   [[ $0 != "$BASH_SOURCE" ]] && SOURCED=1
+  SCRIPT=${BASH_SOURCE[0]}
 elif grep -q dash /proc/$$/cmdline; then
   case $0 in *dash*) SOURCED=1 ;; esac
+  x=$(lsof -p $$ -Fn0 | tail -1); SCRIPT=${x#n}
 fi
 
+SCRIPT_HOME=`readlink -f $(dirname $SCRIPT)`
 if [[ $SOURCED == 0 ]]; then
-  echo "Please call: source $BASH_SOURCE"
+  echo "Please call: source $SCRIPT"
   exit 1
 fi
-
 
 QT_VERSION="${QT_VERSION:-5.15.2}"
 if [[ "$OSTYPE" == "linux"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
   QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/gcc_64}"
-  SCRIPT_HOME=`readlink -f $(dirname $0)`
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
   QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/clang_64}"
-  SCRIPT_HOME=`readlink -f $(dirname $0)`
 elif [[ "$OSTYPE" == "msys"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Visual Studio 16 2019}"
   QT_HOME="${QT_HOME:-c:/Qt/Qt/${QT_VERSION}/msvc2019_64}"
   WIN_PERL="${WIN_PERL:-c:/Strawberry/perl/bin}"
   CMAKE_WIN_ARCH="${CMAKE_WIN_ARCH:--A x64}"
-  SCRIPT_HOME=`readlink -f $(dirname ${BASH_SOURCE[0]})`
   SETUPTOOLS_USE_DISTUTILS=stdlib
 else
   echo "OS does not seem to be linux, darwin or msys. Exiting."
@@ -77,7 +78,7 @@ echo "CMAKE_GENERATOR is $CMAKE_GENERATOR"
 echo "QT_HOME is $QT_HOME"
 if [[ "$OSTYPE" == "msys"* ]]; then echo "WIN_PERL is $WIN_PERL"; fi
 
-echo "To override any of them do unset [name]; export [name]=value; source $0" 
+echo "To override any of them do unset [name]; export [name]=value; source $SCRIPT" 
 echo
 echo "If this is your first time building RV try rvbootstrap (release) or rvbootstrapd (debug)"
 echo "To build quickly after bootstraping try rvmk (release) or rvmkd (debug)"

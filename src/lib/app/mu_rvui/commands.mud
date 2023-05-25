@@ -611,6 +611,7 @@ The PixelImageInfo objects will be in order of front to back.
 sourcesAtFrame """
 Returns an array of the names of source nodes (RVFileSource or
 RVImageSource) which would be evaluated at the given frame.
+The array is guaranteed to contain only unique names (no duplicates).
 """
 
 renderedImages """
@@ -829,6 +830,19 @@ Returns the names of the media representations available for the Switch Group
 corresponding to the given RVFileSource node.
 When sourceNode is an empty string "", then the first Switch node found at the 
 current frame is used to determine the available media representations.
+
+"""
+
+sourceMediaRepsAndNodes() """
+
+Returns an array of (mediaRepName, mediaRepSourceNode) pairs available for the
+switch node specified as parameter containing the media representations.
+Each pair consists of firstly the name of the media representation, and secondly
+of the source node of that media representation.
+Note that for convenience, a source node can be specified instead of the switch 
+node, in which case the associated switch node will be inferred.
+
+Returns an empty array if no media representations are found.
 
 """
 

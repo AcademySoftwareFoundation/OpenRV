@@ -1944,6 +1944,19 @@ ImageRenderer::renderAllChildren(InternalRenderContext& context)
     //
     //  Render the current image's children recursively
     //
+
+    // Note on reverse-order blending : Reversing the order of inputs when 
+    // blending has a huge impact; The first input becomes the top one. 
+    // For blend modes like 'Add' this has no impact, but for others it does.
+    // This mode was implemented when the StackIPNode/SequenceIPNode did not
+    // properly support multi-blend-modes, ie.: all inputs would have the same
+    // blend mode. 
+    //
+    // In order to support per-input blending modes, a new flag
+    // (supportReversedOrderBlending) was created to allow an IPNode to 
+    // instruct the ImageRenderer that a given IPImage does not support
+    // reversing the order of input blending.
+
     bool reverse = false;
     bool dontBlendFirst = false;
     const IPImage* root = context.image;
@@ -1953,6 +1966,7 @@ ImageRenderer::renderAllChildren(InternalRenderContext& context)
     //
 
     if (!context.mergeContext && 
+        root->supportReversedOrderBlending &&
         root->renderType != IPImage::GroupType)  
     {
         switch (context.blendMode)
@@ -2027,16 +2041,7 @@ ImageRenderer::renderAllChildren(InternalRenderContext& context)
             childContext.image = i;
             if (i->device) childContext.device = i->device;
 
-            if (dontBlendFirst && i == root->children && !context.doBlend)
-            {
-                childContext.blendMode = IPImage::Replace;
-                context.doBlend = true; // set to true, because the first 'no blend' has already happened.
-                                        // we want to blend for the rest of the rendering pass
-            }
-            else 
-            {
-                setupBlendMode(childContext);
-            }
+            setupBlendMode(childContext);
 
             renderRecursive(childContext);
         }
@@ -3933,6 +3938,21 @@ ImageRenderer::freeOldTextures()
 
     }
 }
+
+void
+ImageRenderer::freeUploadedTextures()
+{
+    for (FBToTextureMap::iterator it = m_uploadedTextures.begin();
+         it != m_uploadedTextures.end();
+         it++)
+    {
+        m_glState->deleteGLTexture(it->second->id);
+        if (it->second->bufferId) glDeleteBuffers(1, &it->second->bufferId);
+        delete it->second;
+    }
+    m_uploadedTextures.clear();
+}
+
 
 bool
 ImageRenderer::compatible(const FrameBuffer* fb,

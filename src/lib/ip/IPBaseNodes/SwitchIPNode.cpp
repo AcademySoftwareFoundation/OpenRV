@@ -14,6 +14,7 @@
 #include <TwkMath/Function.h>
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/Operations.h>
+#include <TwkUtil/EnvVar.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <iostream>
 
@@ -22,7 +23,10 @@ using namespace TwkContainer;
 using namespace TwkMath;
 using namespace TwkFB;
 using namespace TwkAudio;
+using namespace TwkUtil;
 using namespace std;
+
+static ENVVAR_BOOL( evForceNoIntermediateForSwitchNodes, "RV_FORCE_NO_INTERMEDIATE_FOR_SWITCH_NODES", true );
 
 SwitchIPNode::SwitchIPNode(const std::string& name,
                            const NodeDefinition* def,
@@ -377,6 +381,8 @@ SwitchIPNode::evaluate(const Context& context)
                                 IPImage::BlendRenderType,
                                 width,
                                 height);
+
+    root->noIntermediate = evForceNoIntermediateForSwitchNodes.getValue();
 
     try
     {
