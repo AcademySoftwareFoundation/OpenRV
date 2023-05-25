@@ -15,7 +15,7 @@
 #
 
 set noglob
-set name = rvio
+set name = rvio_sw
 
 if (! $?RV_HOME) then
     set canonicalName = "`readlink -f $0`"

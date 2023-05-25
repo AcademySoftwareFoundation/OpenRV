@@ -6,7 +6,7 @@
 //******************************************************************************
 
 #include <assert.h>
-#include <UICommands.h>
+#include "UICommands.h"
 
 namespace RVIO {
 

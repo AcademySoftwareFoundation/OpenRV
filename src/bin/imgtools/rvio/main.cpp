@@ -18,7 +18,7 @@
 #include <QTBundle/QTBundle.h>
 #endif
 
-#include <UICommands.h>
+#include "UICommands.h"
 #include <IOproxy/IOproxy.h>
 #include <MovieProxy/MovieProxy.h>
 #include <ImfThreading.h>
@@ -34,7 +34,11 @@
 #include <IPBaseNodes/SourceIPNode.h>
 #include <IPCore/GroupIPNode.h>
 #include <IPCore/OutputGroupIPNode.h>
+#ifdef RVIO_HW
 #include <MovieRV_FBO/MovieRV_FBO.h>
+#else
+#include <MovieRV/MovieRV.h>
+#endif
 #include <MovieFB/MovieFB.h>
 #include <MovieMuDraw/MovieMuDraw.h>
 #include <MovieProcedural/MovieProcedural.h>
@@ -100,7 +104,11 @@
 #include <DarwinBundle/DarwinBundle.h>
 #endif
 
+#ifdef RVIO_HW
 #include <TwkGLFFBO/FBOVideoDevice.h>
+#else
+#include <TwkGLFMesa/OSMesaVideoDevice.h>
+#endif
 
 
 typedef TwkContainer::StringProperty StringProperty;
@@ -972,7 +980,13 @@ utf8Main(int argc, char *argv[])
     //  that point.
     //
 
+#ifdef RVIO_HW
     TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
+#else
+    TwkGLF::OSMesaVideoDevice* dummyDev = new TwkGLF::OSMesaVideoDevice(0, 10, 10, true);
+    FrameBuffer* dummyFB = new FrameBuffer(10, 10, 4, FrameBuffer::FLOAT);
+    dummyDev->makeCurrent(dummyFB);
+#endif
     IPCore::ImageRenderer::queryGL();
     const char* glVersion =(const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
     IPCore::Shader::Function::useShadingLanguageVersion(glVersion);
