@@ -99,7 +99,7 @@ LIST(APPEND _configure_options "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PY
 IF(RV_TARGET_WINDOWS)
   # Python path on Windows: python3.9.exe doesn't exist. Moreover, the executable needs the EXE extension otherwise find_package fails
   SET(OCIO_PYTHON_PATH ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_MAJOR}.exe)
-  LIST(APPEND _configure_options "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}")
+  # To be added later to _configure_options as they are reset for Windows.
 ELSE()
   SET(OCIO_PYTHON_PATH ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT})
   LIST(APPEND _configure_options "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}")
@@ -192,7 +192,9 @@ ELSE()
     "-DOpenImageIO_ROOT=${_oiio_install_dir}"         # And the Dev (cfuoco) said that we need to pass them.
     "-DOCIO_BUILD_PYTHON=ON"
     "-DOCIO_INSTALL_EXT_PACKAGES=ALL"
-    "-DPython_ROOT=${OCIO_PYTHON_PATH}"
+    "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}"
+    "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}"
     "-DBUILD_SHARED_LIBS=ON"
     "-DOCIO_BUILD_APPS=ON"
     "-DOCIO_BUILD_TESTS=OFF"
@@ -278,6 +280,7 @@ ELSE()
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
       COMMAND ${CMAKE_COMMAND} -E copy ${_ocio_win_sharedlib_path} ${RV_STAGE_PLUGINS_PYTHON_DIR}
   )
+ENDIF()
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
 RV_COPY_LIB_BIN_FOLDERS()
