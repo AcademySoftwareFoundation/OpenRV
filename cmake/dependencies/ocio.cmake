@@ -172,7 +172,7 @@ IF(NOT RV_TARGET_WINDOWS)
     INSTALL_DIR ${_install_dir}
     DEPENDS ${_depends_oiio} Boost::headers Python::Python Imath::Imath ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE FALSE
     BUILD_ALWAYS FALSE
@@ -261,10 +261,6 @@ ELSE()
     DEPENDERS configure
     WORKING_DIRECTORY "${_source_dir}"
   )
-
-  # TODO_IBR: Add a step to copy build/src/bindings here but exclure the .pyd file (total 3 files, 1 excluded.)
-  # TODO_IBR: Then make sure to review all _byproducts and ensure they are on the EXTERNALPROJECT_ADD call.
-
 ENDIF()
 
 IF(RV_TARGET_DARWIN OR

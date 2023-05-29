@@ -87,9 +87,10 @@ ELSE()
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ZLIB::ZLIB lcms
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' 
-  ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
-  ${_configure_command} ${_configure_options} BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' 
+      ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
+      ${_configure_command} ${_configure_options}
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE FALSE
     BUILD_ALWAYS FALSE

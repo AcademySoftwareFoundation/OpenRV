@@ -155,7 +155,7 @@ IF(NOT RV_TARGET_WINDOWS)
     INSTALL_DIR ${_install_dir}
     DEPENDS ${_depends_freetype} jpeg-turbo::jpeg Tiff::Tiff RV_DEPS_OCIO OpenEXR::OpenEXR RV_DEPS_OPENJPEG jpeg-turbo::turbojpeg PNG::PNG Boost::headers Boost::thread Boost::filesystem Imath::Imath Webp::Webp Raw::Raw ffmpeg::swresample ffmpeg::swscale ffmpeg::avcodec ffmpeg::swresample ZLIB::ZLIB
       CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-      BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+      BUILD_COMMAND ${_make_command} -j${_cpu_count}
       INSTALL_COMMAND ${_make_command} install
       BUILD_IN_SOURCE FALSE
       BUILD_ALWAYS FALSE
