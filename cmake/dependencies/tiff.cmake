@@ -23,7 +23,8 @@ SET(_download_hash
 
 IF(NOT RV_TARGET_WINDOWS)
     # Mac/Linux: Use the unversionned .dylib.so LINK which points to the proper file (which has a diff version number)
-    RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "d")
+    # Mac/Linux: TIFF doesn't use a Postfix only 'MSVC'.
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "")
 ELSE()
   # The current CMake build code via NMake doesn't create a Debug lib named "libtiffd.lib"
   RV_MAKE_STANDARD_LIB_NAME("libtiff" "${_version}" "SHARED" "")
@@ -141,7 +142,7 @@ ELSE()
     SOURCE_DIR ${_source_dir}
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
-    DEPENDS ZLIB::ZLIB jpeg-turbo::jpeg
+    DEPENDS ZLIB::ZLIB RV_DEPS_JPEGTURBO
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
