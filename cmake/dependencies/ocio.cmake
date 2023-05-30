@@ -43,7 +43,9 @@ SET(_iex_name "Iex-3_1")
 SET(_ilmthread_name "IlmThread-3_1")
 SET(_openexrcore_name "OpenEXR-3_1")
 SET(_lib_type STATIC)
-SET(RV_DEPS_OPENEXR_ROOT_DIR ${RV_DEPS_OCIO_DIST_DIR})
+IF(RV_USE_OCIO_OPENEXR)
+  SET(RV_DEPS_OPENEXR_ROOT_DIR ${RV_DEPS_OCIO_DIST_DIR})
+ENDIF()
 IF(RV_TARGET_WINDOWS)
   SET(_ociolib_dir "${RV_DEPS_OCIO_DIST_DIR}/lib")
   SET(_iex_implib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${RV_DEBUG_POSTFIX}.lib")
@@ -105,13 +107,10 @@ ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
 IF(NOT RV_USE_OCIO_OPENEXR)
-  #
-  # Why isn't OCIO finding our own copy of OpenEXR?
-  #
-  #GET_TARGET_PROPERTY(_openexr_library OpenEXR::OpenEXR IMPORTED_LOCATION)
-  #GET_TARGET_PROPERTY(_ilmthread_library OpenEXR::IlmThread IMPORTED_LOCATION)
+  GET_TARGET_PROPERTY(_openexr_library OpenEXR::OpenEXR IMPORTED_LOCATION)
+  GET_TARGET_PROPERTY(_ilmthread_library OpenEXR::IlmThread IMPORTED_LOCATION)
   #GET_TARGET_PROPERTY(_iex_library OpenEXR::Iex IMPORTED_LOCATION)
-  #GET_TARGET_PROPERTY(_openexr_include_dir OpenEXR::OpenEXR INTERFACE_INCLUDE_DIRECTORIES)
+  GET_TARGET_PROPERTY(_openexr_include_dir OpenEXR::OpenEXR INTERFACE_INCLUDE_DIRECTORIES)
   #SET(_openexr_libraries "")
   #LIST(APPEND _openexr_libraries ${_openexr_library})
   #LIST(APPEND _openexr_libraries ${_ilmthread_library})
@@ -121,7 +120,7 @@ IF(NOT RV_USE_OCIO_OPENEXR)
   LIST(APPEND _configure_options "-DOpenEXR_VERSION=${RV_DEPS_OPENEXR_VERSION}")
   LIST(APPEND _configure_options "-DOpenEXR_LIBRARY=${_openexr_library}")
   LIST(APPEND _configure_options "-DOpenEXR_INCLUDE_DIR=${_openexr_include_dir}")
-  #LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
+  LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 ENDIF()
 
 GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
@@ -130,22 +129,20 @@ LIST(APPEND _configure_options "-DImath_LIBRARY=${_imath_library}")
 LIST(APPEND _configure_options "-DImath_INCLUDE_DIR=${_imath_include_dir}/..")
 LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
 
-MESSAGE(WARNING "OCIO: We would like to compile against own OIIO, but OIIO uses OCIO's own OpenEXR")
-IF(FALSE)
-  GET_TARGET_PROPERTY(_oiio_library oiio::oiio IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_oiio_include_dir oiio::oiio INTERFACE_INCLUDE_DIRECTORIES)
-  SET(_depends_oiio "oiio::oiio")
+# OIIO target variables aren't defined yet as OCIO is included before OIIO
+# Moreover, normally giving OCIO the OIIO lib won't work since we build OCIO before OIIO.
+# OCIO is set to build missing dependencies so OCIO will use it's own OIIO lib.
+SET(_oiio_install_dir ${RV_DEPS_BASE_DIR}/RV_DEPS_OIIO/install)
+IF(RV_TARGET_DARWIN)
+  SET(_oiio_library "${_oiio_install_dir}/lib/libOpenImageIO.2.4.6.dylib")
+ELSEIF(RV_TARGET_LINUX)
+  SET(_oiio_library "${_oiio_install_dir}/lib64/libOpenImageIO.2.4.6.so")
 ELSE()
-  # The 'RV_DEPS_OIIO_ROOT_DIR' doesn't exist yet
-  SET(_oiio_base_dir ${RV_DEPS_BASE_DIR}/RV_DEPS_OIIO)
-  SET(_oiio_install_dir ${_oiio_base_dir}/install)
-  # TODO: _oiio_library: What to do for Windows and Linux?
-  IF(RV_TARGET_DARWIN)
-    SET(_oiio_library "${_oiio_install_dir}/lib/libOpenImageIO.2.4.6.dylib")
-  ENDIF()
-  SET(_oiio_include_dir "${_oiio_install_dir}/include")
-  SET(_depends_oiio "")
+  SET(_oiio_library "${_oiio_install_dir}/lib/libOpenImageIO.2.4.6.dll")
 ENDIF()
+SET(_oiio_include_dir "${_oiio_install_dir}/include")
+SET(_depends_oiio "")
+
 MESSAGE(DEBUG "OCIO: _oiio_library='${_oiio_library}'")
 MESSAGE(DEBUG "OCIO: _oiio_include_dir='${_oiio_include_dir}'")
 LIST(APPEND _configure_options "-DOPENIMAGEIO_LIBRARY=${_oiio_library}")
@@ -155,9 +152,10 @@ LIST(APPEND _configure_options "-DOPENIMAGEIO_ROOT_DIR=${_oiio_install_dir}")
 
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
+# OCIO CMake Module FindOpenEXR.cmake file has issues with set_target_properties hence we set
+# APPS OFF. If you need Apps for a Test: hardcode _OpenEXR_TARGET_CREATE to FALSE in FindOpenEXR.cmake in OCIO
 LIST(APPEND _configure_options "-DOCIO_BUILD_APPS=OFF")
 
-MESSAGE(WARNING "TODO: ${_target}: figure out how to run tests???")
 
 IF(NOT RV_TARGET_WINDOWS)
   EXTERNALPROJECT_ADD(
@@ -209,7 +207,6 @@ ELSE()
     "-B ${_build_dir}"
   )
 
-  # TODO_IBR: Both Build & Install & possibly Configure do not Honor CMAKE_BUILD_TYPE
   LIST(APPEND _ocio_build_options
     "--build"
     "${_build_dir}"
