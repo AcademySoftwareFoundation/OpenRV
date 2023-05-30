@@ -32,6 +32,29 @@ FUNCTION(before_copy_platform FILE_PATH RET_VAL)
   RETURN()
 ENDFUNCTION()
 
-FUNCTION(after_copy_platform FILE_PATH)
+SET(STRIP_IGNORE_LIST
+  "csv"
+  "gzip"
+  "json"
+  "octet-stream"
+  "pdf"
+  "x-bytecode.python"
+  "x-bzip2"
+  "x-dosexec"
+  "x-tar"
+  "zip"
+)
 
+FUNCTION(after_copy_platform FILE_PATH)
+  IF(CMAKE_INSTALL_CONFIG_NAME MATCHES "^Release$")
+    EXECUTE_PROCESS(COMMAND file --mime-type ${FILE_PATH} OUTPUT_VARIABLE FILE_CMD_OUT)
+    IF(${FILE_CMD_OUT} MATCHES ": application\/(.+)\n")
+      IF(NOT "${CMAKE_MATCH_1}" IN_LIST STRIP_IGNORE_LIST)
+        EXECUTE_PROCESS(COMMAND strip -S ${FILE_PATH} RESULT_VARIABLE STRIP_EXIT_CODE)
+        IF(NOT STRIP_EXIT_CODE EQUAL 0)
+           MESSAGE(FATAL_ERROR "Unable to strip ${FILE_PATH} with mime type application/${CMAKE_MATCH_1}. Consider adding it to the ignore list.")
+        ENDIF()
+      ENDIF()
+    ENDIF()
+  ENDIF()
 ENDFUNCTION()
