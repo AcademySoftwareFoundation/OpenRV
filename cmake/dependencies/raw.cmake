@@ -24,37 +24,80 @@ SET(_download_hash
     "2942732de752f46baccd9c6d57823b7b"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("raw" "23" "SHARED" "")
+SET(_libraw_lib_version "23")
+IF(NOT RV_TARGET_WINDOWS)
+  RV_MAKE_STANDARD_LIB_NAME("raw" "${_libraw_lib_version}" "SHARED" "")
+ELSE()
+  RV_MAKE_STANDARD_LIB_NAME("libraw" "${_libraw_lib_version}" "SHARED" "")
+ENDIF()
 
-# The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-SET(_configure_options "")  # Overrides defaults set in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-LIST(APPEND _configure_options "--prefix=${_install_dir}")
-LIST(APPEND _configure_options "--enable-lcms")
+IF(RV_TARGET_WINDOWS) 
+  EXTERNALPROJECT_ADD(
+    ${_target}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
+    DOWNLOAD_NAME ${_target}_${_version}.tar.gz
+    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_DIR ${_base_dir}/src
+    INSTALL_DIR ${_install_dir}
+    DEPENDS ZLIB::ZLIB
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND nmake /f Makefile.msvc
+    INSTALL_COMMAND ""
+    BUILD_IN_SOURCE TRUE
+    BUILD_ALWAYS FALSE
+    BUILD_BYPRODUCTS ${_byproducts}
+    USES_TERMINAL_BUILD TRUE
+  )
 
-GET_TARGET_PROPERTY(_lcms_include_dir lcms INTERFACE_INCLUDE_DIRECTORIES)
-SET(_lcms2_flags "-I${_lcms_include_dir}") 
-SET(_lcms2_libs "-L${RV_STAGE_LIB_DIR} -llcms") 
 
-EXTERNALPROJECT_ADD(
-  ${_target}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${_source_dir}
-  BINARY_DIR ${_build_dir}
-  INSTALL_DIR ${_install_dir}
-  DEPENDS ZLIB::ZLIB lcms
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' 
-  ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
-  ${_configure_command} ${_configure_options} BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
-  INSTALL_COMMAND ${_make_command} install
-  BUILD_IN_SOURCE FALSE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_byproducts}
-  USES_TERMINAL_BUILD TRUE
-)
+  # Building with nmake for Windows doesn't provide a nice install target, we need to do it manually
+  # We remove some unneeded files after copying the required directories
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Installing ${_target}'s libs & files into ${_install_dir}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/lib ${_lib_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/libraw ${_include_dir}/libraw
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/bin ${_bin_dir}
+    COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/.keep_me
+    COMMAND ${CMAKE_COMMAND} -E rm ${_lib_dir}/Makefile
+  )
+
+ELSE()
+  # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
+  SET(_configure_options "")  # Overrides defaults set in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
+  LIST(APPEND _configure_options "--prefix=${_install_dir}")
+  LIST(APPEND _configure_options "--enable-lcms")
+
+  GET_TARGET_PROPERTY(_lcms_include_dir lcms INTERFACE_INCLUDE_DIRECTORIES)
+  SET(_lcms2_flags "-I${_lcms_include_dir}") 
+  SET(_lcms2_libs "-L${RV_STAGE_LIB_DIR} -llcms") 
+
+  EXTERNALPROJECT_ADD(
+    ${_target}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
+    DOWNLOAD_NAME ${_target}_${_version}.tar.gz
+    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_DIR ${_source_dir}
+    BINARY_DIR ${_build_dir}
+    INSTALL_DIR ${_install_dir}
+    DEPENDS ZLIB::ZLIB lcms
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' 
+      ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
+      ${_configure_command} ${_configure_options}
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
+    INSTALL_COMMAND ${_make_command} install
+    BUILD_IN_SOURCE FALSE
+    BUILD_ALWAYS FALSE
+    BUILD_BYPRODUCTS ${_byproducts}
+    USES_TERMINAL_BUILD TRUE
+  )
+ENDIF()
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
 RV_COPY_LIB_BIN_FOLDERS()

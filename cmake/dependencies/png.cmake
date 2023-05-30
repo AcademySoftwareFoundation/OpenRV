@@ -19,8 +19,12 @@ SET(_download_hash
     "a704977d681a40d8223d8b957fd41b29"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("png16" "16.39.0" "SHARED" "d")
-
+SET(_libpng_lib_version "16.39.0")
+IF(NOT RV_TARGET_WINDOWS)
+  RV_MAKE_STANDARD_LIB_NAME("png16" "${_libpng_lib_version}" "SHARED" "d")
+ELSE()
+  RV_MAKE_STANDARD_LIB_NAME("libpng16" "${_libpng_lib_version}" "SHARED" "d")
+ENDIF()
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 #LIST(APPEND _configure_options "-DPNG_ZLIB_VERNUM=0")
 #LIST(APPEND _configure_options "-DPNG_BUILD_ZLIB=${RV_DEPS_ZLIB_ROOT_DIR}")
@@ -54,15 +58,21 @@ ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
 ADD_LIBRARY(PNG::PNG STATIC IMPORTED GLOBAL)
 ADD_DEPENDENCIES(PNG::PNG ${_target})
-SET_PROPERTY(
-  TARGET PNG::PNG
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-SET_PROPERTY(
-  TARGET PNG::PNG
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
+IF(NOT RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET PNG::PNG
+    PROPERTY IMPORTED_LOCATION ${_libpath}
+  )
+  SET_PROPERTY(
+    TARGET PNG::PNG
+    PROPERTY IMPORTED_SONAME ${_libname}
+  )
+ELSE()
+  # PNG lib is a STATIC hence our lib & imp lib is a .lib
+  SET_PROPERTY(
+    TARGET PNG::PNG
+    PROPERTY IMPORTED_LOCATION "${_implibpath}"
+  )
   SET_PROPERTY(
     TARGET PNG::PNG
     PROPERTY IMPORTED_IMPLIB ${_implibpath}
