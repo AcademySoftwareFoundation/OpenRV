@@ -122,10 +122,10 @@ LIST(APPEND _configure_options "-DLibRaw_ROOT=${RV_DEPS_RAW_ROOT_DIR}")
 
 LIST(APPEND _configure_options "-DQt5_ROOT=${RV_DEPS_QT5_LOCATION}")
 
-IF(RV_TARGET_LINUX)
-  MESSAGE(WARNING "TODO: Figure out how to lijnk against RV's copy of WebP.")
-ELSE()
+IF(NOT RV_TARGET_LINUX)
   LIST(APPEND _configure_options "-DWebP_ROOT=${RV_DEPS_WEBP_ROOT_DIR}")
+  # Linux has a Link error related to relocation; WebP appears not built with -fPIC. Hence OIIO will
+  # build WebP itself.
 ENDIF()
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
@@ -252,63 +252,3 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 LIST(APPEND RV_DEPS_LIST oiio::utils)
-
-MESSAGE(WARNING "TODO: Figure out what's missing to run OIIO tests.")
-IF(FALSE)
-
-  # None of the test will currently link on Linux, disable all OIIO tests :-(
-
-  SET(_oiio_test_bin_dir ${_build_dir}/bin)
-
-  MESSAGE(WARNING "TODO: investigate OIIO failing tests")
-
-  # Adding harcoded list in case we want to disable 
-  SET(_oiio_test_names "")
-
-  # Currently failing tests
-  #LIST(APPEND _oiio_test_names color)
-  #LIST(APPEND _oiio_test_names compute)
-  #LIST(APPEND _oiio_test_names filesystem) # seems to depends on installation 
-  #LIST(APPEND _oiio_test_names filter)	
-  #LIST(APPEND _oiio_test_names imagebuf)
-  #LIST(APPEND _oiio_test_names imagebufalgo)
-  #LIST(APPEND _oiio_test_names imagecache)
-  #LIST(APPEND _oiio_test_names imageinout)
-  #LIST(APPEND _oiio_test_names imagespec)
-  #LIST(APPEND _oiio_test_names imagespeed)
-  #LIST(APPEND _oiio_test_names paramlist)
-  #LIST(APPEND _oiio_test_names simd)
-  #LIST(APPEND _oiio_test_names strongparam)
-  #LIST(APPEND _oiio_test_names strutil)
-
-  LIST(APPEND _oiio_test_names argparse)
-  LIST(APPEND _oiio_test_names atomic)
-  LIST(APPEND _oiio_test_names fmath)
-  LIST(APPEND _oiio_test_names hash)
-  LIST(APPEND _oiio_test_names optparser)
-  LIST(APPEND _oiio_test_names parallel)
-  LIST(APPEND _oiio_test_names span)
-  LIST(APPEND _oiio_test_names spin_rw)
-  LIST(APPEND _oiio_test_names spinlock)
-  LIST(APPEND _oiio_test_names thread)
-  LIST(APPEND _oiio_test_names timer)
-  LIST(APPEND _oiio_test_names type_traits)
-  LIST(APPEND _oiio_test_names typedesc)
-  LIST(APPEND _oiio_test_names ustring)
-
-  LIST(SORT _oiio_test_names)
-  IF(RV_TARGET_WINDOWS)
-    SET(_exec_suffix ".exe")
-  ELSE()
-    SET(_exec_suffix "")
-  ENDIF()
-  FOREACH(_test_name ${_oiio_test_names})
-    MESSAGE(STATUS "Adding OpenImageIO '${_test_name}' Test ...")
-    SET(_test_path ${_oiio_test_bin_dir}/${_test_name}_test${_exec_suffix})
-    ADD_EXECUTABLE(oiio-${_test_name} IMPORTED GLOBAL)
-    ADD_DEPENDENCIES(oiio-${_test_name} ${_target})
-    SET_PROPERTY(TARGET oiio-${_test_name} PROPERTY IMPORTED_LOCATION "${_test_path}")
-    ADD_TEST(NAME "oiio-${_test_name}-test" COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=${RV_STAGE_LIB_DIR} ${_test_path})
-    #RV_STAGE(TYPE "EXECUTABLE" TARGET "oiio-${_test_name}")  
-  ENDFOREACH()
-ENDIF()  
