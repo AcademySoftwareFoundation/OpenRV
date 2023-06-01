@@ -65,8 +65,13 @@ ADD_SUBDIRECTORY(../../src/pub/lcms src/pub/lcms) # required by raw
 INCLUDE(raw)   # depends on jpeg, zlib
 INCLUDE(openjpeg) # depends on zlib, tiff, png
 INCLUDE(webp)
+IF(NOT RV_USE_OCIO_OPENEXR)
+  INCLUDE(openexr)
+ENDIF()
 INCLUDE(ocio)
-INCLUDE(openexr)  # depends on ocio
+IF(RV_USE_OCIO_OPENEXR)
+  INCLUDE(openexr)  # depends on ocio
+ENDIF()
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
 INCLUDE(oiio)  # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
 IF(RV_USE_OCIO_YAML_CPP)
