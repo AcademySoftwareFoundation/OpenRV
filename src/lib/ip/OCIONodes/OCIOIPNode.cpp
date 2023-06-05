@@ -72,8 +72,6 @@ OCIOIPNode::OCIOIPNode(const string& name,
     : IPNode(name, def, graph, group),
       m_lutfb(0)
 {
-    pthread_mutex_init(&m_lock, NULL);
-
     Property::Info* info = new Property::Info();
     info->setPersistent(false);
 
@@ -137,9 +135,8 @@ OCIOIPNode::~OCIOIPNode()
         if (!m_lutfb->hasStaticRef() || m_lutfb->staticUnRef()) 
         {
             delete m_lutfb;
-        }        
-    }    
-    pthread_mutex_destroy(&m_lock);
+        }
+    }
 }
 
 void
@@ -220,6 +217,10 @@ shaderLegal(const string& s)
     ns.resize(s.size());
 
     transform(s.begin(), s.end(), ns.begin(), op_shaderLegal);
+
+    // for any double underscore, OCIO will replace it with just one; do the same so our names align. (See: OCIO:GPUShaderDesc::setFunctionName)
+    ns = std::regex_replace(ns, std::regex("_+"), "_");   // one or more underscore: replace by only one.
+    ns = std::regex_replace(ns, std::regex("_+$"), "");   // do not end by an underscore because the code will append another one
 
     return ns;
 }
@@ -388,6 +389,7 @@ OCIOIPNode::evaluate(const Context& context)
             shaderName << "OCIO_d_" << shaderLegal(display) << "_" << shaderLegal(view) << "_" << name() << "_" << hex << hashValue;
         }
 
+        QMutexLocker(&this->m_lock);
         OCIO::ConstGPUProcessorRcPtr legacyGPUProcessor = processor->getOptimizedLegacyGPUProcessor(OCIO::OPTIMIZATION_NONE, lutSize);
         OCIO::GpuShaderDescRcPtr shaderDesc = OCIO::GpuShaderDesc::CreateShaderDesc();
         shaderDesc->setLanguage(GPULanguage);
@@ -406,8 +408,6 @@ OCIOIPNode::evaluate(const Context& context)
                  << endl;
             return nullptr;
         }
-
-        pthread_mutex_lock(&m_lock);
 
         string lut3dCacheID  = legacyGPUProcessor->getCacheID();
         string shaderCacheID = lut3dCacheID;
@@ -488,8 +488,6 @@ OCIOIPNode::evaluate(const Context& context)
                         "OCIONode:     new Shader '" << shaderName.str() << "':" << endl << glsl << endl;
             }
         }
-
-        pthread_mutex_unlock(&m_lock);
 
         const Shader::Function* F = m_state->function;
         Shader::ArgumentVector args(F->parameters().size());

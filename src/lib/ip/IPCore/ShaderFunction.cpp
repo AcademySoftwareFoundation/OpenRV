@@ -302,7 +302,7 @@ Function::releaseCompiledState() const
     {
         if (m_state->shader) glDeleteShader(m_state->shader);
         delete m_state;
-        m_state = 0;
+        m_state = nullptr;
     }
 }
 
@@ -1532,7 +1532,8 @@ Function::generateTestGLSL(bool gl2) const
 void
 Function::deleteRetired()
 {
-    for (FunctionVector::iterator i = m_retiredFunctions.begin(); i != m_retiredFunctions.end(); ++i)
+    auto last = std::unique(m_retiredFunctions.begin(), m_retiredFunctions.end());  // assumption an object cannot be added more than once non-consecutively (lifetime of objects)
+    for (FunctionVector::iterator i = m_retiredFunctions.begin(); i != last; ++i)
     {
         delete *i;
     }
