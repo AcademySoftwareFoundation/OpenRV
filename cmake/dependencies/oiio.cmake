@@ -26,17 +26,11 @@ LIST(APPEND _byproducts ${_byprojects_copy})
 LIST(APPEND _configure_options "-DBUILD_THIRDPARTY=1")
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0")  # this on would requireextra pybind11 package
-#LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_INSTALL_DIR}")
 LIST(APPEND _configure_options "-DUSE_OCIO=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
-#GET_TARGET_PROPERTY(_boost_include_dir Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DBoost_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
-#LIST(APPEND _configure_options "-DBOOST_INCLUDE_DIR=${_boost_include_dir}")
-
 LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
-#LIST(APPEND _configure_options "-DOPENEXR_LIBRARY=${_openexr_library}")
-#LIST(APPEND _configure_options "-DOPENEXR_INCLUDE_DIR=${_openexr_include_dir}")
 
 IF(NOT RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
