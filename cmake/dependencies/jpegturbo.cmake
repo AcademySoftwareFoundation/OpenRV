@@ -55,22 +55,6 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _byproducts ${_implibturbojpegpath})
 ENDIF()
 
-# The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-#GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_LOCATION)
-#GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
-#LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_zlib_library}")
-#LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}")
-
-#GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
-#GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
-#LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-#LIST(APPEND _configure_options "-DPNG_INCLUDE_DIR=${_png_include_dir}")
-
-#GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
-#GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
-#LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
-#LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
-
 EXTERNALPROJECT_ADD( ${_target}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
