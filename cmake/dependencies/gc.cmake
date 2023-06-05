@@ -83,6 +83,20 @@ ELSEIF(RV_TARGET_LINUX)
   SET(_cord_lib
       ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}cord${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
+  IF(RV_TARGET_IS_RHEL9)
+    SET(_gc_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}gc${CMAKE_SHARED_LIBRARY_SUFFIX}.1
+    )
+    SET(_cord_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}cord${CMAKE_SHARED_LIBRARY_SUFFIX}.1
+    )
+    SET(_gc_lib
+        ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}gc${CMAKE_SHARED_LIBRARY_SUFFIX}.1
+    )
+    SET(_cord_lib
+        ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}cord${CMAKE_SHARED_LIBRARY_SUFFIX}.1
+    )
+  ENDIF()
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_gc_lib_name
       gc-lib.lib
