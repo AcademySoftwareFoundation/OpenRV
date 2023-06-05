@@ -3469,7 +3469,7 @@ IPGraph::evalAudioThreadMain()
             << ", m_audioThreadStop=" << m_audioThreadStop;
     }
 
-    while (!m_audioThreadStop && secondsBuffered <= audioMaxCache)
+    while (!m_audioThreadStop && secondsBuffered < audioMaxCache)
     {
         m_audioCache.lock();
         const bool   exists     = m_audioCache.exists(m_currentAudioSample);
