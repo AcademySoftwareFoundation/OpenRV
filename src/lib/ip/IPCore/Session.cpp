@@ -70,6 +70,11 @@
 // Flush the audio cache when stopping the playback when ON (default=OFF)
 static ENVVAR_BOOL( evFlushAudioCacheWhenStoppingPlayback, "RV_FLUSH_AUDIO_CACHE_WHEN_STOPPING_PLAYBACK", false );
 
+// Disable automatic garbage collection during playback to make sure the
+// playback doesn't get interrupted which could cause skipped frames.
+// The garbage collection will resume as soon as the playback is stopped.
+static ENVVAR_BOOL( evDisableGarbageCollectionDuringPlayback, "RV_DISABLE_GARBAGE_COLLECTION_DURING_PLAYBACK", true );
+
 template <typename T>
 inline T mod( const T &a, const T &by )
 {
@@ -1880,9 +1885,12 @@ Session::play_v2(string &eventData)
     userGenericEvent("before-play-start", eventData);
     m_beforePlayStartSignal(eventData);
 
-    // Disable automatic garbage collection during playback to make sure it
-    // doesn't get interrupted.
-    Mu::GarbageCollector::disable();
+    // Disable automatic garbage collection during playback to make sure the
+    // playback doesn't get interrupted which could cause skipped frames.
+    if (evDisableGarbageCollectionDuringPlayback.getValue())
+    {
+        Mu::GarbageCollector::disable();
+    }
 
     m_syncLastTime = 0.0;
     m_timer.start();
@@ -1967,9 +1975,12 @@ Session::play_v1(string &eventData)
     userGenericEvent("before-play-start", eventData);
     m_beforePlayStartSignal(eventData);
 
-    // Disable automatic garbage collection during playback to make sure it
-    // doesn't get interrupted.
-    Mu::GarbageCollector::disable();
+    // Disable automatic garbage collection during playback to make sure the
+    // playback doesn't get interrupted which could cause skipped frames.
+    if (evDisableGarbageCollectionDuringPlayback.getValue())
+    {
+        Mu::GarbageCollector::disable();
+    }
 
     m_syncLastTime = 0.0;
     m_timer.start();
@@ -2093,7 +2104,10 @@ Session::stop(string eventData)
     m_playStopSignal(eventData);
 
     // Re-enable automatic garbage collection after playback.
-    Mu::GarbageCollector::enable();
+    if (evDisableGarbageCollectionDuringPlayback.getValue())
+    {
+        Mu::GarbageCollector::enable();
+    }
 
     if (debugPlayback)
     {
