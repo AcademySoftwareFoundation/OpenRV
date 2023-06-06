@@ -752,7 +752,7 @@ Similar to addSource(), but returns the name of the source node created.
 addSourcesVerbose """
 Similar to addSources(), but returns the names of the source nodes created.
 Note that unlike addSources(), addSource(), and addSourceVerbose() which all
-take a sring[] as input parameter, addSourcesVerbose() takes a string[][].
+take a string[] as input parameter, addSourcesVerbose() takes a string[][].
 
 Examples using addSourcesVerbose():
 rv.commands.addSourcesVerbose([["clip1"], ["clip2"]])

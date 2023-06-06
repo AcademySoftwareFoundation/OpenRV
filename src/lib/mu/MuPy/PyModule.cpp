@@ -529,8 +529,9 @@ namespace Mu
       if( PyUnicode_Check( pobj ) )
       {
         PyObject* utf8 = PyUnicode_AsUTF8String( pobj );
-        return Value(
-            Pointer( c->stringType()->allocate( PyBytes_AsString( utf8 ) ) ) );
+        Value ret( Pointer( c->stringType()->allocate( PyBytes_AsString( utf8 ) ) ) );
+        Py_XDECREF( utf8 );
+        return ret;
       }
       else if( PyBytes_Check( pobj ) )
       {
