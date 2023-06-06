@@ -98,6 +98,17 @@ ELSEIF(UNIX)
     -DPLATFORM_OPENGL=1
   )
 
+  EXECUTE_PROCESS(COMMAND cat /etc/redhat-release OUTPUT_VARIABLE RHEL_VERBOSE ERROR_QUIET)
+
+  IF(RHEL_VERBOSE) 
+    MESSAGE(STATUS "Redhat Entreprise Linux version: ${RHEL_VERBOSE}")
+    string(REGEX MATCH "([0-9]+)" RHEL_VERSION_MAJOR "${RHEL_VERBOSE}")
+    SET(RV_TARGET_IS_RHEL${RHEL_VERSION_MAJOR}
+	BOOL TRUE "Detected a Redhat Entreprise Linux OS"
+    )
+  ELSE()
+    MESSAGE(FATAL_ERROR "Unknown or unsupported Linux distribution version; stopping configuration!")
+  ENDIF()
 ELSEIF(WIN32)
   MESSAGE(STATUS "Building RV for Microsoft Windows")
   SET(RV_TARGET_WINDOWS

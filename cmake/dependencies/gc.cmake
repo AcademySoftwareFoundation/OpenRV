@@ -69,32 +69,43 @@ SET(_cord_lib_name
     ${CMAKE_SHARED_LIBRARY_PREFIX}cord.1${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
 
-IF(RV_TARGET_DARWIN)
-  SET(_gc_lib
-      ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}gc.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+IF(RV_TARGET_LINUX)
+  IF(RV_TARGET_IS_RHEL9
+     OR RV_TARGET_IS_RHEL8
   )
-  SET(_cord_lib
-      ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}cord.1${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ELSEIF(RV_TARGET_LINUX)
-  SET(_gc_lib
-      ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}gc${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-  SET(_cord_lib
-      ${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}cord${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ELSEIF(RV_TARGET_WINDOWS)
+    SET(_gc_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}gc${CMAKE_SHARED_LIBRARY_SUFFIX}.1
+    )
+    SET(_cord_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}cord${CMAKE_SHARED_LIBRARY_SUFFIX}.1
+    )
+  ELSE() # Not RHEL
+    SET(_gc_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}gc${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_cord_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}cord${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+  ENDIF()
+ENDIF()
+
+IF(RV_TARGET_WINDOWS)
   SET(_gc_lib_name
       gc-lib.lib
   )
-  SET(_gc_lib
-      ${_lib_dir}/${_gc_lib_name}
-  )
 ENDIF()
+
+SET(_gc_lib
+    ${_lib_dir}/${_gc_lib_name}
+)
 
 LIST(APPEND _gc_byproducts ${_gc_lib})
 LIST(APPEND _gc_stage_outputs ${RV_STAGE_LIB_DIR}/${_gc_lib_name})
 IF(NOT RV_TARGET_WINDOWS)
+  SET(_cord_lib
+      ${_lib_dir}/${_cord_lib_name}
+  )
+
   LIST(APPEND _gc_byproducts ${_cord_lib})
   LIST(APPEND _gc_stage_outputs ${RV_STAGE_LIB_DIR}/${_cord_lib_name})
 ENDIF()
