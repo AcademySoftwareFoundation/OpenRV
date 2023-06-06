@@ -41,6 +41,7 @@ SET(STRIP_IGNORE_LIST
   "x-bytecode.python"
   "x-bzip2"
   "x-dosexec"
+  "x-font-ttf"
   "x-tar"
   "zip"
 )
@@ -52,7 +53,7 @@ FUNCTION(after_copy_platform FILE_PATH)
       IF(NOT "${CMAKE_MATCH_1}" IN_LIST STRIP_IGNORE_LIST)
         EXECUTE_PROCESS(COMMAND strip -S ${FILE_PATH} RESULT_VARIABLE STRIP_EXIT_CODE)
         IF(NOT STRIP_EXIT_CODE EQUAL 0)
-           MESSAGE(FATAL_ERROR "Unable to strip ${FILE_PATH} with mime type application/${CMAKE_MATCH_1}. Consider adding it to the ignore list.")
+           MESSAGE(WARNING "Unable to strip ${FILE_PATH} with mime type application/${CMAKE_MATCH_1}. Consider adding it to the ignore list.")
         ENDIF()
       ENDIF()
     ENDIF()
