@@ -4619,6 +4619,9 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
     //
 
     track->audioFrame->nb_samples = nsamps;
+    track->audioFrame->format = audioFormat;
+    track->audioFrame->channels = audioCodecContext->channels;
+    track->audioFrame->channel_layout = audioCodecContext->channel_layout;
     avcodec_fill_audio_frame(track->audioFrame, audioChannels,
         audioFormat, (uint8_t*)m_audioSamples, totalOutputSize, 0);
     int gotAudio = 0;
