@@ -4,6 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# Empty those lists at the begining of a configure stage
+SET(RV_PACKAGE_LIST
+    ""
+    CACHE INTERNAL ""
+)
+SET(INSTALLED_RV_PACKAGE_LIST
+    ""
+    CACHE INTERNAL ""
+)
+
 #
 # Create & populate a list of all the shared libraries for later testing.
 MACRO(ADD_SHARED_LIBRARY_LIST new_entry)
@@ -401,6 +411,8 @@ FUNCTION(rv_stage)
     IF(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
       MESSAGE(FATAL_ERROR "Couldn't find expected package descriptor file: '${_package_file}'")
     ENDIF()
+
+    SET_DIRECTORY_PROPERTIES(PROPERTIES CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
 
     EXECUTE_PROCESS(
       COMMAND bash -c "cat ${_package_file} | grep version: | grep --only-matching -e '[0-9.]*'"
