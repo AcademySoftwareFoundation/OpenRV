@@ -304,3 +304,8 @@ SET(RV_DEPS_PYSIDE2_VERSION
     ${_pyside2_version}
     CACHE INTERNAL "" FORCE
 )
+
+SET(RV_DEPS_PYTHON3_EXECUTABLE
+    ${_python3_executable}
+    CACHE INTERNAL "" FORCE
+)
