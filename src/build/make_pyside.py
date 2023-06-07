@@ -151,6 +151,9 @@ def prepare() -> None:
     old_cmakelist_path = os.path.join(
         SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt.old"
     )
+    if os.path.exists(old_cmakelist_path):
+        os.remove(old_cmakelist_path)
+
     os.rename(cmakelist_path, old_cmakelist_path)
     with open(old_cmakelist_path) as old_cmakelist:
         with open(cmakelist_path, "w") as cmakelist:
