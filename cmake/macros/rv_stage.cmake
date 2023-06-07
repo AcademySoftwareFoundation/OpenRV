@@ -400,11 +400,16 @@ FUNCTION(rv_stage)
     SET(_package_file
         PACKAGE
     )
-    FILE(
-      GLOB _files
-      RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-      *
-    )
+
+    IF(NOT arg_FILES)
+      FILE(
+              GLOB _files
+              RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+              *
+      )
+    else()
+      SET(_files ${arg_FILES})
+    ENDIF()
 
     LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
 
@@ -451,7 +456,7 @@ FUNCTION(rv_stage)
       COMMENT "Creating ${_package_filename} ..."
       OUTPUT ${_package_filename}
       DEPENDS ${_files} ${_package_file}
-      COMMAND zip -v -J ${_package_filename} ${_files} ${_package_file}
+      COMMAND zip -v -j ${_package_filename} ${_files} ${_package_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
