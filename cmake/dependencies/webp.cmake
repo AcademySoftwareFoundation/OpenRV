@@ -1,15 +1,22 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# WebP official Web page  -- https://www.webmproject.org
-# WebP official sources   -- https://chromium.googlesource.com/webm/libwebp
-# WebP build from sources -- https://github.com/webmproject/libwebp/blob/main/doc/building.md
+# SPDX-License-Identifier: Apache-2.0
 #
+
+#
+# WebP official Web page:  -- https://www.webmproject.org
+#
+# WebP official sources:   -- https://chromium.googlesource.com/webm/libwebp
+#
+# WebP build from sources: -- https://github.com/webmproject/libwebp/blob/main/doc/building.md
+#
+
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 # OpenImageIO was tested up to 1.2.1
-RV_CREATE_STANDARD_DEPS_VARIABLES( "RV_DEPS_WEBP"  "1.2.1" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "1.2.1" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
@@ -97,8 +104,7 @@ IF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-# It is required to force directory creation at configure time
-# otherwise CMake complains about importing a non-existing path
+# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 FILE(MAKE_DIRECTORY "${_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(
   Webp::Webp

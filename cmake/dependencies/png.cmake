@@ -1,14 +1,19 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#
 # Official source repository https://libpng.sourceforge.io/
+#
 # Some clone on GitHub https://github.com/glennrp/libpng
 #
 
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES( "RV_DEPS_PNG" "1.6.39" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "1.6.39" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
@@ -19,7 +24,9 @@ SET(_download_hash
     "a704977d681a40d8223d8b957fd41b29"
 )
 
-SET(_libpng_lib_version "16.39.0")
+SET(_libpng_lib_version
+    "16.39.0"
+)
 IF(NOT RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("png16" "${_libpng_lib_version}" "SHARED" "d")
 ELSE()
@@ -76,8 +83,7 @@ ELSE()
   )
 ENDIF()
 
-# It is required to force directory creation at configure time
-# otherwise CMake complains about importing a non-existing path
+# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 FILE(MAKE_DIRECTORY "${_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(
   PNG::PNG

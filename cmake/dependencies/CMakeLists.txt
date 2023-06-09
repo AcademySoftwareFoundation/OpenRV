@@ -65,13 +65,8 @@ ADD_SUBDIRECTORY(../../src/pub/lcms src/pub/lcms) # required by raw
 INCLUDE(raw)   # depends on jpeg, zlib
 INCLUDE(openjpeg) # depends on zlib, tiff, png
 INCLUDE(webp)
-IF(NOT RV_USE_OCIO_OPENEXR)
-  INCLUDE(openexr)
-ENDIF()
+INCLUDE(openexr)
 INCLUDE(ocio)
-IF(RV_USE_OCIO_OPENEXR)
-  INCLUDE(openexr)  # depends on ocio
-ENDIF()
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
 INCLUDE(oiio)  # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
 IF(RV_USE_OCIO_YAML_CPP)
@@ -99,11 +94,7 @@ IF(RV_TARGET_DARWIN
 ENDIF()
 MESSAGE(STATUS "Using Imath:        ${RV_DEPS_IMATH_VERSION}")
 MESSAGE(STATUS "Using JpegTurbo:    ${RV_DEPS_JPEGTURBO_VERSION}")
-IF(RV_USE_OCIO_OPENEXR)
-  MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION} (Using OCIO's own copy)")
-ELSE()
-  MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION} (Using RV's own copy)")
-ENDIF()
+MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION}")
 MESSAGE(STATUS "Using OpenColorIO   ${RV_DEPS_OCIO_VERSION}")
 MESSAGE(STATUS "Using OpenImageIO   ${RV_DEPS_OIIO_VERSION}")
 MESSAGE(STATUS "Using OpenJpeg:     ${RV_DEPS_OPENJPEG_VERSION}")

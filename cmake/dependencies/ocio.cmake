@@ -1,16 +1,20 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # Build instructions:
 #   https://opencolorio.readthedocs.io/en/latest/quick_start/installation.html#building-from-source
 #
+
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 RV_CREATE_STANDARD_DEPS_VARIABLES( "RV_DEPS_OCIO" "2.2.1" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-# The folder OCIO is building it's own dependencies
+# The folder OCIO is building its own dependencies
 SET(RV_DEPS_OCIO_DIST_DIR ${_build_dir}/ext/dist)
 
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
@@ -43,9 +47,6 @@ SET(_iex_name "Iex-3_1")
 SET(_ilmthread_name "IlmThread-3_1")
 SET(_openexrcore_name "OpenEXR-3_1")
 SET(_lib_type STATIC)
-IF(RV_USE_OCIO_OPENEXR)
-  SET(RV_DEPS_OPENEXR_ROOT_DIR ${RV_DEPS_OCIO_DIST_DIR})
-ENDIF()
 IF(RV_TARGET_WINDOWS)
   SET(_ociolib_dir "${RV_DEPS_OCIO_DIST_DIR}/lib")
   SET(_iex_implib "${_ociolib_dir}/${CMAKE_${_lib_type}_LIBRARY_PREFIX}${_ilmthread_name}${RV_DEBUG_POSTFIX}.lib")
@@ -106,22 +107,14 @@ ELSE()
 ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
-IF(NOT RV_USE_OCIO_OPENEXR)
-  GET_TARGET_PROPERTY(_openexr_library OpenEXR::OpenEXR IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ilmthread_library OpenEXR::IlmThread IMPORTED_LOCATION)
-  #GET_TARGET_PROPERTY(_iex_library OpenEXR::Iex IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_openexr_include_dir OpenEXR::OpenEXR INTERFACE_INCLUDE_DIRECTORIES)
-  #SET(_openexr_libraries "")
-  #LIST(APPEND _openexr_libraries ${_openexr_library})
-  #LIST(APPEND _openexr_libraries ${_ilmthread_library})
-  #LIST(APPEND _openexr_libraries ${_iex_library})
-  #MESSAGE(DEBUG "_openexr_libraries='${_openexr_library}'")
-  #MESSAGE(DEBUG "_openexr_include_dir='${_openexr_include_dir}'")
-  LIST(APPEND _configure_options "-DOpenEXR_VERSION=${RV_DEPS_OPENEXR_VERSION}")
-  LIST(APPEND _configure_options "-DOpenEXR_LIBRARY=${_openexr_library}")
-  LIST(APPEND _configure_options "-DOpenEXR_INCLUDE_DIR=${_openexr_include_dir}")
-  LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
-ENDIF()
+GET_TARGET_PROPERTY(_openexr_library OpenEXR::OpenEXR IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_ilmthread_library OpenEXR::IlmThread IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_openexr_include_dir OpenEXR::OpenEXR INTERFACE_INCLUDE_DIRECTORIES)
+
+LIST(APPEND _configure_options "-DOpenEXR_VERSION=${RV_DEPS_OPENEXR_VERSION}")
+LIST(APPEND _configure_options "-DOpenEXR_LIBRARY=${_openexr_library}")
+LIST(APPEND _configure_options "-DOpenEXR_INCLUDE_DIR=${_openexr_include_dir}")
+LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 
 GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
@@ -184,12 +177,12 @@ ELSE()
   # Some options are not multi-platform so we start clean.
   SET(_configure_options "")
   LIST(APPEND _configure_options
-    "-G ${CMAKE_GENERATOR}"                   # Ninja doesn't build due to Minizip include bad style, VS uses search paths even for dbl-quotes includes.
+    "-G ${CMAKE_GENERATOR}"                   # Not using Ninja: Ninja doesn't build due to Minizip wrong include style, VS uses search paths even for double-quotes includes.
     "-DCMAKE_INSTALL_PREFIX=${_install_dir}"
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    "-DGLEW_ROOT=${_vcpkg_path}/packages/glew_x64-windows"   # Still unknown if GLEW_ROOT, GLUT_ROOT and Oiio_ROOT is needed but at least: *they are used by OCIO in CMake*
+    "-DGLEW_ROOT=${_vcpkg_path}/packages/glew_x64-windows"   # Unknown if GLEW_ROOT, GLUT_ROOT and Oiio_ROOT is needed but at least: *they are used by OCIO in CMake*
     "-DGLUT_ROOT=${_vcpkg_path}/packages/freeglut_x64-windows"   # However, not passing them doesn't seem to cause the build to fail.
-    "-DOpenImageIO_ROOT=${_oiio_install_dir}"         # And the Dev (cfuoco) said that we need to pass them.
+    "-DOpenImageIO_ROOT=${_oiio_install_dir}"         # And the Dev (cfuoco) said that we need to pass them; they are most likely needed for OCIO APPS
     "-DOCIO_BUILD_PYTHON=ON"
     "-DOCIO_INSTALL_EXT_PACKAGES=ALL"
     "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}"

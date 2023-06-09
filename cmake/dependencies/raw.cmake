@@ -1,18 +1,24 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# LibRaw official Web page  -- https://www.libraw.org/about
-# LibRaw official sources   -- https://www.libraw.org/data/LibRaw-0.21.1.tar.gz
-# LibRaw build from sources -- https://www.libraw.org/docs/Install-LibRaw-eng.html
+# SPDX-License-Identifier: Apache-2.0
 #
+
+#
+# LibRaw official Web page: https://www.libraw.org/about
+# LibRaw official sources:  https://www.libraw.org/data/LibRaw-0.21.1.tar.gz
+# LibRaw build from sources: https://www.libraw.org/docs/Install-LibRaw-eng.html
+#
+
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES( "RV_DEPS_RAW" "0.21.1" "make" "../src/configure")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_RAW" "0.21.1" "make" "../src/configure")
 IF(RV_TARGET_LINUX)
-  # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' 
-  # for some reason, this CMake-based project isn't using lib64
-  SET(_lib_dir ${_install_dir}/lib)
+  # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
+  SET(_lib_dir
+      ${_install_dir}/lib
+  )
 ENDIF()
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -24,14 +30,16 @@ SET(_download_hash
     "2942732de752f46baccd9c6d57823b7b"
 )
 
-SET(_libraw_lib_version "23")
+SET(_libraw_lib_version
+    "23"
+)
 IF(NOT RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("raw" "${_libraw_lib_version}" "SHARED" "")
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME("libraw" "${_libraw_lib_version}" "SHARED" "")
 ENDIF()
 
-IF(RV_TARGET_WINDOWS) 
+IF(RV_TARGET_WINDOWS)
   EXTERNALPROJECT_ADD(
     ${_target}
     URL ${_download_url}
@@ -51,16 +59,14 @@ IF(RV_TARGET_WINDOWS)
     USES_TERMINAL_BUILD TRUE
   )
 
-
-  # Building with nmake for Windows doesn't provide a nice install target, we need to do it manually
-  # We remove some unneeded files after copying the required directories
+  # Building with nmake for Windows doesn't provide a nice install target, we need to do it manually. We remove unneeded files after copying the required
+  # directories
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
     COMMENT "Installing ${_target}'s libs & files into ${_install_dir}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/lib ${_lib_dir}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/libraw ${_include_dir}/libraw
-
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/bin ${_bin_dir}
     COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/.keep_me
     COMMAND ${CMAKE_COMMAND} -E rm ${_lib_dir}/Makefile
@@ -68,13 +74,19 @@ IF(RV_TARGET_WINDOWS)
 
 ELSE()
   # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-  SET(_configure_options "")  # Overrides defaults set in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
+  SET(_configure_options
+      ""
+  ) # Overrides defaults set in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
   LIST(APPEND _configure_options "--prefix=${_install_dir}")
   LIST(APPEND _configure_options "--enable-lcms")
 
   GET_TARGET_PROPERTY(_lcms_include_dir lcms INTERFACE_INCLUDE_DIRECTORIES)
-  SET(_lcms2_flags "-I${_lcms_include_dir}") 
-  SET(_lcms2_libs "-L${RV_STAGE_LIB_DIR} -llcms") 
+  SET(_lcms2_flags
+      "-I${_lcms_include_dir}"
+  )
+  SET(_lcms2_libs
+      "-L${RV_STAGE_LIB_DIR} -llcms"
+  )
 
   EXTERNALPROJECT_ADD(
     ${_target}
@@ -87,9 +99,8 @@ ELSE()
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ZLIB::ZLIB lcms
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' 
-      ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
-      ${_configure_command} ${_configure_options}
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command}
+                      ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE FALSE
@@ -121,8 +132,7 @@ IF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-# It is required to force directory creation at configure time
-# otherwise CMake complains about importing a non-existing path
+# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 FILE(MAKE_DIRECTORY "${_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(
   Raw::Raw
@@ -130,4 +140,3 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 LIST(APPEND RV_DEPS_LIST Raw::Raw)
-

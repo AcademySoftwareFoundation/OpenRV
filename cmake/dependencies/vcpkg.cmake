@@ -1,19 +1,27 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Official source repository https://github.com/microsoft/vcpkg
-# Getting start with VCPkg https://vcpkg.io/en/getting-started.html
-# VCPkg Manifest Mode with CMake: https://learn.microsoft.com/en-us/vcpkg/examples/manifest-mode-cmake
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#
+# Official source repository: https://github.com/microsoft/vcpkg
+#
+# Vcpkg getting started page: https://vcpkg.io/en/getting-started.html
+#
+# Vcpkg manifest mode with cmake: https://learn.microsoft.com/en-us/vcpkg/examples/manifest-mode-cmake
 #
 
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 IF(RV_TARGET_WINDOWS)
-  RV_CREATE_STANDARD_DEPS_VARIABLES( "RV_DEPS_VCPKG" "2023.04.15" "" "")
+  RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_VCPKG" "2023.04.15" "" "")
   RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-  SET(_byproducts "${_source_dir}/vcpkg.exe")
+  SET(_byproducts
+      "${_source_dir}/vcpkg.exe"
+  )
   EXTERNALPROJECT_ADD(
     ${_target}
     GIT_REPOSITORY https://github.com/Microsoft/vcpkg.git
@@ -38,8 +46,8 @@ IF(RV_TARGET_WINDOWS)
 
   ADD_EXECUTABLE(VCPKG::VCPKG IMPORTED)
   ADD_DEPENDENCIES(VCPKG::VCPKG ${_target})
-  SET_PROPERTY(TARGET VCPKG::VCPKG
-    PROPERTY IMPORTED_LOCATION
-    ${_source_dir}/vcpkg.exe
+  SET_PROPERTY(
+    TARGET VCPKG::VCPKG
+    PROPERTY IMPORTED_LOCATION ${_source_dir}/vcpkg.exe
   )
 ENDIF(RV_TARGET_WINDOWS)

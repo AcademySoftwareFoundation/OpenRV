@@ -1,31 +1,50 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Sources: https://github.com/OpenImageIO/oiio
-# Documentation: https://openimageio.readthedocs.io/en/v2.4.7.1/
-# Build instructions: https://github.com/OpenImageIO/oiio/blob/master/INSTALL.md
+# SPDX-License-Identifier: Apache-2.0
 #
-include(ProcessorCount)  # require CMake 3.15+
-ProcessorCount(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES( "RV_DEPS_OIIO" "2.4.6.0" "make" "")
+#
+# [OIIO -- Sources](https://github.com/OpenImageIO/oiio)
+#
+# [OIIO -- Documentation](https://openimageio.readthedocs.io/en/v2.4.7.1/)
+#
+# [OIIO -- Build instructions](https://github.com/OpenImageIO/oiio/blob/master/INSTALL.md)
+#
+
+INCLUDE(ProcessorCount) # require CMake 3.15+
+PROCESSORCOUNT(_cpu_count)
+
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "2.4.6.0" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-SET(_download_url "https://github.com/OpenImageIO/oiio/archive/refs/tags/v${_version}.tar.gz")
-SET(_download_hash "c7acc1b9a8fda04ef48f7de1feda4dae")
+SET(_download_url
+    "https://github.com/OpenImageIO/oiio/archive/refs/tags/v${_version}.tar.gz"
+)
+SET(_download_hash
+    "c7acc1b9a8fda04ef48f7de1feda4dae"
+)
 
 RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
-SET(_byprojects_copy ${_byproducts})
-SET(_oiio_utils_libname ${_libname})
-SET(_oiio_utils_libpath ${_libpath})
-SET(_oiio_utils_implibpath ${_implibpath})
+SET(_byprojects_copy
+    ${_byproducts}
+)
+SET(_oiio_utils_libname
+    ${_libname}
+)
+SET(_oiio_utils_libpath
+    ${_libpath}
+)
+SET(_oiio_utils_implibpath
+    ${_implibpath}
+)
 RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 LIST(APPEND _configure_options "-DBUILD_THIRDPARTY=1")
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
-LIST(APPEND _configure_options "-DUSE_PYTHON=0")  # this on would requireextra pybind11 package
+LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
 LIST(APPEND _configure_options "-DUSE_OCIO=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
@@ -101,11 +120,15 @@ LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
-  SET(_depends_freetype "")
+  SET(_depends_freetype
+      ""
+  )
 ELSE()
-  SET(_depends_freetype freetype)
+  SET(_depends_freetype
+      freetype
+  )
   GET_TARGET_PROPERTY(_freetype_library freetype IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_freetype_include_dir freetype INTERFACE_INCLUDE_DIRECTORIES)  
+  GET_TARGET_PROPERTY(_freetype_include_dir freetype INTERFACE_INCLUDE_DIRECTORIES)
   LIST(APPEND _configure_options "-DFREETYPE_LIBRARY=${_freetype_library}")
   LIST(APPEND _configure_options "-DFREETYPE_INCLUDE_DIR=${_freetype_include_dir}")
   MESSAGE(DEBUG "OIIO: _freetype_library='${_freetype_library}'")
@@ -118,46 +141,61 @@ LIST(APPEND _configure_options "-DQt5_ROOT=${RV_DEPS_QT5_LOCATION}")
 
 IF(NOT RV_TARGET_LINUX)
   LIST(APPEND _configure_options "-DWebP_ROOT=${RV_DEPS_WEBP_ROOT_DIR}")
-  # Linux has a Link error related to relocation; WebP appears not built with -fPIC. Hence OIIO will
-  # build WebP itself.
+  # Linux has a Link error related to relocation; WebP appears not built with -fPIC. Hence OIIO will build WebP itself.
 ENDIF()
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
 IF(RV_TARGET_LINUX)
   # OIIO's libUtils Tools & Tests USES a different Link Flags which is 'hidden' and isn't set by us.
-  LIST(APPEND _configure_options
-    "-DOIIO_BUILD_TOOLS=OFF"
-    "-DOIIO_BUILD_TESTS=OFF"
-  )
+  LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  LIST(PREPEND _configure_options 
-    "-G ${CMAKE_GENERATOR}"
-  )
+  LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")
 ENDIF()
 
 IF(NOT RV_TARGET_WINDOWS)
-  EXTERNALPROJECT_ADD( ${_target}
-      URL ${_download_url}
-      URL_MD5 ${_download_hash}
+  EXTERNALPROJECT_ADD(
+    ${_target}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
     DOWNLOAD_NAME ${_target}_${_version}.tar.gz
     DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     SOURCE_DIR ${_source_dir}
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
-    DEPENDS ${_depends_freetype} jpeg-turbo::jpeg Tiff::Tiff RV_DEPS_OCIO OpenEXR::OpenEXR RV_DEPS_OPENJPEG jpeg-turbo::turbojpeg PNG::PNG Boost::headers Boost::thread Boost::filesystem Imath::Imath Webp::Webp Raw::Raw ffmpeg::swresample ffmpeg::swscale ffmpeg::avcodec ffmpeg::swresample ZLIB::ZLIB
-      CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-      BUILD_COMMAND ${_make_command} -j${_cpu_count}
-      INSTALL_COMMAND ${_make_command} install
-      BUILD_IN_SOURCE FALSE
-      BUILD_ALWAYS FALSE
-      BUILD_BYPRODUCTS ${_byproducts}
-      USES_TERMINAL_BUILD TRUE
+    DEPENDS ${_depends_freetype}
+            jpeg-turbo::jpeg
+            Tiff::Tiff
+            RV_DEPS_OCIO
+            OpenEXR::OpenEXR
+            RV_DEPS_OPENJPEG
+            jpeg-turbo::turbojpeg
+            PNG::PNG
+            Boost::headers
+            Boost::thread
+            Boost::filesystem
+            Imath::Imath
+            Webp::Webp
+            Raw::Raw
+            ffmpeg::swresample
+            ffmpeg::swscale
+            ffmpeg::avcodec
+            ffmpeg::swresample
+            ZLIB::ZLIB
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
+    INSTALL_COMMAND ${_make_command} install
+    BUILD_IN_SOURCE FALSE
+    BUILD_ALWAYS FALSE
+    BUILD_BYPRODUCTS ${_byproducts}
+    USES_TERMINAL_BUILD TRUE
   )
 ELSE()
-  LIST(APPEND _oiio_build_options
+  LIST(
+    APPEND
+    _oiio_build_options
     "--build"
     "${_build_dir}"
     "--config"
@@ -165,31 +203,52 @@ ELSE()
     "--parallel"
     "${_cpu_count}"
   )
-  LIST(APPEND _oiio_install_options
+  LIST(
+    APPEND
+    _oiio_install_options
     "--install"
     "${_build_dir}"
     "--prefix"
     "${_install_dir}"
     "--config"
-    "${CMAKE_BUILD_TYPE}"   # for --config
+    "${CMAKE_BUILD_TYPE}" # for --config
   )
 
-  EXTERNALPROJECT_ADD( ${_target}
-      URL ${_download_url}
-      URL_MD5 ${_download_hash}
+  EXTERNALPROJECT_ADD(
+    ${_target}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
     DOWNLOAD_NAME ${_target}_${_version}.tar.gz
     DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     SOURCE_DIR ${_source_dir}
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
-      DEPENDS ${_depends_freetype} jpeg-turbo::jpeg Tiff::Tiff RV_DEPS_OCIO OpenEXR::OpenEXR OpenJpeg::OpenJpeg jpeg-turbo::turbojpeg PNG::PNG Boost::headers Boost::thread Boost::filesystem Imath::Imath Webp::Webp Raw::Raw ffmpeg::swresample ffmpeg::swscale ffmpeg::avcodec ffmpeg::swresample ZLIB::ZLIB
-      CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-      BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
-      INSTALL_COMMAND ${CMAKE_COMMAND} ${_oiio_install_options}
-      BUILD_IN_SOURCE FALSE
-      BUILD_BYPRODUCTS ${_byproducts}
-      USES_TERMINAL_BUILD TRUE
+    DEPENDS ${_depends_freetype}
+            jpeg-turbo::jpeg
+            Tiff::Tiff
+            RV_DEPS_OCIO
+            OpenEXR::OpenEXR
+            OpenJpeg::OpenJpeg
+            jpeg-turbo::turbojpeg
+            PNG::PNG
+            Boost::headers
+            Boost::thread
+            Boost::filesystem
+            Imath::Imath
+            Webp::Webp
+            Raw::Raw
+            ffmpeg::swresample
+            ffmpeg::swscale
+            ffmpeg::avcodec
+            ffmpeg::swresample
+            ZLIB::ZLIB
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+    BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
+    INSTALL_COMMAND ${CMAKE_COMMAND} ${_oiio_install_options}
+    BUILD_IN_SOURCE FALSE
+    BUILD_BYPRODUCTS ${_byproducts}
+    USES_TERMINAL_BUILD TRUE
   )
 ENDIF()
 
@@ -217,8 +276,7 @@ IF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-# It is required to force directory creation at configure time
-# otherwise CMake complains about importing a non-existing path
+# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 FILE(MAKE_DIRECTORY "${_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(
   oiio::oiio
