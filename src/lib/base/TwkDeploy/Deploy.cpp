@@ -7,7 +7,6 @@
 //******************************************************************************
 
 #include <TwkDeploy/Deploy.h>
-#include <TwkDeploy/deploy_macros.h>
 #include <time.h>
 #include <string>
 #include <signal.h>
@@ -71,7 +70,7 @@ TWK_DEPLOY_SEGV(int sig)
 void
 TWK_DEPLOY_SHOW_COPYRIGHT_BANNER(ostream& o)
 {
-    o << TWK_DEPLOY_COPYRIGHT_BANNER;
+    o << COPYRIGHT_TEXT;
     o << endl;
 }
 
