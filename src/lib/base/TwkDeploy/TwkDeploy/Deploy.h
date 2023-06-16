@@ -16,16 +16,6 @@
 #include <unistd.h>
 #endif
 
-//
-//  Things you can set in $BUILD_ROOT/build/deploy_macros.h
-//
-//  TWK_DEPLOY_TIMEOUT : Set to exact date as ANSI C time_t value. If
-//  set it will cause the program to time out at the specified time.
-//
-//  TWK_LOCAL_BANNER : Output for local deployment ( YourCompanyName for
-//  example). Use this to say things like "For use by YourCompanyName only", etc.
-//
-
 typedef void (*ExitFunction)(int);
 
 void TWK_DEPLOY_SHOW_PROGRAM_BANNER(std::ostream&, const char* c = 0);
