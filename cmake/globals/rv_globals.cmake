@@ -222,6 +222,6 @@ IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 ENDIF()
 
 SET(RV_COPYRIGHT_TEXT
-    "Copyright contributors to the Open Review Initiative project."
+    "Copyright Contributors to the Open RV Project"
     CACHE STRING "RV's copyright text."
 )
