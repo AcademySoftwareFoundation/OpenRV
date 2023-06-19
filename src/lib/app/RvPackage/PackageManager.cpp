@@ -250,7 +250,12 @@ PackageManager::installPackage(Package& package)
         {
             const AuxFile& a = package.auxFiles[auxIndex];
             QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-            outfilename = outdir.absoluteFilePath(a.file).toUtf8().constData();
+
+            // Get the file name from the full path
+            QFileInfo fileInfo(a.file);
+            QString onlyFileName = fileInfo.fileName();
+
+            outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
         }
         else if (filename.endsWith(".mu") ||
                  filename.endsWith(".mud") ||
@@ -400,7 +405,11 @@ PackageManager::installPackage(Package& package)
             {
                 const AuxFile& a = package.auxFiles[auxIndex];
                 QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-                outfilename = outdir.absoluteFilePath(a.file).toUtf8().constData();
+
+                QFileInfo fileInfo(a.file);
+                QString onlyFileName = fileInfo.fileName();
+
+                outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
             }
             else if (filename.endsWith(".mu") ||
                      filename.endsWith(".mud") ||
@@ -699,7 +708,11 @@ PackageManager::uninstallPackage(Package& package)
         {
             const AuxFile& a = package.auxFiles[auxIndex];
             QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-            outfilename = outdir.absoluteFilePath(a.file).toUtf8().constData();
+
+            QFileInfo fileInfo(a.file);
+            QString onlyFileName = fileInfo.fileName();
+
+            outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
         }
         else if (filename.endsWith(".mu") || 
                  filename.endsWith(".mud") ||
@@ -910,7 +923,14 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
                 temp[255] = 0;
                 files.push_back(temp);
                 QString f = temp;
-                if (f != "PACKAGE") m_packages.back().files.push_back(f);
+                // Check if it's a directory by checking if it ends with a '/'
+                if (f.endsWith("/"))
+                {
+                    m_packages.back().folders.push_back(f);
+                }
+                else{
+                    if (f != "PACKAGE") m_packages.back().files.push_back(f);
+                }
             } 
             while (unzGoToNextFile(file) == UNZ_OK);
 
@@ -948,9 +968,11 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 				package.openrvversion = "1.0.0";
 				bool modeState = false;
 				bool auxFileState = false;
+        bool auxFolderState = false;
 				bool valueState = false;
 				QString pname;
 				QString auxFile;
+        QString auxFolder;
 
 				for (bool done = false; !done;)
 				{
@@ -977,6 +999,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 						//cout << "seq end" << endl;
 						if (modeState) modeState = false;
 						if (auxFileState) auxFileState = false;
+            if (auxFolderState) auxFolderState = false;
 						break;
 					case YAML_MAPPING_START_EVENT:
 						//cout << "map start" << endl;
@@ -986,6 +1009,11 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 							package.auxFiles.push_back(AuxFile());
 							package.auxFiles.back().file = auxFile;
 						}
+            else if (auxFolderState)
+            {
+              package.auxFolders.push_back(AuxFolder());
+              package.auxFolders.back().folder = auxFolder;
+            }
 						break;
 					case YAML_MAPPING_END_EVENT:
 						//cout << "map end" << endl;
@@ -1001,6 +1029,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 
 							if (v == "modes") modeState = true;
 							else if (v == "files") auxFileState = true;
+              else if (v == "folders") auxFolderState = true;
 							else valueState = true;
 						}
 						else if (modeState)
@@ -1031,6 +1060,17 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 
 							valueState = false;
 						}
+            else if (auxFolderState)
+            {
+              if (package.auxFolders.size())
+              {
+                AuxFolder& a = package.auxFolders.back();
+                if (pname == "folder") a.folder = v;
+                else if (pname == "location") a.location = v;
+              }
+
+              valueState = false;
+            }
 						else
 						{
 							if (pname == "package") package.name = v;
@@ -1069,6 +1109,34 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 				package.installing = false;
 				yaml_event_delete(&input_event);
 				yaml_parser_delete(&parser);
+
+        // Standardize the file and directory paths
+        for (auto& fileName : package.files) {
+          fileName.replace("\\", "/");
+        }
+        for (auto& auxFolder : package.auxFolders) {
+          auxFolder.folder.replace("\\", "/");
+        }
+
+        for (auto& auxFolder : package.auxFolders) {
+          QString folderName = auxFolder.folder;
+          QString folderLocation = auxFolder.location;
+
+          for (auto& fileName : package.files) {
+            // Convert the folder and file names to lower case for case-insensitive comparison
+            QString lowerFolderName = folderName.toLower();
+            QString lowerFileName = fileName.toLower();
+
+            // Check if the file is in the current folder or any of its subdirectories
+            if (lowerFileName.startsWith(lowerFolderName + '/')) {
+              AuxFile newAuxFile;
+              newAuxFile.file = fileName;
+              newAuxFile.location = folderLocation;
+              package.auxFiles.push_back(newAuxFile);
+            }
+          }
+        }
+
 
 				QRegExp rvpkgRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkg");
 				QRegExp zipRE("(.*)\\.zip");
