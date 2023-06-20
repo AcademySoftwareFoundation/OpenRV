@@ -87,7 +87,7 @@ SET(CMAKE_OSX_DEPLOYMENT_TARGET
 INCLUDE(rv_options) # RV's build options
 INCLUDE(rv_targets) # RV's build platform definitions
 INCLUDE(rv_globals) # RV's CMake-build global variables
-INCLUDE(rv_stage) # RV's local appplication packaging
+INCLUDE(rv_stage) # RV's local application packaging
 INCLUDE(CTest)
 
 # The 'cxx_defaults' module will sets global C/C++ compiler defaults Note that variable such as 'CMAKE_CXX_COMPILER_ID' is only available after the 'project'
