@@ -4,16 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# Empty those lists at the begining of a configure stage
-SET(RV_PACKAGE_LIST
-    ""
-    CACHE INTERNAL ""
-)
-SET(INSTALLED_RV_PACKAGE_LIST
-    ""
-    CACHE INTERNAL ""
-)
-
 #
 # Create & populate a list of all the shared libraries for later testing.
 MACRO(ADD_SHARED_LIBRARY_LIST new_entry)
@@ -456,7 +446,7 @@ FUNCTION(rv_stage)
       COMMENT "Creating ${_package_filename} ..."
       OUTPUT ${_package_filename}
       DEPENDS ${_files} ${_package_file}
-      COMMAND zip -v -j ${_package_filename} ${_files} ${_package_file}
+      COMMAND zip -v ${_package_filename} ${_files} ${_package_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
