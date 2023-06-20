@@ -1112,10 +1112,10 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 
         // Standardize the file and directory paths
         for (auto& fileName : package.files) {
-          fileName.replace("\\", "/");
+          fileName = QDir::toNativeSeparators(fileName);
         }
         for (auto& auxFolder : package.auxFolders) {
-          auxFolder.folder.replace("\\", "/");
+          auxFolder.folder = QDir::toNativeSeparators(auxFolder.folder);
         }
 
         for (auto& auxFolder : package.auxFolders) {
