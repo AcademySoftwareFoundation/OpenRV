@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2010 Tweak Software. 
+//  Copyright (c) 2010 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #include <RvPackage/PackageManager.h>
 #include <TwkDeploy/Deploy.h>
@@ -164,11 +164,11 @@ versionCompatible (QString version, int maj, int min, int rev)
 
     bool compatible = false;
 
-    if (cmajor > -1) 
+    if (cmajor > -1)
     {
         compatible = cmajor <= maj;
 
-        if (cmajor == maj && cminor > -1) 
+        if (cmajor == maj && cminor > -1)
         {
             compatible = cminor <= min;
 
@@ -235,7 +235,7 @@ PackageManager::installPackage(Package& package)
     supportdir.cd(pname);
 
     //
-    //  Test to see if any of the package files are already there 
+    //  Test to see if any of the package files are already there
     //
 
     QStringList existingFiles;
@@ -250,7 +250,12 @@ PackageManager::installPackage(Package& package)
         {
             const AuxFile& a = package.auxFiles[auxIndex];
             QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-            outfilename = outdir.absoluteFilePath(a.file).toUtf8().constData();
+
+            // Get the file name from the full path
+            QFileInfo fileInfo(a.file);
+            QString onlyFileName = fileInfo.fileName();
+
+            outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
         }
         else if (filename.endsWith(".mu") ||
                  filename.endsWith(".mud") ||
@@ -400,7 +405,11 @@ PackageManager::installPackage(Package& package)
             {
                 const AuxFile& a = package.auxFiles[auxIndex];
                 QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-                outfilename = outdir.absoluteFilePath(a.file).toUtf8().constData();
+
+                QFileInfo fileInfo(a.file);
+                QString onlyFileName = fileInfo.fileName();
+
+                outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
             }
             else if (filename.endsWith(".mu") ||
                      filename.endsWith(".mud") ||
@@ -456,7 +465,7 @@ PackageManager::installPackage(Package& package)
 	    {
 		outfilename = profdir.absoluteFilePath(filename).toUtf8().constData();
 	    }
-            else 
+            else
             {
                 outfilename = supportdir.absoluteFilePath(filename).toUtf8().data();
             }
@@ -478,7 +487,7 @@ PackageManager::installPackage(Package& package)
                 string cmd = makeFBIO;
                 cmd += " ";
                 cmd += dir.toUtf8().constData();
-                
+
                 if (system(cmd.c_str()) == -1)
                 {
                     cout << "ERROR: executing command " << cmd << endl;
@@ -568,9 +577,9 @@ PackageManager::installPackage(Package& package)
             entry.active   = true;
         }
 
-        if (versionCompatible (entry.rvversion, 3, 7, 99)) 
+        if (versionCompatible (entry.rvversion, 3, 7, 99))
             mlistV1.push_back(entry);
-        else                        
+        else
             mlistV2.push_back(entry);
     }
 
@@ -595,17 +604,17 @@ PackageManager::installPackage(Package& package)
 bool
 PackageManager::makeSupportDirTree(QDir& root)
 {
-    const char* dirs[] = {"Mu", "Python", "SupportFiles", "ConfigFiles", "ImageFormats", 
-                          "MovieFormats", "Packages", "lib", "libquicktime", 
+    const char* dirs[] = {"Mu", "Python", "SupportFiles", "ConfigFiles", "ImageFormats",
+                          "MovieFormats", "Packages", "lib", "libquicktime",
                           "Nodes", "Profiles", NULL};
 
     for (const char** d = dirs; *d; d++)
     {
-        if (!root.exists(*d)) 
+        if (!root.exists(*d))
         {
-            if (!root.mkdir(*d)) 
+            if (!root.mkdir(*d))
             {
-                //QMessageBox::critical(this, 
+                //QMessageBox::critical(this,
                 //                      QString("Support Directory Creation Failed"),
                 //                      QString("Unable to create %1 in directory %2\n").arg(QString(*d)).arg(root.absolutePath()));
                 return false;
@@ -699,9 +708,13 @@ PackageManager::uninstallPackage(Package& package)
         {
             const AuxFile& a = package.auxFiles[auxIndex];
             QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-            outfilename = outdir.absoluteFilePath(a.file).toUtf8().constData();
+
+            QFileInfo fileInfo(a.file);
+            QString onlyFileName = fileInfo.fileName();
+
+            outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
         }
-        else if (filename.endsWith(".mu") || 
+        else if (filename.endsWith(".mu") ||
                  filename.endsWith(".mud") ||
                  filename.endsWith(".muc"))
         {
@@ -770,7 +783,7 @@ PackageManager::uninstallPackage(Package& package)
 	{
             outfilename = profdir.absoluteFilePath(filename);
 	}
-        else 
+        else
         {
             outfilename = supportdir.absoluteFilePath(filename);
         }
@@ -790,7 +803,7 @@ PackageManager::uninstallPackage(Package& package)
         }
     }
 
-    // 
+    //
     // Remove the dangling supportdir
     //
 
@@ -799,7 +812,7 @@ PackageManager::uninstallPackage(Package& package)
     //
     // Report what was unremovable
     //
-    
+
     if (notremoved.size())
     {
         QString s("Files which could not be removed:\n");
@@ -850,7 +863,7 @@ PackageManager::uninstallPackage(Package& package)
     package.installed = false;
     QFileInfo rinfo(package.file);
     writeInstallationFile(rinfo.absoluteDir().absoluteFilePath("rvinstall"));
-    
+
     return true;
 }
 
@@ -867,7 +880,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
         // So if unzOpen is unsuccessful using the canonical
         // file path we try again with the original
         // non-canonical absolute file path.
-    
+
         // NB: The file path we use for m_packages
         // i.e. 'infile' should be the file path that was
         // successful for unzOpen().
@@ -910,8 +923,18 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
                 temp[255] = 0;
                 files.push_back(temp);
                 QString f = temp;
-                if (f != "PACKAGE") m_packages.back().files.push_back(f);
-            } 
+
+                // Check if it's a directory
+                QFileInfo fInfo(f);
+                if (finfo.isDir())
+                {
+                    m_packages.back().folders.push_back(f);
+                }
+                else
+                {
+                    if (f != "PACKAGE") m_packages.back().files.push_back(f);
+                }
+            }
             while (unzGoToNextFile(file) == UNZ_OK);
 
             while (!unzeof(file))
@@ -948,9 +971,11 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 				package.openrvversion = "1.0.0";
 				bool modeState = false;
 				bool auxFileState = false;
+        bool auxFolderState = false;
 				bool valueState = false;
 				QString pname;
 				QString auxFile;
+        QString auxFolder;
 
 				for (bool done = false; !done;)
 				{
@@ -977,6 +1002,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 						//cout << "seq end" << endl;
 						if (modeState) modeState = false;
 						if (auxFileState) auxFileState = false;
+            if (auxFolderState) auxFolderState = false;
 						break;
 					case YAML_MAPPING_START_EVENT:
 						//cout << "map start" << endl;
@@ -986,6 +1012,11 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 							package.auxFiles.push_back(AuxFile());
 							package.auxFiles.back().file = auxFile;
 						}
+            else if (auxFolderState)
+            {
+              package.auxFolders.push_back(AuxFolder());
+              package.auxFolders.back().folder = auxFolder;
+            }
 						break;
 					case YAML_MAPPING_END_EVENT:
 						//cout << "map end" << endl;
@@ -1001,6 +1032,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 
 							if (v == "modes") modeState = true;
 							else if (v == "files") auxFileState = true;
+              else if (v == "folders") auxFolderState = true;
 							else valueState = true;
 						}
 						else if (modeState)
@@ -1031,6 +1063,17 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 
 							valueState = false;
 						}
+            else if (auxFolderState)
+            {
+              if (package.auxFolders.size())
+              {
+                AuxFolder& a = package.auxFolders.back();
+                if (pname == "folder") a.folder = v;
+                else if (pname == "location") a.location = v;
+              }
+
+              valueState = false;
+            }
 						else
 						{
 							if (pname == "package") package.name = v;
@@ -1069,6 +1112,32 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 				package.installing = false;
 				yaml_event_delete(&input_event);
 				yaml_parser_delete(&parser);
+
+        // Standardize the file and directory paths
+        std::transform(package.files.begin(), package.files.end(), package.files.begin(),
+                        [](QString& fileName) { return QDir::toNativeSeparators(fileName); });
+
+        for (auto& auxFolder : package.auxFolders) {
+          auxFolder.folder = QDir::toNativeSeparators(auxFolder.folder);
+
+          // Convert the folder name to lower case for case-insensitive comparison
+          QString lowerFolderName = auxFolder.folder.toLower();
+          QString folderLocation = auxFolder.location;
+
+          // Iterate through files and compare paths
+          std::for_each(package.files.begin(), package.files.end(),
+                         [&](const QString& fileName) {
+                           QString lowerFileName = QDir::toNativeSeparators(fileName).toLower();
+
+                           // Check if the file is in the current folder or any of its subdirectories
+                           if (lowerFileName.startsWith(lowerFolderName + QDir::separator())) {
+                             AuxFile newAuxFile;
+                             newAuxFile.file = fileName;
+                             newAuxFile.location = folderLocation;
+                             package.auxFiles.push_back(newAuxFile);
+                           }
+                         });
+        }
 
 				QRegExp rvpkgRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkg");
 				QRegExp zipRE("(.*)\\.zip");
@@ -1152,7 +1221,7 @@ PackageManager::writeModeFile(const QString& filename,
     if (file.open(QIODevice::WriteOnly))
     {
         file.write((version == 1) ? "1\n" : "4\n", 2);
-        
+
         for (size_t i = 0; i < list.size(); i++)
         {
             const ModeEntry& e = list[i];
@@ -1171,7 +1240,7 @@ PackageManager::writeModeFile(const QString& filename,
                 line += QString(",") + e.rvversion;
             }
 
-            if (version >= 3 || version == 0) 
+            if (version >= 3 || version == 0)
             {
                 line += QString(e.optional ? ",true" : ",false");
             }
@@ -1258,7 +1327,7 @@ PackageManager::writeInstallationFile(const QString& filename)
             const Package& package = m_packages[i];
 
             QFileInfo info(package.file);
-            
+
             if (info.absoluteDir() == filedir)
             {
                 if (package.installed) file.write("*",1);
@@ -1271,7 +1340,7 @@ PackageManager::writeInstallationFile(const QString& filename)
 }
 
 
-void 
+void
 PackageManager::findPackageDependencies()
 {
     for (size_t i = 0; i < m_packages.size(); i++)
@@ -1296,7 +1365,7 @@ PackageManager::findPackageDependencies()
 //
 //  Swap $APPLICATION_DIR in for the actual (canonical) directory if it
 //  appears at the head of the package file path.  This is to enable a
-//  optional package that was switched "on" to be "remembered" across 
+//  optional package that was switched "on" to be "remembered" across
 //  use of different versions of RV (stored in different directories).
 //
 
@@ -1402,11 +1471,11 @@ PackageManager::loadPackages()
                 {
                     PackageManager::ModeEntry& entry = entries[i];
 
-                    if (entry.optional == false) 
+                    if (entry.optional == false)
                     {
                         for (size_t i =0; i < m_packages.size(); i++)
                         {
-                            if (QFileInfo(m_packages[i].file).fileName() == entry.package && m_packages[i].optional) 
+                            if (QFileInfo(m_packages[i].file).fileName() == entry.package && m_packages[i].optional)
                             //
                             //  Then this package has been "opted in" so reset optional flag
                             //
@@ -1524,12 +1593,12 @@ void
 PackageManager::removePackages(const QStringList& files)
 {
     QStringList toremove;
-    
+
     for (size_t i = 0; i < files.size(); i++)
     {
         for (size_t q = 0; q < m_packages.size(); q++)
         {
-	    //  Must canonicalize these to guard against things like varying 
+	    //  Must canonicalize these to guard against things like varying
 	    //  capitalization of driver letters on windows.
 	    //
             QFileInfo packageFI(m_packages[q].file);
@@ -1588,7 +1657,7 @@ PackageManager::removePackages(const QStringList& files)
 //  Default implementation uses cin/cout
 //
 
-bool 
+bool
 PackageManager::yesOrNo(const char* m1,
                         const char* m2,
                         const QString& msg,
@@ -1596,7 +1665,7 @@ PackageManager::yesOrNo(const char* m1,
 {
     char yorn = 0;
 
-    cout << m1 << endl 
+    cout << m1 << endl
          << m2 << endl
          << msg.toUtf8().constData();
 
@@ -1610,7 +1679,7 @@ PackageManager::yesOrNo(const char* m1,
     return yorn == 'y';
 }
 
-bool 
+bool
 PackageManager::fixLoadability(const QString& msg)
 {
     return yesOrNo("Unloadable Package Dependencies",
@@ -1619,7 +1688,7 @@ PackageManager::fixLoadability(const QString& msg)
                    "Load other packages first?");
 }
 
-bool 
+bool
 PackageManager::fixUnloadability(const QString& msg)
 {
     return yesOrNo("Loadable Package Dependencies",
@@ -1628,7 +1697,7 @@ PackageManager::fixUnloadability(const QString& msg)
                    "Unload other packages too?");
 }
 
-bool 
+bool
 PackageManager::installDependantPackages(const QString& msg)
 {
     return yesOrNo("Some Packages Depend on This One",
@@ -1637,7 +1706,7 @@ PackageManager::installDependantPackages(const QString& msg)
                    "Try and uninstall others first?");
 }
 
-bool 
+bool
 PackageManager::overwriteExistingFiles(const QString& msg)
 {
     return yesOrNo("Existing Package Files",
@@ -1646,7 +1715,7 @@ PackageManager::overwriteExistingFiles(const QString& msg)
                    "Overwrite existing files?");
 }
 
-void 
+void
 PackageManager::errorMissingPackageDependancies(const QString& msg)
 {
     cout << "ERROR: Some package dependancies are missing" << endl
@@ -1654,7 +1723,7 @@ PackageManager::errorMissingPackageDependancies(const QString& msg)
          << endl;
 }
 
-bool 
+bool
 PackageManager::uninstallDependantPackages(const QString& msg)
 {
     return yesOrNo("Some Packages Depend on This One",
@@ -1663,33 +1732,33 @@ PackageManager::uninstallDependantPackages(const QString& msg)
                    "Try and uninstall them first?");
 }
 
-void 
+void
 PackageManager::informCannotRemoveSomeFiles(const QString& msg)
 {
     cout << "INFO: Some Files Cannot Be Removed" << endl
          << msg.toUtf8().constData() << endl;
 }
 
-void 
+void
 PackageManager::errorModeFileWriteFailed(const QString& file)
 {
-    cout << "ERROR: File write failed: " 
+    cout << "ERROR: File write failed: "
          << file.toUtf8().constData() << endl;
 }
 
-void 
+void
 PackageManager::informPackageFailedToCopy(const QString& msg)
 {
     cout << "INFO: package failed to copy: "  << msg.toUtf8().constData() << endl;
 }
 
-void 
+void
 PackageManager::declarePackage(Package&, size_t)
 {
     // for UI
 }
 
-bool 
+bool
 PackageManager::uninstallForRemoval(const QString& msg)
 {
     return yesOrNo("Package is installed",
@@ -1699,7 +1768,7 @@ PackageManager::uninstallForRemoval(const QString& msg)
 }
 
 
-int 
+int
 PackageManager::auxFileIndex(Package& p, const QString& file)
 {
     for (int i = 0; i < p.auxFiles.size(); i++)
@@ -1817,7 +1886,7 @@ defaultSettingsFileName()
     return name;
 }
 
-RvSettings::RvSettings() 
+RvSettings::RvSettings()
 {
     //
     //  This function should only ever be called once per run.
@@ -1831,12 +1900,12 @@ RvSettings::RvSettings()
 
     QCoreApplication::setOrganizationName("Autodesk");
     QCoreApplication::setOrganizationDomain("autodesk.com");
-	
+
     //
     //  If -noPrefs command line flag was used, use empty alternate
     //  prefs file, so that default values are used, and any changes
     //  the users makes do not affect stored prefs.
-    //  
+    //
     if (PackageManager::ignoringPrefs())
     {
         QCoreApplication::setApplicationName("RVALT");
@@ -1855,7 +1924,7 @@ RvSettings::RvSettings()
         //  Note that in the noPrefs mode, overriding and clobbering settings
         //  are also ignored.
         //
-        return; 
+        return;
     }
 
     QString   prefsFileName = QFileInfo (defaultSettingsFileName()).fileName();
@@ -1870,13 +1939,13 @@ RvSettings::RvSettings()
 
 RvSettings::~RvSettings()
 {
-    if ( !m_userSettingsErrorAlredyReported && 
+    if ( !m_userSettingsErrorAlredyReported &&
          (m_userSettings->status() != QSettings::NoError) )
     {
         cerr << "ERROR: RvSettings encountered error with: '"
              << m_userSettings->fileName().toStdString() << "' err: "
              << m_userSettings->status() << endl;
-             
+
         m_userSettingsErrorAlredyReported = true;
     }
     delete m_userSettings;
@@ -1889,10 +1958,10 @@ RvSettings::getQSettings()
         QSettings::Format format(QSettings::IniFormat);
     #else
         QSettings::Format format(QSettings::NativeFormat);
-    #endif    
+    #endif
     QSettings* qs = new QSettings(format, QSettings::UserScope, "Autodesk", INTERNAL_APPLICATION_NAME);
     qs->setFallbacksEnabled(false);
-    
+
     if (qs->status() != QSettings::NoError)
     {
         cerr << "ERROR: RvSettings was unable to read settings for: '"
@@ -1936,7 +2005,7 @@ RvSettings::endGroup()
     m_userSettings->endGroup();
 }
 
-QVariant 
+QVariant
 RvSettings::value (const QString& key, const QVariant& defaultValue) const
 {
     SettingsMap::const_iterator i;
@@ -1970,7 +2039,7 @@ RvSettings::value (const QString& key, const QVariant& defaultValue) const
     return defaultValue;
 }
 
-void     
+void
 RvSettings::setValue (const QString& key, const QVariant& value)
 {
     SettingsMap::iterator i;
@@ -2007,11 +2076,11 @@ RvSettings::setValue (const QString& key, const QVariant& value)
     sync();
 }
 
-void     
+void
 RvSettings::sync()
 {
     m_userSettings->sync();
-    if ( !m_userSettingsErrorAlredyReported && 
+    if ( !m_userSettingsErrorAlredyReported &&
          (m_userSettings->status() != QSettings::NoError) )
     {
         cerr << "ERROR: RvSettings was unable to write settings for: '"
