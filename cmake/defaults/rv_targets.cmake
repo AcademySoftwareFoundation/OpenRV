@@ -12,6 +12,7 @@ IF(APPLE)
   # Darwin is the name of the mach BSD-base kernel :-)
   SET(RV_TARGET_DARWIN
       BOOL TRUE "Detected target is Apple's macOS"
+      CACHE INTERNAL ""
   )
   SET(RV_TARGET_STRING
       "Darwin"
@@ -82,6 +83,7 @@ ELSEIF(UNIX)
   MESSAGE(STATUS "Building RV for generic Linux OS")
   SET(RV_TARGET_LINUX
       BOOL TRUE "Detected a generic Linux OS"
+      CACHE INTERNAL ""
   )
   SET(RV_TARGET_STRING
       "Linux"
@@ -98,13 +100,17 @@ ELSEIF(UNIX)
     -DPLATFORM_OPENGL=1
   )
 
-  EXECUTE_PROCESS(COMMAND cat /etc/redhat-release OUTPUT_VARIABLE RHEL_VERBOSE ERROR_QUIET)
+  EXECUTE_PROCESS(
+    COMMAND cat /etc/redhat-release
+    OUTPUT_VARIABLE RHEL_VERBOSE
+    ERROR_QUIET
+  )
 
-  IF(RHEL_VERBOSE) 
+  IF(RHEL_VERBOSE)
     MESSAGE(STATUS "Redhat Entreprise Linux version: ${RHEL_VERBOSE}")
-    string(REGEX MATCH "([0-9]+)" RHEL_VERSION_MAJOR "${RHEL_VERBOSE}")
+    STRING(REGEX MATCH "([0-9]+)" RHEL_VERSION_MAJOR "${RHEL_VERBOSE}")
     SET(RV_TARGET_IS_RHEL${RHEL_VERSION_MAJOR}
-	BOOL TRUE "Detected a Redhat Entreprise Linux OS"
+        BOOL TRUE "Detected a Redhat Entreprise Linux OS"
     )
   ELSE()
     MESSAGE(FATAL_ERROR "Unknown or unsupported Linux distribution version; stopping configuration!")
@@ -113,6 +119,7 @@ ELSEIF(WIN32)
   MESSAGE(STATUS "Building RV for Microsoft Windows")
   SET(RV_TARGET_WINDOWS
       BOOL TRUE "Detected target is Microsoft's Windows (64bit)"
+      CACHE INTERNAL ""
   )
   SET(RV_TARGET_STRING
       "Windows"
