@@ -46,7 +46,7 @@ ENDIF()
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkExc TwkMath TwkUtil OpenEXR::OpenEXR
-  PRIVATE stl_ext lcms ${CMAKE_DL_LIBS}
+  PRIVATE RVMath stl_ext lcms ${CMAKE_DL_LIBS}
 )
 
 IF(RV_TARGET_WINDOWS)

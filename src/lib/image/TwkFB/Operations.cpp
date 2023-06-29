@@ -13,6 +13,7 @@
 #include <ImfChromaticities.h>
 #include <ImathMatrix.h>
 #include <ImathVec.h>
+#include <RVMath/AlexaLogC.h>
 #include <TwkMath/Math.h>
 #include <TwkMath/Vec4.h>
 #include <TwkMath/Vec3.h>
@@ -3793,7 +3794,27 @@ getLogCCurveParams(LogCTransformParams& params,
     }
     else
     {
-        cout << "ERROR: ALEXACameraCode is not available to perform this operation" << endl;
+        //
+        //  NOTE:
+        //  To reproduce the results ARRI gets you need to set pbs to 0 and gs to .18
+        //  This makes black 0 and grey .18 on output.
+        //
+        if (ei == 0.0f) ei = 800.0f;
+
+        RVMath::LogC logC(RVMath::ALEXA_LOGC_PARAMS, ei); 
+
+        params.LogCBlackSignal = 0.0f;
+        params.LogCEncodingOffset = logC.getEncodingOffset();
+        params.LogCEncodingGain = logC.getEncodingGain();
+        params.LogCGraySignal = .18f;
+        params.LogCBlackOffset = logC.getBlackOffset();
+        params.LogCLinearSlope = logC.getLinearSlope();
+        params.LogCLinearOffset = logC.getLinearOffset();
+        params.LogCLinearCutPoint = 
+            (RVMath::ALEXA_LOGC_PARAMS.cutPoint * params.LogCLinearSlope + params.LogCLinearOffset) *
+            params.LogCEncodingGain + params.LogCEncodingOffset;
+
+        params.LogCCutPoint = RVMath::ALEXA_LOGC_PARAMS.cutPoint;
     }
 }
 

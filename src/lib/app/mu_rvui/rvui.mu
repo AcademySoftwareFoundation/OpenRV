@@ -2244,6 +2244,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
             if ((value == "Cineon Log" && r == 0 && l == 1 && s == 0 && g == 1.0) ||
                 (value == "Viper Log"  && r == 0 && l == 2 && s == 0 && g == 1.0) ||
+                (value == "ALEXA LogC" && r == 0 && l == 3 && s == 0 && g == 1.0) ||
+                (value == "ALEXA LogC Film" && r == 0 && l == 4 && s == 0 && g == 1.0) ||
                 (value == "Sony S-Log" && r == 0 && l == 5 && s == 0 && g == 1.0) ||
                 (value == "Red Log"    && r == 0 && l == 6 && s == 0 && g == 1.0) ||
                 (value == "Red Log Film"    && r == 0 && l == 7 && s == 0 && g == 1.0) ||
@@ -2304,6 +2306,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
         if ((type == "Cineon Log") || (type == "Kodak Log"))  l = 1;
         else if (type == "Viper Log")  l = 2;
+        else if (type == "ALEXA LogC") l = 3;
+        else if (type == "ALEXA LogC Film") l = 4;
         else if (type == "SONY S-Log") l = 5;
         else if (type == "Red Log") l = 6;
         else if (type == "Red Log Film") l = 7;
@@ -6287,6 +6291,8 @@ global bool debugGC = false;
             {"File Nonlinear to Linear Conversion", nil, nil, inactiveState},
             {"   No Conversion",    setLinConvert(""), nil, hasLinConversion("")},
             {"   Cineon/DPX Log",   setLinConvert("Cineon Log"), "L", hasLinConversion("Cineon Log")},
+            {"   ALEXA LogC",       setLinConvert("ALEXA LogC"), nil, hasLinConversion("ALEXA LogC")},
+            {"   ALEXA LogC Film",  setLinConvert("ALEXA LogC Film"), nil, hasLinConversion("ALEXA LogC Film")},
             //{"   SONY S-Log",       setLinConvert("SONY S-Log"), nil, hasLinConversion("SONY S-Log")},
             {"   Viper Log",        setLinConvert("Viper Log"), nil, hasLinConversion("Viper Log")},
             {"   Red Log",          setLinConvert("Red Log"), nil, hasLinConversion("Red Log")},
