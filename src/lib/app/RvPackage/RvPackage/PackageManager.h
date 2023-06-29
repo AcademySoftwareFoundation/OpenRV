@@ -83,12 +83,6 @@ class PackageManager
         QString location;
     };
 
-    struct AuxFolder
-    {
-        QString folder;
-        QString location;
-    };
-
     struct Package
     {
         Package() : installed(false),
@@ -121,10 +115,8 @@ class PackageManager
         QString        description;
         QList<Mode>    modes;
         QStringList    files;
-        QStringList    folders;
 
         QList<AuxFile> auxFiles;
-        QList<AuxFolder> auxFolders;
 
         bool           installed;
         bool           loadable;
