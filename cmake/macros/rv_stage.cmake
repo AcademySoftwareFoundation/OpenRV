@@ -4,17 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# Empty those lists at the begining of a configure stage
-SET(RV_PACKAGE_LIST
-    ""
-    CACHE INTERNAL ""
-)
-SET(INSTALLED_RV_PACKAGE_LIST
-    ""
-    CACHE INTERNAL ""
-)
-
-#
 # Create & populate a list of all the shared libraries for later testing.
 MACRO(ADD_SHARED_LIBRARY_LIST new_entry)
   LIST(APPEND _shared_libraries "${new_entry}")
@@ -403,12 +392,14 @@ FUNCTION(rv_stage)
 
     IF(NOT arg_FILES)
       FILE(
-              GLOB _files
-              RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-              *
+        GLOB _files
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        *
       )
-    else()
-      SET(_files ${arg_FILES})
+    ELSE()
+      SET(_files
+          ${arg_FILES}
+      )
     ENDIF()
 
     LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
