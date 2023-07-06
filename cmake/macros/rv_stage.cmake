@@ -392,9 +392,9 @@ FUNCTION(rv_stage)
 
     IF(NOT arg_FILES)
       FILE(
-        GLOB _files
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        *
+              GLOB_RECURSE _files
+              RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+              *
       )
     ELSE()
       SET(_files
@@ -447,7 +447,7 @@ FUNCTION(rv_stage)
       COMMENT "Creating ${_package_filename} ..."
       OUTPUT ${_package_filename}
       DEPENDS ${_files} ${_package_file}
-      COMMAND zip -v -j ${_package_filename} ${_files} ${_package_file}
+      COMMAND zip -v ${_package_filename} ${_files} ${_package_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
