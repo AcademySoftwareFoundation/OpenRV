@@ -396,8 +396,10 @@ FUNCTION(rv_stage)
               RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
               *
       )
-    else()
-      SET(_files ${arg_FILES})
+    ELSE()
+      SET(_files
+          ${arg_FILES}
+      )
     ENDIF()
 
     LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
