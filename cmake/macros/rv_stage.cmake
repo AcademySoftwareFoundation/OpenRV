@@ -436,13 +436,6 @@ FUNCTION(rv_stage)
         CACHE INTERNAL ""
     )
 
-    LIST(APPEND INSTALLED_RV_PACKAGE_LIST "${RV_STAGE_PLUGINS_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg")
-    LIST(REMOVE_DUPLICATES INSTALLED_RV_PACKAGE_LIST)
-    SET(INSTALLED_RV_PACKAGES
-        ${INSTALLED_RV_PACKAGE_LIST}
-        CACHE INTERNAL ""
-    )
-
     ADD_CUSTOM_COMMAND(
       COMMENT "Creating ${_package_filename} ..."
       OUTPUT ${_package_filename}
