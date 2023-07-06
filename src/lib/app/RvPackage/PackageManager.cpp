@@ -250,7 +250,6 @@ PackageManager::installPackage(Package& package)
         {
             const AuxFile& a = package.auxFiles[auxIndex];
             QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-
             // Get the file name from the full path
             QFileInfo fileInfo(a.file);
             QString onlyFileName = fileInfo.fileName();
@@ -408,7 +407,6 @@ PackageManager::installPackage(Package& package)
 
                 QFileInfo fileInfo(a.file);
                 QString onlyFileName = fileInfo.fileName();
-
                 outfilename = outdir.absoluteFilePath(onlyFileName).toUtf8().constData();
             }
             else if (filename.endsWith(".mu") ||
@@ -708,7 +706,6 @@ PackageManager::uninstallPackage(Package& package)
         {
             const AuxFile& a = package.auxFiles[auxIndex];
             QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
-
             QFileInfo fileInfo(a.file);
             QString onlyFileName = fileInfo.fileName();
 
@@ -926,11 +923,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 
                 // Check if it's a directory
                 QFileInfo fInfo(f);
-                if (finfo.isDir())
-                {
-                    m_packages.back().folders.push_back(f);
-                }
-                else
+                if (!finfo.isDir())
                 {
                     if (f != "PACKAGE") m_packages.back().files.push_back(f);
                 }
@@ -1113,13 +1106,7 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
 				yaml_event_delete(&input_event);
 				yaml_parser_delete(&parser);
 
-        // Standardize the file and directory paths
-        std::transform(package.files.begin(), package.files.end(), package.files.begin(),
-                        [](QString& fileName) { return QDir::toNativeSeparators(fileName); });
-
         for (auto& auxFolder : package.auxFolders) {
-          auxFolder.folder = QDir::toNativeSeparators(auxFolder.folder);
-
           // Convert the folder name to lower case for case-insensitive comparison
           QString lowerFolderName = auxFolder.folder.toLower();
           QString folderLocation = auxFolder.location;
@@ -1127,10 +1114,10 @@ PackageManager::loadPackageInfo(const QString& infileNonCanonical)
           // Iterate through files and compare paths
           std::for_each(package.files.begin(), package.files.end(),
                          [&](const QString& fileName) {
-                           QString lowerFileName = QDir::toNativeSeparators(fileName).toLower();
+                           QString lowerFileName = fileName.toLower();
 
                            // Check if the file is in the current folder or any of its subdirectories
-                           if (lowerFileName.startsWith(lowerFolderName + QDir::separator())) {
+                           if (lowerFileName.startsWith(lowerFolderName + '/')) {
                              AuxFile newAuxFile;
                              newAuxFile.file = fileName;
                              newAuxFile.location = folderLocation;

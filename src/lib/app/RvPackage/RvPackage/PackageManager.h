@@ -121,7 +121,6 @@ class PackageManager
         QString        description;
         QList<Mode>    modes;
         QStringList    files;
-        QStringList    folders;
 
         QList<AuxFile> auxFiles;
         QList<AuxFolder> auxFolders;

@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-#
 # Create & populate a list of all the shared libraries for later testing.
 MACRO(ADD_SHARED_LIBRARY_LIST new_entry)
   LIST(APPEND _shared_libraries "${new_entry}")
