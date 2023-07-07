@@ -1,3 +1,13 @@
+#   NOTE ON PATENT LICENSING:
+#
+#   Legal Note: Some of the codecs available in ffmpeg contain proprietary
+#   algorithms that are protected under intellectual property rights. Please
+#   check with your legal department whether you have the proper licenses and
+#   rights to use these codecs. TWEAK is not responsible for any unlicensed use
+#   of these codecs.
+#
+#   Upshot: You should not enable codecs you do not have a license for.
+
 # How to build
 
 ## Mac & Linux

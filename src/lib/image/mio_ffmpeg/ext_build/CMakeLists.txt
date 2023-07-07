@@ -30,6 +30,13 @@ SET(CMAKE_C_STANDARD_REQUIRED
     TRUE
 )
 
+IF(APPLE)
+  SET(CMAKE_OSX_ARCHITECTURES
+      "x86_64"
+      CACHE STRING "Force compilation for Intel processors." FORCE
+  )
+ENDIF()
+
 ADD_LIBRARY(
   ${_target} SHARED
   ${_sources}
@@ -90,10 +97,6 @@ ELSEIF(WIN32)
             -DBOOST_ALL_NO_LIB=1
             -DBOOST_ALL_DYN_LINK=1
   )
-  SET(ARCH
-      "IA32_64"
-      CACHE STRING "CPU Architecture identifier"
-  )
 ELSE()
   MESSAGE(FATAL_ERROR "Unsupported platform")
 ENDIF()
@@ -117,13 +120,6 @@ IF(MIO_TARGET_WINDOWS)
   )
   SET(MIO_SHARED_PREFIX
       ""
-  )
-ENDIF()
-
-IF(APPLE)
-  SET(CMAKE_OSX_ARCHITECTURES
-      "x86_64"
-      CACHE STRING "Force compilation for Intel processors." FORCE
   )
 ENDIF()
 
