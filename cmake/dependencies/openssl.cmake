@@ -166,6 +166,11 @@ IF(RV_TARGET_WINDOWS)
     ${_target}-stage-target ALL
     DEPENDS ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
   )
+ELSEIF(RV_TARGET_IS_RHEL8)
+  # Blank target on RHEL8 Linux to avoid copying RV's OpenSSL files.
+  ADD_CUSTOM_TARGET(
+    ${_target}-stage-target ALL
+  )
 ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
