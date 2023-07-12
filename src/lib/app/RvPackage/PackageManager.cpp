@@ -462,7 +462,6 @@ namespace Rv
         else
         {
           outfilename = supportdir.absoluteFilePath( filename ).toUtf8().data();
-          cout << "Here: " + outfilename << endl;
         }
 
         ofstream outfile( UNICODE_C_STR( outfilename.c_str() ), ios::binary );
