@@ -80,7 +80,6 @@ class PackageManager
     struct AuxFile
     {
         QString file;
-        QString fileName;
         QString location;
     };
 
