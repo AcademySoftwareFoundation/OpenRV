@@ -14,7 +14,7 @@ SET(_target
 )
 
 SET(_version
-    "1.1.1p"
+    "1.1.1u"
 )
 
 IF(RV_TARGET_WINDOWS
@@ -44,7 +44,7 @@ SET(_download_url
     "https://www.openssl.org/source/openssl-${_version}.tar.gz"
 )
 SET(_download_hash
-    "3d610fed4f44ce4d4b42849a368d2071"
+    "72f7ba7395f0f0652783ba1089aa0dcc"
 )
 
 SET(_make_command_script
