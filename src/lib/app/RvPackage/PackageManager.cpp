@@ -28,13 +28,17 @@ namespace Rv
   int PackageManager::findPackageIndexByZip( const QString& zipfile )
   {
     QString zipfileCanonical = QFileInfo( zipfile ).canonicalFilePath();
+    QString pattern = zipfile + "-.*\\.rvpkg";
+    QRegExp rx(pattern);
 
     for( size_t i = 0; i < m_packages.size(); i++ )
     {
       QFileInfo info( m_packages[i].file );
 
       if( info.fileName() == zipfile || info.absoluteFilePath() == zipfile ||
-          info.absoluteFilePath() == zipfileCanonical )
+          info.absoluteFilePath() == zipfileCanonical ||
+          rx.exactMatch(info.fileName()) ||
+          rx.exactMatch(info.absoluteFilePath()))
       {
         return i;
       }
@@ -244,6 +248,13 @@ namespace Rv
       QString filename = package.files[i];
       string outfilename;
       int auxIndex = auxFileIndex( package, filename );
+
+      // Once it is not an auxfile, the installer expects a flat list structure
+      // Therefore, need to check for basename and not the file name which
+      // can include directories
+      QFileInfo fInfo(filename);
+      QString baseName = fInfo.fileName();
+
       if( auxIndex != -1 )
       {
         const AuxFile& a = package.auxFiles[auxIndex];
@@ -251,32 +262,32 @@ namespace Rv
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
         outfilename =
             outdir.absoluteFilePath(
-                 a.fileName.isEmpty() ? a.file : a.fileName)
+                      a.fileName.isEmpty() ? a.file : a.fileName)
                 .toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
       {
-        outfilename = mudir.absoluteFilePath( filename ).toUtf8().constData();
+        outfilename = mudir.absoluteFilePath(baseName).toUtf8().constData();
       }
       else if( filename.endsWith( ".py" ) || filename.endsWith( ".pyc" ) ||
                filename.endsWith( ".pyo" ) || filename.endsWith( ".pyd" ) )
       {
-        outfilename = pydir.absoluteFilePath( filename ).toUtf8().constData();
+        outfilename = pydir.absoluteFilePath(baseName).toUtf8().constData();
       }
       else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
       //
       //  Assume this is a NodeDefinition file (gto) or associated shader code.
       //
       {
-        outfilename = nodedir.absoluteFilePath( filename ).toUtf8().constData();
+        outfilename = nodedir.absoluteFilePath(baseName).toUtf8().constData();
       }
       else if( filename.endsWith( ".profile" ) )
       //
       //  Assume this is a Profile
       //
       {
-        outfilename = profdir.absoluteFilePath( filename ).toUtf8().constData();
+        outfilename = profdir.absoluteFilePath(baseName).toUtf8().constData();
       }
 
       QString n = QString::fromUtf8( outfilename.c_str(), outfilename.size() );
@@ -381,6 +392,8 @@ namespace Rv
       for( size_t i = 0; i < package.files.size(); i++ )
       {
         QString filename = package.files[i];
+        QFileInfo fInfo(filename);
+        QString baseName = fInfo.fileName();
         vector<char> buffer( 4096 );
 
         if( unzLocateFile( file, filename.toUtf8().data(), 1 ) != UNZ_OK )
@@ -400,33 +413,39 @@ namespace Rv
           const AuxFile& a = package.auxFiles[auxIndex];
           QDir outdir( rdir.absoluteFilePath(
               expandVarsInPath( package, a.location ) ) );
-          if (!outdir.exists()) outdir.mkpath(".");
+          if (!outdir.exists()) {
+            bool success = outdir.mkpath(".");
+            if (!success) {
+              cout << "ERROR: Failed to create needed auxiliary directory: "
+                   + outdir.absolutePath().toStdString() << endl;
+            }
+          }
           outfilename =
               outdir.absoluteFilePath(
-                   a.fileName.isEmpty() ? a.file : a.fileName)
+                        a.fileName.isEmpty() ? a.file : a.fileName)
                   .toUtf8().constData();
         }
         else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                  filename.endsWith( ".muc" ) )
         {
-          outfilename = mudir.absoluteFilePath( filename ).toUtf8().data();
+          outfilename = mudir.absoluteFilePath( baseName ).toUtf8().data();
         }
         else if( filename.endsWith( ".py" ) || filename.endsWith( ".pyc" ) ||
                  filename.endsWith( ".pyo" ) || filename.endsWith( ".pyd" ) )
         {
-          outfilename = pydir.absoluteFilePath( filename ).toUtf8().data();
+          outfilename = pydir.absoluteFilePath( baseName ).toUtf8().data();
         }
         else if( filename.endsWith( ".so" ) || filename.endsWith( ".dll" ) ||
                  filename.endsWith( ".dylib" ) )
         {
           if( package.imageio.contains( filename ) )
           {
-            outfilename = imgdir.absoluteFilePath( filename ).toUtf8().data();
+            outfilename = imgdir.absoluteFilePath( baseName ).toUtf8().data();
             fbio = true;
           }
           else if( package.movieio.contains( filename ) )
           {
-            outfilename = movdir.absoluteFilePath( filename ).toUtf8().data();
+            outfilename = movdir.absoluteFilePath( baseName ).toUtf8().data();
           }
           else
           {
@@ -435,33 +454,32 @@ namespace Rv
               if( package.modes[q].file == filename )
               {
                 outfilename =
-                    mudir.absoluteFilePath( filename ).toUtf8().data();
+                    mudir.absoluteFilePath( baseName ).toUtf8().data();
               }
             }
           }
 
           if( outfilename == "" )
           {
-            outfilename = libdir.absoluteFilePath( filename ).toUtf8().data();
+            outfilename = libdir.absoluteFilePath( baseName ).toUtf8().data();
           }
         }
         else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
         //
-        //  Assume this is a NodeDefinition file (gto) or associated shader
-        //  code.
+        //  Assume this is a NodeDefinition file (gto) or associated shader code.
         //
         {
           outfilename =
-              nodedir.absoluteFilePath( filename ).toUtf8().constData();
+              nodedir.absoluteFilePath( baseName ).toUtf8().constData();
         }
         else if( filename.endsWith( ".profile" ) )
         {
           outfilename =
-              profdir.absoluteFilePath( filename ).toUtf8().constData();
+              profdir.absoluteFilePath( baseName ).toUtf8().constData();
         }
         else
         {
-          outfilename = supportdir.absoluteFilePath( filename ).toUtf8().data();
+          outfilename = supportdir.absoluteFilePath( baseName ).toUtf8().data();
         }
 
         ofstream outfile( UNICODE_C_STR( outfilename.c_str() ), ios::binary );
@@ -698,6 +716,9 @@ namespace Rv
     {
       QString outfilename;
       QString filename = package.files[i];
+      QFileInfo fInfo(filename);
+      QString baseName = fInfo.fileName();
+
       QStringList auxfiles;
       int auxIndex = auxFileIndex( package, filename );
 
@@ -709,39 +730,39 @@ namespace Rv
 
         outfilename =
             outdir.absoluteFilePath(
-                 a.fileName.isEmpty() ? a.file : a.fileName)
+                      a.fileName.isEmpty() ? a.file : a.fileName)
                 .toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
       {
-        outfilename = mudir.absoluteFilePath( filename );
+        outfilename = mudir.absoluteFilePath( baseName );
 
         if( filename.endsWith( ".mu" ) )
         {
-          filename.chop( 3 );
+          baseName.chop( 3 );
           auxfiles.push_back(
-              mudir.absoluteFilePath( filename + QString( ".muc" ) ) );
+              mudir.absoluteFilePath( baseName + QString( ".muc" ) ) );
           auxfiles.push_back(
-              mudir.absoluteFilePath( filename + QString( ".mud" ) ) );
+              mudir.absoluteFilePath( baseName + QString( ".mud" ) ) );
           auxfiles.push_back(
-              mudir.absoluteFilePath( filename + QString( ".so" ) ) );
+              mudir.absoluteFilePath( baseName + QString( ".so" ) ) );
         }
       }
       else if( filename.endsWith( ".py" ) || filename.endsWith( ".pyc" ) ||
                filename.endsWith( ".pyo" ) || filename.endsWith( ".pyd" ) )
       {
-        outfilename = pydir.absoluteFilePath( filename );
+        outfilename = pydir.absoluteFilePath( baseName );
 
         if( filename.endsWith( ".py" ) )
         {
-          filename.chop( 3 );
+          baseName.chop( 3 );
           auxfiles.push_back(
-              pydir.absoluteFilePath( filename + QString( ".pyc" ) ) );
+              pydir.absoluteFilePath( baseName + QString( ".pyc" ) ) );
           auxfiles.push_back(
-              pydir.absoluteFilePath( filename + QString( ".pyd" ) ) );
+              pydir.absoluteFilePath( baseName + QString( ".pyd" ) ) );
           auxfiles.push_back(
-              pydir.absoluteFilePath( filename + QString( ".pyo" ) ) );
+              pydir.absoluteFilePath( baseName + QString( ".pyo" ) ) );
         }
       }
       else if( filename.endsWith( ".so" ) || filename.endsWith( ".dll" ) ||
@@ -749,11 +770,11 @@ namespace Rv
       {
         if( package.imageio.contains( filename ) )
         {
-          outfilename = imgdir.absoluteFilePath( filename );
+          outfilename = imgdir.absoluteFilePath( baseName );
         }
         else if( package.movieio.contains( filename ) )
         {
-          outfilename = movdir.absoluteFilePath( filename );
+          outfilename = movdir.absoluteFilePath( baseName );
         }
         else
         {
@@ -761,14 +782,14 @@ namespace Rv
           {
             if( package.modes[q].file == filename )
             {
-              outfilename = mudir.absoluteFilePath( filename );
+              outfilename = mudir.absoluteFilePath( baseName );
             }
           }
         }
 
         if( outfilename == "" )
         {
-          outfilename = libdir.absoluteFilePath( filename );
+          outfilename = libdir.absoluteFilePath( baseName );
         }
       }
       else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
@@ -776,15 +797,15 @@ namespace Rv
       //  Assume this is a NodeDefinition file (gto) or associated shader code.
       //
       {
-        outfilename = nodedir.absoluteFilePath( filename );
+        outfilename = nodedir.absoluteFilePath( baseName );
       }
       else if( filename.endsWith( ".profile" ) )
       {
-        outfilename = profdir.absoluteFilePath( filename );
+        outfilename = profdir.absoluteFilePath( baseName );
       }
       else
       {
-        outfilename = supportdir.absoluteFilePath( filename );
+        outfilename = supportdir.absoluteFilePath( baseName );
       }
 
       QFile file( outfilename );
