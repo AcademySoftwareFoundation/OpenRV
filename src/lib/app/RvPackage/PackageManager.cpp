@@ -260,10 +260,10 @@ namespace Rv
         const AuxFile& a = package.auxFiles[auxIndex];
         QDir outdir(
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
+        QFileInfo auxfileInfo(a.file);
+        QString auxfileName = auxfileInfo.fileName();
         outfilename =
-            outdir.absoluteFilePath(
-                      a.fileName.isEmpty() ? a.file : a.fileName)
-                .toUtf8().constData();
+            outdir.absoluteFilePath(auxfileName).toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
@@ -420,10 +420,10 @@ namespace Rv
                    + outdir.absolutePath().toStdString() << endl;
             }
           }
+          QFileInfo auxfileInfo(a.file);
+          QString auxfileName = auxfileInfo.fileName();
           outfilename =
-              outdir.absoluteFilePath(
-                        a.fileName.isEmpty() ? a.file : a.fileName)
-                  .toUtf8().constData();
+              outdir.absoluteFilePath(auxfileName).toUtf8().constData();
         }
         else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                  filename.endsWith( ".muc" ) )
@@ -727,11 +727,10 @@ namespace Rv
         const AuxFile& a = package.auxFiles[auxIndex];
         QDir outdir(
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
-
+        QFileInfo auxfileInfo(a.file);
+        QString auxfileName = auxfileInfo.fileName();
         outfilename =
-            outdir.absoluteFilePath(
-                      a.fileName.isEmpty() ? a.file : a.fileName)
-                .toUtf8().constData();
+            outdir.absoluteFilePath(auxfileName).toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
@@ -1181,7 +1180,6 @@ namespace Rv
                     QString directory = fileInfo.dir().path();
 
                     AuxFile newAuxFile;
-                    newAuxFile.fileName = fileName;
                     newAuxFile.file = fullPath;
                     newAuxFile.location = auxFolder.location + "/" + directory;
                     package.auxFiles.push_back( newAuxFile );
