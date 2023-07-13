@@ -28,13 +28,17 @@ namespace Rv
   int PackageManager::findPackageIndexByZip( const QString& zipfile )
   {
     QString zipfileCanonical = QFileInfo( zipfile ).canonicalFilePath();
+    QString pattern = zipfile + "-.*\\.rvpkg";
+    QRegExp rx(pattern);
 
     for( size_t i = 0; i < m_packages.size(); i++ )
     {
       QFileInfo info( m_packages[i].file );
 
       if( info.fileName() == zipfile || info.absoluteFilePath() == zipfile ||
-          info.absoluteFilePath() == zipfileCanonical )
+          info.absoluteFilePath() == zipfileCanonical ||
+          rx.exactMatch(info.fileName()) ||
+          rx.exactMatch(info.absoluteFilePath()))
       {
         return i;
       }
@@ -241,48 +245,49 @@ namespace Rv
 
     for( size_t i = 0; i < package.files.size(); i++ )
     {
-      //Get only the file's base name
       QString filename = package.files[i];
+      string outfilename;
+      int auxIndex = auxFileIndex( package, filename );
+
+      // Once it is not an auxfile, the installer expects a flat list structure
+      // Therefore, need to check for basename and not the file name which
+      // can include directories
       QFileInfo fInfo(filename);
       QString baseName = fInfo.fileName();
 
-      string outfilename;
-      int auxIndex = auxFileIndex( package, filename );
       if( auxIndex != -1 )
       {
         const AuxFile& a = package.auxFiles[auxIndex];
         QDir outdir(
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
-
-        QFileInfo fileInfo( a.file );
-        QString onlyFileName = fileInfo.fileName();
-
+        QFileInfo auxfileInfo(a.file);
+        QString auxfileName = auxfileInfo.fileName();
         outfilename =
-            outdir.absoluteFilePath( onlyFileName ).toUtf8().constData();
+            outdir.absoluteFilePath(auxfileName).toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
       {
-        outfilename = mudir.absoluteFilePath( baseName ).toUtf8().constData();
+        outfilename = mudir.absoluteFilePath(baseName).toUtf8().constData();
       }
       else if( filename.endsWith( ".py" ) || filename.endsWith( ".pyc" ) ||
                filename.endsWith( ".pyo" ) || filename.endsWith( ".pyd" ) )
       {
-        outfilename = pydir.absoluteFilePath( baseName ).toUtf8().constData();
+        outfilename = pydir.absoluteFilePath(baseName).toUtf8().constData();
       }
       else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
       //
       //  Assume this is a NodeDefinition file (gto) or associated shader code.
       //
       {
-        outfilename = nodedir.absoluteFilePath( baseName ).toUtf8().constData();
+        outfilename = nodedir.absoluteFilePath(baseName).toUtf8().constData();
       }
       else if( filename.endsWith( ".profile" ) )
       //
       //  Assume this is a Profile
       //
       {
-        outfilename = profdir.absoluteFilePath( baseName ).toUtf8().constData();
+        outfilename = profdir.absoluteFilePath(baseName).toUtf8().constData();
       }
 
       QString n = QString::fromUtf8( outfilename.c_str(), outfilename.size() );
@@ -386,7 +391,6 @@ namespace Rv
     {
       for( size_t i = 0; i < package.files.size(); i++ )
       {
-        //Get only the file's base name
         QString filename = package.files[i];
         QFileInfo fInfo(filename);
         QString baseName = fInfo.fileName();
@@ -409,11 +413,17 @@ namespace Rv
           const AuxFile& a = package.auxFiles[auxIndex];
           QDir outdir( rdir.absoluteFilePath(
               expandVarsInPath( package, a.location ) ) );
-
-          QFileInfo fileInfo( a.file );
-          QString onlyFileName = fileInfo.fileName();
+          if (!outdir.exists()) {
+            bool success = outdir.mkpath(".");
+            if (!success) {
+              cout << "ERROR: Failed to create needed auxiliary directory: "
+                   + outdir.absolutePath().toStdString() << endl;
+            }
+          }
+          QFileInfo auxfileInfo(a.file);
+          QString auxfileName = auxfileInfo.fileName();
           outfilename =
-              outdir.absoluteFilePath( onlyFileName ).toUtf8().constData();
+              outdir.absoluteFilePath(auxfileName).toUtf8().constData();
         }
         else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                  filename.endsWith( ".muc" ) )
@@ -456,8 +466,7 @@ namespace Rv
         }
         else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
         //
-        //  Assume this is a NodeDefinition file (gto) or associated shader
-        //  code.
+        //  Assume this is a NodeDefinition file (gto) or associated shader code.
         //
         {
           outfilename =
@@ -706,10 +715,10 @@ namespace Rv
     for( size_t i = 0; i < package.files.size(); i++ )
     {
       QString outfilename;
-      //Get only the file's base name
       QString filename = package.files[i];
       QFileInfo fInfo(filename);
       QString baseName = fInfo.fileName();
+
       QStringList auxfiles;
       int auxIndex = auxFileIndex( package, filename );
 
@@ -718,11 +727,10 @@ namespace Rv
         const AuxFile& a = package.auxFiles[auxIndex];
         QDir outdir(
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
-        QFileInfo fileInfo( a.file );
-        QString onlyFileName = fileInfo.fileName();
-
+        QFileInfo auxfileInfo(a.file);
+        QString auxfileName = auxfileInfo.fileName();
         outfilename =
-            outdir.absoluteFilePath( onlyFileName ).toUtf8().constData();
+            outdir.absoluteFilePath(auxfileName).toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
@@ -731,13 +739,13 @@ namespace Rv
 
         if( filename.endsWith( ".mu" ) )
         {
-          filename.chop( 3 );
+          baseName.chop( 3 );
           auxfiles.push_back(
-              mudir.absoluteFilePath( filename + QString( ".muc" ) ) );
+              mudir.absoluteFilePath( baseName + QString( ".muc" ) ) );
           auxfiles.push_back(
-              mudir.absoluteFilePath( filename + QString( ".mud" ) ) );
+              mudir.absoluteFilePath( baseName + QString( ".mud" ) ) );
           auxfiles.push_back(
-              mudir.absoluteFilePath( filename + QString( ".so" ) ) );
+              mudir.absoluteFilePath( baseName + QString( ".so" ) ) );
         }
       }
       else if( filename.endsWith( ".py" ) || filename.endsWith( ".pyc" ) ||
@@ -747,13 +755,13 @@ namespace Rv
 
         if( filename.endsWith( ".py" ) )
         {
-          filename.chop( 3 );
+          baseName.chop( 3 );
           auxfiles.push_back(
-              pydir.absoluteFilePath( filename + QString( ".pyc" ) ) );
+              pydir.absoluteFilePath( baseName + QString( ".pyc" ) ) );
           auxfiles.push_back(
-              pydir.absoluteFilePath( filename + QString( ".pyd" ) ) );
+              pydir.absoluteFilePath( baseName + QString( ".pyd" ) ) );
           auxfiles.push_back(
-              pydir.absoluteFilePath( filename + QString( ".pyo" ) ) );
+              pydir.absoluteFilePath( baseName + QString( ".pyo" ) ) );
         }
       }
       else if( filename.endsWith( ".so" ) || filename.endsWith( ".dll" ) ||
@@ -1157,25 +1165,23 @@ namespace Rv
 
           for( auto& auxFolder : package.auxFolders )
           {
-            // Convert the folder name to lower case for case-insensitive
-            // comparison
-            QString lowerFolderName = auxFolder.folder.toLower();
-            QString folderLocation = auxFolder.location;
-
             // Iterate through files and compare paths
             std::for_each(
                 package.files.begin(), package.files.end(),
-                [&]( const QString& fileName )
+                [&]( const QString& fullPath )
                 {
-                  QString lowerFileName = fileName.toLower();
-
                   // Check if the file is in the current folder or any of its
                   // subdirectories
-                  if( lowerFileName.startsWith( lowerFolderName + '/' ) )
+                  if( fullPath.startsWith( auxFolder.folder + '/' ) )
                   {
+                    // Separate the filename and directory structure information
+                    QFileInfo fileInfo(fullPath);
+                    QString fileName = fileInfo.fileName();
+                    QString directory = fileInfo.dir().path();
+
                     AuxFile newAuxFile;
-                    newAuxFile.file = fileName;
-                    newAuxFile.location = folderLocation;
+                    newAuxFile.file = fullPath;
+                    newAuxFile.location = auxFolder.location + "/" + directory;
                     package.auxFiles.push_back( newAuxFile );
                   }
                 } );
