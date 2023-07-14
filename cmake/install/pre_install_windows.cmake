@@ -15,6 +15,16 @@ FUNCTION(before_copy_platform FILE_PATH RET_VAL)
     ENDIF()
   ENDIF()
 
+  # For <TIFF>/install/bin
+  IF(FILE_PATH MATCHES "\\.obj$"
+    OR FILE_PATH MATCHES "\\.c$")
+      SET(${RET_VAL}
+        "NO"
+        PARENT_SCOPE
+      )
+      RETURN()
+  ENDIF()
+
   SET(${RET_VAL}
       "YES"
       PARENT_SCOPE

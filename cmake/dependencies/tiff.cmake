@@ -32,7 +32,11 @@ SET(_download_hash
 IF(NOT RV_TARGET_WINDOWS)
   # Mac/Linux: Use the unversionned .dylib.so LINK which points to the proper file (which has a diff version number) Mac/Linux: TIFF doesn't use a Postfix only
   # 'MSVC'.
-  RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "")
+  IF(RV_TARGET_DARWIN)
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "5.3.0" "SHARED" "")
+  ELSE()
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "")
+  ENDIF()
 ELSE()
   # The current CMake build code via NMake doesn't create a Debug lib named "libtiffd.lib"
   RV_MAKE_STANDARD_LIB_NAME("libtiff" "${_version}" "SHARED" "")
@@ -91,28 +95,8 @@ IF(RV_TARGET_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tiffconf.h ${_include_dir}
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tif_config.h ${_include_dir}
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tif_dir.h ${_include_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/fax2ps.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/fax2tiff.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/fax2ps.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/fax2tiff.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/pal2rgb.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/ppm2tiff.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/raw2tiff.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/rgb2ycbcr.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/thumbnail.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiff2bw.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiff2pdf.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiff2ps.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiff2rgba.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffcmp.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffcp.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffcrop.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffdither.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffdump.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffinfo.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffmedian.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffset.exe ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/tools/tiffsplit.exe ${_bin_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/tools ${_bin_dir}
+    COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/Makefile.am ${_bin_dir}/Makefile.vc ${_bin_dir}/Makefile.in ${_bin_dir}/CMakeLists.txt
   )
 
 ELSE()
@@ -163,9 +147,8 @@ ELSE()
     TARGET ${_target}
     POST_BUILD
     COMMENT "Installing ${_target}'s missing headers"
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/build/libtiff/tif_config.h ${_include_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tiffiop.h ${_include_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tif_dir.h ${_include_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_base_dir}/build/libtiff/tif_config.h ${_base_dir}/src/libtiff/tiffiop.h ${_base_dir}/src/libtiff/tif_dir.h
+            ${_include_dir}
   )
 ENDIF()
 

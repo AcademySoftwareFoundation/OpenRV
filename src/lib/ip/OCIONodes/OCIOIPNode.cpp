@@ -187,7 +187,6 @@ OCIOIPNode::updateContext()
     if (Component* context = component("ocio_context"))
     {
         const Component::Container& props = context->properties();
-        //m_state->context = OCIO::Context::Create(); // destroys old one
 
         for (size_t i = 0; i < props.size(); i++)
         {
@@ -218,7 +217,8 @@ shaderLegal(const string& s)
 
     transform(s.begin(), s.end(), ns.begin(), op_shaderLegal);
 
-    // for any double underscore, OCIO will replace it with just one; do the same so our names align. (See: OCIO:GPUShaderDesc::setFunctionName)
+    // OCIO replaces any consecutive '_' with just one '_' (See: OCIO:GPUShaderDesc::setFunctionName)
+    // In order to keep the names aligned use: GPUShaderDesc::getFunctionName() to get the name OCIO uses to set RV's Shader Function and bind the parameters.
     ns = std::regex_replace(ns, std::regex("_+"), "_");   // one or more underscore: replace by only one.
     ns = std::regex_replace(ns, std::regex("_+$"), "");   // do not end by an underscore because the code will append another one
 
@@ -476,7 +476,7 @@ OCIOIPNode::evaluate(const Context& context)
                 shaderAdd3DLutAsParameter(glsl, m_lutSamplerName);
             }
 
-            m_state->function = new Shader::Function(shaderName.str(), 
+            m_state->function = new Shader::Function(shaderDesc->getFunctionName(),
                                                      glsl,
                                                      Shader::Function::Color,
                                                      1);
@@ -485,7 +485,7 @@ OCIOIPNode::evaluate(const Context& context)
             if (Shader::debuggingType() != Shader::NoDebugInfo)
             {
                 cerr << "OCIONode: " << name() << " new shaderID " << shaderCacheID << endl <<
-                        "OCIONode:     new Shader '" << shaderName.str() << "':" << endl << glsl << endl;
+                        "OCIONode:     new Shader '" << shaderDesc->getFunctionName() << "':" << endl << glsl << endl;
             }
         }
 
