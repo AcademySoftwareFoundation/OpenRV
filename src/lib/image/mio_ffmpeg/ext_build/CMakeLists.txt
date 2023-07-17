@@ -428,3 +428,45 @@ IF(MIO_TARGET_WINDOWS)
     PRIVATE ${LIB_NEDMALLOC} ${LIB_WINPTHREADS}
   )
 ENDIF()
+
+SET(final_lib_name_no_ext
+    mio_ffmpeg
+)
+IF(MIO_TARGET_DARWIN
+   OR MIO_TARGET_LINUX
+)
+  SET(mio_lib_source_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}${_target}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(mio_lib_dest_name
+      ${final_lib_name_no_ext}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(mio_lib_source_path
+      ${CMAKE_BINARY_DIR}/${mio_lib_source_name}
+  )
+  SET(mio_lib_dest_path
+      ${CMAKE_BINARY_DIR}/${mio_lib_dest_name}
+  )
+
+  # as long as the lib name is sync'ed with the lib name on the platform, the rest is cross-platform for Mac & Linux
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Renaming lib ${mio_lib_source_name} into final name: ${mio_lib_dest_name}"
+    COMMAND ${CMAKE_COMMAND} -E copy ${mio_lib_source_path} ${mio_lib_dest_path}
+    COMMAND ${CMAKE_COMMAND} -E rm ${mio_lib_source_path}
+  )
+ELSE()
+  SET(rel_path_prefix
+      ${CMAKE_BUILD_TYPE}
+  )
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Post Build ${_target} Windows: renaming files"
+    COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.dll ${rel_path_prefix}/${final_lib_name_no_ext}.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.lib ${rel_path_prefix}/${final_lib_name_no_ext}.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.exp ${rel_path_prefix}/${final_lib_name_no_ext}.exp
+    COMMAND ${CMAKE_COMMAND} -E rm ${rel_path_prefix}/${_target}.dll ${rel_path_prefix}/${_target}.lib Release/${_target}.exp
+  )
+ENDIF()
