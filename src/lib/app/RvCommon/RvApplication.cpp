@@ -494,9 +494,6 @@ RvApplication::about()
     ostringstream date;
     TWK_DEPLOY_SHOW_PROGRAM_BANNER(date);
 
-    // Note: When updating Copyright year, remember to update those as well:
-    // - src/lib/app/RvCommon/RvApplication.cpp
-    // - src/lib/base/TwkDeploy/deploy_macros.h
     vector<char> temp;
     temp.reserve(2048);
     sprintf(temp.data(),

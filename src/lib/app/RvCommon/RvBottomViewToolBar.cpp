@@ -165,6 +165,7 @@ RvBottomViewToolBar::build()
     a = addAction("");
     b = dynamic_cast<QToolButton*>(widgetForAction(a));
     b->setIcon(QIcon(":/images/control_bstep.png"));
+    b->setToolTip("Step back one frame");
     b->setProperty("tbstyle", QVariant(QString("left")));
     b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_backStepAction = a;
@@ -172,6 +173,7 @@ RvBottomViewToolBar::build()
     a = addAction("");
     b = dynamic_cast<QToolButton*>(widgetForAction(a));
     b->setIcon(QIcon(":/images/control_fstep.png"));
+    b->setToolTip("Step forward one frame");
     b->setProperty("tbstyle", QVariant(QString("right")));
     b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_forwardStepAction = a;
@@ -179,6 +181,7 @@ RvBottomViewToolBar::build()
     a = addAction("");
     b = dynamic_cast<QToolButton*>(widgetForAction(a));
     b->setIcon(QIcon(":/images/control_bplay.png"));
+    b->setToolTip("Play backwards");
     b->setProperty("tbstyle", QVariant(QString("left")));
     b->setProperty("tbsize", QVariant(QString("double")));
     b->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -187,6 +190,7 @@ RvBottomViewToolBar::build()
     a = addAction("");
     b = dynamic_cast<QToolButton*>(widgetForAction(a));
     b->setIcon(QIcon(":/images/control_play.png"));
+    b->setToolTip("Play forwards");
     b->setProperty("tbstyle", QVariant(QString("right")));
     b->setProperty("tbsize", QVariant(QString("double")));
     b->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -195,6 +199,7 @@ RvBottomViewToolBar::build()
     a = addAction("");
     b = dynamic_cast<QToolButton*>(widgetForAction(a));
     b->setIcon(QIcon(":/images/control_bmark.png"));
+    b->setToolTip("Skip to start of sequence");
     b->setProperty("tbstyle", QVariant(QString("left")));
     b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_backMarkAction = a;
@@ -202,6 +207,7 @@ RvBottomViewToolBar::build()
     a = addAction("");
     b = dynamic_cast<QToolButton*>(widgetForAction(a));
     b->setIcon(QIcon(":/images/control_fmark.png"));
+    b->setToolTip("Skip to end of sequence");
     b->setProperty("tbstyle", QVariant(QString("right")));
     b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     m_forwardMarkAction = a;

@@ -4,17 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# Empty those lists at the begining of a configure stage
-SET(RV_PACKAGE_LIST
-    ""
-    CACHE INTERNAL ""
-)
-SET(INSTALLED_RV_PACKAGE_LIST
-    ""
-    CACHE INTERNAL ""
-)
-
-#
 # Create & populate a list of all the shared libraries for later testing.
 MACRO(ADD_SHARED_LIBRARY_LIST new_entry)
   LIST(APPEND _shared_libraries "${new_entry}")
@@ -403,12 +392,14 @@ FUNCTION(rv_stage)
 
     IF(NOT arg_FILES)
       FILE(
-              GLOB _files
+              GLOB_RECURSE _files
               RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
               *
       )
-    else()
-      SET(_files ${arg_FILES})
+    ELSE()
+      SET(_files
+          ${arg_FILES}
+      )
     ENDIF()
 
     LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
@@ -445,18 +436,11 @@ FUNCTION(rv_stage)
         CACHE INTERNAL ""
     )
 
-    LIST(APPEND INSTALLED_RV_PACKAGE_LIST "${RV_STAGE_PLUGINS_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg")
-    LIST(REMOVE_DUPLICATES INSTALLED_RV_PACKAGE_LIST)
-    SET(INSTALLED_RV_PACKAGES
-        ${INSTALLED_RV_PACKAGE_LIST}
-        CACHE INTERNAL ""
-    )
-
     ADD_CUSTOM_COMMAND(
       COMMENT "Creating ${_package_filename} ..."
       OUTPUT ${_package_filename}
       DEPENDS ${_files} ${_package_file}
-      COMMAND zip -v -j ${_package_filename} ${_files} ${_package_file}
+      COMMAND zip -v ${_package_filename} ${_files} ${_package_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 

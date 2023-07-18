@@ -180,6 +180,7 @@ def configure() -> None:
             configure_args.append("darwin64-x86_64-cc")
     elif platform.system() == "Windows":
         configure_args.append("VC-WIN64A")
+        configure_args.append("no-asm")
     else:
         configure_args.append("linux-x86_64")
 

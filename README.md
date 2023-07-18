@@ -31,7 +31,7 @@ Support for other operating systems is on a best effort basis.
 
 ## Building RV
 
-You can use `source rvmds.sh` to add common build aliases into your shell. After the first download following the installation of the required dependencies, use `rvbootstrap` to set up, configure, and build Open RV with the default options.
+You can use `source rvcmds.sh` to add common build aliases into your shell. After the first download following the installation of the required dependencies, use `rvbootstrap` to set up, configure, and build Open RV with the default options.
 
 After the setup, you can use `rvmk` (the common build alias) to configure and build Open RV. You can also use `rvmkd` to configure and build in Debug.
 

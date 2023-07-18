@@ -83,6 +83,12 @@ class PackageManager
         QString location;
     };
 
+    struct AuxFolder
+    {
+        QString folder;
+        QString location;
+    };
+
     struct Package
     {
         Package() : installed(false),
@@ -117,6 +123,7 @@ class PackageManager
         QStringList    files;
 
         QList<AuxFile> auxFiles;
+        QList<AuxFolder> auxFolders;
 
         bool           installed;
         bool           loadable;

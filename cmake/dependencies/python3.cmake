@@ -17,7 +17,7 @@ SET(_pyside2_target
 )
 
 SET(_python3_version
-    "3.9.15"
+    "3.9.17"
 )
 
 SET(_opentimelineio_version
@@ -25,14 +25,14 @@ SET(_opentimelineio_version
 )
 
 SET(_pyside2_version
-    "5.15.2.1"
+    "5.15.10"
 )
 
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
 SET(_python3_download_hash
-    "310405aa7d54dcfb8890930667ac3cdb"
+    "c7b5d223bf9e80c766ccae7c88ff1e66"
 )
 
 SET(_opentimelineio_download_url
@@ -42,11 +42,11 @@ SET(_opentimelineio_git_tag
     "v${_opentimelineio_version}"
 )
 
-SET(_pyside2_git_repo_url
-    "git://code.qt.io/pyside/pyside-setup.git"
+SET(_pyside2_archive_url
+    "https://download.qt.io/official_releases/QtForPython/pyside2/PySide2-${_pyside2_version}-src/pyside-setup-opensource-src-${_pyside2_version}.zip"
 )
-SET(_pyside2_git_tag
-    "v${_pyside2_version}"
+SET(_pyside2_download_hash
+    "87841aaced763b6b52e9b549e31a493f"
 )
 
 SET(_install_dir
@@ -78,8 +78,8 @@ ENDIF()
 
 FETCHCONTENT_DECLARE(
   ${_pyside2_target}
-  GIT_REPOSITORY ${_pyside2_git_repo_url}
-  GIT_TAG ${_pyside2_git_tag}
+  URL ${_pyside2_archive_url}
+  URL_HASH MD5=${_pyside2_download_hash}
   SOURCE_SUBDIR "sources" # Avoids the top level CMakeLists.txt
 )
 
@@ -195,7 +195,7 @@ SET(_requirements_install_command
 
 EXTERNALPROJECT_ADD(
   ${_python3_target}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_NAME ${_python3_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${_source_dir}
