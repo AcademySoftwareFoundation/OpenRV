@@ -457,13 +457,14 @@ IF(MIO_TARGET_DARWIN
     COMMAND ${CMAKE_COMMAND} -E rm ${mio_lib_source_path}
   )
 ELSE()
+  # CMake Generator Expressions are required for build-time values for Multi-Config Generators (Visual Studio)
   SET(rel_path_prefix
-      ${CMAKE_BUILD_TYPE}
+      $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>
   )
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
-    COMMENT "Post Build ${_target} Windows: renaming files"
+    COMMENT "Post Build ${_target} Windows ${rel_path_prefix}: renaming files"
     COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.dll ${rel_path_prefix}/${final_lib_name_no_ext}.dll
     COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.lib ${rel_path_prefix}/${final_lib_name_no_ext}.lib
     COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.exp ${rel_path_prefix}/${final_lib_name_no_ext}.exp
