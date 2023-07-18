@@ -9,6 +9,8 @@
 OPTION(RV_VERBOSE_INVOCATION "Show the compiler/link command invocation." OFF)
 OPTION(RV_SHOW_ALL_VARIABLES "Displays all build variables." ON)
 
+#
+# General build options
 SET(RV_DEPS_BASE_DIR
     "${CMAKE_BINARY_DIR}"
     CACHE STRING "RV's 3rd party cache location."
