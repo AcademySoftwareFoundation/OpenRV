@@ -487,6 +487,19 @@ def configure() -> None:
                     else:
                         makefile.write(new_line)
 
+    # Adds the openssl libs to the Python build environment.
+    openssl_libs = []
+    if platform.system() == "Darwin":
+        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
+    elif platform.system() == "Linux":
+        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*"))
+    elif platform.system() == "Windows":
+        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
+
+    for lib_path in openssl_libs:
+        print(f"Copying {lib_path} to the python source")
+        shutil.copyfile(lib_path, os.path.join(SOURCE_DIR, os.path.basename(lib_path)))
+
 
 def build() -> None:
     """
@@ -494,7 +507,6 @@ def build() -> None:
     """
 
     if platform.system() == "Windows":
-
         build_args = [
             os.path.join(SOURCE_DIR, "PCBuild", "build.bat"),
             "-p",
