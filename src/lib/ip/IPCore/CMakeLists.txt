@@ -252,11 +252,15 @@ IF(RV_TARGET_WINDOWS)
     ${_target}
     PRIVATE "-wd4355"
   )
-ELSE()
+ELSEIF(RV_TARGET_DARWIN)
   FIND_PACKAGE(OpenCL REQUIRED)
   TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC OpenCL::OpenCL
+  )
+ELSE()
+  TARGET_LINK_LIBRARIES(
+    ${_target}
   )
 ENDIF()
 

@@ -26,7 +26,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkFB TwkUtil
-  PRIVATE exif jpeg
+  PRIVATE exif jpeg-turbo::jpeg
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})

@@ -14,6 +14,7 @@ SET(_target
 SET(_version
     "3.1.7"
 )
+
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
 )
@@ -24,6 +25,10 @@ SET(_download_hash
 
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
+)
+
+SET(${_target}_ROOT_DIR
+    ${_install_dir}
 )
 
 IF(RV_TARGET_LINUX)
@@ -67,7 +72,9 @@ SET(_openexr_lib
     ${_lib_dir}/${_openexr_name}
 )
 
-SET(LIB_VERSION_SUFFIX "30.7.1")
+SET(LIB_VERSION_SUFFIX
+    "30.7.1"
+)
 
 IF(RV_TARGET_DARWIN)
   SET(_openexrcore_name
@@ -177,6 +184,7 @@ EXTERNALPROJECT_ADD(
 SET(_include_dir
     ${_install_dir}/include/OpenEXR
 )
+
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
@@ -255,13 +263,14 @@ IF(RV_TARGET_WINDOWS)
     PROPERTY IMPORTED_IMPLIB ${_openexr_implib}
   )
 ENDIF()
+
 TARGET_INCLUDE_DIRECTORIES(
   OpenEXR::OpenEXR
   INTERFACE ${_include_dir}
 )
 TARGET_LINK_LIBRARIES(
   OpenEXR::OpenEXR
-  INTERFACE Imath::Imath OpenEXR::Iex OpenEXR::IlmThread
+  INTERFACE Imath::Imath OpenEXR::Iex OpenEXR::IlmThread ZLIB::ZLIB
 )
 LIST(APPEND RV_DEPS_LIST OpenEXR::OpenEXR)
 
