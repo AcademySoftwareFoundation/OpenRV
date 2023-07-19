@@ -462,7 +462,6 @@ FUNCTION(rv_stage)
       DEPENDS ${_package_filename}
     )
 
-    ADD_DEPENDENCIES(${arg_TARGET}-${_pkg_version}.rvpkg create_pkg_filelist-${arg_TARGET}-${_pkg_version})
     ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
 
   ELSEIF(${arg_TYPE} STREQUAL "IMAGE_FORMAT")
