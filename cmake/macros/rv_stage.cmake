@@ -456,7 +456,6 @@ FUNCTION(rv_stage)
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
-    ADD_CUSTOM_TARGET(create_pkg_filelist-${arg_TARGET}-${_pkg_version} ALL DEPENDS ${_temp_file})
     ADD_CUSTOM_TARGET(
       ${arg_TARGET}-${_pkg_version}.rvpkg ALL
       DEPENDS ${_package_filename}
