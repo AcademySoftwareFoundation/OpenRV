@@ -436,11 +436,23 @@ FUNCTION(rv_stage)
         CACHE INTERNAL ""
     )
 
+    # Generate a file to store the list of package files
+    SET(_temp_file "${CMAKE_CURRENT_BINARY_DIR}/pkgfilelist.txt")
+
+    # Remove the file if it exists
+    file(REMOVE ${_temp_file})
+
+    # For each package file in the list, append it to the file
+    foreach(file IN LISTS _files _package_file)
+      file(APPEND ${_temp_file} "${file}\n")
+    endforeach()
+
+    # Create the package zip file
     ADD_CUSTOM_COMMAND(
       COMMENT "Creating ${_package_filename} ..."
       OUTPUT ${_package_filename}
-      DEPENDS ${_files} ${_package_file}
-      COMMAND zip -v ${_package_filename} ${_files} ${_package_file}
+      DEPENDS ${_temp_file}
+      COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
