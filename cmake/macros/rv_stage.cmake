@@ -449,17 +449,17 @@ FUNCTION(rv_stage)
 
     # Create the package zip file
     ADD_CUSTOM_COMMAND(
-            COMMENT "Creating ${_package_filename} ..."
-            OUTPUT ${_package_filename}
-            DEPENDS ${_temp_file}
-            COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      COMMENT "Creating ${_package_filename} ..."
+      OUTPUT ${_package_filename}
+      DEPENDS ${_temp_file}
+      COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
     ADD_CUSTOM_TARGET(create_pkg_filelist-${arg_TARGET}-${_pkg_version} ALL DEPENDS ${_temp_file})
     ADD_CUSTOM_TARGET(
-            ${arg_TARGET}-${_pkg_version}.rvpkg ALL
-            DEPENDS ${_package_filename}
+      ${arg_TARGET}-${_pkg_version}.rvpkg ALL
+      DEPENDS ${_package_filename}
     )
 
     ADD_DEPENDENCIES(${arg_TARGET}-${_pkg_version}.rvpkg create_pkg_filelist-${arg_TARGET}-${_pkg_version})
