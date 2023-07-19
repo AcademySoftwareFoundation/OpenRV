@@ -458,16 +458,28 @@ IF(MIO_TARGET_DARWIN
   )
 ELSE()
   # CMake Generator Expressions are required for build-time values for Multi-Config Generators (Visual Studio)
-  SET(rel_path_prefix
+  SET(relative_path_prefix
       $<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>
+  )
+  # Hack: We cannot check if a file exists in ADD_CUSTOM_COMMAND especially when mixing with Generator Expression due to multi-config. Therefore since we do not
+  # know if we are in Debug or Release for the POST_BUILD commands, we repeat a command for Release since a command cannot be empty.
+  SET(hack_source_pdb_file_path_or_dup_exp_path
+      $<$<CONFIG:Debug>:Debug/${_target}.pdb>$<$<CONFIG:Release>:${relative_path_prefix}/${_target}.exp>
+  )
+  SET(hack_dest_pdb_file_path_or_dup_exp_path
+      $<$<CONFIG:Debug>:Debug/${final_lib_name_no_ext}.pdb>$<$<CONFIG:Release>:${relative_path_prefix}/${final_lib_name_no_ext}.exp>
   )
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
-    COMMENT "Post Build ${_target} Windows ${rel_path_prefix}: renaming files"
-    COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.dll ${rel_path_prefix}/${final_lib_name_no_ext}.dll
-    COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.lib ${rel_path_prefix}/${final_lib_name_no_ext}.lib
-    COMMAND ${CMAKE_COMMAND} -E copy ${rel_path_prefix}/${_target}.exp ${rel_path_prefix}/${final_lib_name_no_ext}.exp
-    COMMAND ${CMAKE_COMMAND} -E rm ${rel_path_prefix}/${_target}.dll ${rel_path_prefix}/${_target}.lib Release/${_target}.exp
+    COMMENT "Post Build ${_target} Windows ${relative_path_prefix}: renaming files"
+    COMMAND ${CMAKE_COMMAND} -E copy ${relative_path_prefix}/${_target}.dll ${relative_path_prefix}/${final_lib_name_no_ext}.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${relative_path_prefix}/${_target}.lib ${relative_path_prefix}/${final_lib_name_no_ext}.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${relative_path_prefix}/${_target}.exp ${relative_path_prefix}/${final_lib_name_no_ext}.exp
+    # Only for Debug, Release will duplicate a previous command.
+    COMMAND ${CMAKE_COMMAND} -E copy ${hack_source_pdb_file_path_or_dup_exp_path} ${hack_dest_pdb_file_path_or_dup_exp_path}
+    # Finally remove old files, rm -f doesn't fail if the file doesn't exist.
+    COMMAND ${CMAKE_COMMAND} -E rm ${relative_path_prefix}/${_target}.dll ${relative_path_prefix}/${_target}.lib ${relative_path_prefix}/${_target}.exp
+    COMMAND ${CMAKE_COMMAND} -E rm -f Debug/${_target}.pdb
   )
 ENDIF()
