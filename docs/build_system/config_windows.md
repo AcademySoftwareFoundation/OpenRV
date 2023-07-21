@@ -81,7 +81,7 @@ Note: To confirm which version/location of any tool used inside the MSYS shell, 
 
 The path to mingw's bin must be added e.g. `msys64/mingw64/bin`.
 
-To set your PATH correctly: you can edit the MSYS ~/.bashrc or alter (untested) the Windows Path EnvVar. In ~/.bashrc, add a line `PATH=<python>:<mingw64 bin>:PATH` such as `PATH=/c/Python310:/c/msys64/mingw64/bin:PATH` which will put Python and Ninja before `PATH` which contains `msys64/usr/bin`. If you do not have a separate Python, do not add it and python.exe from mingw64 will be used. (But read the Python section about Building DEBUG)
+To set your PATH correctly: you can edit the MSYS ~/.bashrc or alter (untested) the Windows Path EnvVar. In ~/.bashrc, add a line `PATH=<mingw64 bin>:PATH` such as `PATH=/c/msys64/mingw64/bin:PATH` which will put Python and Ninja before `PATH` which contains `msys64/usr/bin`.
 
 ### Python
 
@@ -95,7 +95,7 @@ This step is not required if you do not intend to build the debug version of RV.
 
 ### Ninja
 
-To use Ninja on MSYS, you must add **msys64/mingw64/bin** to your PATH. Ninja is installed as a dependency for `meson`.
+A large part of the RV build on Windows uses Ninja. To use Ninja on MSYS, you must add **msys64/mingw64/bin** to your PATH. Ninja is installed as a dependency for `meson` hence it doesn't need to be manually installed.
 
 ### CMake
 
