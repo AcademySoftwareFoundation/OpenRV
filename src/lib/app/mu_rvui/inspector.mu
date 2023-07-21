@@ -32,7 +32,10 @@ class: Inspector : Widget
     bool            _xFlipped;
     bool            _yFlipped;
     bool            _inputsChanged;
+    bool            _graphStateChanged;
     bool            _glReadPending;
+    bool            _updateAverageColor;
+    bool            _skipNextSampleAtPoint;
     bool            _nearTriangle;
     int             _widW;
 
@@ -111,9 +114,13 @@ class: Inspector : Widget
         if (_showFBColor)
         {
             _glReadPending = true;
-            //  float[] pixels;
-            //  glReadPixels(ip.x, ip.y, 1, 1, GL_RGBA, pixels);
-            //  _fbColor = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
+            _averageColor    = Color(0, 0, 0);
+            _colorSamples    = 0;
+        }
+        else
+        {
+            _averageColor    = sp.v;
+            _colorSamples    = 1;
         }
 
         _colorSampling   = true;
@@ -122,8 +129,6 @@ class: Inspector : Widget
         _colorPointEvent = ip;
         _colorPointImage = eventToImageSpace(sName, ip);
         _colorSourceInfo = pinfo;
-        _averageColor    = sp.v;
-        _colorSamples    = 1;
         _colorFrame      = frame();
         redraw();
     }
@@ -144,9 +149,13 @@ class: Inspector : Widget
         if (_showFBColor)
         {
             _glReadPending = true;
-            //  float[] pixels;
-            //  glReadPixels(ip.x, ip.y, 1, 1, GL_RGBA, pixels);
-            //  _fbColor = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
+            _averageColor    = Color(0, 0, 0);
+            _colorSamples    = 0;
+        }
+        else
+        {
+            _averageColor    = sp.v;
+            _colorSamples    = 1;
         }
 
         _colorSampling   = true;
@@ -155,14 +164,28 @@ class: Inspector : Widget
         _colorPointEvent = ip;
         _colorPointImage = eventToImageSpace(sName, ip);
         _colorSourceInfo = pinfo;
-        _averageColor    = sp.v;
-        _colorSamples    = 1;
         _colorFrame      = frame();
+
+        _skipNextSampleAtPoint = true;
+
         redraw();
     }
 
     \: sampleAtPoint (void; Inspector this, Event event)
     {
+        // Whenever we shift-click to reset the _averageColor value, it calls 'pointer-1--shift--push' then
+        // 'pointer-1--shift--drag'. This behaviour makes it so when we reset, we'd get 2 samples inside the
+        // _averageColor var, which is not what we want, because we're resetting that value! 
+        // (it should be either 0 or 1, for the value under the current position). 
+        // This if statement corrects that behaviour, by making sure that we skip the first time we enter
+        // sampleAtPoint() because beginSampling() was called at the same time.
+
+        if (_skipNextSampleAtPoint)
+        {
+            _skipNextSampleAtPoint = false;
+            return;
+        }
+
         State state = data();
         recordPixelInfo(event);
         if (state.pixelInfo eq nil || state.pixelInfo.empty()) return;
@@ -175,9 +198,11 @@ class: Inspector : Widget
         if (_showFBColor)
         {
             _glReadPending = true;
-            //  float[] pixels;
-            //  glReadPixels(ip.x, ip.y, 1, 1, GL_RGBA, pixels);
-            //  _fbColor = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
+        }
+        else
+        {
+            _averageColor    += sp.v;
+            _colorSamples    += 1;
         }
 
         _currentColor     = sp.v;
@@ -185,8 +210,6 @@ class: Inspector : Widget
         _colorPointPixel  = Point(pinfo.px, pinfo.py);
         _colorPointImage  = eventToImageSpace(sName, ip);
         _colorSourceInfo  = pinfo;
-        _averageColor    += sp.v;
-        _colorSamples    += 1;
         _colorFrame       = frame();
 
         redraw();
@@ -226,10 +249,8 @@ class: Inspector : Widget
             if (_showFBColor)
             {
                 _glReadPending = true;
-                //  float[] pixels;
-                //  glReadPixels(offpt.x, offpt.y, 1, 1, GL_RGBA, pixels);
-                //  _fbColor = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
             }
+
             _colorSampling   = true;
             _currentColor    = sp.v;
             _colorPointPixel = Point(pinfo.px, pinfo.py);
@@ -237,6 +258,7 @@ class: Inspector : Widget
             _colorPointImage = eventToImageSpace(sName, _colorPointEvent);
             _colorSourceInfo = pinfo;
             _colorFrame      = frame();
+            _updateAverageColor = false;
         }
 
         redraw();
@@ -253,6 +275,9 @@ class: Inspector : Widget
     \: optFinalColor (void; Inspector i, bool val, Event event)
     {
         i._showFBColor = val;
+        i._graphStateChanged = true;
+        i._averageColor = Color(0, 0, 0);
+        i._colorSamples = 0;
         writeSettings(i);
     }
 
@@ -361,6 +386,12 @@ class: Inspector : Widget
         redraw();
     }
 
+    method: graphStateChanged (void; Event event)
+    {
+        event.reject();
+        _graphStateChanged = true;
+    }
+
     method: nearMenuTriangle (bool; Event event)
     {
         State state = data();
@@ -401,6 +432,7 @@ class: Inspector : Widget
                     ("pointer-3--push", popupOpts(this,), "Popup Inspector Options"),
                     ("pointer--move", inspectorMove, ""),
                     ("graph-node-inputs-changed", inputsChanged, ""),
+                    ("graph-state-change", graphStateChanged, ""),
                     ("stylus-pen--push", storeDownPoint(this,), "Move Inspector"),
                     ("stylus-pen--drag", drag(this,), "Move Inspector"),
                     ("stylus-pen--release", release(this,, \: (void;) { Widget.toggle(this); }), ""),
@@ -441,7 +473,10 @@ class: Inspector : Widget
         _xFlipped = false;
         _yFlipped = false;
         _inputsChanged = false;
+        _graphStateChanged = false;
         _glReadPending = false;
+        _updateAverageColor = true;
+        _skipNextSampleAtPoint = false;
         _nearTriangle = false;
     }
 
@@ -511,7 +546,7 @@ class: Inspector : Widget
 
         gltext.size(state.config.inspectorTextSize);
 
-        if (_colorSampling && (frame() != _colorFrame || _inputsChanged || _glReadPending))
+        if (_colorSampling && (frame() != _colorFrame || _inputsChanged || _graphStateChanged || _glReadPending))
         {
             if (_showFBColor)
             {
@@ -526,14 +561,19 @@ class: Inspector : Widget
                 c = _currentColor;
             }
 
-            if (!_glReadPending)
+            // This should be true most of the time, only changing when we are dragging [drag()]
+            // (not to confuse with shift-dragging [sampleAtPoint()], which does update the _averageColor var)
+            if(_updateAverageColor)
             {
                 _averageColor += c;
                 _colorSamples += 1;
-                _colorFrame    = frame();
-                _inputsChanged = false;
             }
+
+            _colorFrame    = frame();
+            _inputsChanged = false;
+            _graphStateChanged = false;
             _glReadPending = false;
+            _updateAverageColor = true;
         }
 
         let a       = _averageColor / float(_colorSamples),

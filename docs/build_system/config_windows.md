@@ -87,6 +87,8 @@ To set your PATH correctly: you can edit the MSYS ~/.bashrc or alter (untested) 
 
 You must use Python from mingw64 (msys64/mingw64/bin/python.exe) or your own. Therefore, you must set your PATH EnvVar correctly. Python must be BEFORE **msys64/usr/bin**.
 
+Reminder: you must install, via pip, the requirements which are contained at the root of the project in the file requirements.txt. You must start pip from your mingw64 python executable. If there's any errors while installing via pip, see build_system/build_errors.md.
+
 **Building DEBUG**
 
 To successfully build Open RV in debug on Windows, you must also install a Windows-native python3 ([download page](https://www.python.org/downloads/)) as it is required to build the opentimelineio python wheel in debug.
