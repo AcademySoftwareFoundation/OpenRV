@@ -1,4 +1,4 @@
-# Building Open RV on Rocky 9
+# Building Open RV on Rocky 8
 
 ## Summary
 
