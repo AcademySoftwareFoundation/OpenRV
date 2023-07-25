@@ -394,6 +394,7 @@ FUNCTION(rv_stage)
       FILE(
               GLOB_RECURSE _files
               RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+              CONFIGURE_DEPENDS
               *
       )
     ELSE()
