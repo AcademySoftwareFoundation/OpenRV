@@ -48,12 +48,10 @@ IF(RV_TARGET_WINDOWS)
   # On Windows build, the options are in the cmake/patches/nmake.opt' file. Hence to toggle the options in nmake.opt, we have a patch in cmake/patches to change
   # it. UPDATE NOTE: When upating TIFF, update the patch in cmake/patches.
 
-  # We cannot use COPY's /Y switch as CMake's path translation converts the switch to \Y which then becomes an invalid statement. For that reason we'll simply
-  # create a variable to the patch file and use the command directly in the ExternalProject_Add block.
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    STRING(REPLACE "/" "\\" _patch_path "${RV_PATCHES_DIR}/tiff_nmake_dbg.opt")
+    SET(_patch_path "${RV_PATCHES_DIR}/tiff_nmake_dbg.opt")
   ELSE()
-    STRING(REPLACE "/" "\\" _patch_path "${RV_PATCHES_DIR}/tiff_nmake_rel.opt")
+    SET(_patch_path "${RV_PATCHES_DIR}/tiff_nmake_rel.opt")
   ENDIF()
 
   EXTERNALPROJECT_ADD(
@@ -63,10 +61,10 @@ IF(RV_TARGET_WINDOWS)
     DOWNLOAD_NAME ${_target}_${_version}.tar.gz
     DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${_base_dir}/src
+    SOURCE_DIR ${_source_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ZLIB::ZLIB jpeg-turbo::jpeg
-    PATCH_COMMAND COPY /Y ${_patch_path} nmake.opt
+    PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${_patch_path} ${_source_dir}/nmake.opt
     CONFIGURE_COMMAND ""
     BUILD_COMMAND nmake /f Makefile.vc
     INSTALL_COMMAND ""
