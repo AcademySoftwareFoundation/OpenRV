@@ -2973,7 +2973,12 @@ Session::evaluateForDisplay()
 
         if (!m_postFirstNonEmptyRender && currentFrameState() == OkStatus)
         {
-            m_postFirstNonEmptyRender = true;
+            // In progressive source loading, we need to wait until the first load is actually completed
+            static const bool progressiveSourceLoading = Application::optionValue<bool>("progressiveSourceLoading", false);
+            if (!progressiveSourceLoading)
+            {
+                m_postFirstNonEmptyRender = true;
+            }
         }
     }
     catch (const std::exception& exc)
@@ -4501,6 +4506,10 @@ Session::userGenericEvent(const string& eventName,
     GenericStringEvent event(eventName, this, contents, senderName);
     sendEvent(event);
     m_currentSession = s;
+    if (!m_postFirstNonEmptyRender && eventName =="after-progressive-loading" ){
+        m_postFirstNonEmptyRender = true;
+    } 
+        
     return event.returnContent();
 }
 
