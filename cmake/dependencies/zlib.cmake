@@ -84,6 +84,13 @@ SET(_libpath
     ${_lib_dir}/${_libname}
 )
 
+IF(RV_TARGET_WINDOWS)
+  # Zlib is a Shared lib (see _libname): On Windows it'll go in the bin dir.
+  SET(_libpath
+      ${_bin_dir}/${_libname}
+  )
+ENDIF()
+
 LIST(APPEND _zlib_byproducts ${_libpath})
 
 IF(RV_TARGET_WINDOWS)
