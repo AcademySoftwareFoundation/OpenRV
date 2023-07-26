@@ -1,4 +1,4 @@
-# Building Open RV on Rocky 9
+# Building Open RV on Rocky 8
 
 ## Summary
 
@@ -22,7 +22,7 @@ Some of the build dependencies come from outside the main AppStream repo. So fir
 ```bash
 sudo dnf install epel-release
 sudo dnf config-manager --set-enabled crb devel
-sudo dnf install alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson ninja-build openssl-devel perl-FindBin pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zip zlib-devel
+sudo dnf install alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson ninja-build openssl-devel pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zip zlib-devel
 ```
 
 You can disable the devel repo afterwards since dnf will warn about it:
@@ -37,6 +37,12 @@ You may or may not have libGLU on your system depending on your graphics driver 
 ```bash
 sudo dnf install mesa-libGLU mesa-libGLU-devel
 ```
+
+### OPENSSL
+
+Warning: RV's OpenSSL breaks this Linux version: Building OpenRV will fail and OpenRV will not start if the build is fixed.
+
+Fixing the build: edit src/build/make_python.py, find the openssl_libs variable for Linux (platform == "Linux") and remove the OPENSSL_OUTPUT_DIR and change it to 'usr' and change 'lib' to 'lib64'.
 
 ### Install the python requirements
 
