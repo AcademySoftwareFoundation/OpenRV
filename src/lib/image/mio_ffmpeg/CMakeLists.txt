@@ -242,3 +242,57 @@ IF(RV_TARGET_WINDOWS
 ENDIF()
 
 RV_STAGE(TYPE "MOVIE_FORMAT" TARGET ${_target})
+
+SET(_test_location
+    ${RV_DEPS_BASE_DIR}/src/lib/image/mio_ffmpeg
+)
+
+SET(_test_build_dir_location
+    ${_test_location}/test_build
+)
+
+# When CTest is called to run this test, the source code will be copied in this test directory (_test_location). Moreover, a build folder
+# (_test_build_dir_location) will be created before CTest calls the test
+IF(RV_TARGET_WINDOWS)
+  ADD_TEST(
+    MIO_FFMPEG_EXT_BUILD
+    ${CMAKE_CTEST_COMMAND}
+    --build-and-test
+    ${_test_location}
+    ${_test_build_dir_location}
+    --build-generator
+    ${CMAKE_GENERATOR}
+    --build-noclean
+    --build-config
+    ${CMAKE_BUILD_TYPE}
+  )
+ELSE()
+  ADD_TEST(
+    MIO_FFMPEG_EXT_BUILD
+    ${CMAKE_CTEST_COMMAND}
+    --build-and-test
+    ${_test_location}
+    ${_test_build_dir_location}
+    --build-generator
+    "Ninja"
+    --build-config
+    ${CMAKE_BUILD_TYPE}
+    --build-makeprogram
+    ${CMAKE_MAKE_PROGRAM}
+    VERBOSE=1
+    --build-options
+    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+  )
+ENDIF()
+
+# Run the test in Post Build, use a EnvVar to set Lib/Bin search path to the Stage folder
+ADD_CUSTOM_COMMAND(
+  TARGET ${_target}
+  POST_BUILD
+  COMMENT "Running MIO_FFMPEG Test: Copying the external build files and start CTest"
+  COMMAND ${CMAKE_COMMAND} -E rm -Rf ${_test_build_dir_location}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${_test_build_dir_location}
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_STAGE_SRC_DIR}/${_target} ${_test_location}
+  COMMAND ${CMAKE_COMMAND} -E env MIO_DEP_ROOT_DIR=${RV_STAGE_ROOT_DIR} ${CMAKE_CTEST_COMMAND}
+  WORKING_DIRECTORY ${_test_location}
+)
