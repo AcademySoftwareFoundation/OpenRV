@@ -16,6 +16,9 @@ ADD_LIBRARY(
   ${_target} SHARED
   ${_sources}
 )
+# mio_ffmpeg and the external build plus the CTest for the external build depend on FFMPEG (and boost) However, cmake/dependencies is built before but we
+# emphasize here the dependency.
+ADD_DEPENDENCIES(${_target} ffmpeg::avcodec)
 
 TARGET_LINK_LIBRARIES(
   ${_target}
@@ -243,9 +246,17 @@ ENDIF()
 
 RV_STAGE(TYPE "MOVIE_FORMAT" TARGET ${_target})
 
-SET(_test_location
+SET(_test_base_location
     ${RV_DEPS_BASE_DIR}/src/lib/image/mio_ffmpeg
 )
+
+SET(_test_location
+    ${_test_base_location}/test_workspace
+)
+
+IF(NOT EXISTS (${_test_location}))
+  FILE(MAKE_DIRECTORY ${_test_location})
+ENDIF()
 
 SET(_test_build_dir_location
     ${_test_location}/test_build
@@ -290,9 +301,9 @@ ADD_CUSTOM_COMMAND(
   TARGET ${_target}
   POST_BUILD
   COMMENT "Running MIO_FFMPEG Test: Copying the external build files and start CTest"
-  COMMAND ${CMAKE_COMMAND} -E rm -Rf ${_test_build_dir_location}
+  COMMAND ${CMAKE_COMMAND} -E rm -rf ${_test_build_dir_location}
   COMMAND ${CMAKE_COMMAND} -E make_directory ${_test_build_dir_location}
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_STAGE_SRC_DIR}/${_target} ${_test_location}
   COMMAND ${CMAKE_COMMAND} -E env MIO_DEP_ROOT_DIR=${RV_STAGE_ROOT_DIR} ${CMAKE_CTEST_COMMAND}
-  WORKING_DIRECTORY ${_test_location}
+  WORKING_DIRECTORY ${_test_base_location}
 )
