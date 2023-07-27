@@ -502,7 +502,7 @@ RvApplication::about()
             TWK_DEPLOY_MAJOR_VERSION(),
             TWK_DEPLOY_MINOR_VERSION(),
             TWK_DEPLOY_PATCH_LEVEL(),
-             GIT_HEAD,
+            GIT_HEAD,
             headerComment.str().c_str(),
             UI_APPLICATION_NAME,
             COPYRIGHT_TEXT);
@@ -984,7 +984,7 @@ RvApplication::prefs()
         QPushButton* b1 = box.addButton(tr("Cancel"), QMessageBox::RejectRole);
         QPushButton* b2 = box.addButton(tr("Disable Presentation Mode"), QMessageBox::AcceptRole);
 #ifdef PLATFORM_LINUX
-        box.setIconPixmap(QPixmap(":images/RV_icon.png").scaledToHeight(64));
+        box.setIconPixmap(QPixmap(RV_ICON).scaledToHeight(64));
 #else
         box.setIcon(QMessageBox::Critical);
 #endif
@@ -1573,7 +1573,7 @@ RvApplication::setPresentationMode(bool value)
                     if (doc) parent = (RvDocument *)doc->opaquePointer();
                     QMessageBox box(parent);
                     box.setWindowTitle(tr(UI_APPLICATION_NAME ": Presentation Mode"));
-		    QString baseText = QString("The presentation device (%1/%2) is busy or cannot be opened.")
+		            QString baseText = QString("The presentation device (%1/%2) is busy or cannot be opened.")
                                 .arg(d->module()->name().c_str()).arg(d->name().c_str());
                     QString detailedText = QString(UI_APPLICATION_NAME " failed to open or bind the presentation device (%1/%2)."
                                                 " Check to see if another program is using the device"
@@ -1586,7 +1586,7 @@ RvApplication::setPresentationMode(bool value)
                     box.setText(baseText + "\n\n" + detailedText);
                     box.setWindowModality(Qt::WindowModal);
                     QPushButton* b0 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                    box.setIconPixmap(QPixmap(":images/RV_icon.png").scaledToHeight(64));
+                    box.setIconPixmap(QPixmap(RV_ICON).scaledToHeight(64));
                     box.exec();
 
                     m_presentationMode = false;
@@ -1600,10 +1600,10 @@ RvApplication::setPresentationMode(bool value)
                 box.setWindowTitle(tr(UI_APPLICATION_NAME ": Presentation Mode"));
                 QString baseText = QString("The presentation device (%1/%2) failed to open.")
                             .arg(d->module()->name().c_str()).arg(d->name().c_str());
-		box.setText(baseText + "\n\n" + exc.what());
+		        box.setText(baseText + "\n\n" + exc.what());
                 box.setWindowModality(Qt::WindowModal);
                 QPushButton* b0 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                box.setIconPixmap(QPixmap(":images/RV_icon.png").scaledToHeight(64));
+                box.setIconPixmap(QPixmap(RV_ICON).scaledToHeight(64));
                 box.exec();
 
                 m_presentationMode = false;
