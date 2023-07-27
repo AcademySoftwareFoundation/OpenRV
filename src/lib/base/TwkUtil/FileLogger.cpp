@@ -20,11 +20,9 @@ namespace TwkUtil {
 
     FileLogger::FileLogger()
     {
-    #if defined(PLATFORM_LINUX)
-        std::string logFilePath = "/var/log/";
-    #elif defined(PLATFORM_DARWIN)
+    #if defined(PLATFORM_DARWIN)
         std::string logFilePath = QDir::homePath().toStdString() + "/Library/Logs/" + QCoreApplication::organizationName().toStdString() + "/";
-    #elif defined(PLATFORM_WINDOWS)
+    #else
         std::string logFilePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() +  "/";
     #endif
 
@@ -37,9 +35,13 @@ namespace TwkUtil {
         ).get();
 
         setLogLevel(evFileLogLevel.getValue());
+
+        m_logger->info("============ SESSION START ============");
     }
 
-    FileLogger::~FileLogger() {}
+    FileLogger::~FileLogger() {
+        m_logger->info("============  SESSION END  ============");        
+    }
 
     void FileLogger::logToFile(spdlog::level::level_enum lineLevel, std::string& line)
     {
