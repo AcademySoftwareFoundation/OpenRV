@@ -297,3 +297,8 @@ SET(RV_DEPS_BOOST_VERSION
     ${_version}
     CACHE INTERNAL "" FORCE
 )
+
+SET(RV_DEPS_BOOST_MAJOR_MINOR_VERSION
+    ${_major_minor_version}
+    CACHE INTERNAL "" FORCE
+)

@@ -49,7 +49,8 @@ FUNCTION(before_copy FILE_PATH RET_VAL)
   IF(FILE_PATH MATCHES "\\.prl$"
      OR FILE_PATH MATCHES "\\.o$"
      OR FILE_PATH MATCHES "\\.obj$"
-     OR FILE_PATH MATCHES "\\.a$"
+     OR (FILE_PATH MATCHES "\\.a$"
+         AND NOT FILE_PATH MATCHES "${RV_STAGE_SRC_DIR}/mio_ffmpeg/lib")
      OR FILE_PATH MATCHES "\\.la$"
      OR FILE_PATH MATCHES "\\.c$"
   )
