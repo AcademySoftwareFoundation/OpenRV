@@ -45,7 +45,7 @@ RV is built with Microsoft Visual Studio 2019 via the cmake "Visual Studio 16 20
 
 msys2 is only used for convenience as it comes with a package manager with utility packages required for the RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
 
-NOTE: The Windows' WSL2 feature conflict with MSYS2. For simplicity, it is recommanded to disable Windows' WSL or WSL2 feature entirely.
+NOTE: The Windows' WSL2 feature conflict with MSYS2. For simplicity, it is highly recommended to disable Windows' WSL or WSL2 feature entirely.
 
 Additional information can be found on the [MSYS2 github](https://github.com/msys2/setup-msys2/issues/52).
 
@@ -73,10 +73,41 @@ pacman -S --needed \
         zip
 ```
 
+While installing the MSYS packages, review the list for any missing package. Some packages might not be installed after the first command.
+
+Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
+
+### Setting the PATH
+
+The path to mingw's bin must be added e.g. `msys64/mingw64/bin`.
+
+To set your PATH correctly: you can edit the MSYS ~/.bashrc or alter (untested) the Windows Path EnvVar. In ~/.bashrc, add a line `PATH=<mingw64 bin>:PATH` such as `PATH=/c/msys64/mingw64/bin:PATH` which will put Python and Ninja before `PATH` which contains `msys64/usr/bin`.
+
+### Python
+
+You must use Python from mingw64 (msys64/mingw64/bin/python.exe) or your own. Therefore, you must set your PATH EnvVar correctly. Python must be BEFORE **msys64/usr/bin**.
+
+Reminder: you must install, via pip, the requirements which are contained at the root of the project in the file requirements.txt. You must start pip from your mingw64 python executable. If there's any errors while installing via pip, see build_system/build_errors.md.
+
+**Building DEBUG**
 
 To successfully build Open RV in debug on Windows, you must also install a Windows-native python3 ([download page](https://www.python.org/downloads/)) as it is required to build the opentimelineio python wheel in debug.
 
 This step is not required if you do not intend to build the debug version of RV.
 
-NOTE: Even as of Windows 11, for legacy reason, a default system path length is still limited to 254 bytes long.
+### Ninja
+
+A large part of the RV build on Windows uses Ninja. To use Ninja on MSYS, you must add **msys64/mingw64/bin** to your PATH. Ninja is installed as a dependency for `meson` hence it doesn't need to be manually installed.
+
+### CMake
+
+If you have your own install of CMake on your computer, your PATH will need to pick mingw's CMake and not your own. `cmake --help` must return that the default is Ninja e.g. : `* Ninja`. Usually CMake on Windows will default to **Visual Studio** but mingw's CMake defaults to **Ninja which OpenRV is dependent on**.
+
+Symptoms of using Windows' (and not mingw64) CMake:
+- During the build, Python scripts such as quoteFile.py, make_openssl.py and make_python.py fail: either they don't work or they aren't found.
+- `build.ninja not found` during the build of a dependency. (cmake/dependencies) Reason: CMake in ExternalProject_Add *configured* the Project with the Visual Studio Generator whereas OpenRV's ExternalProject_Add build command expects that Ninja will be used.
+
+### NOTE: Path Length
+
+Even as of Windows 11, for legacy reason, a default system path length is still limited to 254 bytes long.
 For that reason we strongly suggest cloning `OpenRV` into drive's root directory e.g.: `C:\`

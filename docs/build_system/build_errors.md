@@ -146,6 +146,30 @@ Ref.: [Resolve "DSO missing from command line" error](https://zhangboyi.gitlab.i
 Ref.: [error adding symbols: DSO missing from command line](https://stackoverflow.com/questions/19901934/libpthread-so-0-error-adding-symbols-dso-missing-from-command-line)
 
 
+### Windows 10 & Windows 11 (Windows 10+) : PIP REQUIREMENTS: py7zr fails to install
+
+```
+  [end of output]
+
+        note: This error originates from a subprocess, and is likely not a problem with pip.
+
+      See above for output.
+
+      note: This is an issue with the package mentioned above, not pip.
+      hint: See above for details.
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× pip subprocess to install build dependencies did not run successfully.
+```
+Note: There's an issue with the latest version of MSYS2 and Python3.xx versions. Enter the following command from the same MSYS2-MinGW64 shell if you encounter an error when installing the **py7zr** python requirement:
+
+```shell
+SETUPTOOLS_USE_DISTUTILS=stdlib pip install py7zr
+```
+
 ### macOS, Linux, Windows
 ```text
 [ 99%] Linking CXX executable rv
