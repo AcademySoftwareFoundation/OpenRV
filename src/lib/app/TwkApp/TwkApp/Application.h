@@ -9,6 +9,7 @@
 #define __TwkApp__Application__h__
 #include <TwkUtil/Notifier.h>
 #include <TwkApp/Document.h>
+#include <TwkApp/OutputPlugins.h>
 
 namespace TwkApp {
 class VideoModule;
@@ -56,6 +57,8 @@ class Application : public TwkUtil::Notifier
     //  Video Device Modules
     //
 
+    void loadOutputPlugins(const std::string& envvar);
+    void unloadOutputPlugins();
     void addVideoModule(VideoModule* m) { m_videoModules.push_back(m); }
     virtual VideoModule* primaryVideoModule() const;
     const VideoModules& videoModules() const { return m_videoModules; }
@@ -76,6 +79,7 @@ class Application : public TwkUtil::Notifier
   private:
     Documents           m_documents;
     VideoModules        m_videoModules;
+    OutputPlugins       m_outputPlugins;
     static Application* m_app;
     friend class Document;
 };

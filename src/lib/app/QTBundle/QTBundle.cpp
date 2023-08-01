@@ -137,6 +137,7 @@ QTBundle::init()
                 static const char* dirs[] = {"Packages", "ImageFormats", "MovieFormats",
                                              "Mu", "SupportFiles", "ConfigFiles", "lib", 
                                              "Python", "OIIO", "Nodes", "Profiles",
+                                             "Output",
                                              NULL};
 
                 for (size_t q = 0; dirs[q]; q++)
@@ -168,6 +169,12 @@ QTBundle::init()
             {
                 addPathToEnvVar("OIIO_LIBRARY_PATH", 
                                 dir.absoluteFilePath("OIIO").toUtf8().constData());
+            }
+
+            if (dir.exists("Output"))
+            {
+                addPathToEnvVar("TWK_OUTPUT_PLUGIN_PATH", 
+                                dir.absoluteFilePath("Output").toUtf8().constData());
             }
 
             if (dir.exists("MovieFormats"))

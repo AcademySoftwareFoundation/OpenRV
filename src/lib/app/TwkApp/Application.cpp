@@ -7,7 +7,9 @@
 //******************************************************************************
 
 #include <TwkApp/Application.h>
-#include <assert.h>
+#include <TwkApp/OutputPlugin.h>
+#include <TwkApp/VideoDevice.h>
+#include <TwkApp/VideoModule.h>
 #include <stl_ext/stl_ext_algo.h>
 
 namespace TwkApp {
@@ -57,6 +59,35 @@ VideoModule*
 Application::primaryVideoModule() const
 {
     return m_videoModules.empty() ? 0 : m_videoModules.front();
+}
+
+void
+Application::loadOutputPlugins(const std::string& envvar)
+{
+    m_outputPlugins.loadPlugins(envvar);
+    for (auto outputPlugin : m_outputPlugins.plugins())
+    {
+        int moduleIndex = 0;
+        TwkApp::VideoModule* outputModule = nullptr;
+        do 
+        {
+            outputModule = outputPlugin->output_module_create(OUTPUT_PLUGIN_VERSION, moduleIndex++);
+            if (outputModule)
+            {
+                addVideoModule(outputModule);
+                for (auto d : outputModule->devices())
+                {
+                    std::cout << "INFO: " << outputModule->name() << " found " << d->name() << std::endl;
+                }
+            }
+        } while (outputModule!=nullptr);
+    }
+}
+
+void
+Application::unloadOutputPlugins()
+{
+    m_outputPlugins.unloadPlugins();
 }
 
 

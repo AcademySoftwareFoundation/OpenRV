@@ -56,8 +56,6 @@ class RvApplication : public QObject, public IPCore::Application
     typedef std::vector<const QTGLVideoDevice*>  VideoDeviceVector;
     typedef TwkUtil::Timer                       Timer;
 
-    typedef void (*DeviceCreationFunc)(RvDocument*, RvApplication*);
-
     typedef std::map<DispatchID, DispatchCallback>      DispatchMap;
     typedef std::mutex                                  DispatchMutex;
 
@@ -65,7 +63,7 @@ class RvApplication : public QObject, public IPCore::Application
     //  Constructors
     //
 
-    RvApplication(int argc, char** argv, DeviceCreationFunc F = 0);
+    RvApplication(int argc, char** argv);
     virtual ~RvApplication();
 
     void createNewSessionFromFiles(const StringVector&) override;
@@ -155,7 +153,6 @@ class RvApplication : public QObject, public IPCore::Application
     bool                    m_presentationMode;
     mutable pthread_mutex_t m_deleteLock;
     std::string             m_executableNameCaps;
-    DeviceCreationFunc      m_deviceCreationFunc;
     DesktopVideoModule*     m_desktopModule;
     QTimer*                 m_pingTimer;
     QTimer*                 m_dispatchTimer;
