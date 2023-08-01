@@ -25,6 +25,8 @@ SET(_sources
     Application.cpp
     Bundle.cpp
     Exception.cpp
+    OutputPlugin.cpp
+    OutputPlugins.cpp
     VideoDevice.cpp
     VideoModule.cpp
 )

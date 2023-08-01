@@ -70,25 +70,6 @@ class VideoModule
     VideoDevices m_devices;
 };
 
-
-class VideoModuleProxy : public VideoModule
-{
-  public:
-    VideoModuleProxy(const std::string& name, const std::string& pluginFilename);
-    virtual ~VideoModuleProxy();
-
-    virtual std::string name() const;
-    virtual void open();
-    virtual void close();
-    virtual bool isOpen() const;
-    virtual const VideoDevices& devices() const;
-
-  private:
-    std::string     m_name;
-    std::string     m_file;
-    VideoModule*    m_module;
-};
-
 } // TwkApp
 
 #endif // __TwkApp__VideoModule__h__
