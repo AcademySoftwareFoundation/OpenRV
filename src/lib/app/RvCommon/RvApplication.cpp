@@ -22,7 +22,6 @@
 #include <QtGui/QtGui>
 #include <QtNetwork/QtNetwork>
 #include <QtCore/QTimer>
-//#include <QtNetwork/QNetworkProxy>
 #include <IPCore/Application.h>
 #include <RvApp/Options.h>
 #include <TwkQtBase/QtUtil.h>
@@ -35,7 +34,6 @@
 #include <TwkUtil/User.h>
 #include <TwkUtil/Clock.h>
 #include <QTAudioRenderer/QTAudioRenderer.h>
-//#include <qglobal.h>
 #include <iostream>
 #include <iterator>
 #include <thread>
@@ -239,7 +237,7 @@ static void setEnvVar(const string& var, const string& val)
 #endif
 }
 
-RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
+RvApplication::RvApplication(int argc, char** argv)
     : QObject(),
       IPCore::Application(),
     m_newTimer(0),
@@ -258,7 +256,6 @@ RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
     m_presentationMode(false),
     m_presentationDevice(0),
     m_executableNameCaps(UI_APPLICATION_NAME),
-    m_deviceCreationFunc(F),
     m_desktopModule(0),
     m_dispatchAtomicInt(0)
 {
@@ -715,22 +712,11 @@ RvApplication::newSessionFromFiles(const StringVector& files)
         }
         catch (...)
         {
-                cerr << "ERROR: QTVideoModule failed" << endl;
+                cerr << "ERROR: DesktopVideoModule failed" << endl;
         }
 
-        try
-        {
-            if (m_deviceCreationFunc != 0)
-            {
-                m_deviceCreationFunc(doc, this);
-            }
-        }
-        catch (std::exception& e)
-        {
-            cout << "WARNING: VideoDeviceModule creation failed: "
-                 << e.what()
-                 << endl;
-        }
+        // Load audio/video output plugins
+        loadOutputPlugins("TWK_OUTPUT_PLUGIN_PATH");
     }
 
     doc->session()->graph().setPhysicalDevices(videoModules());

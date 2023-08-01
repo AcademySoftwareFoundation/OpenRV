@@ -220,6 +220,7 @@ DarwinBundle::DarwinBundle(const FileName& appName,
             NSString* imgformats = [path stringByAppendingPathComponent: @"ImageFormats"];
             NSString* nodes = [path stringByAppendingPathComponent: @"Nodes"];
             NSString* oiioplugs = [path stringByAppendingPathComponent: @"OIIO"];
+            NSString* output = [path stringByAppendingPathComponent: @"Output"];
             NSString* movformats = [path stringByAppendingPathComponent: @"MovieFormats"];
             NSString* supportfiles = [path stringByAppendingPathComponent: @"SupportFiles"];
             NSString* configfiles = [path stringByAppendingPathComponent: @"ConfigFiles"];
@@ -233,6 +234,7 @@ DarwinBundle::DarwinBundle(const FileName& appName,
                 mkpath(mu);
                 mkpath(imgformats);
                 mkpath(oiioplugs);
+                mkpath(output);
                 mkpath(movformats);
                 mkpath(supportfiles);
                 mkpath(configfiles);
@@ -243,6 +245,7 @@ DarwinBundle::DarwinBundle(const FileName& appName,
             addPathToEnvVar("TWK_FB_PLUGIN_PATH", [imgformats UTF8String]);
             addPathToEnvVar("TWK_NODE_PLUGIN_PATH", [nodes UTF8String]);
             addPathToEnvVar("TWK_MOVIE_PLUGIN_PATH", [movformats UTF8String]);
+            addPathToEnvVar("TWK_OUTPUT_PLUGIN_PATH", [output UTF8String]);
             addPathToEnvVar("TWK_PROFILE_PLUGIN_PATH", [profiles UTF8String]);
             addPathToEnvVar("MU_MODULE_PATH", [mu UTF8String]);
             addPathToEnvVar("PYTHONPATH", [py UTF8String]);

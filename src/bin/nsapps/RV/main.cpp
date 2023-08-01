@@ -216,16 +216,6 @@ static int gc_filter (const char* name, void* ptr, size_t size)
     }
 }
 
-static void showDevices(TwkApp::VideoModule* m)
-{
-    for (auto d : m->devices()) cout << "INFO: " << m->name() << " found " << d->name() << endl;
-}
-
-void createDevices(Rv::RvDocument* doc, Rv::RvApplication* app)
-{
-    // This is where video output devices are created (optional)
-}
-
 int main(int argc, char *argv[])
 {
     if (!getenv("HOME"))
@@ -535,7 +525,7 @@ int main(int argc, char *argv[])
         QCoreApplication::removeLibraryPath("/Developer/Applications/Qt/plugins");
     #endif
 
-    Rv::RvApplication* rvapp = new Rv::RvApplication(argc, argv, createDevices);
+    Rv::RvApplication* rvapp = new Rv::RvApplication(argc, argv);
     app->installEventFilter(rvapp);
     app->setQuitOnLastWindowClosed(true);
 
