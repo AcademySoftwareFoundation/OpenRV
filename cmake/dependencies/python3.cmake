@@ -17,7 +17,7 @@ SET(_pyside2_target
 )
 
 SET(_python3_version
-    "3.9.17"
+    "3.10.12"
 )
 
 SET(RV_DEPS_PYTHON_VERSION_MAJOR
@@ -39,7 +39,7 @@ SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
 SET(_python3_download_hash
-    "c7b5d223bf9e80c766ccae7c88ff1e66"
+    "69de50b7f8e90167932f677390e0490f"
 )
 
 SET(_opentimelineio_download_url
