@@ -11,8 +11,11 @@
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvPackage/PackageManager.h>
+#include <spdlog/common.h>
 #include <iostream>
+#include <string.h>
 #include <stl_ext/string_algo.h>
+
 
 namespace
 {
@@ -272,40 +275,42 @@ RvConsoleWindow::processLastTextBuffer()
 bool 
 RvConsoleWindow::processLine(string& line, QString& html)
 {
-    bool error = line.find("ERROR:") == 0; 
-    bool warning = line.find("WARNING:") == 0; 
-    bool info = line.find("INFO:") == 0; 
-    bool debug = line.find("DEBUG:") == 0; 
-
     bool qtimerwarning = line.find("Application asked to unregister timer") != string::npos; 
     bool qfilesystemwatcher = line.find("QFileSystemWatcher:") != string::npos;
 
     // filter this
     if (qtimerwarning || qfilesystemwatcher) return false;
 
+    spdlog::level::level_enum lineLogLevel = spdlog::level::info;
+
+    if (line.find("ERROR:") == 0) lineLogLevel = spdlog::level::err;
+    else if (line.find("WARNING:") == 0) lineLogLevel = spdlog::level::warn;
+    else if (line.find("INFO:") == 0) lineLogLevel = spdlog::level::info;
+    else if (line.find("DEBUG:") == 0) lineLogLevel = spdlog::level::debug;
+
     ostream* out = m_cout;
 
-    if (error)
+    if (lineLogLevel == spdlog::level::err)
     {
         html += "<font color=red>ERROR:</font> ";
         line.erase(0, 6);
         out = m_cerr;
         *out << "ERROR:";
     }
-    else if (warning)
+    else if (lineLogLevel == spdlog::level::warn)
     {
         html += "<font color=orange>WARNING:</font> ";
         line.erase(0, 8);
         out = m_cerr;
         *out << "WARNING:";
     }
-    else if (info)
+    else if (lineLogLevel == spdlog::level::info)
     {
         html += "<font color=cyan>INFO:</font> ";
         line.erase(0, 5);
         *out << "INFO:";
     }
-    else if (debug)
+    else if (lineLogLevel == spdlog::level::debug)
     {
         html += "<font color=green>DEBUG:</font> ";
         line.erase(0, 6);
@@ -313,7 +318,7 @@ RvConsoleWindow::processLine(string& line, QString& html)
     }
 
     html += line.c_str();
-
+    m_fileLogger.logToFile(lineLogLevel, line);
     if (line.size() && line[0] != '<') 
     {
         *out << line;
@@ -326,29 +331,31 @@ RvConsoleWindow::processLine(string& line, QString& html)
     //  Should we show the Console as a result of this line ?
     //
     return (showIndex != 4 &&
-        ((error && showIndex <= 3) ||
-         (warning && showIndex <= 3 && showIndex >= 1) ||
-         (info && showIndex <= 3 && showIndex >= 2) ||
+        ((lineLogLevel == spdlog::level::err && showIndex <= 3) ||
+         (lineLogLevel == spdlog::level::warn && showIndex <= 3 && showIndex >= 1) ||
+         (lineLogLevel == spdlog::level::info && showIndex <= 3 && showIndex >= 2) ||
          showIndex == 3));
 }
 
 bool 
 RvConsoleWindow::processAndDisplayLine(string& line)
 {
-    bool error = line.find("ERROR:") == 0; 
-    bool warning = line.find("WARNING:") == 0; 
-    bool info = line.find("INFO:") == 0; 
-    bool debug = line.find("DEBUG:") == 0; 
-
     bool qtimerwarning = line.find("Application asked to unregister timer") != string::npos; 
     bool qfilesystemwatcher = line.find("QFileSystemWatcher:") != string::npos;
 
     // filter this
     if (qtimerwarning || qfilesystemwatcher) return false;
 
+    spdlog::level::level_enum lineLogLevel = spdlog::level::info;
+
+    if (line.find("ERROR:") == 0) lineLogLevel = spdlog::level::err;
+    else if (line.find("WARNING:") == 0) lineLogLevel = spdlog::level::warn;
+    else if (line.find("INFO:") == 0) lineLogLevel = spdlog::level::info;
+    else if (line.find("DEBUG:") == 0) lineLogLevel = spdlog::level::debug;
+
     ostream* out = m_cout;
 
-    if (error)
+    if (lineLogLevel == spdlog::level::err)
     {
         textEdit()->setTextColor( Qt::red ); 
         textEdit()->insertPlainText( "ERROR:" );
@@ -356,7 +363,7 @@ RvConsoleWindow::processAndDisplayLine(string& line)
         out = m_cerr;
         *out << "ERROR:";
     }
-    else if (warning)
+    else if (lineLogLevel == spdlog::level::warn)
     {
         static const QColor orangeColor(255, 175, 0);
         textEdit()->setTextColor( orangeColor ); 
@@ -365,14 +372,14 @@ RvConsoleWindow::processAndDisplayLine(string& line)
         out = m_cerr;
         *out << "WARNING:";
     }
-    else if (info)
+    else if (lineLogLevel == spdlog::level::info)
     {
         textEdit()->setTextColor( Qt::cyan );
         textEdit()->insertPlainText( "INFO:" );
         line.erase(0, 5);
         *out << "INFO:";
     }
-    else if (debug)
+    else if (lineLogLevel == spdlog::level::debug)
     {
         textEdit()->setTextColor( Qt::green );
         textEdit()->insertPlainText( "DEBUG:" );
@@ -383,6 +390,7 @@ RvConsoleWindow::processAndDisplayLine(string& line)
     textEdit()->setTextColor( Qt::white );
     textEdit()->insertPlainText( line.c_str() );
     *out << line;
+    m_fileLogger.logToFile(lineLogLevel, line);
 
     int showIndex = m_ui.showComboBox->currentIndex();
 
@@ -390,9 +398,9 @@ RvConsoleWindow::processAndDisplayLine(string& line)
     //  Should we show the Console as a result of this line ?
     //
     return (showIndex != 4 &&
-        ((error && showIndex <= 3) ||
-         (warning && showIndex <= 3 && showIndex >= 1) ||
-         (info && showIndex <= 3 && showIndex >= 2) ||
+        ((lineLogLevel == spdlog::level::err && showIndex <= 3) ||
+         (lineLogLevel == spdlog::level::warn && showIndex <= 3 && showIndex >= 1) ||
+         (lineLogLevel == spdlog::level::info && showIndex <= 3 && showIndex >= 2) ||
          showIndex == 3));
 }
 

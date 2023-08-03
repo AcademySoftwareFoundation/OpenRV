@@ -201,6 +201,7 @@ TARGET_LINK_LIBRARIES(
           IOjpeg
           IOtarga
           IOtiff
+          spdlog::spdlog
 )
 
 IF(RV_TARGET_DARWIN)

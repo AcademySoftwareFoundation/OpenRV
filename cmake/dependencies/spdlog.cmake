@@ -1,0 +1,156 @@
+#
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+INCLUDE(ProcessorCount) # require CMake 3.15+
+PROCESSORCOUNT(_cpu_count)
+
+SET(_target
+    "RV_DEPS_SPDLOG"
+)
+
+SET(_version
+    "1.11.0"
+)
+
+SET(_download_url
+    "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
+)
+
+SET(_download_hash
+    cd620e0f103737a122a3b6539bd0a57a
+)
+
+SET(_install_dir
+    ${RV_DEPS_BASE_DIR}/${_target}/install
+)
+
+SET(_include_dir
+    ${_install_dir}/include
+)
+
+IF(RV_TARGET_LINUX)
+  SET(_lib_dir
+      ${_install_dir}/lib64
+  )
+ELSE()
+  SET(_lib_dir
+      ${_install_dir}/lib
+  )
+ENDIF()
+
+SET(_spdlog_lib_name
+    ${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${CMAKE_STATIC_LIBRARY_SUFFIX}
+)
+
+SET(_spdlog_lib
+    ${_lib_dir}/${_spdlog_lib_name}
+)
+
+IF(RV_TARGET_WINDOWS)
+  # MSYS2/CMake defaults to Ninja
+  SET(_make_command
+      ninja
+  )
+ELSE()
+  SET(_make_command
+      make
+  )
+ENDIF()
+
+IF(RV_TARGET_WINDOWS)
+  SET(_cmake_configure_command
+    ${CMAKE_COMMAND}
+  ) 
+  LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
+  LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+  LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
+  EXTERNALPROJECT_ADD(
+    ${_target}
+    DOWNLOAD_NAME ${_target}_${_version}.zip
+    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+    INSTALL_DIR ${_install_dir}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
+    CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
+    BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
+    INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    BUILD_IN_SOURCE TRUE
+    BUILD_ALWAYS FALSE
+    BUILD_BYPRODUCTS ${_spdlog_lib}
+    USES_TERMINAL_BUILD TRUE
+  )
+ELSE()
+  EXTERNALPROJECT_ADD(
+    ${_target}
+    DOWNLOAD_NAME ${_target}_${_version}.zip
+    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+    INSTALL_DIR ${_install_dir}
+    URL ${_download_url}
+    URL_MD5 ${_download_hash}
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DSPDLOG_BUILD_EXAMPLE=OFF -B ./_build
+    BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
+    INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    BUILD_IN_SOURCE TRUE
+    BUILD_ALWAYS FALSE
+    BUILD_BYPRODUCTS ${_spdlog_lib}
+    USES_TERMINAL_BUILD TRUE
+  )
+ENDIF()
+
+ADD_LIBRARY(spdlog::spdlog STATIC IMPORTED GLOBAL)
+ADD_DEPENDENCIES(spdlog::spdlog ${_target})
+SET_PROPERTY(
+  TARGET spdlog::spdlog
+  PROPERTY IMPORTED_LOCATION ${_spdlog_lib}
+)
+SET_PROPERTY(
+  TARGET spdlog::spdlog
+  PROPERTY IMPORTED_SONAME ${_spdlog_lib_name}
+)
+
+FILE(MAKE_DIRECTORY ${_include_dir})
+TARGET_INCLUDE_DIRECTORIES(
+  spdlog::spdlog
+  INTERFACE ${_include_dir}
+)
+LIST(APPEND RV_DEPS_LIST spdlog::spdlog)
+
+IF(RV_TARGET_WINDOWS)
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
+  )
+  ADD_CUSTOM_TARGET(
+    ${_target}-stage-target ALL
+    DEPENDS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name}
+  )
+ELSE()
+  ADD_CUSTOM_COMMAND(
+    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
+    OUTPUT ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    DEPENDS ${_target}
+  )
+  ADD_CUSTOM_TARGET(
+    ${_target}-stage-target ALL
+    DEPENDS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name}
+  )
+ENDIF()
+
+ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+
+SET(RV_DEPS_SPDLOG_VERSION
+    ${_version}
+    CACHE INTERNAL "" FORCE
+)
