@@ -10,6 +10,12 @@ SET(_target
     "TwkUtil"
 )
 
+FIND_PACKAGE(
+  Qt5
+  COMPONENTS Core
+  REQUIRED
+)
+
 SET(_sources
     TwkRegEx.cpp
     Timer.cpp
@@ -40,6 +46,7 @@ SET(_sources
     sgcHopTools.cpp
     sgcJobDispatcher.cpp
     sgcRefCounted.cpp
+    FileLogger.cpp
 )
 
 ADD_LIBRARY(
@@ -54,8 +61,8 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC Boost::thread TwkExc TwkMath
-  PRIVATE Boost::system stl_ext
+  PUBLIC Boost::thread TwkExc TwkMath spdlog::spdlog
+  PRIVATE Boost::system Qt5::Core stl_ext
 )
 
 IF(RV_TARGET_LINUX)

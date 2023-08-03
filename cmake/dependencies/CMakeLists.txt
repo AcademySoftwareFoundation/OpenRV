@@ -72,6 +72,7 @@ INCLUDE(ocio)
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
 INCLUDE(oiio) # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
 INCLUDE(yaml-cpp) # depends on OCIO
+INCLUDE(spdlog)
 
 LIST(REMOVE_DUPLICATES RV_DEPS_LIST)
 SET(RV_DEPS_LIST
@@ -108,3 +109,4 @@ MESSAGE(STATUS "Using Tiff:         ${RV_DEPS_TIFF_VERSION}")
 MESSAGE(STATUS "Using WebP:         ${RV_DEPS_WEBP_VERSION}")
 MESSAGE(STATUS "Using Yaml-CPP:     ${RV_DEPS_YAML_CPP_VERSION} (Using OCIO's own copy)")
 MESSAGE(STATUS "Using zlib:         ${RV_DEPS_ZLIB_VERSION}")
+MESSAGE(STATUS "Using spdlog:       ${RV_DEPS_SPDLOG_VERSION}")
