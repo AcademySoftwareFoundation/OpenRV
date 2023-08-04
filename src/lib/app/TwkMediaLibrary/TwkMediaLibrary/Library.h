@@ -46,6 +46,17 @@ struct HTTPCookie
     std::string value;
 };
 
+struct HTTPHeader
+{
+    HTTPHeader(std::string n,
+               std::string v)
+        : name(std::move(n)),
+          value(std::move(v)) {}
+    
+    std::string name;
+    std::string value;
+};
+
 //
 //  All std::strings are assumed to be UTF-8 encoded *except* for URLs.
 //  These should be the subset of UTF-8 strings producing valid URLs.
@@ -66,6 +77,7 @@ typedef std::vector<int>                    IntVector;
 typedef std::pair<std::string, std::string> StringPair;
 typedef std::vector<StringPair>             StringPairVector;
 typedef std::vector<HTTPCookie>             HTTPCookieVector;
+typedef std::vector<HTTPHeader>             HTTPHeaderVector;
 
 enum PropertyType
 {
@@ -410,6 +422,7 @@ class MediaAPI : public NodeAPI
     virtual bool isRedirecting() const = 0;
     virtual const Node* baseMediaNode() const = 0; // iff isProxy() == true
     virtual HTTPCookieVector httpCookies() const;
+    virtual HTTPHeaderVector httpHeaders() const;
 
   protected:
     MediaAPI() : NodeAPI() {}

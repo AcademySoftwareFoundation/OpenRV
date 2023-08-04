@@ -8,6 +8,7 @@
 #ifndef __rv__RvApplication__h__
 #define __rv__RvApplication__h__
 #include <TwkMediaLibrary/Library.h>
+#include <EventMediaLibrary/EventMediaLibrary.h>
 #include <QtCore/QTimer>
 #include <IPCore/Application.h>
 #include <QtNetwork/QTcpServer>
@@ -55,6 +56,7 @@ class RvApplication : public QObject, public IPCore::Application
     typedef std::set<RvDocument*>                RvDocSet;
     typedef std::vector<const QTGLVideoDevice*>  VideoDeviceVector;
     typedef TwkUtil::Timer                       Timer;
+    typedef TwkMediaLibrary::EventMediaLibrary   EventMediaLibrary;
 
     typedef std::map<DispatchID, DispatchCallback>      DispatchMap;
     typedef std::mutex                                  DispatchMutex;
@@ -132,6 +134,7 @@ class RvApplication : public QObject, public IPCore::Application
     void dispatchTimeout();
 
   private:
+    EventMediaLibrary       m_eventLibrary;
     NewSessionQueue         m_newSessions;
     RvDocSet                m_deleteDocs;
     QTimer*                 m_timer;
