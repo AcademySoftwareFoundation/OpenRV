@@ -2572,6 +2572,16 @@ FileSourceIPNode::openMovieTask(const string& filename,
                               << "; domain=" << cookies[c].domain;
                 }
                 m_inparams.push_back(StringPair("cookies", cookieStm.str()));
+
+                ostringstream headersStm;
+                TwkMediaLibrary::HTTPHeaderVector headers = api->httpHeaders();
+                for (size_t h = 0, size = headers.size(); h < size; ++h) 
+                {
+                    if (h > 0) cookieStm << "\n";
+                    headersStm << headers[h].name << ": " << headers[h].value;
+                
+                }
+                m_inparams.push_back(StringPair("headers", headersStm.str()));
             }
         }
     }

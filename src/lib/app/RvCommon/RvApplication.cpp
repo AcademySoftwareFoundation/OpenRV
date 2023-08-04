@@ -257,8 +257,11 @@ RvApplication::RvApplication(int argc, char** argv)
     m_presentationDevice(0),
     m_executableNameCaps(UI_APPLICATION_NAME),
     m_desktopModule(0),
+    m_eventLibrary(INTERNAL_APPLICATION_NAME),
     m_dispatchAtomicInt(0)
 {
+    m_eventLibrary.setName("event-media-library");
+
 #ifdef PLATFORM_DARWIN
     sessionFromUrlPointer = sessionFromUrl;
     #endif

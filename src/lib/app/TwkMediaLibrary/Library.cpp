@@ -273,6 +273,7 @@ CutAPI::~CutAPI() {}
 NoteAPI::~NoteAPI() {}
 MediaAPI::~MediaAPI() {}
 HTTPCookieVector MediaAPI::httpCookies() const { return HTTPCookieVector(); }
+HTTPHeaderVector MediaAPI::httpHeaders() const { return HTTPHeaderVector(); }
 
 //----------------------------------------------------------------------
 

@@ -171,7 +171,7 @@ TARGET_LINK_LIBRARIES(
          TwkApp
          TwkGLF
          TwkMath
-         TwkMediaLibrary
+         EventMediaLibrary
          TwkQtChat
          TwkUtil
          Boost::thread
