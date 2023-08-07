@@ -19,9 +19,16 @@ ADD_LIBRARY(
   ${_sources}
 )
 
+FIND_PACKAGE(
+  Qt5
+  COMPONENTS Core
+  REQUIRED
+)
+
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC RvApp TwkMediaLibrary
+  PRIVATE Qt5::Core
 )
 
 TARGET_INCLUDE_DIRECTORIES(
