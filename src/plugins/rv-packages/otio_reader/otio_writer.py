@@ -79,9 +79,9 @@ def write_otio_file(root_node_name, file_path):
     otio.adapters.write_to_file(timeline, file_path)
 
 
-def _run_hook(hook_name, optional=True, timeline=None, *args, **kwargs):
+def _run_hook(hook_name, optional=True, *args, **kwargs):
     try:
-        return otio.hooks.run(hook_name, timeline, kwargs)
+        return otio.hooks.run(hook_name, kwargs.get("timeline"), kwargs)
     except KeyError:
         if not optional:
             raise NoMappingForNodeTypeError("No {} hook found".format(hook_name))
@@ -157,7 +157,7 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
     return next_node
 
 
-def _create_track(node_name, timeline=None):
+def _create_track(node_name, *args, **kwargs):
     """
     Create an OTIO Track instance from an RVSequenceGroup.
     :param node_name: `str`
@@ -197,14 +197,14 @@ def _create_track(node_name, timeline=None):
         edl_out = edl["out_frame"][edl_index] if has_edl else None
         cut_in_frame = edl["cut_in_frame"][edl_index] if has_edl else None
 
-        item = create_otio_from_rv_node(
-            rv_node,
-            in_frame=edl_in,
-            out_frame=edl_out,
-            cut_in_frame=cut_in_frame,
-        )
+        kwargs["in_frame"] = edl_in
+        kwargs["out_frame"] = edl_out
+        kwargs["cut_in_frame"] = cut_in_frame
+         
+        item = create_otio_from_rv_node(rv_node, *args, **kwargs)
 
         if has_edl:
+            timeline = kwargs.get("timeline")
             # set the global start time to the EDL start of the first input
             if edl_index == 0 and timeline:
                 timeline.global_start_time = otio.opentime.RationalTime(edl_in, fps)
@@ -218,11 +218,11 @@ def _create_track(node_name, timeline=None):
 
         # Now that we have the items surrounding the transition, create it
         if transition:
-            transition_node = create_otio_from_rv_node(
-                transition,
-                pre_item=track[-1] if len(track) > 0 else None,
-                post_item=item,
-            )
+            kwargs["pre_item"] = track[-1] if len(track) > 0 else None,
+            kwargs["post_item"] = item
+
+            transition_node = create_otio_from_rv_node(transition, *args, **kwargs)
+
             if transition_node:
                 track.append(transition_node)
 
@@ -254,9 +254,7 @@ def _create_stack(node_name, *args, **kwargs):
     return stack
 
 
-def _create_item(
-    node_name, in_frame=None, out_frame=None, cut_in_frame=None, *args, **kwargs
-):
+def _create_item(node_name, *args, **kwargs):
     """
     Create an OTIO Clip or Gap for an RVSourceGroup.
     :param node_name: `str`
@@ -265,6 +263,10 @@ def _create_item(
     :param cut_in_frame: `int`
     :return: `otio.schema.Clip` or `otio.schema.Gap`
     """
+
+    in_frame = kwargs.get("in_frame")
+    out_frame = kwargs.get("out_frame")
+    cut_in_frame = kwargs.get("cut_in_frame")
 
     active_source = get_source_node(node_name)
     active_source_group = node_name
@@ -388,12 +390,15 @@ def _create_media_reference(node_name, source_node):
     return media_reference
 
 
-def _create_transition(rv_trx, pre_item=None, post_item=None, *args, **kwargs):
+def _create_transition(rv_trx, *args, **kwargs):
     """
     Create an OTIO Transition for a CrossDissolve node.
     :param node_name: `str`
     :return: `otio.schema.Transition`
     """
+    pre_item = kwargs.get("pre_item")
+    pre_item = kwargs.get("post_item")
+
     transition_type = TRANSITION_TYPE_MAP.get(
         commands.nodeType(rv_trx), otio.schema.TransitionTypes.Custom
     )
