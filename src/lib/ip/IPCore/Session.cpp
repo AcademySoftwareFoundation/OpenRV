@@ -369,6 +369,7 @@ Session::Session(IPGraph* graph)
       m_syncLastTime(0),
       m_syncPredictionEnabled(true),
       m_syncTargetRefresh(-1.0),
+      m_preFirstNonEmptyRender(false),
       m_postFirstNonEmptyRender(false),
       m_batchMode(false),
       m_nextVSyncTime(0.0),
@@ -4506,7 +4507,12 @@ Session::userGenericEvent(const string& eventName,
     GenericStringEvent event(eventName, this, contents, senderName);
     sendEvent(event);
     m_currentSession = s;
-    if (!m_postFirstNonEmptyRender && eventName =="after-progressive-loading" ){
+
+    if (eventName == "before-progressive-loading") {
+        m_preFirstNonEmptyRender = true;
+    }
+
+    if (m_preFirstNonEmptyRender && !m_postFirstNonEmptyRender && eventName =="after-progressive-loading"){
         m_postFirstNonEmptyRender = true;
     } 
         
