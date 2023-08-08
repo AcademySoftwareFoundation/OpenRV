@@ -5449,7 +5449,8 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
                              bool bruteForce,
                              int codecThreads,
                              string language,
-                             double defaultFPS)
+                             double defaultFPS,
+                             void (*registerCustomCodecs)() /*=nullptr*/)
     : MovieIO("MovieFFMpeg","v2"),
       m_codecFilter(codecFilter)
 {
@@ -5464,6 +5465,9 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
 
     // Store a default frame rate just in case
     setDoubleAttribute("defaultFPS", defaultFPS);
+
+    // Register custom codecs if requested (optional)
+    if (registerCustomCodecs) registerCustomCodecs();
 
     // Init av
     avformat_network_init();

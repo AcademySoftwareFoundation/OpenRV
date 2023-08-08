@@ -79,7 +79,8 @@ class MovieFFMpegIO : public MovieIO
                   bool bruteForce,
                   int codecThreads,
                   std::string language,
-                  double defaultFPS);
+                  double defaultFPS,
+                  void (*registerCustomCodecs)()=nullptr);
 
     virtual ~MovieFFMpegIO();
 
