@@ -1018,6 +1018,7 @@ class Session : public TwkApp::Document
     ProfilingRecordVector m_profilingSamples;
     Timer                m_profilingTimer;
 
+    bool                 m_preFirstNonEmptyRender;
     bool                 m_postFirstNonEmptyRender;
 
     const VideoDevice*   m_controlVideoDevice;
