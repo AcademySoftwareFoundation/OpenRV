@@ -4,11 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-ADD_CUSTOM_TARGET(dependencies)
-SET(RV_DEPS_LIST
-    ""
-    CACHE INTERNAL ""
-)
+IF(NOT TARGET dependencies)
+  ADD_CUSTOM_TARGET(dependencies)
+ENDIF()
+
+IF(NOT DEFINED RV_DEPS_LIST)
+  SET(RV_DEPS_LIST
+      ""
+      CACHE INTERNAL ""
+  )
+ENDIF()
 
 FIND_PACKAGE(Git QUIET)
 IF(GIT_FOUND

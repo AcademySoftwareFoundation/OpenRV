@@ -212,6 +212,15 @@ IF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
+IF(RV_FFMPEG_POST_CONFIGURE_STEP)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} post_configure_step
+    ${RV_FFMPEG_POST_CONFIGURE_STEP}
+    DEPENDEES configure
+    DEPENDERS build
+  )
+ENDIF()
+
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 FOREACH(
