@@ -8,11 +8,16 @@ INCLUDE(rv_create_std_deps_vars)
 INCLUDE(rv_make_std_lib_name)
 INCLUDE(rv_copy_lib_bin_folders)
 
-ADD_CUSTOM_TARGET(dependencies)
-SET(RV_DEPS_LIST
-    ""
-    CACHE INTERNAL ""
-)
+IF(NOT TARGET dependencies)
+  ADD_CUSTOM_TARGET(dependencies)
+ENDIF()
+
+IF(NOT DEFINED RV_DEPS_LIST)
+  SET(RV_DEPS_LIST
+      ""
+      CACHE INTERNAL ""
+  )
+ENDIF()
 
 FIND_PACKAGE(Git QUIET)
 IF(GIT_FOUND
