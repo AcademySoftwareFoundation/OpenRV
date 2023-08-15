@@ -57,7 +57,7 @@ LIST(APPEND _disabled_encoders "--disable-encoder=aac")
 LIST(APPEND _disabled_encoders "--disable-encoder=aac_mf")
 LIST(APPEND _disabled_encoders "--disable-encoder=vp9_qsv")
 LIST(APPEND _disabled_encoders "--disable-encoder=vp9_vaapi")
-LIST(APPEND _disabled_decoders "--disable-encoder=dvvideo")
+LIST(APPEND _disabled_encoders "--disable-encoder=dvvideo")
 
 LIST(APPEND _disabled_parsers "--disable-parser=vp9")
 
@@ -170,19 +170,44 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-SET(_cflags
-    "-I${RV_DEPS_BASE_DIR}/RV_DEPS_OPENSSL/install/include"
+IF(NOT DEFINED RV_FFMPEG_CONFIG_OPTIONS)
+  SET(RV_FFMPEG_CONFIG_OPTIONS
+      ""
+      CACHE INTERNAL ""
+  )
+ENDIF()
+
+LIST(APPEND RV_FFMPEG_CONFIG_OPTIONS "--disable-iconv")
+LIST(APPEND RV_FFMPEG_CONFIG_OPTIONS "--disable-outdevs")
+LIST(APPEND RV_FFMPEG_CONFIG_OPTIONS "--disable-programs")
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
+SET(RV_FFMPEG_EXTRA_LIBPATH_OPTIONS
+    ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS}
+    CACHE INTERNAL ""
 )
-IF(RV_TARGET_WINDOWS)
-  SET(_ldflags
-      "-LIBPATH:${RV_DEPS_OPENSSL_LIB_DIR} -LIBPATH:${RV_DEPS_DAVID_LIB_DIR}"
-  )
-  SET(_toolchain
-      "--toolchain=msvc"
-  )
-ELSE()
-  SET(_ldflags
-      "-L${RV_DEPS_OPENSSL_LIB_DIR}"
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_C_OPTIONS)
+SET(RV_FFMPEG_EXTRA_C_OPTIONS
+    ${RV_FFMPEG_EXTRA_C_OPTIONS}
+    CACHE INTERNAL ""
+)
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTERNAL_LIBS)
+SET(RV_FFMPEG_EXTERNAL_LIBS
+    ${RV_FFMPEG_EXTERNAL_LIBS}
+    CACHE INTERNAL ""
+)
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_CONFIG_OPTIONS)
+SET(RV_FFMPEG_CONFIG_OPTIONS
+    ${RV_FFMPEG_CONFIG_OPTIONS}
+    CACHE INTERNAL ""
+)
+
+IF(NOT DEFINED RV_FFMPEG_LIB_BUILD_TYPE_FLAG)
+  SET(RV_FFMPEG_LIB_BUILD_TYPE_FLAG
+      "--enable-shared"
   )
 ENDIF()
 
@@ -199,7 +224,7 @@ ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  DEPENDS dav1d::dav1d RV_DEPS_OPENSSL
+  DEPENDS ${RV_FFMPEG_DEPENDS}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
@@ -208,9 +233,9 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir} --disable-programs --enable-shared
-    --enable-openssl --enable-libdav1d --disable-iconv --disable-outdevs ${_toolchain} --extra-ldflags=${_ldflags} --extra-cflags=${_cflags}
-    ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
+    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir}
+    ${RV_FFMPEG_LIB_BUILD_TYPE_FLAG} ${_toolchain} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS}
+    ${RV_FFMPEG_EXTRA_C_OPTIONS} ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
