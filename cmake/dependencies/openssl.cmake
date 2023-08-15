@@ -30,15 +30,31 @@ ENDIF()
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
+SET(_include_dir
+    ${_install_dir}/include
+)
 SET(_source_dir
     ${RV_DEPS_BASE_DIR}/${_target}/src
 )
 SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_target}/build
 )
-SET(RV_DEPS_OPENSSL_LIB_DIR
+SET(_lib_dir
     ${_install_dir}/lib
 )
+
+IF(RV_TARGET_WINDOWS)
+  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-LIBPATH:${_lib_dir}")
+ELSE()
+  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-L${_lib_dir}")
+ENDIF()
+
+LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-lssl")
+LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-lcrypto")
+
+LIST(APPEND RV_FFMPEG_EXTRA_C_OPTIONS "--extra-cflags=-I${_include_dir}")
+
+LIST(APPEND RV_FFMPEG_EXTERNAL_LIBS "--enable-openssl")
 
 SET(_download_url
     "https://www.openssl.org/source/openssl-${_version}.tar.gz"
@@ -87,17 +103,12 @@ ELSE()
 ENDIF()
 
 SET(_crypto_lib
-    ${RV_DEPS_OPENSSL_LIB_DIR}/${_crypto_lib_name}
+    ${_lib_dir}/${_crypto_lib_name}
 )
 
 SET(_ssl_lib
-    ${RV_DEPS_OPENSSL_LIB_DIR}/${_ssl_lib_name}
+    ${_lib_dir}/${_ssl_lib_name}
 )
-
-# IF(RV_TARGET_IS_RHEL9 OR RV_TARGET_IS_RHEL8) SET(_crypto_lib_name ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) SET(_crypto_lib
-# ${RV_DEPS_OPENSSL_LIB_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) SET(_ssl_lib_name
-# ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) SET(_ssl_lib
-# ${RV_DEPS_OPENSSL_LIB_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -117,9 +128,6 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-SET(_include_dir
-    ${_install_dir}/include
-)
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 ADD_LIBRARY(OpenSSL::Crypto SHARED IMPORTED GLOBAL)
@@ -154,6 +162,8 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 LIST(APPEND RV_DEPS_LIST OpenSSL::SSL)
 
+LIST(APPEND RV_FFMPEG_DEPENDS RV_DEPS_OPENSSL)
+
 IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
@@ -168,14 +178,12 @@ IF(RV_TARGET_WINDOWS)
   )
 ELSEIF(RV_TARGET_IS_RHEL8)
   # Blank target on RHEL8 Linux to avoid copying RV's OpenSSL files.
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-  )
+  ADD_CUSTOM_TARGET(${_target}-stage-target ALL)
 ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_LIB_DIR} ${RV_STAGE_LIB_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
     DEPENDS ${_target}
   )
   ADD_CUSTOM_TARGET(
