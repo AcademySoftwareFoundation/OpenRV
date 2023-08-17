@@ -128,6 +128,17 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
+# The enable-openssl config option expects the openssl names not to prefixed with lib, but our build of OpenSSL does add this prefix, so we'll make a copy of
+# the implibs to make it work correctly
+IF(RV_TARGET_WINDOWS)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} copy_implibs
+    COMMAND ${CMAKE_COMMAND} -E copy ${_install_dir}/lib/libssl.lib ${_install_dir}/lib/ssl.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${_install_dir}/lib/libcrypto.lib ${_install_dir}/lib/crypto.lib
+    DEPENDERS configure
+  )
+ENDIF()
+
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 ADD_LIBRARY(OpenSSL::Crypto SHARED IMPORTED GLOBAL)
