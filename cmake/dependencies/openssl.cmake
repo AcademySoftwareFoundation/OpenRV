@@ -49,9 +49,6 @@ ELSE()
   LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-L${_lib_dir}")
 ENDIF()
 
-LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-lssl")
-LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-lcrypto")
-
 LIST(APPEND RV_FFMPEG_EXTRA_C_OPTIONS "--extra-cflags=-I${_include_dir}")
 
 LIST(APPEND RV_FFMPEG_EXTERNAL_LIBS "--enable-openssl")
@@ -110,6 +107,12 @@ SET(_ssl_lib
     ${_lib_dir}/${_ssl_lib_name}
 )
 
+# Required for configuring ffmpeg build
+SET(RV_DEPS_OPENSSL_LIB_DIR
+    ${_lib_dir}
+    CACHE INTERNAL ""
+)
+
 EXTERNALPROJECT_ADD(
   ${_target}
   DOWNLOAD_NAME ${_target}_${_version}.zip
@@ -127,17 +130,6 @@ EXTERNALPROJECT_ADD(
   BUILD_BYPRODUCTS ${_crypto_lib} ${_ssl_lib}
   USES_TERMINAL_BUILD TRUE
 )
-
-# The enable-openssl config option expects the openssl names not to prefixed with lib, but our build of OpenSSL does add this prefix, so we'll make a copy of
-# the implibs to make it work correctly
-IF(RV_TARGET_WINDOWS)
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} copy_implibs
-    COMMAND ${CMAKE_COMMAND} -E copy ${_install_dir}/lib/libssl.lib ${_install_dir}/lib/ssl.lib
-    COMMAND ${CMAKE_COMMAND} -E copy ${_install_dir}/lib/libcrypto.lib ${_install_dir}/lib/crypto.lib
-    DEPENDERS configure
-  )
-ENDIF()
 
 FILE(MAKE_DIRECTORY ${_include_dir})
 

@@ -198,9 +198,21 @@ SET(RV_FFMPEG_CONFIG_OPTIONS
     CACHE INTERNAL ""
 )
 
+LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
+SET(RV_FFMPEG_DEPENDS
+    ${RV_FFMPEG_DEPENDS}
+    CACHE INTERNAL ""
+)
+
 IF(NOT DEFINED RV_FFMPEG_LIB_BUILD_TYPE_FLAG)
   SET(RV_FFMPEG_LIB_BUILD_TYPE_FLAG
       "--enable-shared"
+  )
+ENDIF()
+
+IF(RV_TARGET_WINDOWS)
+  SET(_toolchain
+      "--toolchain=msvc"
   )
 ENDIF()
 
@@ -215,9 +227,9 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env PKG_CONFIG_PATH=${RV_DEPS_BASE_DIR}/RV_DEPS_DAV1D/install/lib/pkgconfig ${_configure_command} --prefix=${_install_dir}
-    ${RV_FFMPEG_LIB_BUILD_TYPE_FLAG} ${_toolchain} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS}
-    ${RV_FFMPEG_EXTRA_C_OPTIONS} ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
+    ${CMAKE_COMMAND} -E env PKG_CONFIG_PATH=${RV_DEPS_DAVID_LIB_DIR}/pkgconfig ${_configure_command} --prefix=${_install_dir} ${RV_FFMPEG_LIB_BUILD_TYPE_FLAG}
+    ${_toolchain} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${_disabled_decoders}
+    ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
@@ -225,6 +237,17 @@ EXTERNALPROJECT_ADD(
   BUILD_BYPRODUCTS ${_build_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
+
+# The enable-openssl config option expects the openssl names not to prefixed with lib, but our build of OpenSSL does add this prefix, so we'll make a copy of
+# the implibs to make it work correctly
+IF(RV_TARGET_WINDOWS)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} copy_implibs
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_LIB_DIR}/libssl.lib ${RV_DEPS_OPENSSL_LIB_DIR}/ssl.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_LIB_DIR}/libcrypto.lib ${RV_DEPS_OPENSSL_LIB_DIR}/crypto.lib
+    DEPENDERS configure
+  )
+ENDIF()
 
 IF(RV_FFMPEG_POST_CONFIGURE_STEP)
   EXTERNALPROJECT_ADD_STEP(
