@@ -17,6 +17,9 @@ Here is a list of the people who've contributed code to the Open RV project, sor
 * Matt Daw ([mattdaw](https://github.com/mattdaw))
 * Nicolas Montmarquette ([nmontmarquette](https://github.com/nmontmarquette))
 * Roger Nelson ([rogernelson](https://github.com/rogernelson))
+* Shannon Yearwood ([shannonyearwood](https://github.com/shannonyearwood))  
+* Thomas Bernier ([ThomBern](https://github.com/ThomBern))  
+
 
 A special recognition to the Tweak Software original founders, and to all the developers who contributed to RV before it became Open RV. Their passion, dedication, and hard work have shaped RV into the powerful media review and playback software it is today.
 
