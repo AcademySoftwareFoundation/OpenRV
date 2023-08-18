@@ -244,6 +244,17 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
+# The enable-openssl config option expects the openssl names not to prefixed with lib, but our build of OpenSSL does add this prefix, so we'll make a copy of
+# the implibs to make it work correctly
+IF(RV_TARGET_WINDOWS)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} copy_implibs
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_LIB_DIR}/libssl.lib ${RV_DEPS_OPENSSL_LIB_DIR}/ssl.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_LIB_DIR}/libcrypto.lib ${RV_DEPS_OPENSSL_LIB_DIR}/crypto.lib
+    DEPENDERS configure
+  )
+ENDIF()
+
 IF(RV_FFMPEG_POST_CONFIGURE_STEP)
   EXTERNALPROJECT_ADD_STEP(
     ${_target} post_configure_step
