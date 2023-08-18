@@ -46,17 +46,11 @@ SET(_dav1d_lib
     ${_lib_dir}/${_david_lib_name}
 )
 
-IF(RV_TARGET_WINDOWS)
-  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-LIBPATH:${_lib_dir}")
-ELSE()
-  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-L${_lib_dir}")
-ENDIF()
-
-LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-ldav1d")
-
-LIST(APPEND RV_FFMPEG_EXTRA_C_OPTIONS "--extra-cflags=-I${_include_dir}")
-
-LIST(APPEND RV_FFMPEG_EXTERNAL_LIBS "--enable-libdav1d")
+# Required for configuring ffmpeg build
+SET(RV_DEPS_DAVID_LIB_DIR
+    ${_lib_dir}
+    CACHE INTERNAL ""
+)
 
 SET(_configure_command
     meson
@@ -119,10 +113,7 @@ TARGET_INCLUDE_DIRECTORIES(
   dav1d::dav1d
   INTERFACE ${_include_dir}
 )
-
 LIST(APPEND RV_DEPS_LIST dav1d::dav1d)
-
-LIST(APPEND RV_FFMPEG_DEPENDS RV_DEPS_DAV1D)
 
 IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
