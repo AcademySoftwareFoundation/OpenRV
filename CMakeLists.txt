@@ -81,7 +81,7 @@ SET(CMAKE_MODULE_PATH
 )
 
 SET(CMAKE_OSX_DEPLOYMENT_TARGET
-    "10.14"
+    "11.0"
 )
 
 INCLUDE(rv_options) # RV's build options
