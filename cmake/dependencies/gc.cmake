@@ -151,9 +151,7 @@ ELSE()
       "--enable-cplusplus"
   )
   LIST(APPEND _configure_args "--prefix=${_install_dir}")
-  IF(RV_TARGET_MACOS)
-    LIST(APPEND _configure_args MACOSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
-  ENDIF()
+
   EXTERNALPROJECT_ADD(
     ${_target}
     DOWNLOAD_NAME ${_target}_${_version}.zip
