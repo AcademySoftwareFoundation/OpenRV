@@ -16,13 +16,15 @@ Open RV is high-performant, hardware accelerated, and pipeline-friendly.
 
 ## Cloning the repository
 
-OpenRV uses submodules to pull some dependencies. When cloning the repository, make sure to do it recursively by using the following command:
+OpenRV uses submodules to pull some dependencies. When cloning the repository, make sure to do it recursively by using
+the following command:
 
 ```bash
 git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 ```
 
-If you cloned the repo without setting the `--recursive` flag, you can initialize the submodule in another step with the following command:
+If you cloned the repo without setting the `--recursive` flag, you can initialize the submodule in another step with the
+following command:
 
 ```bash
 git submodule update --init --recursive
@@ -38,12 +40,17 @@ Open RV is currently supported on the following operating systems:
 
 Support for other operating systems is on a best effort basis.
 
-
 ## Building RV
 
-You can use `source rvcmds.sh` to add common build aliases into your shell. After the first download following the installation of the required dependencies, use `rvbootstrap` to set up, configure, and build Open RV with the default options.
+You can use `source rvcmds.sh` to add common build aliases into your shell. After the first download following the
+installation of the required dependencies, use `rvbootstrap` to set up, configure, and build Open RV with the default
+options.
 
-After the setup, you can use `rvmk` (the common build alias) to configure and build Open RV. You can also use `rvmkd` to configure and build in Debug.
+After the setup, you can use `rvmk` (the common build alias) to configure and build Open RV. You can also use `rvmkd` to
+configure and build in Debug.
+
+On macOS, if you want to build for a different deployment target than your current operating system, make sure to define
+the MACOSX_DEPLOYMENT_TARGET environment variable.
 
 ### Contributor setup
 
@@ -53,13 +60,10 @@ This repository uses a pre-commit to execute formatting before a commit. To inst
 pre-commit install
 ```
 
-
-
 ### Cleanup
 
-To clean your build directory and restart from a clean slate, use the `rvclean` common build alias, or delete the `_build` folder.
-
-
+To clean your build directory and restart from a clean slate, use the `rvclean` common build alias, or delete
+the `_build` folder.
 
 ### Bootstrap
 
@@ -75,13 +79,13 @@ Use the `rvsetup` common build alias to run the bootstrap step.
 python3 -m pip install --user --upgrade -r requirements.txt
 ```
 
-
-
 ### Configure
 
-The project uses CMake and requires a `configure` step before building. It is during the configure step that you provide your Qt package.
+The project uses CMake and requires a `configure` step before building. It is during the configure step that you provide
+your Qt package.
 
-From the root of the repository, execute `cmake` and specify the path to an arbitrary build folder and the path to your QT5 package.
+From the root of the repository, execute `cmake` and specify the path to an arbitrary build folder and the path to your
+QT5 package.
 
 #### Common build alias
 
@@ -109,7 +113,6 @@ cmake -B _build -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=/Path/To/Your/
 
 To keep your third-party builds between build cleanups, set `-DRV_DEPS_BASE_DIR=/path/to/third/party`.
 
-
 ### Build
 
 Invoke the previously specified generator tool using cmake to run the `build` step (recommended).
@@ -123,8 +126,6 @@ Use the `rvbuild` (the common build alias) to run the build step. You can also u
 ```bash
 cmake --build _build --config Release -v --parallel=8 --target main_executable
 ```
-
-
 
 ### Test
 
@@ -156,23 +157,22 @@ You can run the tests with extra verbosity with the flag `--extra-verbose`.
 
 > **Important:** You cannot use `--extra-verbose` with `--parallel`. It's one or the other, not both.
 
-
-
 ### Run
 
 Once the build ends, you can execute (or debug!) Open RV from the _build directory.
 
 The path to the build is `_build/stage/app`. It contains everything required to have the proper debug symbols.
 
-
-
 ### Install
 
-Invoke the `install` step using cmake. The install step prepares Open RV for packaging by building a copy of Open RV in the `_install` folder.
+Invoke the `install` step using cmake. The install step prepares Open RV for packaging by building a copy of Open RV in
+the `_install` folder.
 
-The build system allows you to prepackage Open RV using cmake's `install` command. It will strip debug symbols if required.
+The build system allows you to prepackage Open RV using cmake's `install` command. It will strip debug symbols if
+required.
 
-Then, it's up to you to either sign or package the result, or to do both. It should contain the minimum required to have a functional Open RV.
+Then, it's up to you to either sign or package the result, or to do both. It should contain the minimum required to have
+a functional Open RV.
 
 #### Common build alias
 
