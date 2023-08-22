@@ -37,15 +37,26 @@ ELSE()
   )
 ENDIF()
 
+SET(_glew_name
+    "GLEW"
+)
+
+IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  SET(_glew_name
+      "${_glew_name}d"
+  )
+ENDIF()
+
 IF(RV_TARGET_DARWIN)
   SET(_glew_lib_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.2.2.0${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}${_glew_name}.${_version}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSE()
   SET(_glew_lib_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW${CMAKE_SHARED_LIBRARY_SUFFIX}.2.2.0
+      ${CMAKE_SHARED_LIBRARY_PREFIX}${_glew_name}${CMAKE_SHARED_LIBRARY_SUFFIX}.${_version}
   )
 ENDIF()
+
 SET(_glew_lib
     ${_lib_dir}/${_glew_lib_name}
 )
@@ -53,16 +64,6 @@ SET(_glew_lib
 SET(_make_command
     make
 )
-
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
-ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -72,9 +73,12 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  CONFIGURE_COMMAND cd auto && ${_make_command}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
-  INSTALL_COMMAND ${_make_command} install GLEW_DEST=${_install_dir}
+  CONFIGURE_COMMAND make -C auto
+  COMMAND
+    cd build/cmake && ${CMAKE_COMMAND} -B ${RV_DEPS_BASE_DIR}/${_target}/build -DCMAKE_INSTALL_PREFIX=${_install_dir}
+    -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES} -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+  BUILD_COMMAND ${CMAKE_COMMAND} --build ${RV_DEPS_BASE_DIR}/${_target}/build --parallel -v
+  INSTALL_COMMAND ${CMAKE_COMMAND} --install ${RV_DEPS_BASE_DIR}/${_target}/build
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_glew_lib}

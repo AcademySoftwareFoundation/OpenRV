@@ -58,6 +58,12 @@ LIST(APPEND _make_command "--source-dir")
 LIST(APPEND _make_command ${_source_dir})
 LIST(APPEND _make_command "--output-dir")
 LIST(APPEND _make_command ${_install_dir})
+
+IF(RV_TARGET_DARWIN)
+  LIST(APPEND _make_command "--macos-deploy-target")
+  LIST(APPEND _make_command ${CMAKE_OSX_DEPLOYMENT_TARGET})
+ENDIF()
+
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND _make_command "--perlroot")
   LIST(APPEND _make_command ${RV_DEPS_WIN_PERL_ROOT})
@@ -168,9 +174,7 @@ IF(RV_TARGET_WINDOWS)
   )
 ELSEIF(RV_TARGET_IS_RHEL8)
   # Blank target on RHEL8 Linux to avoid copying RV's OpenSSL files.
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-  )
+  ADD_CUSTOM_TARGET(${_target}-stage-target ALL)
 ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"

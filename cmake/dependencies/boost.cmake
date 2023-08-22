@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+INCLUDE(cxx_defaults)
 
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
@@ -17,8 +18,12 @@ SET(_version
     "1.76.0"
 )
 
+STRING(REPLACE "." ";" _version_list ${_version})
+LIST(GET VERSION_LIST 0 _major_version)
+LIST(GET VERSION_LIST 1 _minor_version)
+
 SET(_major_minor_version
-    "1_76"
+    "${_major_version}_${_minor_version}"
 )
 
 STRING(REPLACE "." "_" _version_with_underscore ${_version})
@@ -34,13 +39,30 @@ SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
+SET(_lib_dir
+    ${_install_dir}/lib
+)
+
+IF(RV_TARGET_WINDOWS)
+  SET(_include_dir
+      ${_install_dir}/include/boost-${_major_minor_version}
+  )
+ELSE()
+  SET(_include_dir
+      ${_install_dir}/include
+  )
+ENDIF()
+
+FILE(MAKE_DIRECTORY ${_install_dir})
+FILE(MAKE_DIRECTORY ${_lib_dir})
+FILE(MAKE_DIRECTORY ${_include_dir})
+
 SET(_boost_libs
     chrono
     date_time
     filesystem
     graph
     iostreams
-    locale
     program_options
     random
     regex
@@ -50,9 +72,13 @@ SET(_boost_libs
     timer
 )
 
-SET(_lib_dir
-    ${_install_dir}/lib
+LIST(
+  TRANSFORM _boost_libs
+  PREPEND "--with-"
+          OUTPUT_VARIABLE _boost_with_list
 )
+
+STRING(TOLOWER ${CMAKE_BUILD_TYPE} _boost_variant)
 
 # Note: Boost has a custom lib naming scheme on windows
 IF(RV_TARGET_WINDOWS)
@@ -105,30 +131,32 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-SET(_boost_b2_options
-    "-s NO_LZMA=1"
-)
-IF(RV_VERBOSE_INVOCATION)
-  SET(_boost_b2_options
-      "${_boost_b2_options} -d+2"
-  )
-ELSE()
-  SET(_boost_b2_options
-      "${_boost_b2_options} -d+0"
-  )
-ENDIF()
+LIST(APPEND _boost_cxx_flags "-stdlib=libc++")
+LIST(APPEND _boost_link_flags "-stdlib=libc++")
 
 IF(RV_TARGET_DARWIN)
   SET(_toolset
       "clang"
   )
-  SET(_boost_b2_options
-      "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}"
+
+  LIST(APPEND _boost_cxx_flags "-fPIC")
+
+  FOREACH(
+    _cmake_arch
+    ${CMAKE_OSX_ARCHITECTURES}
   )
+    LIST(APPEND _boost_cxx_flags "-arch" "${_cmake_arch}")
+    LIST(APPEND _boost_link_flags "-arch" "${_cmake_arch}")
+  ENDFOREACH()
+
+  LIST(APPEND _boost_cxx_flags "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+  LIST(APPEND _boost_link_flags "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
 ELSEIF(RV_TARGET_LINUX)
   SET(_toolset
       "gcc"
   )
+
+  LIST(APPEND _boost_cxx_flags "-fPIC")
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_toolset
       "msvc-14.2"
@@ -137,50 +165,40 @@ ELSE()
   MESSAGE(FATAL_ERROR "Unsupported (yet) target for Boost")
 ENDIF()
 
-SET(_b2_command
+SET(_boost_b2_command
     ./b2
 )
 
 IF(RV_TARGET_WINDOWS)
-  SET(_bootstrap_command
+  SET(_boost_bootstrap_command
       ./bootstrap.bat
   )
 ELSE()
-  SET(_bootstrap_command
+  SET(_boost_bootstrap_command
       ./bootstrap.sh
   )
 ENDIF()
 
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
+LIST(APPEND _boost_bootstrap_options "--prefix=${_install_dir}")
+LIST(APPEND _boost_bootstrap_options "--with-toolset=${_toolset}")
+LIST(APPEND _boost_bootstrap_options "--with-python=${RV_DEPS_PYTHON3_EXECUTABLE}")
 
-  SET(_b2_command
-      ${_darwin_x86_64} ${_b2_command}
-  )
-  SET(_bootstrap_command
-      ${_darwin_x86_64} ${_bootstrap_command}
-  )
-ENDIF()
+LIST(APPEND _boost_b2_options "toolset=${_toolset}")
+LIST(APPEND _boost_b2_options "${_boost_with_list}")
+LIST(APPEND _boost_b2_options "-d+0")
+LIST(APPEND _boost_b2_options "-q")
+LIST(APPEND _boost_b2_options "cxxstd=${RV_CPP_STANDARD}")
+LIST(APPEND _boost_b2_options "visibility=global")
+LIST(APPEND _boost_b2_options "variant=${_boost_variant}")
+LIST(APPEND _boost_b2_options "link=shared")
+LIST(APPEND _boost_b2_options "address-model=64")
+LIST(APPEND _boost_b2_options "threading=multi")
 
-IF(RV_TARGET_WINDOWS)
-  SET(_boost_python_bin
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/python.exe
-  )
-ELSE()
-  SET(_boost_python_bin
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python
-  )
-ENDIF()
+STRING(REPLACE ";" " " _boost_cxx_flags_joined "${_boost_cxx_flags}")
+STRING(REPLACE ";" " " _boost_link_flags_joined "${_boost_link_flags}")
 
-STRING(TOLOWER ${CMAKE_BUILD_TYPE} _boost_variant)
-
-LIST(
-  TRANSFORM _boost_libs
-  PREPEND "--with-"
-          OUTPUT_VARIABLE _boost_with_list
-)
+LIST(APPEND _boost_b2_options "cxxflags=${_boost_cxx_flags_joined}")
+LIST(APPEND _boost_b2_options "linkflags=${_boost_link_flags_joined}")
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -192,30 +210,14 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  CONFIGURE_COMMAND ${_bootstrap_command} --with-toolset=${_toolset} --with-python=${_boost_python_bin}
-  BUILD_COMMAND
-    # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
-    # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
-    ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=x86 address-model=64
-    ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
+  CONFIGURE_COMMAND ${_boost_bootstrap_command} ${_boost_boostrap_options}
+  BUILD_COMMAND ${_boost_b2_command} ${_boost_b2_options} -j ${_cpu_count} install --prefix=${_install_dir}
   INSTALL_COMMAND echo "Boost was both built and installed in the build stage"
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_boost_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
-
-IF(RV_TARGET_WINDOWS)
-  SET(_include_dir
-      ${_install_dir}/include/boost-${_major_minor_version}
-  )
-ELSE()
-  SET(_include_dir
-      ${_install_dir}/include
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY ${_include_dir})
 
 FOREACH(
   _boost_lib

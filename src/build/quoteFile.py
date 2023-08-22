@@ -3,7 +3,7 @@
 # Copyright (c) 2001, Tweak Films
 # Copyright (c) 2008, Tweak Software
 #
-# SPDX-License-Identifier: Apache-2.0 
+# SPDX-License-Identifier: Apache-2.0
 #
 # Quote a text file in C++ form for inclusion into a C++ source file
 #

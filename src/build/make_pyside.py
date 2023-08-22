@@ -36,8 +36,12 @@ VARIANT = ""
 QT_OUTPUT_DIR = ""
 PYTHON_OUTPUT_DIR = ""
 OPENSSL_OUTPUT_DIR = ""
+MACOS_DEPLOY_TARGET = ""
 
-LIBCLANG_URL_BASE = "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_"
+LIBCLANG_URL_BASE = (
+    "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_"
+)
+
 
 def test_python_distribution(python_home: str) -> None:
     """
@@ -78,18 +82,18 @@ def prepare() -> None:
 
     # PySide2 5.15.x recommends building with clang version 8.
     # But clang 8 headers are not compatible with Mac SDK 13.3+ headers.
-    # To workaround it, since Mac is clang-based, we'll detect the OS clang 
+    # To workaround it, since Mac is clang-based, we'll detect the OS clang
     # version and download the matching headers to build PySide.
     clang_filename_suffix = ""
-   
+
     system = platform.system()
     if system == "Darwin":
         clang_version_search = re.search(
-           "version (\d+)\.(\d+)",
-           os.popen('clang --version').read(),
+            "version (\d+)\.(\d+)",
+            os.popen("clang --version").read(),
         )
-        clang_version_str = ''.join(clang_version_search.groups())
-        clang_version_int = int(clang_version_str) 
+        clang_version_str = "".join(clang_version_search.groups())
+        clang_version_int = int(clang_version_str)
 
         if clang_version_int <= 120:
             clang_filename_suffix = clang_version_str + "-based-mac.7z"
@@ -97,7 +101,7 @@ def prepare() -> None:
             clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
     elif system == "Linux":
         clang_filename_suffix = "80-based-linux-Rhel7.2-gcc5.3-x86_64.7z"
-    elif system ==  "Windows":
+    elif system == "Windows":
         clang_filename_suffix = "80-based-windows-vs2017_64.7z"
 
     download_url = LIBCLANG_URL_BASE + clang_filename_suffix
@@ -166,40 +170,6 @@ def prepare() -> None:
                 cmakelist.write(new_line)
 
 
-def remove_broken_shortcuts(python_home: str) -> None:
-    """
-    Remove broken Python shortcuts that depend on the absolute
-    location of the Python executable.
-
-    Note that this method will also remove scripts like
-    pip, easy_install and wheel that were left around by
-    previous steps of the build pipeline.
-
-    :param str python_home: Path to the Python folder.
-    :param int version: Version of the python executable.
-    """
-    if platform.system() == "Windows":
-        # All executables inside Scripts have a hardcoded
-        # absolute path to the python, which can't be relied
-        # upon, so remove all scripts.
-        shutil.rmtree(os.path.join(python_home, "Scripts"))
-    else:
-        # Aside from the python executables, every other file
-        # in the build is a script that does not support
-        bin_dir = os.path.join(python_home, "bin")
-        for filename in os.listdir(bin_dir):
-            filepath = os.path.join(bin_dir, filename)
-            if filename not in [
-                "python",
-                "python3",
-                "python3.9",
-            ]:
-                print(f"Removing {filepath}...")
-                os.remove(filepath)
-            else:
-                print(f"Keeping {filepath}...")
-
-
 def build() -> None:
     """
     Run the build step of the build. It compile every target of the project.
@@ -218,6 +188,9 @@ def build() -> None:
         f"--parallel={os.cpu_count() or 1}",
         "--skip-docs",
     ]
+
+    if platform.system() == "Darwin":
+        pyside_build_args.append(f"--macos-deployment-target={MACOS_DEPLOY_TARGET}")
 
     # PySide2 v5.15.2.1 builds with errors on Windows using Visual Studio 2019.
     # We force Visual Studio 2017 here to make it build without errors.
@@ -282,7 +255,6 @@ def build() -> None:
             print(f"Copying {lib} into {pyside_folder}")
             shutil.copy(lib, pyside_folder)
 
-    remove_broken_shortcuts(python_home)
     test_python_distribution(python_home)
 
 
@@ -302,6 +274,9 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)
 
     parser.add_argument("--variant", dest="variant", type=str, required=True)
+    parser.add_argument(
+        "--macos-deploy-target", dest="target", type=str, required=False, default=""
+    )
 
     parser.set_defaults(prepare=False, build=False)
 
@@ -314,6 +289,7 @@ if __name__ == "__main__":
     PYTHON_OUTPUT_DIR = args.python
     QT_OUTPUT_DIR = args.qt
     VARIANT = args.variant
+    MACOS_DEPLOY_TARGET = args.target
 
     args = parser.parse_args()
     print(args)

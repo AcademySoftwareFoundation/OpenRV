@@ -10,6 +10,7 @@
 
 
 import argparse
+import errno
 import glob
 import os
 import pathlib
@@ -33,6 +34,8 @@ TEMP_DIR = ""
 VARIANT = ""
 ARCH = ""
 OPENTIMELINEIO_SOURCE_DIR = ""
+
+MACOS_DEPLOY_TARGET = ""
 
 SITECUSTOMIZE_FILE_CONTENT = f'''
 #
@@ -406,7 +409,8 @@ def configure() -> None:
             configure_args = ["arch", ARCH] + configure_args
 
         if platform.system() == "Darwin":
-            configure_args.append("MACOSX_DEPLOYMENT_TARGET=10.14")
+            configure_args.append("--with-universal-archs=universal2")
+            configure_args.append(f"MACOSX_DEPLOYMENT_TARGET={MACOS_DEPLOY_TARGET}")
 
             readline_prefix_proc = subprocess.run(
                 ["brew", "--prefix", "readline"], capture_output=True
@@ -487,6 +491,31 @@ def configure() -> None:
                     else:
                         makefile.write(new_line)
 
+    # Adds the openssl libs to the Python build environment.
+    openssl_libs = []
+    if platform.system() == "Darwin":
+        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
+    elif platform.system() == "Linux":
+        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*"))
+    elif platform.system() == "Windows":
+        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
+
+    if platform.system() != "Windows":
+        try:
+            os.mkdir(os.path.join(OUTPUT_DIR, "lib"))
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+    for lib_path in openssl_libs:
+        print(f"Copying {lib_path} to the python source")
+
+        shutil.copyfile(lib_path, os.path.join(SOURCE_DIR, os.path.basename(lib_path)))
+        if platform.system() != "Windows":
+            shutil.copyfile(
+                lib_path, os.path.join(OUTPUT_DIR, "lib", os.path.basename(lib_path))
+            )
+
 
 def build() -> None:
     """
@@ -494,7 +523,6 @@ def build() -> None:
     """
 
     if platform.system() == "Windows":
-
         build_args = [
             os.path.join(SOURCE_DIR, "PCBuild", "build.bat"),
             "-p",
@@ -627,6 +655,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--variant", dest="variant", type=str, required=True)
     parser.add_argument("--arch", dest="arch", type=str, required=False, default="")
+    parser.add_argument(
+        "--macos-deploy-target", dest="target", type=str, required=False, default=""
+    )
 
     parser.add_argument(
         "--opentimelineio-source-dir",
@@ -647,6 +678,7 @@ if __name__ == "__main__":
     VARIANT = args.variant
     ARCH = args.arch
     OPENTIMELINEIO_SOURCE_DIR = args.otio_source_dir
+    MACOS_DEPLOY_TARGET = args.target
 
     if args.clean:
         clean()

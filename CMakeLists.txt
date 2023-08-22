@@ -6,68 +6,68 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.24)
 
 SET(RV_MAJOR_VERSION
-    "1"
-    CACHE STRING "RV's version major"
+        "1"
+        CACHE STRING "RV's version major"
 )
 SET(RV_MINOR_VERSION
-    "0"
-    CACHE STRING "RV's version minor"
+        "0"
+        CACHE STRING "RV's version minor"
 )
 SET(RV_REVISION_NUMBER
-    "0"
-    CACHE STRING "RV's revision number"
+        "0"
+        CACHE STRING "RV's revision number"
 )
 
 SET(RV_VERSION_YEAR
-    "2023"
-    CACHE STRING "RV's year of release."
+        "2023"
+        CACHE STRING "RV's year of release."
 )
 
-IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE
-      "Debug"
-  )
-ENDIF()
+IF (NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE
+            "Debug"
+    )
+ENDIF ()
 
-IF(CMAKE_BUILD_TYPE
-   AND NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release)$"
+IF (CMAKE_BUILD_TYPE
+        AND NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release)$"
 )
-  MESSAGE(FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-ENDIF()
+    MESSAGE(FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+ENDIF ()
 
-IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  SET(RV_RELEASE_DESCRIPTION
-      "Debug"
-  )
-ELSE()
-  # as checked 'src/lib/app/RvCommon/RvApplication.cpp'
-  SET(RV_RELEASE_DESCRIPTION
-      "RELEASE"
-  )
-ENDIF()
+IF (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    SET(RV_RELEASE_DESCRIPTION
+            "Debug"
+    )
+ELSE ()
+    # as checked 'src/lib/app/RvCommon/RvApplication.cpp'
+    SET(RV_RELEASE_DESCRIPTION
+            "RELEASE"
+    )
+ENDIF ()
 
 SET(RV_UI_APPLICATION_NAME
-    "Open RV"
-    CACHE STRING "RV's UI application name"
+        "Open RV"
+        CACHE STRING "RV's UI application name"
 )
 SET(RV_INTERNAL_APPLICATION_NAME
-    "OpenRV"
-    CACHE STRING "RV's internal application name"
+        "OpenRV"
+        CACHE STRING "RV's internal application name"
 )
 PROJECT(
-  open-rv
-  VERSION "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"
-  LANGUAGES CXX C
+        open-rv
+        VERSION "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"
+        LANGUAGES CXX C
 )
 
 SET(CMAKE_CONFIGURATION_TYPES
-    "Debug;Release"
-    CACHE STRING "" FORCE
+        "Debug;Release"
+        CACHE STRING "" FORCE
 )
 
 SET(CMAKE_BUILD_TYPE
-    "${CMAKE_BUILD_TYPE}"
-    CACHE STRING "CMake Build Type"
+        "${CMAKE_BUILD_TYPE}"
+        CACHE STRING "CMake Build Type"
 )
 
 MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -76,12 +76,12 @@ MESSAGE("PROJECT DIR ${PROJECT_SOURCE_DIR}")
 
 # Specify our own CMake modules so we can include them right after.
 SET(CMAKE_MODULE_PATH
-    ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/defaults ${PROJECT_SOURCE_DIR}/cmake/dependencies ${PROJECT_SOURCE_DIR}/cmake/globals
-    ${PROJECT_SOURCE_DIR}/cmake/macros
+        ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/defaults ${PROJECT_SOURCE_DIR}/cmake/dependencies ${PROJECT_SOURCE_DIR}/cmake/globals
+        ${PROJECT_SOURCE_DIR}/cmake/macros
 )
 
 SET(CMAKE_OSX_DEPLOYMENT_TARGET
-    "10.14"
+        "10.14"
 )
 
 INCLUDE(rv_options) # RV's build options
@@ -102,7 +102,7 @@ INCLUDE(ExternalProject) # once in the project to include the module
 # Force verbosity of the FETCHCONTENT function, thus outputting some progress rather than just stalling CMake. Fetching and expanding an archive takes some
 # time, as an indicator that something is actually happening, we'll force verbosity of the FETCHCONTENT function thus printing some minimal progress.
 SET(FETCHCONTENT_QUIET
-    OFF
+        OFF
 )
 
 ADD_SUBDIRECTORY(cmake/dependencies)

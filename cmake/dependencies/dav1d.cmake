@@ -63,8 +63,11 @@ IF(${RV_OSX_EMULATION})
   SET(_meson_cross_file
       "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
   )
+
+  CONFIGURE_FILE(${_meson_cross_file} ${CMAKE_CURRENT_BINARY_DIR}/dav1d-cross-file.txt)
+
   SET(_configure_command
-      ${_configure_command} "--cross-file" ${_meson_cross_file}
+      ${_configure_command} "--cross-file" ${CMAKE_CURRENT_BINARY_DIR}/dav1d-cross-file.txt
   )
 ENDIF()
 
@@ -87,8 +90,9 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  CONFIGURE_COMMAND ${_configure_command} ./_build --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false -Denable_tools=false
-  BUILD_COMMAND ${_make_command} -C _build
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env MACOSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} ${_configure_command} ./_build
+                    --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false -Denable_tools=false
+  BUILD_COMMAND ${CMAKE_COMMAND} -E env MACOSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} ${_make_command} -C _build
   INSTALL_COMMAND ${_make_command} -C _build install
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
   BUILD_IN_SOURCE TRUE

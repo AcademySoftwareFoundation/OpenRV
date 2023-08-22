@@ -67,7 +67,9 @@ SET(_openexr_lib
     ${_lib_dir}/${_openexr_name}
 )
 
-SET(LIB_VERSION_SUFFIX "30.7.1")
+SET(LIB_VERSION_SUFFIX
+    "30.7.1"
+)
 
 IF(RV_TARGET_DARWIN)
   SET(_openexrcore_name
@@ -144,6 +146,7 @@ SET(_cmake_configure_command
 )
 LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
 LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
 LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
 LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 LIST(APPEND _cmake_configure_command "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")

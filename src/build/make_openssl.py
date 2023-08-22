@@ -24,6 +24,8 @@ OUTPUT_DIR = ""
 ARCH = ""
 PERL_ROOT = ""
 
+MACOS_DEPLOY_TARGET = ""
+
 
 def get_openssl_args(root) -> List[str]:
     """
@@ -178,6 +180,9 @@ def configure() -> None:
             configure_args.append(f"darwin64{ARCH}-cc")
         else:
             configure_args.append("darwin64-x86_64-cc")
+
+        configure_args.append(f"-mmacosx-version-min={MACOS_DEPLOY_TARGET}")
+
     elif platform.system() == "Windows":
         configure_args.append("VC-WIN64A")
         configure_args.append("no-asm")
@@ -246,6 +251,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--perlroot", dest="perlroot", type=str, required=False, default=""
     )
+    parser.add_argument(
+        "--macos-deploy-target", dest="target", type=str, required=False, default=""
+    )
 
     parser.set_defaults(clean=False, configure=False, build=False, install=False)
 
@@ -256,6 +264,7 @@ if __name__ == "__main__":
     OUTPUT_DIR = args.output
     ARCH = args.arch
     PERL_ROOT = args.perlroot
+    MACOS_DEPLOY_TARGET = args.target
 
     if args.clean:
         clean()

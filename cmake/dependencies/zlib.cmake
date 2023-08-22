@@ -36,24 +36,6 @@ SET(_bin_dir
     ${_install_dir}/bin
 )
 
-SET(_make_command
-    make
-)
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
-ENDIF()
-IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
-  )
-ENDIF()
-
 IF(RV_TARGET_WINDOWS)
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     SET(_zlibname
@@ -99,9 +81,9 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${RV_DEPS_BASE_DIR}/${_target}/src
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
-  INSTALL_COMMAND ${_make_command} install
+                    -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${RV_DEPS_BASE_DIR}/${_target}/src
+  BUILD_COMMAND ${CMAKE_COMMAND} --build ${RV_DEPS_BASE_DIR}/${_target}/src --parallel -v
+  INSTALL_COMMAND ${CMAKE_COMMAND} --install ${RV_DEPS_BASE_DIR}/${_target}/src
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_zlib_byproducts}

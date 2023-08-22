@@ -41,70 +41,47 @@ ELSE()
   )
 ENDIF()
 
+IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  SET(_spdlog_debug_suffix
+      d
+  )
+ENDIF()
+
 SET(_spdlog_lib_name
-    ${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${CMAKE_STATIC_LIBRARY_SUFFIX}
+    ${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${_spdlog_debug_suffix}${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
 SET(_spdlog_lib
     ${_lib_dir}/${_spdlog_lib_name}
 )
 
-IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
-  )
-ELSE()
-  SET(_make_command
-      make
-  )
-ENDIF()
-
-IF(RV_TARGET_WINDOWS)
-  SET(_cmake_configure_command
+SET(_cmake_configure_command
     ${CMAKE_COMMAND}
-  ) 
-  LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
-  LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-  LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-    INSTALL_DIR ${_install_dir}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
-    INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_spdlog_lib}
-    USES_TERMINAL_BUILD TRUE
-  )
-ELSE()
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-    INSTALL_DIR ${_install_dir}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DSPDLOG_BUILD_EXAMPLE=OFF -B ./_build
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
-    INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_spdlog_lib}
-    USES_TERMINAL_BUILD TRUE
-  )
-ENDIF()
+)
+
+LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
+LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+
+EXTERNALPROJECT_ADD(
+  ${_target}
+  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  INSTALL_DIR ${_install_dir}
+  URL ${_download_url}
+  URL_MD5 ${_download_hash}
+  CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
+  BUILD_COMMAND ${CMAKE_COMMAND} --build _build --parallel -v
+  INSTALL_COMMAND ${CMAKE_COMMAND} --install _build
+  BUILD_IN_SOURCE TRUE
+  BUILD_ALWAYS FALSE
+  BUILD_BYPRODUCTS ${_spdlog_lib}
+  USES_TERMINAL_BUILD TRUE
+)
 
 ADD_LIBRARY(spdlog::spdlog STATIC IMPORTED GLOBAL)
 ADD_DEPENDENCIES(spdlog::spdlog ${_target})
