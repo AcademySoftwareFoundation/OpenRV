@@ -78,10 +78,6 @@ SET(_configure_args
 )
 LIST(APPEND _configure_args "--prefix=${_install_dir}")
 
-IF(RV_TARGET_MACOS)
-  LIST(APPEND _configure_args MACOSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
-ENDIF()
-
 EXTERNALPROJECT_ADD(
   ${_target}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
