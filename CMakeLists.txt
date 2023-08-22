@@ -80,10 +80,6 @@ SET(CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake/macros
 )
 
-SET(CMAKE_OSX_DEPLOYMENT_TARGET
-    "11.0"
-)
-
 INCLUDE(rv_options) # RV's build options
 INCLUDE(rv_targets) # RV's build platform definitions
 INCLUDE(rv_globals) # RV's CMake-build global variables
