@@ -2466,6 +2466,14 @@ FileSourceIPNode::reloadMediaFromFiles()
 
     m_mediaMovies->valueContainer() = media;
 
+    // 
+    // First assume that the media files are all available (active)
+    // Note that if any of the media file associated with this FileSourceIPNode
+    // is unreachable, then setMediaActive(false) will be called.
+    // For reference : FileSourceIPNode::openMovieTask()
+    // 
+    m_mediaActive->front() = 1;
+
     //
     //  Sync media files
     //
@@ -2615,10 +2623,6 @@ FileSourceIPNode::openMovieTask(const string& filename,
         str << name() << ";;" << file << ";;" << mediaRepName();
         TwkApp::GenericStringEvent event("source-media-unavailable", graph(), str.str());
         graph()->sendEvent(event);
-    }
-    else
-    {
-        setMediaActive(true);
     }
 
     SharedMediaPointer sharedMedia(newSharedMedia(mov, true /*hasValidRange*/));
