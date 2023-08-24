@@ -184,20 +184,6 @@ IF(RV_TARGET_WINDOWS)
   SET(_python_release_in_bin_libpath
       ${_bin_dir}/${_python_release_libname}
   )
-
-  IF(RV_TARGET_WINDOWS)
-    # On Windows: we copy the Debug lib to the Release lib name since OCIO v2.2. Pybind11 has an issue: it is hardcoded to use the python lib for Release even
-    # for Debug.
-    IF(EXISTS ${_python_release_libpath})
-      MESSAGE("Configure removing existing Python lib file: ${_python_release_libpath}")
-      FILE(REMOVE ${_python_release_libpath})
-    ENDIF()
-
-    IF(EXISTS ${_python_release_in_bin_libpath})
-      MESSAGE("Configure removing existing Python lib file in BIN dir: ${_python_release_in_bin_libpath}")
-      FILE(REMOVE ${_python_release_in_bin_libpath})
-    ENDIF()
-  ENDIF()
 ELSE() # Not WINDOWS
   SET(_python_name
       python${_python3_version_major}.${_python3_version_minor}
