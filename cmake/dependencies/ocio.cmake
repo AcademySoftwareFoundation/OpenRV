@@ -114,13 +114,7 @@ LIST(APPEND _configure_options "-DBOOST_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
 
 # Ref.: https://cmake.org/cmake/help/latest/module/FindPython.html#hints
 LIST(APPEND _configure_options "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
-IF(RV_TARGET_WINDOWS)
-  # Python path on Windows: python3.9.exe doesn't exist. Moreover, the executable needs the EXE extension otherwise find_package fails
-  SET(OCIO_PYTHON_PATH
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_MAJOR}.exe
-  )
-  # To be added later to _configure_options as they are reset for Windows.
-ELSE()
+IF(NOT RV_TARGET_WINDOWS)
   SET(OCIO_PYTHON_PATH
       ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT}
   )
@@ -192,7 +186,7 @@ IF(NOT RV_TARGET_WINDOWS)
     SOURCE_DIR ${_source_dir}
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
-    DEPENDS ${_depends_oiio} Boost::headers Python::Python Imath::Imath ZLIB::ZLIB
+    DEPENDS ${_depends_oiio} Boost::headers RV_DEPS_PYTHON3 Imath::Imath ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
@@ -202,6 +196,19 @@ IF(NOT RV_TARGET_WINDOWS)
     USES_TERMINAL_BUILD TRUE
   )
 ELSE()
+  SET(_pyopencolorio_patch_script_path
+      ${PROJECT_SOURCE_DIR}/src/build/patch_OCIO/ocio_pyopencolorio_patch.py
+  )
+  SET(_pyopencolorio_cmakelists_path
+      ${_source_dir}/src/bindings/python/CMakeLists.txt
+  )
+  SET(_backup_pyopencolorio_cmakelists_path
+      ${_pyopencolorio_cmakelists_path}.bk
+  )
+  IF(EXISTS ${_backup_pyopencolorio_cmakelists_path})
+    FILE(REMOVE ${_backup_pyopencolorio_cmakelists_path})
+  ENDIF()
+
   GET_TARGET_PROPERTY(_vcpkg_location VCPKG::VCPKG IMPORTED_LOCATION)
   GET_FILENAME_COMPONENT(_vcpkg_path ${_vcpkg_location} DIRECTORY)
 
@@ -222,14 +229,15 @@ ELSE()
     "-DOpenImageIO_ROOT=${_oiio_install_dir}" # And the Dev (cfuoco) said that we need to pass them; they are most likely needed for OCIO APPS
     "-DOCIO_BUILD_PYTHON=ON"
     "-DOCIO_INSTALL_EXT_PACKAGES=ALL" # We should use the Default which is "MISSING" when OCIO removes OpenExr and find how to pass our own.
-    "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe"
     "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
     "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # Mandatory param: OCIO CMake code finds Python
                                                                                                                 # with this param
+    # DRV_Python_LIBRARIES: A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, which we don't
+    # want and doesn't build.
+    "-DRV_Python_LIBRARIES=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib"
     "-DPython_INCLUDE_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/include"
     "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}"
     "-DBUILD_SHARED_LIBS=ON"
-    "-DOCIO_BUILD_APPS=ON"
     "-DOCIO_BUILD_TESTS=OFF"
     "-DOCIO_BUILD_GPU_TESTS=OFF"
     "-DOCIO_BUILD_DOCS=OFF"
@@ -239,6 +247,14 @@ ELSE()
     "-S ${_source_dir}"
     "-B ${_build_dir}"
   )
+
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    # We don't build GLUT in Debug hence the debug lib for Glut doesn't exist which is needed for APPs We also switch the Python EXE because in Debug, Python
+    # builds python_d.exe and not the normal EXE filename.
+    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe" "-DOCIO_BUILD_APPS=OFF")
+  ELSE()
+    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe" "-DOCIO_BUILD_APPS=ON")
+  ENDIF()
 
   LIST(APPEND _ocio_build_options "--build" "${_build_dir}" "--config" "${CMAKE_BUILD_TYPE}"
        # "--parallel"    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib. "${_cpu_count}"   # Moreover, our Zlib
@@ -265,7 +281,8 @@ ELSE()
     SOURCE_DIR ${_source_dir}
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
-    DEPENDS ${_depends_oiio} Boost::headers Python::Python Imath::Imath VCPKG::VCPKG ZLIB::ZLIB
+    DEPENDS ${_depends_oiio} Boost::headers RV_DEPS_PYTHON3 Imath::Imath VCPKG::VCPKG ZLIB::ZLIB
+    PATCH_COMMAND python3 ${_pyopencolorio_patch_script_path} ${_pyopencolorio_cmakelists_path}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_ocio_build_options}
     INSTALL_COMMAND ${CMAKE_COMMAND} ${_ocio_install_options}

@@ -20,8 +20,12 @@ SET(_python3_version
     "3.9.17"
 )
 
-SET(RV_DEPS_PYTHON_VERSION_MAJOR 3)
-SET(RV_DEPS_PYTHON_VERSION_SHORT "3.9")
+SET(RV_DEPS_PYTHON_VERSION_MAJOR
+    3
+)
+SET(RV_DEPS_PYTHON_VERSION_SHORT
+    "3.9"
+)
 
 SET(_opentimelineio_version
     "0.15"
@@ -168,6 +172,32 @@ IF(RV_TARGET_WINDOWS)
   SET(_python3_executable
       ${_bin_dir}/python${PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG}.exe
   )
+
+  # When building in Debug, we need the Release name also: see below for add_custom_command.
+  SET(_python_release_libname
+      python${_python3_version_major}${_python3_version_minor}${CMAKE_STATIC_LIBRARY_SUFFIX}
+  )
+  SET(_python_release_libpath
+      ${_lib_dir}/${_python_release_libname}
+  )
+
+  SET(_python_release_in_bin_libpath
+      ${_bin_dir}/${_python_release_libname}
+  )
+
+  IF(RV_TARGET_WINDOWS)
+    # On Windows: we copy the Debug lib to the Release lib name since OCIO v2.2. Pybind11 has an issue: it is hardcoded to use the python lib for Release even
+    # for Debug.
+    IF(EXISTS ${_python_release_libpath})
+      MESSAGE("Configure removing existing Python lib file: ${_python_release_libpath}")
+      FILE(REMOVE ${_python_release_libpath})
+    ENDIF()
+
+    IF(EXISTS ${_python_release_in_bin_libpath})
+      MESSAGE("Configure removing existing Python lib file in BIN dir: ${_python_release_in_bin_libpath}")
+      FILE(REMOVE ${_python_release_in_bin_libpath})
+    ENDIF()
+  ENDIF()
 ELSE() # Not WINDOWS
   SET(_python_name
       python${_python3_version_major}.${_python3_version_minor}
@@ -226,6 +256,19 @@ ADD_CUSTOM_COMMAND(
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${_requirements_file}
 )
+
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
+  # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib.
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_python3_target}
+    POST_BUILD
+    COMMENT "Copying Debug Python lib as a unversionned file for Debug"
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+  )
+ENDIF()
 
 SET(${_pyside2_target}-build-flag
     ${_install_dir}/${_pyside2_target}-build-flag
