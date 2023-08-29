@@ -30,42 +30,8 @@ SET(_install_dir
 )
 
 SET(${_target}_ROOT_DIR
-  ${_install_dir}
+    ${_install_dir}
 )
-
-LIST(APPEND _disabled_decoders "--disable-decoder=bink")
-LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_dct")
-LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_rdft")
-LIST(APPEND _disabled_decoders "--disable-decoder=vp9")
-LIST(APPEND _disabled_decoders "--disable-decoder=vp9_cuvid")
-LIST(APPEND _disabled_decoders "--disable-decoder=vp9_mediacodec")
-LIST(APPEND _disabled_decoders "--disable-decoder=vp9_qsv")
-LIST(APPEND _disabled_decoders "--disable-decoder=vp9_rkmpp")
-LIST(APPEND _disabled_decoders "--disable-decoder=vp9_v4l2m2m")
-LIST(APPEND _disabled_decoders "--disable-decoder=dnxhd")
-LIST(APPEND _disabled_decoders "--disable-decoder=prores")
-LIST(APPEND _disabled_decoders "--disable-decoder=qtrle")
-LIST(APPEND _disabled_decoders "--disable-decoder=aac")
-LIST(APPEND _disabled_decoders "--disable-decoder=aac_fixed")
-LIST(APPEND _disabled_decoders "--disable-decoder=aac_latm")
-LIST(APPEND _disabled_decoders "--disable-decoder=dvvideo")
-
-LIST(APPEND _disabled_encoders "--disable-encoder=dnxhd")
-LIST(APPEND _disabled_encoders "--disable-encoder=prores")
-LIST(APPEND _disabled_encoders "--disable-encoder=qtrle")
-LIST(APPEND _disabled_encoders "--disable-encoder=aac")
-LIST(APPEND _disabled_encoders "--disable-encoder=aac_mf")
-LIST(APPEND _disabled_encoders "--disable-encoder=vp9_qsv")
-LIST(APPEND _disabled_encoders "--disable-encoder=vp9_vaapi")
-LIST(APPEND _disabled_decoders "--disable-encoder=dvvideo")
-
-LIST(APPEND _disabled_parsers "--disable-parser=vp9")
-
-LIST(APPEND _disabled_filters "--disable-filter=geq")
-
-LIST(APPEND _disabled_protocols "--disable-protocol=ffrtmpcrypt")
-LIST(APPEND _disabled_protocols "--disable-protocol=rtmpe")
-LIST(APPEND _disabled_protocols "--disable-protocol=rtmpte")
 
 SET(_make_command
     make
@@ -170,27 +136,95 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-SET(_cflags
-    "-I${RV_DEPS_BASE_DIR}/RV_DEPS_OPENSSL/install/include"
-)
+# Make a list of common FFmpeg config options
+LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-shared")
+LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-static")
+LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-iconv")
+LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-outdevs")
+LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-programs")
+LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-large-tests")
 IF(RV_TARGET_WINDOWS)
-  SET(_ldflags
-      "-LIBPATH:${RV_DEPS_OPENSSL_LIB_DIR} -LIBPATH:${RV_DEPS_DAVID_LIB_DIR}"
-  )
-  SET(_toolchain
-      "--toolchain=msvc"
-  )
-ELSE()
-  SET(_ldflags
-      "-L${RV_DEPS_OPENSSL_LIB_DIR}"
+  LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
+ENDIF()
+SET(RV_FFMPEG_COMMON_CONFIG_OPTIONS
+    ${RV_FFMPEG_COMMON_CONFIG_OPTIONS}
+    CACHE INTERNAL ""
+)
+
+# Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
+# customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake variable.
+IF(NOT DEFINED RV_FFMPEG_CONFIG_OPTIONS)
+  LIST(APPEND _disabled_decoders "--disable-decoder=bink")
+  LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_dct")
+  LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_rdft")
+  LIST(APPEND _disabled_decoders "--disable-decoder=vp9")
+  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_cuvid")
+  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_mediacodec")
+  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_qsv")
+  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_rkmpp")
+  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_v4l2m2m")
+  LIST(APPEND _disabled_decoders "--disable-decoder=dnxhd")
+  LIST(APPEND _disabled_decoders "--disable-decoder=prores")
+  LIST(APPEND _disabled_decoders "--disable-decoder=qtrle")
+  LIST(APPEND _disabled_decoders "--disable-decoder=aac")
+  LIST(APPEND _disabled_decoders "--disable-decoder=aac_fixed")
+  LIST(APPEND _disabled_decoders "--disable-decoder=aac_latm")
+  LIST(APPEND _disabled_decoders "--disable-decoder=dvvideo")
+
+  LIST(APPEND _disabled_encoders "--disable-encoder=dnxhd")
+  LIST(APPEND _disabled_encoders "--disable-encoder=prores")
+  LIST(APPEND _disabled_encoders "--disable-encoder=qtrle")
+  LIST(APPEND _disabled_encoders "--disable-encoder=aac")
+  LIST(APPEND _disabled_encoders "--disable-encoder=aac_mf")
+  LIST(APPEND _disabled_encoders "--disable-encoder=vp9_qsv")
+  LIST(APPEND _disabled_encoders "--disable-encoder=vp9_vaapi")
+  LIST(APPEND _disabled_encoders "--disable-encoder=dvvideo")
+
+  LIST(APPEND _disabled_parsers "--disable-parser=vp9")
+
+  LIST(APPEND _disabled_filters "--disable-filter=geq")
+
+  LIST(APPEND _disabled_protocols "--disable-protocol=ffrtmpcrypt")
+  LIST(APPEND _disabled_protocols "--disable-protocol=rtmpe")
+  LIST(APPEND _disabled_protocols "--disable-protocol=rtmpte")
+
+  SET(RV_FFMPEG_CONFIG_OPTIONS
+      "${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}"
+      CACHE INTERNAL ""
   )
 ENDIF()
 
-SET(_ffmpeg_david_cmake_lib_dir_path "${RV_DEPS_DAVID_LIB_DIR}")
+LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
+SET(RV_FFMPEG_DEPENDS
+    ${RV_FFMPEG_DEPENDS}
+    CACHE INTERNAL ""
+)
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_C_OPTIONS)
+SET(RV_FFMPEG_EXTRA_C_OPTIONS
+    ${RV_FFMPEG_EXTRA_C_OPTIONS}
+    CACHE INTERNAL ""
+)
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
+SET(RV_FFMPEG_EXTRA_LIBPATH_OPTIONS
+    ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS}
+    CACHE INTERNAL ""
+)
+
+LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTERNAL_LIBS)
+SET(RV_FFMPEG_EXTERNAL_LIBS
+    ${RV_FFMPEG_EXTERNAL_LIBS}
+    CACHE INTERNAL ""
+)
+
+SET(_ffmpeg_david_cmake_lib_dir_path
+    "${RV_DEPS_DAVID_LIB_DIR}"
+)
 IF(RV_TARGET_WINDOWS)
   # Changing path start from "c:/..." to "/c/..." and replacing all backslashes with slashes since PkgConfig wants a linux path
-  string(REPLACE "\\" "/" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
-  string(REPLACE ":" "" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
+  STRING(REPLACE "\\" "/" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
+  STRING(REPLACE ":" "" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
   STRING(FIND ${_ffmpeg_david_cmake_lib_dir_path} / _ffmpeg_first_slash_index)
   IF(_ffmpeg_first_slash_index GREATER 0)
     STRING(PREPEND _ffmpeg_david_cmake_lib_dir_path "/")
@@ -199,7 +233,7 @@ ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  DEPENDS dav1d::dav1d RV_DEPS_OPENSSL
+  DEPENDS ${RV_FFMPEG_DEPENDS}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
@@ -207,10 +241,10 @@ EXTERNALPROJECT_ADD(
   URL ${_download_url}
   URL_MD5 ${_download_hash}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  ${RV_FFMPEG_PATCH_COMMAND_STEP}
   CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir} --disable-programs --enable-shared
-    --enable-openssl --enable-libdav1d --disable-iconv --disable-outdevs ${_toolchain} --extra-ldflags=${_ldflags} --extra-cflags=${_cflags}
-    ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
+    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir}
+    ${RV_FFMPEG_COMMON_CONFIG_OPTIONS} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
@@ -218,17 +252,6 @@ EXTERNALPROJECT_ADD(
   BUILD_BYPRODUCTS ${_build_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
-
-# The enable-openssl config option expects the openssl names not to prefixed with lib, but our build of OpenSSL does add this prefix, so we'll make a copy of
-# the implibs to make it work correctly
-IF(RV_TARGET_WINDOWS)
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} copy_implibs
-    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_LIB_DIR}/libssl.lib ${RV_DEPS_OPENSSL_LIB_DIR}/ssl.lib
-    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_LIB_DIR}/libcrypto.lib ${RV_DEPS_OPENSSL_LIB_DIR}/crypto.lib
-    DEPENDERS configure
-  )
-ENDIF()
 
 IF(RV_FFMPEG_POST_CONFIGURE_STEP)
   EXTERNALPROJECT_ADD_STEP(
@@ -286,11 +309,11 @@ SET(${_target}-stage-flag
     ${RV_STAGE_LIB_DIR}/${_target}-stage-flag
 )
 
-
-ADD_CUSTOM_TARGET(clean-${_target}
-    COMMENT "Cleaning '${_target}' ..."
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
+ADD_CUSTOM_TARGET(
+  clean-${_target}
+  COMMENT "Cleaning '${_target}' ..."
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
 )
 
 IF(RV_TARGET_WINDOWS)

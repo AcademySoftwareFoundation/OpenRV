@@ -30,14 +30,20 @@ ENDIF()
 SET(RV_DEPS_OPENSSL_INSTALL_DIR
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
+SET(_include_dir
+    ${RV_DEPS_OPENSSL_INSTALL_DIR}/include
+)
 SET(_source_dir
     ${RV_DEPS_BASE_DIR}/${_target}/src
 )
 SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_target}/build
 )
-SET(RV_DEPS_OPENSSL_LIB_DIR
+SET(_lib_dir
     ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib
+)
+SET(_bin_dir
+    ${RV_DEPS_OPENSSL_INSTALL_DIR}/bin
 )
 
 SET(_download_url
@@ -87,17 +93,12 @@ ELSE()
 ENDIF()
 
 SET(_crypto_lib
-    ${RV_DEPS_OPENSSL_LIB_DIR}/${_crypto_lib_name}
+    ${_lib_dir}/${_crypto_lib_name}
 )
 
 SET(_ssl_lib
-    ${RV_DEPS_OPENSSL_LIB_DIR}/${_ssl_lib_name}
+    ${_lib_dir}/${_ssl_lib_name}
 )
-
-# IF(RV_TARGET_IS_RHEL9 OR RV_TARGET_IS_RHEL8) SET(_crypto_lib_name ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) SET(_crypto_lib
-# ${RV_DEPS_OPENSSL_LIB_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) SET(_ssl_lib_name
-# ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) SET(_ssl_lib
-# ${RV_DEPS_OPENSSL_LIB_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1 ) ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -117,9 +118,6 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-SET(_include_dir
-    ${RV_DEPS_OPENSSL_INSTALL_DIR}/include
-)
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 ADD_LIBRARY(OpenSSL::Crypto SHARED IMPORTED GLOBAL)
@@ -155,38 +153,44 @@ TARGET_INCLUDE_DIRECTORIES(
 LIST(APPEND RV_DEPS_LIST OpenSSL::SSL)
 
 SET(_openssl_stage_lib_dir
-  ${RV_STAGE_LIB_DIR}
+    ${RV_STAGE_LIB_DIR}
 )
 
 IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${_openssl_stage_lib_dir} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib ${_openssl_stage_lib_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_INSTALL_DIR}/bin ${RV_STAGE_BIN_DIR}
+    COMMENT "Renaming the openssl import libs to the name FFmpeg is expecting"
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib ${_lib_dir}/ssl.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libcrypto.lib ${_lib_dir}/crypto.lib
+  )
+  ADD_CUSTOM_COMMAND(
+    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+    OUTPUT ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_bin_dir} ${RV_STAGE_BIN_DIR}
+    DEPENDS ${_target}
   )
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
+    DEPENDS ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
   )
 ELSE()
 
-  # Because RHEL8 has the same version of openssl library as we use but is not compatible with
-  # our library, we will copy openssl into its own seperate lib directory and conditionally add it to the
-  # LD_LIBRARY_PATH if the version we build does not match the system version. This will allow RHEL8 to
-  # use its own system version
+  # Because RHEL8 has the same version of openssl library as we use but is not compatible with our library, we will copy openssl into its own seperate lib
+  # directory and conditionally add it to the LD_LIBRARY_PATH if the version we build does not match the system version. This will allow RHEL8 to use its own
+  # system version
   #
-  IF (RV_TARGET_LINUX)
+  IF(RV_TARGET_LINUX)
     SET(_openssl_stage_lib_dir
-      ${_openssl_stage_lib_dir}/OpenSSL
+        ${_openssl_stage_lib_dir}/OpenSSL
     )
   ENDIF()
 
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${_openssl_stage_lib_dir}"
     OUTPUT ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_LIB_DIR} ${_openssl_stage_lib_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${_openssl_stage_lib_dir}
     DEPENDS ${_target}
   )
   ADD_CUSTOM_TARGET(
@@ -201,3 +205,13 @@ SET(RV_DEPS_OPENSSL_VERSION
     ${_version}
     CACHE INTERNAL "" FORCE
 )
+
+# FFmpeg customization to make it use this version of openssl
+LIST(APPEND RV_FFMPEG_DEPENDS RV_DEPS_OPENSSL)
+LIST(APPEND RV_FFMPEG_EXTRA_C_OPTIONS "--extra-cflags=-I${_include_dir}")
+IF(RV_TARGET_WINDOWS)
+  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-LIBPATH:${_lib_dir}")
+ELSE()
+  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-L${_lib_dir}")
+ENDIF()
+LIST(APPEND RV_FFMPEG_EXTERNAL_LIBS "--enable-openssl")
