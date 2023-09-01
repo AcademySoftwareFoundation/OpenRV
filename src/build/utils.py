@@ -340,7 +340,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
 
     mvs_base_path = os.path.join(
         os.path.expandvars("%SystemDrive%") + os.sep,
-        "Program Files (x86)",
+        "Program Files",
         "Microsoft Visual Studio",
     )
     vcvars_path = os.path.join(
