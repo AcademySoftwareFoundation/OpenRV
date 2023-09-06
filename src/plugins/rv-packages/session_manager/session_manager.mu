@@ -982,6 +982,7 @@ class: SessionManagerMode : MinorMode
     QIcon              _videoIcon;
     bool               _inputOrderLock;
     bool               _disableUpdates;
+    bool               _progressiveLoadingInProgress;
     QTimer             _lazySetInputsTimer;
     QTimer             _lazyUpdateTimer;
     QTimer             _mainWinVisTimer;
@@ -1345,7 +1346,7 @@ class: SessionManagerMode : MinorMode
 
     method: updateInputs (void; string node)
     {
-        if (_disableUpdates) return;
+        if (_disableUpdates || _progressiveLoadingInProgress) return;
 
         _inputOrderLock = true;
 
@@ -1943,13 +1944,13 @@ class: SessionManagerMode : MinorMode
     method: beforeProgressiveLoading (void; Event event)
     {
         event.reject();
-        _disableUpdates = true;
+        _progressiveLoadingInProgress = true;
     }
 
     method: afterProgressiveLoading (void; Event event)
     {
         event.reject();
-        _disableUpdates = false;
+        _progressiveLoadingInProgress = false;
         updateTree();
         updateInputs(viewNode());
     }
@@ -2825,7 +2826,8 @@ class: SessionManagerMode : MinorMode
         _inputOrderLock = false;
         _editors        = QTreeWidgetItem[]();
         _quitting       = false;
-        _disableUpdates = (loadTotal() != 0);
+        _disableUpdates = false;
+        _progressiveLoadingInProgress = (loadTotal() != 0);
 
         init(name,
              [ ("new-node", updateTreeEvent, "New user node"),

@@ -1140,6 +1140,13 @@ MovieFFMpegReader::openAVFormat()
                 av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
                 av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
             }
+            else if (name == "headers")
+            {
+                av_dict_set(&fmtOptions, "headers", value.c_str(), 0);
+                av_dict_set_int(&fmtOptions, "seekable", 1, 0);
+                av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
+                av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
+            }
         }
     }
 
@@ -5442,7 +5449,8 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
                              bool bruteForce,
                              int codecThreads,
                              string language,
-                             double defaultFPS)
+                             double defaultFPS,
+                             void (*registerCustomCodecs)() /*=nullptr*/)
     : MovieIO("MovieFFMpeg","v2"),
       m_codecFilter(codecFilter)
 {
@@ -5457,6 +5465,9 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
 
     // Store a default frame rate just in case
     setDoubleAttribute("defaultFPS", defaultFPS);
+
+    // Register custom codecs if requested (optional)
+    if (registerCustomCodecs) registerCustomCodecs();
 
     // Init av
     avformat_network_init();

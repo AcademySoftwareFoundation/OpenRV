@@ -142,16 +142,6 @@ static void control_c_handler(int sig)
 }
 #endif
 
-static void showDevices(TwkApp::VideoModule* m)
-{
-    for (auto d : m->devices()) cout << "INFO: " << m->name() << " found " << d->name() << endl;
-}
-
-void createDevices(Rv::RvDocument* doc, Rv::RvApplication* app)
-{
-    // This is where video output devices are created (optional)
-}
-
 void setEnvVar(const string& var, const string& val)
 {
 #ifdef WIN32
@@ -549,7 +539,7 @@ utf8Main(int argc, char *argv[])
     dir.cd("Qt");
     QApplication::addLibraryPath(dir.absolutePath());
 
-    Rv::RvApplication* rvapp = new Rv::RvApplication(argc, argv, createDevices);
+    Rv::RvApplication* rvapp = new Rv::RvApplication(argc, argv);
 
     rvapp->setExecutableNameCaps ("RV");
 

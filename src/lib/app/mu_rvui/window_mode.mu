@@ -95,6 +95,7 @@ class: WindowMinorMode : MinorMode
         let newPos = qt.QPoint(mainWin.x() + deltaX, mainWin.y() + deltaY);
         if (deltaX != 0 || deltaY != 0) mainWin.setPos(newPos);
 
+        resizeFit();
         redraw();
     }
 

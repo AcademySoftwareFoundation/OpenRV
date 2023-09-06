@@ -171,7 +171,7 @@ TARGET_LINK_LIBRARIES(
          TwkApp
          TwkGLF
          TwkMath
-         TwkMediaLibrary
+         EventMediaLibrary
          TwkQtChat
          TwkUtil
          Boost::thread
@@ -201,6 +201,7 @@ TARGET_LINK_LIBRARIES(
           IOjpeg
           IOtarga
           IOtiff
+          spdlog::spdlog
 )
 
 IF(RV_TARGET_DARWIN)
@@ -246,3 +247,5 @@ TARGET_COMPILE_OPTIONS(
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
+
+CONFIGURE_FILE(qrc/images/RV_icon.png ${RV_STAGE_RESOURCES_DIR}/RV.ico COPYONLY)

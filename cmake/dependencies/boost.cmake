@@ -132,9 +132,7 @@ IF(RV_TARGET_DARWIN)
   SET(_toolset
       "clang"
   )
-  SET(_boost_b2_options
-      "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}"
-  )
+
 ELSEIF(RV_TARGET_LINUX)
   SET(_toolset
       "gcc"

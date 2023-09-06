@@ -8,6 +8,7 @@
 #ifndef __rv__RvApplication__h__
 #define __rv__RvApplication__h__
 #include <TwkMediaLibrary/Library.h>
+#include <EventMediaLibrary/EventMediaLibrary.h>
 #include <QtCore/QTimer>
 #include <IPCore/Application.h>
 #include <QtNetwork/QTcpServer>
@@ -55,8 +56,7 @@ class RvApplication : public QObject, public IPCore::Application
     typedef std::set<RvDocument*>                RvDocSet;
     typedef std::vector<const QTGLVideoDevice*>  VideoDeviceVector;
     typedef TwkUtil::Timer                       Timer;
-
-    typedef void (*DeviceCreationFunc)(RvDocument*, RvApplication*);
+    typedef TwkMediaLibrary::EventMediaLibrary   EventMediaLibrary;
 
     typedef std::map<DispatchID, DispatchCallback>      DispatchMap;
     typedef std::mutex                                  DispatchMutex;
@@ -65,7 +65,7 @@ class RvApplication : public QObject, public IPCore::Application
     //  Constructors
     //
 
-    RvApplication(int argc, char** argv, DeviceCreationFunc F = 0);
+    RvApplication(int argc, char** argv);
     virtual ~RvApplication();
 
     void createNewSessionFromFiles(const StringVector&) override;
@@ -134,6 +134,7 @@ class RvApplication : public QObject, public IPCore::Application
     void dispatchTimeout();
 
   private:
+    EventMediaLibrary       m_eventLibrary;
     NewSessionQueue         m_newSessions;
     RvDocSet                m_deleteDocs;
     QTimer*                 m_timer;
@@ -155,7 +156,6 @@ class RvApplication : public QObject, public IPCore::Application
     bool                    m_presentationMode;
     mutable pthread_mutex_t m_deleteLock;
     std::string             m_executableNameCaps;
-    DeviceCreationFunc      m_deviceCreationFunc;
     DesktopVideoModule*     m_desktopModule;
     QTimer*                 m_pingTimer;
     QTimer*                 m_dispatchTimer;

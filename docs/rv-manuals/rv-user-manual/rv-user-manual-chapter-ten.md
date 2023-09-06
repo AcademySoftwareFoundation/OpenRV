@@ -32,6 +32,7 @@ The file system of each directory in the support path contains these directories
 | ImageFormats/ | Image format Plug-Ins                                                   |
 | MovieFormats/ | Movie format Plug-Ins                                                   |
 | Mu/           | Mu files implementing packages                                          |
+| Output/       | Output Plug-Ins (Audio/Video)                                           |
 | Python/       | Python files implementing packages                                      |
 | SupportFiles/ | Additional files used by packages (icons, etc)                          |
 | lib/          | Shared libraries required by packages                                   |

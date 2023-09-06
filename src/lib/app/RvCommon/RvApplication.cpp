@@ -22,7 +22,6 @@
 #include <QtGui/QtGui>
 #include <QtNetwork/QtNetwork>
 #include <QtCore/QTimer>
-//#include <QtNetwork/QNetworkProxy>
 #include <IPCore/Application.h>
 #include <RvApp/Options.h>
 #include <TwkQtBase/QtUtil.h>
@@ -35,7 +34,6 @@
 #include <TwkUtil/User.h>
 #include <TwkUtil/Clock.h>
 #include <QTAudioRenderer/QTAudioRenderer.h>
-//#include <qglobal.h>
 #include <iostream>
 #include <iterator>
 #include <thread>
@@ -239,7 +237,7 @@ static void setEnvVar(const string& var, const string& val)
 #endif
 }
 
-RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
+RvApplication::RvApplication(int argc, char** argv)
     : QObject(),
       IPCore::Application(),
     m_newTimer(0),
@@ -258,10 +256,12 @@ RvApplication::RvApplication(int argc, char** argv, DeviceCreationFunc F)
     m_presentationMode(false),
     m_presentationDevice(0),
     m_executableNameCaps(UI_APPLICATION_NAME),
-    m_deviceCreationFunc(F),
     m_desktopModule(0),
+    m_eventLibrary(INTERNAL_APPLICATION_NAME),
     m_dispatchAtomicInt(0)
 {
+    m_eventLibrary.setName("event-media-library");
+
 #ifdef PLATFORM_DARWIN
     sessionFromUrlPointer = sessionFromUrl;
     #endif
@@ -502,7 +502,7 @@ RvApplication::about()
             TWK_DEPLOY_MAJOR_VERSION(),
             TWK_DEPLOY_MINOR_VERSION(),
             TWK_DEPLOY_PATCH_LEVEL(),
-             GIT_HEAD,
+            GIT_HEAD,
             headerComment.str().c_str(),
             UI_APPLICATION_NAME,
             COPYRIGHT_TEXT);
@@ -715,22 +715,11 @@ RvApplication::newSessionFromFiles(const StringVector& files)
         }
         catch (...)
         {
-                cerr << "ERROR: QTVideoModule failed" << endl;
+                cerr << "ERROR: DesktopVideoModule failed" << endl;
         }
 
-        try
-        {
-            if (m_deviceCreationFunc != 0)
-            {
-                m_deviceCreationFunc(doc, this);
-            }
-        }
-        catch (std::exception& e)
-        {
-            cout << "WARNING: VideoDeviceModule creation failed: "
-                 << e.what()
-                 << endl;
-        }
+        // Load audio/video output plugins
+        loadOutputPlugins("TWK_OUTPUT_PLUGIN_PATH");
     }
 
     doc->session()->graph().setPhysicalDevices(videoModules());
@@ -984,7 +973,7 @@ RvApplication::prefs()
         QPushButton* b1 = box.addButton(tr("Cancel"), QMessageBox::RejectRole);
         QPushButton* b2 = box.addButton(tr("Disable Presentation Mode"), QMessageBox::AcceptRole);
 #ifdef PLATFORM_LINUX
-        box.setIconPixmap(QPixmap(":images/RV_icon.png").scaledToHeight(64));
+        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
 #else
         box.setIcon(QMessageBox::Critical);
 #endif
@@ -1573,7 +1562,7 @@ RvApplication::setPresentationMode(bool value)
                     if (doc) parent = (RvDocument *)doc->opaquePointer();
                     QMessageBox box(parent);
                     box.setWindowTitle(tr(UI_APPLICATION_NAME ": Presentation Mode"));
-		    QString baseText = QString("The presentation device (%1/%2) is busy or cannot be opened.")
+		            QString baseText = QString("The presentation device (%1/%2) is busy or cannot be opened.")
                                 .arg(d->module()->name().c_str()).arg(d->name().c_str());
                     QString detailedText = QString(UI_APPLICATION_NAME " failed to open or bind the presentation device (%1/%2)."
                                                 " Check to see if another program is using the device"
@@ -1586,7 +1575,7 @@ RvApplication::setPresentationMode(bool value)
                     box.setText(baseText + "\n\n" + detailedText);
                     box.setWindowModality(Qt::WindowModal);
                     QPushButton* b0 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                    box.setIconPixmap(QPixmap(":images/RV_icon.png").scaledToHeight(64));
+                    box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
                     box.exec();
 
                     m_presentationMode = false;
@@ -1600,10 +1589,10 @@ RvApplication::setPresentationMode(bool value)
                 box.setWindowTitle(tr(UI_APPLICATION_NAME ": Presentation Mode"));
                 QString baseText = QString("The presentation device (%1/%2) failed to open.")
                             .arg(d->module()->name().c_str()).arg(d->name().c_str());
-		box.setText(baseText + "\n\n" + exc.what());
+		        box.setText(baseText + "\n\n" + exc.what());
                 box.setWindowModality(Qt::WindowModal);
                 QPushButton* b0 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                box.setIconPixmap(QPixmap(":images/RV_icon.png").scaledToHeight(64));
+                box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
                 box.exec();
 
                 m_presentationMode = false;

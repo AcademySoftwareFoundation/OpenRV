@@ -2466,6 +2466,14 @@ FileSourceIPNode::reloadMediaFromFiles()
 
     m_mediaMovies->valueContainer() = media;
 
+    // 
+    // First assume that the media files are all available (active)
+    // Note that if any of the media file associated with this FileSourceIPNode
+    // is unreachable, then setMediaActive(false) will be called.
+    // For reference : FileSourceIPNode::openMovieTask()
+    // 
+    m_mediaActive->front() = 1;
+
     //
     //  Sync media files
     //
@@ -2572,6 +2580,16 @@ FileSourceIPNode::openMovieTask(const string& filename,
                               << "; domain=" << cookies[c].domain;
                 }
                 m_inparams.push_back(StringPair("cookies", cookieStm.str()));
+
+                ostringstream headersStm;
+                TwkMediaLibrary::HTTPHeaderVector headers = api->httpHeaders();
+                for (size_t h = 0, size = headers.size(); h < size; ++h) 
+                {
+                    if (h > 0) cookieStm << "\n";
+                    headersStm << headers[h].name << ": " << headers[h].value;
+                
+                }
+                m_inparams.push_back(StringPair("headers", headersStm.str()));
             }
         }
     }
@@ -2605,10 +2623,6 @@ FileSourceIPNode::openMovieTask(const string& filename,
         str << name() << ";;" << file << ";;" << mediaRepName();
         TwkApp::GenericStringEvent event("source-media-unavailable", graph(), str.str());
         graph()->sendEvent(event);
-    }
-    else
-    {
-        setMediaActive(true);
     }
 
     SharedMediaPointer sharedMedia(newSharedMedia(mov, true /*hasValidRange*/));
