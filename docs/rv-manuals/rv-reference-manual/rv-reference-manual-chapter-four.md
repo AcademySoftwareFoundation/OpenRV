@@ -1,6 +1,8 @@
 # Chapter 4 - Python
 
-You can use Python3 in RV in conjunction with Mu or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned. So in answer to the question: which language should I use to customize RV? At this point, we recommend using Python. There are some slight differences that need to be noted when translating code between the two languages: In Python the modules names required by RV are the same as in Mu. As of this writing, these are commands, extra_commands, rvtypes, and rvui. However, the Python modules all live in the rv package. This package is in-memory and only available at RV's runtime. You can access these commands via writing your own custom MinorMode package. So while in Mu, you can:
+Which language should you use to customize RV? In short, we recommend using Python. You can use Python3 in RV in conjunction with Mu, or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned. 
+
+_Note: there are some slight differences that need to be noted when translating code between the two languages: In Python the modules names required by RV are the same as in Mu. As of this writing, these are commands, extra_commands, rvtypes, and rvui. However, the Python modules all live in the rv package. This package is in-memory and only available at RV's runtime. You can access these commands via writing your own custom MinorMode package._ So while in Mu, you can:
 
 ```
  use commands 
