@@ -29,6 +29,7 @@ namespace {
 const char* global_glsl = "#version 150\n"
     "#extension GL_ARB_texture_rectangle : require\n";
 const char* global_glsl_gl2 = "#extension GL_ARB_texture_rectangle : require\n";
+const char* global_glsl_lt_150 = "#version 120\n";
 }
 
 struct SymbolTypeAssociation
@@ -108,6 +109,22 @@ Function::useShadingLanguageVersion(const char* glVersion)
 
         glslMajor = 0;
         glslMinor = 0;
+    }
+}
+
+bool Function::isGLSLVersionLessThan150()
+{
+    if(glslMajor > 1)
+    {
+        return false;
+    }
+    else
+    {
+        // Two edge case checks: check for 0 and check that minor versions are multiples of 10. Kronos spec is that minor is always a mult of 10.
+        // If not a multiple of 10; we abort and keep the number as-is.
+        unsigned int minor = glslMinor == 0 || glslMinor < 10 ? glslMinor : glslMinor % 10 != 0 ? glslMinor : glslMinor / 10;
+        cout << "==== Is Check: " << "MAJ: " << glslMajor << " MIN: " << minor << std::endl;
+        return glslMajor < 1 || (glslMajor == 1 && minor < 5);
     }
 }
 
@@ -826,7 +843,7 @@ compileGLSL(const string& source, GLuint& shaderID, int& status, vector<char>& l
     int logsize;
 
     const char* src[2];
-    src[0] = glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
+    src[0] = Shader::Function::isGLSLVersionLessThan150() ? global_glsl_lt_150  : glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
     src[1] = source.c_str();
 
     glShaderSource(shaderID, 2, src, 0);
@@ -874,13 +891,17 @@ Function::compile() const
              << endl;
     
         cout << "ERROR: ----- source follows ----" << endl;
-        outputAnnotatedCode(cout, global_glsl + m_sourceCode);
+        outputAnnotatedCode(cout,
+         Shader::Function::isGLSLVersionLessThan150() ? global_glsl_lt_150  : glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl +
+         m_sourceCode);
         releaseCompiledState();
     }
     else if (Shader::debuggingType() != Shader::NoDebugInfo)
     {
         cout << "INFO: ---- " << name() << " source follows ----" << endl;
-        outputAnnotatedCode(cout, global_glsl + m_sourceCode);
+        outputAnnotatedCode(cout,
+         Shader::Function::isGLSLVersionLessThan150() ? global_glsl_lt_150  : glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl +
+         m_sourceCode);
     }
 
     return status == GL_TRUE;

@@ -27,7 +27,14 @@ SET(_download_hash
     "ef5ac6de4b800afaebeb10df9ef189b2"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("webp" "${_version}" "STATIC" "d")
+IF(RV_TARGET_DARWIN
+   OR RV_TARGET_LINUX
+)
+  # WebP lib on Darwin&Linux is built without a version number.
+  RV_MAKE_STANDARD_LIB_NAME("webp" "" "STATIC" "d")
+ELSE()
+  RV_MAKE_STANDARD_LIB_NAME("webp" "${_version}" "STATIC" "d")
+ENDIF()
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_LOCATION)
