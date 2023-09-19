@@ -851,6 +851,27 @@ Function::replaceTextureCalls()
 }
 
 namespace {
+    // param: pass the GL_VERSION, not GLSL -- ex: glGetString(GL_VERSION)
+    const char* const get_glsl_header(const char* const glVersion)
+    {
+        if(nullptr == glVersion)
+        {
+            std::cerr << "get_glsl_header error: glVersion is null." << std::endl;
+            return global_glsl;
+        }
+
+        const char* glsl_header = global_glsl;
+        if(Shader::Function::isGLSLVersionLessThan150())
+        {
+            glsl_header = global_glsl_lt_150;
+        }
+        else
+        {
+            glsl_header = glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
+        }
+
+        return glsl_header;
+    }
 void
 compileGLSL(const string& source, GLuint& shaderID, int& status, vector<char>& log)
 {
@@ -860,14 +881,7 @@ compileGLSL(const string& source, GLuint& shaderID, int& status, vector<char>& l
     int logsize;
 
     const char* src[2];
-    if(Shader::Function::isGLSLVersionLessThan150())
-    {
-        src[0] = global_glsl_lt_150;
-    }
-    else
-    {
-        src[0] = glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
-    }
+    src[0] = get_glsl_header(glVersion);
     src[1] = source.c_str();
 
     glShaderSource(shaderID, 2, src, 0);
@@ -907,6 +921,8 @@ Function::compile() const
     }
     
     compileGLSL(m_sourceCode, m_state->shader, status, buffer);
+    const char* glVersion = (const char*)glGetString(GL_VERSION);
+    const std::string glsl_header(get_glsl_header(glVersion));
 
     if (status != GL_TRUE)
     {
@@ -915,29 +931,13 @@ Function::compile() const
              << endl;
     
         cout << "ERROR: ----- source follows ----" << endl;
-        if(Shader::Function::isGLSLVersionLessThan150())
-        {
-            outputAnnotatedCode(cout, global_glsl_lt_150 + m_sourceCode);
-        }
-        else
-        {
-            const char* glVersion = (const char*)glGetString(GL_VERSION);
-            outputAnnotatedCode(cout, glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl + m_sourceCode);
-        }
+        outputAnnotatedCode(cout, glsl_header + m_sourceCode);
         releaseCompiledState();
     }
     else if (Shader::debuggingType() != Shader::NoDebugInfo)
     {
         cout << "INFO: ---- " << name() << " source follows ----" << endl;
-        if(Shader::Function::isGLSLVersionLessThan150())
-        {
-            outputAnnotatedCode(cout, global_glsl_lt_150 + m_sourceCode);
-        }
-        else
-        {
-            const char* glVersion = (const char*)glGetString(GL_VERSION);
-            outputAnnotatedCode(cout, glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl + m_sourceCode);
-        }
+        outputAnnotatedCode(cout, glsl_header + m_sourceCode);
     }
 
     return status == GL_TRUE;
