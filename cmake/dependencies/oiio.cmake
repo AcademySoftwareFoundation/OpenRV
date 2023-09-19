@@ -168,7 +168,6 @@ IF(NOT RV_TARGET_WINDOWS)
     DEPENDS ${_depends_freetype}
             jpeg-turbo::jpeg
             Tiff::Tiff
-            RV_DEPS_OCIO
             OpenEXR::OpenEXR
             RV_DEPS_OPENJPEG
             jpeg-turbo::turbojpeg
@@ -227,7 +226,6 @@ ELSE()
     DEPENDS ${_depends_freetype}
             jpeg-turbo::jpeg
             Tiff::Tiff
-            RV_DEPS_OCIO
             OpenEXR::OpenEXR
             OpenJpeg::OpenJpeg
             jpeg-turbo::turbojpeg

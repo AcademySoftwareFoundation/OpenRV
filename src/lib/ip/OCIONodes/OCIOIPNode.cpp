@@ -390,10 +390,10 @@ OCIOIPNode::evaluate(const Context& context)
         }
 
         QMutexLocker(&this->m_lock);
-        OCIO::ConstGPUProcessorRcPtr legacyGPUProcessor = processor->getOptimizedLegacyGPUProcessor(OCIO::OPTIMIZATION_NONE, lutSize);
         OCIO::GpuShaderDescRcPtr shaderDesc = OCIO::GpuShaderDesc::CreateShaderDesc();
-        shaderDesc->setLanguage(GPULanguage);
         shaderDesc->setFunctionName(shaderName.str().c_str());
+        shaderDesc->setLanguage(GPULanguage);
+        OCIO::ConstGPUProcessorRcPtr legacyGPUProcessor = processor->getOptimizedLegacyGPUProcessor(OCIO::OPTIMIZATION_DEFAULT, lutSize);
 
         // Fills the shaderDesc from the proc.
         legacyGPUProcessor->extractGpuShaderInfo(shaderDesc);

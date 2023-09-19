@@ -138,6 +138,7 @@ class Function
              const std::string& doc="");
 
     static void useShadingLanguageVersion(const char*);
+    static bool isGLSLVersionLessThan150();
 
     const std::string& name() const { return m_name; }
     const std::string& callName() const { return m_callName; }
