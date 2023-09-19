@@ -31,11 +31,11 @@ using namespace std;
 RvPusher::RvPusher(QCoreApplication &app, string tag, string cmd, vector<string> argv, QObject *parent) :
         QObject(parent),
         m_app(app),
-        m_tag(tag),
+        m_client(0),
         m_command(cmd),
+        m_tag(tag),
         m_argv(argv),
         m_error(0),
-        m_client(0),
         m_rvStarted(false)
 {
     //
