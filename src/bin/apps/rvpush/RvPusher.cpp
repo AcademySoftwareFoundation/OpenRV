@@ -89,7 +89,9 @@ RvPusher::buildFileList()
     for (int i = 0; i < rawList.size(); ++i)
     {
         QStringList parts = rawList[i].fileName().split("_");
-        if ((parts.size() == 1 && tagString == "") || (parts.size() == 2 && parts[1] == tagString))
+        QString name = parts.mid(1).join("_");
+
+        if ((parts.size() == 1 && tagString == "") || (parts.size() >= 2 && name == tagString))
         {
             m_fileList.push_back(rawList[i]);
         }
@@ -428,4 +430,3 @@ RvPusher::newMessage (const QString& sender, const QString& inmessage)
 
     disconnect();
 }
-
