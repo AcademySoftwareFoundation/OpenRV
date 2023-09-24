@@ -195,7 +195,7 @@ SET(_requirements_install_command
 
 EXTERNALPROJECT_ADD(
   ${_python3_target}
-  DOWNLOAD_NAME ${_python3_target}_${_version}.zip
+  DOWNLOAD_NAME ${_python3_target}_${_python3_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${_source_dir}
