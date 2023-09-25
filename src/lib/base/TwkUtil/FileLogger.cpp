@@ -54,6 +54,8 @@ namespace TwkUtil
                      name, logFilePath.append( name + ".log" ),
                      evFileLogSize.getValue(), evFileLogNumFiles.getValue() )
                      .get();
+      m_logger->flush_on(
+          spdlog::level::err );
     }
 
     setLogLevel( evFileLogLevel.getValue() );
