@@ -1,6 +1,8 @@
 # Chapter 4 - Python
 
-You can use Python3 in RV in conjunction with Mu or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned. So in answer to the question: which language should I use to customize RV? The answer is whichever you like. At this point we recommend using Python. There are some slight differences that need to be noted when translating code between the two languages: In Python the modules names required by RV are the same as in Mu. As of this writing, these are commands, extra_commands, rvtypes, and rvui. However, the Python modules all live in the rv package. This package is in-memory and only available at RV's runtime. You can access these commands via writing your own custom MinorMode package. So while in Mu, you can:
+Which language should you use to customize RV? In short, we recommend using Python. You can use Python3 in RV in conjunction with Mu, or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned. 
+
+_Note: there are some slight differences that need to be noted when translating code between the two languages: In Python the modules names required by RV are the same as in Mu. As of this writing, these are commands, extra_commands, rvtypes, and rvui. However, the Python modules all live in the rv package. This package is in-memory and only available at RV's runtime. You can access these commands via writing your own custom MinorMode package._ So while in Mu, you can:
 
 ```
  use commands 
@@ -135,7 +137,7 @@ let pyModule = python.PyImport_Import ("os");
 
 python.PyObject pyMethod = python.PyObject_GetAttr (pyModule, "getcwd");
 
-string result = to_string(python.PyObject_CallObject (pyMethod, PyTuple_New(0)));
+string result = to_string(python.PyObject_CallObject (pyMethod, python.PyTuple_New(0)));
 
 print("result: %s\n" % result); // Prints "result: /var/tmp" 
 ```
@@ -198,12 +200,13 @@ Table 4.1:Mu-Python Value Conversion
 You can use PySide2 to make Qt interface components (RV is a Qt Application). Below is a simple pyside example using RV's py-interp.
 
 ```python
-#!/Applications/RV64.app/Contents/MacOS/py-interp
+#!/Applications/RV.app/Contents/MacOS/py-interp
 
-# Import PySide classes
+# Import PySide2 classes
 import sys
-from PySide.QtCore import *
-from PySide.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 
 # Create a Qt application.
 # IMPORTANT: RV's py-interp contains an instance of QApplication;
@@ -213,10 +216,10 @@ if app == None:
     app = QApplication(sys.argv)
 
 # Display the file path of the app.
-print app.applicationFilePath()
+print(f"{app.applicationFilePath()}")
 
 # Create a Label and show it.
-label = QLabel("Using RV's PySide")
+label = QLabel("Using RV's PySide2")
 label.show()
 
 # Enter Qt application main loop.
