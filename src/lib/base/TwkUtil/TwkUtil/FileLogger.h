@@ -8,9 +8,9 @@
 #ifndef _TwkUtilLog_h_
 #define _TwkUtilLog_h_
 
+#include <TwkUtil/dll_defs.h>
+#include <spdlog/logger.h>
 #include <string>
-#include "spdlog/logger.h"
-#include "TwkUtil/dll_defs.h"
 
 namespace TwkUtil
 {

@@ -5,13 +5,13 @@
 //
 //******************************************************************************
 
-#include <ostream>
+#include <TwkUtil/FileLogger.h>
+#include <TwkUtil/EnvVar.h>
 #include <QtCore/QtCore>
+#include <spdlog/async.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <boost/algorithm/string.hpp>
-#include "spdlog/async.h"
-#include "spdlog/sinks/rotating_file_sink.h"
-#include "TwkUtil/FileLogger.h"
-#include "TwkUtil/EnvVar.h"
+#include <ostream>
 
 namespace TwkUtil
 {
