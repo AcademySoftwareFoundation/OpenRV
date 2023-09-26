@@ -2,6 +2,8 @@
 
 ## 1. Overview ‌ ‌
 
+Which language should you use to customize RV? In short, we recommend using Python. You can use Python3 in RV in conjunction with Mu, or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned.
+
 Mu is principally targeted towards computer graphics applications. The original (usable) version appeared at Tweak Films around 2001-2002. Over the years its syntax and runtime has been refactored and evolved from a simple shading language to a nearly full featured general language. However, Mu is still probably best suited for computer graphics than other computing tasks.
 
 The following discussion is mostly a result of experience in the feature film special effects industry (which I’ll call film). One could argue that computing tasks for film are extreme in many cases and that achievements and trends there tend to trickle down into related CG disciplines (like games and television post production). Indeed, over a short period of time the distinction between these CG disciplines has blurred.

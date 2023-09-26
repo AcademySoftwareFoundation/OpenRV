@@ -77,6 +77,7 @@ INCLUDE(ocio)
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
 INCLUDE(oiio) # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
 INCLUDE(yaml-cpp) # depends on OCIO
+
 INCLUDE(spdlog)
 
 LIST(REMOVE_DUPLICATES RV_DEPS_LIST)

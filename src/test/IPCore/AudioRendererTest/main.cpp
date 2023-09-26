@@ -78,6 +78,7 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
     // With disabled ALSA, for now we'll get 2 entries
     CHECK_EQ(3, modules.size());
 
+    bool audioAvailable = true;
     // On Linux, this typically outputs
     // INFO: Found module = 'ALSA (Pre-1.0.14)' 
     // INFO: Found module = 'ALSA (Safe)' 
@@ -92,35 +93,44 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
         AudioRenderer::setModule(module.name);     
 
         auto renderer = AudioRenderer::renderer();
-        // On Jenkins it is reasonable not to have any audio hardware at all
-        CHECK(!(renderer == nullptr && module.name.rfind("ALSA") == 0));
 
-        if(renderer)
+        // On CI it is reasonable not to have any audio hardware at all
+        if(!renderer)
         {
-            auto state = renderer->deviceState();
-            cout << "INFO: ... state.device = '" << state.device.c_str() << "'" << endl;
-            cout << "INFO: ... state.rate = '" << state.rate << "'" << endl;
-            cout << "INFO: ... state.latency = '" << state.latency << "'" << endl;
-            cout << "INFO: ... state.framesPerBuffer = '" << state.framesPerBuffer << "'" << endl;
+          audioAvailable &= false;
+          CHECK(AudioRenderer::audioDisabled());
 
-            CHECK_FALSE(renderer->isPlaying());
-            cout << "INFO: ... Trying out play() ..." << endl;
-            renderer->play();
-            CHECK(renderer->isPlaying());
-            CHECK(renderer->isOK());
-            cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
-
-            cout << "INFO: ... Trying out stop() ..." << endl;
-            renderer->stop();
-            CHECK_FALSE(renderer->isPlaying());
-            CHECK(renderer->isOK());
-            cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
-
-            cout << "INFO: ... Trying out shutdown() ..." << endl;
-            renderer->shutdown();
-            CHECK(renderer->isOK());
-            cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+          continue;
         }
+
+        auto state = renderer->deviceState();
+        cout << "INFO: ... state.device = '" << state.device.c_str() << "'" << endl;
+        cout << "INFO: ... state.rate = '" << state.rate << "'" << endl;
+        cout << "INFO: ... state.latency = '" << state.latency << "'" << endl;
+        cout << "INFO: ... state.framesPerBuffer = '" << state.framesPerBuffer << "'" << endl;
+
+        CHECK_FALSE(renderer->isPlaying());
+        cout << "INFO: ... Trying out play() ..." << endl;
+        renderer->play();
+        CHECK(renderer->isPlaying());
+        CHECK(renderer->isOK());
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+
+        cout << "INFO: ... Trying out stop() ..." << endl;
+        renderer->stop();
+        CHECK_FALSE(renderer->isPlaying());
+        CHECK(renderer->isOK());
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+
+        cout << "INFO: ... Trying out shutdown() ..." << endl;
+        renderer->shutdown();
+        CHECK(renderer->isOK());
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+    }
+
+    if (!audioAvailable)
+    {
+      CHECK(AudioRenderer::audioDisabledAlways());
     }
 }
 
@@ -199,6 +209,8 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
 
     int sleepCount = 10; // approx 1 seconds
     auto renderer = AudioRenderer::renderer();
+
+    // On CI it is reasonable not to have any audio hardware at all
     if(renderer)
     {
         REQUIRE(renderer);
@@ -216,6 +228,8 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
 
     cout << "INFO: Stopping playback ... " << endl;
     app.stopAll();
+
+    // On CI it is reasonable not to have any audio hardware at all
     if(renderer)
     {
         cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'" << endl;

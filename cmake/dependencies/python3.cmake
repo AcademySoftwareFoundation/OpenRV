@@ -107,7 +107,7 @@ LIST(APPEND _python3_make_command ${_install_dir})
 LIST(APPEND _python3_make_command "--temp-dir")
 LIST(APPEND _python3_make_command ${_build_dir})
 LIST(APPEND _python3_make_command "--openssl-dir")
-LIST(APPEND _python3_make_command ${RV_DEPS_BASE_DIR}/${_target}/install)
+LIST(APPEND _python3_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND _python3_make_command "--opentimelineio-source-dir")
   LIST(APPEND _python3_make_command ${rv_deps_opentimelineio_SOURCE_DIR})
@@ -132,7 +132,7 @@ LIST(APPEND _pyside2_make_command ${_install_dir})
 LIST(APPEND _pyside2_make_command "--temp-dir")
 LIST(APPEND _pyside2_make_command ${_build_dir})
 LIST(APPEND _pyside2_make_command "--openssl-dir")
-LIST(APPEND _pyside2_make_command ${RV_DEPS_BASE_DIR}/${_target}/install)
+LIST(APPEND _pyside2_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
 LIST(APPEND _pyside2_make_command "--python-dir")
 LIST(APPEND _pyside2_make_command ${_install_dir})
 LIST(APPEND _pyside2_make_command "--qt-dir")
@@ -214,7 +214,7 @@ SET(_requirements_install_command
 
 EXTERNALPROJECT_ADD(
   ${_python3_target}
-  DOWNLOAD_NAME ${_python3_target}_${_version}.zip
+  DOWNLOAD_NAME ${_python3_target}_${_python3_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${_source_dir}
