@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkMath OpenEXR::OpenEXR
-  PRIVATE TwkUtil tiff
+  PRIVATE TwkUtil Tiff::Tiff
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})

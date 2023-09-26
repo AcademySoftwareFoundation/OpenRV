@@ -41,8 +41,14 @@ ELSE()
   )
 ENDIF()
 
+IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+  SET(RV_SPDLOG_DEBUG_POSTFIX
+      "d"
+  )
+ENDIF()
+
 SET(_spdlog_lib_name
-    ${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${CMAKE_STATIC_LIBRARY_SUFFIX}
+    ${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${RV_SPDLOG_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
 SET(_spdlog_lib
@@ -60,51 +66,31 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_TARGET_WINDOWS)
-  SET(_cmake_configure_command
+SET(_cmake_configure_command
     ${CMAKE_COMMAND}
-  ) 
-  LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
-  LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-  LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-    INSTALL_DIR ${_install_dir}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
-    INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_spdlog_lib}
-    USES_TERMINAL_BUILD TRUE
-  )
-ELSE()
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-    INSTALL_DIR ${_install_dir}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DSPDLOG_BUILD_EXAMPLE=OFF -B ./_build
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
-    INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_spdlog_lib}
-    USES_TERMINAL_BUILD TRUE
-  )
-ENDIF()
+)
+LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
+
+EXTERNALPROJECT_ADD(
+  ${_target}
+  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  INSTALL_DIR ${_install_dir}
+  URL ${_download_url}
+  URL_MD5 ${_download_hash}
+  CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
+  BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
+  INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  BUILD_IN_SOURCE TRUE
+  BUILD_ALWAYS FALSE
+  BUILD_BYPRODUCTS ${_spdlog_lib}
+  USES_TERMINAL_BUILD TRUE
+)
 
 ADD_LIBRARY(spdlog::spdlog STATIC IMPORTED GLOBAL)
 ADD_DEPENDENCIES(spdlog::spdlog ${_target})

@@ -42,6 +42,16 @@ else
      setenv LD_LIBRARY_PATH "$RV_HOME/lib"
 endif
 
+# Unless the RV_USE_SYSTEM_OPENSSL environment variable is set, use the
+# OpenSSL provided with RV when the required OpenSSL version cannot be found.
+# 
+if (! $?RV_USE_SYSTEM_OPENSSL) then
+     set required_openssl_found = "`openssl version | grep 1.1.1`"
+     if ( "$required_openssl_found" == "" ) then
+        setenv LD_LIBRARY_PATH "$RV_HOME/lib/OpenSSL:$LD_LIBRARY_PATH"
+     endif
+endif
+
 # exec RV
 
 exec $pyinterpbin $*:q

@@ -29,8 +29,13 @@ FIND_PACKAGE(
 SET(SOURCES
     main.cpp utf8WinMain.cpp
 )
+
 IF(RV_TARGET_WINDOWS)
-  LIST(APPEND SOURCES RV.RC)
+  IF(DEFINED RV_RC_ICON)
+    LIST(APPEND SOURCES ${RV_RC_ICON})
+  ELSE()
+    LIST(APPEND SOURCES RV.RC) # Use Default Open RV logo
+  ENDIF()
 ENDIF()
 
 QT5_ADD_RESOURCES(_rv_qrc rv.qrc)
@@ -39,6 +44,15 @@ ADD_EXECUTABLE(
   ${_target}
   ${SOURCES} ${_rv_qrc}
 )
+
+IF(RV_TARGET_WINDOWS)
+  IF(CMAKE_BUILD_TYPE STREQUAL "Release")
+    SET_PROPERTY(
+      TARGET ${_target}
+      PROPERTY WIN32_EXECUTABLE True
+    )
+  ENDIF()
+ENDIF()
 
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}

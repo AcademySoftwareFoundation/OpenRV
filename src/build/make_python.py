@@ -405,9 +405,6 @@ def configure() -> None:
         if ARCH:
             configure_args = ["arch", ARCH] + configure_args
 
-        if platform.system() == "Darwin":
-            configure_args.append("MACOSX_DEPLOYMENT_TARGET=10.14")
-
             readline_prefix_proc = subprocess.run(
                 ["brew", "--prefix", "readline"], capture_output=True
             )

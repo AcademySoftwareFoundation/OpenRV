@@ -29,7 +29,7 @@ namespace Rv
   {
     QString zipfileCanonical = QFileInfo( zipfile ).canonicalFilePath();
     QString pattern = zipfile + "-.*\\.rvpkg";
-    QRegExp rx(pattern);
+    QRegExp rx( pattern );
 
     for( size_t i = 0; i < m_packages.size(); i++ )
     {
@@ -37,8 +37,8 @@ namespace Rv
 
       if( info.fileName() == zipfile || info.absoluteFilePath() == zipfile ||
           info.absoluteFilePath() == zipfileCanonical ||
-          rx.exactMatch(info.fileName()) ||
-          rx.exactMatch(info.absoluteFilePath()))
+          rx.exactMatch( info.fileName() ) ||
+          rx.exactMatch( info.absoluteFilePath() ) )
       {
         return i;
       }
@@ -252,7 +252,7 @@ namespace Rv
       // Once it is not an auxfile, the installer expects a flat list structure
       // Therefore, need to check for basename and not the file name which
       // can include directories
-      QFileInfo fInfo(filename);
+      QFileInfo fInfo( filename );
       QString baseName = fInfo.fileName();
 
       if( auxIndex != -1 )
@@ -260,34 +260,34 @@ namespace Rv
         const AuxFile& a = package.auxFiles[auxIndex];
         QDir outdir(
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
-        QFileInfo auxfileInfo(a.file);
+        QFileInfo auxfileInfo( a.file );
         QString auxfileName = auxfileInfo.fileName();
         outfilename =
-            outdir.absoluteFilePath(auxfileName).toUtf8().constData();
+            outdir.absoluteFilePath( auxfileName ).toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
       {
-        outfilename = mudir.absoluteFilePath(baseName).toUtf8().constData();
+        outfilename = mudir.absoluteFilePath( baseName ).toUtf8().constData();
       }
       else if( filename.endsWith( ".py" ) || filename.endsWith( ".pyc" ) ||
                filename.endsWith( ".pyo" ) || filename.endsWith( ".pyd" ) )
       {
-        outfilename = pydir.absoluteFilePath(baseName).toUtf8().constData();
+        outfilename = pydir.absoluteFilePath( baseName ).toUtf8().constData();
       }
       else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
       //
       //  Assume this is a NodeDefinition file (gto) or associated shader code.
       //
       {
-        outfilename = nodedir.absoluteFilePath(baseName).toUtf8().constData();
+        outfilename = nodedir.absoluteFilePath( baseName ).toUtf8().constData();
       }
       else if( filename.endsWith( ".profile" ) )
       //
       //  Assume this is a Profile
       //
       {
-        outfilename = profdir.absoluteFilePath(baseName).toUtf8().constData();
+        outfilename = profdir.absoluteFilePath( baseName ).toUtf8().constData();
       }
 
       QString n = QString::fromUtf8( outfilename.c_str(), outfilename.size() );
@@ -392,7 +392,7 @@ namespace Rv
       for( size_t i = 0; i < package.files.size(); i++ )
       {
         QString filename = package.files[i];
-        QFileInfo fInfo(filename);
+        QFileInfo fInfo( filename );
         QString baseName = fInfo.fileName();
         vector<char> buffer( 4096 );
 
@@ -413,17 +413,20 @@ namespace Rv
           const AuxFile& a = package.auxFiles[auxIndex];
           QDir outdir( rdir.absoluteFilePath(
               expandVarsInPath( package, a.location ) ) );
-          if (!outdir.exists()) {
-            bool success = outdir.mkpath(".");
-            if (!success) {
-              cout << "ERROR: Failed to create needed auxiliary directory: "
-                   + outdir.absolutePath().toStdString() << endl;
+          if( !outdir.exists() )
+          {
+            bool success = outdir.mkpath( "." );
+            if( !success )
+            {
+              cout << "ERROR: Failed to create needed auxiliary directory: " +
+                          outdir.absolutePath().toStdString()
+                   << endl;
             }
           }
-          QFileInfo auxfileInfo(a.file);
+          QFileInfo auxfileInfo( a.file );
           QString auxfileName = auxfileInfo.fileName();
           outfilename =
-              outdir.absoluteFilePath(auxfileName).toUtf8().constData();
+              outdir.absoluteFilePath( auxfileName ).toUtf8().constData();
         }
         else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                  filename.endsWith( ".muc" ) )
@@ -466,7 +469,8 @@ namespace Rv
         }
         else if( filename.endsWith( ".glsl" ) || filename.endsWith( ".gto" ) )
         //
-        //  Assume this is a NodeDefinition file (gto) or associated shader code.
+        //  Assume this is a NodeDefinition file (gto) or associated shader
+        //  code.
         //
         {
           outfilename =
@@ -716,7 +720,7 @@ namespace Rv
     {
       QString outfilename;
       QString filename = package.files[i];
-      QFileInfo fInfo(filename);
+      QFileInfo fInfo( filename );
       QString baseName = fInfo.fileName();
 
       QStringList auxfiles;
@@ -727,10 +731,10 @@ namespace Rv
         const AuxFile& a = package.auxFiles[auxIndex];
         QDir outdir(
             rdir.absoluteFilePath( expandVarsInPath( package, a.location ) ) );
-        QFileInfo auxfileInfo(a.file);
+        QFileInfo auxfileInfo( a.file );
         QString auxfileName = auxfileInfo.fileName();
         outfilename =
-            outdir.absoluteFilePath(auxfileName).toUtf8().constData();
+            outdir.absoluteFilePath( auxfileName ).toUtf8().constData();
       }
       else if( filename.endsWith( ".mu" ) || filename.endsWith( ".mud" ) ||
                filename.endsWith( ".muc" ) )
@@ -1166,25 +1170,26 @@ namespace Rv
           for( auto& auxFolder : package.auxFolders )
           {
             // Iterate through files and compare paths
-            std::for_each(
-                package.files.begin(), package.files.end(),
-                [&]( const QString& fullPath )
-                {
-                  // Check if the file is in the current folder or any of its
-                  // subdirectories
-                  if( fullPath.startsWith( auxFolder.folder + '/' ) )
-                  {
-                    // Separate the filename and directory structure information
-                    QFileInfo fileInfo(fullPath);
-                    QString fileName = fileInfo.fileName();
-                    QString directory = fileInfo.dir().path();
+            std::for_each( package.files.begin(), package.files.end(),
+                           [&]( const QString& fullPath )
+                           {
+                             // Check if the file is in the current folder or
+                             // any of its subdirectories
+                             if( fullPath.startsWith( auxFolder.folder + '/' ) )
+                             {
+                               // Separate the filename and directory structure
+                               // information
+                               QFileInfo fileInfo( fullPath );
+                               QString fileName = fileInfo.fileName();
+                               QString directory = fileInfo.dir().path();
 
-                    AuxFile newAuxFile;
-                    newAuxFile.file = fullPath;
-                    newAuxFile.location = auxFolder.location + "/" + directory;
-                    package.auxFiles.push_back( newAuxFile );
-                  }
-                } );
+                               AuxFile newAuxFile;
+                               newAuxFile.file = fullPath;
+                               newAuxFile.location =
+                                   auxFolder.location + "/" + directory;
+                               package.auxFiles.push_back( newAuxFile );
+                             }
+                           } );
           }
 
           QRegExp rvpkgRE( "(.*)-[0-9]+\\.[0-9]+\\.rvpkg" );
@@ -1959,8 +1964,6 @@ namespace Rv
     //
     if( PackageManager::ignoringPrefs() )
     {
-      QCoreApplication::setApplicationName( "RVALT" );
-
       m_userSettings = getQSettings();
       //
       //  Empty the prefs file.
@@ -2011,8 +2014,9 @@ namespace Rv
 #else
     QSettings::Format format( QSettings::NativeFormat );
 #endif
-    QSettings* qs = new QSettings( format, QSettings::UserScope, "Autodesk",
-                                   INTERNAL_APPLICATION_NAME );
+    QSettings* qs = new QSettings(
+        format, QSettings::UserScope, "Autodesk",
+        PackageManager::ignoringPrefs() ? "RVALT" : INTERNAL_APPLICATION_NAME );
     qs->setFallbacksEnabled( false );
 
     if( qs->status() != QSettings::NoError )
