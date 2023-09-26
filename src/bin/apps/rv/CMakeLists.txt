@@ -45,12 +45,14 @@ ADD_EXECUTABLE(
   ${SOURCES} ${_rv_qrc}
 )
 
-IF( RV_TARGET_WINDOWS)
-  if (CMAKE_BUILD_TYPE STREQUAL "Release")
-     set_property(TARGET ${_target} PROPERTY WIN32_EXECUTABLE True)
-  endif()
-endif()
-
+IF(RV_TARGET_WINDOWS)
+  IF(CMAKE_BUILD_TYPE STREQUAL "Release")
+    SET_PROPERTY(
+      TARGET ${_target}
+      PROPERTY WIN32_EXECUTABLE True
+    )
+  ENDIF()
+ENDIF()
 
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}
