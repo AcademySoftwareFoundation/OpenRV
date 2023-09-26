@@ -10,6 +10,7 @@
 #include <IPCore/IPImage.h>
 #include <IPCore/IPNode.h>
 #include <TwkFB/FrameBuffer.h>
+#include <QMutex>
 
 namespace IPCore {
 
@@ -52,9 +53,10 @@ class OCIOIPNode : public IPNode
     StringProperty* m_configDescription;
     StringProperty* m_configWorkingDir;
     FrameBuffer*    m_lutfb;
+    std::string     m_lutSamplerName;
     FrameBuffer*    m_prelutfb;
     OCIOState*      m_state;
-    pthread_mutex_t m_lock;
+    mutable QMutex  m_lock;
 };
 
 } // Rv

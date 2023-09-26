@@ -22,8 +22,15 @@ SET(_download_hash
     "51ffa9de9e5b0c17cbabc0d8b780beb2"
 )
 
+SET(_base_dir
+    ${RV_DEPS_BASE_DIR}/${_target}
+)
 SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
+    ${_base_dir}/install
+)
+
+SET(${_target}_ROOT_DIR
+  ${_install_dir}
 )
 
 LIST(APPEND _disabled_decoders "--disable-decoder=bink")
@@ -179,6 +186,17 @@ ELSE()
   )
 ENDIF()
 
+SET(_ffmpeg_david_cmake_lib_dir_path "${RV_DEPS_DAVID_LIB_DIR}")
+IF(RV_TARGET_WINDOWS)
+  # Changing path start from "c:/..." to "/c/..." and replacing all backslashes with slashes since PkgConfig wants a linux path
+  string(REPLACE "\\" "/" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
+  string(REPLACE ":" "" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
+  STRING(FIND ${_ffmpeg_david_cmake_lib_dir_path} / _ffmpeg_first_slash_index)
+  IF(_ffmpeg_first_slash_index GREATER 0)
+    STRING(PREPEND _ffmpeg_david_cmake_lib_dir_path "/")
+  ENDIF()
+ENDIF()
+
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS dav1d::dav1d RV_DEPS_OPENSSL
@@ -190,7 +208,7 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env PKG_CONFIG_PATH=${RV_DEPS_DAVID_LIB_DIR}/pkgconfig ${_configure_command} --prefix=${_install_dir} --disable-programs --enable-shared
+    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir} --disable-programs --enable-shared
     --enable-openssl --enable-libdav1d --disable-iconv --disable-outdevs ${_toolchain} --extra-ldflags=${_ldflags} --extra-cflags=${_cflags}
     ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
@@ -266,6 +284,13 @@ TARGET_LINK_LIBRARIES(
 
 SET(${_target}-stage-flag
     ${RV_STAGE_LIB_DIR}/${_target}-stage-flag
+)
+
+
+ADD_CUSTOM_TARGET(clean-${_target}
+    COMMENT "Cleaning '${_target}' ..."
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
 )
 
 IF(RV_TARGET_WINDOWS)

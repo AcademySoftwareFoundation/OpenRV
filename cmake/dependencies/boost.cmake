@@ -30,11 +30,21 @@ SET(_download_hash
     e425bf1f1d8c36a3cd464884e74f007a
 )
 
+# Set _base_dir for Clean-<target>
+SET(_base_dir
+  ${RV_DEPS_BASE_DIR}/${_target}
+)
+
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
+SET(${_target}_ROOT_DIR
+  ${_install_dir}
+)
+
 SET(_boost_libs
+    atomic
     chrono
     date_time
     filesystem
@@ -271,6 +281,12 @@ ENDIF()
 ADD_CUSTOM_TARGET(
   ${_target}-stage-target ALL
   DEPENDS ${_boost_stage_output}
+)
+
+ADD_CUSTOM_TARGET(clean-${_target}
+    COMMENT "Cleaning '${_target}' ..."
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
 )
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)

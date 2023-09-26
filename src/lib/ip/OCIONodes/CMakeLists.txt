@@ -10,6 +10,8 @@ SET(_target
     "OCIONodes"
 )
 
+FIND_PACKAGE(Qt5 REQUIRED COMPONENTS Core)
+
 FILE(GLOB _sources *.c*)
 ADD_LIBRARY(
   ${_target} STATIC
@@ -24,7 +26,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC IPCore TwkFB
-  PRIVATE OpenColorIO TwkUtil
+  PRIVATE ocio::ocio TwkUtil Qt5::Core
 )
 
 IF(RV_TARGET_WINDOWS)
