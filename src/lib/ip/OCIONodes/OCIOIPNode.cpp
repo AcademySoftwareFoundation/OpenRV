@@ -174,6 +174,7 @@ OCIOIPNode::updateConfig()
     if (getenv("OCIO")) {
         m_state->linear   = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR)->getName();
     } else {
+        m_state->linear   = "";
         std::cerr << "ERROR: OCIO environment variable not set" << '\n';
     }
     
