@@ -171,11 +171,14 @@ OCIOIPNode::updateConfig()
     m_state->display  = m_state->config->getDefaultDisplay();
     m_state->view     = m_state->config->getDefaultView(m_state->display.c_str());
     
-    if (getenv("OCIO")) {
+    if (getenv("OCIO"))
+    {
         m_state->linear   = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR)->getName();
-    } else {
+    }
+    else
+    {
         m_state->linear   = "";
-        std::cerr << "ERROR: OCIO environment variable not set" << '\n';
+        std::cerr << "ERROR: OCIO environment variable not set" << std::endl;
     }
     
     m_state->shaderID = "";
