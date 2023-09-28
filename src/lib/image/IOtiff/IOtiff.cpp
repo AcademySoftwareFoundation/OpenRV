@@ -345,9 +345,9 @@ readAllTags(TIFF* tif, FrameBuffer& img)
     //  Now the rest of the tags
     //
    
-    for (int i = 0, n = tif->tif_nfields; i < n; i++)
+    for (int fi = 0, nfi = tif->tif_nfields; fi < nfi; fi++)
     {
-        const TIFFFieldInfo* fip = tif->tif_fieldinfo[i];
+        const TIFFField* const fip =  tif->tif_fields[fi];
 
         if (fip->field_tag != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
             fip->field_tag != EXIFTAG_COLORSPACE &&

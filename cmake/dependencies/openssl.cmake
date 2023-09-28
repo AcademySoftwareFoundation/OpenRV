@@ -27,7 +27,7 @@ IF(RV_TARGET_WINDOWS
   )
 ENDIF()
 
-SET(_install_dir
+SET(RV_DEPS_OPENSSL_INSTALL_DIR
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 SET(_source_dir
@@ -37,7 +37,7 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_target}/build
 )
 SET(RV_DEPS_OPENSSL_LIB_DIR
-    ${_install_dir}/lib
+    ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib
 )
 
 SET(_download_url
@@ -57,7 +57,7 @@ SET(_make_command
 LIST(APPEND _make_command "--source-dir")
 LIST(APPEND _make_command ${_source_dir})
 LIST(APPEND _make_command "--output-dir")
-LIST(APPEND _make_command ${_install_dir})
+LIST(APPEND _make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND _make_command "--perlroot")
   LIST(APPEND _make_command ${RV_DEPS_WIN_PERL_ROOT})
@@ -105,7 +105,7 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${_source_dir}
-  INSTALL_DIR ${_install_dir}
+  INSTALL_DIR ${RV_DEPS_OPENSSL_INSTALL_DIR}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
   CONFIGURE_COMMAND ${_make_command} --configure
@@ -118,7 +118,7 @@ EXTERNALPROJECT_ADD(
 )
 
 SET(_include_dir
-    ${_install_dir}/include
+    ${RV_DEPS_OPENSSL_INSTALL_DIR}/include
 )
 FILE(MAKE_DIRECTORY ${_include_dir})
 
@@ -154,33 +154,44 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 LIST(APPEND RV_DEPS_LIST OpenSSL::SSL)
 
+SET(_openssl_stage_lib_dir
+  ${RV_STAGE_LIB_DIR}
+)
+
 IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMENT "Installing ${_target}'s libs and bin into ${_openssl_stage_lib_dir} and ${RV_STAGE_BIN_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib ${_openssl_stage_lib_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_INSTALL_DIR}/bin ${RV_STAGE_BIN_DIR}
   )
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
     DEPENDS ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
   )
-ELSEIF(RV_TARGET_IS_RHEL8)
-  # Blank target on RHEL8 Linux to avoid copying RV's OpenSSL files.
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-  )
 ELSE()
+
+  # Because RHEL8 has the same version of openssl library as we use but is not compatible with
+  # our library, we will copy openssl into its own seperate lib directory and conditionally add it to the
+  # LD_LIBRARY_PATH if the version we build does not match the system version. This will allow RHEL8 to
+  # use its own system version
+  #
+  IF (RV_TARGET_LINUX)
+    SET(_openssl_stage_lib_dir
+      ${_openssl_stage_lib_dir}/OpenSSL
+    )
+  ENDIF()
+
   ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_LIB_DIR} ${RV_STAGE_LIB_DIR}
+    COMMENT "Installing ${_target}'s libs into ${_openssl_stage_lib_dir}"
+    OUTPUT ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_OPENSSL_LIB_DIR} ${_openssl_stage_lib_dir}
     DEPENDS ${_target}
   )
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
+    DEPENDS ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
   )
 ENDIF()
 

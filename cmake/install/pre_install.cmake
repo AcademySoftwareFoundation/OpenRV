@@ -48,8 +48,10 @@ FUNCTION(before_copy FILE_PATH RET_VAL)
 
   IF(FILE_PATH MATCHES "\\.prl$"
      OR FILE_PATH MATCHES "\\.o$"
+     OR FILE_PATH MATCHES "\\.obj$"
      OR FILE_PATH MATCHES "\\.a$"
      OR FILE_PATH MATCHES "\\.la$"
+     OR FILE_PATH MATCHES "\\.c$"
   )
     SET(${RET_VAL}
         "NO"
