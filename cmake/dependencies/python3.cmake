@@ -16,15 +16,27 @@ SET(_pyside2_target
     "RV_DEPS_PYSIDE2"
 )
 
+SET(PYTHON_VERSION_MAJOR
+    3
+)
+
+SET(PYTHON_VERSION_MINOR
+    10
+)
+
+SET(PYTHON_VERSION_PATCH
+    12
+)
+
 SET(_python3_version
-    "3.10.12"
+    "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.${PYTHON_VERSION_PATCH}"
 )
 
 SET(RV_DEPS_PYTHON_VERSION_MAJOR
-    3
+    ${PYTHON_VERSION_MAJOR}
 )
 SET(RV_DEPS_PYTHON_VERSION_SHORT
-    "3.9"
+    "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
 SET(_opentimelineio_version
@@ -65,10 +77,6 @@ SET(_source_dir
 SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
-
-STRING(REPLACE "." ";" _version_list ${_python3_version})
-LIST(GET _version_list 0 _python3_version_major)
-LIST(GET _version_list 1 _python3_version_minor)
 
 IF(RV_TARGET_WINDOWS)
 
@@ -149,7 +157,7 @@ IF(RV_TARGET_WINDOWS)
     )
   ENDIF()
   SET(_python_name
-      python${_python3_version_major}${_python3_version_minor}${PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG}
+      python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG}
   )
   SET(_include_dir
       ${_install_dir}/include
@@ -175,7 +183,7 @@ IF(RV_TARGET_WINDOWS)
 
   # When building in Debug, we need the Release name also: see below for add_custom_command.
   SET(_python_release_libname
-      python${_python3_version_major}${_python3_version_minor}${CMAKE_STATIC_LIBRARY_SUFFIX}
+      python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${CMAKE_STATIC_LIBRARY_SUFFIX}
   )
   SET(_python_release_libpath
       ${_lib_dir}/${_python_release_libname}
@@ -186,7 +194,7 @@ IF(RV_TARGET_WINDOWS)
   )
 ELSE() # Not WINDOWS
   SET(_python_name
-      python${_python3_version_major}.${_python3_version_minor}
+      python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
   )
   SET(_include_dir
       ${_install_dir}/include/${_python_name}
