@@ -14,6 +14,7 @@
 #include <OpenColorIO/OpenColorIO.h>
 #include <boost/functional/hash.hpp>
 #include <algorithm>
+#include <cstdlib>
 #include <regex>
 
 namespace OCIO = OCIO_NAMESPACE;
@@ -169,7 +170,17 @@ OCIOIPNode::updateConfig()
 
     m_state->display  = m_state->config->getDefaultDisplay();
     m_state->view     = m_state->config->getDefaultView(m_state->display.c_str());
-    m_state->linear   = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR)->getName();
+    
+    if (getenv("OCIO"))
+    {
+        m_state->linear   = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR)->getName();
+    }
+    else
+    {
+        m_state->linear   = "";
+        std::cerr << "ERROR: OCIO environment variable not set" << std::endl;
+    }
+    
     m_state->shaderID = "";
     m_state->lutID    = "";
 
