@@ -462,6 +462,7 @@ FUNCTION(rv_stage)
       OUTPUT ${_package_filename}
       DEPENDS ${_temp_file} ${_files} ${_package_file}
       COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
+      COMMAND ${CMAKE_COMMAND} -E rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
