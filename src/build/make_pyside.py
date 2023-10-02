@@ -193,7 +193,7 @@ def remove_broken_shortcuts(python_home: str) -> None:
             if filename not in [
                 "python",
                 "python3",
-                "python3.9",
+                "python3.10",
             ]:
                 print(f"Removing {filepath}...")
                 os.remove(filepath)
