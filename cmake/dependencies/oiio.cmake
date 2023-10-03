@@ -19,10 +19,10 @@ RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "2.4.6.0" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
-    "https://github.com/OpenImageIO/oiio/archive/refs/tags/v${_version}.tar.gz"
+    "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
-    "c7acc1b9a8fda04ef48f7de1feda4dae"
+    "628c588112ce8e08f31ec3417eb6828d"
 )
 
 RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
