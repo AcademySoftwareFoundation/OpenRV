@@ -46,12 +46,6 @@ SET(_dav1d_lib
     ${_lib_dir}/${_david_lib_name}
 )
 
-# Required for configuring ffmpeg build
-SET(RV_DEPS_DAVID_LIB_DIR
-    ${_lib_dir}
-    CACHE INTERNAL ""
-)
-
 SET(_configure_command
     meson
 )
@@ -145,4 +139,18 @@ ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 SET(RV_DEPS_DAV1D_VERSION
     ${_version}
     CACHE INTERNAL "" FORCE
+)
+
+# FFmpeg customization adding dav1d codec support to FFmpeg
+LIST(APPEND RV_FFMPEG_DEPENDS RV_DEPS_DAV1D)
+LIST(APPEND RV_FFMPEG_EXTRA_C_OPTIONS "--extra-cflags=-I${_include_dir}")
+IF(RV_TARGET_WINDOWS)
+  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-LIBPATH:${_lib_dir}")
+ELSE()
+  LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS "--extra-ldflags=-L${_lib_dir}")
+ENDIF()
+LIST(APPEND RV_FFMPEG_EXTERNAL_LIBS "--enable-libdav1d")
+SET(RV_DEPS_DAVID_LIB_DIR
+    ${_lib_dir}
+    CACHE INTERNAL ""
 )
