@@ -1,2 +1,2 @@
 myst-parser       # License: MIT License (MIT)
-sphinx_rtd_theme  #sphinx read the docs theme
+sphinx_rtd_theme  # License: MIT License (MIT)
