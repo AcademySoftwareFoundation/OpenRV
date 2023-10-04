@@ -47,6 +47,7 @@
 #include <TwkAudio/AudioFormats.h>
 #include <TwkMovie/MovieIO.h>
 #include <TwkUtil/SystemInfo.h>
+#include <TwkUtil/File.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -2912,9 +2913,7 @@ RvPreferences::addPackage(bool)
 
             pdir.cd("Packages");
 
-            QFileInfo pinfo(pdir.absolutePath());
-
-            if (pinfo.isWritable())
+            if (TwkUtil::isWritable(UTF8::qconvert(pdir.absolutePath()).c_str()))
             {
                 possiblePlaces.push_back(pdir.absolutePath());
             }

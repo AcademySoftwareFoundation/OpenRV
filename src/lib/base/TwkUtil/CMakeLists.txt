@@ -91,7 +91,7 @@ ENDIF()
 IF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE nedmalloc win_posix win_pthreads
+    PRIVATE nedmalloc win_posix win_pthreads TwkQtCoreUtil
     PUBLIC pcre
   )
 ENDIF()

@@ -89,10 +89,12 @@ fillData (QList<QVariant>& data, QFileInfo* fi)
 {
     if (fi)
     {
+        const auto path = UTF8::qconvert(fi->absoluteFilePath());
+ 
         data << fi->owner() 
             << fi->size() 
-            << (QString(fi->isReadable() ? "r" : "-")
-                + QString(fi->isWritable() ? "w" : "-"))
+            << (QString(TwkUtil::isReadable(path.c_str()) ? "r" : "-")
+                + QString(TwkUtil::isWritable(path.c_str()) ? "w" : "-"))
             << fi->lastModified();
     }
     else data << QString() << QString() << QString() << QString();

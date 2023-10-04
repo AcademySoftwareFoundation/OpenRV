@@ -17,6 +17,7 @@
 #include <IPCore/DisplayGroupIPNode.h>
 #include <IPCore/PipelineGroupIPNode.h>
 #include <QtCore/QtCore>
+#include <TwkUtil/File.h>
 #include <TwkQtCoreUtil/QtConvert.h>
 
 #include <QtWidgets/QMessageBox>
@@ -73,7 +74,6 @@ RvProfileManager::loadModel()
         Profile* p = m_profiles[i];
         QString filename = p->fileName().c_str();
         QString name = p->name().c_str();
-        QFileInfo info(filename);
         
         string assignName = "";
 
@@ -86,7 +86,7 @@ RvProfileManager::loadModel()
             }
         }
 
-        QIcon icon = info.isWritable() ? QIcon() : QIcon(":images/lock_out.png");
+        QIcon icon = TwkUtil::isWritable(p->fileName().c_str()) ? QIcon() : QIcon(":images/lock_out.png");
 
         QList<QStandardItem*> row;
 
@@ -211,7 +211,10 @@ RvProfileManager::addProfile()
         QFileInfo fileInfo(profilesDir, QString(name.c_str()));
         QFileInfo dirInfo(profilesDir.canonicalPath());
 
-        if (!dirInfo.isWritable() || (fileInfo.exists() && !fileInfo.isWritable()))
+        const bool isDirWritable = TwkUtil::isWritable(UTF8::qconvert(profilesDir.canonicalPath()).c_str()); 
+        const bool isFileWritable = TwkUtil::isWritable(UTF8::qconvert(fileInfo.absoluteFilePath()).c_str()); 
+
+        if (!isDirWritable || (fileInfo.exists() && !isFileWritable))
         {
             cerr << "ERROR: User Profile directory \""
                  << UTF8::qconvert(profilesDir.canonicalPath())
@@ -247,10 +250,8 @@ RvProfileManager::deleteProfile()
     Profile* p = currentProfile();
     if (!p) return;
     QString filename = p->fileName().c_str();
-    QString name = p->name().c_str();
-    QFileInfo info(filename);
 
-    if (info.isWritable())
+    if (TwkUtil::isWritable(p->fileName().c_str()))
     {
         QMessageBox box(this);
         box.setWindowTitle(tr("Delete Profile"));
