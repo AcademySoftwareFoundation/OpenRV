@@ -56,6 +56,7 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/User.h>
+#include <TwkUtil/File.h>
 #include <assert.h>
 #include <RvCommon/GLView.h> // WINDOWS NEEDS THIS LAST
 //#include <RvCommon/SequenceFileEngine.h>
@@ -1097,13 +1098,14 @@ NODE_IMPLEMENTATION(saveFileDialog, Pointer)
 
             v = pathConform(UTF8::qconvert(files.at(0)));
             QFileInfo info(UTF8::qconvert(v.c_str()));
-            QFileInfo dirInfo(info.absolutePath());
 
             //
             //  QFileInfo says a non-existant file is not writable, so have to check the directory
             //  in that case.
             //
-	    if ((!info.exists() && !dirInfo.isWritable()) || (info.exists() && !info.isWritable()))
+            const bool isDirWritable = TwkUtil::isWritable(UTF8::qconvert(info.absolutePath()).c_str());
+            const bool isFileWritable = TwkUtil::isWritable(v.c_str());
+	    if ((!info.exists() && !isDirWritable) || (info.exists() && !isFileWritable))
 	    {
 		QString message = QString("File '") + UTF8::qconvert(v.c_str()) +
 			"' is not writable; please check the permissions or choose another location.";

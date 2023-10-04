@@ -2538,6 +2538,7 @@ FileSourceIPNode::openMovieTask(const string& filename,
 
     debuggingLoadDelay();
 
+
     //
     //  NOTE: addMedia() will cause a propagateRangeChange() down the
     //  graph using this thread (which is usually some worker thread
@@ -2596,7 +2597,8 @@ FileSourceIPNode::openMovieTask(const string& filename,
 
     Movie* mov = 0;
     bool failed = false;
-    
+    ostringstream errMsg;
+
     try
     {
         mov = openMovie(file);
@@ -2604,7 +2606,9 @@ FileSourceIPNode::openMovieTask(const string& filename,
     catch (std::exception& exc)
     {
         failed = true;
-        cerr << "ERROR: Open of '" << file << "' failed: " << exc.what() << endl;
+        errMsg << "Open of '" << file << "' failed: " << exc.what();
+
+        cerr << "ERROR: " << errMsg.str() << endl;
     }
     catch (...)
     {
@@ -2613,10 +2617,12 @@ FileSourceIPNode::openMovieTask(const string& filename,
 
     if (!mov || failed)
     {
-        ostringstream errorString;
-        errorString << "Could not locate \"" << file << "\". Relocate source to fix.";
+        if ( errMsg.tellp() == std::streampos(0) )
+        {
+            errMsg << "Could not locate \"" << file << "\". Relocate source to fix.";
+        }
 
-        mov = openProxyMovie(errorString.str(), 0.0, filename, defaultFPS);
+        mov = openProxyMovie(errMsg.str(), 0.0, filename, defaultFPS);
         setMediaActive(false);
 
         ostringstream str;
@@ -2721,6 +2727,19 @@ FileSourceIPNode::findCachedMediaMetaData(const string& filename, PropertyContai
 FileSourceIPNode::Movie* 
 FileSourceIPNode::openMovie(const string& filename)
 {
+    // Ensure file exists and is accessible by the current user before continuing
+    //
+    if ( !TwkUtil::pathIsURL(filename) )
+    {
+        const auto firstFileInSeq = TwkUtil:: firstFileInPattern( filename.c_str() );
+        const char* pathToTest = firstFileInSeq.empty() ? filename.c_str() : firstFileInSeq.c_str();
+ 
+        if ( !TwkUtil::isReadable(pathToTest) )
+        {
+            TWK_THROW_EXC_STREAM(strerror(errno));
+        }
+    }
+
     MovieInfo info;
     PropertyContainer* pc = new PropertyContainer(); 
     findCachedMediaMetaData(filename, pc);

@@ -33,7 +33,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Qt5::Core
-  PRIVATE TwkDeploy TwkUtil yaml stl_ext TwkApp minizip
+  PRIVATE TwkDeploy TwkUtil TwkQtCoreUtil yaml stl_ext TwkApp minizip
 )
 
 TARGET_COMPILE_OPTIONS(

@@ -11,6 +11,8 @@
 #include <unzip.h>
 #include <yaml.h>
 #include <TwkApp/Bundle.h>
+#include <TwkUtil/File.h>
+#include <TwkQtCoreUtil/QtConvert.h>
 #include <stl_ext/string_algo.h>
 #include <fstream>
 #include <string_view>
@@ -925,9 +927,9 @@ namespace Rv
         m_packageMap.insert( infile, m_packages.size() - 1 );
 
         QFileInfo finfo( infile );
-        QFileInfo fdir( finfo.absolutePath() );
-        m_packages.back().fileWritable = finfo.isWritable();
-        m_packages.back().dirWritable = fdir.isWritable();
+
+        m_packages.back().fileWritable = TwkUtil::isWritable( TwkQtCoreUtil::UTF8::qconvert(infile).c_str() );
+        m_packages.back().dirWritable = TwkUtil::isWritable( TwkQtCoreUtil::UTF8::qconvert(finfo.absolutePath()).c_str() );
 
         unz_global_info info;
         unzGetGlobalInfo( file, &info );

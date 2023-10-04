@@ -577,8 +577,7 @@ int main(int argc, char *argv[])
         //  Override license file from command line
         //
 
-        QFileInfo qfi(opts.licarg);
-        if (!qfi.isReadable())
+        if (!TwkUtil::isReadable(opts.licarg))
         {
             cerr << "ERROR: license file '"  << opts.licarg << "' unreadable" << endl;
             exit(-1);

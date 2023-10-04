@@ -371,7 +371,7 @@ TARGET_LINK_LIBRARIES(
          Qt5::Xml
          Qt5::XmlPatterns
          qtcolortriangle
-  PRIVATE Mu MuLang Qt5::UiTools
+  PRIVATE Mu MuLang Qt5::UiTools TwkQtCoreUtil TwkUtil
 )
 
 IF(RV_TARGET_WINDOWS)

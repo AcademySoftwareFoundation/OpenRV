@@ -1151,8 +1151,9 @@ MovieFFMpegReader::openAVFormat()
     }
 
     // Open the file
-    if (avformat_open_input(&m_avFormatContext, safe_path.c_str(), 0, &fmtOptions) != 0)
-        TWK_THROW_EXC_STREAM("Failed to open for reading: " << m_filename);
+    const int ret = avformat_open_input(&m_avFormatContext, safe_path.c_str(), 0, &fmtOptions); 
+    if (ret != 0)
+        TWK_THROW_EXC_STREAM("Failed to open " << m_filename << " for reading: " << avErr2Str(ret));
 
     return true;
 }
