@@ -349,6 +349,7 @@ int parseInParams(int, char**);
 int parseDebugKeyWords(int, char**);
 int parseMuFlags(int, char**);
 int parseSendEvents(int, char**);
+const char* getDebugCategories();
 
 } // Rv
 
@@ -546,7 +547,7 @@ int parseSendEvents(int, char**);
          "-bakeURL", ARG_FLAG(&opt.bakeURL), "Fully bake the command line as an rvlink URL, print, and exit", \
          "-sendEvent", ARG_SUBR(&Rv::parseSendEvents), "Send external events e.g. -sendEvent 'name' 'content'",               \
          "-flags", ARG_SUBR(&Rv::parseMuFlags), "Arbitrary flags (flag, or 'name=value') for use in Mu code",\
-         "-debug", ARG_SUBR(&Rv::parseDebugKeyWords), "Debug category",               \
+         "-debug", ARG_SUBR(&Rv::parseDebugKeyWords), Rv::getDebugCategories(), \
          "-version", ARG_FLAG(&opt.showVersion), "Show RV version number"
 
 #endif // __RV__Options__h__

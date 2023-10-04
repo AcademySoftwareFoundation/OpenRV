@@ -61,6 +61,7 @@ static Options* globalOptions=0;
 
 static ENVVAR_INT( evProgressiveSourceLoading, "RV_PROGRESSIVE_SOURCE_LOADING", 0 );
 
+// If you add a new debugging switch, please update getDebugCategories for the help menu too.
 void debugSwitches(const std::string& name)
 {
     if (name == "events") TwkApp::Document::debugEvents();
@@ -98,6 +99,34 @@ void debugSwitches(const std::string& name)
              << name 
              << "\"" << endl;
     }
+}
+
+const char* 
+getDebugCategories()
+{
+   return "Debuging categories: "
+    "events, "
+    "threads, "
+    "gpu, "
+    "audio, "
+    "audioverbose, "
+    "dumpaudio, "
+    "shaders, "
+    "shadercode, "
+    "profile, "
+    "playback, "
+    "playbackverbose, "
+    "cache, "
+    "mu, "
+    "muc, "
+    "compile, "
+    "dtree, "
+    "passes, "
+    "imagefbo, "
+    "nogpucache, "
+    "imagefbolog, "
+    "nodes, "
+    "plugins";
 }
 
 int

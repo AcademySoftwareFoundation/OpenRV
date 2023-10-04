@@ -36,13 +36,15 @@
 #endif
 #endif
 
-
 namespace TwkUtil {
 
 typedef std::vector<std::string> FileNameList;
 
 // *****************************************************************************
 #ifdef _MSC_VER
+#define F_OK 0
+#define W_OK 2
+#define R_OK 4
 TWKUTIL_EXPORT std::wstring to_wstring(const char *c);
 TWKUTIL_EXPORT std::string to_utf8(const wchar_t *wc);
 TWKUTIL_EXPORT int stat(const char *c, struct _stat64 *buffer);
@@ -51,6 +53,7 @@ TWKUTIL_EXPORT int stat(const char *c, struct stat *buffer);
 #endif
 TWKUTIL_EXPORT FILE* fopen(const char *c, const char *mode);
 TWKUTIL_EXPORT int open(const char *c, int oflag);
+TWKUTIL_EXPORT int access(const char *path, int mode);
 
 TWKUTIL_EXPORT bool modificationTime( const char *fname, time_t &modTime );
 TWKUTIL_EXPORT bool creationTime( const char *fname, time_t &creTime );
@@ -115,6 +118,10 @@ inline bool isDirectory(const std::string& filename)
 { 
     return isDirectory(filename.c_str()); 
 }
+
+// Convenience wrappers for access
+TWKUTIL_EXPORT bool isReadable(const char* path);
+TWKUTIL_EXPORT bool isWritable(const char* path);
 
 //
 //  Sort a file name list so that negative numbers, etc, are handled
