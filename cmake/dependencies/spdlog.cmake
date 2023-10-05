@@ -70,6 +70,7 @@ SET(_cmake_configure_command
     ${CMAKE_COMMAND}
 )
 LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
 LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
 
