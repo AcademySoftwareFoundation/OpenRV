@@ -54,8 +54,7 @@ namespace TwkUtil
                      name, logFilePath.append( name + ".log" ),
                      evFileLogSize.getValue(), evFileLogNumFiles.getValue() )
                      .get();
-      m_logger->flush_on(
-          spdlog::level::err );
+      m_logger->flush_on( spdlog::level::err );
     }
 
     setLogLevel( evFileLogLevel.getValue() );
@@ -69,11 +68,8 @@ namespace TwkUtil
   }
 
   void FileLogger::logToFile( spdlog::level::level_enum lineLevel,
-                              std::string& line )
+                              const std::string& line )
   {
-    // Remove the unecessary newline for the log file (it would 'double space'
-    // each line in the log)
-    boost::trim_right( line );
     switch( lineLevel )
     {
       case spdlog::level::debug:
