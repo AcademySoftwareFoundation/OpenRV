@@ -8,6 +8,11 @@
 #ifndef _TwkUtilLog_h_
 #define _TwkUtilLog_h_
 
+// Required before including <spdlog/...>
+#if !defined( SPDLOG_EOF )
+#define SPDLOG_EOF ""
+#endif
+
 #include <TwkUtil/dll_defs.h>
 #include <spdlog/logger.h>
 #include <string>
@@ -21,7 +26,8 @@ namespace TwkUtil
     FileLogger();
     ~FileLogger();
 
-    void logToFile( spdlog::level::level_enum lineLevel, std::string& line );
+    void logToFile( spdlog::level::level_enum lineLevel,
+                    const std::string& line );
 
    private:
     spdlog::logger* m_logger;
