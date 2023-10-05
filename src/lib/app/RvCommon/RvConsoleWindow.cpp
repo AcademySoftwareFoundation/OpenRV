@@ -6,6 +6,11 @@
 //
 //******************************************************************************
 
+// Required before including <spdlog/...>
+#if !defined( SPDLOG_EOF )
+#define SPDLOG_EOF ""
+#endif
+
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvPackage/PackageManager.h>
