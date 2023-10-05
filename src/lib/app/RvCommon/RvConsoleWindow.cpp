@@ -275,17 +275,20 @@ namespace Rv
     if( qtimerwarning || qfilesystemwatcher ) return false;
 
     spdlog::level::level_enum lineLogLevel = spdlog::level::info;
+    ostream* out = m_cout;
 
     if( line.find( "ERROR:" ) == 0 )
     {
       lineLogLevel = spdlog::level::err;
       line.erase( 0, 6 );
+      out = m_cerr;
       *out << "ERROR:";
     }
     else if( line.find( "WARNING:" ) == 0 )
     {
       lineLogLevel = spdlog::level::warn;
       line.erase( 0, 8 );
+      out = m_cerr;
       *out << "WARNING:";
     }
     else if( line.find( "INFO:" ) == 0 )
@@ -300,17 +303,14 @@ namespace Rv
       line.erase( 0, 6 );
       *out << "DEBUG:";
     }
-    ostream* out = m_cout;
 
     if( lineLogLevel == spdlog::level::err )
     {
       html += "<font color=red>ERROR:</font> ";
-      out = m_cerr;
     }
     else if( lineLogLevel == spdlog::level::warn )
     {
       html += "<font color=orange>WARNING:</font> ";
-      out = m_cerr;
     }
     else if( lineLogLevel == spdlog::level::info )
     {
