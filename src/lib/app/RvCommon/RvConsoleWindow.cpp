@@ -277,41 +277,48 @@ namespace Rv
     spdlog::level::level_enum lineLogLevel = spdlog::level::info;
 
     if( line.find( "ERROR:" ) == 0 )
+    {
       lineLogLevel = spdlog::level::err;
+      line.erase( 0, 6 );
+      *out << "ERROR:";
+    }
     else if( line.find( "WARNING:" ) == 0 )
+    {
       lineLogLevel = spdlog::level::warn;
+      line.erase( 0, 8 );
+      *out << "WARNING:";
+    }
     else if( line.find( "INFO:" ) == 0 )
+    {
       lineLogLevel = spdlog::level::info;
+      line.erase( 0, 5 );
+      *out << "INFO:";
+    }
     else if( line.find( "DEBUG:" ) == 0 )
+    {
       lineLogLevel = spdlog::level::debug;
-
+      line.erase( 0, 6 );
+      *out << "DEBUG:";
+    }
     ostream* out = m_cout;
 
     if( lineLogLevel == spdlog::level::err )
     {
       html += "<font color=red>ERROR:</font> ";
-      line.erase( 0, 6 );
       out = m_cerr;
-      *out << "ERROR:";
     }
     else if( lineLogLevel == spdlog::level::warn )
     {
       html += "<font color=orange>WARNING:</font> ";
-      line.erase( 0, 8 );
       out = m_cerr;
-      *out << "WARNING:";
     }
     else if( lineLogLevel == spdlog::level::info )
     {
       html += "<font color=cyan>INFO:</font> ";
-      line.erase( 0, 5 );
-      *out << "INFO:";
     }
     else if( lineLogLevel == spdlog::level::debug )
     {
       html += "<font color=green>DEBUG:</font> ";
-      line.erase( 0, 6 );
-      *out << "DEBUG:";
     }
 
     html += line.c_str();
