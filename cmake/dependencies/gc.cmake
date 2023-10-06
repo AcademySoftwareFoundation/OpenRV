@@ -136,7 +136,7 @@ IF(RV_TARGET_WINDOWS)
     URL ${_download_url}
     URL_MD5 ${_download_hash}
     CONFIGURE_COMMAND ${_cmake_configure_command}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+    BUILD_COMMAND ${_make_command} -j${_cpu_count} 
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_BASE_DIR}/${_target}/src/include ${_include_dir}/gc
     COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/src/${_gc_lib_name} ${_gc_lib}
     BUILD_IN_SOURCE TRUE
@@ -161,7 +161,7 @@ ELSE()
     URL ${_download_url}
     URL_MD5 ${_download_hash}
     CONFIGURE_COMMAND ${_autogen_command} && ${_configure_command} ${_configure_args}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+    BUILD_COMMAND ${_make_command} -j${_cpu_count} 
     INSTALL_COMMAND ${_make_command} install
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir} ${CMAKE_BINARY_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}

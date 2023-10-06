@@ -172,7 +172,7 @@ EXTERNALPROJECT_ADD(
   DEPENDS Imath::Imath ZLIB::ZLIB
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${_cmake_configure_command}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+  BUILD_COMMAND ${_make_command} -j${_cpu_count} 
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE

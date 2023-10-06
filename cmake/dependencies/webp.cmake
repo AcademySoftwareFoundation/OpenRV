@@ -81,7 +81,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   DEPENDS ZLIB::ZLIB jpeg-turbo::jpeg Tiff::Tiff PNG::PNG
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+  BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE

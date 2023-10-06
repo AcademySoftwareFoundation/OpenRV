@@ -245,7 +245,7 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND
     ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir}
     ${RV_FFMPEG_COMMON_CONFIG_OPTIONS} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+  BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE

@@ -115,7 +115,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${RV_DEPS_BASE_DIR}/${_target}/src
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} -v
+  BUILD_COMMAND ${_make_command} -j${_cpu_count} 
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
