@@ -6,11 +6,6 @@
 //
 //******************************************************************************
 
-// Required before including <spdlog/...>
-#if !defined( SPDLOG_EOF )
-#define SPDLOG_EOF ""
-#endif
-
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvPackage/PackageManager.h>
@@ -282,26 +277,33 @@ namespace Rv
       lineLogLevel = spdlog::level::err;
       line.erase( 0, 6 );
       out = m_cerr;
-      *out << "ERROR:";
+      *out << "ERROR: ";
     }
     else if( line.find( "WARNING:" ) == 0 )
     {
       lineLogLevel = spdlog::level::warn;
       line.erase( 0, 8 );
       out = m_cerr;
-      *out << "WARNING:";
+      *out << "WARNING: ";
     }
     else if( line.find( "INFO:" ) == 0 )
     {
       lineLogLevel = spdlog::level::info;
       line.erase( 0, 5 );
-      *out << "INFO:";
+      *out << "INFO: ";
     }
     else if( line.find( "DEBUG:" ) == 0 )
     {
       lineLogLevel = spdlog::level::debug;
       line.erase( 0, 6 );
-      *out << "DEBUG:";
+      *out << "DEBUG: ";
+    }
+
+    // We removed the message type from the line, let's make sure
+    // that we also remove the space between the type and the line
+    if( std::isspace( line.at( 0 ) ) )
+    {
+      line.erase( 0, 1 );
     }
 
     if( lineLogLevel == spdlog::level::err )

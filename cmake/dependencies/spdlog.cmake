@@ -83,6 +83,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
+  PATCH_COMMAND patch -u -b include/spdlog/tweakme.h -i "${PROJECT_SOURCE_DIR}/cmake/patches/spdlog_tweakme.h.patch"
   CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
   BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
   INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
