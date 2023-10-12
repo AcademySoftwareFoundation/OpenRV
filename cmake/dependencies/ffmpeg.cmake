@@ -146,10 +146,6 @@ LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-large-tests")
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
 ENDIF()
-SET(RV_FFMPEG_COMMON_CONFIG_OPTIONS
-    ${RV_FFMPEG_COMMON_CONFIG_OPTIONS}
-    CACHE INTERNAL ""
-)
 
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake variable.
@@ -190,33 +186,13 @@ IF(NOT DEFINED RV_FFMPEG_CONFIG_OPTIONS)
 
   SET(RV_FFMPEG_CONFIG_OPTIONS
       "${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}"
-      CACHE INTERNAL ""
   )
 ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
-SET(RV_FFMPEG_DEPENDS
-    ${RV_FFMPEG_DEPENDS}
-    CACHE INTERNAL ""
-)
-
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_C_OPTIONS)
-SET(RV_FFMPEG_EXTRA_C_OPTIONS
-    ${RV_FFMPEG_EXTRA_C_OPTIONS}
-    CACHE INTERNAL ""
-)
-
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
-SET(RV_FFMPEG_EXTRA_LIBPATH_OPTIONS
-    ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS}
-    CACHE INTERNAL ""
-)
-
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTERNAL_LIBS)
-SET(RV_FFMPEG_EXTERNAL_LIBS
-    ${RV_FFMPEG_EXTERNAL_LIBS}
-    CACHE INTERNAL ""
-)
 
 SET(_ffmpeg_david_cmake_lib_dir_path
     "${RV_DEPS_DAVID_LIB_DIR}"
