@@ -146,6 +146,10 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _openexr_byproducts ${_openexr_implib} ${_ilmthread_implib} ${_iex_implib})
 ENDIF()
 
+SET(_patch_command 
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/openexr_invalid_to_black.patch
+)
+
 SET(_cmake_configure_command
     ${CMAKE_COMMAND}
 )
@@ -173,6 +177,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${_cmake_configure_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} 
+  PATCH_COMMAND ${_patch_command}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
