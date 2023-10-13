@@ -269,7 +269,7 @@ namespace Rv
     // filter this
     if( qtimerwarning || qfilesystemwatcher ) return false;
 
-    spdlog::level::level_enum lineLogLevel = spdlog::level::info;
+    static spdlog::level::level_enum lineLogLevel = spdlog::level::info;
     ostream* out = m_cout;
 
     if( line.find( "ERROR:" ) == 0 )
@@ -308,19 +308,19 @@ namespace Rv
 
     if( lineLogLevel == spdlog::level::err )
     {
-      html += "<font color=red>ERROR:</font> ";
+      html += "<font color=red>ERROR: </font> ";
     }
     else if( lineLogLevel == spdlog::level::warn )
     {
-      html += "<font color=orange>WARNING:</font> ";
+      html += "<font color=orange>WARNING: </font> ";
     }
     else if( lineLogLevel == spdlog::level::info )
     {
-      html += "<font color=cyan>INFO:</font> ";
+      html += "<font color=cyan>INFO: </font> ";
     }
     else if( lineLogLevel == spdlog::level::debug )
     {
-      html += "<font color=green>DEBUG:</font> ";
+      html += "<font color=green>DEBUG: </font> ";
     }
 
     html += line.c_str();
@@ -355,49 +355,51 @@ namespace Rv
     // filter this
     if( qtimerwarning || qfilesystemwatcher ) return false;
 
-    spdlog::level::level_enum lineLogLevel = spdlog::level::info;
-
-    if( line.find( "ERROR:" ) == 0 )
-      lineLogLevel = spdlog::level::err;
-    else if( line.find( "WARNING:" ) == 0 )
-      lineLogLevel = spdlog::level::warn;
-    else if( line.find( "INFO:" ) == 0 )
-      lineLogLevel = spdlog::level::info;
-    else if( line.find( "DEBUG:" ) == 0 )
-      lineLogLevel = spdlog::level::debug;
+    static spdlog::level::level_enum lineLogLevel = spdlog::level::info;
 
     ostream* out = m_cout;
 
-    if( lineLogLevel == spdlog::level::err )
+    if( line.find( "ERROR:" ) == 0 )
     {
       textEdit()->setTextColor( Qt::red );
-      textEdit()->insertPlainText( "ERROR:" );
+      textEdit()->insertPlainText( "ERROR: " );
       line.erase( 0, 6 );
       out = m_cerr;
-      *out << "ERROR:";
+      *out << "ERROR: ";
+      lineLogLevel = spdlog::level::err;
     }
-    else if( lineLogLevel == spdlog::level::warn )
+    else if( line.find( "WARNING:" ) == 0 )
     {
       static const QColor orangeColor( 255, 175, 0 );
       textEdit()->setTextColor( orangeColor );
-      textEdit()->insertPlainText( "WARNING:" );
+      textEdit()->insertPlainText( "WARNING: " );
       line.erase( 0, 8 );
       out = m_cerr;
-      *out << "WARNING:";
+      *out << "WARNING: ";
+      lineLogLevel = spdlog::level::warn;
     }
-    else if( lineLogLevel == spdlog::level::info )
+    else if( line.find( "INFO:" ) == 0 )
     {
       textEdit()->setTextColor( Qt::cyan );
-      textEdit()->insertPlainText( "INFO:" );
+      textEdit()->insertPlainText( "INFO: " );
       line.erase( 0, 5 );
-      *out << "INFO:";
+      *out << "INFO: ";
+      lineLogLevel = spdlog::level::info;
     }
-    else if( lineLogLevel == spdlog::level::debug )
+    else if( line.find( "DEBUG:" ) == 0 )
     {
       textEdit()->setTextColor( Qt::green );
-      textEdit()->insertPlainText( "DEBUG:" );
+      textEdit()->insertPlainText( "DEBUG: " );
       line.erase( 0, 6 );
-      *out << "DEBUG:";
+      *out << "DEBUG: ";
+      lineLogLevel = spdlog::level::debug;
+    }
+
+    // We removed the message type from the line, let's make sure
+    // that we also remove the space between the type and the line
+    if( std::isspace( line.at( 0 ) ) )
+    {
+      line.erase( 0, 1 );
     }
 
     textEdit()->setTextColor( Qt::white );
