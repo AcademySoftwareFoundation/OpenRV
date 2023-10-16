@@ -59,12 +59,12 @@ namespace TwkUtil
 
     setLogLevel( evFileLogLevel.getValue() );
 
-    m_logger->info( "============ SESSION START ============" );
+    m_logger->info( "============ SESSION START ============\n" );
   }
 
   FileLogger::~FileLogger()
   {
-    m_logger->info( "============  SESSION END  ============" );
+    m_logger->info( "============  SESSION END  ============\n" );
   }
 
   void FileLogger::logToFile( spdlog::level::level_enum lineLevel,

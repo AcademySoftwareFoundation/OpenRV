@@ -4,6 +4,18 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# ---------------------- FFmpeg Build Customization ----------------------------
+# Note: The FFmpeg build can be customized by super projects via the following cmake global properties (typically by appending values to them):
+# cmake-format: off
+# RV_FFMPEG_DEPENDS - Additional FFmpeg's dependencies can be appended to this property 
+# RV_FFMPEG_PATCH_COMMAND_STEP - Commands to be executed as part of FFmpeg's patch step 
+# RV_FFMPEG_POST_CONFIGURE_STEP - Commands to be executed after FFMpeg's configure step 
+# RV_FFMPEG_CONFIG_OPTIONS - Custom FFmpeg configure options to enable/disable decoders and encoders 
+# RV_FFMPEG_EXTRA_C_OPTIONS - Extra cflags options 
+# RV_FFMPEG_EXTRA_LIBPATH_OPTIONS - Extra libpath options
+# cmake-format: on
+# ------------------------------------------------------------------------------
+
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
@@ -136,6 +148,36 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
+# Fetch customizable FFmpeg build properties
+GET_PROPERTY(
+  RV_FFMPEG_DEPENDS GLOBAL
+  PROPERTY "RV_FFMPEG_DEPENDS"
+)
+GET_PROPERTY(
+  RV_FFMPEG_PATCH_COMMAND_STEP GLOBAL
+  PROPERTY "RV_FFMPEG_PATCH_COMMAND_STEP"
+)
+GET_PROPERTY(
+  RV_FFMPEG_POST_CONFIGURE_STEP GLOBAL
+  PROPERTY "RV_FFMPEG_POST_CONFIGURE_STEP"
+)
+GET_PROPERTY(
+  RV_FFMPEG_CONFIG_OPTIONS GLOBAL
+  PROPERTY "RV_FFMPEG_CONFIG_OPTIONS"
+)
+GET_PROPERTY(
+  RV_FFMPEG_EXTRA_C_OPTIONS GLOBAL
+  PROPERTY "RV_FFMPEG_EXTRA_C_OPTIONS"
+)
+GET_PROPERTY(
+  RV_FFMPEG_EXTRA_LIBPATH_OPTIONS GLOBAL
+  PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS"
+)
+GET_PROPERTY(
+  RV_FFMPEG_EXTERNAL_LIBS GLOBAL
+  PROPERTY "RV_FFMPEG_EXTERNAL_LIBS"
+)
+
 # Make a list of common FFmpeg config options
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-shared")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-static")
@@ -146,14 +188,10 @@ LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-large-tests")
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
 ENDIF()
-SET(RV_FFMPEG_COMMON_CONFIG_OPTIONS
-    ${RV_FFMPEG_COMMON_CONFIG_OPTIONS}
-    CACHE INTERNAL ""
-)
 
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
-# customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake variable.
-IF(NOT DEFINED RV_FFMPEG_CONFIG_OPTIONS)
+# customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
+IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   LIST(APPEND _disabled_decoders "--disable-decoder=bink")
   LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_dct")
   LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_rdft")
@@ -190,33 +228,14 @@ IF(NOT DEFINED RV_FFMPEG_CONFIG_OPTIONS)
 
   SET(RV_FFMPEG_CONFIG_OPTIONS
       "${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}"
-      CACHE INTERNAL ""
   )
 ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
-SET(RV_FFMPEG_DEPENDS
-    ${RV_FFMPEG_DEPENDS}
-    CACHE INTERNAL ""
-)
-
+LIST(REMOVE_DUPLICATES RV_FFMPEG_CONFIG_OPTIONS)
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_C_OPTIONS)
-SET(RV_FFMPEG_EXTRA_C_OPTIONS
-    ${RV_FFMPEG_EXTRA_C_OPTIONS}
-    CACHE INTERNAL ""
-)
-
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
-SET(RV_FFMPEG_EXTRA_LIBPATH_OPTIONS
-    ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS}
-    CACHE INTERNAL ""
-)
-
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTERNAL_LIBS)
-SET(RV_FFMPEG_EXTERNAL_LIBS
-    ${RV_FFMPEG_EXTERNAL_LIBS}
-    CACHE INTERNAL ""
-)
 
 SET(_ffmpeg_david_cmake_lib_dir_path
     "${RV_DEPS_DAVID_LIB_DIR}"
