@@ -69,6 +69,7 @@ pacman -S --needed \
         git \
         nasm \
         p7zip \
+        patch \
         unzip \
         zip
 ```
