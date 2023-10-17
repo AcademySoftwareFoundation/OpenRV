@@ -2844,7 +2844,7 @@ namespace IPCore
     // Ensure file exists and is accessible by the current user before
     // continuing
     //
-    if( !TwkUtil::pathIsURL( filename ) )
+    if( !TwkUtil::pathIsURL( filename ) && TwkUtil::extension( filename ) != "movieproc" )
     {
       const auto firstFileInSeq =
           TwkUtil::firstFileInPattern( filename.c_str() );
