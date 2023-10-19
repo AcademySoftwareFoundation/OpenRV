@@ -1930,13 +1930,13 @@ namespace Rv
       path = p;
     else
       path = QDir::homePath();
-    name = QFileInfo( path ).canonicalFilePath() + "/Autodesk/" +
+    name = QFileInfo( path ).canonicalFilePath() + "/" + INTERNAL_ORGANIZATION_NAME + "/" +
            INTERNAL_APPLICATION_NAME + ".ini";
 #elif defined( PLATFORM_DARWIN )
-    name = QDir::homePath() + "/Library/Preferences/com.Autodesk." +
+    name = QDir::homePath() + "/Library/Preferences/com." + INTERNAL_ORGANIZATION_NAME + "." +
            INTERNAL_APPLICATION_NAME + ".plist";
 #else
-    name = QDir::homePath() + "/.config/Autodesk/" + INTERNAL_APPLICATION_NAME +
+    name = QDir::homePath() + "/.config/" + INTERNAL_ORGANIZATION_NAME + "/" + INTERNAL_APPLICATION_NAME +
            ".conf";
 #endif
 
@@ -1956,8 +1956,8 @@ namespace Rv
     QSettings::setDefaultFormat( QSettings::IniFormat );
 #endif
 
-    QCoreApplication::setOrganizationName( "Autodesk" );
-    QCoreApplication::setOrganizationDomain( "autodesk.com" );
+    QCoreApplication::setOrganizationName( INTERNAL_ORGANIZATION_NAME );
+    QCoreApplication::setOrganizationDomain( INTERNAL_ORGANIZATION_DOMAIN );
 
     //
     //  If -noPrefs command line flag was used, use empty alternate
@@ -2017,7 +2017,7 @@ namespace Rv
     QSettings::Format format( QSettings::NativeFormat );
 #endif
     QSettings* qs = new QSettings(
-        format, QSettings::UserScope, "Autodesk",
+        format, QSettings::UserScope, INTERNAL_ORGANIZATION_NAME,
         PackageManager::ignoringPrefs() ? "RVALT" : INTERNAL_APPLICATION_NAME );
     qs->setFallbacksEnabled( false );
 
