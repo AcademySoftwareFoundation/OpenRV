@@ -62,6 +62,8 @@ public:
     static void initThreading();
     static void destroyThreading();
 
+    static void uninit() {}
+
     //
     //  Get the OSMesaFrameBuffer
     //
