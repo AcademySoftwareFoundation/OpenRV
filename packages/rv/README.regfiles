@@ -1,18 +1,20 @@
+Each provided .reg contains a REPLACE_ME_FOR_RV_HOME placeholder that must be replaced with the location of the application.
+Also included is a .bat version of each .reg files. Each .bat file sets the registry entry and automatically updates REPLACE_ME_FOR_RV_HOME with the location of the application.
 
 The "standard" windows registry files here are:
 
-    openwith.reg
+    openwith.reg / openwith.reg.bat
 
         Launch RV when double-clicking on media files.
 
-    rvlink.reg
+    rvlink.reg / rvlink.reg.bat
 
         Register RV as the handler for the "rvlink://" custom protocol.  Docs on the rvlink protocol here:
 
             https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-user-manual/rv-user-manual-chapter-c.md
 
 
-The "rvpush" .reg files are alternates to support different workflows.  RVPUSH
+The "rvpush" files are alternates to support different workflows.  RVPUSH
 is an executable we provide that allows you to communicate with a running RV
 from the command line.  Docs here:
 
@@ -23,18 +25,18 @@ startup time when loading media by using a running RV if one is available.
 
 In particular:
 
-    rvlink_rvpush.reg 
+    rvlink_rvpush.reg / rvlink_rvpush.reg.bat
 
         This one uses RVPUSH to handle URLs, IE the first one will open a new
         RV (tagged as the URL handler) and if that RV is still running when
         next you click on a URL, that will be handled by the running RV instead
         of a new one.
 
-    openwith_rvpush_set.reg 
+    openwith_rvpush_set.reg / openwith_rvpush_set.reg.bat
 
         Similar to the above, but for the "double click on a file" workflow.
 
-    openwith_rvpush_merge.reg 
+    openwith_rvpush_merge.reg / openwith_rvpush_merge.reg.bat
     
         This uses the "merge" action instead of the "set" action for RVPUSH,
         which means that double-clicking on a second file after you have
