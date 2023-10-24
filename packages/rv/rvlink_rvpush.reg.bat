@@ -40,3 +40,4 @@ reg add "HKCR\rvlink\shell\open\command" /ve /d "\"%rvpushExePath%\" \"-tag\" \"
 
 popd
 pause
+

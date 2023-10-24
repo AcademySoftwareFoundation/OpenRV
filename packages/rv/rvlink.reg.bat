@@ -41,3 +41,4 @@ reg add "HKCR\rvlink\shell\open\command" /ve /d "\"%rvExePath%\" \"%%1\"" /f
 
 popd
 pause
+
