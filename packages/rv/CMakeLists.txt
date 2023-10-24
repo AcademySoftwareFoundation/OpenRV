@@ -20,7 +20,7 @@ IF(RV_TARGET_WINDOWS)
   FILE(
     GLOB regfiles
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    *.reg
+    *.reg*
   )
   FOREACH(
     regfile
@@ -29,4 +29,9 @@ IF(RV_TARGET_WINDOWS)
     CONFIGURE_FILE(${regfile} ${RV_APP_ROOT}/etc/${regfile} COPYONLY)
   ENDFOREACH()
   CONFIGURE_FILE(README.regfiles ${RV_APP_ROOT}/etc/README.regfiles COPYONLY)
+ENDIF()
+
+IF(RV_TARGET_LINUX)
+  CONFIGURE_FILE(rv.install_handler_linux ${RV_STAGE_BIN_DIR} COPYONLY)
+  CONFIGURE_FILE(rv.install_handler_linux_rvpush ${RV_STAGE_BIN_DIR} COPYONLY)
 ENDIF()
