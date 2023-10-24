@@ -55,11 +55,11 @@ SET(RV_INTERNAL_APPLICATION_NAME
     CACHE STRING "RV's internal application name"
 )
 SET(RV_INTERNAL_ORGANIZATION_NAME
-    "Autodesk"
+    "ASWF"
     CACHE STRING "RV's internal organization name"
 )
 SET(RV_INTERNAL_ORGANIZATION_DOMAIN
-    "autodesk.com"
+    "aswf.com"
     CACHE STRING "RV's internal organization domain"
 )
 PROJECT(
