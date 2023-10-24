@@ -20,7 +20,7 @@ IF(RV_TARGET_WINDOWS)
   FILE(
     GLOB regfiles
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    *.reg
+    *.reg*
   )
   FOREACH(
     regfile
