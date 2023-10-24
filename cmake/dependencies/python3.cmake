@@ -50,7 +50,7 @@ SET(_opentimelineio_git_tag
 )
 
 SET(_pyside2_archive_url
-    "https://download.qt.io/official_releases/QtForPython/pyside2/PySide2-${_pyside2_version}-src/pyside-setup-opensource-src-${_pyside2_version}.zip"
+    "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside2_version}-src/pyside-setup-opensource-src-${_pyside2_version}.zip"
 )
 SET(_pyside2_download_hash
     "87841aaced763b6b52e9b549e31a493f"

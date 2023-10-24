@@ -37,7 +37,8 @@ QT_OUTPUT_DIR = ""
 PYTHON_OUTPUT_DIR = ""
 OPENSSL_OUTPUT_DIR = ""
 
-LIBCLANG_URL_BASE = "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_"
+LIBCLANG_URL_BASE = "https://mirrors.ocf.berkeley.edu/qt/development_releases/prebuilt/libclang/libclang-release_"
+
 
 def test_python_distribution(python_home: str) -> None:
     """
@@ -78,18 +79,18 @@ def prepare() -> None:
 
     # PySide2 5.15.x recommends building with clang version 8.
     # But clang 8 headers are not compatible with Mac SDK 13.3+ headers.
-    # To workaround it, since Mac is clang-based, we'll detect the OS clang 
+    # To workaround it, since Mac is clang-based, we'll detect the OS clang
     # version and download the matching headers to build PySide.
     clang_filename_suffix = ""
-   
+
     system = platform.system()
     if system == "Darwin":
         clang_version_search = re.search(
-           "version (\d+)\.(\d+)",
-           os.popen('clang --version').read(),
+            "version (\d+)\.(\d+)",
+            os.popen("clang --version").read(),
         )
-        clang_version_str = ''.join(clang_version_search.groups())
-        clang_version_int = int(clang_version_str) 
+        clang_version_str = "".join(clang_version_search.groups())
+        clang_version_int = int(clang_version_str)
 
         if clang_version_int <= 120:
             clang_filename_suffix = clang_version_str + "-based-mac.7z"
@@ -97,7 +98,7 @@ def prepare() -> None:
             clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
     elif system == "Linux":
         clang_filename_suffix = "80-based-linux-Rhel7.2-gcc5.3-x86_64.7z"
-    elif system ==  "Windows":
+    elif system == "Windows":
         clang_filename_suffix = "80-based-windows-vs2017_64.7z"
 
     download_url = LIBCLANG_URL_BASE + clang_filename_suffix
