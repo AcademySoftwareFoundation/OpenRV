@@ -100,16 +100,16 @@
 #undef uint16_t
 #endif
 
-#ifdef PLATFORM_DARWIN
-#include <DarwinBundle/DarwinBundle.h>
-#endif
-
 #ifdef RVIO_HW
 #include <TwkGLFFBO/FBOVideoDevice.h>
 #else
 #include <TwkGLFMesa/OSMesaVideoDevice.h>
 #endif
 
+// RVIO third party optional customization
+#if defined(RVIO_THIRD_PARTY_CUSTOMIZATION)
+    extern void rvioThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
+#endif
 
 typedef TwkContainer::StringProperty StringProperty;
 
@@ -1415,6 +1415,11 @@ utf8Main(int argc, char *argv[])
     string initPath = bundle.rcfile("rviorc", "mu", "RVIO_INIT");
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
     if (initscript) initPath = initscript;
+
+    // RVIO third party optional customization
+#if defined(RVIO_THIRD_PARTY_CUSTOMIZATION)
+    rvioThirdPartyCustomization(bundle, licarg);
+#endif
 
     try
     {

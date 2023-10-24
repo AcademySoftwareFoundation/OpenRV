@@ -69,6 +69,11 @@
 extern const char* rv_mac_dark;
 extern const char* rv_mac_aqua;
 
+// RV third party optional customization
+#if defined(RV_THIRD_PARTY_CUSTOMIZATION)
+    extern void rvThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
+#endif
+
 //
 //  Check that a version actually exists. If we're compiling opt error
 //  out in cpp. Otherwise, just note the lack of version info.
@@ -557,7 +562,6 @@ int main(int argc, char *argv[])
     bundle.setEnvVar("RV_APP_RELEASE_NOTES", bundle.resource("rv_release_notes", "html"));
     bundle.setEnvVar("RV_APP_LICENSES_NOTES", bundle.resource("rv_client_licenses", "html"));
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
-    TwkApp::Bundle::PathVector licfiles = bundle.licenseFiles("license", "gto");
 
     //
     //  Find the init file
@@ -568,24 +572,10 @@ int main(int argc, char *argv[])
     bundle.setEnvVar("RV_APP_INIT", muInitFile.c_str());
     bundle.setEnvVar("RV_APP_PYINIT", pyInitFile.c_str());
 
-    if (! opts.licarg) opts.licarg = getenv("RV_LICENSE_FILE");
-    if (! opts.licarg) opts.licarg = getenv("TWEAK_LICENSE_FILE");
-
-    if (opts.licarg)
-    {
-        //
-        //  Override license file from command line
-        //
-
-        if (!TwkUtil::isReadable(opts.licarg))
-        {
-            cerr << "ERROR: license file '"  << opts.licarg << "' unreadable" << endl;
-            exit(-1);
-        }
-        licfiles.resize(1);
-        licfiles.front() = opts.licarg;
-        bundle.setEnvVar("RV_APP_USE_LICENSE_FILE", opts.licarg);
-    }
+    // RV third party optional customization
+#if defined(RV_THIRD_PARTY_CUSTOMIZATION)
+    rvThirdPartyCustomization(bundle, opts.licarg);
+#endif
 
     try
     {

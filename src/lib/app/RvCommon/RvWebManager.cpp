@@ -356,34 +356,6 @@ RvWebManager::replyDone(QNetworkReply* reply)
 
     if (authDebug) cerr << "INFO: reply " << reply << ", replyDone (" << array.size() << " byes): '" << array.constData() << "'" << endl;
 
-    if (d.session == 0 && d.replyEvent == "auth-no-event")
-    {
-        ostringstream eventContents;
-        eventContents << TWK_DEPLOY_GET_LICENSE_STATE() << "|";
-
-        QString replyString(array.constData());
-
-        if (reply->error())
-        {
-            eventContents << "2|Offline usage";
-        }
-        else
-        if (replyString.contains("{\"valid\":1}"))
-        {
-            eventContents << "2|License Success";
-            if (d.callback) (*d.callback)();
-        }
-
-        eventContents << "|" << UTF8::qconvert(d.tag);
-
-        Rv::Session* session = Rv::Session::currentSession();
-        if (session)
-        {
-            session->userGenericEvent("license-state-transition", eventContents.str());
-            session->askForRedraw();
-        }
-    }
-    else
     if (d.session)
     {
         if (ctype.contains("text/", Qt::CaseInsensitive)

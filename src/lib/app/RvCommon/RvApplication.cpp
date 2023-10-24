@@ -86,6 +86,11 @@ static void init()
 #define DBL(level, x)
 #endif
 
+// RV lazy build third party optional customization
+#if defined(RV_LAZY_BUILD_THIRD_PARTY_CUSTOMIZATION)
+    extern void rvLazyBuildThirdPartyCustomization();
+#endif
+
 namespace Rv {
 using namespace std;
 using namespace TwkApp;
@@ -411,6 +416,11 @@ void
 RvApplication::lazyBuild()
 {
     if (!m_console) m_console = new RvConsoleWindow();
+
+// RV lazy build third party optional customization
+#if defined(RV_LAZY_BUILD_THIRD_PARTY_CUSTOMIZATION)
+    rvLazyBuildThirdPartyCustomization();
+#endif    
 }
 
 RvConsoleWindow*

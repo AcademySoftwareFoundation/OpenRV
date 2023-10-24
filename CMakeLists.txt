@@ -54,6 +54,14 @@ SET(RV_INTERNAL_APPLICATION_NAME
     "OpenRV"
     CACHE STRING "RV's internal application name"
 )
+SET(RV_INTERNAL_ORGANIZATION_NAME
+    "ASWF"
+    CACHE STRING "RV's internal organization name"
+)
+SET(RV_INTERNAL_ORGANIZATION_DOMAIN
+    "aswf.com"
+    CACHE STRING "RV's internal organization domain"
+)
 PROJECT(
   open-rv
   VERSION "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"

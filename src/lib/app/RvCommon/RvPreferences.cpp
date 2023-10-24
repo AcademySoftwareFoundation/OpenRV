@@ -809,8 +809,8 @@ RvPreferences::resetPreferencesFile()
     QSettings::setDefaultFormat(QSettings::IniFormat);
 #endif
     
-    QCoreApplication::setOrganizationName("Autodesk");
-    QCoreApplication::setOrganizationDomain("autodesk.com");
+    QCoreApplication::setOrganizationName(INTERNAL_ORGANIZATION_NAME);
+    QCoreApplication::setOrganizationDomain(INTERNAL_ORGANIZATION_DOMAIN);
     QCoreApplication::setApplicationName(INTERNAL_APPLICATION_NAME);
 
     QSettings user;

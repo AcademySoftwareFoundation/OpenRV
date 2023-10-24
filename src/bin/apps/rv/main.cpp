@@ -38,9 +38,6 @@
 #include <RvCommon/MuUICommands.h>
 #include <RvCommon/PyUICommands.h>
 #include <RvCommon/RvPreferences.h>
-#ifdef PLATFORM_DARWIN
-#include "pool.h"
-#endif
 #include <IOproxy/IOproxy.h>
 #include <MovieProxy/MovieProxy.h>
 #include <MovieSideCar/MovieSideCarIO.h>
@@ -105,6 +102,11 @@
 #include <QtGlobal>
 
 extern const char* rv_linux_dark;
+
+// RV third party optional customization
+#if defined(RV_THIRD_PARTY_CUSTOMIZATION)
+    extern void rvThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
+#endif
 
 //
 //  Check that a version actually exists. If we're compiling opt error
@@ -584,7 +586,6 @@ utf8Main(int argc, char *argv[])
     bundle.setEnvVar("RV_APP_GTO_REFERENCE", bundle.resource("gto", "pdf"));
     bundle.setEnvVar("RV_APP_RELEASE_NOTES", bundle.resource("rv_release_notes", "html"));
     bundle.setEnvVar("RV_APP_LICENSES_NOTES", bundle.resource("rv_client_licenses", "html"));
-    TwkApp::Bundle::PathVector licfiles = bundle.licenseFiles("license", "gto");
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
 
     //
@@ -598,26 +599,10 @@ utf8Main(int argc, char *argv[])
 
     if (opts.initscript) muInitFile = opts.initscript;
 
-    string licVar = string(EXECUTABLE_SHORT_NAME_CAPS) +  "_LICENSE_FILE";
-
-    if (! opts.licarg) opts.licarg = getenv(licVar.c_str());
-    if (! opts.licarg) opts.licarg = getenv("TWEAK_LICENSE_FILE");
-
-    if (opts.licarg)
-    {
-        //
-        //  Override license file from command line
-        //
-
-        if (!TwkUtil::isReadable(opts.licarg))
-        {
-            cerr << "ERROR: license file '"  << opts.licarg << "' unreadable" << endl;
-            exit(-1);
-        }
-        licfiles.resize(1);
-        licfiles.front() = opts.licarg;
-        bundle.setEnvVar("RV_APP_USE_LICENSE_FILE", opts.licarg);
-    }
+    // RV third party optional customization
+#if defined(RV_THIRD_PARTY_CUSTOMIZATION)
+    rvThirdPartyCustomization(bundle, opts.licarg);
+#endif
 
     try
     {
@@ -793,10 +778,6 @@ utf8Main(int argc, char *argv[])
 #ifdef PTW32_STATIC_LIB
     pthread_win32_thread_detach_np();
     pthread_win32_process_detach_np();
-#endif
-
-#ifdef PLATFORM_DARWIN
-    releasePool();
 #endif
 
     TwkFB::ThreadPool::shutdown();
