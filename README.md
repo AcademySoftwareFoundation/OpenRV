@@ -3,8 +3,8 @@
 [![Open RV](docs/images/OpenRV_icon.png)](https://github.com/AcademySoftwareFoundation/OpenRV.git)
 ---
 
-![Supported Versions](https://img.shields.io/badge/python-3.9-blue)
-[![Supported VFX Platform Versions](https://img.shields.io/badge/vfx%20platform-2022-lightgrey.svg)](http://www.vfxplatform.com/)
+![Supported Versions](https://img.shields.io/badge/python-3.10-blue)
+[![Supported VFX Platform Versions](https://img.shields.io/badge/vfx%20platform-2023-lightgrey.svg)](http://www.vfxplatform.com/)
 [![docs](https://readthedocs.org/projects/aswf-openrv/badge/?version=latest)](https://aswf-openrv.readthedocs.io/en/latest)
 
 ## Overview

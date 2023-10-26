@@ -14,11 +14,11 @@ SET(_target
 
 # This version of boost resolves Python3 compatibilty issues on Big Sur and Monterey and is compatible with Python 2.7 through Python 3.10
 SET(_version
-    "1.76.0"
+    "1.80.0"
 )
 
 SET(_major_minor_version
-    "1_76"
+    "1_80"
 )
 
 STRING(REPLACE "." "_" _version_with_underscore ${_version})
@@ -27,7 +27,7 @@ SET(_download_url
 )
 
 SET(_download_hash
-    e425bf1f1d8c36a3cd464884e74f007a
+    077f074743ea7b0cb49c6ed43953ae95
 )
 
 # Set _base_dir for Clean-<target>
@@ -71,11 +71,11 @@ IF(RV_TARGET_WINDOWS)
   )
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     SET(BOOST_LIBRARY_SUFFIX
-        "-vc142-mt-gd-x64-${_major_minor_version}"
+        "-vc143-mt-gd-x64-${_major_minor_version}"
     )
   ELSE()
     SET(BOOST_LIBRARY_SUFFIX
-        "-vc142-mt-x64-${_major_minor_version}"
+        "-vc143-mt-x64-${_major_minor_version}"
     )
   ENDIF()
   SET(BOOST_SHARED_LIBRARY_SUFFIX
@@ -139,7 +139,7 @@ ELSEIF(RV_TARGET_LINUX)
   )
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_toolset
-      "msvc-14.2"
+      "msvc-14.3"
   )
 ELSE()
   MESSAGE(FATAL_ERROR "Unsupported (yet) target for Boost")
