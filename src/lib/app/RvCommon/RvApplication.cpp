@@ -1,9 +1,9 @@
 //******************************************************************************
 // Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <RvCommon/QTUtils.h>
@@ -480,26 +480,15 @@ callRunCreateSession(void* a)
 void
 RvApplication::about()
 {
+    bool isReleaseBuild = strcmp(RELEASE_DESCRIPTION, "RELEASE") == 0;
 
     ostringstream headerComment;
 
-    if ((TWK_DEPLOY_MAJOR_VERSION() % 100) == 99 ||
-        TWK_DEPLOY_MINOR_VERSION() == 99 ||
-        TWK_DEPLOY_PATCH_LEVEL() == 99)
-    {
-        headerComment << "<h3><i><font color=red>Developer Version</font></i></h3>";
-    }
-    else
-    {
-        if (!strcmp(RELEASE_DESCRIPTION, "RELEASE"))
-        {
-            headerComment << "<h3>Release Version</h3>";
-        }
-        else
-        {
-            headerComment << "<h3>Release Development Version</h3>";
-        }
-    }
+    headerComment << "<h3>";
+    if (!isReleaseBuild) headerComment << "<i><font color=red>";
+    headerComment << RELEASE_DESCRIPTION << " Version";
+    if (!isReleaseBuild) headerComment << "</font></i>";
+    headerComment << "</h3>";
 
     ostringstream date;
     TWK_DEPLOY_SHOW_PROGRAM_BANNER(date);
