@@ -43,14 +43,15 @@ fi
 RV_HOME="${RV_HOME:-$SCRIPT_HOME}"
 RV_BUILD="${RV_BUILD:-${RV_HOME}/_build}"
 RV_INST="${RV_INST:-${RV_HOME}/_install}"
+RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.cpu_count())')}"
 
 # ALIASES: Basic commands
 
 alias rvsetup="python3 -m pip install --user --upgrade -r ${RV_HOME}/requirements.txt"
 alias rvcfg="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvcfgd="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvbuildt="cmake --build ${RV_BUILD} --config Release -v --parallel=8 --target "
-alias rvbuildtd="cmake --build ${RV_BUILD} --config Debug -v --parallel=8 --target "
+alias rvbuildt="cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
+alias rvbuildtd="cmake --build ${RV_BUILD} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuild="rvbuildt main_executable"
 alias rvbuildd="rvbuildtd main_executable"
 alias rvtest="ctest --test-dir ${RV_BUILD} --extra=verbose"
@@ -69,8 +70,9 @@ alias rvbootstrapd="rvsetup && rvmkd"
 
 echo "Please ensure you have installed any required dependencies from doc/build_system/config_[os]"
 echo
-echo "CMake parameters:" 
+echo "CMake parameters:"
 
+echo "RV_BUILD_PARALLELISM is $RV_BUILD_PARALLELISM"
 echo "RV_HOME is $RV_HOME"
 echo "RV_BUILD is $RV_BUILD"
 echo "RV_INST is $RV_INST"
@@ -78,7 +80,7 @@ echo "CMAKE_GENERATOR is $CMAKE_GENERATOR"
 echo "QT_HOME is $QT_HOME"
 if [[ "$OSTYPE" == "msys"* ]]; then echo "WIN_PERL is $WIN_PERL"; fi
 
-echo "To override any of them do unset [name]; export [name]=value; source $SCRIPT" 
+echo "To override any of them do unset [name]; export [name]=value; source $SCRIPT"
 echo
 echo "If this is your first time building RV try rvbootstrap (release) or rvbootstrapd (debug)"
 echo "To build quickly after bootstraping try rvmk (release) or rvmkd (debug)"
