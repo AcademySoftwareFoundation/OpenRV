@@ -35,15 +35,17 @@ IF(CMAKE_BUILD_TYPE
   MESSAGE(FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 ENDIF()
 
-IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  SET(RV_RELEASE_DESCRIPTION
-      "Debug"
-  )
-ELSE()
-  # as checked 'src/lib/app/RvCommon/RvApplication.cpp'
-  SET(RV_RELEASE_DESCRIPTION
-      "RELEASE"
-  )
+IF (NOT RV_RELEASE_DESCRIPTION)
+    IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        SET(RV_RELEASE_DESCRIPTION
+            "DEVELOPMENT"
+        )
+    ELSE()
+        # as checked 'src/lib/app/RvCommon/RvApplication.cpp'
+        SET(RV_RELEASE_DESCRIPTION
+            "RELEASE"
+        )
+    ENDIF()
 ENDIF()
 
 SET(RV_UI_APPLICATION_NAME
@@ -62,6 +64,13 @@ SET(RV_INTERNAL_ORGANIZATION_DOMAIN
     "aswf.com"
     CACHE STRING "RV's internal organization domain"
 )
+
+IF(NOT RV_APPLICATION_TYPE)
+  SET(RV_APPLICATION_TYPE
+      ${RV_INTERNAL_APPLICATION_NAME}
+  )
+ENDIF()
+
 PROJECT(
   open-rv
   VERSION "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"

@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 module: mode_manager
 {
@@ -53,7 +53,7 @@ class: PyMinorMode : MinorMode
         _deactivateFunc     = PyObject_GetAttr(pyrvui, "modeDeactivate");
 
 	//
-	//  These are also references to the mode, so INCREF since we are 
+	//  These are also references to the mode, so INCREF since we are
         //  holding these refs.
 	//
 
@@ -89,13 +89,13 @@ class: PyMinorMode : MinorMode
         PyObject_CallObject(_deactivateFunc, _pymode);
     }
 
-    method: layout (void; Event event) 
-    { 
+    method: layout (void; Event event)
+    {
         PyObject_CallObject(_layoutFunc, event);
     }
 
-    method: render (void; Event event) 
-    { 
+    method: render (void; Event event)
+    {
         // NOTE: _renderFunc is partially evalled by python so no need to
         // give it _pymode as the "self" argument. Just pass in the event.
         PyObject_CallObject(_renderFunc, event);
@@ -191,7 +191,7 @@ class: ModeManagerMode : MinorMode
         return ret;
     }
 
-    //  
+    //
     //  Note that we are dealing with full path names here, and esp on windows,
     //  we may get arbitrary combinations of upper and lower case.  Convert everything
     //  to lower before we compare.
@@ -213,10 +213,10 @@ class: ModeManagerMode : MinorMode
     {
         \: (int; )
         {
-            if entry.mode eq nil 
+            if entry.mode eq nil
                  then UncheckedMenuState
-                 else if entry.mode._active 
-                        then CheckedMenuState 
+                 else if entry.mode._active
+                        then CheckedMenuState
                         else UncheckedMenuState;
         };
     }
@@ -235,7 +235,7 @@ class: ModeManagerMode : MinorMode
 
     method: findModeEntry (ModeEntry; string name)
     {
-        for_each (entry; _modes) 
+        for_each (entry; _modes)
         {
             if (entry.name == name) return entry;
         }
@@ -255,7 +255,7 @@ class: ModeManagerMode : MinorMode
         let pymodname = without_extension(entry.name),
             pymodule = PyImport_Import(pymodname);
 
-        if (is_nil(pymodule)) 
+        if (is_nil(pymodule))
         {
             print("ERROR: python module %s could not be imported\n" % pymodname);
             return nil;
@@ -269,7 +269,7 @@ class: ModeManagerMode : MinorMode
 	    print ("INFO: Loading mode from python module '%s'\n" % to_string(PyObject_GetAttr(pymodule, "__file__")));
 	}
 
-        if (is_nil(attr) || !PyFunction_Check(attr)) 
+        if (is_nil(attr) || !PyFunction_Check(attr))
         {
             print("ERROR: python module %s has no createMode() function" % modname);
             return nil;
@@ -287,7 +287,7 @@ class: ModeManagerMode : MinorMode
         {
             State state = data();
 
-            for_each (m; entry.requiresModes) 
+            for_each (m; entry.requiresModes)
             {
                 let mentry = findModeEntry(m);
 
@@ -302,8 +302,8 @@ class: ModeManagerMode : MinorMode
             }
             let loadStartTime = theTime();
             PyMinorMode pymode = nil;
-        
-            if (!runtime.load_module(entry.name)) 
+
+            if (!runtime.load_module(entry.name))
             {
                 try
                 {
@@ -360,7 +360,7 @@ class: ModeManagerMode : MinorMode
             showWarning("unable to load \"%s\" : %s" % (name, exc));
         }
 
-        if (entry.mode neq nil && entry.mode._active != activate) 
+        if (entry.mode neq nil && entry.mode._active != activate)
         {
             entry.mode.toggle();
         }
@@ -370,7 +370,7 @@ class: ModeManagerMode : MinorMode
     {
         event.reject();
 
-        for_each (entry; _modes) 
+        for_each (entry; _modes)
         {
             if (entry.loaded && (entry.mode neq nil))
             {
@@ -396,7 +396,7 @@ class: ModeManagerMode : MinorMode
     {
         let entry = findModeEntry(name);
 
-        if (entry neq nil) 
+        if (entry neq nil)
         {
             activateEntry(entry, activate);
             return entry.mode;
@@ -411,7 +411,7 @@ class: ModeManagerMode : MinorMode
     {
         let entry = findModeEntry(name);
 
-        if (entry neq nil) 
+        if (entry neq nil)
         {
             toggleEntry(entry);
             return entry.mode;
@@ -449,11 +449,11 @@ class: ModeManagerMode : MinorMode
                 itemTree = MenuItem(itemPath[i], Menu(itemTree));
             }
         }
-    
+
         itemTree;
     }
 
-    method: loadOrSkip (string; 
+    method: loadOrSkip (string;
                         string name,
                         Package pkg,
                         string base,
@@ -466,7 +466,7 @@ class: ModeManagerMode : MinorMode
             rvVparts  = rvVersion.split("."),
             preload = isPreload(name);
 
-        if (pkg.existing neq nil) 
+        if (pkg.existing neq nil)
         {
             return "package %s already loaded" % pkg.existing.name;
         }
@@ -531,7 +531,7 @@ class: ModeManagerMode : MinorMode
         if pkg eq nil then addPackage(name) else pkg;
     }
 
-    method: addModeEntry (ModeEntry; 
+    method: addModeEntry (ModeEntry;
                           string name,
                           Package pkg,
                           string menu,
@@ -543,7 +543,7 @@ class: ModeManagerMode : MinorMode
                           string[] requiredModes,
                           string baseDir)
     {
-        let entry = ModeEntry(name, pkg, menu, accel, event, 
+        let entry = ModeEntry(name, pkg, menu, accel, event,
                               loaded, active, optload,
                               requiredModes, baseDir, nil);
 
@@ -566,7 +566,7 @@ class: ModeManagerMode : MinorMode
             let line  = lines[i],
                 parts = line.split(",");
 
-            if (i == 0) 
+            if (i == 0)
             {
                 fileV = int(line);
 
@@ -582,7 +582,7 @@ class: ModeManagerMode : MinorMode
             }
 
             \: nilOrThing (string; string s) { if s == "nil" then nil else s; }
-            
+
             if (parts.size() >= 7 && parts[0] != "#")
             {
                 let name    = parts[0],
@@ -602,15 +602,15 @@ class: ModeManagerMode : MinorMode
                 if (fileV > 2) parts.erase(0, 1);
                 if (fileV > 3) parts.erase(0, 1);
 
-                let reqVersion = (if getReleaseVariant()=="OPENSOURCE" then openrvversion else reqV);
+                let reqVersion = (if getApplicationType()=="OpenRV" then openrvversion else reqV);
                 let skipReason = loadOrSkip(name, pkg, sdir, reqVersion, optload);
 
                 if (0 == optionsNoPackages() && skipReason eq nil)
                 {
                     let entry = addModeEntry(name, pkg, menu, accel, event,
                                              false, false, optload, parts, sdir);
-                    
-                    if (loaded) 
+
+                    if (loaded)
                     {
                         try
                         {
@@ -625,7 +625,7 @@ class: ModeManagerMode : MinorMode
                 }
                 else
                 {
-                    showInfo("Skipped loading of \"%s\" from \"%s\" (%s)" % 
+                    showInfo("Skipped loading of \"%s\" from \"%s\" (%s)" %
                              (name, pkg.name, skipReason));
                 }
             }
@@ -640,7 +640,7 @@ class: ModeManagerMode : MinorMode
             parts     = string.split(mudirs, path.concat_separator()),
             processed = string[]();
 
-        for_each (dir; parts) 
+        for_each (dir; parts)
         {
             let skip = false,
                 qd = qt.QDir(dir),
@@ -669,7 +669,7 @@ class: ModeManagerMode : MinorMode
         for_each (m; _modes)
         {
             if (m.menu neq nil) top.push_back(parseMenuEntry(m));
-            
+
             if (m.event neq nil)
             {
                 bind(m.event, \: (void; Event ev)
@@ -681,7 +681,7 @@ class: ModeManagerMode : MinorMode
 
         defineModeMenu(name(), top);
 
-        //  
+        //
         //  We should be able to dump these references at this
         //  point, since defineModeMenu should have called
         //  retainExternal on them, but we still get a crash that
@@ -726,7 +726,7 @@ class: ModeManagerMode : MinorMode
             name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "",
             entry = findModeEntry(name);
 
-        if (entry neq nil) 
+        if (entry neq nil)
         {
             activateEntry(entry, on);
             if (on) sendInternalEvent("view-edit-mode-activated");
@@ -756,7 +756,7 @@ class: ModeManagerMode : MinorMode
               ("after-graph-view-change", viewChange(,true), "Activate mode when view changes")],
              nil,
              "zzzzzz");
-        
+
         try
         {
             _doNotLoadPackages = packageListFromSetting("doNotLoadPackages");
@@ -769,7 +769,7 @@ class: ModeManagerMode : MinorMode
 
         _stateFuncRefs = (int;)[]();
         _toggleFuncRefs = (void; Event)[]();
-    } 
+    }
 }
 
 }
