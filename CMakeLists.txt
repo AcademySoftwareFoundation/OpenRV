@@ -89,6 +89,8 @@ SET(CMAKE_BUILD_TYPE
 
 MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+MESSAGE("PROJECT DIR ${PROJECT_SOURCE_DIR}")
+
 # Specify our own CMake modules so we can include them right after.
 SET(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/defaults ${PROJECT_SOURCE_DIR}/cmake/dependencies ${PROJECT_SOURCE_DIR}/cmake/globals
