@@ -50,6 +50,7 @@ distributed with the build instead of relying on the OS keychain. In order to ke
 an up to date list, we're going to pull it from the certifi module, which incorporates
 all the certificate authorities that are distributed with Firefox.
 """
+import site
 
 try:
     import os
@@ -67,8 +68,45 @@ try:
         os.environ["SSL_CERT_FILE"] = certifi.where()
 
 except Exception as e:
-    pass  # Silently fail..
+    print("Failed to set certifi.where() as SSL_CERT_FILE.", file=sys.stderr)
+    print(e, file=sys.stderr)
+    print("Set DO_NOT_SET_SSL_CERT_FILE to skip this step in RV's Python initialization.", file=sys.stderr)
 
+try:
+    import os
+
+    if "DO_NOT_REORDER_PYTHON_PATH" not in os.environ:
+        import site
+        import sys
+
+        prefixes = list(set(site.PREFIXES))
+
+        # Python libs and site-packages is the first that should be in the PATH
+        new_path_list = list(set(site.getsitepackages()))
+        new_path_list.insert(0, os.path.dirname(new_path_list[0]))
+
+        # Then any paths in RV's app package
+        for path in sys.path:
+            for prefix in prefixes:
+                if path.startswith(prefix) is False:
+                    continue
+
+                if os.path.exists(path):
+                    new_path_list.append(path)
+
+        # Then the remaining paths
+        for path in sys.path:
+            if os.path.exists(path):
+                new_path_list.append(path)
+
+        # Save the new sys.path
+        sys.path = new_path_list
+        site.removeduppaths()
+
+except Exception as e:
+    print("Failed to reorder RV's Python search path", file=sys.stderr)
+    print(e, file=sys.stderr)
+    print("Set DO_NOT_REORDER_PYTHON_PATH to skip this step in RV's Python initialization.", file=sys.stderr)
 '''
 
 
