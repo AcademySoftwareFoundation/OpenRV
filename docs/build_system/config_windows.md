@@ -109,10 +109,10 @@ Symptoms of using Windows' (and not mingw64) CMake:
 
 ### NOTE: Before starting a build
 
-Ensure that:
-- Your codebase is fully updated to the latest version (or the version you want to use) via a command like `git pull`.
-- Fix all conflicts due to updating the code
-- Revisit any modified files to ensure they aren't using old code that changed during the update such as when the visual studio version changes
+To maximize your chances of successfully building RV, you must:
+- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
+- Fix all conflicts due to updating the code.
+- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
 
 ### NOTE: Path Length
 
