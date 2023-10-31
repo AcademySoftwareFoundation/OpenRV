@@ -223,8 +223,6 @@ def build() -> None:
     # PySide2 v5.15.2.1 builds with errors on Windows using Visual Studio 2019.
     # We force Visual Studio 2017 here to make it build without errors.
     if platform.system() == "Windows":
-        source_widows_msvc_env("2022")
-
         # Add Qt jom to the path to build in parallel
         jom_path = os.path.abspath(
             os.path.join(QT_OUTPUT_DIR, "..", "..", "Tools", "QtCreator", "bin", "jom")
