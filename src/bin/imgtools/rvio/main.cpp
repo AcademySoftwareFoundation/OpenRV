@@ -1675,6 +1675,10 @@ utf8Main(int argc, char *argv[])
         //
 
         if (!writer->write(outmov, outfile, writeRequest)) exit (-2);
+
+        // clean up any frame buffers we allocated writing the movie
+        //
+        MovieRV::uninit();
     }
     catch (TwkExc::Exception& exc)
     {

@@ -23,6 +23,9 @@ public:
    GLSyncObject& operator=(GLSyncObject&&);
    ~GLSyncObject();
 
+   GLSyncObject( const GLSyncObject& rhs ) = delete;
+   GLSyncObject& operator=(const GLSyncObject&) = delete;
+ 
    // Set a fence within the GL command stream.
    void setFence();
 

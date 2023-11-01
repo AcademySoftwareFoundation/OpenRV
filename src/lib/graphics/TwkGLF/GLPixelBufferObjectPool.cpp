@@ -693,6 +693,7 @@ public:
    }
 };
 
+
 //----------------------------------------------------------------------------
 //
 class PBOWrap
@@ -884,7 +885,7 @@ public:
       {
          if ( gPoolFromGPUInitialized )
          {
-            gPoolToGPUInitialized = false;
+            gPoolFromGPUInitialized = false;
          }
       }
    }

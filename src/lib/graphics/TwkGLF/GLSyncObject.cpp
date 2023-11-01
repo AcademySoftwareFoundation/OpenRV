@@ -24,6 +24,12 @@ public:
    Imp() : _fenceSet( false ) {}
    virtual ~Imp() {}
 
+   Imp( const Imp& ) = delete;
+   Imp( Imp && ) = delete;
+
+   Imp& operator=( const Imp& ) = delete;
+   Imp& operator=( Imp&& ) = delete;
+
    virtual void setFence() = 0;
    virtual void unsetFence() = 0;
    virtual void waitFence() const = 0;
@@ -401,8 +407,8 @@ GLSyncObject::GLSyncObject()
 //------------------------------------------------------------------------------
 //
 GLSyncObject::GLSyncObject( GLSyncObject&& rhs )
+  : _imp( rhs._imp)
 {
-   _imp = rhs._imp;
    rhs._imp = nullptr;
 }
 
@@ -410,8 +416,12 @@ GLSyncObject::GLSyncObject( GLSyncObject&& rhs )
 //
 GLSyncObject& GLSyncObject::operator=(GLSyncObject&& rhs)
 {
-   _imp = rhs._imp;
-   rhs._imp = nullptr;
+   if( this != &rhs )
+   {
+     delete _imp;
+     _imp = rhs._imp;
+     rhs._imp = nullptr;
+   }
    return *this;
 }
 

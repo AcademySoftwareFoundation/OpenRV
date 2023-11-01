@@ -52,6 +52,7 @@ class MovieRV : public TwkMovie::MovieReader,
     //
 
     TwkGLF::GLVideoDevice* device() const { return m_device; }
+    static void uninit();
 
     //
     //  MovieReader API

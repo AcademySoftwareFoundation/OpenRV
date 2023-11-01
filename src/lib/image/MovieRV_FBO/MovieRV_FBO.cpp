@@ -104,6 +104,13 @@ MovieRV::~MovieRV()
 }
 
 void
+MovieRV::uninit()
+{
+    m_device->makeCurrent();     
+    TwkGLF::UninitPBOPools();
+}
+
+void
 MovieRV::open(const string &filename,
               const TwkMovie::MovieInfo &info,
               const Movie::ReadRequest& request)
