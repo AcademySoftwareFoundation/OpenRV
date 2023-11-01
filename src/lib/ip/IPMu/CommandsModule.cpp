@@ -1,9 +1,9 @@
 //
 //  Copyright (c) 2013 Tweak Software
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 //  This file contains the Mu commands that operate on IPCore and
 //  IPBaseNodes libraries. Other CommandModules exist for example jjjjj
@@ -92,7 +92,7 @@ typedef Session::PropertyVector          PropertyVector;
 typedef TwkApp::EventType::EventInstance Event;
 //----------------------------------------------------------------------
 
-static void throwBadArgumentException(const Mu::Node& node, 
+static void throwBadArgumentException(const Mu::Node& node,
                                       Mu::Thread& thread,
                                       const Mu::String& msg)
 {
@@ -119,7 +119,7 @@ static void throwBadArgumentException(const Mu::Node& node,
 }
 
 static void
-throwBadProperty(Thread& thread, 
+throwBadProperty(Thread& thread,
                  const Mu::Node& node,
                  const Mu::String& name)
 {
@@ -148,7 +148,7 @@ throwBadProperty(Thread& thread,
 }
 
 static void
-throwBadPropertyType(Thread& thread, 
+throwBadPropertyType(Thread& thread,
                      const Mu::Node& node,
                      const Mu::String& name)
 {
@@ -219,9 +219,9 @@ static std::tuple<std::string, bool> detectTile( const std::string& sourceName )
 
 // Helper function to adjust tile coordinates so that they take into account
 // the frame-ratio and to make sure they are in the right range.
-// Note that y-values are in a 1-normalized range, whereas x-values are 
+// Note that y-values are in a 1-normalized range, whereas x-values are
 // normalized in a range that is based on the frame-ratio.
-void adjustTileCoords( const std::string& sourceName, Vector2f& mp, 
+void adjustTileCoords( const std::string& sourceName, Vector2f& mp,
                        const RenderQuery& renderQuery, const bool inImageSpace )
 {
     double frameRatio(1.0);
@@ -968,10 +968,10 @@ NODE_IMPLEMENTATION(setCacheMode, void)
 
     //
     //  If we just turned the cache off, we should clear
-    //  the frame-level cache in case when we turn the cache on 
+    //  the frame-level cache in case when we turn the cache on
     //  something has changed that means we should remap identifiers
     //  to frames.
-    //  
+    //
     if (mode == Session::NeverCache)
     {
         s->graph().cache().lock();
@@ -1071,12 +1071,12 @@ NODE_IMPLEMENTATION(cacheInfo, Mu::Pointer)
 
     cinfo->capacity           = stats.capacity;
     cinfo->used               = stats.used;
-    
-    // Note: usedLookAhead is no longer computed since it isn't used anymore by 
-    // the app. However usedLookahead placeholder kept in the command for 
+
+    // Note: usedLookAhead is no longer computed since it isn't used anymore by
+    // the app. However usedLookahead placeholder kept in the command for
     // backward compatibility.
     cinfo->usedLookahead      = stats.used;
-    
+
     cinfo->lookahead          = stats.lookAheadSeconds;
     cinfo->lookaheadWaitTime  = s->maxBufferedWaitTime();
     cinfo->audio              = stats.audioSecondsCached;
@@ -1110,7 +1110,7 @@ NODE_IMPLEMENTATION(audioCacheInfo, Mu::Pointer)
     AudioCacheInfoTuple* cinfo = reinterpret_cast<AudioCacheInfoTuple*>(tuple->structure());
 
     cinfo->audioSecondsCached = s->graph().audioCache().totalSecondsCached();
-    
+
     TwkAudio::AudioCache::FrameRangeVector cachedRanges;
     s->graph().audioCache().computeCachedRangesStat(s->fps(), cachedRanges);
     cinfo->audioCachedRanges  = new DynamicArray(atype, 1);
@@ -1271,7 +1271,7 @@ NODE_IMPLEMENTATION(event2image, Mu::Vector2f)
     //
 
     Vector2f mp;
-    try 
+    try
     {
         Box2f vp = s->renderer()->viewport();
         Mat44f M, P, T, O, Pl;
@@ -1283,12 +1283,12 @@ NODE_IMPLEMENTATION(event2image, Mu::Vector2f)
         // IP images are all normalized to a single
         // BOTTOM_LEFT orientation in the renderer.
         Mat44f NI = normalize ? Pl.inverted() : Mat44f();
-        
+
         Mat44f I = P * M * NI;
         I.invert();
 
-        Vec3f p = I * Vec3f((x - vp.min.x) / vp.size().x * 2.0 - 1.0f, 
-                            (y - vp.min.y) / vp.size().y * 2.0 - 1.0f, 
+        Vec3f p = I * Vec3f((x - vp.min.x) / vp.size().x * 2.0 - 1.0f,
+                            (y - vp.min.y) / vp.size().y * 2.0 - 1.0f,
                             0);
 
         mp[0] = p.x;
@@ -1309,7 +1309,7 @@ NODE_IMPLEMENTATION(event2image, Mu::Vector2f)
 
     NODE_RETURN(mp);
 }
- 
+
 static void computePixelImages(float x,
                                float y,
                                ImageRenderer::RenderedImagesVector& images,
@@ -1319,7 +1319,7 @@ static void computePixelImages(float x,
     {
         const ImageRenderer::RenderedImage& image = images[i];
         PixelImage& ps = pixelImages[i];
-        
+
         //
         //  Sanity check for Nans  (this only checks on field for nans)
         //
@@ -1331,7 +1331,7 @@ static void computePixelImages(float x,
         //  M may have nans, so catch float exc that may occur
         //
         IPImage::Matrix I;
-        
+
         try
         {
             I = invert(M);
@@ -1387,41 +1387,41 @@ static void computePixelImages(float x,
                 p0.y = p.y;
                 iclosest = xmax - p.x;
             }
-            
+
             if (p.y - ymin < iclosest)
             {
                 p0.x = p.x;
                 p0.y = ymin;
                 iclosest = p.y - ymin;
             }
-            
+
             if (ymax - p.y < iclosest)
             {
                 p0.x = p.x;
                 p0.y = ymax;
                 iclosest = ymax - p.y;
             }
-            
+
             p0    = M * p0;
             ps.x  = p0.x;
             ps.y  = p0.y;
-            
+
             Vec3f tp = Vec3f((p.x / ua) * uw, p.y * uh, 0);
-            
+
             ps.px = tp.x;
             ps.py = tp.y;
-            
+
             assert(ps.px == ps.px);
-            
+
             const Vec3f dir = p0 - point;
             const float d = dot(dir, dir);
             ps.edgeDistance = sqrt(d);
         }
         else
         {
-            
+
             Vec3f p0(0.0f);
-            
+
             if (p.x < xmin)
             {
                 if (p.y <= ymin)        p0 = Vec3f(xmin, ymin, 0);
@@ -1438,16 +1438,16 @@ static void computePixelImages(float x,
             {
                 p0 = Vec3f(p.x, p.y >= ymax ? ymax : ymin, 0);
             }
-            
+
             const Vec3f tp = Vec3f((p0.x / ua) * uw, p0.y * uh, 0);
-            
+
             ps.px = tp.x;
             ps.py = tp.y;
-            
+
             p0 = M * p0;
             const Vec3f dir = p0 - point;
             const float d = dot(dir, dir);
-            
+
             ps.inside           = false;
             ps.x                = p0.x;
             ps.y                = p0.y;
@@ -1482,7 +1482,7 @@ NODE_IMPLEMENTATION(inputAtPixel, Pointer)
     PixelImageVector pixelImages;
     pixelImages.resize(images.size());
     computePixelImages(x, y, images, pixelImages);
-    
+
     //
     //  Retime only has one input and does not report it in
     //  imagesAtPixel
@@ -1496,12 +1496,12 @@ NODE_IMPLEMENTATION(inputAtPixel, Pointer)
     //
     //  Check for image containing point
     //
-	    
+
     for (size_t i = 0; i < images.size(); ++i)
     {
         ImageRenderer::RenderedImage& image = images[i];
         PixelImage& ps = pixelImages[i];
-        
+
         if (!image.node) continue;
 
         const IPNode* imageNode = image.node;
@@ -1529,7 +1529,7 @@ NODE_IMPLEMENTATION(inputAtPixel, Pointer)
     //  Retime only has one input and does not report it in
     //  imagesAtPixel
     //
-    if (inputs.size() == 1) 
+    if (inputs.size() == 1)
     {
         inputName = stype->allocate(inputs[0]->name());
         NODE_RETURN(inputName);
@@ -1564,7 +1564,7 @@ NODE_IMPLEMENTATION(inputAtPixel, Pointer)
 
     NODE_RETURN(inputName);
 }
-    
+
 NODE_IMPLEMENTATION(image2event, Mu::Vector2f)
 {
     Session*                  s          = Session::currentSession();
@@ -1602,7 +1602,7 @@ NODE_IMPLEMENTATION(image2event, Mu::Vector2f)
 
         Mat44f W = P * M;
 
-        if (normalize) 
+        if (normalize)
         {
             // Note we disregard orientation i.e. O matrix
             // from the normalization calc because our
@@ -1619,7 +1619,7 @@ NODE_IMPLEMENTATION(image2event, Mu::Vector2f)
 
             // It is important to use the full name, not the tile name.
             adjustTileCoords( name->c_str(), inputCoords, renderQuery, false );
-            
+
             x = inputCoords[0];
             y = inputCoords[1];
         }
@@ -1668,8 +1668,8 @@ NODE_IMPLEMENTATION(event2camera, Mu::Vector2f)
 
         Mat44f I = P.inverted();
 
-        Vec3f p = I * Vec3f((x - vp.min.x) / vp.size().x * 2.0 - 1.0f, 
-                            (y - vp.min.y) / vp.size().y * 2.0 - 1.0f, 
+        Vec3f p = I * Vec3f((x - vp.min.x) / vp.size().x * 2.0 - 1.0f,
+                            (y - vp.min.y) / vp.size().y * 2.0 - 1.0f,
                             0);
 
         mp[0] = p.x;
@@ -1699,7 +1699,7 @@ NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
     float                   x       = (inp[0] - vp.min.x) / (vp.size().x-1.0) * 2.0 - 1.0;
     float                   y       = (inp[1] - vp.min.y) / (vp.size().y-1.0) * 2.0 - 1.0;
     DynamicArray*           array   = new DynamicArray(atype, 1);
-    const FixedArrayType*   m44type = 
+    const FixedArrayType*   m44type =
         static_cast<const FixedArrayType*>(c->arrayType(c->floatType(), 2, 4, 4, 0));
 
     ImageRenderer::RenderedImagesVector images;
@@ -1715,12 +1715,12 @@ NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
     {
         int   closestIndex = -1;
         float closestEdge  = numeric_limits<float>::max();
-        
+
         for (size_t i = 0; i < images.size(); i++)
         {
             ImageRenderer::RenderedImage& image = images[i];
             PixelImage& ps = pixelImages[i];
-            
+
             if (!image.node) continue;
 
             if (!dynamic_cast<const SourceIPNode*>(image.node)) continue;
@@ -1732,7 +1732,7 @@ NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
                 closestIndex = i;
             }
         }
-        
+
         if (wantedOnes.empty() && closestIndex != -1)
         {
             // if none inside and found a closest
@@ -1776,10 +1776,10 @@ NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
         float               initPixelAspect;
     };
 
-    const DynamicArrayType* tarrayType = 
+    const DynamicArrayType* tarrayType =
         static_cast<const DynamicArrayType*>(atype->elementType()->fieldType(14));
     const Class* tsType = static_cast<const Class*>(tarrayType->elementType());
-    
+
     for (size_t i = 0; i < wantedOnes.size(); i++)
     {
         ImageRenderer::RenderedImage& image = images[wantedOnes[i]];
@@ -1828,7 +1828,7 @@ NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
         }
 
         tt->tagArray = a;
-        
+
         string nname    = image.node ? image.node->name() : "";
         tt->index       = image.index;
         tt->node        = stype->allocate(nname);
@@ -1855,7 +1855,7 @@ NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
 
         array->element<ClassInstance*>(i) = o;
     }
-    
+
     NODE_RETURN(array);
 }
 
@@ -1897,7 +1897,7 @@ NODE_IMPLEMENTATION(renderedImages, Pointer)
     const DynamicArrayType* atype   = static_cast<const DynamicArrayType*>(NODE_THIS.type());
     const Class*            rtype   = static_cast<const Class*>(atype->elementType());
     DynamicArray*           array   = new DynamicArray(atype, 1);
-    const FixedArrayType*   m44type = 
+    const FixedArrayType*   m44type =
         static_cast<const FixedArrayType*>(c->arrayType(c->floatType(), 2, 4, 4, 0));
 
     ImageRenderer::RenderedImagesVector sarray;
@@ -1905,7 +1905,7 @@ NODE_IMPLEMENTATION(renderedImages, Pointer)
     renderQuery.renderedImages(sarray);
     array->resize(sarray.size());
 
-    const DynamicArrayType* tarrayType = 
+    const DynamicArrayType* tarrayType =
         static_cast<const DynamicArrayType*>(atype->elementType()->fieldType(20));
     const Class* tsType = static_cast<const Class*>(tarrayType->elementType());
 
@@ -1938,7 +1938,7 @@ NODE_IMPLEMENTATION(renderedImages, Pointer)
         int                 imageNum;
         int                 textureID;
     };
-    
+
     for (int i=0; i < sarray.size(); i++)
     {
         ImageRenderer::RenderedImage ps = sarray[i];
@@ -1977,7 +1977,7 @@ NODE_IMPLEMENTATION(renderedImages, Pointer)
         string nname    = ps.node ? ps.node->name() : "";
 
         tt->tags = a;
-        
+
         tt->source        = stype->allocate(ps.source);
         tt->index         = ps.index;
         tt->imageMin[0]   = ps.imageBox.min.x;
@@ -2010,7 +2010,7 @@ NODE_IMPLEMENTATION(renderedImages, Pointer)
 
         array->element<ClassInstance*>(i) = o;
     }
-    
+
     NODE_RETURN(array);
 }
 
@@ -2067,13 +2067,13 @@ NODE_IMPLEMENTATION(imageGeometryByIndex, Pointer)
         renderQuery.imageCorners(index, points, useStencil);
         DynamicArray* array = new DynamicArray(atype, 1);
         array->resize(points.size());
-        
+
         for (int i=0; i < points.size(); i++)
         {
             Vector2f p;
             p[0] = (points[i].x * 0.5 + 0.5) * vp.size().x + vp.min.x;
             p[1] = (points[i].y * 0.5 + 0.5) * vp.size().y + vp.min.y;
-            
+
             array->element<Vector2f>(i) = p;
         }
 
@@ -2108,13 +2108,13 @@ NODE_IMPLEMENTATION(imageGeometryByTag, Pointer)
         renderQuery.imageCornersByTag(name->utf8std(), value->utf8std(), points, useStencil);
         DynamicArray* array = new DynamicArray(atype, 1);
         array->resize(points.size());
-        
+
         for (int i=0; i < points.size(); i++)
         {
             Vector2f p;
             p[0] = (points[i].x * 0.5 + 0.5) * vp.size().x + vp.min.x;
             p[1] = (points[i].y * 0.5 + 0.5) * vp.size().y + vp.min.y;
-            
+
             array->element<Vector2f>(i) = p;
         }
 
@@ -2144,7 +2144,7 @@ NODE_IMPLEMENTATION(setSessionFileName, void)
 
     if (Session* s = Session::currentSession())
     {
-        const string filename = pathConform(name->utf8std()); 
+        const string filename = pathConform(name->utf8std());
         s->setFileName(filename);
     }
 }
@@ -2155,7 +2155,7 @@ NODE_IMPLEMENTATION(undoPathSwapVars, Pointer)
     const StringType::String* inS = NODE_ARG_OBJECT(0, StringType::String);
 
     if (!inS) throwBadArgumentException(NODE_THIS, NODE_THREAD, "input string is nil");
-    
+
     string outS = IPCore::Application::mapFromVar(inS->c_str());
 
     NODE_RETURN(t->allocate(outS));
@@ -2298,11 +2298,11 @@ NODE_IMPLEMENTATION(writeNodeDefinition, void)
     const NodeManager*        nodeManager      = s->graph().nodeManager();
     bool                      inlineSourceCode = NODE_ARG(2, bool);
 
-    if (!typeName) 
+    if (!typeName)
     {
         throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil typeName argument");
     }
-    
+
     const NodeDefinition* def = nodeManager->definition(typeName->c_str());
 
     if (!def)
@@ -2394,7 +2394,7 @@ NODE_IMPLEMENTATION(updateNodeDefinition, void)
         ostringstream str;
         str << "\"" << nodeType->c_str() << "\" is not a node type";
         string s = str.str(); // windows
-        throwBadArgumentException(NODE_THIS, NODE_THREAD, s.c_str()); 
+        throwBadArgumentException(NODE_THIS, NODE_THREAD, s.c_str());
     }
 
     try
@@ -2424,7 +2424,7 @@ NODE_IMPLEMENTATION(clearSession, void)
     s->clear();
     s->askForRedraw();
 }
- 
+
 NODE_IMPLEMENTATION(newSession, void)
 {
     Session*       s         = Session::currentSession();
@@ -2518,8 +2518,8 @@ NODE_IMPLEMENTATION(setFloatProperty, void)
 
         if (!allowResize && newValues->size() != prop->size() * width)
         {
-            throwBadArgumentException(NODE_THIS, 
-                                      NODE_THREAD, 
+            throwBadArgumentException(NODE_THIS,
+                                      NODE_THREAD,
                                       "number of values does not match property size");
         }
 
@@ -2561,10 +2561,10 @@ NODE_IMPLEMENTATION(insertFloatProperty, void)
             throwBadPropertyType(NODE_THREAD, NODE_THIS, name->c_str());
         }
 
-        if (node) 
+        if (node)
         {
-            node->propertyWillInsert(prop, 
-                                     size_t(insertIndex / width), 
+            node->propertyWillInsert(prop,
+                                     size_t(insertIndex / width),
                                      newValues->size() / width);
             node->propertyWillChange(prop);
         }
@@ -2573,10 +2573,10 @@ NODE_IMPLEMENTATION(insertFloatProperty, void)
                                       newValues->begin<float>(),
                                       newValues->end<float>());
 
-        if (node) 
+        if (node)
         {
-            node->propertyDidInsert(prop, 
-                                    size_t(insertIndex / width), 
+            node->propertyDidInsert(prop,
+                                    size_t(insertIndex / width),
                                     newValues->size() / width);
 
             node->propertyChanged(prop);
@@ -2648,8 +2648,8 @@ NODE_IMPLEMENTATION(setHalfProperty, void)
 
         if (!allowResize && newValues->size() != prop->size() * width)
         {
-            throwBadArgumentException(NODE_THIS, 
-                                      NODE_THREAD, 
+            throwBadArgumentException(NODE_THIS,
+                                      NODE_THREAD,
                                       "number of values does not match property size");
         }
 
@@ -2659,7 +2659,7 @@ NODE_IMPLEMENTATION(setHalfProperty, void)
         const half* data = newValues->data<half>();
         half* pdata = reinterpret_cast<half*>(prop->rawData());
         copy(data, data + prop->size() * width, pdata);
-        
+
         if (node) node->propertyChanged(prop);
 
         session->forceNextEvaluation();
@@ -2691,24 +2691,24 @@ NODE_IMPLEMENTATION(insertHalfProperty, void)
             throwBadPropertyType(NODE_THREAD, NODE_THIS, name->c_str());
         }
 
-        if (node) 
+        if (node)
         {
-            node->propertyWillInsert(prop, 
-                                     size_t(insertIndex / width), 
+            node->propertyWillInsert(prop,
+                                     size_t(insertIndex / width),
                                      newValues->size() / width);
             node->propertyWillChange(prop);
         }
-        
+
         prop->valueContainer().insert(prop->begin() + insertIndex,
                                       newValues->begin<half>(),
                                       newValues->end<half>());
-        
-        if (node) 
+
+        if (node)
         {
-            node->propertyDidInsert(prop, 
-                                    size_t(insertIndex / width), 
+            node->propertyDidInsert(prop,
+                                    size_t(insertIndex / width),
                                     newValues->size() / width);
-            
+
             node->propertyChanged(prop);
         }
 
@@ -2778,8 +2778,8 @@ NODE_IMPLEMENTATION(setIntProperty, void)
 
         if (!allowResize && newValues->size() != prop->size() * width)
         {
-            throwBadArgumentException(NODE_THIS, 
-                                      NODE_THREAD, 
+            throwBadArgumentException(NODE_THIS,
+                                      NODE_THREAD,
                                       "number of values does not match property size");
         }
 
@@ -2789,7 +2789,7 @@ NODE_IMPLEMENTATION(setIntProperty, void)
         const int* data = newValues->data<int>();
         int* pdata = reinterpret_cast<int*>(prop->rawData());
         copy(data, data + prop->size() * width, pdata);
-        
+
         if (node) node->propertyChanged(prop);
 
         session->forceNextEvaluation();
@@ -2820,10 +2820,10 @@ NODE_IMPLEMENTATION(insertIntProperty, void)
             throwBadPropertyType(NODE_THREAD, NODE_THIS, name->c_str());
         }
 
-        if (node) 
+        if (node)
         {
-            node->propertyWillInsert(prop, 
-                                     size_t(insertIndex / width), 
+            node->propertyWillInsert(prop,
+                                     size_t(insertIndex / width),
                                      newValues->size() / width);
             node->propertyWillChange(prop);
         }
@@ -2832,10 +2832,10 @@ NODE_IMPLEMENTATION(insertIntProperty, void)
                                       newValues->begin<int>(),
                                       newValues->end<int>());
 
-        if (node) 
+        if (node)
         {
-            node->propertyDidInsert(prop, 
-                                    size_t(insertIndex / width), 
+            node->propertyDidInsert(prop,
+                                    size_t(insertIndex / width),
                                     newValues->size() / width);
 
             node->propertyChanged(prop);
@@ -2906,8 +2906,8 @@ NODE_IMPLEMENTATION(setByteProperty, void)
 
         if (!allowResize && newValues->size() != prop->size() * width)
         {
-            throwBadArgumentException(NODE_THIS, 
-                                      NODE_THREAD, 
+            throwBadArgumentException(NODE_THIS,
+                                      NODE_THREAD,
                                       "number of values does not match property size");
         }
 
@@ -2948,10 +2948,10 @@ NODE_IMPLEMENTATION(insertByteProperty, void)
             throwBadPropertyType(NODE_THREAD, NODE_THIS, name->c_str());
         }
 
-        if (node) 
+        if (node)
         {
-            node->propertyWillInsert(prop, 
-                                     size_t(insertIndex / width), 
+            node->propertyWillInsert(prop,
+                                     size_t(insertIndex / width),
                                      newValues->size() / width);
             node->propertyWillChange(prop);
         }
@@ -2960,10 +2960,10 @@ NODE_IMPLEMENTATION(insertByteProperty, void)
                                       newValues->begin<unsigned char>(),
                                       newValues->end<unsigned char>());
 
-        if (node) 
+        if (node)
         {
-            node->propertyDidInsert(prop, 
-                                    size_t(insertIndex / width), 
+            node->propertyDidInsert(prop,
+                                    size_t(insertIndex / width),
                                     newValues->size() / width);
 
             node->propertyChanged(prop);
@@ -3037,8 +3037,8 @@ NODE_IMPLEMENTATION(setStringProperty, void)
 
         if (!allowResize && newValues->size() != prop->size() * width)
         {
-            throwBadArgumentException(NODE_THIS, 
-                                      NODE_THREAD, 
+            throwBadArgumentException(NODE_THIS,
+                                      NODE_THREAD,
                                       "number of values does not match property size");
         }
 
@@ -3050,7 +3050,7 @@ NODE_IMPLEMENTATION(setStringProperty, void)
         {
             for (int i=0; i < newValues->size(); i++)
             {
-                Mu::StringType::String *s = 
+                Mu::StringType::String *s =
                         newValues->element<StringType::String*>(i);
                 (*sp)[i] = (s) ? s->c_str() : "<nil>";
             }
@@ -3110,10 +3110,10 @@ NODE_IMPLEMENTATION(insertStringProperty, void)
             throwBadPropertyType(NODE_THREAD, NODE_THIS, name->c_str());
         }
 
-        if (node) 
+        if (node)
         {
-            node->propertyWillInsert(prop, 
-                                     size_t(insertIndex / width), 
+            node->propertyWillInsert(prop,
+                                     size_t(insertIndex / width),
                                      newValues.size() / width);
             node->propertyWillChange(prop);
         }
@@ -3122,10 +3122,10 @@ NODE_IMPLEMENTATION(insertStringProperty, void)
                                       newValues.begin(),
                                       newValues.end());
 
-        if (node) 
+        if (node)
         {
-            node->propertyDidInsert(prop, 
-                                    size_t(insertIndex / width), 
+            node->propertyDidInsert(prop,
+                                    size_t(insertIndex / width),
                                     newValues.size() / width);
 
             node->propertyChanged(prop);
@@ -3182,7 +3182,7 @@ NODE_IMPLEMENTATION(viewSize, Vector2f)
 }
 
 NODE_IMPLEMENTATION(bgMethod, Pointer)
-{ 
+{
     Process*          p     = NODE_THREAD.process();
     MuLangContext*    c     = TwkApp::muContext();
     Session*          s     = Session::currentSession();
@@ -3253,7 +3253,7 @@ NODE_IMPLEMENTATION(getRendererType, Pointer)
     Session*         s     = Session::currentSession();
 
     StringType::String* n = c->stringType()->allocate(s->renderer()->name());
-    
+
     NODE_RETURN(n);
 }
 
@@ -3319,9 +3319,9 @@ newProp(const Mu::Node& node,
     vector<string> tokens;
     stl_ext::tokenize(tokens, string(name->c_str()), ".");
 
-    if (tokens.size() != 3 || 
-        tokens[0].size() < 2 || 
-        tokens[1].size() < 1 || 
+    if (tokens.size() != 3 ||
+        tokens[0].size() < 2 ||
+        tokens[1].size() < 1 ||
         tokens[2].size() < 1)
     {
         throwBadArgumentException(node, thread, "malformed property name");
@@ -3330,7 +3330,7 @@ newProp(const Mu::Node& node,
     IPGraph& graph = s->graph();
     IPNode* object = graph.findNode(tokens[0]);
 
-    if (!object) 
+    if (!object)
     {
         IPGraph::NodeVector nodes;
         string typeName = tokens[0].substr(1, tokens[0].size());
@@ -3357,7 +3357,7 @@ newProp(const Mu::Node& node,
     }
 
 
-    if (!object) 
+    if (!object)
     {
         throwBadArgumentException(node, thread, "not an object");
     }
@@ -3366,7 +3366,7 @@ newProp(const Mu::Node& node,
 
     switch (Property::Layout(type))
     {
-      case Property::IntLayout:  
+      case Property::IntLayout:
           switch (dimensions.x)
           {
             case 1: prop = object->createProperty<IntProperty>(tokens[1], tokens[2]); break;
@@ -3398,7 +3398,7 @@ newProp(const Mu::Node& node,
       case Property::StringLayout:
           prop = object->createProperty<StringProperty>(tokens[1], tokens[2]);
           break;
-      case Property::ByteLayout:   
+      case Property::ByteLayout:
           switch (dimensions.x)
           {
             default:
@@ -3408,7 +3408,7 @@ newProp(const Mu::Node& node,
             case 4: prop = object->createProperty<Vec4ucProperty>(tokens[1], tokens[2]); break;
           }
           break;
-      case Property::ShortLayout:   
+      case Property::ShortLayout:
           switch (dimensions.x)
           {
             case 1: prop = object->createProperty<ShortProperty>(tokens[1], tokens[2]); break;
@@ -3469,9 +3469,9 @@ NODE_IMPLEMENTATION(deleteProperty, void)
     vector<string> tokens;
     stl_ext::tokenize(tokens, string(name->c_str()), ".");
 
-    if (tokens.size() != 3 || 
-        tokens[0].size() < 2 || 
-        tokens[1].size() < 1 || 
+    if (tokens.size() != 3 ||
+        tokens[0].size() < 2 ||
+        tokens[1].size() < 1 ||
         tokens[2].size() < 1)
     {
         throwBadArgumentException(NODE_THIS, NODE_THREAD, "malformed property name");
@@ -3480,7 +3480,7 @@ NODE_IMPLEMENTATION(deleteProperty, void)
     IPGraph& graph = s->graph();
     IPNode* object = graph.findNode(tokens[0]);
 
-    if (!object) 
+    if (!object)
     {
         IPGraph::NodeVector nodes;
         graph.findNodesByTypeName(s->currentFrame(),
@@ -3497,7 +3497,7 @@ NODE_IMPLEMENTATION(deleteProperty, void)
         }
     }
 
-    if (!object) 
+    if (!object)
     {
         throwBadArgumentException(NODE_THIS, NODE_THREAD, "not an object");
     }
@@ -3574,7 +3574,7 @@ NODE_IMPLEMENTATION(propertyInfo, Pointer)
         pi->userDefined = false;
         pi->info        = 0;
     }
-    
+
     NODE_RETURN(obj);
 }
 
@@ -3756,7 +3756,7 @@ NODE_IMPLEMENTATION(sendInternalEvent, Pointer)
     {
         throwBadArgumentException(NODE_THIS, NODE_THREAD, "no event name specified");
     }
-    
+
     string r = s->userGenericEvent(name->c_str(),
                                    contents ? contents->c_str() : "",
                                    sender ? sender->c_str() : "");
@@ -3864,10 +3864,10 @@ NODE_IMPLEMENTATION(viewNode, Pointer)
     NODE_RETURN(str);
 }
 
-struct StringArrayPairTuple 
-{ 
+struct StringArrayPairTuple
+{
     ClassInstance* _0;
-    ClassInstance* _1; 
+    ClassInstance* _1;
 };
 
 NODE_IMPLEMENTATION(nodeConnections, Pointer)
@@ -3903,7 +3903,7 @@ NODE_IMPLEMENTATION(nodeConnections, Pointer)
             {
                 if (GroupIPNode* group = dynamic_cast<GroupIPNode*>(nodeIns[i]))
                 {
-                    while (dynamic_cast<GroupIPNode*>(group->rootNode())) 
+                    while (dynamic_cast<GroupIPNode*>(group->rootNode()))
                         group = static_cast<GroupIPNode*>(group->rootNode());
 
                     ins.push_back(group->rootNode());
@@ -3924,7 +3924,7 @@ NODE_IMPLEMENTATION(nodeConnections, Pointer)
                     //cout << "node " << node->name() << " gets outputs from "
                     //<< group->name()
                                              //<< endl;
-                    
+
                     for (size_t q = 0; q < onodes.size(); q++)
                     {
                         outs.push_back(onodes[q]);
@@ -3952,13 +3952,13 @@ NODE_IMPLEMENTATION(nodeConnections, Pointer)
 
         for (size_t i = 0; i < ins.size(); i++)
         {
-            inarray->element<StringType::String*>(i) = 
+            inarray->element<StringType::String*>(i) =
                 c->stringType()->allocate(ins[i]->name());
         }
 
         for (size_t i = 0; i < outs.size(); i++)
         {
-            outarray->element<StringType::String*>(i) = 
+            outarray->element<StringType::String*>(i) =
                 c->stringType()->allocate(outs[i]->name());
         }
 
@@ -3998,30 +3998,30 @@ NODE_IMPLEMENTATION(nodesInGroup, Pointer)
             int count = 0;
 
             // Compile a list of the IPNodes sorted by name.
-            // Note: 'members' is an std::set of IPNodes which are inherently 
+            // Note: 'members' is an std::set of IPNodes which are inherently
             // 'ordered' because an std::set is ordered. However it is ordered
             // by memory addess because this is what the std::set contains.
             // We are sorting them by names here before returning that list
 
             // Compile the list of node names
             std::vector<std::string> node_names;
-            std::for_each(members.cbegin(), members.cend(), 
-                [&](const IPNode * node) { 
+            std::for_each(members.cbegin(), members.cend(),
+                [&](const IPNode * node) {
                     node_names.push_back(node->name());
                 });
 
-            // Sort the node names 
+            // Sort the node names
             std::sort(node_names.begin(), node_names.end());
 
             // Initialize an outarray with the sorted node names
-            std::for_each(node_names.begin(), node_names.end(), 
-                [&](const std::string& node_name) { 
-                    outarray->element<StringType::String*>(count) = 
+            std::for_each(node_names.begin(), node_names.end(),
+                [&](const std::string& node_name) {
+                    outarray->element<StringType::String*>(count) =
                         c->stringType()->allocate(node_name);
                     count++;
                 }
             );
-            
+
             NODE_RETURN(outarray);
         }
         else
@@ -4235,7 +4235,7 @@ NODE_IMPLEMENTATION(setNodeInputs, void)
     if (!name) throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node name");
 
     IPGraph::IPNodes inputNodes;
-    
+
     for (size_t i = 0; i < inputs->size(); i++)
     {
         StringType::String* n = inputs->element<StringType::String*>(i);
@@ -4296,9 +4296,9 @@ NODE_IMPLEMENTATION(testNodeInputs, Pointer)
     const StringType*   stype  = static_cast<const StringType*>(name->type());
 
     IPGraph::IPNodes inputNodes;
-    
+
     if (!name) throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node name");
-    
+
     for (size_t i = 0; i < inputs->size(); i++)
     {
         StringType::String* n = inputs->element<StringType::String*>(i);
@@ -4359,7 +4359,7 @@ NODE_IMPLEMENTATION(flushCachedNode, void)
         GroupIPNode *group = dynamic_cast <GroupIPNode *> (node);
         if (!group) group = node->group();
 
-        if (group) 
+        if (group)
         {
             group->flushIDsOfGroup();
 
@@ -4397,7 +4397,7 @@ NODE_IMPLEMENTATION(existingFilesInSequence, Pointer)
         int index = 0;
         array->resize (existingCount);
 
-        for (int i = 0; i < list.size(); ++i) 
+        for (int i = 0; i < list.size(); ++i)
         {
             if (list[i].exists)
             {
@@ -4429,7 +4429,7 @@ NODE_IMPLEMENTATION(existingFramesInSequence, Pointer)
         int index = 0;
         array->resize (existingCount);
 
-        for (int i = 0; i < list.size(); ++i) 
+        for (int i = 0; i < list.size(); ++i)
         {
             if (list[i].exists)
             {
@@ -4489,7 +4489,7 @@ NODE_IMPLEMENTATION(ioFormats, Pointer)
                 ClassInstance* obj = ClassInstance::allocate(itype);
                 array->element<ClassInstance*>(count++) = obj;
                 IOFormat* format = reinterpret_cast<IOFormat*>(obj->structure());
-                
+
                 format->ext = c->stringType()->allocate(info.extension);
                 format->desc = c->stringType()->allocate(info.description);
                 format->caps = info.capabilities;
@@ -4541,7 +4541,7 @@ NODE_IMPLEMENTATION(ioParameters, Pointer)
     const StringType::String* codec  = NODE_ARG_OBJECT(2, StringType::String);
 
     typedef TwkMovie::GenericIO::Plugins Plugins;
-    
+
     struct IOParameter
     {
         Pointer name;
@@ -4741,7 +4741,7 @@ NODE_IMPLEMENTATION(licensingState, int)
 
 namespace {
 DynamicArray*
-makeChannelArray(const DynamicArrayType* type, 
+makeChannelArray(const DynamicArrayType* type,
                  const StringType* stype,
                  const vector<TwkFB::FBInfo::ChannelInfo>& infos)
 {
@@ -4750,7 +4750,7 @@ makeChannelArray(const DynamicArrayType* type,
         Pointer name;
         int type;
     };
-    
+
     const Class* channelType = static_cast<const Class*>(type->elementType());
     DynamicArray* array = new DynamicArray(type, 1);
     array->resize(infos.size());
@@ -4778,7 +4778,7 @@ NODE_IMPLEMENTATION(sourceMediaInfo, Mu::Pointer)
     const StringType::String* name  = NODE_ARG_OBJECT(0, StringType::String);
     const StringType::String* media = NODE_ARG_OBJECT(1, StringType::String);
     const MovieInfo*          info  = 0;
-    
+
     StringType::String*       mfile = 0;
 
     if (!name) throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source");
@@ -4793,7 +4793,7 @@ NODE_IMPLEMENTATION(sourceMediaInfo, Mu::Pointer)
         if (SourceIPNode* snode = s->graph().findNodeOfType<SourceIPNode>(name->c_str()))
         {
             // First make sure that the media is active
-            // Note that a source might not be active if it is one of many 
+            // Note that a source might not be active if it is one of many
             // multiple media representations and that it hasn't been activated
             // yet.
             if (!snode->isMediaActive() && snode->numMedia()==0)
@@ -4844,8 +4844,8 @@ NODE_IMPLEMENTATION(sourceMediaInfo, Mu::Pointer)
     struct ChapterInfoStruct
     {
         Pointer title;
-        int startFrame; 
-        int endFrame; 
+        int startFrame;
+        int endFrame;
     };
 
     struct STuple
@@ -4896,23 +4896,23 @@ NODE_IMPLEMENTATION(sourceMediaInfo, Mu::Pointer)
         st->hasAudio    = info->audio;
         st->hasVideo    = info->video;
         st->pa          = info->pixelAspect;
-        
+
         switch (info->dataType)
         {
-          case TwkFB::FrameBuffer::FLOAT: 
+          case TwkFB::FrameBuffer::FLOAT:
               st->f = true;
               st->bits = 32; break;
           case TwkFB::FrameBuffer::HALF:
               st->f = true; // no break;
-          case TwkFB::FrameBuffer::USHORT: 
+          case TwkFB::FrameBuffer::USHORT:
               st->bits = 16; break;
-          case TwkFB::FrameBuffer::DOUBLE: 
+          case TwkFB::FrameBuffer::DOUBLE:
               st->f = true;
               st->bits = 64; break;
           default:
-          case TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8: 
-          case TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8: 
-          case TwkFB::FrameBuffer::UCHAR: 
+          case TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8:
+          case TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8:
+          case TwkFB::FrameBuffer::UCHAR:
               st->bits = 8; break;
           case TwkFB::FrameBuffer::PACKED_R10_G10_B10_X2:
           case TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10:
@@ -4920,7 +4920,7 @@ NODE_IMPLEMENTATION(sourceMediaInfo, Mu::Pointer)
         }
 
         viArray->resize(info->viewInfos.size());
-        
+
         for (size_t i = 0; i < info->viewInfos.size(); i++)
         {
             const TwkFB::FBInfo::ViewInfo& vi = info->viewInfos[i];
@@ -5006,9 +5006,19 @@ NODE_IMPLEMENTATION(getReleaseVariant, Pointer)
     Process*            p     = NODE_THREAD.process();
     MuLangContext*      c     = static_cast<MuLangContext*>(p->context());
     const StringType*         stype      = c->stringType();
-    static const std::string RELEASE_DESCRIPTION = "OPENSOURCE";
-    NODE_RETURN(stype->allocate(RELEASE_DESCRIPTION));
+    static const std::string rd = RELEASE_VARIANT;
+    NODE_RETURN(stype->allocate(rd));
 }
+
+NODE_IMPLEMENTATION(getApplicationType, Pointer)
+{
+    Process*            p     = NODE_THREAD.process();
+    MuLangContext*      c     = static_cast<MuLangContext*>(p->context());
+    const StringType*         stype      = c->stringType();
+    static const std::string at = APPLICATION_TYPE;
+    NODE_RETURN(stype->allocate(at));
+}
+
 
 NODE_IMPLEMENTATION(isDebug, bool)
 {
@@ -5023,7 +5033,7 @@ NODE_IMPLEMENTATION(isDebug, bool)
 // Note: DO NOT DOCUMENT in commands.mud
 NODE_IMPLEMENTATION(crash, void)
 {
-    volatile int* a = (int*)(NULL); 
+    volatile int* a = (int*)(NULL);
     *a = 1;
 }
 
@@ -5276,7 +5286,7 @@ void initCommands(Mu::MuLangContext* context)
     types.clear();  // audioCacheInfo() return tuple
     types.push_back(context->floatType());  // seconds of audio cached
     types.push_back(context->arrayType(context->intType(), 1, 0)); // cached audio samples ranges
-    context->tupleType(types);    
+    context->tupleType(types);
 
     types.clear();                          // edl commands use (int,int,int)
     types.push_back(context->intType());
@@ -5332,7 +5342,7 @@ void initCommands(Mu::MuLangContext* context)
                          new SymbolicConstant(c, "ModuleNameID", "int", Value(VideoDevice::ModuleNameID)),
 
                          EndArguments);
-    
+
     commands->addSymbols(
                          new Function(c, "sessionName", sessionName, None,
                                       Return, "string",
@@ -5344,13 +5354,13 @@ void initCommands(Mu::MuLangContext* context)
 
                          new Function(c, "setSessionName", setSessionName, None,
                                       Return, "void",
-                                      Parameters, 
+                                      Parameters,
                                       new Param(c, "name", "string"),
                                       End),
 
                          new Function(c, "setFrame", setFrame, None,
                                       Return, "void",
-                                      Parameters, 
+                                      Parameters,
                                       new Param(c, "frame", "int"),
                                       End),
 
@@ -5396,13 +5406,13 @@ void initCommands(Mu::MuLangContext* context)
                          new Function(c, "reload", reload, None,
                                       Return, "void",
                                       End),
- 
+
                          new Function(c, "loadChangedFrames", loadChangedFrames, None,
                                       Return, "void",
                                       Parameters,
                                       new Param(c, "sourceNodes", "string[]"),
                                       End),
- 
+
                          new Function(c, "reload", reloadRange, None,
                                       Return, "void",
                                       Parameters,
@@ -5490,20 +5500,20 @@ void initCommands(Mu::MuLangContext* context)
                                       End),
 
                          new Function(c, "skipped", skipped, None,
-                                      Return, "int", 
+                                      Return, "int",
                                       End),
 
-                         new Function(c, "isCurrentFrameIncomplete", 
+                         new Function(c, "isCurrentFrameIncomplete",
                                       isCurrentFrameIncomplete, None,
                                       Return, "bool",
                                       End),
 
-                         new Function(c, "isCurrentFrameError", 
+                         new Function(c, "isCurrentFrameError",
                                       isCurrentFrameError, None,
                                       Return, "bool",
                                       End),
 
-                         new Function(c, "currentFrameStatus", 
+                         new Function(c, "currentFrameStatus",
                                       currentFrameStatus, None,
                                       Return, "int",
                                       End),
@@ -5762,7 +5772,7 @@ void initCommands(Mu::MuLangContext* context)
 
                          new Function(c, "setSessionFileName", setSessionFileName, None,
                                       Return, "void",
-                                      Parameters, 
+                                      Parameters,
                                       new Param(c, "name", "string"),
                                       End),
 
@@ -5863,7 +5873,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "float[]"),
-                                      new Param(c, "allowResize", 
+                                      new Param(c, "allowResize",
                                                 "bool", Value(false)),
                                       End),
 
@@ -5873,7 +5883,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "float[]"),
-                                      new Param(c, "beforeIndex", "int", 
+                                      new Param(c, "beforeIndex", "int",
                                                 Value(numeric_limits<int>::max())),
                                       End),
 
@@ -5892,7 +5902,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "half[]"),
-                                      new Param(c, "allowResize", 
+                                      new Param(c, "allowResize",
                                                 "bool", Value(false)),
                                       End),
 
@@ -5902,7 +5912,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "half[]"),
-                                      new Param(c, "beforeIndex", "int", 
+                                      new Param(c, "beforeIndex", "int",
                                                 Value(numeric_limits<int>::max())),
                                       End),
 
@@ -5921,7 +5931,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "int[]"),
-                                      new Param(c, "allowResize", 
+                                      new Param(c, "allowResize",
                                                 "bool", Value(false)),
                                       End),
 
@@ -5931,7 +5941,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "int[]"),
-                                      new Param(c, "beforeIndex", "int", 
+                                      new Param(c, "beforeIndex", "int",
                                                 Value(numeric_limits<int>::max())),
                                       End),
 
@@ -5950,7 +5960,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "byte[]"),
-                                      new Param(c, "allowResize", 
+                                      new Param(c, "allowResize",
                                                 "bool", Value(false)),
                                       End),
 
@@ -5960,7 +5970,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "byte[]"),
-                                      new Param(c, "beforeIndex", "int", 
+                                      new Param(c, "beforeIndex", "int",
                                                 Value(numeric_limits<int>::max())),
                                       End),
 
@@ -5979,7 +5989,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "string[]"),
-                                      new Param(c, "allowResize", 
+                                      new Param(c, "allowResize",
                                                 "bool", Value(false)),
                                       End),
 
@@ -5989,7 +5999,7 @@ void initCommands(Mu::MuLangContext* context)
                                       Parameters,
                                       new Param(c, "propertyName", "string"),
                                       new Param(c, "value", "string[]"),
-                                      new Param(c, "beforeIndex", "int", 
+                                      new Param(c, "beforeIndex", "int",
                                                 Value(numeric_limits<int>::max())),
                                       End),
 
@@ -6258,10 +6268,10 @@ void initCommands(Mu::MuLangContext* context)
 
                          new Function(c, "hopProfDynName", hopProfDynName, None,
                                       Return, "void",
-                                      Parameters, 
+                                      Parameters,
                                       new Param(c, "name", "string"),
                                       End),
-                         
+
                          new Function(c, "logMetrics", logMetrics, None,
                                       Return, "void",
                                       Parameters,
@@ -6274,22 +6284,26 @@ void initCommands(Mu::MuLangContext* context)
                                       new Param(c, "event", "string"),
                                       new Param(c, "properties", "string"),
                                       End),
-                         
+
                          new Function(c, "getVersion", getVersion, None,
                                       Return, "int[]",
                                       End),
-                         
+
                          new Function(c, "getReleaseVariant", getReleaseVariant, None,
                                       Return, "string",
                                       End),
-                         
+
+                         new Function(c, "getApplicationType", getApplicationType, None,
+                                      Return, "string",
+                                      End),
+
                          new Function(c, "isDebug", isDebug, None,
                                       Return, "bool",
                                       End),
-                         
+
                          new Function(c, "crash", crash, None,
                                       Return, "void",
-                                      Parameters, 
+                                      Parameters,
                                       End),
 
                          EndArguments);

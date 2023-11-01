@@ -1,9 +1,9 @@
 //******************************************************************************
 // Copyright (c) 2003 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <TwkDeploy/Deploy.h>
@@ -31,6 +31,7 @@ using namespace std;
 static int         Vmajor       = 0;
 static int         Vminor       = 0;
 static int         Vpatch_level = 0;
+static const char* Vdesc       = "";
 static const char* Cdate        = "someday";
 static const char* Ctime        = "sometime";
 static int         Pargc        = 0;
@@ -104,6 +105,7 @@ void TWK_DEPLOY_INITIALIZE(int major, int minor, int patch_level,
     Vmajor = major;
     Vminor = minor;
     Vpatch_level = patch_level;
+    Vdesc = release_description;
     Pargc = argc;
     Pargv = argv;
     Cdate = d;
@@ -120,7 +122,7 @@ TWK_DEPLOY_SHOW_PROGRAM_BANNER(ostream& o, const char *m)
     o << endl;
 
     o << "Version " << Vmajor << "." << Vminor << "." << Vpatch_level
-      << ", built on " << Cdate
+      << " (" << Vdesc << "), built on " << Cdate
       //<< " at " << Ctime << " (" << 8*sizeof(void*) << "bit).";
       << " at " << Ctime << " (" << SCM_ID << ").";
 

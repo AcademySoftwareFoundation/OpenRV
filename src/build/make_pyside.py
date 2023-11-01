@@ -99,7 +99,7 @@ def prepare() -> None:
     elif system == "Linux":
         clang_filename_suffix = "80-based-linux-Rhel7.2-gcc5.3-x86_64.7z"
     elif system == "Windows":
-        clang_filename_suffix = "80-based-windows-vs2017_64.7z"
+        clang_filename_suffix = "140-based-windows-vs2019_64.7z"
 
     download_url = LIBCLANG_URL_BASE + clang_filename_suffix
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
@@ -193,7 +193,7 @@ def remove_broken_shortcuts(python_home: str) -> None:
             if filename not in [
                 "python",
                 "python3",
-                "python3.9",
+                "python3.10",
             ]:
                 print(f"Removing {filepath}...")
                 os.remove(filepath)
@@ -223,8 +223,6 @@ def build() -> None:
     # PySide2 v5.15.2.1 builds with errors on Windows using Visual Studio 2019.
     # We force Visual Studio 2017 here to make it build without errors.
     if platform.system() == "Windows":
-        source_widows_msvc_env("2017")
-
         # Add Qt jom to the path to build in parallel
         jom_path = os.path.abspath(
             os.path.join(QT_OUTPUT_DIR, "..", "..", "Tools", "QtCreator", "bin", "jom")
