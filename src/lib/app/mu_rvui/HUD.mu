@@ -283,6 +283,7 @@ class: ImageInfo : Widget
 class: InfoStrip : Widget
 {
     bool _showFilename;
+    bool _scaleWithResolution;
 
     method: showFilename (EventFunc; bool useFilename)
     {
@@ -303,6 +304,17 @@ class: InfoStrip : Widget
         };
     }
 
+    method: toggleScaleWithResolution (void; Event event)
+    {
+        _scaleWithResolution = !_scaleWithResolution;
+        writeSetting("InfoStrip", "scaleWithResolution", SettingsValue.Bool(_scaleWithResolution));
+    }
+
+    method: isScaling (int; )
+    { 
+        if (_scaleWithResolution) then CheckedMenuState else UncheckedMenuState; 
+    }
+
     method: popupOpts (void; Event event)
     {
         popupMenu(event, Menu {
@@ -310,6 +322,7 @@ class: InfoStrip : Widget
                 {"_", nil},
                 {"Show Filename", showFilename(true), nil, isFilename(true)},
                 {"Show UI Name", showFilename(false), nil, isFilename(false)},
+                {"Scale with Resolution", toggleScaleWithResolution, nil, isScaling},
             });
     }
 
@@ -330,12 +343,15 @@ class: InfoStrip : Widget
         _y = 50;
         try
         {
-            let SettingsValue.Bool f = readSetting("InfoStrip", "showFilename", SettingsValue.Bool(true));
-            _showFilename = f;
+            let SettingsValue.Bool isFilenameSelected = readSetting("InfoStrip", "showFilename", SettingsValue.Bool(true));
+            let SettingsValue.Bool isScalingSelected = readSetting("InfoStrip", "scaleWithResolution", SettingsValue.Bool(true));
+            _showFilename = isFilenameSelected;
+            _scaleWithResolution = isScalingSelected;
         }
         catch (...)
         {
             _showFilename = true;
+            _scaleWithResolution = true;
         }
     }
 
@@ -399,7 +415,16 @@ class: InfoStrip : Widget
 
         state.filestripX1 = 0;
 
-        gltext.size(20);
+        int textSize = 20;
+        if (_scaleWithResolution)
+        {
+            int baseResolution = 1280;
+            int fontSize = 20;
+            int minTextSize = 12;
+            textSize = max((w / baseResolution) * fontSize, minTextSize);
+        }
+
+        gltext.size(textSize);
         setupProjection(w, h, event.domainVerticalFlip());
 
         let b      = gltext.bounds(filename),
@@ -420,7 +445,7 @@ class: InfoStrip : Widget
         let bg = state.config.bgFeedback,
             fg = state.config.fgFeedback;
 
-        drawTextWithCartouche(x, y, filename, 20,
+        drawTextWithCartouche(x, y, filename, textSize,
                                 fg, bg,
                                 circleGlyph, bg * .7);
 
