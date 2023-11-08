@@ -124,12 +124,13 @@ def prepare() -> None:
 
     libclang_install_dir = os.path.join(libclang_extracted, "libclang")
 
-    os.environ["PATH"] = os.path.pathsep.join(
-        [
-            os.path.join(OPENSSL_OUTPUT_DIR, "bin"),
-            os.environ.get("PATH", ""),
-        ]
-    )
+    if OPENSSL_OUTPUT_DIR:
+        os.environ["PATH"] = os.path.pathsep.join(
+            [
+                os.path.join(OPENSSL_OUTPUT_DIR, "bin"),
+                os.environ.get("PATH", ""),
+            ]
+        )
 
     print(f"PATH={os.environ['PATH']}")
 
@@ -214,11 +215,13 @@ def build() -> None:
         f"--qmake={os.path.join(QT_OUTPUT_DIR, 'bin', 'qmake' + ('.exe' if platform.system() == 'Windows' else ''))}",
         "--ignore-git",
         "--standalone",
-        f"--openssl={os.path.join(OPENSSL_OUTPUT_DIR, 'bin')}",
         "--verbose-build",
         f"--parallel={os.cpu_count() or 1}",
         "--skip-docs",
     ]
+
+    if OPENSSL_OUTPUT_DIR:
+        pyside_build_args.append(f"--openssl={os.path.join(OPENSSL_OUTPUT_DIR, 'bin')}")
 
     # PySide2 v5.15.2.1 builds with errors on Windows using Visual Studio 2019.
     # We force Visual Studio 2017 here to make it build without errors.
@@ -271,7 +274,7 @@ def build() -> None:
     print(f"Executing {generator_cleanup_args}")
     subprocess.run(generator_cleanup_args).check_returncode()
 
-    if platform.system() == "Windows":
+    if OPENSSL_OUTPUT_DIR and platform.system() == "Windows":
         pyside_folder = glob.glob(
             os.path.join(python_home, "**", "site-packages", "PySide2"), recursive=True
         )[0]
@@ -295,7 +298,7 @@ if __name__ == "__main__":
     parser.add_argument("--python-dir", dest="python", type=pathlib.Path, required=True)
     parser.add_argument("--qt-dir", dest="qt", type=pathlib.Path, required=True)
     parser.add_argument(
-        "--openssl-dir", dest="openssl", type=pathlib.Path, required=True
+        "--openssl-dir", dest="openssl", type=pathlib.Path, required=False
     )
     parser.add_argument("--temp-dir", dest="temp", type=pathlib.Path, required=True)
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)

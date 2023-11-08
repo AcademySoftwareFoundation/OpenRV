@@ -158,56 +158,56 @@ def patch_python_distribution(python_home: str) -> None:
         if "ssl" in failed_lib or "hashlib" in failed_lib:
             print(f"Fixing {failed_lib}")
             shutil.move(failed_lib, failed_lib.replace("_failed.so", ".so"))
+    if OPENSSL_OUTPUT_DIR:
+        if platform.system() == "Darwin":
+            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
+            openssl_libs = [l for l in openssl_libs if os.path.islink(l) is False]
 
-    if platform.system() == "Darwin":
-        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
-        openssl_libs = [l for l in openssl_libs if os.path.islink(l) is False]
+            python_openssl_libs = []
 
-        python_openssl_libs = []
+            for lib_path in openssl_libs:
+                print(f"Copying {lib_path} to the python home")
+                dest = os.path.join(python_home, "lib", os.path.basename(lib_path))
+                shutil.copyfile(lib_path, dest)
+                python_openssl_libs.append(dest)
 
-        for lib_path in openssl_libs:
-            print(f"Copying {lib_path} to the python home")
-            dest = os.path.join(python_home, "lib", os.path.basename(lib_path))
-            shutil.copyfile(lib_path, dest)
-            python_openssl_libs.append(dest)
+            libs_to_patch = glob.glob(
+                os.path.join(python_home, "lib", "**", "*.so"), recursive=True
+            )
 
-        libs_to_patch = glob.glob(
-            os.path.join(python_home, "lib", "**", "*.so"), recursive=True
-        )
+            for lib_path in python_openssl_libs:
+                lib_name = os.path.basename(lib_path)
 
-        for lib_path in python_openssl_libs:
-            lib_name = os.path.basename(lib_path)
+                for lib_to_patch in libs_to_patch:
+                    print(f"Changing the library path of {lib_name} on {lib_to_patch}")
+                    install_name_tool_change_args = [
+                        "install_name_tool",
+                        "-change",
+                        lib_path,
+                        f"@rpath/{lib_name}",
+                        lib_to_patch,
+                    ]
 
-            for lib_to_patch in libs_to_patch:
-                print(f"Changing the library path of {lib_name} on {lib_to_patch}")
-                install_name_tool_change_args = [
-                    "install_name_tool",
-                    "-change",
-                    lib_path,
-                    f"@rpath/{lib_name}",
-                    lib_to_patch,
-                ]
+                    print(f"Executing {install_name_tool_change_args}")
+                    subprocess.run(install_name_tool_change_args).check_returncode()
 
-                print(f"Executing {install_name_tool_change_args}")
-                subprocess.run(install_name_tool_change_args).check_returncode()
+        elif platform.system() == "Linux":
+            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*"))
 
-    elif platform.system() == "Linux":
-        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*"))
+            for lib_path in openssl_libs:
+                print(f"Copying {lib_path} to the python home")
+                shutil.copy(lib_path, os.path.join(python_home, "lib"))
 
-        for lib_path in openssl_libs:
-            print(f"Copying {lib_path} to the python home")
-            shutil.copy(lib_path, os.path.join(python_home, "lib"))
+        elif platform.system() == "Windows":
+            openssl_dlls = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
+            for dll_path in openssl_dlls:
+                print(f"Copying {dll_path} to the python home")
+                shutil.copy(dll_path, os.path.join(python_home, "bin"))
 
-    elif platform.system() == "Windows":
-        openssl_dlls = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
-        for dll_path in openssl_dlls:
-            print(f"Copying {dll_path} to the python home")
-            shutil.copy(dll_path, os.path.join(python_home, "bin"))
-
-        openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*"))
-        for lib_path in openssl_libs:
-            print(f"Copying {lib_path} to the python home")
-            shutil.copy(lib_path, os.path.join(python_home, "libs"))
+            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*"))
+            for lib_path in openssl_libs:
+                print(f"Copying {lib_path} to the python home")
+                shutil.copy(lib_path, os.path.join(python_home, "libs"))
 
     python_interpreter_args = get_python_interpreter_args(python_home)
 
@@ -431,8 +431,11 @@ def configure() -> None:
             f"--prefix={OUTPUT_DIR}",
             f"--exec-prefix={OUTPUT_DIR}",
             "--enable-shared",
-            f"--with-openssl={OPENSSL_OUTPUT_DIR}",
         ]
+
+        if OPENSSL_OUTPUT_DIR:
+            configure_args.append(f"--with-openssl={OPENSSL_OUTPUT_DIR}")
+
 
         if VARIANT == "Release":
             configure_args.append("--enable-optimizations")
@@ -488,10 +491,14 @@ def configure() -> None:
 
         print(f"Executing {configure_args} from {SOURCE_DIR}")
 
+        subprocess_env = {**os.environ}
+        if OPENSSL_OUTPUT_DIR:
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+
         subprocess.run(
             configure_args,
             cwd=SOURCE_DIR,
-            env={**os.environ, "LC_RPATH": os.path.join(OPENSSL_OUTPUT_DIR, "lib")},
+            env=subprocess_env,
         ).check_returncode()
 
         makefile_path = os.path.join(SOURCE_DIR, "Makefile")
@@ -551,15 +558,15 @@ def build() -> None:
 
         python_env = sys.executable
 
+        subprocess_env = {**os.environ, "PYTHON": python_env, "PATH": path_env}
+        if OPENSSL_OUTPUT_DIR:
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+
+
         subprocess.run(
             build_args,
             cwd=SOURCE_DIR,
-            env={
-                **os.environ,
-                "LC_RPATH": os.path.join(OPENSSL_OUTPUT_DIR, "lib"),
-                "PYTHON": python_env,
-                "PATH": path_env,
-            },
+            env=subprocess_env,
         ).check_returncode()
     else:
         make_args = ["make", f"-j{os.cpu_count() or 1}"]
@@ -568,10 +575,14 @@ def build() -> None:
             make_args = ["arch", ARCH] + make_args
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
+        subprocess_env = {**os.environ}
+        if OPENSSL_OUTPUT_DIR:
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+
         subprocess.run(
             make_args,
             cwd=SOURCE_DIR,
-            env={**os.environ, "LC_RPATH": os.path.join(OPENSSL_OUTPUT_DIR, "lib")},
+            env=subprocess_env,
         ).check_returncode()
 
 
@@ -628,11 +639,13 @@ def install() -> None:
             make_args = ["arch", ARCH] + make_args
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
-
+        subprocess_env = {**os.environ}
+        if OPENSSL_OUTPUT_DIR:
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
         subprocess.run(
             make_args,
             cwd=SOURCE_DIR,
-            env={**os.environ, "LC_RPATH": os.path.join(OPENSSL_OUTPUT_DIR, "lib")},
+            env=subprocess_env,
         ).check_returncode()
 
     # Create the 'python' symlink
@@ -655,7 +668,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--source-dir", dest="source", type=pathlib.Path, required=True)
     parser.add_argument(
-        "--openssl-dir", dest="openssl", type=pathlib.Path, required=True
+        "--openssl-dir", dest="openssl", type=pathlib.Path, required=False
     )
     parser.add_argument("--temp-dir", dest="temp", type=pathlib.Path, required=True)
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)
