@@ -9,21 +9,22 @@ SET(_target
 )
 
 IF(RV_TARGET_IS_RHEL8)
-  find_package(OpenSSL 1.1.1 REQUIRED)
-
+  FIND_PACKAGE(OpenSSL 1.1.1 REQUIRED)
 
   SET(RV_DEPS_OPENSSL_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
+      ${_version}
+      CACHE INTERNAL "" FORCE
+  )
 
   SET(RV_DEPS_OPENSSL_VERSION
       ${OPENSSL_VERSION}
       CACHE INTERNAL "" FORCE
   )
 
-  SET(_include_dir ${OPENSSL_INCLUDE_DIR})
-  get_filename_component(_lib_dir "${OPENSSL_SSL_LIBRARY}" DIRECTORY)
+  SET(_include_dir
+      ${OPENSSL_INCLUDE_DIR}
+  )
+  GET_FILENAME_COMPONENT(_lib_dir "${OPENSSL_SSL_LIBRARY}" DIRECTORY)
 
   MESSAGE(STATUS "_include_dir ${_include_dir}")
   MESSAGE(STATUS "_lib_dir ${_lib_dir}")
@@ -43,7 +44,7 @@ ELSE()
   )
 
   IF(RV_TARGET_WINDOWS
-    AND (NOT RV_DEPS_WIN_PERL_ROOT
+     AND (NOT RV_DEPS_WIN_PERL_ROOT
           OR RV_DEPS_WIN_PERL_ROOT STREQUAL "")
   )
     MESSAGE(
@@ -99,7 +100,7 @@ ELSE()
   ENDIF()
 
   IF(RV_TARGET_IS_RHEL9
-    OR RV_TARGET_IS_RHEL8
+     OR RV_TARGET_IS_RHEL8
   )
     SET(_crypto_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
@@ -236,7 +237,7 @@ ELSE()
     GLOBAL APPEND
     PROPERTY "RV_FFMPEG_DEPENDS" RV_DEPS_OPENSSL
   )
-endif()
+ENDIF()
 
 SET_PROPERTY(
   GLOBAL APPEND
