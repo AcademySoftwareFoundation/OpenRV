@@ -2,7 +2,7 @@
 
 ## OpenColorIO Development Integration Notes
 
-RV has new OpenColorIO (OCIO) integration.
+RV has OpenColorIO (OCIO) integration.
 
 You can use OCIO nodes in addition to or in place of RV’s "native" nodes in the Linearize, Color, Look, and Display pipelines. In each case OCIO can be used to convert from an incoming and outgoing color space with a user defined OCIO context. OCIO requires some work to set up and should be considered an advanced feature. Large facilities may find OCIO particularily useful in RV when used in conjunction with Nuke, Mari, or other products which support it.
 
@@ -65,10 +65,8 @@ You can add properties to the OCIO node in RV to create an OCIO context. Any str
 
 ### Feedback
 
-*   Should individual slots be hard coded to similar nuke node types? E.g. should the look OCIO slot behave only as if ocio.function == "look"? Or should we leave it up to the user to decide?
-    
-*   We can add control for constructing a display pipeline like ociodisplay has (gamma, exposure, etc). Although this generally overlaps with existing RV features it may help for matching color between applications.
-    
+* Should individual slots be hard coded to similar nuke node types? E.g. should the look OCIO slot behave only as if ocio.function == "look"? Or should we leave it up to the user to decide?
+* We can add control for constructing a display pipeline like ociodisplay has (gamma, exposure, etc). Although this generally overlaps with existing RV features it may help for matching color between applications.
 
 * * *
 

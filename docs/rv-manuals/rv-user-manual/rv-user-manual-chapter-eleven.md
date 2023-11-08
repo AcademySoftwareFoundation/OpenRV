@@ -16,7 +16,6 @@ The reference manual contains more detailed information about how to configure R
 
 ### 11.1 The ocio_source_setup Package
 
-
 OpenColorIO defines color spaces which are used to transform images for viewing or for storage in various file formats. It does not have any policy about when to apply these transforms.
 
 The provided ocio_source_setup package uses the default Sony Picture Imageworks method of detecting color space names in the incoming file names. The package queries OCIO and if the file name matches, the package will use OCIO nodes in various places in RV's pipelines instead of the usual RV color processing. If the incoming file name does not match an OCIO color space, the package will allow the existing RV color management to be used.
@@ -27,9 +26,9 @@ The package provides a basic menu fashioned after the OCIO display example progr
 
 In order to use the ocio_source_setup package you need to do the following:
 
-*   Find the “OpenColorIO Basic Color Management” package in the Packages tab of the preferences. Make sure the “load” button next to the package name is activated and restart RV.
-*   Set the OCIO environment variable to the path to your config file.
-*   Start RV and load an image with the color space in the name.
-*   Note the "OCIO" top-level menu that appears when you use RV this way. You can use this menu to chose a Linearizing transform, or Display transform, from those provided by your config.
+* Find the “OpenColorIO Basic Color Management” package in the Packages tab of the preferences. Make sure the “load” button next to the package name is activated and restart RV.
+* Set the OCIO environment variable to the path to your config file.
+* Start RV and load an image with the color space in the name.
+* Note the "OCIO" top-level menu that appears when you use RV this way. You can use this menu to chose a Linearizing transform, or Display transform, from those provided by your config.
 
 The OpenColorIO mailing list and website is a good place to get help about config files, documentation, and general operation.
