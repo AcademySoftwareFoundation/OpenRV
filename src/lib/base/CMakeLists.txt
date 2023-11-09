@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+ADD_SUBDIRECTORY(RVMath)
 ADD_SUBDIRECTORY(stl_ext)
 ADD_SUBDIRECTORY(TwkUtil)
 ADD_SUBDIRECTORY(TwkMath)
