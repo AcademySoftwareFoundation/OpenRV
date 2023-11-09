@@ -38,12 +38,6 @@ You may or may not have libGLU on your system depending on your graphics driver 
 sudo dnf install mesa-libGLU mesa-libGLU-devel
 ```
 
-### OPENSSL
-
-Warning: RV's OpenSSL breaks this Linux version: Building OpenRV will fail and OpenRV will not start if the build is fixed.
-
-Fixing the build: edit src/build/make_python.py, find the openssl_libs variable for Linux (platform == "Linux") and remove the OPENSSL_OUTPUT_DIR and change it to 'usr' and change 'lib' to 'lib64'.
-
 ### Install the python requirements
 
 Some of the RV build scripts requires extra python packages. They can be installed using the requirements.txt at the root of the repository.
