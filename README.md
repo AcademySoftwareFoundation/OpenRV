@@ -79,6 +79,11 @@ Use the `rvsetup` common build alias to run the bootstrap step.
 python3 -m pip install --user --upgrade -r requirements.txt
 ```
 
+Note that on Windows, use the following command instead from an MSYS2-MinGW64 shell:
+```bash
+SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
+```
+
 ### Configure
 
 The project uses CMake and requires a `configure` step before building. It is during the configure step that you provide
