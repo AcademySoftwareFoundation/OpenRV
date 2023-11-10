@@ -367,6 +367,8 @@ RvGraph::setupSource(SourceIPNode* source, IPCore::SourceIPNode* mediaRepSisterS
             }
 
             switchGroup = new SwitchGroupIPNode(name+"_switchGroup", def, this);
+            switchGroup->switchNode()->setProperty<IntProperty>("mode.autoEDL", 0);
+
             if (mediaRepSisterSrcNode)
             {
                 switchGroup->setInputs2(mediaRepSisterSrcNode->group(), sourceGroup);
