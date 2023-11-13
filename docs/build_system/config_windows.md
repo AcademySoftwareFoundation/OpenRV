@@ -52,9 +52,10 @@ Additional information can be found on the [MSYS2 github](https://github.com/msy
 From an MSYS2-MinGW64 shell, install the following packages which are required to build RV:
 
 ```shell
-pacman -S --needed \
+pacman -Sy --needed \
         mingw-w64-x86_64-autotools \
         mingw-w64-x86_64-cmake \
+        mingw-w64-x86_64-cmake-cmcldeps \
         mingw-w64-x86_64-glew \
         mingw-w64-x86_64-libarchive \
         mingw-w64-x86_64-make \
@@ -62,9 +63,12 @@ pacman -S --needed \
         mingw-w64-x86_64-python-pip \
         mingw-w64-x86_64-python-psutil \
         mingw-w64-x86_64-toolchain \
+        autoconf  \
+        automake \
         bison \
         flex \
         git \
+        libtool \
         nasm \
         p7zip \
         patch \
