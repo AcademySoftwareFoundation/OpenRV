@@ -12,15 +12,15 @@ SET(_target
 )
 
 SET(_version
-    "2.2.0"
+    "e1a80a9f12d7def202d394f46e44cfced1104bfb"
 )
 
 SET(_download_url
-    "https://github.com/nigels-com/glew/archive/refs/tags/glew-${_version}.zip"
+    "https://github.com/nigels-com/glew/archive/${_version}.zip"
 )
 
 SET(_download_hash
-    f150f61074d049ff0423b09b18cd1ef6
+    9bfc689dabeb4e305ce80b5b6f28bcf9
 )
 
 SET(_install_dir
