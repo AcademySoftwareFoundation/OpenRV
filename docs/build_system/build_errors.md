@@ -170,6 +170,17 @@ Note: There's an issue with the latest version of MSYS2 and Python3.xx versions.
 SETUPTOOLS_USE_DISTUTILS=stdlib pip install py7zr
 ```
 
+### Windows : System-wide vcpkg
+
+Another installation of vcpkg can conflict with the one installed by the build system. Currently,
+there are only two possibles solutions:
+
+  - Option A: Remove the automatic integration of the system-wide vcpkg into cmake using :
+    ```bash 
+    vcpkg integrate remove
+    ```
+  - Option B: Make sure that the right dependencies (and version) are installed in the system-wide vcpkg.
+
 ### macOS, Linux, Windows
 ```text
 [ 99%] Linking CXX executable rv
