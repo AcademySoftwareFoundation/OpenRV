@@ -47,7 +47,7 @@ RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.
 
 # ALIASES: Basic commands
 
-alias rvsetup="python3 -m pip install --user --upgrade -r ${RV_HOME}/requirements.txt"
+alias rvsetup="SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --user --upgrade -r ${RV_HOME}/requirements.txt"
 alias rvcfg="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvcfgd="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvbuildt="cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "

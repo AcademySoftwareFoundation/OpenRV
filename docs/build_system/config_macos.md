@@ -10,7 +10,8 @@
 
 ## Install XCode
 
-From the App Store, download XCode. Make sure that it's the source of the active developer directory.
+From the App Store, download XCode 14.3.1. Make sure that it's the source of the active developer directory.
+Note that using an XCode version more recent than 14.3.1 will result in an FFmpeg build break.
 
 `xcode-select -p` should return `/Applications/Xcode.app/Contents/Developer`. If it's not the case, run `sudo xcode-select -s /Applications/Xcode.app`
 
