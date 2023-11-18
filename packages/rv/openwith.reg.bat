@@ -10,7 +10,7 @@ if %errorLevel% == 0 (
     exit /b
 )
 
-cd %~dp0
+cd /d %~dp0
 pushd ..
 
 REM Define the path to the executable
