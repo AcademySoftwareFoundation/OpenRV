@@ -80,6 +80,9 @@ using namespace boost;
 // that an issue originates from this specific mechanism.
 static ENVVAR_BOOL( evUseFastAddSource, "RV_USE_FAST_ADD_SOURCE", true );
 
+// Defines the default value of the autoEDL mode for the RVSwitchGroup node
+static ENVVAR_INT( evMediaRepSwitchAutoEDL, "RV_MEDIA_REP_SWITCH_AUTO_EDL", 0 );
+
 //----------------------------------------------------------------------
 
 RvGraph::RvGraph(const NodeManager* nodeManager)
@@ -367,6 +370,9 @@ RvGraph::setupSource(SourceIPNode* source, IPCore::SourceIPNode* mediaRepSisterS
             }
 
             switchGroup = new SwitchGroupIPNode(name+"_switchGroup", def, this);
+            switchGroup->switchNode()->setProperty<IntProperty>(
+                "mode.autoEDL", evMediaRepSwitchAutoEDL.getValue() );
+
             if (mediaRepSisterSrcNode)
             {
                 switchGroup->setInputs2(mediaRepSisterSrcNode->group(), sourceGroup);
