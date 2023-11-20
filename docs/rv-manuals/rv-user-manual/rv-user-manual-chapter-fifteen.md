@@ -184,9 +184,7 @@ How an EXR image is displayed on screen, under certain data/display window overl
 
 The two OpenEXR preferences, found under Preferences-Format-OpenEXR, that define RV's data/display window handling behavior are -exrReadWindow and -exrReadWindowIsDisplayWindow. The flag -exrReadWindow specifies how the final data/display window (i.e ReadWindow) is defined. The choices are “Data Window”, “Display Window”, “Data Window Inside Display Window” and “Union of Data and Display Window”. In addition the flag -exrReadWindowIsDisplayWindow maybe optionally set to always make the ReadWindow the EXR display window; otherwise the display window is determined by source's EXR display window attributes.
 
-Table 15.3:
-
-OpenEXR format settings that emulate data/display window handling of various tools\*
+Table 15.3: OpenEXR format settings that emulate data/display window handling of various tools\*
 
 | Read Window                   | Read Window Is Display Window | Tool                     |
 | --------------------------------- | --------------------------------- | ---------------------------- |
@@ -196,8 +194,6 @@ OpenEXR format settings that emulate data/display window handling of various too
 | Union of Data and Display Window  | Checked                           | Renderman it, exrdisplay -w  |
 
 \* = Subject to change by the vendor.
-
-Note: If you have EXR sequences in which each file has a possibly unique data/display window and caching the files in memory still results in slow play back compared to files without unique data/display windows and if you have "Use OpenGL Pixel Buffer Objects" ON in the rendering tab of the preferences, try turning it off.
 
 ##### Parts
 

@@ -49,12 +49,15 @@ Additional information can be found on the [MSYS2 github](https://github.com/msy
 
 ## 5. Install required MSYS2 pacman packages
 
+![MSYS2-MinGW64](../images/rv-msys2-mingw64-shortcut.png)
+
 From an MSYS2-MinGW64 shell, install the following packages which are required to build RV:
 
 ```shell
-pacman -S --needed \
+pacman -Sy --needed \
         mingw-w64-x86_64-autotools \
         mingw-w64-x86_64-cmake \
+        mingw-w64-x86_64-cmake-cmcldeps \
         mingw-w64-x86_64-glew \
         mingw-w64-x86_64-libarchive \
         mingw-w64-x86_64-make \
@@ -62,9 +65,12 @@ pacman -S --needed \
         mingw-w64-x86_64-python-pip \
         mingw-w64-x86_64-python-psutil \
         mingw-w64-x86_64-toolchain \
+        autoconf  \
+        automake \
         bison \
         flex \
         git \
+        libtool \
         nasm \
         p7zip \
         patch \
@@ -78,9 +84,12 @@ Note: To confirm which version/location of any tool used inside the MSYS shell, 
 
 ### Setting the PATH
 
-The path to mingw's bin must be added e.g. `msys64/mingw64/bin`.
+The path to MSYS2's mingw64/bin folder must be added to the path.
+To set your PATH correctly: edit the MSYS2's ~/.bashrc file and add the following line:
+`PATH=/c/msys64/mingw64/bin:${PATH}`
 
-To set your PATH correctly: you can edit the MSYS ~/.bashrc or alter (untested) the Windows Path EnvVar. In ~/.bashrc, add a line `PATH=<mingw64 bin>:PATH` such as `PATH=/c/msys64/mingw64/bin:PATH` which will put Python and Ninja before `PATH` which contains `msys64/usr/bin`.
+Also add the following line to your ~/.bashrc file:
+`export ACLOCAL_PATH=/c/msys64/usr/share/aclocal/`
 
 ### Python
 
