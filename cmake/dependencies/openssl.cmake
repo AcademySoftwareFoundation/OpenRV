@@ -94,9 +94,7 @@ ELSE()
     LIST(APPEND _make_command --arch=${RV_OSX_EMULATION_ARCH})
   ENDIF()
 
-  IF(RV_TARGET_IS_RHEL9
-     OR RV_TARGET_IS_RHEL8
-  )
+  IF(RV_TARGET_LINUX)
     SET(_crypto_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
     )
