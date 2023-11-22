@@ -40,8 +40,17 @@ class: WindowTitle : MinorMode
     {
         if (_title != s) 
         {
-	    _title = s;
-	    setWindowTitle(_title);
+            _title = s;
+            string releaseVariant = getReleaseVariant();
+            if (releaseVariant == "RELEASE")
+            {
+                setWindowTitle(_title);
+            }
+            else
+            {
+                // Add the release variant as suffix.
+                setWindowTitle("(%s) %s" % (releaseVariant, _title));
+            }
         }
     }
 
