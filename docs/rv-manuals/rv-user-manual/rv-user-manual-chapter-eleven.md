@@ -2,7 +2,7 @@
 
 OpenColorIO (OCIO) is a software library which provides cross application color consistency.
 
-Note: Open RV supports OCIO v2, but is limited to the legacy API of OCIO v1.
+**Note:** Open RV supports OCIO v2, but is limited to the legacy API of OCIO v1.
 
 You can use OCIO in RV's display, look, viewing, linearize and color pipelines. In each case OCIO can be used to convert from an incoming and outgoing color space with a user defined OCIO context. OCIO requires some work to set up and should be considered an advanced feature. Large facilities may find OCIO particularly useful in RV when used in conjunction with Nuke, Mari, or other products which support it.
 
@@ -10,7 +10,7 @@ You can learn about OpenColorIO at the [OpenColorIO website](http://www.opencolo
 
 In order to use OCIO with RV a source setup package needs to be created along with OCIO configuration files, LUTs, and an appropriate user environment. RV comes with a package called ocio_source_setup which implements a default policy for using OCIO. We recommend the package be copied and modified to suit each facility that uses OCIO. When the OCIO source setup package is enabled, parts or all of RV’s existing color pipelines may be replaced with OCIO equivalents.
 
-Note: The sample OCIO source setup package **supplements** the default source_setup and does not replace it; there is no need to turn off the default source_setup. We highly recommend copying and customizing the sample OCIO package for real world use.
+**Note:** The sample OCIO source setup package **supplements** the default source_setup and does not replace it; there is no need to turn off the default source_setup. We highly recommend copying and customizing the sample OCIO package for real world use.
 
 There are four OCIO node types available in RV: OCIOLook, OCIOFile, OCIODispay, and the generic OCIO node. The default ocio_source_setup will use these nodes to replace RV's existing color, look, and display pipelines.
 
@@ -67,7 +67,7 @@ There are four OCIO node types: OCIONode, OCIOFile, OCIODisplay, and OCIOLook. A
 
 The generic OCIONode can used as a top level (user) node. As with the RVColor node the OCIONode can therefor be used as a secondary color correction.
 
-Note: You can use both RV and OCIO nodes in any of the pipelines. However, the example package does not do this: the intention is to show how OCIO can be used (at least for some media) *in place of* RV’s color pipeline.
+**Note:** You can use both RV and OCIO nodes in any of the pipelines. However, the example package does not do this: the intention is to show how OCIO can be used (at least for some media) *in place of* RV’s color pipeline.
 
 Table 1. OCIO Node Properties
 
