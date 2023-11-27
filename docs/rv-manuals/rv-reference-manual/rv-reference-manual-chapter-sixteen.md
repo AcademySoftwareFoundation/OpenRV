@@ -366,7 +366,7 @@ The linearize node has a large number of color controls. The CDL is applied befo
 
 OpenColorIO nodes can be used in place of existing RV LUT pipelines. Properties in RVColorPipelineGroup, RVLinearizePipelineGroup, RVLookPipelineGroup, and RVDisplayPipelineGroup determine whether or not the OCIO nodes are used. All OCIO nodes have the same properties and function, but their location in the color pipeline is determined by their type. The exception is the generic OCIO node which can be created by the user and used in any context.
 
-For more information, see [OpenColorIO Development Integration Notes](../rv-opencolorio-integrations.md)
+For more information, see [Chapter 11 - OpenColorIO](.././rv-user-manual/rv-user-manual-chapter-eleven.md)
 
 | Property | Type | Size | Description |
 | --- | --- | --- | --- |
