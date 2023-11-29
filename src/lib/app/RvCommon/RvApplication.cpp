@@ -244,7 +244,7 @@ static void setEnvVar(const string& var, const string& val)
 
 RvApplication::RvApplication(int argc, char** argv)
     : QObject(),
-      IPCore::Application(),
+      RvConsoleApplication(),
     m_newTimer(0),
     m_lazyBuildTimer(0),
     m_console(0),

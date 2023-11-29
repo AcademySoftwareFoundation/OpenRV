@@ -12,6 +12,8 @@
 #include <implement.h>
 #endif
 
+#include <RvCommon/RvConsoleApplication.h>
+
 #ifdef PLATFORM_DARWIN
 #include <DarwinBundle/DarwinBundle.h>
 #else
@@ -1443,7 +1445,7 @@ utf8Main(int argc, char *argv[])
 
     TwkFB::GenericIO::compileExtensionSet(predicateFileExtensions());
 
-    IPCore::Application app;
+    Rv::RvConsoleApplication app;
 
     //
     //  Initialize everything

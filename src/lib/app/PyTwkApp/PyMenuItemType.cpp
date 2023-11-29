@@ -5,6 +5,8 @@
 //  SPDX-License-Identifier: Apache-2.0
 //  
 //
+
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 
 #include <PyTwkApp/PyMenuItemType.h>

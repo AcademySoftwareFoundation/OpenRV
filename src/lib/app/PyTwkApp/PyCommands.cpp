@@ -10,6 +10,7 @@
 #include <PyTwkApp/PyInterface.h>
 #include <PyTwkApp/PyMenuState.h>
 
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 
 #include <MuPy/PyModule.h>

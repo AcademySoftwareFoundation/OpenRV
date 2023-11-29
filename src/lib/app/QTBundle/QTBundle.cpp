@@ -137,7 +137,7 @@ QTBundle::init()
                 static const char* dirs[] = {"Packages", "ImageFormats", "MovieFormats",
                                              "Mu", "SupportFiles", "ConfigFiles", "lib", 
                                              "Python", "OIIO", "Nodes", "Profiles",
-                                             "Output",
+                                             "Output", "MediaLibrary",
                                              NULL};
 
                 for (size_t q = 0; dirs[q]; q++)
@@ -195,6 +195,14 @@ QTBundle::init()
                 //  cerr << "    Mu subdir exists" << endl;
                 addPathToEnvVar("PYTHONPATH",
                                 dir.absoluteFilePath("Python").toUtf8().constData());
+            }
+
+            if (dir.exists("MediaLibrary"))
+            {
+                addPathToEnvVar("TWK_MEDIA_LIBRARY_PLUGIN_PATH",
+                                 dir.absoluteFilePath("MediaLibrary").toUtf8().constData());
+                addPathToEnvVar("PYTHONPATH",
+                                 dir.absoluteFilePath("MediaLibrary").toUtf8().constData());
             }
         }
         else

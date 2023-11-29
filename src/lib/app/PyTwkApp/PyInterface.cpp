@@ -17,6 +17,7 @@
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/MuInterface.h>
 #include <TwkApp/Menu.h>
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 #include <TwkUtil/File.h>
 
@@ -266,7 +267,16 @@ namespace TwkApp
 
     PySys_SetArgvEx( argc, w_argv, 0 );
 
-    PyLockObject::initialize();
+    //
+    //  Initialize python threading, acquire the GIL for the main
+    //  thread.
+    //
+    PyEval_InitThreads();
+
+    //
+    //  Release the GIL
+    //
+    (void)PyEval_SaveThread();
 
     //
     //  Add MuPy to the default Mu modules

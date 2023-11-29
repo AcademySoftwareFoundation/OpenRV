@@ -31,7 +31,8 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Mu MuLang MuTwkApp TwkMovie TwkAudio
-  PRIVATE IOproxy
+  PRIVATE RvCommon
+          IOproxy
           MovieProxy
           OpenEXR::OpenEXR
           PyTwkApp

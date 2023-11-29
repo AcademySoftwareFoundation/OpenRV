@@ -26,16 +26,17 @@ You can override the default support path locations by setting the environment v
 The file system of each directory in the support path contains these directories:
 
 | | |
-| ------------- | ----------------------------------------------------------------------- |
-| Packages/     | Package zip files                                                       |
-| ConfigFiles/  | Area used by packages to store non-preference configuration information |
-| ImageFormats/ | Image format Plug-Ins                                                   |
-| MovieFormats/ | Movie format Plug-Ins                                                   |
-| Mu/           | Mu files implementing packages                                          |
-| Output/       | Output Plug-Ins (Audio/Video)                                           |
-| Python/       | Python files implementing packages                                      |
-| SupportFiles/ | Additional files used by packages (icons, etc)                          |
-| lib/          | Shared libraries required by packages                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| Packages/        | Package zip files                                                       |
+| ConfigFiles/     | Area used by packages to store non-preference configuration information |
+| ImageFormats/    | Image format Plug-Ins                                                   |
+| MovieFormats/    | Movie format Plug-Ins                                                   |
+| Mu/              | Mu files implementing packages                                          |
+| Output/          | Output Plug-Ins (Audio/Video)                                           |
+| MediaLibrary/    | Media Library Plug-Ins                                                  |
+| Python/          | Python files implementing packages                                      |
+| SupportFiles/    | Additional files used by packages (icons, etc)                          |
+| lib/             | Shared libraries required by packages                                   |
 
 RV will create this structure if it's not already there the first time you add or install a package.
 

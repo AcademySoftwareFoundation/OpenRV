@@ -44,7 +44,8 @@ TARGET_LINK_LIBRARIES(
          TwkAudio
          TwkGLFMesa
          MovieRV
-  PRIVATE IOproxy
+  PRIVATE RvCommon
+          IOproxy
           MovieProxy
           OpenEXR::OpenEXR
           PyTwkApp

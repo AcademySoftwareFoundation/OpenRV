@@ -423,6 +423,7 @@ class MediaAPI : public NodeAPI
     virtual const Node* baseMediaNode() const = 0; // iff isProxy() == true
     virtual HTTPCookieVector httpCookies() const;
     virtual HTTPHeaderVector httpHeaders() const;
+    virtual URL httpRedirection() const;
 
   protected:
     MediaAPI() : NodeAPI() {}

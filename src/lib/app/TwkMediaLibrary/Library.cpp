@@ -274,6 +274,7 @@ NoteAPI::~NoteAPI() {}
 MediaAPI::~MediaAPI() {}
 HTTPCookieVector MediaAPI::httpCookies() const { return HTTPCookieVector(); }
 HTTPHeaderVector MediaAPI::httpHeaders() const { return HTTPHeaderVector(); }
+URL MediaAPI::httpRedirection() const { return URL(); }
 
 //----------------------------------------------------------------------
 

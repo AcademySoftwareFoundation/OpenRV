@@ -32,10 +32,11 @@ class EventMediaNode : public EventNode, public MediaAPI
     }
 
     bool isStreaming() const override { return true; }
-    bool isRedirecting() const override { return true; }
+    bool isRedirecting() const override { return false; }
     const Node* baseMediaNode() const override { return this; }
     HTTPCookieVector httpCookies() const override;
     HTTPHeaderVector httpHeaders() const override;
+    URL httpRedirection() const override { return m_url; } ;
 
   private:
     URL m_url;

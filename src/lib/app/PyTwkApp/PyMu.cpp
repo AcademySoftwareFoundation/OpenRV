@@ -29,6 +29,7 @@
 #include <MuLang/MuLangContext.h>
 #include <MuPy/PyModule.h>
 #include <MuTwkApp/MuInterface.h>
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 #include <sstream>
 
