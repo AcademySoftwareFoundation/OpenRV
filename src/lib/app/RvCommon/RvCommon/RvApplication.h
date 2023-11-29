@@ -9,7 +9,6 @@
 #define __rv__RvApplication__h__
 #include <RvCommon/RvConsoleApplication.h>
 #include <TwkMediaLibrary/Library.h>
-#include <EventMediaLibrary/EventMediaLibrary.h>
 #include <PyMediaLibrary/PyMediaLibrary.h>
 #include <QtCore/QTimer>
 #include <IPCore/Application.h>
@@ -58,7 +57,6 @@ class RvApplication : public QObject, public RvConsoleApplication
     typedef std::set<RvDocument*>                RvDocSet;
     typedef std::vector<const QTGLVideoDevice*>  VideoDeviceVector;
     typedef TwkUtil::Timer                       Timer;
-    typedef TwkMediaLibrary::EventMediaLibrary   EventMediaLibrary;
     typedef std::map<DispatchID, DispatchCallback>      DispatchMap;
     typedef std::mutex                                  DispatchMutex;
 
@@ -135,7 +133,6 @@ class RvApplication : public QObject, public RvConsoleApplication
     void dispatchTimeout();
 
   private:
-    EventMediaLibrary       m_eventLibrary;
     NewSessionQueue         m_newSessions;
     RvDocSet                m_deleteDocs;
     QTimer*                 m_timer;

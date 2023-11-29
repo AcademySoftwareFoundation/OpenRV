@@ -6,6 +6,8 @@ openrv: 1.0.0
 files:
   - file: media_library_environment_variable_reader_plugin.py
     location: MediaLibrary/$PACKAGE
+  - file: media_library_event_plugin.py
+    location: MediaLibrary/$PACKAGE
 
 description: |
 

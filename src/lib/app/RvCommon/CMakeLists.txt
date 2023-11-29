@@ -172,7 +172,6 @@ TARGET_LINK_LIBRARIES(
          TwkApp
          TwkGLF
          TwkMath
-         EventMediaLibrary
          PyMediaLibrary
          TwkQtChat
          TwkUtil
