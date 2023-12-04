@@ -387,6 +387,11 @@ namespace TwkApp
       str << ", ";
       str << exc.what();
 
+      // Printing the error using cerr right away because the exception string does not get 
+      // displayed. The issue is that PyErr_Occurred does not return true and the printing is 
+      // skipped in PyStateFunc::state().
+      cerr << "ERROR: " << str.str() << endl;
+
       PyErr_SetString( PyExc_Exception, str.str().c_str() );
       return NULL;
     }
