@@ -2,11 +2,15 @@
 
 OpenColorIO (OCIO) is a software library which provides cross application color consistency.
 
+**Note:** Open RV supports OCIO v2, but is limited to the legacy API of OCIO v1.
+
 You can use OCIO in RV's display, look, viewing, linearize and color pipelines. In each case OCIO can be used to convert from an incoming and outgoing color space with a user defined OCIO context. OCIO requires some work to set up and should be considered an advanced feature. Large facilities may find OCIO particularly useful in RV when used in conjunction with Nuke, Mari, or other products which support it.
 
 You can learn about OpenColorIO at the [OpenColorIO website](http://www.opencolorio.org) .
 
-In order to use OCIO with RV a source setup package needs to be created along with OCIO configuration files, LUTs, and an appropriate user environment. RV comes with a package called ocio_source_setup which implements a default policy for using OCIO. We recommend the package be copied and modified to suit each facility that uses OCIO.
+In order to use OCIO with RV a source setup package needs to be created along with OCIO configuration files, LUTs, and an appropriate user environment. RV comes with a package called ocio_source_setup which implements a default policy for using OCIO. We recommend the package be copied and modified to suit each facility that uses OCIO. When the OCIO source setup package is enabled, parts or all of RV’s existing color pipelines may be replaced with OCIO equivalents.
+
+**Note:** The sample OCIO source setup package **supplements** the default source_setup and does not replace it; there is no need to turn off the default source_setup. We highly recommend copying and customizing the sample OCIO package for real world use.
 
 There are four OCIO node types available in RV: OCIOLook, OCIOFile, OCIODispay, and the generic OCIO node. The default ocio_source_setup will use these nodes to replace RV's existing color, look, and display pipelines.
 
@@ -14,8 +18,7 @@ RV uses the OCIO GPU path instead of the more common CPU path for color computat
 
 The reference manual contains more detailed information about how to configure RV's OCIO nodes.
 
-### 11.1 The ocio_source_setup Package
-
+## 11.1 The ocio_source_setup Package
 
 OpenColorIO defines color spaces which are used to transform images for viewing or for storage in various file formats. It does not have any policy about when to apply these transforms.
 
@@ -27,9 +30,61 @@ The package provides a basic menu fashioned after the OCIO display example progr
 
 In order to use the ocio_source_setup package you need to do the following:
 
-*   Find the “OpenColorIO Basic Color Management” package in the Packages tab of the preferences. Make sure the “load” button next to the package name is activated and restart RV.
-*   Set the OCIO environment variable to the path to your config file.
-*   Start RV and load an image with the color space in the name.
-*   Note the "OCIO" top-level menu that appears when you use RV this way. You can use this menu to chose a Linearizing transform, or Display transform, from those provided by your config.
+* Find the “OpenColorIO Basic Color Management” package in the Packages tab of the preferences. Make sure the “load” button next to the package name is activated and restart RV.
+* Set the OCIO environment variable to the path to your config file.
+* Start RV and load an image with the color space in the name.
+* Note the "OCIO" top-level menu that appears when you use RV this way. You can use this menu to chose a Linearizing transform, or Display transform, from those provided by your config.
 
 The OpenColorIO mailing list and website is a good place to get help about config files, documentation, and general operation.
+
+### 11.2 Testing the Sample OCIO Source Setup
+
+1. Find the "OpenColorIO Basic Color Management" Package in the Packages tab of the Preferences. Click "Load" button next to the package and exit.
+
+1. Set the "OCIO" environment variable to the path to your favorite OCIO config file:
+
+   ```sh
+   setenv OCIO /OCIO/spi-vfx/config.ocio 
+   ```
+
+1. Start RV and load an image with the color space in the name or otherwise (however is appropriate for your config).
+
+   ```sh
+   rv /media/images/ocio_special_names/marcie_clean_lg10.cin 
+   ```
+
+1. Note the "OCIO" top-level menu that appears when you use RV this way. You can use this menu to chose a Linearizing transform, or Display transform, from those provided by your config.
+
+### 11.3 Operation of the OCIO Node
+
+The OCIO node in the OpenColorIO Basic Color Management package is configured to emulate three of the OCIO nuke node types: color, look, and display.
+
+The OCIO nodes can be used in any of the RV pipelines as either a supplement to RV’s existing color pipeline or in place of it. The pipelines are placed in RV’s node graph in the places where all of the significant color processing occurs. By default these pipelines contain RV’s color nodes (RVLinearize, RVColor, RVLookLUT, RVDisplayColor).
+
+The default OCIO package will swap in OCIO equivalent nodes for the existing RV nodes. For example when using the SPI OCIO config with an "lg10" cineon file the OCIO package will remove RV’s RVLinearize node in the linearization pipeline and replace it with a OCIOFile node set to take the lg10 input by default and output scene referred linear. The default OCIO package will also swap out the RVDisplayColor node (which does display color correction) for an OCIODisplay node. The OCIODisplay node is set to take scene referred linear and output to the default viewing transform (by default).
+
+There are four OCIO node types: OCIONode, OCIOFile, OCIODisplay, and OCIOLook. All of them have the same properties; they only differ in their default configuration. Each of them can be used in any context if desired. The different node type names are primarily to make it easy to identify the nodes from the user interface.
+
+The generic OCIONode can used as a top level (user) node. As with the RVColor node the OCIONode can therefor be used as a secondary color correction.
+
+**Note:** You can use both RV and OCIO nodes in any of the pipelines. However, the example package does not do this: the intention is to show how OCIO can be used (at least for some media) *in place of* RV’s color pipeline.
+
+Table 1. OCIO Node Properties
+
+|  |  |
+| --- | --- |
+| string ocio.function | One of "color", "look", or "display" |
+| float ocio.lut | Used internally to store the OCIO generated 3D LUT |
+| int ocio.active | Activates/deactivates the OCIO node |
+| int ocio.lut3DSize | The desired size of the OCIO generated 3D LUT (default=32) |
+| string ocio.inColorSpace | The OCIO name of the input color space |
+| string ocio_color.outColorSpace | The OCIO name of the output color space when ocio.function == "color" |
+| string ocio_look.look | The OCIO command string for the look when ocio.function == "look" |
+| int ocio_look.direction | 0=forward, 1=inverse |
+| string ocio_display.display | OCIO display name when ocio.function == "display" |
+| string ocio_display.view | OCIO view name when ocio.function == "display" |
+| component ocio_context | String properties in this component become OCIO config name/value pairs |
+
+### 11.4 The ocio_context Component
+
+You can add properties to the OCIO node in RV to create an OCIO context. Any string property in the component called `ocio_context` will become a name/value pair for the OCIO context.
