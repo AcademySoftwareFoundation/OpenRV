@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Python::Python Mu
-  PRIVATE MuLang Imath::Imath
+  PRIVATE MuLang Imath::Imath TwkPython
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})

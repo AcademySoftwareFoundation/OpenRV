@@ -8,6 +8,7 @@
 #include <PyTwkApp/PyMuSymbolType.h>
 #include <PyTwkApp/PyEventType.h>
 
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 
 #include <Mu/ClassInstance.h>

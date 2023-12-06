@@ -11,6 +11,7 @@
 
 #include <MuPy/PyModule.h>
 #include <TwkApp/Event.h>
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 #include <iostream>
 #include <sstream>

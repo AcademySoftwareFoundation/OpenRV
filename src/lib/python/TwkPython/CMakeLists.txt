@@ -7,11 +7,11 @@
 INCLUDE(cxx_defaults)
 
 SET(_target
-    "EventMediaLibrary"
+    "TwkPython"
 )
 
 SET(_sources
-    EventMediaLibrary.cpp
+    PyLockObject.cpp
 )
 
 ADD_LIBRARY(
@@ -19,16 +19,10 @@ ADD_LIBRARY(
   ${_sources}
 )
 
-FIND_PACKAGE(
-  Qt5
-  COMPONENTS Core
-  REQUIRED
-)
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC RvApp TwkMediaLibrary
-  PRIVATE Qt5::Core
+  PUBLIC Python::Python
 )
 
 TARGET_INCLUDE_DIRECTORIES(

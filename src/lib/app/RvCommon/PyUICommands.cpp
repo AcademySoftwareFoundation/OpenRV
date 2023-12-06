@@ -16,6 +16,7 @@
 #endif
 #endif
 
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 
 #include <RvCommon/MediaFileTypes.h>

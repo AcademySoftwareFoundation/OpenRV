@@ -221,6 +221,7 @@ DarwinBundle::DarwinBundle(const FileName& appName,
             NSString* nodes = [path stringByAppendingPathComponent: @"Nodes"];
             NSString* oiioplugs = [path stringByAppendingPathComponent: @"OIIO"];
             NSString* output = [path stringByAppendingPathComponent: @"Output"];
+            NSString* libraries = [path stringByAppendingPathComponent: @"MediaLibrary"];
             NSString* movformats = [path stringByAppendingPathComponent: @"MovieFormats"];
             NSString* supportfiles = [path stringByAppendingPathComponent: @"SupportFiles"];
             NSString* configfiles = [path stringByAppendingPathComponent: @"ConfigFiles"];
@@ -235,6 +236,7 @@ DarwinBundle::DarwinBundle(const FileName& appName,
                 mkpath(imgformats);
                 mkpath(oiioplugs);
                 mkpath(output);
+                mkpath(libraries);
                 mkpath(movformats);
                 mkpath(supportfiles);
                 mkpath(configfiles);
@@ -249,7 +251,9 @@ DarwinBundle::DarwinBundle(const FileName& appName,
             addPathToEnvVar("TWK_PROFILE_PLUGIN_PATH", [profiles UTF8String]);
             addPathToEnvVar("MU_MODULE_PATH", [mu UTF8String]);
             addPathToEnvVar("PYTHONPATH", [py UTF8String]);
-            addPathToEnvVar("OIIO_LIBRARY_PATH.", [oiioplugs UTF8String]);
+            addPathToEnvVar("OIIO_LIBRARY_PATH", [oiioplugs UTF8String]);
+            addPathToEnvVar("TWK_MEDIA_LIBRARY_PLUGIN_PATH", [libraries UTF8String]);
+            addPathToEnvVar("PYTHONPATH", [libraries UTF8String]);
         }
     }
 

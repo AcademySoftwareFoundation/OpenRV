@@ -45,6 +45,7 @@ SET(_sources
     RvConsoleWindow.cpp
     RvPreferences.cpp
     RvDocument.cpp
+    RvConsoleApplication.cpp
     RvApplication.cpp
     GLView.cpp
     TwkQTAction.cpp
@@ -171,7 +172,7 @@ TARGET_LINK_LIBRARIES(
          TwkApp
          TwkGLF
          TwkMath
-         EventMediaLibrary
+         PyMediaLibrary
          TwkQtChat
          TwkUtil
          Boost::thread
@@ -191,6 +192,7 @@ TARGET_LINK_LIBRARIES(
           TwkMovie
           TwkQtBase
           TwkQtCoreUtil
+          TwkPython
           arg
           stl_ext
           yaml

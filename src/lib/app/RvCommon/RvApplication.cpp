@@ -244,7 +244,7 @@ static void setEnvVar(const string& var, const string& val)
 
 RvApplication::RvApplication(int argc, char** argv)
     : QObject(),
-      IPCore::Application(),
+      RvConsoleApplication(),
     m_newTimer(0),
     m_lazyBuildTimer(0),
     m_console(0),
@@ -262,10 +262,8 @@ RvApplication::RvApplication(int argc, char** argv)
     m_presentationDevice(0),
     m_executableNameCaps(UI_APPLICATION_NAME),
     m_desktopModule(0),
-    m_eventLibrary(INTERNAL_APPLICATION_NAME),
     m_dispatchAtomicInt(0)
 {
-    m_eventLibrary.setName("event-media-library");
 
 #ifdef PLATFORM_DARWIN
     sessionFromUrlPointer = sessionFromUrl;

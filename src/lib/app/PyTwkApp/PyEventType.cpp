@@ -11,6 +11,9 @@
 #include <TwkApp/EventTable.h>
 #include <TwkApp/VideoDevice.h>
 
+#include <TwkPython/PyLockObject.h>
+#include <Python.h>
+
 namespace TwkApp
 {
   static PyObject* BadEvent = 0;
