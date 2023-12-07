@@ -23,11 +23,11 @@ ENDIF()
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
-    "https://www.libraw.org/data/LibRaw-${_version}.tar.gz"
+    "https://github.com/LibRaw/LibRaw/archive/refs/tags/${_version}.tar.gz"
 )
 
 SET(_download_hash
-    "2942732de752f46baccd9c6d57823b7b"
+    "3ad334296a7a2c8ee841f353cc1b450b"
 )
 
 SET(_libraw_lib_version
@@ -96,14 +96,14 @@ ELSE()
     DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     SOURCE_DIR ${_source_dir}
-    BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ZLIB::ZLIB lcms
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command}
-                      ${_configure_options}
+    CONFIGURE_COMMAND aclocal
+    COMMAND autoreconf --install
+    COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command} ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
-    BUILD_IN_SOURCE FALSE
+    BUILD_IN_SOURCE TRUE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_byproducts}
     USES_TERMINAL_BUILD TRUE
