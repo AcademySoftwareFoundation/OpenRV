@@ -1,0 +1,23 @@
+package: Media Library Demo
+version: 1.0
+rv: 2024.0.0
+openrv: 1.0.0
+
+files:
+  - file: media_library_environment_variable_reader_plugin.py
+    location: MediaLibrary/$PACKAGE
+  - file: media_library_event_plugin.py
+    location: MediaLibrary/$PACKAGE
+
+description: |
+
+  <p> 
+  This package implements examples of Media Library plugins
+  </p>
+  
+  <p>
+  This is a demo package for RV. It is not meant to be used in production.
+  It is meant to show how to use the media library API to create a media library
+  that can be used to browse media from a web server.
+  </p
+  

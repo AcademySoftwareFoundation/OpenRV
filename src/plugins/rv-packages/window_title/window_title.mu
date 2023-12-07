@@ -13,6 +13,8 @@ class: WindowTitle : MinorMode
 { 
     string _title;
     string _mystate;
+    string _titlePrefix;
+    bool _isRelease;
     qt.QTimer _playStopTimer;
     qt.QTimer _updateTimer;
 
@@ -40,8 +42,15 @@ class: WindowTitle : MinorMode
     {
         if (_title != s) 
         {
-	    _title = s;
-	    setWindowTitle(_title);
+            _title = s;
+            if (_isRelease)
+            {
+                setWindowTitle(_title);
+            }
+            else
+            {
+                setWindowTitle(_titlePrefix + _title);
+            }
         }
     }
 
@@ -125,6 +134,14 @@ class: WindowTitle : MinorMode
 
         _title = "";
         _mystate = "unknown";
+
+        // Compute the title prefix.
+        _titlePrefix = getReleaseVariant();
+        _isRelease = _titlePrefix == "RELEASE";
+        if (!_isRelease)
+        {
+            _titlePrefix = "(%s) " % _titlePrefix;
+        }
 
         _playStopTimer = qt.QTimer(mainWindowWidget());
         _playStopTimer.setSingleShot(true);

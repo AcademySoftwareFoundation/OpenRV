@@ -78,7 +78,6 @@ rv-manuals/rv-gto
 rv-manuals/rv-luts
 rv-manuals/rv-media-multi-representation
 rv-manuals/rv-mu-programming
-rv-manuals/rv-opencolorio-integrations
 ```
 
 ```{toctree}

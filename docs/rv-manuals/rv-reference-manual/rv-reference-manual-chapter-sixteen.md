@@ -364,8 +364,9 @@ The linearize node has a large number of color controls. The CDL is applied befo
 
 ### OCIO (OpenColorIO), OCIOFile, OCIOLook, and OCIODisplay
 
+OpenColorIO nodes can be used in place of existing RV LUT pipelines. Properties in RVColorPipelineGroup, RVLinearizePipelineGroup, RVLookPipelineGroup, and RVDisplayPipelineGroup determine whether or not the OCIO nodes are used. All OCIO nodes have the same properties and function, but their location in the color pipeline is determined by their type. The exception is the generic OCIO node which can be created by the user and used in any context.
 
-OpenColorIO nodes can be used in place of existing RV LUT pipelines. Properties in RVColorPipelineGroup, RVLinearizePipelineGroup, RVLookPipelineGroup, and RVDisplayPipelineGroup determine whether or not the OCIO nodes are used. All OCIO nodes have the same properties and function, but their location in the color pipeline is determined by their type. The exception is the generic OCIO node which can be created by the user and used in any context.NOTE: THIS IS INCOMPLETE – [SEE ACCOMPANYING OCIO INTEGRATION DOCUMENT](../rv-opencolorio-integrations.md)
+For more information, see [Chapter 11 - OpenColorIO](.././rv-user-manual/rv-user-manual-chapter-eleven.md)
 
 | Property | Type | Size | Description |
 | --- | --- | --- | --- |
@@ -377,7 +378,6 @@ OpenColorIO nodes can be used in place of existing RV LUT pipelines. Properties 
 | ocio_context. *name* | string | 1 | Name/Value pairs for OCIO context |
 
 ### RVOverlay
-
 
 Overlay nodes can be used with any source. They can be used to draw arbitrary rectangles and text over the source but beneath any annotations. Overlay nodes can hold any number of 3 types of components: **rect** components describe a rectangle to be rendered, **text** components describe a string (or an array of strings, one per frame) to be rendered, and **window** components describe a matted region to be indicated either by coloring the region outside the window, or by outlining it. The coordiates of the corners of the window may be animated by specifying one number per frame.In the below the “ **id** ” in the component name can be any string, but must be different for each component of the same type.
 

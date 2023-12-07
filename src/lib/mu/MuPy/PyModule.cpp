@@ -9,6 +9,7 @@
 #include <MuPy/PyObjectType.h>
 #include <MuPy/PyTypeObjectType.h>
 
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
 
 #include <half.h>
@@ -41,38 +42,7 @@
 #include <stdexcept>
 #include <sstream>
 
-//
-//  Note that we don't use the PyGILState_Ensure/Release API here,
-//  although it would be convenient, since it would destroy the
-//  thread state each time a thread backs out of python completely.
-//  We prefer to leave it around since we expect a given thread to
-//  dip in and out of python many times.
 
-void PyLockObject::initialize()
-{
-  //
-  //  Initialize python threading, acquire the GIL for the main
-  //  thread.
-  //
-  PyEval_InitThreads();
-
-  //
-  //  Release the GIL
-  //
-  (void)PyEval_SaveThread();
-}
-
-// Ensure that the current thread is ready to call the Python C API
-// regardless of the current state of Python, or of the global interpreter lock.
-PyLockObject::PyLockObject() : _gilState( PyGILState_Ensure() ) {}
-
-// Release any resources previously acquired. After this call,
-// Python’s state will be the same as it was prior to the corresponding
-// PyGILState_Ensure() call (Done while initializing _gilState).
-PyLockObject::~PyLockObject()
-{
-  PyGILState_Release( _gilState );
-}
 
 namespace Mu
 {

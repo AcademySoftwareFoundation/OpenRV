@@ -57,6 +57,8 @@
   }
 
 static ENVVAR_BOOL( evIgnoreAudio, "RV_IGNORE_AUDIO", false );
+static ENVVAR_BOOL( evDebugCookies, "RV_DEBUG_FFMPEG_COOKIES", false );
+static ENVVAR_BOOL( evDebugHeaders, "RV_DEBUG_FFMPEG_HEADERS", false );
 
 namespace IPCore
 {
@@ -2669,37 +2671,57 @@ namespace IPCore
       for( int n = 0; n < nodes.size(); n++ )
       {
         const TwkMediaLibrary::Node* node = nodes[n];
+        std::string nodeName = node->name();
+
         if( const TwkMediaLibrary::MediaAPI* api =
                 TwkMediaLibrary::api_cast<TwkMediaLibrary::MediaAPI>( node ) )
         {
-          TwkMediaLibrary::HTTPCookieVector cookies = api->httpCookies();
-          if( !cookies.empty() )
+          if( api->isStreaming() )
           {
-            ostringstream cookieStm;
-
-            for( int c = 0; c < cookies.size(); c++ )
+            TwkMediaLibrary::HTTPCookieVector cookies = api->httpCookies();
+            if( !cookies.empty() )
             {
-              if( c > 0 ) cookieStm << "\n";
-              cookieStm << cookies[c].name << "=" << cookies[c].value
-                        << "; path=" << cookies[c].path
-                        << "; domain=" << cookies[c].domain;
+              ostringstream cookieStm;
+
+              for( int c = 0; c < cookies.size(); c++ )
+              {
+                if( c > 0 ) cookieStm << "\n";
+                cookieStm << cookies[c].name << "=" << cookies[c].value;
+
+                if( !cookies[c].path.empty() )
+                  cookieStm << "; path=" << cookies[c].path;
+                if( !cookies[c].domain.empty() )
+                  cookieStm << "; domain=" << cookies[c].domain;
+              }
+
+              if (evDebugCookies.getValue()) std::cout << "Cookies:\n" << cookieStm.str() << std::endl;
+
+              m_inparams.push_back( StringPair( "cookies", cookieStm.str() ) );
             }
 
-            m_inparams.push_back( StringPair( "cookies", cookieStm.str() ) );
+            TwkMediaLibrary::HTTPHeaderVector headers = api->httpHeaders();
+            if( !headers.empty() )
+            {
+              ostringstream headersStm;
+
+              for( size_t h = 0, size = headers.size(); h < size; ++h )
+              {
+                if( h > 0 ) headersStm << "\r\n";
+                headersStm << headers[h].name << ": " << headers[h].value;
+              }
+
+              if (evDebugCookies.getValue()) std::cout << "Headers:\n" << headersStm.str() << std::endl;
+
+              m_inparams.push_back( StringPair( "headers", headersStm.str() ) );
+            }
           }
 
-          TwkMediaLibrary::HTTPHeaderVector headers = api->httpHeaders();
-          if( !headers.empty() )
+          if( api->isRedirecting() )
           {
-            ostringstream headersStm;
-
-            for( size_t h = 0, size = headers.size(); h < size; ++h )
-            {
-              if( h > 0 ) headersStm << "\r\n";
-              headersStm << headers[h].name << ": " << headers[h].value;
-            }
-
-            m_inparams.push_back( StringPair( "headers", headersStm.str() ) );
+            std::string redirection = api->httpRedirection();
+            std::cout << "INFO: " << nodeName << " is redirecting " << file
+                      << " to " << redirection << std::endl;
+            file = redirection;
           }
         }
       }

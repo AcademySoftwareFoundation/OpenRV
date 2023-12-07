@@ -10,7 +10,10 @@
 #include <PyTwkApp/PyInterface.h>
 
 #include <MuPy/PyModule.h>
+
+#include <TwkPython/PyLockObject.h>
 #include <Python.h>
+
 #include <iostream>
 
 namespace TwkApp

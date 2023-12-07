@@ -31,7 +31,7 @@ IF(RV_TARGET_DARWIN
    OR RV_TARGET_LINUX
 )
   # WebP lib on Darwin&Linux is built without a version number.
-  RV_MAKE_STANDARD_LIB_NAME("webp" "" "STATIC" "d")
+  RV_MAKE_STANDARD_LIB_NAME("webp" "" "STATIC" "")
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME("webp" "${_version}" "STATIC" "d")
 ENDIF()
