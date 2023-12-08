@@ -231,6 +231,8 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   SET(RV_FFMPEG_CONFIG_OPTIONS
       "${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}"
   )
+ELSE()
+  SEPARATE_ARGUMENTS(RV_FFMPEG_CONFIG_OPTIONS)
 ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
