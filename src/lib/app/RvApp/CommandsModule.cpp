@@ -107,10 +107,17 @@ static void throwBadArgumentException(const Mu::Node& node,
     if (context->debugging())
     {
         const Mu::AnnotatedNode& anode = static_cast<const Mu::AnnotatedNode&>(node);
-        str << anode.sourceFileName()
-            << ", line " << anode.linenum()
-            << ", char " << anode.charnum()
-            << ": ";
+        // When linenum is 0, it indicates that sourceFileName is either empty or not 
+        // null-terminated. This typically occurs when an exception is raised from a Python plugin.
+        // Despite populating the exception object with relevant information, the text does not 
+        // display in the console for such cases.
+        if (anode.linenum() > 0)
+        {
+            str << anode.sourceFileName()
+                << ", line " << anode.linenum()
+                << ", char " << anode.charnum()
+                << ": ";
+        }
     }
 
     str << "in " << node.symbol()->fullyQualifiedName() << ": " << msg;
@@ -135,10 +142,13 @@ throwBadProperty(Thread& thread,
     if (context->debugging())
     {
         const Mu::AnnotatedNode& anode = static_cast<const Mu::AnnotatedNode&>(node);
-        str << anode.sourceFileName()
-            << ", line " << anode.linenum()
-            << ", char " << anode.charnum()
-            << ": ";
+        if (anode.linenum() > 0)
+        {
+            str << anode.sourceFileName()
+                << ", line " << anode.linenum()
+                << ", char " << anode.charnum()
+                << ": ";
+        }
     }
 
     str << "invalid property name " << name.c_str();
@@ -165,10 +175,13 @@ throwBadPropertyType(Thread& thread,
     if (context->debugging())
     {
         const Mu::AnnotatedNode& anode = static_cast<const Mu::AnnotatedNode&>(node);
-        str << anode.sourceFileName()
-            << ", line " << anode.linenum()
-            << ", char " << anode.charnum()
-            << ": ";
+        if (anode.linenum() > 0)
+        {
+            str << anode.sourceFileName()
+                << ", line " << anode.linenum()
+                << ", char " << anode.charnum()
+                << ": ";
+        }
     }
 
     str << "wrong property type " << name.c_str();
