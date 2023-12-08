@@ -323,14 +323,29 @@ IF(RV_TARGET_DARWIN
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
   )
 ELSE()
+  SET(_rv_stage_lib_site_package_dir
+      "${RV_STAGE_LIB_DIR}/site-packages"
+  )
+
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
     COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${RV_STAGE_PLUGINS_PYTHON_DIR}
+    # Copy PyOpenColorIO.pyd into RV_STAGE_PLUGINS_PYTHON_DIR as PyOpenColorIO_d.pyd in debug.
+    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} "$<$<CONFIG:Debug>:${RV_STAGE_PLUGINS_PYTHON_DIR}/PyOpenColorIO_d.pyd>$<$<CONFIG:Release>:${RV_STAGE_PLUGINS_PYTHON_DIR}>"
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${_ocio_win_sharedlib_path} ${RV_STAGE_PLUGINS_PYTHON_DIR}
   )
+
+  # Debug Python on Windows search for modules with *_d suffix, but OCIO does not create a PyOpenColor_d.pyd.
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    ADD_CUSTOM_COMMAND(
+      TARGET ${_target}
+      POST_BUILD
+      COMMENT "Rename PyOpenColorIO.py to PyOpenColorIO_d.py in '${_rv_stage_lib_site_package_dir}'."
+      COMMAND ${CMAKE_COMMAND} -E rename ${_rv_stage_lib_site_package_dir}/PyOpenColorIO.pyd ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
+    )
+  ENDIF()
 ENDIF()
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
