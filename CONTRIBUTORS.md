@@ -16,6 +16,7 @@ Here is a list of the people who've contributed code to the Open RV project, sor
 * Martin Chesnay ([mchesnay](https://github.com/mchesnay))
 * Matt Daw ([mattdaw](https://github.com/mattdaw))
 * Nicolas Montmarquette ([nmontmarquette](https://github.com/nmontmarquette))
+* Robert Zhou ([meepzh](https://github.com/meepzh))
 * Roger Nelson ([rogernelson](https://github.com/rogernelson))
 * Shannon Yearwood ([shannonyearwood](https://github.com/shannonyearwood))  
 * Thomas Bernier ([ThomBern](https://github.com/ThomBern))  
