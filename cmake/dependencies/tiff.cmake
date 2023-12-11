@@ -18,22 +18,22 @@ INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 # OpenImageIO required >= 3.9, using latest 4.0
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "4.0.9" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "4.6.0" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
-    "https://download.osgeo.org/libtiff/tiff-${_version}.tar.gz"
+    "https://gitlab.com/libtiff/libtiff/-/archive/v4.6.0/libtiff-v${_version}.tar.gz"
 )
 
 SET(_download_hash
-    "54bad211279cc93eb4fca31ba9bfdc79"
+    "118a2e5fc9ed71653195b332b9715890"
 )
 
 IF(NOT RV_TARGET_WINDOWS)
   # Mac/Linux: Use the unversionned .dylib.so LINK which points to the proper file (which has a diff version number) Mac/Linux: TIFF doesn't use a Postfix only
   # 'MSVC'.
   IF(RV_TARGET_DARWIN)
-    RV_MAKE_STANDARD_LIB_NAME("tiff" "5.3.0" "SHARED" "")
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "6.0.2" "SHARED" "")
   ELSE()
     RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "")
   ENDIF()
@@ -49,9 +49,13 @@ IF(RV_TARGET_WINDOWS)
   # it. UPDATE NOTE: When upating TIFF, update the patch in cmake/patches.
 
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    SET(_patch_path "${RV_PATCHES_DIR}/tiff_nmake_dbg.opt")
+    SET(_patch_path
+        "${RV_PATCHES_DIR}/tiff_nmake_dbg.opt"
+    )
   ELSE()
-    SET(_patch_path "${RV_PATCHES_DIR}/tiff_nmake_rel.opt")
+    SET(_patch_path
+        "${RV_PATCHES_DIR}/tiff_nmake_rel.opt"
+    )
   ENDIF()
 
   EXTERNALPROJECT_ADD(
@@ -93,6 +97,7 @@ IF(RV_TARGET_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tiffconf.h ${_include_dir}
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tif_config.h ${_include_dir}
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tif_dir.h ${_include_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/libtiff/tif_hash_set.h ${_include_dir}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/tools ${_bin_dir}
     COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/Makefile.am ${_bin_dir}/Makefile.vc ${_bin_dir}/Makefile.in ${_bin_dir}/CMakeLists.txt
   )
@@ -119,6 +124,7 @@ ELSE()
   GET_TARGET_PROPERTY(_jpeg_include_dir jpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
   LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
   LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
+  LIST(APPEND _configure_options "-Dwebp=OFF")
 
   EXTERNALPROJECT_ADD(
     ${_target}
@@ -146,7 +152,7 @@ ELSE()
     POST_BUILD
     COMMENT "Installing ${_target}'s missing headers"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_base_dir}/build/libtiff/tif_config.h ${_base_dir}/src/libtiff/tiffiop.h ${_base_dir}/src/libtiff/tif_dir.h
-            ${_include_dir}
+            ${_base_dir}/src/libtiff/tif_hash_set.h ${_include_dir}
   )
 ENDIF()
 
