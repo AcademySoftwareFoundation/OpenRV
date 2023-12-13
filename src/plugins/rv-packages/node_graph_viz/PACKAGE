@@ -4,7 +4,7 @@ organization: Autodesk, Inc.
 version: 0.1
 requires: ''
 rv: 7.5.0
-openrv: 1.0.0
+openrv: 1.0.1
 optional: true
 hidden: true
 

@@ -3,8 +3,6 @@
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
 OpenTimelineIO          # License: Other/Proprietary License (Modified Apache 2.0 License)
-matplotlib              # License: Python Software Foundation License (PSF)
-networkx                # License: BSD License
 PyOpenGL                # License: BSD License (BSD)
 PyOpenGL_accelerate     # License: BSD License (BSD)
 
