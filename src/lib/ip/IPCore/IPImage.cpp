@@ -71,6 +71,8 @@ IPImage::init()
     cropEndX                     = 0;
     cropEndY                     = 0;
     supportReversedOrderBlending = true;
+    width                        = 0;
+    height                       = 0;
 }
 
 IPImage::IPImage(const IPNode* n) : node(n) { init(); }
@@ -743,12 +745,17 @@ IPImage::computeMatricesRecursive(const InternalGLMatricesContext& baseContext)
 
     if (!isNoBuffer()) 
     {
-        float imageAspect = (float)width / height;
-        if (isCropped)
+        float imageAspect = 1.0f;
+        if (width!=0 && height!=0)
         {
-            imageAspect *= (float)(cropEndX - cropStartX) * (float)height
-                           / (float)((cropEndY - cropStartY) * width);
+            imageAspect = (float)width / height;
+            if (isCropped && cropStartY!=cropEndY)
+            {
+                imageAspect *= (float)(cropEndX - cropStartX) * (float)height
+                            / (float)((cropEndY - cropStartY) * width);
+            }
         }
+
         Mat44f T;
         T.makeTranslation(Vec3f(-imageAspect / 2.0f, -0.5f, 0.f));
 

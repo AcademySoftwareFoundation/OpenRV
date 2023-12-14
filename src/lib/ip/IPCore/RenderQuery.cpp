@@ -9,10 +9,39 @@
 #include <stl_ext/string_algo.h>
 #include <IPCore/IPNode.h>
 
+#include <type_traits>
+
 namespace IPCore {
     
 using namespace std;
 using namespace boost;
+
+namespace {
+
+// Returns true if all tokens are contained within source (delimited by '/') 
+// and are in the same order
+// Example: 
+//    source = sourceGroup000000_source.0/track 1/1 
+//    matches
+//    tokens of sourceGroup000000_source.0/track 1 = [sourceGroup000000_source.0, track 1]
+//    (The source in this example has an extra '1' token which corresponds to the frame number)
+bool sourceHasMatchingTokens(const std::string& source,
+                             const std::vector<string> & tokens)
+{
+    vector<string> stokens;
+    stl_ext::tokenize(stokens, source, "/");
+
+    const auto tokensSize = tokens.size();
+    if ( stokens.size() < tokensSize ) return false;
+
+    for (std::remove_const_t<decltype(tokensSize)> q = 0; q < tokensSize; ++q) { 
+        if( stokens[q] != tokens[q] ) return false;
+    }
+
+    return true;
+}
+
+}
     
 struct CompareRenderedImages
 {
@@ -119,46 +148,15 @@ RenderQuery::imageTransforms(const string& name,
     {
         const RenderedImage& image = images[i];
         
-        if (image.source == name)
+        if ( (image.source == name) ||
+             sourceHasMatchingTokens(image.source, tokens) )
         {
-            M = image.globalMatrix;
-            P = image.projectionMatrix;
-            T = Matrix();
-            O = image.orientationMatrix;
-            Pl = image.placementMatrix;
-            return;
-        }
-    }
-    
-    for (size_t i = 0; i < images.size(); ++i)
-    {
-        const RenderedImage& image = images[i];
-        
-        vector<string> stokens;
-        stl_ext::tokenize(stokens, image.source, "/");
-        
-        if (stokens.size() >= tokens.size())
-        {
-            bool matches = true;
-            
-            for (size_t q = 0; q < tokens.size(); q++)
-            {
-                if (stokens[q] != tokens[q])
-                {
-                    matches = false;
-                    break;
-                }
-            }
-            
-            if (matches)
-            {
                 M = image.globalMatrix;
                 P = image.projectionMatrix;
                 T = Matrix();
                 O = image.orientationMatrix;
                 Pl = image.placementMatrix;
                 return;
-            }
         }
     }
     
@@ -174,11 +172,17 @@ void RenderQuery::imageFrameRatio(const std::string& name,
     
     if ( renderedImages )
     {
+        vector<string> tokens;
+        stl_ext::tokenize(tokens, name, "/");
+
         for (size_t i = 0; i < renderedImages->size(); ++i)
         {
             const RenderedImage& image = (*renderedImages)[i];
             
-            if (image.source == name && image.uncropHeight > 0)
+            if (image.uncropHeight <= 0) continue;
+            
+            if ( (image.source == name) || 
+                 sourceHasMatchingTokens(image.source, tokens) )
             {
                 frameRatio =
                     static_cast<double>(image.uncropWidth) /
@@ -303,30 +307,9 @@ RenderQuery::imageCorners(const string& source, vector<Vec3f>& points, bool sten
     {
         const RenderedImage& image = images[i];
         
-        bool matches = image.source == source ||
-                       (image.node && image.node->name() == source);
-        
-        if (!matches)
-        {
-            vector<string> stokens;
-            stl_ext::tokenize(stokens, image.source, "/");
-            
-            if (stokens.size() >= tokens.size())
-            {
-                matches = true;
-                
-                for (size_t q = 0; q < tokens.size(); q++)
-                {
-                    if (stokens[q] != tokens[q])
-                    {
-                        matches = false;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        if (matches)
+        if ((image.source == source) ||
+            (image.node && image.node->name() == source) ||
+            sourceHasMatchingTokens(image.source, tokens) )
         {
             imageCornersForImage(image, points, stencil);
             return;
