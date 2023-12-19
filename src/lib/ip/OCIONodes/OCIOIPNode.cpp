@@ -6,18 +6,20 @@
 //  
 //
 #include <OCIONodes/OCIOIPNode.h>
+#include <OCIONodes/ConfigIOProxy.h>
 #include <IPCore/SessionIPNode.h>
 #include <IPCore/NodeDefinition.h>
 #include <IPCore/IPGraph.h>
 #include <IPCore/ShaderCommon.h>
+#include <TwkExc/Exception.h>
 #include <TwkUtil/EnvVar.h>
-#include <OpenColorIO/OpenColorIO.h>
+
 #include <boost/functional/hash.hpp>
+
 #include <algorithm>
 #include <cstdlib>
+#include <sstream>
 #include <regex>
-
-namespace OCIO = OCIO_NAMESPACE;
 
 namespace IPCore {
 using namespace std;
@@ -71,7 +73,8 @@ OCIOIPNode::OCIOIPNode(const string& name,
                        IPGraph* graph,
                        GroupIPNode* group)
     : IPNode(name, def, graph, group),
-      m_lutfb(0)
+      m_lutfb(0),
+      m_useRawConfig(false)
 {
     Property::Info* info = new Property::Info();
     info->setPersistent(false);
@@ -93,10 +96,20 @@ OCIOIPNode::OCIOIPNode(const string& name,
 
     declareProperty<StringProperty>("ocio_display.display", "");
     declareProperty<StringProperty>("ocio_display.view", "");
-    //declareProperty<FloatProperty>("ocio_display.exposure");
-    //declareProperty<FloatProperty>("ocio_display.gamma");
-    //declareProperty<IntProperty>("ocio_display.channels");
+
+    if (func == "synlinearize")
+    {
+        m_inTransformURL = declareProperty<StringProperty>("inTransform.url", "", info);
+        m_inTransformData = declareProperty<ByteProperty>("inTransform.data", info);
+        m_useRawConfig = true;
+    }
     
+    if (func == "syndisplay")
+    {
+        m_outTransformURL = declareProperty<StringProperty>("outTransform.url", "", info);
+        m_useRawConfig = true;
+    }
+
     //
     //  Read-only properties to report config info to the user
     //
@@ -145,7 +158,14 @@ OCIOIPNode::updateConfig()
 {
     try 
     {
-        m_state->config = OCIO::GetCurrentConfig();
+        if (useRawConfig())
+        {  
+            m_state->config = OCIO::Config::CreateFromConfigIOProxy(std::make_shared<ConfigIOProxy>(this));
+        }
+        else
+        {
+            m_state->config = OCIO::GetCurrentConfig();
+        }
     }
     catch (std::exception& exc)
     {
@@ -170,17 +190,21 @@ OCIOIPNode::updateConfig()
 
     m_state->display  = m_state->config->getDefaultDisplay();
     m_state->view     = m_state->config->getDefaultView(m_state->display.c_str());
-    
-    if (getenv("OCIO"))
+
+    if (useRawConfig())
     {
-        m_state->linear   = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR)->getName();
+        m_state->linear = "";
+    }
+    else if (getenv("OCIO"))
+    {
+        m_state->linear = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR)->getName();
     }
     else
     {
-        m_state->linear   = "";
+        m_state->linear = "";
         std::cerr << "ERROR: OCIO environment variable not set" << std::endl;
     }
-    
+
     m_state->shaderID = "";
     m_state->lutID    = "";
 
@@ -251,6 +275,47 @@ shaderAdd3DLutAsParameter(std::string& inout_glsl, const std::string& lutSampler
 
 };
 
+OCIO::MatrixTransformRcPtr OCIOIPNode::createMatrixTransformXYZToRec709() const
+{
+    OCIO::MatrixTransformRcPtr matrix_xyz_to_rec709 = OCIO::MatrixTransform::Create();
+    double m44[16] = { 3.240969941905, -1.537383177570, -0.498610760293, 0, 
+                    -0.969243636281, 1.875967501508, 0.041555057407, 0, 
+                    0.055630079697, -0.203976958889, 1.056971514243, 0, 
+                    0, 0, 0, 1 };
+    matrix_xyz_to_rec709->setMatrix(m44);
+
+    return matrix_xyz_to_rec709;
+}
+
+OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformXYZToRec709()
+{
+    if (!m_matrix_xyz_to_rec709)
+    {
+        QMutexLocker(&this->m_lock);
+        if (!m_matrix_xyz_to_rec709)
+        {
+            m_matrix_xyz_to_rec709 = createMatrixTransformXYZToRec709();
+        }
+    }
+
+    return m_matrix_xyz_to_rec709;
+}
+
+OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformRec709ToXYZ()
+{
+    if (!m_matrix_rec709_to_xyz)
+    {
+        QMutexLocker(&this->m_lock);
+        if (!m_matrix_rec709_to_xyz)
+        {
+            m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
+            m_matrix_rec709_to_xyz->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
+        }
+    }
+
+    return m_matrix_rec709_to_xyz;
+}
+
 IPImage*
 OCIOIPNode::evaluate(const Context& context)
 {
@@ -265,7 +330,7 @@ OCIOIPNode::evaluate(const Context& context)
     //  we generate an intermediate buffer in the "display" case.
     //
 
-    if (ociofunction != "display")
+    if (ociofunction != "display" && ociofunction != "syndisplay")
     {
         image = IPNode::evaluate(context);
         if (!image) return IPImage::newNoImage(this, "No Input");
@@ -398,6 +463,86 @@ OCIOIPNode::evaluate(const Context& context)
 
             size_t hashValue = string_hash(inName + display + view);
             shaderName << "OCIO_d_" << shaderLegal(display) << "_" << shaderLegal(view) << "_" << name() << "_" << hex << hashValue;
+        }
+        else if (ociofunction == "synlinearize")
+        {
+            // The input transform can be specified in two ways: via a url or via a data array 
+            string inTransformURL = stringProp("inTransform.url", "");
+            if ( inTransformURL.empty() && (!m_inTransformData || m_inTransformData->size()==0)) 
+            {
+                TWK_THROW_EXC_STREAM("Either inTransform.url or inTransform.data property needs to be set for synlinearize function");
+            }
+
+            if (!m_transform)
+            {
+                QMutexLocker(&this->m_lock);
+                if (!m_transform)
+                {
+                    m_transform = OCIO::GroupTransform::Create();
+
+                    // Is the input transform specified via a data array ?
+                    if (inTransformURL.empty())
+                    {
+                        // We need to provide a unique name to OCIOv2, otherwise it might use a 
+                        // potentially incorrect color transform with the same name already in its cache.
+                        static int uniqueCounter = 0;
+                        inTransformURL = name()+"."+std::to_string(uniqueCounter++)+"."+ConfigIOProxy::USE_IN_TRANSFORM_DATA_PROPERTY;
+                    }
+
+                    // Inverse the ICC transform 
+                    OCIO::FileTransformRcPtr transform = OCIO::FileTransform::Create();
+                    transform->setSrc(inTransformURL.c_str());
+                    transform->setInterpolation(OCIO::INTERP_BEST);
+                    transform->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
+                    m_transform->appendTransform(transform);
+
+                    // Concatenate it with the RV's working space transform which is currently assumed to be 
+                    // 709 linear like the original EXR spec. 
+                    m_transform->appendTransform(getMatrixTransformXYZToRec709());
+                }
+            }
+
+            processor = m_state->config->getProcessor(m_state->context, 
+                                                      m_transform,
+                                                      OCIO::TRANSFORM_DIR_FORWARD);
+
+            size_t hashValue = string_hash(name());
+            shaderName << "OCIO_sl_" << name() << "_" << hex << hashValue;
+        }
+        else if (ociofunction == "syndisplay")
+        {
+            // The outTransform.url property typically refers to an ICC monitor profile
+            const string outTransformURL = stringProp("outTransform.url", "");
+            if (outTransformURL.empty())
+            {
+                TWK_THROW_EXC_STREAM("outTransform.url property needs to be set for syndisplay function");
+            }
+
+            if (!m_transform)
+            {
+                QMutexLocker(&this->m_lock);
+                if (!m_transform)
+                {
+                    m_transform = OCIO::GroupTransform::Create();
+
+                    // RV's working space is currently assumed to be 709 linear like the original
+                    // EXR spec. In the display case this transform is inverted.
+                    m_transform->appendTransform(getMatrixTransformRec709ToXYZ());
+
+                    // Concatenate the inverse workingSpaceTransform with the ICC monitor profile transforma
+                    OCIO::FileTransformRcPtr transform = OCIO::FileTransform::Create();
+                    transform->setSrc(outTransformURL.c_str());
+                    transform->setInterpolation(OCIO::INTERP_BEST);
+                    m_transform->appendTransform(transform);
+                }
+            }
+
+            processor = m_state->config->getProcessor(m_state->context, 
+                                                      m_transform,
+                                                      OCIO::TRANSFORM_DIR_FORWARD);
+
+            size_t hashValue = string_hash(outTransformURL);
+            shaderName << "OCIO_sd_" << name() << "_" << hex << hashValue;
         }
 
         QMutexLocker(&this->m_lock);
@@ -549,6 +694,13 @@ OCIOIPNode::propertyChanged(const Property* p)
         if (context->hasProperty(p)) updateContext();
     }
 
+    // synlinearize/syndisplay functions:
+    // Reset transforms and associated color transform files if a linked property changed
+    if (p == m_inTransformURL || p == m_inTransformData || p == m_outTransformURL)
+    {
+        m_transform.reset();
+    }
+
     IPNode::propertyChanged(p);
 }
 
@@ -560,4 +712,4 @@ OCIOIPNode::readCompleted(const string& t, unsigned int v)
     IPNode::readCompleted(t,v);
 }
 
-} // Rv
+} // IPCore
