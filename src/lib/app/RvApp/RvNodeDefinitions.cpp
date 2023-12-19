@@ -493,6 +493,28 @@ void addRvNodeDefinitions(NodeManager* m)
         m->addDefinition(def);
     }
 
+    {
+        NodeDefinition* def = new NodeDefinition("SYNLinearize", 1, false,
+                                                 "sclin",
+                                                 newIPNode<OCIOIPNode>,
+                                                 "", "", emptyIcon,
+                                                 true);
+
+        def->declareProperty<StringProperty>("defaults.function", "synlinearize");
+        m->addDefinition(def);
+    }
+
+    {
+        NodeDefinition* def = new NodeDefinition("SYNDisplay", 1, false,
+                                                 "scdsp",
+                                                 newIPNode<OCIOIPNode>,
+                                                 "", "", emptyIcon,
+                                                 true);
+
+        def->declareProperty<StringProperty>("defaults.function", "syndisplay");
+        m->addDefinition(def);
+    }
+
     m->addDefinition(new NodeDefinition("RVOverlay", 1, false,
                                         "overlay",
                                         newIPNode<OverlayIPNode>,
