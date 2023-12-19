@@ -1454,7 +1454,7 @@ IOtiff::readImage(FrameBuffer& fb,
                                     m_iomaxAsync);
 
             tif = TIFFClientOpen(filename.c_str(), "r",
-                                 stream,
+                                 (thandle_t)stream,
                                  readproc, writeproc,
                                  seekproc, closeproc, sizeproc,
                                  NULL, NULL);
