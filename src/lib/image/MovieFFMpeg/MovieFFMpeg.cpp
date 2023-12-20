@@ -688,6 +688,15 @@ codecHasSlowAccess(string name)
     return false;
 };
 
+bool
+isMP4format(AVFormatContext* avFormatContext)
+{
+    return avFormatContext!=nullptr 
+            && avFormatContext->iformat!=nullptr 
+            && avFormatContext->iformat->name!=nullptr  
+            && strstr(avFormatContext->iformat->name, "mp4") != nullptr;
+}
+
 int64_t
 findBestTS(int64_t goalTS, double frameDur, VideoTrack* track, bool finalPacket)
 {
@@ -1395,7 +1404,7 @@ MovieFFMpegReader::snagColr(AVCodecContext* videoCodecContext,
     //
 
     void* fileHandle;
-    if (mp4v2Utils::readFile(m_filename,fileHandle))
+    if (isMP4format(m_avFormatContext) && mp4v2Utils::readFile(m_filename,fileHandle))
     {
         int streamIndex = track->number;
         mp4v2Utils::getColrType(fileHandle, streamIndex, track->colrType);
