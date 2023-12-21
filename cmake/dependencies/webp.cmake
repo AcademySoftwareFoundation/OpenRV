@@ -37,15 +37,19 @@ ELSE()
 ENDIF()
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_zlib_library}")
-LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}")
+IF(RV_TARGET_WINDOWS)
+  GET_TARGET_PROPERTY(zlib_library ZLIB::ZLIB IMPORTED_IMPLIB)
+ELSE()
+  GET_TARGET_PROPERTY(zlib_library ZLIB::ZLIB IMPORTED_LOCATION)
+ENDIF()
+GET_TARGET_PROPERTY(zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
+LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${zlib_include_dir}")
+LIST(APPEND _configure_options "-DZLIB_LIBRARY=${zlib_library}")
 
 GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-LIST(APPEND _configure_options "-DPNG_INCLUDE_DIR=${_png_include_dir}")
+LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
@@ -66,8 +70,17 @@ GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
 LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
 
-LIST(APPEND _configure_options "-DWEBP_BUILD_GIF2WEBP=OFF")
 LIST(APPEND _configure_options "-DWEBP_BUILD_ANIM_UTILS=OFF")
+
+# Do no build Webp tools.
+LIST(APPEND _configure_options "-DWEBP_BUILD_GIF2WEBP=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_CWEBP=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_DWEBP=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_IMG2WEBP=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_VWEBP=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_WEBPINFO=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_WEBPMUX=OFF")
+LIST(APPEND _configure_options "-DWEBP_BUILD_EXTRAS=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -89,8 +102,17 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-RV_COPY_LIB_BIN_FOLDERS()
+# No bin folder because webp is built as static and we don't build webp tools (executable).
+ADD_CUSTOM_COMMAND(
+  TARGET ${_target}
+  POST_BUILD
+  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+)
+ADD_CUSTOM_TARGET(
+  ${_target}-stage-target ALL
+  DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
+)
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 

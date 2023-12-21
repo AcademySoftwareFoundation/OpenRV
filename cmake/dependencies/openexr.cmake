@@ -165,6 +165,9 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _cmake_configure_command "-DZLIB_LIBRARY=${_zlib_implibpath}")
 ENDIF()
 
+# OpenEXR tools are not needed.
+LIST(APPEND _cmake_configure_command "-DOPENEXR_BUILD_TOOLS=OFF")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}

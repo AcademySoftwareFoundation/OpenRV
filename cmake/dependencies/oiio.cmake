@@ -146,10 +146,8 @@ IF(NOT RV_TARGET_LINUX)
 ENDIF()
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
-IF(RV_TARGET_LINUX)
-  # OIIO's libUtils Tools & Tests USES a different Link Flags which is 'hidden' and isn't set by us.
-  LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
-ENDIF()
+# OIIO tools are not needed.
+LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 
 IF(RV_TARGET_WINDOWS)
   LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")
