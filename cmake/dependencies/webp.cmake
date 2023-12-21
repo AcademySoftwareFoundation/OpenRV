@@ -104,11 +104,12 @@ EXTERNALPROJECT_ADD(
 
 # No bin folder because webp is built as static and we don't build webp tools (executable).
 ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
+  OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  DEPENDS ${_target}
 )
+
 ADD_CUSTOM_TARGET(
   ${_target}-stage-target ALL
   DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}

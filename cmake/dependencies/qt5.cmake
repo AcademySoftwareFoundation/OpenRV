@@ -179,6 +179,13 @@ IF(RV_TARGET_WINDOWS)
       LIST(REMOVE_ITEM _qt_debug_libs ${_d_lib})
     ENDFOREACH()
 
+    # Qt executable are not needed to build nor to deploy the solution.
+    FILE(
+      GLOB _qt_executables
+      RELATIVE ${SRC_DIR}
+      ${SRC_DIR}/*.exe
+    )
+
     IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
       SET(_qt_libs_to_copy
           ${_qt_debug_libs}
@@ -190,6 +197,7 @@ IF(RV_TARGET_WINDOWS)
         ${SRC_DIR}/*
       )
       LIST(REMOVE_ITEM _qt_libs_to_copy ${_qt_debug_libs})
+      LIST(REMOVE_ITEM _qt_libs_to_copy ${_qt_executables})
     ENDIF()
 
     FOREACH(
