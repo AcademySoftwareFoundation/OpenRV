@@ -691,14 +691,6 @@ RvPreferences::update()
 
     m_ui.displayOutputCombo->setCurrentIndex(dindex);
 
-#ifdef PLATFORM_DARWIN
-    //
-    //  Remove the 10 bit option on os x
-    //  can't figure out how to disable it
-    //
-    if (m_ui.displayOutputCombo->count() > 2) m_ui.displayOutputCombo->removeItem(2);
-#endif
-
     settings.endGroup();
 
     //----------------------------------------------------------------------
