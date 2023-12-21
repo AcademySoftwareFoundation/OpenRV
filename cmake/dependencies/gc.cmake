@@ -137,8 +137,8 @@ IF(RV_TARGET_WINDOWS)
     URL_MD5 ${_download_hash}
     CONFIGURE_COMMAND ${_cmake_configure_command}
     BUILD_COMMAND ${_make_command} -j${_cpu_count} 
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_BASE_DIR}/${_target}/src/include ${_include_dir}/gc
-    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/src/${_gc_lib_name} ${_gc_lib}
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${RV_DEPS_BASE_DIR}/${_target}/src/include/" "${_include_dir}/gc"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${RV_DEPS_BASE_DIR}/${_target}/src/${_gc_lib_name}" "${_gc_lib}"
     BUILD_IN_SOURCE TRUE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_gc_byproducts}
@@ -163,8 +163,8 @@ ELSE()
     CONFIGURE_COMMAND ${_autogen_command} && ${_configure_command} ${_configure_args}
     BUILD_COMMAND ${_make_command} -j${_cpu_count} 
     INSTALL_COMMAND ${_make_command} install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir} ${CMAKE_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/" "${CMAKE_BINARY_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/lib/" "${RV_STAGE_LIB_DIR}"
     BUILD_IN_SOURCE TRUE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_gc_byproducts}
@@ -209,7 +209,7 @@ ENDIF()
 ADD_CUSTOM_COMMAND(
   COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
   OUTPUT ${_gc_stage_outputs}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_lib_dir}/" "${RV_STAGE_LIB_DIR}"
   DEPENDS ${_target}
 )
 ADD_CUSTOM_TARGET(

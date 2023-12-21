@@ -102,7 +102,8 @@ FUNCTION(yacc_it)
   # Copy the generated .hpp to a .h file
   EXECUTE_PROCESS(
     WORKING_DIRECTORY ${arg_OUTPUT_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${arg_OUTPUT_DIR}/${_yacc_generated_include_filename} ${arg_OUTPUT_DIR}/${_renamed_include_filename} COMMAND_ECHO STDOUT
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${arg_OUTPUT_DIR}/${_yacc_generated_include_filename}" "${arg_OUTPUT_DIR}/${_renamed_include_filename}"
+    COMMAND_ECHO STDOUT
     OUTPUT_STRIP_TRAILING_WHITESPACE
     RESULT_VARIABLE _result_code
   )

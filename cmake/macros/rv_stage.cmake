@@ -71,7 +71,7 @@ FUNCTION(rv_stage)
         POST_BUILD
         COMMENT "Building ${RV_STAGE_BIN_DIR}/${arg_TARGET}.wrapper"
         COMMAND ${CMAKE_COMMAND} -E rename "$<TARGET_FILE:${arg_TARGET}>" "$<TARGET_FILE:${arg_TARGET}>.bin"
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${arg_TARGET}.wrapper "$<TARGET_FILE:${arg_TARGET}>"
+        COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${CMAKE_CURRENT_SOURCE_DIR}/${arg_TARGET}.wrapper" "$<TARGET_FILE:${arg_TARGET}>"
         COMMAND chmod +x "$<TARGET_FILE:${arg_TARGET}>"
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
@@ -85,7 +85,6 @@ FUNCTION(rv_stage)
         ADD_CUSTOM_COMMAND(
           COMMENT "Fixing ${arg_TARGET}'s RPATHs" TARGET ${arg_TARGET} POST_BUILD
           COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks" "$<TARGET_FILE:${arg_TARGET}>"
-          COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../lib" "$<TARGET_FILE:${arg_TARGET}>"
         )
       ENDIF()
 
@@ -222,7 +221,7 @@ FUNCTION(rv_stage)
         COMMENT "Copying ${arg_TARGET} Python Source Module Directory '${directory_name}'"
         OUTPUT ${${directory}_output}
         DEPENDS ${${directory}_depends}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${directory} ${RV_STAGE_PLUGINS_MU_DIR}/${directory_name}
+        COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${directory}/" "${RV_STAGE_PLUGINS_MU_DIR}/${directory_name}"
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
     ENDFOREACH()
@@ -232,7 +231,7 @@ FUNCTION(rv_stage)
         COMMENT "Copying ${arg_TARGET} Python Source Module Files"
         OUTPUT ${${arg_TARGET}_mu_source_module_file_output}
         DEPENDS ${${arg_TARGET}_mu_source_module_file_input}
-        COMMAND ${CMAKE_COMMAND} -E copy ${${arg_TARGET}_mu_source_module_file_input} ${RV_STAGE_PLUGINS_MU_DIR}
+        COMMAND ${CMAKE_COMMAND} -E env -- cp -fv ${${arg_TARGET}_mu_source_module_file_input} ${RV_STAGE_PLUGINS_MU_DIR}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
     ENDIF()
@@ -299,7 +298,7 @@ FUNCTION(rv_stage)
         COMMENT "Copying ${arg_TARGET} Python Source Module Directory '${directory_name}'"
         OUTPUT ${${directory}_output}
         DEPENDS ${${directory}_depends}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${directory} ${RV_STAGE_PLUGINS_PYTHON_DIR}/${directory_name}
+        COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv ${directory}/ ${RV_STAGE_PLUGINS_PYTHON_DIR}/${directory_name}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
     ENDFOREACH()
@@ -309,7 +308,7 @@ FUNCTION(rv_stage)
         COMMENT "Copying ${arg_TARGET} Python Source Module Files"
         OUTPUT ${${arg_TARGET}_python_source_module_file_output}
         DEPENDS ${${arg_TARGET}_python_source_module_file_input}
-        COMMAND ${CMAKE_COMMAND} -E copy ${${arg_TARGET}_python_source_module_file_input} ${RV_STAGE_PLUGINS_PYTHON_DIR}
+        COMMAND ${CMAKE_COMMAND} -E env -- cp -fv ${${arg_TARGET}_python_source_module_file_input} ${RV_STAGE_PLUGINS_PYTHON_DIR}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
     ENDIF()

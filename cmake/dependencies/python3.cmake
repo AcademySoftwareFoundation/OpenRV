@@ -251,7 +251,7 @@ ADD_CUSTOM_COMMAND(
   COMMENT "Installing requirements from ${_requirements_file}"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
-  COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
+  COMMAND ${CMAKE_COMMAND} -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${_requirements_file}
 )
 
@@ -263,8 +263,9 @@ IF(RV_TARGET_WINDOWS
     TARGET ${_python3_target}
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv  "${_python3_implib}" "${_python_release_libpath}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv  "${_python3_implib}" "${_python_release_in_bin_libpath}"
+    DEPENDS ${_python3_target} ${_requirements_file}
   )
 ENDIF()
 
@@ -276,8 +277,7 @@ ADD_CUSTOM_COMMAND(
   COMMENT "Building PySide2 using ${_pyside2_make_command_script}"
   OUTPUT ${${_pyside2_target}-build-flag}
   # First PySide build script on Windows which doesn't respect '--debug' option
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
-          ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
+  COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py" "${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py"
   COMMAND ${_pyside2_make_command} --prepare --build
   COMMAND cmake -E touch ${${_pyside2_target}-build-flag}
   DEPENDS ${_python3_target} ${_pyside2_make_command_script} ${${_python3_target}-requirements-flag}
@@ -288,9 +288,9 @@ IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/lib/" "${RV_STAGE_LIB_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/include/" "${RV_STAGE_INCLUDE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/bin/" "${RV_STAGE_BIN_DIR}"
     DEPENDS ${_python3_target} ${${_pyside2_target}-build-flag} ${${_python3_target}-requirements-flag}
   )
   ADD_CUSTOM_TARGET(
@@ -301,9 +301,9 @@ ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_LIB_DIR}/${_python3_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/lib/" "${RV_STAGE_LIB_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/include/" "${RV_STAGE_INCLUDE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/bin/" "${RV_STAGE_BIN_DIR}"
     DEPENDS ${_python3_target} ${${_pyside2_target}-build-flag} ${${_python3_target}-requirements-flag}
   )
   ADD_CUSTOM_TARGET(

@@ -343,16 +343,16 @@ IF(RV_TARGET_WINDOWS)
     POST_BUILD
     COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
     # Note: The FFmpeg build stores both the import lib and the dll in the install bin directory
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-    COMMAND cmake -E touch ${${_target}-stage-flag}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/bin/" "${RV_STAGE_LIB_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/bin/" "${RV_STAGE_BIN_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E touch ${${_target}-stage-flag}
   )
 ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${${_target}-stage-flag}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    COMMAND cmake -E touch ${${_target}-stage-flag}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_lib_dir}/" "${RV_STAGE_LIB_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E touch ${${_target}-stage-flag}
     DEPENDS ${_target}
   )
 ENDIF()

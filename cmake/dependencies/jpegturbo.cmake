@@ -113,7 +113,7 @@ IF(NOT RV_TARGET_WINDOWS)
     TARGET ${_target}
     POST_BUILD
     COMMENT "Copying jpegturbo's libjpeg ('${_libjpeg62path}') to '${RV_STAGE_LIB_DIR}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_libjpeg62path} ${RV_STAGE_LIB_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${_libjpeg62path}" "${RV_STAGE_LIB_DIR}"
   )
 ENDIF()
 

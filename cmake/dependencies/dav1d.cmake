@@ -84,7 +84,7 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND ${_configure_command} ./_build --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false -Denable_tools=false
   BUILD_COMMAND ${_make_command} -C _build
   INSTALL_COMMAND ${_make_command} -C _build install
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_lib_dir}/" "${RV_STAGE_LIB_DIR}"
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_dav1d_lib}
@@ -114,8 +114,8 @@ IF(RV_TARGET_WINDOWS)
     TARGET ${_target}
     POST_BUILD
     COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/lib/" "${RV_STAGE_LIB_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_install_dir}/bin/" "${RV_STAGE_BIN_DIR}"
   )
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
@@ -125,7 +125,7 @@ ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_LIB_DIR}/${_david_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_lib_dir}/" "${RV_STAGE_LIB_DIR}"
     DEPENDS ${_target}
   )
   ADD_CUSTOM_TARGET(

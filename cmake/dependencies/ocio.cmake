@@ -298,7 +298,7 @@ ELSE()
   EXTERNALPROJECT_ADD_STEP(
     ${_target} add_vcpkg_manifest
     COMMENT "Copying the VCPKG manifest"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_vcpkg_manifest} "${_source_dir}/vcpkg.json"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${_vcpkg_manifest}" "${_source_dir}/vcpkg.json"
     DEPENDERS configure
   )
 
@@ -319,8 +319,8 @@ IF(RV_TARGET_DARWIN
     TARGET ${_target}
     POST_BUILD
     COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${RV_STAGE_PLUGINS_PYTHON_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${_pyocio_lib}" "${RV_STAGE_PLUGINS_PYTHON_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_lib_dir}/" "${RV_STAGE_LIB_DIR}"
   )
 ELSE()
   SET(_rv_stage_lib_site_package_dir
@@ -332,9 +332,9 @@ ELSE()
     POST_BUILD
     COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
     # Copy PyOpenColorIO.pyd into RV_STAGE_PLUGINS_PYTHON_DIR as PyOpenColorIO_d.pyd in debug.
-    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} "$<$<CONFIG:Debug>:${RV_STAGE_PLUGINS_PYTHON_DIR}/PyOpenColorIO_d.pyd>$<$<CONFIG:Release>:${RV_STAGE_PLUGINS_PYTHON_DIR}>"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_ocio_win_sharedlib_path} ${RV_STAGE_PLUGINS_PYTHON_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${_pyocio_lib}" "$<$<CONFIG:Debug>:${RV_STAGE_PLUGINS_PYTHON_DIR}/PyOpenColorIO_d.pyd>$<$<CONFIG:Release>:${RV_STAGE_PLUGINS_PYTHON_DIR}>"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -Rfv "${_lib_dir}/" "${RV_STAGE_LIB_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E env -- cp -fv "${_ocio_win_sharedlib_path}" "${RV_STAGE_PLUGINS_PYTHON_DIR}"
   )
 
   # Debug Python on Windows search for modules with *_d suffix, but OCIO does not create a PyOpenColor_d.pyd.

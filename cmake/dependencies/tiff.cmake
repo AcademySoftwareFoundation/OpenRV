@@ -90,8 +90,8 @@ ADD_CUSTOM_COMMAND(
   TARGET ${_target}
   POST_BUILD
   COMMENT "Installing ${_target}'s missing headers"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_base_dir}/build/libtiff/tif_config.h ${_base_dir}/src/libtiff/tiffiop.h ${_base_dir}/src/libtiff/tif_dir.h
-          ${_base_dir}/src/libtiff/tif_hash_set.h ${_include_dir}
+  COMMAND ${CMAKE_COMMAND} -E env -- cp -fv  "${_base_dir}/build/libtiff/tif_config.h" "${_base_dir}/src/libtiff/tiffiop.h" "${_base_dir}/src/libtiff/tif_dir.h"
+        "${_base_dir}/src/libtiff/tif_hash_set.h" "${_include_dir}"
 )
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
