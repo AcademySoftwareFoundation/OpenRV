@@ -179,7 +179,7 @@ IF(RV_TARGET_WINDOWS)
       LIST(REMOVE_ITEM _qt_debug_libs ${_d_lib})
     ENDFOREACH()
 
-    # Qt executable are not needed to build nor to deploy the solution.
+    # Remove Qt5 executables that are not needed.
     FILE(
       GLOB _qt_executables
       RELATIVE ${SRC_DIR}
