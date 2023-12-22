@@ -42,7 +42,6 @@ RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-LIST(APPEND _configure_options "-DBUILD_THIRDPARTY=1")
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
 LIST(APPEND _configure_options "-DUSE_OCIO=0")
@@ -67,7 +66,7 @@ ENDIF()
 GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-LIST(APPEND _configure_options "-DPNG_INCLUDE_DIR=${_png_include_dir}")
+LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
@@ -89,14 +88,7 @@ GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_D
 LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
 LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
 
-GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
-IF(NOT RV_TARGET_WINDOWS)
-  LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
-ELSE()
-  LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
-ENDIF()
-LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
+LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
 GET_TARGET_PROPERTY(_ffmpeg_include_dir ffmpeg::avcodec INTERFACE_INCLUDE_DIRECTORIES)
 IF(RV_TARGET_WINDOWS)
@@ -119,6 +111,7 @@ LIST(APPEND _configure_options "-DFFMPEG_LIBAVFORMAT=${_ffmpeg_libavformat}")
 LIST(APPEND _configure_options "-DFFMPEG_LIBAVUTIL=${_ffmpeg_libavutil}")
 LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
 
+# Question: Do we need freetype at all? It is disabled above with USE_FREETYPE=0.
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
   SET(_depends_freetype

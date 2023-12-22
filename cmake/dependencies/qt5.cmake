@@ -186,6 +186,17 @@ IF(RV_TARGET_WINDOWS)
       ${SRC_DIR}/*.exe
     )
 
+    # Filtering. Some executables are needed for RV to work:
+    # QtWebEngineProcess.exe
+    FOREACH(
+      _qt_executable 
+      ${_qt_executables}
+    )
+      IF("${_qt_executable}" STREQUAL "QtWebEngineProcess.exe")
+          LIST(REMOVE_ITEM _qt_executables "${_qt_executable}")
+      ENDIF()
+    ENDFOREACH()
+
     IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
       SET(_qt_libs_to_copy
           ${_qt_debug_libs}
