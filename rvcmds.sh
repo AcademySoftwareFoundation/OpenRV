@@ -55,7 +55,8 @@ alias rvbuildtd="cmake --build ${RV_BUILD} --config Debug -v --parallel=${RV_BUI
 alias rvbuild="rvbuildt main_executable"
 alias rvbuildd="rvbuildtd main_executable"
 alias rvtest="ctest --test-dir ${RV_BUILD} --extra=verbose"
-alias rvinst="cmake --install ${RV_BUILD} --prefix ${RV_INST}"
+alias rvinst="cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Release"
+alias rvinstd="cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Debug"
 alias rvclean="rm -rf ${RV_BUILD}"
 
 # ALIASES: Config and Build
