@@ -686,6 +686,7 @@ FUNCTION(rv_stage)
                    MACOSX_BUNDLE_BUNDLE_VERSION "${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}"
                    MACOSX_BUNDLE_ICON_FILE "${_target}.icns"
                    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist"
+                   XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
       )
     ELSEIF(RV_TARGET_LINUX)
       # Allow plugins that call dlopen to read app symbols
