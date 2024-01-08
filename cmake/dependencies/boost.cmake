@@ -23,7 +23,7 @@ SET(_major_minor_version
 
 STRING(REPLACE "." "_" _version_with_underscore ${_version})
 SET(_download_url
-    "https://boostorg.jfrog.io/artifactory/main/release/${_version}/source/boost_${_version_with_underscore}.tar.gz"
+    "https://archives.boost.io/release/${_version}/source/boost_${_version_with_underscore}.tar.gz"
 )
 
 SET(_download_hash
@@ -32,7 +32,7 @@ SET(_download_hash
 
 # Set _base_dir for Clean-<target>
 SET(_base_dir
-  ${RV_DEPS_BASE_DIR}/${_target}
+    ${RV_DEPS_BASE_DIR}/${_target}
 )
 
 SET(_install_dir
@@ -40,7 +40,7 @@ SET(_install_dir
 )
 
 SET(${_target}_ROOT_DIR
-  ${_install_dir}
+    ${_install_dir}
 )
 
 SET(_boost_libs
@@ -283,10 +283,11 @@ ADD_CUSTOM_TARGET(
   DEPENDS ${_boost_stage_output}
 )
 
-ADD_CUSTOM_TARGET(clean-${_target}
-    COMMENT "Cleaning '${_target}' ..."
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
+ADD_CUSTOM_TARGET(
+  clean-${_target}
+  COMMENT "Cleaning '${_target}' ..."
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
 )
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
