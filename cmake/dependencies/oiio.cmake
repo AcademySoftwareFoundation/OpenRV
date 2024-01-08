@@ -111,7 +111,7 @@ LIST(APPEND _configure_options "-DFFMPEG_LIBAVFORMAT=${_ffmpeg_libavformat}")
 LIST(APPEND _configure_options "-DFFMPEG_LIBAVUTIL=${_ffmpeg_libavutil}")
 LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
 
-# Question: Do we need freetype at all? It is disabled above with USE_FREETYPE=0.
+# TODO: Check if RV really need freetype because it is disabled above (USE_FREETYPE=0).
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
   SET(_depends_freetype

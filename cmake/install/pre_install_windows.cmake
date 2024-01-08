@@ -15,26 +15,22 @@ FUNCTION(before_copy_platform FILE_PATH RET_VAL)
     ENDIF()
   ENDIF()
 
-  # Export file contains information about symbols. Not needed for runtime.
+  # Exp files contains information about symbols. Not needed for runtime.
   IF(FILE_PATH MATCHES "\\.exp$")
-    IF(CMAKE_INSTALL_CONFIG_NAME MATCHES "^Release$")
-      SET(${RET_VAL}
-          "NO"
-          PARENT_SCOPE
-      )
-      RETURN()
-    ENDIF()
+    SET(${RET_VAL}
+      "NO"
+      PARENT_SCOPE
+    )
+    RETURN()
   ENDIF()
 
   # Only used by the compiler/linker. Not needed for runtime.
   IF(FILE_PATH MATCHES "\\.lib$")
-    IF(CMAKE_INSTALL_CONFIG_NAME MATCHES "^Release$")
-      SET(${RET_VAL}
-          "NO"
-          PARENT_SCOPE
-      )
-      RETURN()
-    ENDIF()
+    SET(${RET_VAL}
+      "NO"
+      PARENT_SCOPE
+    )
+    RETURN()
   ENDIF()
 
   SET(${RET_VAL}
