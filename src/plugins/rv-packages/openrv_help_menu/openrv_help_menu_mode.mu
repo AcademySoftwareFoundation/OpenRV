@@ -3,7 +3,7 @@
 // 
 // SPDX-License-Identifier: Apache-2.0 
 //
-module: help_mode {
+module: openrv_help_menu_mode {
 use rvtypes;
 use runtime;
 use commands;
@@ -14,11 +14,11 @@ require io;
 require qt;
 
 documentation: """
-HelpMinorMode adds a Help menu and some modal event tables that
+OpenRVHelpMenuMinorMode adds a Help menu and some modal event tables that
 implement things like describe key, etc. Help minor mode should always
 appear list in the menu bar.
 """
-class: HelpMinorMode : MinorMode
+class: OpenRVHelpMenuMinorMode : MinorMode
 {
     \: showManual (void; Event ev, string env)
     {
@@ -35,29 +35,6 @@ class: HelpMinorMode : MinorMode
                 system.defaultWindowsOpen(wpath);
             }
             else openUrl("file://" + m);
-
-            /*
-            if (globalConfig.os == "DARWIN")
-            {
-                system.system("open " + m);
-            }
-            else if (globalConfig.os == "LINUX")
-            {
-                if (io.path.extension(m) == "pdf")
-                {
-                    system.system("%s %s&" % (state.config.pdfReader, m));
-                }
-                else
-                {
-                    system.system("%s %s&" % (state.config.htmlReader, m));
-                }
-            }
-            else if (globalConfig.os == "WINDOWS")
-            {
-                let wpath = regex.replace("/", m, "\\\\");
-                system.defaultWindowsOpen(wpath);
-            }
-            */
         }
         catch (...)
         {
@@ -154,18 +131,8 @@ class: HelpMinorMode : MinorMode
 
     \: inactiveState (int;) { DisabledMenuState; }
 
-    method: HelpMinorMode (HelpMinorMode;)
+    method: OpenRVHelpMenuMinorMode (OpenRVHelpMenuMinorMode;)
     {
-        string menuName = "Help";
-        if (runtime.build_os() == "DARWIN")
-        {
-            require system;
-            let major = system.getenv("RV_OS_VERSION_MAJOR"),
-                minor = system.getenv("RV_OS_VERSION_MINOR");
-
-            if (major == "10" && int(minor) < 6) menuName = "RV Help";
-        }
-
         Menu menuList = Menu {
                 {"Online Resources",    nil, nil, inactiveState},
                 {"   RV User's Manual",   opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), nil},
@@ -186,26 +153,7 @@ class: HelpMinorMode : MinorMode
                 {"   Show Environment",    ~showEnv}
         };
 
-        let exec = system.getenv ("RV_APP_RV_SHORT_NAME", nil);
-        if (exec neq nil && regex.match("rvsdi", exec))
-        //
-        //  Add RV-SDI manual references to head of menu.
-        //
-        {
-            Menu newMenu;
-            for_each (item; menuList)
-            {
-                newMenu.push_back(item);
-                if (item.label == "Documentation")
-                {
-                    //newMenu.push_back (MenuItem {"   RV-SDI Manual (PDF)",  showManual(,"RV_APP_SDI_MANUAL"),      nil});
-                    newMenu.push_back (MenuItem {"   RV-SDI Manual (HTML)", showManual(,"RV_APP_SDI_MANUAL_HTML"), nil});
-                }
-            }
-            menuList = newMenu;
-        }
-
-        Menu menu = Menu {{menuName, menuList}};
+        Menu menu = Menu {{"Help", menuList}};
 
         \: bindDescribe (void; string name, EventFunc F)
         {
@@ -303,6 +251,11 @@ class: HelpMinorMode : MinorMode
                   "z",
                   9999);  // always last
     } 
+}
+
+\: createMode (Mode;)
+{
+    return OpenRVHelpMenuMinorMode();
 }
 
 }
