@@ -30,7 +30,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/clang_64}"
 elif [[ "$OSTYPE" == "msys"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Visual Studio 17 2022}"
-  QT_HOME="${QT_HOME:-c:/Qt/Qt/${QT_VERSION}/msvc2019_64}"
+  QT_HOME="${QT_HOME:-c:/Qt/${QT_VERSION}/msvc2019_64}"
   WIN_PERL="${WIN_PERL:-c:/Strawberry/perl/bin}"
   CMAKE_WIN_ARCH="${CMAKE_WIN_ARCH:--A x64}"
   SETUPTOOLS_USE_DISTUTILS=stdlib
