@@ -7024,9 +7024,6 @@ global bool debugGC = false;
     use window_mode;
     s.minorModes.push_back(WindowMinorMode());
 
-    use help_mode;
-    s.minorModes.push_back(HelpMinorMode());
-
     use presentation_mode;
     s.minorModes.push_back(PresentationControlMinorMode());
 

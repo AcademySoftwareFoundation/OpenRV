@@ -1,0 +1,21 @@
+package: Open RV Help menu
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.0
+requires: 
+rv: 2024.0.0
+openrv: 1.0.0
+optional: false
+system: true
+hidden: true
+
+modes: 
+  - file: openrv_help_menu_mode.mu
+    load: immediate
+
+description: |
+
+    <p>
+    Open RV Help menu
+    </p>
+
