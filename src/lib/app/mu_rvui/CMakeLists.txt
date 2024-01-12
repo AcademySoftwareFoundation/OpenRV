@@ -19,7 +19,6 @@ SET(_mumodules
     gltexture.mu
     wipes.mu
     inspector.mu
-    help_mode.mu
     window_mode.mu
     mode_manager.mu
     xmlrpc.mu

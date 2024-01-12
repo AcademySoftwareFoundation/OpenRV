@@ -389,91 +389,95 @@ FUNCTION(rv_stage)
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
   ELSEIF(${arg_TYPE} STREQUAL "RVPKG")
-    SET(_package_file
-        PACKAGE
-    )
-
-    IF(NOT arg_FILES)
-      FILE(
-        GLOB_RECURSE _files
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        CONFIGURE_DEPENDS *
-      )
+    IF(${arg_TARGET} IN_LIST RVPKG_DO_NOT_INSTALL_LIST)
+      MESSAGE(STATUS "Skipping RV package '${arg_TARGET}' as requested")
     ELSE()
-      SET(_files
-          ${arg_FILES}
+      SET(_package_file
+          PACKAGE
       )
-    ENDIF()
 
-    LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
+      IF(NOT arg_FILES)
+        FILE(
+          GLOB_RECURSE _files
+          RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+          CONFIGURE_DEPENDS *
+        )
+      ELSE()
+        SET(_files
+            ${arg_FILES}
+        )
+      ENDIF()
 
-    IF(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
-      MESSAGE(FATAL_ERROR "Couldn't find expected package descriptor file: '${_package_file}'")
-    ENDIF()
+      LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
 
-    SET_DIRECTORY_PROPERTIES(PROPERTIES CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
+      IF(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
+        MESSAGE(FATAL_ERROR "Couldn't find expected package descriptor file: '${_package_file}'")
+      ENDIF()
 
-    EXECUTE_PROCESS(
-      COMMAND bash -c "cat ${_package_file} | grep version: | grep --only-matching -e '[0-9.]*'"
-      RESULT_VARIABLE _result
-      OUTPUT_VARIABLE _pkg_version
-      OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-    IF(_result
-       AND NOT _result EQUAL 0
-    )
-      MESSAGE(FATAL_ERROR "Error retrieving version field from '${_package_file}'")
-    ELSE()
-      MESSAGE(DEBUG "Found version for '${arg_TARGET}.rvpkg' package version ${_pkg_version} ...")
-    ENDIF()
+      SET_DIRECTORY_PROPERTIES(PROPERTIES CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
 
-    SET(_package_filename
-        "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg"
-    )
-
-    LIST(APPEND RV_PACKAGE_LIST "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg")
-    LIST(REMOVE_DUPLICATES RV_PACKAGE_LIST)
-    SET(RV_PACKAGE_LIST
-        ${RV_PACKAGE_LIST}
-        CACHE INTERNAL ""
-    )
-
-    # Generate a file to store the list of package files
-    SET(_temp_file
-        "${CMAKE_CURRENT_BINARY_DIR}/pkgfilelist.txt"
-    )
-
-    # Remove the file if it exists
-    FILE(REMOVE ${_temp_file})
-
-    # For each package file in the list, append it to the file
-    FOREACH(
-      file IN
-      LISTS _files _package_file
-    )
-      FILE(
-        APPEND ${_temp_file}
-        "${file}\n"
+      EXECUTE_PROCESS(
+        COMMAND bash -c "cat ${_package_file} | grep version: | grep --only-matching -e '[0-9.]*'"
+        RESULT_VARIABLE _result
+        OUTPUT_VARIABLE _pkg_version
+        OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       )
-    ENDFOREACH()
+      IF(_result
+         AND NOT _result EQUAL 0
+      )
+        MESSAGE(FATAL_ERROR "Error retrieving version field from '${_package_file}'")
+      ELSE()
+        MESSAGE(DEBUG "Found version for '${arg_TARGET}.rvpkg' package version ${_pkg_version} ...")
+      ENDIF()
 
-    # Create the package zip file
-    ADD_CUSTOM_COMMAND(
-      COMMENT "Creating ${_package_filename} ..."
-      OUTPUT ${_package_filename}
-      DEPENDS ${_temp_file} ${_files} ${_package_file}
-      COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
-      COMMAND ${CMAKE_COMMAND} -E rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
+      SET(_package_filename
+          "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg"
+      )
 
-    ADD_CUSTOM_TARGET(
-      ${arg_TARGET}-${_pkg_version}.rvpkg ALL
-      DEPENDS ${_package_filename}
-    )
+      LIST(APPEND RV_PACKAGE_LIST "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg")
+      LIST(REMOVE_DUPLICATES RV_PACKAGE_LIST)
+      SET(RV_PACKAGE_LIST
+          ${RV_PACKAGE_LIST}
+          CACHE INTERNAL ""
+      )
 
-    ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
+      # Generate a file to store the list of package files
+      SET(_temp_file
+          "${CMAKE_CURRENT_BINARY_DIR}/pkgfilelist.txt"
+      )
+
+      # Remove the file if it exists
+      FILE(REMOVE ${_temp_file})
+
+      # For each package file in the list, append it to the file
+      FOREACH(
+        file IN
+        LISTS _files _package_file
+      )
+        FILE(
+          APPEND ${_temp_file}
+          "${file}\n"
+        )
+      ENDFOREACH()
+
+      # Create the package zip file
+      ADD_CUSTOM_COMMAND(
+        COMMENT "Creating ${_package_filename} ..."
+        OUTPUT ${_package_filename}
+        DEPENDS ${_temp_file} ${_files} ${_package_file}
+        COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
+        COMMAND ${CMAKE_COMMAND} -E rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      )
+
+      ADD_CUSTOM_TARGET(
+        ${arg_TARGET}-${_pkg_version}.rvpkg ALL
+        DEPENDS ${_package_filename}
+      )
+
+      ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
+    ENDIF()
 
   ELSEIF(${arg_TYPE} STREQUAL "IMAGE_FORMAT")
     GET_TARGET_PROPERTY(_native_target_type ${arg_TARGET} TYPE)
