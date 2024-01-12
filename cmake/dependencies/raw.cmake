@@ -5,9 +5,8 @@
 #
 
 #
-# LibRaw official Web page: https://www.libraw.org/about
-# LibRaw official sources:  https://www.libraw.org/data/LibRaw-0.21.1.tar.gz
-# LibRaw build from sources: https://www.libraw.org/docs/Install-LibRaw-eng.html
+# LibRaw official Web page: https://www.libraw.org/about LibRaw official sources:  https://www.libraw.org/data/LibRaw-0.21.1.tar.gz LibRaw build from sources:
+# https://www.libraw.org/docs/Install-LibRaw-eng.html
 #
 
 INCLUDE(ProcessorCount) # require CMake 3.15+
@@ -65,9 +64,12 @@ IF(RV_TARGET_WINDOWS)
     TARGET ${_target}
     POST_BUILD
     COMMENT "Installing ${_target}'s libs & files into ${_install_dir}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/lib ${_lib_dir}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/libraw ${_include_dir}/libraw
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/bin ${_bin_dir}
+    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/lib" --destination
+            "${_lib_dir}"
+    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/libraw" --destination
+            "${_include_dir}/libraw"
+    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/bin" --destination
+            "${_bin_dir}"
     COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/.keep_me
     COMMAND ${CMAKE_COMMAND} -E rm ${_lib_dir}/Makefile
   )
@@ -100,7 +102,8 @@ ELSE()
     DEPENDS ZLIB::ZLIB lcms
     CONFIGURE_COMMAND aclocal
     COMMAND autoreconf --install
-    COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command} ${_configure_options}
+    COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command}
+            ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE TRUE

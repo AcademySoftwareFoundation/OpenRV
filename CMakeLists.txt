@@ -35,17 +35,17 @@ IF(CMAKE_BUILD_TYPE
   MESSAGE(FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 ENDIF()
 
-IF (NOT RV_RELEASE_DESCRIPTION)
-    IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        SET(RV_RELEASE_DESCRIPTION
-            "DEVELOPMENT"
-        )
-    ELSE()
-        # as checked 'src/lib/app/RvCommon/RvApplication.cpp'
-        SET(RV_RELEASE_DESCRIPTION
-            "RELEASE"
-        )
-    ENDIF()
+IF(NOT RV_RELEASE_DESCRIPTION)
+  IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    SET(RV_RELEASE_DESCRIPTION
+        "DEVELOPMENT"
+    )
+  ELSE()
+    # as checked 'src/lib/app/RvCommon/RvApplication.cpp'
+    SET(RV_RELEASE_DESCRIPTION
+        "RELEASE"
+    )
+  ENDIF()
 ENDIF()
 
 SET(RV_UI_APPLICATION_NAME
@@ -89,8 +89,6 @@ SET(CMAKE_BUILD_TYPE
 
 MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-MESSAGE("PROJECT DIR ${PROJECT_SOURCE_DIR}")
-
 # Specify our own CMake modules so we can include them right after.
 SET(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/defaults ${PROJECT_SOURCE_DIR}/cmake/dependencies ${PROJECT_SOURCE_DIR}/cmake/globals
@@ -116,6 +114,11 @@ INCLUDE(ExternalProject) # once in the project to include the module
 # time, as an indicator that something is actually happening, we'll force verbosity of the FETCHCONTENT function thus printing some minimal progress.
 SET(FETCHCONTENT_QUIET
     OFF
+)
+
+SET(OPEN_RV_ROOT
+    ${PROJECT_SOURCE_DIR}
+    CACHE STRING "RV's root directory" FORCE
 )
 
 ADD_SUBDIRECTORY(cmake/dependencies)
