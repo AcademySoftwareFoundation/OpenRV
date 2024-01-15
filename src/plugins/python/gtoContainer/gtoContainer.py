@@ -389,7 +389,7 @@ class Component:
         for prop in self.__properties:
             if prop.name() == name:
                 return prop
-        raiseAttributeError("Container instance has no attribute '%s'" % name)
+        raise AttributeError("Container instance has no attribute '%s'" % name)
 
     def __setattr__(self, name, value):
         if isinstance(value, Property):
