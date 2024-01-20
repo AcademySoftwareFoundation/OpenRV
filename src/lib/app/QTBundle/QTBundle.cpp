@@ -62,6 +62,7 @@ QTBundle::init()
     m_ui = m_root;
     if (!m_scripts.cd("scripts")) cerr << "WARNING: missing scripts dir in bundle" << endl;
     if (!m_plugins.cd("plugins")) cerr << "WARNING: missing plugin dir in bundle" << endl;
+    if (!m_etc.cd("etc")) cerr << "WARNING: missing etc dir in bundle" << endl;
 
 #ifdef PLATFORM_LINUX
     m_homeSupport = m_home;
