@@ -63,6 +63,10 @@ QTBundle::init()
     if (!m_scripts.cd("scripts")) cerr << "WARNING: missing scripts dir in bundle" << endl;
     if (!m_plugins.cd("plugins")) cerr << "WARNING: missing plugin dir in bundle" << endl;
 
+    // Note: we do not issue a warning here for a potentially missing 'etc' dir since 
+    // it is optional and is not populated on all platforms like on Linux for example.
+    m_etc.cd("etc");
+
 #ifdef PLATFORM_LINUX
     m_homeSupport = m_home;
 
