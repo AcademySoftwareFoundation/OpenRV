@@ -33,7 +33,10 @@ ELSE()
   RV_MAKE_STANDARD_LIB_NAME("libpng16" "${_libpng_lib_version}" "SHARED" "d")
 ENDIF()
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
+# Future: The main branch of libpng has deprecated 'PNG_EXECUTABLES' in favor of 'PNG_TOOLS'.
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
+LIST(APPEND _configure_options "-DPNG_EXECUTABLES=OFF")
+LIST(APPEND _configure_options "-DPNG_TESTS=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}

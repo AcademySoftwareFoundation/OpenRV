@@ -179,6 +179,24 @@ IF(RV_TARGET_WINDOWS)
       LIST(REMOVE_ITEM _qt_debug_libs ${_d_lib})
     ENDFOREACH()
 
+    # Remove Qt5 executables that are not needed.
+    FILE(
+      GLOB _qt_executables
+      RELATIVE ${SRC_DIR}
+      ${SRC_DIR}/*.exe
+    )
+
+    # Filtering. Some executables are needed for RV to work:
+    # QtWebEngineProcess.exe
+    FOREACH(
+      _qt_executable 
+      ${_qt_executables}
+    )
+      IF("${_qt_executable}" STREQUAL "QtWebEngineProcess.exe")
+          LIST(REMOVE_ITEM _qt_executables "${_qt_executable}")
+      ENDIF()
+    ENDFOREACH()
+
     IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
       SET(_qt_libs_to_copy
           ${_qt_debug_libs}
@@ -190,6 +208,7 @@ IF(RV_TARGET_WINDOWS)
         ${SRC_DIR}/*
       )
       LIST(REMOVE_ITEM _qt_libs_to_copy ${_qt_debug_libs})
+      LIST(REMOVE_ITEM _qt_libs_to_copy ${_qt_executables})
     ENDIF()
 
     FOREACH(
