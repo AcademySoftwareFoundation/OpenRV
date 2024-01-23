@@ -77,9 +77,24 @@ which is identical to this:
 shell> rv -gamma 0.454545454545
 ```
 
-### Troubleshooting Open RV
+## Troubleshooting Open RV
 
 Launching RV from the command line is the best way to troubleshoot RV by giving you access to error messages or crash dumps.
+
+You can also access the logs at the following locations:
+
+| OS | Logs location |
+| --- | --- |
+| Linux | ~/.local/share/Autodesk/RV/RV.log |
+| macOS | ~/Library/Logs/Autodesk/RV.log |
+| Windows | %AppData%\Roaming\Autodesk\RV\RV.log |
+
+These logs contain anything that is written in the RV Console.
+
+You can control the size and number of log files kept by RV with the following environment variables:
+
+- `RV_FILE_LOG_SIZE`: Sets the maximum size of each log file. When that maximum size is reached, RV creates a new log file. Default value is 5 MB.
+- `RV_FILE_LOG_NUM_FILES`: Sets the number of log files to keep. If there are a number of log files equal to `RV_FILE_LOG_NUM_FILES`, then RV deletes the oldest log file before creating a new one. Default value is 2.
 
 ### Command-Line Options
 
@@ -211,11 +226,11 @@ Launching RV from the command line is the best way to troubleshoot RV by giving 
 
 Table 3.1: Per-Source Command Line Options <a id="per-source-command-line-options"></a>
 
-### 3.1 Image Sequence Notation
+## 3.1 Image Sequence Notation
 
 RV has a special syntax to describe image sequences as source movies. Sequences are assumed to be files with a common base name followed by a frame number and an image type extension. For example, the filenames foo.1.tif and foo.0001.tif would be interpreted as frame 1 of the TIFF sequence foo. RV sorts images by frame numbers in numeric order. It sorts image base names in lexical order. What this means is that RV will sort images into sequences the way you expect it to. Padding tricks are unnecessary for RV to get the image order correct; image order will be interpreted correctly.
 
-```
+```sh
 foo.0001.tif foo.0002.tif foo.0003.tif foo.0004.tif
 foo.0005.tif foo.0006.tif foo.0007.tif foo.0008.tif
 foo.0009.tif foo.0010.tif
@@ -223,7 +238,7 @@ foo.0009.tif foo.0010.tif
 
 To play this image sequence in RV from the command line, you could start RV like this:
 
-```
+```sh
 shell> rv foo.\*.tif
 ```
 
@@ -231,7 +246,7 @@ and RV will automatically attempt to group the files into a logical movie. ( **N
 
 When you want to play a subset of frames or audio needs to be included, you can specify the sequence using the \`\`#'' or \`\`@'' notation (similar to Shake's) or the printf-like notation using \`\`%'' similar to Nuke.
 
-```
+```sh
 rv foo.#.tif
 rv foo.2-8#.tif
 rv foo.2-8@@@@.tif
@@ -246,19 +261,19 @@ The next two examples use the printf-like syntax accepted by nuke. In the first 
 
 Sometimes, you will encounter or create an image sequence which is purposefully missing frames. For example, you may be rendering something that is very expensive to render and only wish to look at every tenth frame. In this case, you can specify the increment using the \`\`x'' character like this:
 
-```
+```sh
 rv foo.1-100x10#.tif
 ```
 
 or alternately like this using the \`\`@'' notation for padding to four digits:
 
-```
+```sh
 rv foo.1-100x10@@@@.tif
 ```
 
 or if the file was padded to three digits like foo.001.tif:
 
-```
+```sh
 rv foo.1-100x10@@@.tif
 ```
 
@@ -266,7 +281,7 @@ In these examples, RV will play frames 1 through 100 by tens. So it will expect 
 
 If there is no obvious increment, but the frames need to be group into a sequence, you can list the frame numbers with commas:
 
-```
+```sh
 rv foo.1,3,5,7,8,9#.tif
 ```
 
@@ -274,36 +289,36 @@ In many cases, RV can detect file types automatically even if a file extension i
 
 **NOTE** : Use the same format for exporting multiple annotated frames.
 
-#### 3.1.1 Negative Frame Numbers
+### 3.1.1 Negative Frame Numbers
 
 RV can handle negative frames in image sequences. If the frame numbers are zero padded, they should look like so:
 
-```
+```sh
 foo.-012.tif
 foo.-001.tif
 ```
 
 To specify in and out points on the command line in the presence of negative frames, just include the minus signs:
 
-```
+```sh
 foo.-10-20#.tif
 foo.-10--5#.tif
 ```
 
 The first example uses frames -10 to +20. The second example uses frames -10 to -5. Although the use of the \`\`-'' character to specify ranges can make the sequence a bit visually confusing, the interpretation is not ambiguous.
 
-#### 3.1.2 Stereo Notation
+### 3.1.2 Stereo Notation
 
 RV can accept stereo notation similar to Nuke's \`\`%v'' and \`\`%V'' syntax. By default, RV can only recognize left, right, Left, and Right for %V and for %v it will try L, R, or l and r. You can change the substitutions by setting the environment variables RV_STEREO_NAME_PAIRS and RV_STEREO_CHAR_PAIRS. These should be set to a colon separated list of values (even on windows). For example, the defaults would look like this:
 
-```
+```sh
 RV_STEREO_NAME_PAIRS = left:right:Left:Right
 RV_STEREO_CHAR_PAIRS = L:R:l:r
 ```
 
 So for example, if you have two image sequences:
 
-```
+```sh
 foo.0001.left.exr
 foo.0002.left.exr
 foo.0001.right.exr
@@ -312,61 +327,61 @@ foo.0002.right.exr
 
 you could refer to the entire stereo sequence as:
 
-```
+```sh
 foo.%04d.%V.exr
 ```
 
-### 3.2 Source Layers from the Command Line
+## 3.2 Source Layers from the Command Line
 
 You can create source material from multiple audio, image, and movie files from the command line by enclosing them in square brackets. The typical usage looks something like this:
 
-```
+```sh
 shell> rv [ foo.#.exr soundtrack.aiff ]
 ```
 
 Note that there are spaces around the brackets: they must be completely separated from subsequent arguments to be interpreted correctly. You cannot nest brackets and the brackets must be matched; for every begin bracket there must be an end bracket.
 
-#### 3.2.1 Associating Audio with Image Sequences or Movie Files
+### 3.2.1 Associating Audio with Image Sequences or Movie Files
 
 Frequently a movie file or image sequence needs to be viewed with one or more separate audio files. When you have multiple layers on the command line and one or more of the layers are audio files, RV will play back the all of the audio files mixed together along with the images or movies. For example, to play back a two wav files with an image sequence:
 
-```
+```sh
 shell> rv [ foo.#.exr first.wav second.wav ]
 ```
 
 If you have a movie file which already has audio you can still add additional audio files to be played:
 
-```
+```sh
 shell> rv [ movie_with_audio.mov more_audio.aiff ]
 ```
 
-#### 3.2.2 Dual Image Sequences and/or Movie Files as Stereo
+### 3.2.2 Dual Image Sequences and/or Movie Files as Stereo
 
 It's not unusual to render left and right eyes separately and want to view them as stereo together. When you give RV multiple layers of movie files or image sequences, it uses the first two as the left and right eyes.
 
-```
+```sh
 shell> rv [ left.#.exr right.#.exr ]
 ```
 
 It's OK to mix and match formats with layers:
 
-```
+```sh
 shell> rv [ left.mov right.100-300#.jpg ]
 ```
 
 if you want audio too:
 
-```
+```sh
 shell> rv [ left.#.exr right.#.exr soundtrack.aiff ]
 ```
 
 As with the mono case, any number of audio files can be added: they will be played simultaneously.
 
-#### 3.2.3 Per-Source Arguments
+### 3.2.3 Per-Source Arguments
 
 There are a few arguments which can be applied with in the square brackets (See Table [3.1](#per-source-command-line-options) ). The range start sets the first frame number to its argument; so for example to set the start frame of a movie file with or without a time code track so that it starts at frame 101:
 
-```
+```sh
 shell> rv [ -rs 101 foo.mov ]
 ```
 
@@ -374,17 +389,17 @@ You must use the square brackets to set per-source arguments (and the square bra
 
 The -in and -out per-source arguments are an easy way to create an EDL on the command line, even when playing movie files.
 
-#### 3.2.4 A note on the -fps per-source argument
+### 3.2.4 A note on the -fps per-source argument
 
 The point of the -fps arg is to provide a scaling factor in cases where the frame rate of the media cannot be determined and you want to play an audio file with it. For example, if you want to play "[foo.#.dpx foo.wav]" in the same session with "[bar.#.dpx bar.wav]" but the "native frame rate of foo is 24fps and the native frame rate of bar is 30fps, then you might want to say:
 
-```
+```sh
 shell> rv [foo.#.dpx foo.wav -fps 24 ] [ bar.#.dpx bar.wav -fps 30 ]
 ```
 
 This will ensure that the video and audio are synced properly no matter what frame rate you use for playback. To clarify further, the per-source -fps flag has no relation to the frame rate that is used for playback, and in general RV plays media (all loaded media) at whatever single frame rate is currently in use.
 
-#### 3.2.5 Source Layer Caveats and Capabilities
+### 3.2.5 Source Layer Caveats and Capabilities
 
 There are a number of things you should be aware of when using source layers. In most cases, RV will attempt to do something with what you give it. However, if your input is logically ambiguous the result may be different than what you expect. Here are some things you should avoid using in layers of a single source:
 
@@ -403,11 +418,11 @@ Here are some things that are OK to do with layers:
 - A movie with audio for one eye and a movie without audio for the other
 - Audio files with no imagery
 
-### 3.3 Directories as Input
+## 3.3 Directories as Input
 
 If you give RV the name of a directory instead of a single file or an image sequence it will attempt to interpret the contents of the directory. RV will find any single images, image sequences, or single movie files that it can and present them as individual source movies. This is especially useful with the directory \`\`.'' on Linux and macOS. If you navigate in a shell to a directory that contains an image sequence for example, you need only type the following to play it:
 
-```
+```sh
 rv .
 ```
 
