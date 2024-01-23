@@ -180,17 +180,17 @@ ELSE()
       TARGET ${_target}
       POST_BUILD
       COMMENT "Renaming the openssl import libs to the name FFmpeg is expecting"
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
-              "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib" --destination "${_lib_dir}/ssl.lib"
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib"
+              --destination "${_lib_dir}/ssl.lib"
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
               "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libcrypto.lib" --destination "${_lib_dir}/crypto.lib"
     )
     ADD_CUSTOM_COMMAND(
       COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
       OUTPUT ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
               "${RV_STAGE_LIB_DIR}"
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_bin_dir}" --destination
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_bin_dir}" --destination
               "${RV_STAGE_BIN_DIR}"
       DEPENDS ${_target}
     )
@@ -213,7 +213,7 @@ ELSE()
     ADD_CUSTOM_COMMAND(
       COMMENT "Installing ${_target}'s libs into ${_openssl_stage_lib_dir}"
       OUTPUT ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
               "${_openssl_stage_lib_dir}"
       DEPENDS ${_target}
     )

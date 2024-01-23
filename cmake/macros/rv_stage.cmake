@@ -93,7 +93,7 @@ FUNCTION(rv_stage)
       )
         ADD_CUSTOM_COMMAND(
           COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
-          COMMAND python3 "${OPEN_RV_ROOT}/src/build/remove_absolute_rpath.py" --target "$<TARGET_FILE:${arg_TARGET}>" --root "${CMAKE_BINARY_DIR}"
+          COMMAND python3 "${OPENRV_ROOT}/src/build/remove_absolute_rpath.py" --target "$<TARGET_FILE:${arg_TARGET}>" --root "${CMAKE_BINARY_DIR}"
         )
       ENDIF()
     ENDIF()

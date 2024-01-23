@@ -298,7 +298,7 @@ ELSE()
   EXTERNALPROJECT_ADD_STEP(
     ${_target} add_vcpkg_manifest
     COMMENT "Copying the VCPKG manifest"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_vcpkg_manifest}" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_vcpkg_manifest}" --destination
             "${_source_dir}/vcpkg.json"
     DEPENDERS configure
   )
@@ -320,9 +320,9 @@ IF(RV_TARGET_DARWIN
     TARGET ${_target}
     POST_BUILD
     COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_pyocio_lib}" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_pyocio_lib}" --destination
             "${RV_STAGE_PLUGINS_PYTHON_DIR}/${_pyocio_libname}"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
             "${RV_STAGE_LIB_DIR}"
   )
 ELSE()
@@ -335,12 +335,11 @@ ELSE()
     POST_BUILD
     COMMENT "Copying PyOpenColorIO lib into '${RV_STAGE_PLUGINS_PYTHON_DIR}'."
     # Copy PyOpenColorIO.pyd into RV_STAGE_PLUGINS_PYTHON_DIR as PyOpenColorIO_d.pyd in debug.
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_pyocio_lib}" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_pyocio_lib}" --destination
             "$<$<CONFIG:Debug>:${RV_STAGE_PLUGINS_PYTHON_DIR}/PyOpenColorIO_d.pyd>$<$<CONFIG:Release>:${RV_STAGE_PLUGINS_PYTHON_DIR}/${_pyocio_libname}>"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
-            "${RV_STAGE_LIB_DIR}"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_ocio_win_sharedlib_path}"
-            --destination "${RV_STAGE_PLUGINS_PYTHON_DIR}/${_ocio_win_sharedlibname}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_ocio_win_sharedlib_path}" --destination
+            "${RV_STAGE_PLUGINS_PYTHON_DIR}/${_ocio_win_sharedlibname}"
   )
 
   # Debug Python on Windows search for modules with *_d suffix, but OCIO does not create a PyOpenColor_d.pyd.

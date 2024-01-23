@@ -64,11 +64,11 @@ IF(RV_TARGET_WINDOWS)
     TARGET ${_target}
     POST_BUILD
     COMMENT "Installing ${_target}'s libs & files into ${_install_dir}"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/lib" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/lib" --destination
             "${_lib_dir}"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/libraw" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/libraw" --destination
             "${_include_dir}/libraw"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/bin" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/bin" --destination
             "${_bin_dir}"
     COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/.keep_me
     COMMAND ${CMAKE_COMMAND} -E rm ${_lib_dir}/Makefile

@@ -102,7 +102,7 @@ FUNCTION(yacc_it)
   # Copy the generated .hpp to a .h file
   EXECUTE_PROCESS(
     WORKING_DIRECTORY ${arg_OUTPUT_DIR}
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
             "${arg_OUTPUT_DIR}/${_yacc_generated_include_filename}" --destination "${arg_OUTPUT_DIR}/${_renamed_include_filename}" COMMAND_ECHO STDOUT
     OUTPUT_STRIP_TRAILING_WHITESPACE
     RESULT_VARIABLE _result_code

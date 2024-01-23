@@ -65,29 +65,29 @@ IF(RV_TARGET_DARWIN
    OR RV_TARGET_LINUX
 )
   EXECUTE_PROCESS(
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/lib"
-            --destination "${RV_STAGE_LIB_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/lib" --destination
+            "${RV_STAGE_LIB_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
   EXECUTE_PROCESS(
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/plugins"
-            --destination "${RV_STAGE_PLUGINS_QT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/plugins" --destination
+            "${RV_STAGE_PLUGINS_QT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
 ENDIF()
 
 IF(RV_TARGET_LINUX)
   EXECUTE_PROCESS(
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/libexec"
-            --destination "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/libexec" --destination
+            "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
 ENDIF()
 
 IF(NOT RV_TARGET_DARWIN)
   EXECUTE_PROCESS(
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_RESOURCES_FOLDER}"
-            --destination "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_RESOURCES_FOLDER}" --destination
+            "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
   EXECUTE_PROCESS(
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_TRANSLATIONS_FOLDER}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_TRANSLATIONS_FOLDER}"
             --destination "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
 ENDIF()
@@ -142,8 +142,8 @@ IF(RV_TARGET_WINDOWS)
     )
       IF(NOT IS_DIRECTORY "${SRC_DIR}/${_qt_lib}")
         EXECUTE_PROCESS(
-          COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${SRC_DIR}/${_qt_lib}"
-                  --destination "${DST_DIR}/${_qt_lib}" --no-override COMMAND_ERROR_IS_FATAL ANY
+          COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${SRC_DIR}/${_qt_lib}" --destination
+                  "${DST_DIR}/${_qt_lib}" --no-override COMMAND_ERROR_IS_FATAL ANY
         )
       ENDIF()
     ENDFOREACH()

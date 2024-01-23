@@ -27,9 +27,9 @@ MACRO(RV_COPY_LIB_BIN_FOLDERS)
       TARGET ${_target}
       POST_BUILD
       COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
               "${RV_STAGE_LIB_DIR}"
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_bin_dir}" --destination
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_bin_dir}" --destination
               "${RV_STAGE_BIN_DIR}"
     )
     ADD_CUSTOM_TARGET(
@@ -40,7 +40,7 @@ MACRO(RV_COPY_LIB_BIN_FOLDERS)
     ADD_CUSTOM_COMMAND(
       COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
       OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-      COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
               "${RV_STAGE_LIB_DIR}"
       DEPENDS ${_target}
     )

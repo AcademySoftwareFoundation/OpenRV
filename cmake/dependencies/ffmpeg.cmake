@@ -343,9 +343,9 @@ IF(RV_TARGET_WINDOWS)
     POST_BUILD
     COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
     # Note: The FFmpeg build stores both the import lib and the dll in the install bin directory
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
             "${RV_STAGE_LIB_DIR}"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
             "${RV_STAGE_BIN_DIR}"
     COMMAND ${CMAKE_COMMAND} -E touch ${${_target}-stage-flag}
   )
@@ -353,8 +353,7 @@ ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${${_target}-stage-flag}
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
-            "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination "${RV_STAGE_LIB_DIR}"
     COMMAND ${CMAKE_COMMAND} -E touch ${${_target}-stage-flag}
     DEPENDS ${_target}
   )
