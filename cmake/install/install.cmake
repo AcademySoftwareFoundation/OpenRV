@@ -47,8 +47,7 @@ FOREACH(
   FILE(MAKE_DIRECTORY ${DESTINATION_FOLDER})
 
   EXECUTE_PROCESS(
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${directory}
-    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_APP_ROOT}/${FILE_TO_COPY}" --destination
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${RV_APP_ROOT}" --source "${RV_APP_ROOT}/${FILE_TO_COPY}" --destination
             "${CMAKE_INSTALL_PREFIX}/${FILE_TO_COPY}" COMMAND_ERROR_IS_FATAL ANY
   )
 
