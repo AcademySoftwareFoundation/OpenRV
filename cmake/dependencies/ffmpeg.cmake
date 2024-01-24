@@ -239,18 +239,23 @@ LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_C_OPTIONS)
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTERNAL_LIBS)
 
-SET(_ffmpeg_david_cmake_lib_dir_path
-    "${RV_DEPS_DAVID_LIB_DIR}"
-)
+SET(_ffmpeg_preprocess_pkg_config_path $ENV{PKG_CONFIG_PATH})
+LIST(APPEND _ffmpeg_preprocess_pkg_config_path "${RV_DEPS_DAVID_LIB_DIR}/pkgconfig")
 IF(RV_TARGET_WINDOWS)
-  # Changing path start from "c:/..." to "/c/..." and replacing all backslashes with slashes since PkgConfig wants a linux path
-  STRING(REPLACE "\\" "/" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
-  STRING(REPLACE ":" "" _ffmpeg_david_cmake_lib_dir_path "${_ffmpeg_david_cmake_lib_dir_path}")
-  STRING(FIND ${_ffmpeg_david_cmake_lib_dir_path} / _ffmpeg_first_slash_index)
-  IF(_ffmpeg_first_slash_index GREATER 0)
-    STRING(PREPEND _ffmpeg_david_cmake_lib_dir_path "/")
-  ENDIF()
+  FOREACH(_ffmpeg_pkg_config_path_element IN LISTS _ffmpeg_preprocess_pkg_config_path)
+    # Changing path start from "c:/..." to "/c/..." and replacing all backslashes with slashes since PkgConfig wants a linux path
+    STRING(REPLACE "\\" "/" _ffmpeg_pkg_config_path_element "${_ffmpeg_pkg_config_path_element}")
+    STRING(REPLACE ":" "" _ffmpeg_pkg_config_path_element "${_ffmpeg_pkg_config_path_element}")
+    STRING(FIND ${_ffmpeg_pkg_config_path_element} / _ffmpeg_first_slash_index)
+    IF(_ffmpeg_first_slash_index GREATER 0)
+      STRING(PREPEND _ffmpeg_pkg_config_path_element "/")
+    ENDIF()
+	LIST(APPEND _ffmpeg_pkg_config_path ${_ffmpeg_pkg_config_path_element})
+  ENDFOREACH()
+ELSE()
+  SET(_ffmpeg_pkg_config_path ${_ffmpeg_preprocess_pkg_config_path})
 ENDIF()
+LIST(JOIN _ffmpeg_pkg_config_path ":" _ffmpeg_pkg_config_path)
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -264,7 +269,7 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   ${RV_FFMPEG_PATCH_COMMAND_STEP}
   CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${_ffmpeg_david_cmake_lib_dir_path}/pkgconfig" ${_configure_command} --prefix=${_install_dir}
+    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=${_ffmpeg_pkg_config_path}" ${_configure_command} --prefix=${_install_dir}
     ${RV_FFMPEG_COMMON_CONFIG_OPTIONS} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
   BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
