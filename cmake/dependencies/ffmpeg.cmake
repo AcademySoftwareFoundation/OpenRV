@@ -229,7 +229,7 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   LIST(APPEND _disabled_protocols "--disable-protocol=rtmpte")
 
   SET(RV_FFMPEG_CONFIG_OPTIONS
-      "${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}"
+      ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   )
 ENDIF()
 
