@@ -19,6 +19,8 @@ import sys
 import time
 import threading
 
+from typing import Tuple
+
 from remove_absolute_rpath import fix_rpath
 
 os.environ["PYTHONUNBUFFERED"] = "1"
@@ -245,7 +247,7 @@ def copy_third_party(
     source: pathlib.Path,
     destination: pathlib.Path,
     build_root: pathlib.Path,
-    denied_extensions: tuple[str],
+    denied_extensions: Tuple[str],
     quiet: bool = False,
     dry_run: bool = False,
     override: bool = True,
