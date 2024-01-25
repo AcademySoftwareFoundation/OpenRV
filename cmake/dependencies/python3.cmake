@@ -251,7 +251,7 @@ ADD_CUSTOM_COMMAND(
   COMMENT "Installing requirements from ${_requirements_file}"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
-  COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
+  COMMAND ${CMAKE_COMMAND} -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${_requirements_file}
 )
 
@@ -263,8 +263,10 @@ IF(RV_TARGET_WINDOWS
     TARGET ${_python3_target}
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_python3_implib}" --destination
+            "${_python_release_libpath}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_python3_implib}" --destination
+            "${_python_release_in_bin_libpath}" DEPENDS ${_python3_target} ${_requirements_file}
   )
 ENDIF()
 
@@ -276,8 +278,9 @@ ADD_CUSTOM_COMMAND(
   COMMENT "Building PySide2 using ${_pyside2_make_command_script}"
   OUTPUT ${${_pyside2_target}-build-flag}
   # First PySide build script on Windows which doesn't respect '--debug' option
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
-          ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
+  COMMAND
+    python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
+    "${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py" --destination "${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py"
   COMMAND ${_pyside2_make_command} --prepare --build
   COMMAND cmake -E touch ${${_pyside2_target}-build-flag}
   DEPENDS ${_python3_target} ${_pyside2_make_command_script} ${${_python3_target}-requirements-flag}
@@ -288,9 +291,14 @@ IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/lib" --destination
+            "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/include" --destination
+            "${RV_STAGE_INCLUDE_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
+            "${RV_STAGE_BIN_DIR}"
+    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/fix_pyside2_qt_copy.py" --python-executable "${RV_STAGE_BIN_DIR}/python3.exe" --libraries
+            "${RV_STAGE_LIB_DIR}" --plugins "${RV_STAGE_PLUGINS_QT_DIR}"
     DEPENDS ${_python3_target} ${${_pyside2_target}-build-flag} ${${_python3_target}-requirements-flag}
   )
   ADD_CUSTOM_TARGET(
@@ -301,9 +309,14 @@ ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_LIB_DIR}/${_python3_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/lib" --destination
+            "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/include" --destination
+            "${RV_STAGE_INCLUDE_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
+            "${RV_STAGE_BIN_DIR}"
+    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/fix_pyside2_qt_copy.py" --python-executable "${RV_STAGE_BIN_DIR}/python3" --libraries "${RV_STAGE_LIB_DIR}"
+            --plugins "${RV_STAGE_PLUGINS_QT_DIR}"
     DEPENDS ${_python3_target} ${${_pyside2_target}-build-flag} ${${_python3_target}-requirements-flag}
   )
   ADD_CUSTOM_TARGET(

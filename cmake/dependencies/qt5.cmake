@@ -53,10 +53,7 @@ FIND_PACKAGE(
   REQUIRED
 )
 
-SET(_qt_copy_message
-    "Copying Qt into ${RV_STAGE_ROOT_DIR}"
-)
-MESSAGE(STATUS "${_qt_copy_message}")
+MESSAGE(STATUS "Copying Qt into ${RV_STAGE_ROOT_DIR}")
 
 SET(RV_DEPS_QT5_VERSION
     ${Qt5Core_VERSION_STRING}
@@ -67,91 +64,38 @@ SET(RV_DEPS_QT5_VERSION
 IF(RV_TARGET_DARWIN
    OR RV_TARGET_LINUX
 )
-  FILE(
-    GLOB _qt_plugins_dirs
-    RELATIVE ${RV_DEPS_QT5_LOCATION}/plugins
-    ${RV_DEPS_QT5_LOCATION}/plugins/*
+  EXECUTE_PROCESS(
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/lib" --destination
+            "${RV_STAGE_LIB_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
-  FOREACH(
-    _qt_plugin_dir
-    ${_qt_plugins_dirs}
+  EXECUTE_PROCESS(
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/plugins" --destination
+            "${RV_STAGE_PLUGINS_QT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
-    FILE(
-      COPY ${RV_DEPS_QT5_LOCATION}/plugins/${_qt_plugin_dir}
-      DESTINATION ${RV_STAGE_PLUGINS_QT_DIR}
-    )
-  ENDFOREACH()
 ENDIF()
 
-# Mac
-IF(RV_TARGET_DARWIN)
-  SET(_qt5_lib_dir
-      ${RV_DEPS_QT5_LOCATION}/lib
-  )
-  FILE(
-    GLOB libs_to_copy
-    RELATIVE ${_qt5_lib_dir}
-    ${_qt5_lib_dir}/*
-  )
-  FOREACH(
-    lib_to_copy
-    ${libs_to_copy}
-  )
-    IF(lib_to_copy MATCHES "framework(.dSYM)?")
-      FILE(
-        COPY ${_qt5_lib_dir}/${lib_to_copy}
-        DESTINATION ${RV_STAGE_FRAMEWORKS_DIR}
-      )
-    ENDIF()
-  ENDFOREACH()
-ENDIF()
-
-# Linux
 IF(RV_TARGET_LINUX)
-  SET(RV_DEPS_QT5_LIB_DIR
-      ${RV_DEPS_QT5_LOCATION}/lib
-  )
-  FILE(
-    GLOB libs_to_copy
-    RELATIVE ${RV_DEPS_QT5_LIB_DIR}
-    CONFIGURE_DEPENDS ${RV_DEPS_QT5_LIB_DIR}/*
-  )
-  FOREACH(
-    lib_to_copy
-    ${libs_to_copy}
-  )
-    FILE(
-      COPY ${RV_DEPS_QT5_LIB_DIR}/${lib_to_copy}
-      DESTINATION ${RV_STAGE_LIB_DIR}
-    )
-  ENDFOREACH()
-
-  MESSAGE(STATUS "Copying Qt libexec files ...")
-  FILE(
-    COPY "${RV_DEPS_QT5_LOCATION}/libexec"
-    DESTINATION "${RV_STAGE_ROOT_DIR}"
-  )
-
-  MESSAGE(STATUS "Copying Qt resources files ...")
-  FILE(
-    COPY "${RV_DEPS_QT5_RESOURCES_FOLDER}"
-    DESTINATION "${RV_STAGE_ROOT_DIR}"
-  )
-
-  MESSAGE(STATUS "Copying Qt translations files ...")
-  FILE(
-    COPY "${RV_DEPS_QT5_TRANSLATIONS_FOLDER}"
-    DESTINATION "${RV_STAGE_ROOT_DIR}"
+  EXECUTE_PROCESS(
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/libexec" --destination
+            "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
 ENDIF()
 
-# Windows
+IF(NOT RV_TARGET_DARWIN)
+  EXECUTE_PROCESS(
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_RESOURCES_FOLDER}" --destination
+            "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+  )
+  EXECUTE_PROCESS(
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_TRANSLATIONS_FOLDER}"
+            --destination "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+  )
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   # Note: On windows, the Qt distribution has both the debug and release versions of its libs, dlls, and plugins into the same directories. This will prevent RV
   # from working correctly. We need to only copy the ones matching the CMAKE_BUILD_TYPE
   FUNCTION(COPY_ONLY_LIBS_MATCHING_BUILD_TYPE SRC_DIR DST_DIR)
-
     IF(NOT EXISTS (${DST_DIR}))
       FILE(MAKE_DIRECTORY ${DST_DIR})
     ENDIF()
@@ -216,7 +160,10 @@ IF(RV_TARGET_WINDOWS)
       ${_qt_libs_to_copy}
     )
       IF(NOT IS_DIRECTORY "${SRC_DIR}/${_qt_lib}")
-        FILE(COPY_FILE ${SRC_DIR}/${_qt_lib} ${DST_DIR}/${_qt_lib} ONLY_IF_DIFFERENT)
+        EXECUTE_PROCESS(
+          COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${SRC_DIR}/${_qt_lib}" --destination
+                  "${DST_DIR}/${_qt_lib}" --no-override COMMAND_ERROR_IS_FATAL ANY
+        )
       ENDIF()
     ENDFOREACH()
   ENDFUNCTION()
@@ -245,18 +192,6 @@ IF(RV_TARGET_WINDOWS)
       ${RV_DEPS_QT5_LOCATION}/bin
   )
   COPY_ONLY_LIBS_MATCHING_BUILD_TYPE(${RV_DEPS_QT5_BIN_DIR} ${RV_STAGE_BIN_DIR})
-
-  MESSAGE(STATUS "Copying Qt translations files ...")
-  FILE(
-    COPY "${RV_DEPS_QT5_LOCATION}/translations"
-    DESTINATION "${RV_STAGE_ROOT_DIR}"
-  )
-
-  MESSAGE(STATUS "Copying Qt resources files ...")
-  FILE(
-    COPY "${RV_DEPS_QT5_LOCATION}/resources"
-    DESTINATION "${RV_STAGE_ROOT_DIR}"
-  )
 ENDIF()
 
 MESSAGE(STATUS "${_qt_copy_message} -- DONE")

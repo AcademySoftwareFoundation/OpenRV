@@ -98,7 +98,7 @@ LIST(APPEND RV_DEPS_LIST GLEW::GLEW)
 ADD_CUSTOM_COMMAND(
   COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
   OUTPUT ${RV_STAGE_LIB_DIR}/${_glew_lib_name}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination "${RV_STAGE_LIB_DIR}"
   DEPENDS ${_target}
 )
 

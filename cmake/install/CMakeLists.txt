@@ -14,9 +14,9 @@ FOREACH(
   _variableName
   ${_variableNames}
 )
-  IF(_variableName MATCHES "^RV_")
+  IF(_variableName MATCHES "RV")
     IF(${_variableName})
-      MESSAGE(STATUS "Adding VARIABLE ${_variableName} to INSTALL")
+      MESSAGE(STATUS "Adding VARIABLE ${_variableName} [${${_variableName}}] to INSTALL")
       INSTALL(CODE "SET(${_variableName} ${${_variableName}})")
     ENDIF()
   ENDIF()

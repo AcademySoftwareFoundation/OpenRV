@@ -51,7 +51,6 @@ GET_TARGET_PROPERTY(zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${zlib_include_dir}")
 LIST(APPEND _configure_options "-DZLIB_LIBRARY=${zlib_library}")
 
-
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
 ELSE()
@@ -93,8 +92,14 @@ ADD_CUSTOM_COMMAND(
   TARGET ${_target}
   POST_BUILD
   COMMENT "Installing ${_target}'s missing headers"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_base_dir}/build/libtiff/tif_config.h ${_base_dir}/src/libtiff/tiffiop.h ${_base_dir}/src/libtiff/tif_dir.h
-          ${_base_dir}/src/libtiff/tif_hash_set.h ${_include_dir}
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/build/libtiff/tif_config.h"
+          --destination "${_include_dir}/tif_config.h"
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/libtiff/tiffiop.h" --destination
+          "${_include_dir}/tiffiop.h"
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/libtiff/tif_dir.h" --destination
+          "${_include_dir}/tif_dir.h"
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_base_dir}/src/libtiff/tif_hash_set.h"
+          --destination "${_include_dir}/tif_hash_set.h"
 )
 
 # The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
