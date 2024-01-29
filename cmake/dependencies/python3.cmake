@@ -25,7 +25,7 @@ SET(PYTHON_VERSION_MINOR
 )
 
 SET(PYTHON_VERSION_PATCH
-    12
+    13
 )
 
 SET(_python3_version
@@ -51,7 +51,7 @@ SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
 SET(_python3_download_hash
-    "69de50b7f8e90167932f677390e0490f"
+    "21b32503f31386b37f0c42172dfe5637"
 )
 
 SET(_opentimelineio_download_url
