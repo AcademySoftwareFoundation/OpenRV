@@ -241,7 +241,10 @@ ELSE()
     "-DOCIO_BUILD_TESTS=OFF"
     "-DOCIO_BUILD_GPU_TESTS=OFF"
     "-DOCIO_BUILD_DOCS=OFF"
+    # Note for OCIO v2.3.0 (future): OCIO_USE_SSE has been renamed to OCIO_USE_SIMD.
     "-DOCIO_USE_SSE=ON"
+    # OCIO apps are not needed.
+    "-DOCIO_BUILD_APPS=OFF"
     "-DOCIO_WARNING_AS_ERROR=OFF"
     "-DOCIO_BUILD_JAVA=OFF"
     "-S ${_source_dir}"
@@ -249,11 +252,10 @@ ELSE()
   )
 
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    # We don't build GLUT in Debug hence the debug lib for Glut doesn't exist which is needed for APPs We also switch the Python EXE because in Debug, Python
-    # builds python_d.exe and not the normal EXE filename.
-    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe" "-DOCIO_BUILD_APPS=OFF")
+    # Use debug Python executable.
+    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe")
   ELSE()
-    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe" "-DOCIO_BUILD_APPS=ON")
+    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe")
   ENDIF()
 
   LIST(APPEND _ocio_build_options "--build" "${_build_dir}" "--config" "${CMAKE_BUILD_TYPE}"

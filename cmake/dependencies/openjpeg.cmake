@@ -33,22 +33,11 @@ SET(_download_hash
 RV_MAKE_STANDARD_LIB_NAME("openjp2" "2.5.0" "SHARED" "")
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-LIST(APPEND _configure_options "-DBUILD_THIRDPARTY=1") # to build LCMS2
 
-GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_zlib_library}")
-LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}")
-
-GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-LIST(APPEND _configure_options "-DPNG_INCLUDE_DIR=${_png_include_dir}")
-
-GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
-LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
+# Do not build the executables (OpenJPEG calls them "codec executables"). 
+# BUILD_THIRDPARTY options is valid only if BUILD_CODEC=ON.
+# PNG, TIFF and ZLIB are not needed anymore because they are used for the executables only.
+LIST(APPEND _configure_options "-DBUILD_CODEC=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}

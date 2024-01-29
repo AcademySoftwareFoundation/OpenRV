@@ -66,6 +66,9 @@ LIST(APPEND _configure_options "-Dlzma=OFF")
 LIST(APPEND _configure_options "-Dzlib=ON")
 LIST(APPEND _configure_options "-Dwebp=OFF")
 
+# Do not need TIFF tools.
+LIST(APPEND _configure_options "-Dtiff-tools=OFF")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}

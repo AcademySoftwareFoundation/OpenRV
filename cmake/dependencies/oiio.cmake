@@ -42,7 +42,6 @@ RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-LIST(APPEND _configure_options "-DBUILD_THIRDPARTY=1")
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
 LIST(APPEND _configure_options "-DUSE_OCIO=0")
@@ -67,7 +66,7 @@ ENDIF()
 GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-LIST(APPEND _configure_options "-DPNG_INCLUDE_DIR=${_png_include_dir}")
+LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
@@ -89,14 +88,7 @@ GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_D
 LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
 LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
 
-GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
-IF(NOT RV_TARGET_WINDOWS)
-  LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
-ELSE()
-  LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
-ENDIF()
-LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
+LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
 GET_TARGET_PROPERTY(_ffmpeg_include_dir ffmpeg::avcodec INTERFACE_INCLUDE_DIRECTORIES)
 IF(RV_TARGET_WINDOWS)
@@ -146,10 +138,8 @@ IF(NOT RV_TARGET_LINUX)
 ENDIF()
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
-IF(RV_TARGET_LINUX)
-  # OIIO's libUtils Tools & Tests USES a different Link Flags which is 'hidden' and isn't set by us.
-  LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
-ENDIF()
+# OIIO tools are not needed.
+LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 
 IF(RV_TARGET_WINDOWS)
   LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")

@@ -15,6 +15,24 @@ FUNCTION(before_copy_platform FILE_PATH RET_VAL)
     ENDIF()
   ENDIF()
 
+  # Exp files contains information about symbols. Not needed for runtime.
+  IF(FILE_PATH MATCHES "\\.exp$")
+    SET(${RET_VAL}
+      "NO"
+      PARENT_SCOPE
+    )
+    RETURN()
+  ENDIF()
+
+  # Only used by the compiler/linker. Not needed for runtime.
+  IF(FILE_PATH MATCHES "\\.lib$")
+    SET(${RET_VAL}
+      "NO"
+      PARENT_SCOPE
+    )
+    RETURN()
+  ENDIF()
+
   SET(${RET_VAL}
       "YES"
       PARENT_SCOPE

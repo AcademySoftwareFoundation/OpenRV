@@ -67,8 +67,10 @@ IF(RV_TARGET_WINDOWS)
     COMMENT "Installing ${_target}'s libs & files into ${_install_dir}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/lib ${_lib_dir}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/libraw ${_include_dir}/libraw
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/bin ${_bin_dir}
-    COMMAND ${CMAKE_COMMAND} -E rm ${_bin_dir}/.keep_me
+    # Copy only the DLL on Windows because there is no option to disable the "examples/samples" 
+    # with Makefile.msvc.
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${_bin_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/bin/${_libname} ${_bin_dir}
     COMMAND ${CMAKE_COMMAND} -E rm ${_lib_dir}/Makefile
   )
 

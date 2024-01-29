@@ -94,6 +94,19 @@ ELSE()
     LIST(APPEND _make_command --arch=${RV_OSX_EMULATION_ARCH})
   ENDIF()
 
+
+  # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1`
+  # and `libssl.so.1.1`.
+
+  # On Windows build with MSVC or using MingW, shared libraries are named
+  # `libcrypto-1_1.dll` and `libssl-1_1.dll` for 32-bit Windows,
+  # `libcrypto-1_1-x64.dll` and `libssl-1_1-x64.dll` for 64-bit x86_64 Windows,
+  # and `libcrypto-1_1-ia64.dll` and `libssl-1_1-ia64.dll` for IA64 Windows.
+  # With MSVC, the import libraries are named `libcrypto.lib` and `libssl.lib`,
+  # while with MingW, they are named `libcrypto.dll.a` and `libssl.dll.a`.
+
+  # Ref: https://github.com/openssl/openssl/blob/398011848468c7e8e481b295f7904afc30934217/INSTALL.md?plain=1#L1847-L1858
+
   IF(RV_TARGET_LINUX)
     SET(_crypto_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
@@ -101,6 +114,15 @@ ELSE()
 
     SET(_ssl_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
+    )
+  ELSEIF(RV_TARGET_WINDOWS)
+    # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64
+    # when OpenSSL is build with MSVC.
+    SET(_crypto_lib_name
+      libcrypto-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ssl_lib_name
+      libssl-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   ELSE()
     SET(_crypto_lib_name
@@ -187,7 +209,8 @@ ELSE()
       COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
       OUTPUT ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_bin_dir} ${RV_STAGE_BIN_DIR}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_ssl_lib_name} ${RV_STAGE_BIN_DIR}
       DEPENDS ${_target}
     )
     ADD_CUSTOM_TARGET(
