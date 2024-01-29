@@ -6,7 +6,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.24)
 
 SET(RV_MAJOR_VERSION
-    "1"
+    "2"
     CACHE STRING "RV's version major"
 )
 SET(RV_MINOR_VERSION
@@ -19,7 +19,7 @@ SET(RV_REVISION_NUMBER
 )
 
 SET(RV_VERSION_YEAR
-    "2023"
+    "2024"
     CACHE STRING "RV's year of release."
 )
 
