@@ -40,7 +40,7 @@ Open RV is currently supported on the following operating systems:
 * [Linux Rocky 8](docs/build_system/config_linux_rocky8.md)
 * [Linux Rocky 9](docs/build_system/config_linux_rocky9.md)
 
-Support for other operating systems is on a best effort basis.
+Support for other [operating systems](docs/build_system) is on a best effort basis.
 
 ## Building RV
 
