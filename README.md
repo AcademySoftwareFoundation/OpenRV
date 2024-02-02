@@ -38,7 +38,7 @@ Open RV is currently supported on the following operating systems:
 * [macOS Big Sur, Monterey and Ventura](docs/build_system/config_macos.md)
 * [Linux Centos 7](docs/build_system/config_linux_centos7.md)
 
-Support for other operating systems is on a best effort basis.
+Support for other [operating systems](docs/build_system) is on a best effort basis.
 
 ## Building RV
 
