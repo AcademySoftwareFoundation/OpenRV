@@ -38,6 +38,7 @@
 #include <mp4v2Utils/mp4v2Utils.h>
 
 extern "C" {
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/imgutils.h>
 #include <libavutil/opt.h>
@@ -215,18 +216,16 @@ struct AudioTrack
           numChannels(0),
           start(0),
           desired(0),
-          bufferPointer(0)
+          bufferPointer(0),
+          avCodecContext(0)
     {
         audioFrame = av_frame_alloc();
-        audioPacket = new AVPacket();
-        av_init_packet(audioPacket);
-        audioPacket->data = NULL;
-        audioPacket->size = 0;
+        audioPacket = av_packet_alloc();
     };
 
     ~AudioTrack()
     {
-        if (audioPacket) delete audioPacket;
+        if (audioPacket) av_packet_free(&audioPacket);
         if (audioFrame) av_frame_free(&audioFrame);
     };
 
@@ -250,6 +249,7 @@ struct AudioTrack
     SampleTime          start;
     SampleTime          desired;
     float*              bufferPointer;
+    AVCodecContext*     avCodecContext;
 };
 
 struct VideoTrack
@@ -262,22 +262,20 @@ struct VideoTrack
           imgConvertContext(0),
           isOpen(false),
           rotate(false),
-          colrType("")
+          colrType(""),
+          avCodecContext(0)
     {
         videoFrame = av_frame_alloc();
-        videoPacket = new AVPacket();
-        av_init_packet(videoPacket);
-        videoPacket->data = NULL;
-        videoPacket->size = 0;
-        memset(&inPicture, 0, sizeof(AVPicture));
-        memset(&outPicture, 0, sizeof(AVPicture));
+        videoPacket = av_packet_alloc();
+        inPicture = av_frame_alloc();
+        outPicture = av_frame_alloc();
     };
 
     ~VideoTrack()
     {
         //
         //  Be paranoid: get rid of these pointers that were borrowed
-        //  from AVPicture. ffmpeg doesn't touch them on deletion, but
+        //  from AVFrame. ffmpeg doesn't touch them on deletion, but
         //  it also doesn't say it won't
         //
 
@@ -288,10 +286,10 @@ struct VideoTrack
         }
 
         if (imgConvertContext) sws_freeContext(imgConvertContext);
-        if (videoPacket) delete videoPacket;
+        if (videoPacket) av_packet_free(&videoPacket);
         if (videoFrame) av_frame_free(&videoFrame);
-        avpicture_free(&inPicture);
-        avpicture_free(&outPicture);
+        av_frame_free(&inPicture);
+        av_frame_free(&outPicture);
     };
 
     VideoTrack& initFrom(const VideoTrack* t)
@@ -315,9 +313,10 @@ struct VideoTrack
     struct SwsContext*  imgConvertContext;
     AVPacket*           videoPacket;
     AVFrame*            videoFrame;
-    AVPicture           inPicture;
-    AVPicture           outPicture;
+    AVFrame*            inPicture;
+    AVFrame*            outPicture;
     string              colrType;
+    AVCodecContext*     avCodecContext;
 };
 
 //
@@ -498,7 +497,7 @@ ContextPool::Reservation::Reservation(MovieFFMpegReader* reader,
 
             gcp.m_currentOpenThreads -= closeContext.avContext->thread_count;
 
-            avcodec_close(closeContext.avContext);
+            avcodec_free_context(&closeContext.avContext);
 
             if (closeContext.vTrack) closeContext.vTrack->isOpen = false;
             if (closeContext.aTrack) closeContext.aTrack->isOpen = false;
@@ -535,9 +534,15 @@ ContextPool::Reservation::~Reservation()
     {
         AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
 
-        context.avContext = avStream->codec;
-
         context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
+        if (context.vTrack)
+        {
+          context.avContext = context.vTrack->avCodecContext;
+        }
+        else if (context.aTrack)
+        {
+          context.avContext = context.aTrack->avCodecContext;
+        }
     }
 
     //
@@ -546,7 +551,7 @@ ContextPool::Reservation::~Reservation()
     //  first if necessary.
     //
 
-    if (context.avContext && !avcodec_is_open(context.avContext))
+    if (!context.avContext)
     {
         if (context.inOpenList)
         {
@@ -743,7 +748,7 @@ AVPixelFormat
 getBestAVFormat(AVPixelFormat native)
 {
     const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
-    int bitSize = desc->comp[0].depth_minus1 + 1 - desc->comp[0].shift;
+    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
     bool hasAlpha = true; //(desc->flags & AV_PIX_FMT_FLAG_ALPHA);
     return (hasAlpha) ?
         ((bitSize > 8) ? AV_PIX_FMT_RGBA64 : AV_PIX_FMT_RGBA) :
@@ -764,7 +769,7 @@ getBestRVFormat(AVPixelFormat native)
     //
 
     const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
-    int bitSize = desc->comp[0].depth_minus1 + 1 - desc->comp[0].shift;
+    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
     bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
     bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
     bool isRGB = (desc->flags & AV_PIX_FMT_FLAG_RGB);
@@ -856,26 +861,26 @@ rowColumnSwap(unsigned char* in, int w, int h, unsigned char* out)
 }
 
 void
-validateTimestamps(AVPacket* pkt, AVStream* stm, int64_t frameCount,
+validateTimestamps(AVPacket* pkt, AVStream* stm, AVCodecContext* context, int64_t frameCount,
     bool isAudio=false)
 
 {
     if (pkt->pts == AV_NOPTS_VALUE && !isAudio &&
-        !(stm->codec->codec->capabilities & AV_CODEC_CAP_DELAY))
+        !(context->codec->capabilities & AV_CODEC_CAP_DELAY))
         pkt->pts = frameCount;
 
     if (pkt->pts != AV_NOPTS_VALUE)
         pkt->pts =
-            av_rescale_q(pkt->pts, stm->codec->time_base, stm->time_base);
+            av_rescale_q(pkt->pts, context->time_base, stm->time_base);
     if (pkt->dts != AV_NOPTS_VALUE)
         pkt->dts =
-            av_rescale_q(pkt->dts, stm->codec->time_base, stm->time_base);
+            av_rescale_q(pkt->dts, context->time_base, stm->time_base);
     if (pkt->duration > 0 && isAudio)
         pkt->duration =
-            av_rescale_q(pkt->duration, stm->codec->time_base, stm->time_base);
+            av_rescale_q(pkt->duration, context->time_base, stm->time_base);
 }
 
-void copyImage(AVPicture* dst, const AVPicture* src,
+void copyImage(AVFrame* dst, const AVFrame* src,
                const AVPixelFormat pix_fmt, int width, int height)
 {
   HOP_PROF_FUNC();
@@ -885,16 +890,10 @@ void copyImage(AVPicture* dst, const AVPicture* src,
   const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get( pix_fmt );
   if( desc && !( desc->flags & AV_PIX_FMT_FLAG_HWACCEL ) )
   {
-    if( desc->flags & AV_PIX_FMT_FLAG_PAL ||
-        desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL )
+    if( desc->flags & AV_PIX_FMT_FLAG_PAL )
     {
-      FastMemcpy_MP( dst->data[0], src->data[0], width * height );
       // copy the palette
-      if( ( desc->flags & AV_PIX_FMT_FLAG_PAL ) ||
-          ( dst->data[1] && src->data[1] ) )
-      {
-        FastMemcpy( dst->data[1], src->data[1], 4 * 256 );
-      }
+      FastMemcpy( dst->data[1], src->data[1], 4 * 256 );
     }
     else
     {
@@ -958,10 +957,6 @@ MovieFFMpegReader::MovieFFMpegReader(const MovieFFMpegIO* io)
     #if DB_TIMING & DB_LEVEL
         m_timingDetails = new TimingDetails();
     #endif
-
-    // use the new FFMpeg API for video decoding
-    // only when specified explicitly.
-    m_useNewVideoDecodingApi = getenv("SGC_PREF_USE_NEW_VIDEO_DECODING_API");
 }
 
 MovieFFMpegReader::~MovieFFMpegReader()
@@ -989,7 +984,7 @@ MovieFFMpegReader::close()
         AudioTrack* track = m_audioTracks[i];
         if (track->isOpen)
         {
-            avcodec_close(m_avFormatContext->streams[track->number]->codec);
+            avcodec_free_context(&track->avCodecContext);
         }
         ContextPool::flushContext(this, track->number);
         delete track;
@@ -1001,7 +996,7 @@ MovieFFMpegReader::close()
         VideoTrack* track = m_videoTracks[i];
         if (track->isOpen)
         {
-            avcodec_close(m_avFormatContext->streams[track->number]->codec);
+            avcodec_free_context(&track->avCodecContext);
         }
         ContextPool::flushContext(this, track->number);
         delete track;
@@ -1198,7 +1193,7 @@ MovieFFMpegReader::trackFromStreamIndex(int index, VideoTrack*& vTrack,
 }
 
 bool
-MovieFFMpegReader::openAVCodec(int index)
+MovieFFMpegReader::openAVCodec(int index, AVCodecContext** avCodecContext)
 {
     // Make sure the format is opened
     if (m_avFormatContext == 0)
@@ -1209,12 +1204,11 @@ MovieFFMpegReader::openAVCodec(int index)
 
     // Get the codec context
     AVStream* avStream = m_avFormatContext->streams[index];
-    AVCodecContext* avCodecContext = avStream->codec;
-    if (avcodec_is_open(avCodecContext)) return true;
+    if (*avCodecContext && avcodec_is_open(*avCodecContext)) return true;
 
     // Find the decoder for the av stream
-    AVCodec* avCodec = 0;
-    switch (avCodecContext->codec_id)
+    const AVCodec* avCodec = 0;
+    switch (avStream->codecpar->codec_id)
     {
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_H265:
@@ -1224,34 +1218,51 @@ MovieFFMpegReader::openAVCodec(int index)
             // no break;
 
         default:
-            avCodec = avcodec_find_decoder(avCodecContext->codec_id);
+            avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
             break;
     }
     if (avCodec == 0)
     {
         cout << "ERROR: MovieFFMpeg: Unsupported codec_id '" <<
-            avCodecContext->codec_id << "' in " << m_filename << endl;
+            avStream->codecpar->codec_id << "' in " << m_filename << endl;
+        return false;
+    }
+
+    *avCodecContext = avcodec_alloc_context3(avCodec);
+    if (!*avCodecContext) {
+        cout << "ERROR: MovieFFMpeg: Failed to allocate codec context '" <<
+            avCodec->name << "' for " << m_filename << endl;
+        return false;;
+    }
+
+    // Copy codec parameters from input stream to output codec context
+    if (avcodec_parameters_to_context(*avCodecContext, avStream->codecpar) < 0) {
+        cout << "ERROR: MovieFFMpeg: Failed to copy '" << avCodec->name <<
+            "' codec parameters to decoder context for " << m_filename << endl;
+        avcodec_free_context(avCodecContext);
         return false;
     }
 
     // Open the codec
-    avCodecContext->thread_count = m_io->codecThreads();
-    if (avcodec_open2(avCodecContext, avCodec, 0) < 0)
+    (*avCodecContext)->thread_count = m_io->codecThreads();
+    if (avcodec_open2(*avCodecContext, avCodec, 0) < 0)
     {
         cout << "ERROR: MovieFFMpeg: Failed to open codec '" <<
             avCodec->name << "' for " << m_filename << endl;
+        avcodec_free_context(avCodecContext);
         return false;
     }
 
     // Check if this is a valid Video Pixel Format
-    if (avCodecContext->codec_type == AVMEDIA_TYPE_VIDEO)
+    if ((*avCodecContext)->codec_type == AVMEDIA_TYPE_VIDEO)
     {
-        AVPixelFormat nativeFormat = avCodecContext->pix_fmt;
+        AVPixelFormat nativeFormat = (*avCodecContext)->pix_fmt;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
         if (desc == NULL)
         {
             cout << "ERROR: MovieFFMpeg: Invalid pixel format! " <<
                 m_filename << endl;
+            avcodec_free_context(avCodecContext);
             return false;
         }
     }
@@ -1269,11 +1280,11 @@ MovieFFMpegReader::openAVCodec(int index)
     if (aTrack) aTrack->lastDecodedAudio = AV_NOPTS_VALUE;
 
     // Make sure to only use allowed codecs
-    if (!m_io->codecIsAllowed(avCodecContext->codec->name, true))
+    if (!m_io->codecIsAllowed((*avCodecContext)->codec->name, true))
     {
         cout << "ERROR: MovieFFMpeg: Unallowed codec '" <<
-            avCodecContext->codec->name << "' in " << m_filename << endl;
-        if (avCodecContext) avcodec_close(avCodecContext);
+            (*avCodecContext)->codec->name << "' in " << m_filename << endl;
+        avcodec_free_context(avCodecContext);
         return false;
     }
 
@@ -1298,8 +1309,8 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
     {
         AVStream *tsStream = m_avFormatContext->streams[i];
 
-        AVRational tcRate = {tsStream->codec->time_base.den,
-                             tsStream->codec->time_base.num};
+        AVRational tcRate = {tsStream->time_base.den,
+                             tsStream->time_base.num};
 
         AVDictionaryEntry *tcrEntry;
         tcrEntry = av_dict_get(tsStream->metadata, "reel_name", NULL, 0);
@@ -1455,7 +1466,7 @@ FrameBuffer::Orientation
 MovieFFMpegReader::snagOrientation(VideoTrack* track)
 {
     AVStream* videoStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* videoCodecContext = videoStream->codec;
+    AVCodecContext* videoCodecContext = track->avCodecContext;
     AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
     const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
     bool yuvPlanar = (!(desc->flags & AV_PIX_FMT_FLAG_ALPHA) &&
@@ -1500,7 +1511,7 @@ bool
 MovieFFMpegReader::snagVideoColorInformation(VideoTrack* track)
 {
     AVStream* videoStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* videoCodecContext = videoStream->codec;
+    AVCodecContext* videoCodecContext = track->avCodecContext;
 
     // Check and see if we have any data about the color
     bool hasColorData = (snagColr(videoCodecContext, track) ||
@@ -1889,9 +1900,9 @@ MovieFFMpegReader::initializeAll()
     {
         heroVideoTracks.push_back(false);
         heroAudioTracks.push_back(false);
-        AVCodecContext* tsCodecContext = m_avFormatContext->streams[i]->codec;
+        AVStream* tsStream = m_avFormatContext->streams[i];
 
-        if (tsCodecContext->codec_type == AVMEDIA_TYPE_VIDEO)
+        if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             //
             // Due to a bug in how some decoders reset the width and height
@@ -1899,15 +1910,15 @@ MovieFFMpegReader::initializeAll()
             // reading the file header for the first time.
             //
 
-            height = max(height, tsCodecContext->height);
-            width  = max(width,  tsCodecContext->width);
-            pair<int, int> key(tsCodecContext->height, tsCodecContext->width);
+            height = max(height, tsStream->codecpar->height);
+            width  = max(width,  tsStream->codecpar->width);
+            pair<int, int> key(tsStream->codecpar->height, tsStream->codecpar->width);
             resTrackMap[key].push_back(i);
         }
-        else if (tsCodecContext->codec_type == AVMEDIA_TYPE_AUDIO)
+        else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             string tsLang = streamLang(i);
-            int numChans = tsCodecContext->channels;
+            int numChans = tsStream->codecpar->channels;
 
             // Keep a sorted set of channel counts for each language
             chLangMap[tsLang].insert(numChans);
@@ -1988,16 +1999,16 @@ MovieFFMpegReader::initializeAll()
         // Search for audio, video, and subtitle streams
         //
 
-        switch (tsStream->codec->codec_type)
+        switch (tsStream->codecpar->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
                 DBL (DB_METADATA, "Video Track: " << i);
                 if (heroVideoTracks[i])
                 {
                     ContextPool::Reservation reserve(this, i);
-                    if (openAVCodec(i))
+                    VideoTrack* track = new VideoTrack;
+                    if (openAVCodec(i, &track->avCodecContext))
                     {
-                        VideoTrack* track = new VideoTrack;
                         track->number = i;
 
                         ostringstream trackName;
@@ -2014,6 +2025,10 @@ MovieFFMpegReader::initializeAll()
                         trk << "Track" << i;
                         snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
                     }
+                    else
+                    {
+                      delete track;
+                    }
                 }
                 break;
             case AVMEDIA_TYPE_AUDIO:
@@ -2021,15 +2036,19 @@ MovieFFMpegReader::initializeAll()
                 if (heroAudioTracks[i])
                 {
                     ContextPool::Reservation reserve(this, i);
-                    if (openAVCodec(i))
+                    AudioTrack* track = new AudioTrack;
+                    if (openAVCodec(i, &track->avCodecContext))
                     {
-                        AudioTrack* track = new AudioTrack;
                         track->number = i;
                         track->isOpen = true;
                         m_audioTracks.push_back(track);
                         ostringstream trk;
                         trk << "Track" << i;
                         snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
+                    }
+                    else
+                    {
+                      delete track;
                     }
                 }
                 break;
@@ -2045,13 +2064,13 @@ MovieFFMpegReader::initializeAll()
             case AVMEDIA_TYPE_SUBTITLE:
                 DBL (DB_METADATA, "Subtitle Track: " << i);
                 {
-                    #if DB_LEVEL & DB_SUBTITLES
-                        ContextPool::Reservation reserve(this, i);
-                        if (openAVCodec(i))
-                        {
-                            m_subtitleMap[i] = 1;
-                        }
-                    #endif
+                    //#if DB_LEVEL & DB_SUBTITLES
+                    //    ContextPool::Reservation reserve(this, i);
+                    //    if (openAVCodec(i))
+                    //    {
+                    //        m_subtitleMap[i] = 1;
+                    //    }
+                    //#endif
                 }
                 break;
             case AVMEDIA_TYPE_UNKNOWN:
@@ -2162,7 +2181,7 @@ MovieFFMpegReader::initializeVideo(int height, int width)
     {
         VideoTrack* track = m_videoTracks[i];
         AVStream* videoStream = m_avFormatContext->streams[track->number];
-        AVCodecContext* videoCodecContext = videoStream->codec;
+        AVCodecContext* videoCodecContext = track->avCodecContext;
 
         // Tell RV to restrict caching to one thread
         bool slowTrackRandomAccess =
@@ -2188,10 +2207,10 @@ MovieFFMpegReader::initializeVideo(int height, int width)
     // Set the shared MovieInfo. XXX Default to first video track
     AVStream* firstVideoStream =
         m_avFormatContext->streams[m_videoTracks[0]->number];
-    AVCodecContext* firstVideoCodecContext = firstVideoStream->codec;
+    AVCodecContext* firstVideoCodecContext = m_videoTracks[0]->avCodecContext;
     AVPixelFormat nativeFormat = firstVideoCodecContext->pix_fmt;
     const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-    int bitSize = desc->comp[0].depth_minus1 + 1 - desc->comp[0].shift;
+    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
     m_info.numChannels      = desc->nb_components;
     m_info.dataType         = (bitSize > 8) ?
         FrameBuffer::USHORT : FrameBuffer::UCHAR;
@@ -2288,7 +2307,7 @@ MovieFFMpegReader::initializeAudio()
     {
         AudioTrack* track = m_audioTracks[i];
         AVStream* audioStream = m_avFormatContext->streams[track->number];
-        AVCodecContext* audioCodecContext = audioStream->codec;
+        AVCodecContext* audioCodecContext = track->avCodecContext;
         if (audioSampleRate != 0 && audioSampleRate != audioCodecContext->sample_rate)
         {
             TWK_THROW_EXC_STREAM("Audio sample rate must match for each track!");
@@ -2312,7 +2331,6 @@ MovieFFMpegReader::initializeAudio()
         audioCodec = string(audioCodecContext->codec->long_name);
 
         DBL (DB_AUDIO, "Audio track " << i
-                    << " first_dts: " << audioStream->first_dts
                     << " start_time: " << audioStream->start_time
                     << " num frames: " << audioStream->nb_frames
                     << " frame size: " << audioCodecContext->frame_size
@@ -2327,7 +2345,7 @@ MovieFFMpegReader::initializeAudio()
         audioChannels = idAudioChannels(layout, numChannels);
 
         // XXX Assume this thread will never decode audio
-        avcodec_close(audioCodecContext);
+        avcodec_free_context(&audioCodecContext);
         track->isOpen = false;
     }
 
@@ -2374,8 +2392,7 @@ MovieFFMpegReader::initializeAudio()
 void
 MovieFFMpegReader::addVideoFBAttrs(VideoTrack* track)
 {
-    AVStream* videoStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* videoCodecContext = videoStream->codec;
+    AVCodecContext* videoCodecContext = track->avCodecContext;
 
     // Initialize the frame type
     snagVideoFrameType(track);
@@ -2480,7 +2497,7 @@ MovieFFMpegReader::collectPlaybackTiming(vector<bool> heroVideoTracks,
                          << " codecFPS: " << codecFPS
                          << " frameDur: " << frameDur);
 
-        if (tsStream->codec->codec_type == AVMEDIA_TYPE_VIDEO &&
+        if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
             heroVideoTracks[i] && stmFrames > 0)
         {
 
@@ -2494,18 +2511,17 @@ MovieFFMpegReader::collectPlaybackTiming(vector<bool> heroVideoTracks,
                  << " frames: " << frames
                  << " frameDur: " << frameDur
                  << " timeDuration: " << timeDuration
-                 << " start_time: " << tsStream->start_time
-                 << " first_dts: " << tsStream->first_dts);
+                 << " start_time: " << tsStream->start_time);
 
         }
         // check if we are reading an image instead of a video
-        else if (tsStream->codec->codec_type == AVMEDIA_TYPE_VIDEO &&
+        else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
                  heroVideoTracks[i] && isImageFormat(m_avFormatContext->iformat->name))
         {
             timeDuration = 1;
             frames = 1;
         }
-        else if (tsStream->codec->codec_type == AVMEDIA_TYPE_AUDIO &&
+        else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO &&
                  heroAudioTracks[i])
         {
             if ( stmDuration > 0 && stmTB > 0 )
@@ -2519,7 +2535,7 @@ MovieFFMpegReader::collectPlaybackTiming(vector<bool> heroVideoTracks,
             }
             else
             {
-                double sampleRate = tsStream->codec->sample_rate;
+                double sampleRate = tsStream->codecpar->sample_rate;
                 if (stmFrames > 0 && sampleRate > 0)
                 {
                     double stmLength = double(stmFrames) / sampleRate;
@@ -2693,7 +2709,7 @@ MovieFFMpegReader::audioFillBuffer(const AudioReadRequest& request,
         if (start < 0) continue;
         AudioTrack* track = m_audioTracks[i];
         ContextPool::Reservation reserve(this, track->number);
-        track->isOpen = openAVCodec(track->number);
+        track->isOpen = openAVCodec(track->number, &track->avCodecContext);
         if (!track->isOpen)
         {
             cout << "ERROR: Unable to read from audio stream: " <<
@@ -2703,7 +2719,6 @@ MovieFFMpegReader::audioFillBuffer(const AudioReadRequest& request,
         AVStream* audioStream = m_avFormatContext->streams[track->number];
 
         DBL (DB_AUDIO, "nb_frames: " << audioStream->nb_frames
-                    << " first_dts: " << audioStream->first_dts
                     << " timebase: " << av_q2d(audioStream->time_base)
                     << " start: " << start);
 
@@ -2757,7 +2772,7 @@ SampleTime
 MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
 {
     AVStream* audioStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* audioCodecContext = audioStream->codec;
+    AVCodecContext* audioCodecContext = track->avCodecContext;
     double timebase = av_q2d(audioStream->time_base);
 
     DBL (DB_AUDIO, "start: " << track->start
@@ -2810,7 +2825,6 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
     // in the range we are requesting.
     //
 
-    int bytesRead = 0;
     int frameFinished = 0;
     bool finalPacket = false;
     do
@@ -2829,7 +2843,7 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
             {
                 DBL (DB_AUDIO, "freeing audio packet from stream: "
                     << track->audioPacket->stream_index);
-                av_free_packet(track->audioPacket);
+                av_packet_unref(track->audioPacket);
                 if (av_read_frame(m_avFormatContext, track->audioPacket) < 0)
                 {
                     finalPacket = true;
@@ -2847,23 +2861,15 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
                     << " dur: " << track->audioPacket->duration
                     << " final: " << finalPacket);
 
+        avcodec_send_packet(audioCodecContext, track->audioPacket);
         // Loop we normally pass through once unless draining the last packet
         do
         {
-            bytesRead = avcodec_decode_audio4(audioCodecContext,
-                track->audioFrame, &frameFinished, track->audioPacket);
-            if (bytesRead == 0 && m_filename.substr(0,4) == "http" && !finalPacket)
+            frameFinished = avcodec_receive_frame(audioCodecContext, track->audioFrame) == 0;
+            if (!frameFinished)
             {
-                cerr << "attempting restart in audio" << endl;
-                close();
-                initializeAll();
-                TWK_THROW_EXC_STREAM("Could not decode audio.");
+              break;
             }
-            if (bytesRead < 0)
-            {
-                TWK_THROW_EXC_STREAM("Could not decode audio.");
-            }
-
             if (frameFinished)
             {
                 track->bufferLength = track->audioFrame->nb_samples;
@@ -2873,7 +2879,7 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
 
             DBL (DB_AUDIO, "pkt: " << track->audioPacket->stream_index
                         << " frmDts: " << track->audioFrame->pkt_dts
-                        << " frmPts: " << track->audioFrame->pkt_pts
+                        << " frmPts: " << track->audioFrame->pts
                         << " frmSize: " << track->audioFrame->pkt_size
                         << " bufferStart: " << track->bufferStart
                         << " bufferEnd: " << track->bufferEnd
@@ -2881,7 +2887,6 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
                         << " last: " << track->lastDecodedAudio
                         << " start: " << track->start
                         << " desired: " << track->desired
-                        << " bytesRead: " << bytesRead
                         << " frameFinished: " << frameFinished
                         << " frmDur: " << track->audioFrame->pkt_duration
                         << " nb_samples: " << track->audioFrame->nb_samples
@@ -2912,12 +2917,11 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
                 if (track->bufferEnd < track->start)
                 {
                     frameFinished = false;
-                    bytesRead = 0;
                     track->lastDecodedAudio = AV_NOPTS_VALUE;
                 }
             }
         }
-        while (!frameFinished && finalPacket && bytesRead > 0);
+        while (!frameFinished && finalPacket);
     }
     while (!frameFinished);
 
@@ -2932,8 +2936,7 @@ MovieFFMpegReader::oneTrackAudioFillBuffer(AudioTrack* track)
 int
 MovieFFMpegReader::decodeAudioForBuffer(AudioTrack* track)
 {
-    AVStream* audioStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* audioCodecContext = audioStream->codec;
+    AVCodecContext* audioCodecContext = track->avCodecContext;
     AVSampleFormat audioFormat = audioCodecContext->sample_fmt;
 
     int collected = 0;
@@ -3045,41 +3048,28 @@ MovieFFMpegReader::configureYUVPlanes(FrameBuffer::DataType dataType,
 }
 
 void MovieFFMpegReader::seekToFrame(const int inframe, const double frameDur,
-                                    AVStream* videoStream, VideoTrack* track,
-                                    bool drainRequested)
+                                    AVStream* videoStream, VideoTrack* track)
 {
   #if DB_TIMING & DB_LEVEL
   m_timingDetails->startTimer("seek");
   #endif
 
-  //
-  // XXX I am working from the assumption that timestamp 0 is true start
-  // of every type of media. Therefore if we get a negative timestamp for
-  // the first dts, then we have to assume it refers to the preroll
-  // required to decode the first frame (ideally at or near 0). Thus when
-  // we need to seek we should look for the previous frame offset by any
-  // preroll indicated by a negative first dts.
-  //
-  const int64_t startPTS = (videoStream->start_time != AV_NOPTS_VALUE) ?
-                           videoStream->start_time : 0;
-  const int64_t firstDTS = (videoStream->first_dts != AV_NOPTS_VALUE) ?
-                           videoStream->first_dts : 0;
-  const int64_t seekTarget = int64_t((inframe - 1) * frameDur) +
-                             min(firstDTS, firstDTS - startPTS);
+  // To make seeking a bit more robust, step back 3 frames from the intended frame.
+  // This is because FFmpeg internally seeks with the dts timestamp and not the pts
+  // timestamp, so we need to have a bit of a buffer.
+  const int64_t seekTarget = int64_t((inframe - 3) * frameDur);
 
   DBL (DB_VIDEO, "seekTarget: " << seekTarget
                                 << " last: " << track->lastDecodedVideo
                                 << " inMinus1: " << inframe - 1);
 
-  if(drainRequested)
-  {
-    avcodec_send_packet(videoStream->codec, nullptr);
+  avcodec_send_packet(track->avCodecContext, nullptr);
 
-    int ret = 0;
-    while (ret != AVERROR_EOF)
-      ret = avcodec_receive_frame( videoStream->codec, track->videoFrame );
-  }
-  avcodec_flush_buffers(videoStream->codec);
+  int ret = 0;
+  while (ret != AVERROR_EOF)
+    ret = avcodec_receive_frame( track->avCodecContext, track->videoFrame );
+
+  avcodec_flush_buffers(track->avCodecContext);
   if(av_seek_frame(m_avFormatContext, track->number, seekTarget,
                    AVSEEK_FLAG_BACKWARD) < 0)
   {
@@ -3114,7 +3104,7 @@ bool MovieFFMpegReader::readPacketFromStream(const int inframe, VideoTrack* trac
   {
     DBL (DB_VIDEO, "freeing video packet from stream: "
       << track->videoPacket->stream_index);
-    av_free_packet(track->videoPacket);
+    av_packet_unref(track->videoPacket);
     HOP_PROF("av_read_frame()");
     if (av_read_frame(m_avFormatContext, track->videoPacket) < 0)
     {
@@ -3161,9 +3151,9 @@ bool MovieFFMpegReader::readPacketFromStream(const int inframe, VideoTrack* trac
   return finalPacket;
 }
 
-void MovieFFMpegReader::sendPacketToDecoder(AVStream* videoStream, VideoTrack* track)
+void MovieFFMpegReader::sendPacketToDecoder(VideoTrack* track)
 {
-  int ret = avcodec_send_packet(videoStream->codec, track->videoPacket);
+  int ret = avcodec_send_packet(track->avCodecContext, track->videoPacket);
   if (ret < 0)
   {
     if (ret == AVERROR(EAGAIN))
@@ -3172,6 +3162,7 @@ void MovieFFMpegReader::sendPacketToDecoder(AVStream* videoStream, VideoTrack* t
       // However, since we fully drain the output in each decode call, this
       // should never happen.
       TWK_THROW_EXC_STREAM("avcodec_send_packet failed in video stream: AVERROR(EAGAIN)");
+
     }
     else
     {
@@ -3181,7 +3172,7 @@ void MovieFFMpegReader::sendPacketToDecoder(AVStream* videoStream, VideoTrack* t
 }
 
 bool MovieFFMpegReader::findImageWithBestTimestamp(
-  int inframe, int frameDur, AVStream* videoStream, VideoTrack* track)
+  int inframe, double frameDur, AVStream* videoStream, VideoTrack* track)
 {
   // The goal timestamp is the same as the seek target adjusted
   // for pts vs dts.
@@ -3195,7 +3186,7 @@ bool MovieFFMpegReader::findImageWithBestTimestamp(
     readPacketFromStream(inframe, track);
 
     // Then we need to send the packet as input to the decoder.
-    sendPacketToDecoder(videoStream, track);
+    sendPacketToDecoder(track);
   }
   // Look for the best (closest to the goal) timestamp in the updated list.
   int64_t bestTS = findBestTS(goalTS, frameDur, track, false);
@@ -3204,7 +3195,7 @@ bool MovieFFMpegReader::findImageWithBestTimestamp(
   while (searching)
   {
     HOP_PROF("avcodec_receive_frame()");
-    int ret = avcodec_receive_frame( videoStream->codec, track->videoFrame );
+    int ret = avcodec_receive_frame( track->avCodecContext, track->videoFrame );
     if (ret < 0)
     {
       if (ret == AVERROR(EAGAIN))
@@ -3212,7 +3203,7 @@ bool MovieFFMpegReader::findImageWithBestTimestamp(
         // This is valid. This occurs when we need more input.
         // Let's supply a new packet to the codec and update the best timestamp.
         readPacketFromStream(inframe, track);
-        sendPacketToDecoder(videoStream, track);
+        sendPacketToDecoder(track);
         bestTS = findBestTS(goalTS, frameDur, track, false);
         continue;
       }
@@ -3227,7 +3218,7 @@ bool MovieFFMpegReader::findImageWithBestTimestamp(
       // Figure out if we got a good timestamp. Whether we are using pts
       // ot dts for this format calculate the frame this decode
       // represents for RV.
-      const int64_t pktPTS = track->videoFrame->pkt_pts;
+      const int64_t pktPTS = track->videoFrame->pts;
       const int64_t pktDTS = track->videoFrame->pkt_dts;
       const int64_t lastTS = (pktPTS == AV_NOPTS_VALUE) ? pktDTS : pktPTS;
       track->lastDecodedVideo = int(double(lastTS) / frameDur + 1.49);
@@ -3257,132 +3248,6 @@ bool MovieFFMpegReader::findImageWithBestTimestamp(
   return true;
 }
 
-bool MovieFFMpegReader::findImageWithBestTimestamp_legacy(
-  int inframe, double frameDur, AVStream* videoStream, VideoTrack* track)
-{
-  AVCodecContext* videoCodecContext = videoStream->codec;
-
-  //
-  // What follows is a bit tricky. If we are decoding a non-interframe codec,
-  // that is a codec that stores everything needed to decode each frame with
-  // each frame, then we typically only need to call av_read_frame once and
-  // avcodec_decode_video2 once to get our frame. That is the simple case.
-  //
-  // The reason for all the do loops is for the harder interframe case where
-  // we may need multiple calls to av_read_frame and avcodec_decode_video2 to
-  // get one single frame. With interframe codecs you may have everything you
-  // need on one frame, but you could need one or two more other frames to
-  // decode the frame you are looking for.
-  //
-  // This is all made a bit trickier by the fact that in order to get the
-  // most efficent read and decode possible the underlying libraries try to
-  // read ahead for you so that they can automatically reorder the decoded
-  // frames into presentation order rather than how they are stored in
-  // decode order.
-  //
-  // That means that as we get close to reading the end of the file we have
-  // to switch from a read and decode approach to draining the internal cache
-  // of the videoPacket.
-  //
-  // The main loop here reads and decodes until we have completely decoded
-  // the frame we came here for. If we read past that frame and don't have
-  // a completed frame we throw.
-  //
-  int frameFinished = 0;
-  int bytesRead = 0;
-  bool finalPacket = false;
-  bool packetsDrained = false;
-  bool searching = false;
-  do
-  {
-    DBL (DB_VIDEO, "searching for video");
-
-    // The goal timestamp is the same as the seek target adjusted
-    // for pts vs dts.
-    const int64_t goalTS = (inframe - 1) * frameDur;
-
-    // Read a packet from the stream.
-    finalPacket = readPacketFromStream(inframe, track);
-
-    // Look for the best (closest to the goal) timestamp in the updated list.
-    const int64_t bestTS = findBestTS(goalTS, frameDur, track, finalPacket);
-
-    // Loop we normally pass through once unless draining the last packet
-    do
-    {
-      HOP_PROF("avcodec_decode_video2()");
-      bytesRead = avcodec_decode_video2(videoCodecContext,
-                                        track->videoFrame, &frameFinished, track->videoPacket);
-      if (bytesRead == 0 && m_filename.substr(0,4) == "http" && !finalPacket)
-      {
-        cerr << "attempting restart in video" << endl;
-        close();
-        initializeAll();
-        TWK_THROW_EXC_STREAM("Could not decode video.");
-      }
-      if (bytesRead < 0)
-      {
-        TWK_THROW_EXC_STREAM("Could not decode video.");
-      }
-
-      //
-      // Figure out if we got a good timestamp. Whether we are using pts
-      // ot dts for this format calculate the frame this decode
-      // represents for RV.
-      //
-
-      int64_t pktPTS = track->videoFrame->pkt_pts;
-      int64_t pktDTS = track->videoFrame->pkt_dts;
-      int64_t lastTS = AV_NOPTS_VALUE;
-      if (frameFinished)
-      {
-        lastTS = (pktPTS == AV_NOPTS_VALUE) ? pktDTS : pktPTS;
-      }
-      track->lastDecodedVideo = int(double(lastTS) / frameDur + 1.49);
-
-      //
-      // If the last timestamp is now equal to or greater than either the
-      // best possible timestamp for inframe or the last of the stream
-      // then we are no longer searching.
-      //
-
-      searching = (lastTS < bestTS);
-
-      //
-      // If there are no more valid decoded timestamps in the frame then
-      // the packet is drained and we can read no more.
-      //
-
-      packetsDrained = (finalPacket && pktPTS == AV_NOPTS_VALUE &&
-                        pktDTS == AV_NOPTS_VALUE);
-
-      #if DB_VIDEO & DB_LEVEL
-      int64_t startPTS = (videoStream->start_time != AV_NOPTS_VALUE) ?
-              videoStream->start_time : 0;
-      #endif
-      DBL (DB_VIDEO, "read: " << bytesRead
-                              << " frameDur: " << frameDur
-                              << " startPTS: " << startPTS
-                              << " done: " << frameFinished
-                              << " srch: " << int(searching)
-                              << " final: " << int(finalPacket)
-                              << " empty: " << int(packetsDrained));
-      DBL (DB_VIDEO, "pktPTS: " << pktPTS
-                                << " pktDTS: " << pktDTS
-                                << " goalTS: " << goalTS
-                                << " goal: " << int(double(goalTS) / frameDur + 1.49)
-                                << " bestTS: " << bestTS
-                                << " best: " << int(double(bestTS) / frameDur + 1.49)
-                                << " lastTS: " << lastTS
-                                << " last: " << track->lastDecodedVideo);
-    }
-    while ((searching || !frameFinished) && finalPacket && !packetsDrained);
-  }
-  while ((searching || !frameFinished) && !packetsDrained);
-
-  return frameFinished;
-}
-
 FrameBuffer*
 MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
 {
@@ -3404,20 +3269,16 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
     HOP_PROF_FUNC();
 
     AVStream* videoStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* videoCodecContext = videoStream->codec;
+    AVCodecContext* videoCodecContext = track->avCodecContext;
     double frameDur = double(videoStream->time_base.den) /
         (double(videoStream->time_base.num) * m_info.fps);
-    const bool useNewVideoDecodingApi =
-        m_useNewVideoDecodingApi ||
-        videoStream->codec->codec_id == AV_CODEC_ID_AV1;
 
     DBL (DB_VIDEO, "stream duration: " << videoStream->duration
                 << " num frames: " << videoStream->nb_frames
                 << " time base: " << av_q2d(videoStream->time_base)
                 << " (" << videoStream->time_base.num
                 << "/" << videoStream->time_base.den
-                << ") first dts: " << videoStream->first_dts
-                << " start time: " << videoStream->start_time
+                << ") start time: " << videoStream->start_time
                 << " frameDur: " << frameDur);
 
     // Seek to requested frame if necessary
@@ -3435,7 +3296,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
         track->lastDecodedVideo >= inframe ||
         track->lastDecodedVideo <  ( inframe - nearFrameThreshold ) )
     {
-      seekToFrame(inframe, frameDur, videoStream, track, useNewVideoDecodingApi);
+      seekToFrame(inframe, frameDur, videoStream, track);
     }
 
     //
@@ -3446,9 +3307,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
         m_timingDetails->startTimer("decode");
     #endif
 
-    const bool frameFinished = useNewVideoDecodingApi
-        ? findImageWithBestTimestamp(inframe, frameDur, videoStream, track)
-        : findImageWithBestTimestamp_legacy(inframe, frameDur, videoStream, track);
+    const bool frameFinished = findImageWithBestTimestamp(inframe, frameDur, videoStream, track);
 
     // Remove earlier timestamps
     int64_t prune = (inframe - 2) * frameDur;
@@ -3507,7 +3366,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
 
     AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
     const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-    int bitSize = desc->comp[0].depth_minus1 + 1 - desc->comp[0].shift;
+    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
     int numPlanes = 0;
     bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
     bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
@@ -3517,7 +3376,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
         FrameBuffer::USHORT : FrameBuffer::UCHAR;
     FrameBuffer::StringVector chans(3);
     FrameBuffer* out = 0;
-    avpicture_fill((AVPicture*)outFrame, 0, nativeFormat, width, height);
+    av_image_fill_arrays(outFrame->data, outFrame->linesize, 0, nativeFormat, width, height, 1);
 
     // Note: We're about to use offset_plus1 here to derive the RGB channel
     // ordering. Here is the definition of offset_plus1 according to the FFmpeg
@@ -3526,7 +3385,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
     // Elements are *bytes*.
     // For an RGB24 format, you will get offset_plus1 = {1,2,3}
     // For an RGB48 format, you will get offset_plus1 = {1,3,5}
-    const int nbElementsPerChannel = max(1, (desc->comp[0].depth_minus1+1+7)/8);
+    const int nbElementsPerChannel = max(1, (desc->comp[0].depth+7)/8);
 
     switch (nativeFormat)
     {
@@ -3539,7 +3398,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
             chans.resize(4);
             {
                 const int maxOffset = static_cast<int>(chans.size())-1;
-                int offset3 = max(0, min(maxOffset, (desc->comp[3].offset_plus1 - 1)/nbElementsPerChannel));
+                int offset3 = max(0, min(maxOffset, desc->comp[3].offset/nbElementsPerChannel));
                 chans[offset3] = "A";
             }
         case AV_PIX_FMT_RGB48:
@@ -3548,9 +3407,9 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
         case AV_PIX_FMT_BGR24:
             {
                 const int maxOffset = static_cast<int>(chans.size())-1;
-                int offset0 = max(0, min(maxOffset, (desc->comp[0].offset_plus1 - 1)/nbElementsPerChannel));
-                int offset1 = max(0, min(maxOffset, (desc->comp[1].offset_plus1 - 1)/nbElementsPerChannel));
-                int offset2 = max(0, min(maxOffset, (desc->comp[2].offset_plus1 - 1)/nbElementsPerChannel));
+                int offset0 = max(0, min(maxOffset, desc->comp[0].offset/nbElementsPerChannel));
+                int offset1 = max(0, min(maxOffset, desc->comp[1].offset/nbElementsPerChannel));
+                int offset2 = max(0, min(maxOffset, desc->comp[2].offset/nbElementsPerChannel));
                 chans[offset0] = "R";
                 chans[offset1] = "G";
                 chans[offset2] = "B";
@@ -3575,8 +3434,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
             else
             {
                 convertFormat = true;
-                avpicture_fill((AVPicture*)outFrame, 0, nativeFormat,
-                    width, height);
+                av_image_fill_arrays(outFrame->data, outFrame->linesize, 0, nativeFormat, width, height, 1);
                 out = new FrameBuffer(
                     width, height, (hasAlpha) ? 4 : 3, dataType);
             }
@@ -3618,11 +3476,7 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
     }
     else
     {
-        av_picture_copy((AVPicture*)outFrame,
-                        (AVPicture*)track->videoFrame,
-                        videoCodecContext->pix_fmt,
-                        width,
-                        height);
+        av_image_copy(outFrame->data, outFrame->linesize, track->videoFrame->data, track->videoFrame->linesize, videoCodecContext->pix_fmt, width, height);
     }
 
     // Clean up
@@ -3678,8 +3532,8 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
         AVStream *tsStream = m_avFormatContext->streams[m_timecodeTrack];
         AVDictionaryEntry *tcEntry;
         tcEntry = av_dict_get(tsStream->metadata, "timecode", NULL, 0);
-        AVRational rate = {tsStream->codec->time_base.den,
-                           tsStream->codec->time_base.num};
+        AVRational rate = {tsStream->time_base.den,
+                           tsStream->time_base.num};
 
         // Correct wrong frame rates that seem to be generated by some codecs
         if ( rate.num > 1000 && rate.den == 1)
@@ -3723,7 +3577,7 @@ MovieFFMpegReader::imagesAtFrame(const ReadRequest& request,
     {
         VideoTrack* track = m_videoTracks[i];
         ContextPool::Reservation reserve(this, track->number);
-        track->isOpen = openAVCodec(track->number);
+        track->isOpen = openAVCodec(track->number, &track->avCodecContext);
         if (!track->isOpen)
         {
             cout << "ERROR: Unable to read from audio stream: " <<
@@ -3892,8 +3746,7 @@ MovieFFMpegReader::translateAVAudio(AudioTrack* track, double maximum, int offse
     //                    ch0SampleM, ch1SampleM, ... chNSampleM
     //
 
-    AVStream* audioStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* audioCodecContext = audioStream->codec;
+    AVCodecContext* audioCodecContext = track->avCodecContext;
     AVSampleFormat audioFormat = audioCodecContext->sample_fmt;
     bool planar = av_sample_fmt_is_planar(audioFormat);
 
@@ -4030,7 +3883,7 @@ void
 MovieFFMpegWriter::addTrack(bool isVideo, string codec,
     bool removeAppliedCodecParametersFromTheList /*=true*/)
 {
-    AVCodec* avCodec = avcodec_find_encoder_by_name(codec.c_str());
+    const AVCodec* avCodec = avcodec_find_encoder_by_name(codec.c_str());
 
     if (!avCodec)
     {
@@ -4045,7 +3898,7 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
     }
 
     avStream->id = m_avFormatContext->nb_streams - 1;
-    AVCodecContext* avCodecContext = avStream->codec;
+    AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
     if (isVideo)
     {
         m_avOutputFormat->video_codec   = avCodec->id;
@@ -4118,7 +3971,7 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
         AVPixelFormat requestFormat = (m_canControlRequest) ?
             getBestAVFormat(avCodecContext->pix_fmt) : RV_OUTPUT_FFMPEG_FMT;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(requestFormat);
-        int bitSize = desc->comp[0].depth_minus1 + 1 - desc->comp[0].shift;
+        int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
 
         // XXX might need to set avCodecContext->bits_per_raw_sample to match
@@ -4140,6 +3993,7 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
 
         VideoTrack* track = new VideoTrack;
         track->number = avStream->id;
+        track->avCodecContext = avCodecContext;
         m_videoTracks.push_back(track);
 
         // Set the reel name if provided
@@ -4178,6 +4032,7 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
 
         AudioTrack* track = new AudioTrack;
         track->number = avStream->id;
+        track->avCodecContext = avCodecContext;
         m_audioTracks.push_back(track);
 
         // Step back a frame for AAC pre-roll
@@ -4576,7 +4431,7 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
 
     AudioTrack* track = m_audioTracks[0];
     AVStream* audioStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* audioCodecContext = audioStream->codec;
+    AVCodecContext* audioCodecContext = track->avCodecContext;
     AVSampleFormat audioFormat = audioCodecContext->sample_fmt;
     int audioChannels = audioCodecContext->channels;
     int sampleSize = av_get_bytes_per_sample(audioFormat);
@@ -4641,7 +4496,6 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
     track->audioFrame->channel_layout = audioCodecContext->channel_layout;
     avcodec_fill_audio_frame(track->audioFrame, audioChannels,
         audioFormat, (uint8_t*)m_audioSamples, totalOutputSize, 0);
-    int gotAudio = 0;
 
     //
     // Make sure the frame has a valid pts to seed the packet.
@@ -4654,56 +4508,35 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
     track->lastEncodedAudio =
         track->audioFrame->pts + track->audioFrame->nb_samples;
 
-    int ret = avcodec_encode_audio2(
-        audioCodecContext, track->audioPacket, track->audioFrame, &gotAudio);
+    int ret = avcodec_send_frame(audioCodecContext, track->audioFrame);
     if (ret < 0)
     {
         TWK_THROW_EXC_STREAM("Error encoding audio frame: " << avErr2Str(ret));
     }
 
-    if (!ret && gotAudio && track->audioPacket->size)
+    while (ret >= 0)
     {
-        track->audioPacket->stream_index = audioStream->index;
-        validateTimestamps(track->audioPacket, audioStream, 0, true);
-        ret = av_interleaved_write_frame(m_avFormatContext, track->audioPacket);
+        ret = avcodec_receive_packet(audioCodecContext, track->audioPacket);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+          break;
+        }
+
         if (ret < 0)
         {
             TWK_THROW_EXC_STREAM(
-                "Error while writing audio frame: " << avErr2Str(ret));
+                "Error encoding audio frame: " << avErr2Str(ret));
         }
-
-        // Update the last time sample in seconds we encoded
-        m_lastAudioTime += samplesToTime(nsamps, m_info.audioSampleRate);
-    }
-    av_free_packet(track->audioPacket);
-    track->audioFrame->pts = track->lastEncodedAudio;
-
-    // Flush any delayed audio packets
-    if (lastPass)
-    {
-        gotAudio = 1;
-        while (gotAudio == 1)
+        if (!ret && track->audioPacket->size)
         {
-            int ret = avcodec_encode_audio2(
-                audioCodecContext, track->audioPacket, NULL, &gotAudio);
+            track->audioPacket->stream_index = audioStream->index;
+            validateTimestamps(track->audioPacket, audioStream, audioCodecContext, 0, true);
+            ret = av_interleaved_write_frame(
+                    m_avFormatContext, track->audioPacket);
             if (ret < 0)
             {
                 TWK_THROW_EXC_STREAM(
-                    "Error encoding audio frame: " << avErr2Str(ret));
+                    "Error while writing audio frame: " << avErr2Str(ret));
             }
-            if (!ret && gotAudio && track->audioPacket->size)
-            {
-                track->audioPacket->stream_index = audioStream->index;
-                validateTimestamps(track->audioPacket, audioStream, 0, true);
-                ret = av_interleaved_write_frame(
-                        m_avFormatContext, track->audioPacket);
-                if (ret < 0)
-                {
-                    TWK_THROW_EXC_STREAM(
-                        "Error while writing audio frame: " << avErr2Str(ret));
-                }
-            }
-            av_free_packet(track->audioPacket);
         }
     }
 
@@ -4716,7 +4549,7 @@ MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
 {
     VideoTrack* track = m_videoTracks[trackIndex];
     AVStream* avStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* videoCodecContext = avStream->codec;
+    AVCodecContext* videoCodecContext = track->avCodecContext;
 
     int fbIndex = (trackIndex > fbs.size() - 1) ? fbs.size() - 1 : trackIndex;
     FrameBuffer* fb = fbs[fbIndex];
@@ -4753,14 +4586,10 @@ MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
               linesizes,
               0,
               videoCodecContext->height,
-              track->outPicture.data,
-              track->outPicture.linesize);
+              track->outPicture->data,
+              track->outPicture->linesize);
 
-    int gotVideo = 0;
-    int ret = avcodec_encode_video2(videoCodecContext,
-                                    track->videoPacket,
-                                    track->videoFrame,
-                                    &gotVideo);
+    int ret = avcodec_send_frame(videoCodecContext, track->videoFrame);
 
     if (ret < 0)
     {
@@ -4768,50 +4597,31 @@ MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
             "Error encoding video frame: " << avErr2Str(ret));
     }
 
-    track->lastEncodedVideo = track->videoFrame->pts;
-    if (!ret && gotVideo && track->videoPacket->size)
+    while (ret >= 0)
     {
-        track->videoPacket->stream_index = avStream->index;
-        validateTimestamps(
-            track->videoPacket, avStream, track->lastEncodedVideo);
-        ret = av_interleaved_write_frame(m_avFormatContext, track->videoPacket);
-        if (ret != 0)
+        ret = avcodec_receive_packet(videoCodecContext, track->videoPacket);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+          break;
+        }
+
+        if (ret < 0)
         {
             TWK_THROW_EXC_STREAM(
-                "Error while writing video frame: " << avErr2Str(ret));
+                "Error encoding video frame: " << avErr2Str(ret));
         }
-    }
-    av_free_packet(track->videoPacket);
-    track->videoFrame->pts = ++track->lastEncodedVideo;
 
-    // Flush any delayed video packets
-    if (lastPass)
-    {
-        gotVideo = 1;
-        while (gotVideo == 1)
+        if (!ret && track->videoPacket->size)
         {
-            int ret = avcodec_encode_video2(
-                videoCodecContext, track->videoPacket, NULL, &gotVideo);
-            if (ret < 0)
+            track->videoPacket->stream_index = avStream->index;
+            validateTimestamps(
+                track->videoPacket, avStream, videoCodecContext, track->lastEncodedVideo);
+            ret = av_interleaved_write_frame(
+                m_avFormatContext, track->videoPacket);
+            if (ret != 0)
             {
                 TWK_THROW_EXC_STREAM(
-                    "Error encoding video frame: " << avErr2Str(ret));
+                    "Error while writing video frame: " << avErr2Str(ret));
             }
-
-            if (!ret && gotVideo && track->videoPacket->size)
-            {
-                track->videoPacket->stream_index = avStream->index;
-                validateTimestamps(
-                    track->videoPacket, avStream, track->lastEncodedVideo);
-                ret = av_interleaved_write_frame(
-                    m_avFormatContext, track->videoPacket);
-                if (ret != 0)
-                {
-                    TWK_THROW_EXC_STREAM(
-                        "Error while writing video frame: " << avErr2Str(ret));
-                }
-            }
-            av_free_packet(track->videoPacket);
         }
     }
 
@@ -4849,7 +4659,7 @@ MovieFFMpegWriter::initVideoTrack(AVStream* avStream)
     DBL (DB_WRITE, "initVideoTrack: " << avStream->id);
 
     VideoTrack* track = m_videoTracks[avStream->id];
-    AVCodecContext* videoCodecContext = avStream->codec;
+    AVCodecContext* videoCodecContext = track->avCodecContext;
     AVPixelFormat srcFmt = (m_canControlRequest) ?
         getBestAVFormat(videoCodecContext->pix_fmt) : RV_OUTPUT_FFMPEG_FMT;
     AVPixelFormat dstFmt = videoCodecContext->pix_fmt;
@@ -4872,13 +4682,15 @@ MovieFFMpegWriter::initVideoTrack(AVStream* avStream)
     }
 
     //
-    //  NOTE: AVPicture buffers are allocated by this function
+    //  NOTE: AVFrame buffers are allocated by this function
     //
 
-    int ret = avpicture_alloc( &track->outPicture,
-                               videoCodecContext->pix_fmt,
-                               videoCodecContext->width,
-                               videoCodecContext->height);
+    track->outPicture->format = videoCodecContext->pix_fmt;
+    track->outPicture->width = videoCodecContext->width;
+    track->outPicture->height = videoCodecContext->height;
+
+    int ret = av_frame_get_buffer(track->outPicture, 0);
+
     if (ret < 0)
     {
         TWK_THROW_EXC_STREAM(
@@ -4886,13 +4698,15 @@ MovieFFMpegWriter::initVideoTrack(AVStream* avStream)
     }
 
     //
-    //  NOTE: AVPicture buffers are allocated by this function
+    //  NOTE: AVFrame buffers are allocated by this function
     //
 
-    ret = avpicture_alloc(&track->inPicture,
-                          srcFmt,
-                          videoCodecContext->width,
-                          videoCodecContext->height);
+    track->inPicture->format = srcFmt;
+    track->inPicture->width = videoCodecContext->width;
+    track->inPicture->height = videoCodecContext->height;
+
+    ret = av_frame_get_buffer(track->inPicture, 0);
+
     if (ret < 0)
     {
         TWK_THROW_EXC_STREAM(
@@ -4914,13 +4728,13 @@ MovieFFMpegWriter::initVideoTrack(AVStream* avStream)
     //  problem.
     //
 
-    assert(sizeof(track->videoFrame->data) == sizeof(track->outPicture.data));
-    assert(sizeof(track->videoFrame->linesize) == sizeof(track->outPicture.linesize));
+    assert(sizeof(track->videoFrame->data) == sizeof(track->outPicture->data));
+    assert(sizeof(track->videoFrame->linesize) == sizeof(track->outPicture->linesize));
 
     for (size_t i = 0; i < AV_NUM_DATA_POINTERS; i++)
     {
-        track->videoFrame->data[i] = track->outPicture.data[i];
-        track->videoFrame->linesize[i] = track->outPicture.linesize[i];
+        track->videoFrame->data[i] = track->outPicture->data[i];
+        track->videoFrame->linesize[i] = track->outPicture->linesize[i];
     }
 
     // Init frame settings from video codec context
@@ -5176,7 +4990,7 @@ MovieFFMpegWriter::getWriterCodec(std::string type, vector<string> guesses)
         }
 
         // Check if this is the right type for the track/stream
-        AVCodec* avCodec = avcodec_find_encoder_by_name(guess.c_str());
+        const AVCodec* avCodec = avcodec_find_encoder_by_name(guess.c_str());
         if (!avCodec || avCodec->type != avType)
         {
             if (i == 0) TWK_THROW_EXC_STREAM("Invalid " << type << " codec: " << guess);
@@ -5253,7 +5067,6 @@ MovieFFMpegWriter::open(const MovieInfo& info,
     {
         TWK_THROW_EXC_STREAM("Unable to create output format");
     }
-    m_avOutputFormat = m_avFormatContext->oformat;
 
     // Check if the output supports video and/or audio
     MovieFFMpegIO::MFFormatMap formats = m_io->getFormats();
@@ -5327,7 +5140,7 @@ MovieFFMpegWriter::open(const MovieInfo& info,
     }
 
     // Open the output file, if needed
-    if ( !(m_avOutputFormat->flags & AVFMT_NOFILE) )
+    if ( !(m_avFormatContext->oformat->flags & AVFMT_NOFILE) )
     {
         int ret = avio_open(
             &m_avFormatContext->pb, m_filename.c_str(), AVIO_FLAG_WRITE);
@@ -5414,13 +5227,13 @@ MovieFFMpegWriter::write(Movie* inMovie)
     for (unsigned int i = 0; i < m_audioTracks.size(); i++)
     {
         AudioTrack* track = m_audioTracks[i];
-        avcodec_close(m_avFormatContext->streams[track->number]->codec);
+        avcodec_free_context(&track->avCodecContext);
         delete track;
     }
     for (unsigned int i = 0; i < m_videoTracks.size(); i++)
     {
         VideoTrack* track = m_videoTracks[i];
-        avcodec_close(m_avFormatContext->streams[track->number]->codec);
+        avcodec_free_context(&track->avCodecContext);
         delete track;
     }
     if (m_audioSamples) av_freep(&m_audioSamples);
@@ -5548,7 +5361,7 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
         //
 
         string fakefile = "test." + formatsItr->first;
-        AVOutputFormat* avOutputFormat = av_guess_format(NULL, fakefile.c_str(), NULL);
+        const AVOutputFormat* avOutputFormat = av_guess_format(NULL, fakefile.c_str(), NULL);
         if (avOutputFormat && avOutputFormat->priv_class)
         {
             collectParameters(avOutputFormat->priv_class, &separams, &sdparams, "", "f:");
@@ -5559,8 +5372,9 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
         //
 
         map <string, int> codecs;
-        AVCodec* codec = av_codec_next(NULL);
-        while (codec != NULL)
+        void *iter = NULL;
+        const AVCodec* codec;
+        while ((codec = av_codec_iterate(&iter)))
         {
             if (codecs.find(codec->name) == codecs.end() &&
                 codecIsAllowed(codec->name, false) &&
@@ -5588,7 +5402,6 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
                 }
                 codecs[codec->name] = 1;
             }
-            codec = av_codec_next(codec);
         }
         if (formatsItr->second.second & MovieIO::MovieWrite)
         {
