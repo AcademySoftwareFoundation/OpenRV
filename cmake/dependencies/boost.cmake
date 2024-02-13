@@ -205,7 +205,7 @@ EXTERNALPROJECT_ADD(
     # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
     # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
     ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=x86 address-model=64
-    ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
+    ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir} define=_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION
   INSTALL_COMMAND echo "Boost was both built and installed in the build stage"
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE

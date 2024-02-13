@@ -37,7 +37,7 @@ QT_OUTPUT_DIR = ""
 PYTHON_OUTPUT_DIR = ""
 OPENSSL_OUTPUT_DIR = ""
 
-LIBCLANG_URL_BASE = "https://mirrors.ocf.berkeley.edu/qt/development_releases/prebuilt/libclang/libclang-release_"
+LIBCLANG_URL_BASE = "https://qt.mirror.constant.com/development_releases/prebuilt/libclang/libclang-release_"
 
 
 def test_python_distribution(python_home: str) -> None:

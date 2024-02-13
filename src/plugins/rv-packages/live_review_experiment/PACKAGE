@@ -1,0 +1,19 @@
+package: Live Review Experiment
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.0
+rv: 2024.0.0
+openrv: 2.0.0
+
+requires: ''
+
+modes: 
+  - file: sync_review_marshal.py
+    load: immediate
+  - file: message_queue_implementation.py
+    load: immediate
+
+description: |
+  <p>
+  ASWF Live Review Demo
+  </p>

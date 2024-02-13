@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import math
 import numbers
@@ -77,6 +77,34 @@ def write_otio_file(root_node_name, file_path):
         timeline.tracks[:] = [otio_root]
 
     otio.adapters.write_to_file(timeline, file_path)
+
+
+def write_otio_string(root_node_name):
+    """
+    Create an OTIO Timeline starting from the supplied RV node and dumps it to a string
+    :param root_node_name: `str`
+    """
+
+    timeline = otio.schema.Timeline()
+
+    otio_root = create_otio_from_rv_node(root_node_name, timeline=timeline)
+    if not otio_root:
+        return "{}"
+
+    if commands.nodeType(root_node_name) == "RVStackGroup":
+        # check if the OTIO import saved any timeline properties to the stack
+        timeline.metadata.update(
+            get_node_otio_metadata(root_node_name, "timeline_metadata")
+        )
+        name_prop = "{}.otio.timeline_name".format(root_node_name)
+        if commands.propertyExists(name_prop):
+            timeline.name = commands.getStringProperty(name_prop)[0]
+
+        timeline.tracks = otio_root
+    else:
+        timeline.tracks[:] = [otio_root]
+
+    return otio.adapters.write_to_string(timeline)
 
 
 def _run_hook(hook_name, optional=True, *args, **kwargs):
@@ -200,7 +228,7 @@ def _create_track(node_name, *args, **kwargs):
         kwargs["in_frame"] = edl_in
         kwargs["out_frame"] = edl_out
         kwargs["cut_in_frame"] = cut_in_frame
-         
+
         item = create_otio_from_rv_node(rv_node, *args, **kwargs)
 
         if has_edl:
@@ -218,7 +246,7 @@ def _create_track(node_name, *args, **kwargs):
 
         # Now that we have the items surrounding the transition, create it
         if transition:
-            kwargs["pre_item"] = track[-1] if len(track) > 0 else None,
+            kwargs["pre_item"] = (track[-1] if len(track) > 0 else None,)
             kwargs["post_item"] = item
 
             transition_node = create_otio_from_rv_node(transition, *args, **kwargs)

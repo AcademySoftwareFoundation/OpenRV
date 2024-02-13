@@ -72,6 +72,18 @@ def read_otio_file(otio_file):
     return create_rv_node_from_otio(input_otio, context)
 
 
+def read_otio_string(otio_string):
+    """
+    Main entry point to expand a given otio into the current RV session.
+
+    Returns the top level node created that represents this otio
+    timeline.
+    """
+    input_otio = otio.adapters.read_from_string(otio_string)
+    context = {"otio_string": otio_string}
+    return create_rv_node_from_otio(input_otio, context)
+
+
 def _run_hook(hook_name, otio_obj, context={}, optional=True):
     try:
         return otio.hooks.run(hook_name, otio_obj, context)
