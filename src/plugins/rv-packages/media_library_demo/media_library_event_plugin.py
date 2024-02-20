@@ -1,13 +1,22 @@
-from rv.commands import sendInternalEvent
+# Note that this event based Media Library's implementation is not available
+# from rvio because rvio does not support modes.
+plugin_enabled = True
+try:
+    from rv.commands import sendInternalEvent
+except:
+    plugin_enabled = False
 
 from ast import literal_eval
 from typing import Dict, Iterable
+
 
 def is_plugin_enabled() -> bool:
     """
     Returns True if the media library plugin is enabled.
     """
-    return bool(literal_eval(sendInternalEvent("media-library-events-are-enabled") or "True"))
+    return plugin_enabled and bool(
+        literal_eval(sendInternalEvent("media-library-events-are-enabled") or "True")
+    )
 
 
 def is_library_media_url(url: str) -> bool:
@@ -22,7 +31,9 @@ def is_streaming(url: str) -> bool:
     Returns True if the given url is a streaming url and should receive cookies and headers.
     """
 
-    return bool(literal_eval(sendInternalEvent("media-library-is-streaming", url) or "True"))
+    return bool(
+        literal_eval(sendInternalEvent("media-library-is-streaming", url) or "True")
+    )
 
 
 def is_redirecting(url: str) -> bool:
@@ -30,7 +41,9 @@ def is_redirecting(url: str) -> bool:
     Returns True if the given url will get redirected by the media library.
     """
 
-    return bool(literal_eval(sendInternalEvent("media-library-is-streaming", url) or "False"))
+    return bool(
+        literal_eval(sendInternalEvent("media-library-is-streaming", url) or "False")
+    )
 
 
 def get_http_cookies(url: str) -> Iterable[Dict]:
@@ -58,11 +71,10 @@ def get_http_cookies(url: str) -> Iterable[Dict]:
             "name": name.strip(),
             "value": value.strip(),
             "domain": domain.strip(),
-            "path": path.strip()
+            "path": path.strip(),
         }
 
     yield from ()
-
 
 
 def get_http_headers(url: str) -> Iterable[Dict]:
@@ -83,13 +95,9 @@ def get_http_headers(url: str) -> Iterable[Dict]:
     for header in headers.splitlines():
         name, value = header.split(":", 1)
 
-        yield {
-            "name": name.strip(),
-            "value": value.strip()
-        }
+        yield {"name": name.strip(), "value": value.strip()}
 
     yield from ()
-
 
 
 def get_http_redirection(url: str) -> str:
