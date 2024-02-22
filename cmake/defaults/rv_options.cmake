@@ -45,3 +45,35 @@ SET_PROPERTY(
   CACHE RV_C_STANDARD
   PROPERTY STRINGS C99 11 17
 )
+
+#
+# VFX Platform option
+#
+# That option is to control the versions of the external dependencies
+# that OpenRV downloads and install based on the VFX platform.
+# 
+# e.g. For CY2023, OCIO 2.2.x should be supported.
+#      For CY2024, OCIO 2.3.x should be supported.
+#
+# Supported VFX platform.
+SET(_RV_VFX_SUPPORTED_OPTIONS CY2023 CY2024)
+# Default option
+SET(_RV_VFX_PLATFORM "CY2023")
+
+IF(DEFINED RV_VFX_PLATFORM)
+  # Match lowercase and uppercase.
+  STRING(TOUPPER "${RV_VFX_PLATFORM}" _RV_VFX_PLATFORM)
+  IF(NOT "${_RV_VFX_PLATFORM}" IN_LIST _RV_VFX_SUPPORTED_OPTIONS)
+    MESSAGE(FATAL_ERROR "RV_VFX_PLATFORM=${RV_VFX_PLATFORM} is unsupported. Supported value are: ${_RV_VFX_SUPPORTED_OPTIONS}")
+  ENDIF()
+ENDIF()
+
+# Overwrite the cache variable with the normalized (upper)case.
+SET(RV_VFX_PLATFORM 
+  "${_RV_VFX_PLATFORM}" 
+  CACHE STRING "Set the VFX platform for installaing external dependencies" FORCE
+)
+SET_PROPERTY(
+  CACHE RV_VFX_PLATFORM
+  PROPERTY STRINGS ${_RV_VFX_PLATFORM}
+)

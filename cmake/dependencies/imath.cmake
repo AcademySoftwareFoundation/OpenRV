@@ -12,7 +12,7 @@ SET(_target
 )
 
 SET(_version
-    "3.1.5"
+    "3.1.6"
 )
 
 SET(_download_url
@@ -20,7 +20,7 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "921ac54505ab076a95b33a16b61956f4"
+    "3900f9e7cf8a0ae3edf2552ea92ef7d8"
 )
 
 SET(_install_dir
