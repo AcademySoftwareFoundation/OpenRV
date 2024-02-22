@@ -15,6 +15,8 @@
 #include <QMutex>
 #include <OpenColorIO/OpenColorIO.h>
 
+#include <memory>
+
 namespace IPCore {
 
 /// Provides 3D and Channel OCIOs for DisplayIPNode and ColorIPNode
@@ -26,6 +28,11 @@ namespace IPCore {
 struct OCIOState;
 
 namespace OCIO = OCIO_NAMESPACE;
+
+class OCIO1DLUT;
+using OCIO1DLUTPtr = std::shared_ptr<OCIO1DLUT>;
+class OCIO3DLUT;
+using OCIO3DLUTPtr = std::shared_ptr<OCIO3DLUT>;
 
 class OCIOIPNode : public IPNode
 {
@@ -60,12 +67,10 @@ class OCIOIPNode : public IPNode
   private:
 
     IntProperty*    m_activeProperty{nullptr};
-    IntProperty*    m_lutSize{nullptr};
     StringProperty* m_configDescription{nullptr};
     StringProperty* m_configWorkingDir{nullptr};
-    FrameBuffer*    m_lutfb{nullptr};
-    std::string     m_lutSamplerName;
-    FrameBuffer*    m_prelutfb{nullptr};
+    std::vector<OCIO1DLUTPtr> m_1DLUTs;
+    std::vector<OCIO3DLUTPtr> m_3DLUTs;
     OCIOState*      m_state{nullptr};
     mutable QMutex  m_lock;
     bool            m_useRawConfig{false};
