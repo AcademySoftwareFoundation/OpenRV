@@ -151,7 +151,8 @@ IF(NOT RV_TARGET_WINDOWS)
 ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
-LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath")
+# Using Imath_ROOT because Imath_DIR does not seems to be enough on UNIX-based platform (at least Rocky linux).
+LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
 
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
