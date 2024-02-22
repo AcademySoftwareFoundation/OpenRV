@@ -136,9 +136,11 @@ IF(RV_TARGET_WINDOWS)
     URL ${_download_url}
     URL_MD5 ${_download_hash}
     CONFIGURE_COMMAND ${_cmake_configure_command}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} 
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_BASE_DIR}/${_target}/src/include ${_include_dir}/gc
-    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/src/${_gc_lib_name} ${_gc_lib}
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
+    INSTALL_COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
+                    "${RV_DEPS_BASE_DIR}/${_target}/src/include" --destination "${_include_dir}/gc"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
+            "${RV_DEPS_BASE_DIR}/${_target}/src/${_gc_lib_name}" --destination "${_gc_lib}/${_gc_lib_name}"
     BUILD_IN_SOURCE TRUE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_gc_byproducts}
@@ -161,10 +163,12 @@ ELSE()
     URL ${_download_url}
     URL_MD5 ${_download_hash}
     CONFIGURE_COMMAND ${_autogen_command} && ${_configure_command} ${_configure_args}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} 
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir} ${CMAKE_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}" --destination
+            "${CMAKE_BINARY_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/lib" --destination
+            "${RV_STAGE_LIB_DIR}"
     BUILD_IN_SOURCE TRUE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_gc_byproducts}
@@ -209,7 +213,7 @@ ENDIF()
 ADD_CUSTOM_COMMAND(
   COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
   OUTPUT ${_gc_stage_outputs}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination "${RV_STAGE_LIB_DIR}"
   DEPENDS ${_target}
 )
 ADD_CUSTOM_TARGET(

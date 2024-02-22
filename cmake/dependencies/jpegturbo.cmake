@@ -97,7 +97,7 @@ EXTERNALPROJECT_ADD(
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} 
+  BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE
@@ -122,16 +122,6 @@ ELSE()
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
     DEPENDS ${RV_STAGE_BIN_DIR}/${_libname}
-  )
-ENDIF()
-
-IF(NOT RV_TARGET_WINDOWS)
-  # RV_COPY_LIB_BIN_FOLDERS doesn't copy symlinks so this command is used for _libjpeg62path
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Copying jpegturbo's libjpeg ('${_libjpeg62path}') to '${RV_STAGE_LIB_DIR}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_libjpeg62path} ${RV_STAGE_LIB_DIR}
   )
 ENDIF()
 

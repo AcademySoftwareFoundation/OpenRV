@@ -146,7 +146,7 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _openexr_byproducts ${_openexr_implib} ${_ilmthread_implib} ${_iex_implib})
 ENDIF()
 
-SET(_patch_command 
+SET(_patch_command
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/openexr_invalid_to_black.patch
 )
 
@@ -179,7 +179,7 @@ EXTERNALPROJECT_ADD(
   DEPENDS Imath::Imath ZLIB::ZLIB
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${_cmake_configure_command}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} 
+  BUILD_COMMAND ${_make_command} -j${_cpu_count}
   PATCH_COMMAND ${_patch_command}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
@@ -201,8 +201,10 @@ IF(RV_TARGET_WINDOWS)
     TARGET ${_target}
     POST_BUILD
     COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/lib" --destination
+            "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
+            "${RV_STAGE_BIN_DIR}"
   )
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
@@ -212,7 +214,7 @@ ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination "${RV_STAGE_LIB_DIR}"
     DEPENDS ${_target}
   )
   ADD_CUSTOM_TARGET(

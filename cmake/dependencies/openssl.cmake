@@ -94,16 +94,11 @@ ELSE()
     LIST(APPEND _make_command --arch=${RV_OSX_EMULATION_ARCH})
   ENDIF()
 
+  # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1` and `libssl.so.1.1`.
 
-  # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1`
-  # and `libssl.so.1.1`.
-
-  # On Windows build with MSVC or using MingW, shared libraries are named
-  # `libcrypto-1_1.dll` and `libssl-1_1.dll` for 32-bit Windows,
-  # `libcrypto-1_1-x64.dll` and `libssl-1_1-x64.dll` for 64-bit x86_64 Windows,
-  # and `libcrypto-1_1-ia64.dll` and `libssl-1_1-ia64.dll` for IA64 Windows.
-  # With MSVC, the import libraries are named `libcrypto.lib` and `libssl.lib`,
-  # while with MingW, they are named `libcrypto.dll.a` and `libssl.dll.a`.
+  # On Windows build with MSVC or using MingW, shared libraries are named `libcrypto-1_1.dll` and `libssl-1_1.dll` for 32-bit Windows, `libcrypto-1_1-x64.dll`
+  # and `libssl-1_1-x64.dll` for 64-bit x86_64 Windows, and `libcrypto-1_1-ia64.dll` and `libssl-1_1-ia64.dll` for IA64 Windows. With MSVC, the import libraries
+  # are named `libcrypto.lib` and `libssl.lib`, while with MingW, they are named `libcrypto.dll.a` and `libssl.dll.a`.
 
   # Ref: https://github.com/openssl/openssl/blob/398011848468c7e8e481b295f7904afc30934217/INSTALL.md?plain=1#L1847-L1858
 
@@ -116,13 +111,12 @@ ELSE()
         ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
     )
   ELSEIF(RV_TARGET_WINDOWS)
-    # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64
-    # when OpenSSL is build with MSVC.
+    # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64 when OpenSSL is build with MSVC.
     SET(_crypto_lib_name
-      libcrypto-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libcrypto-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_ssl_lib_name
-      libssl-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libssl-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   ELSE()
     SET(_crypto_lib_name
@@ -202,15 +196,18 @@ ELSE()
       TARGET ${_target}
       POST_BUILD
       COMMENT "Renaming the openssl import libs to the name FFmpeg is expecting"
-      COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib ${_lib_dir}/ssl.lib
-      COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libcrypto.lib ${_lib_dir}/crypto.lib
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib"
+              --destination "${_lib_dir}/ssl.lib"
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source
+              "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libcrypto.lib" --destination "${_lib_dir}/crypto.lib"
     )
     ADD_CUSTOM_COMMAND(
       COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
       OUTPUT ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-      COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}
-      COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_ssl_lib_name} ${RV_STAGE_BIN_DIR}
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+              "${RV_STAGE_LIB_DIR}"
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_bin_dir}" --destination
+              "${RV_STAGE_BIN_DIR}"
       DEPENDS ${_target}
     )
     ADD_CUSTOM_TARGET(
@@ -232,7 +229,8 @@ ELSE()
     ADD_CUSTOM_COMMAND(
       COMMENT "Installing ${_target}'s libs into ${_openssl_stage_lib_dir}"
       OUTPUT ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${_openssl_stage_lib_dir}
+      COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_lib_dir}" --destination
+              "${_openssl_stage_lib_dir}"
       DEPENDS ${_target}
     )
     ADD_CUSTOM_TARGET(
