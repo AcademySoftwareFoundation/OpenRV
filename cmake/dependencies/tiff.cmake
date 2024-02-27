@@ -111,7 +111,7 @@ SET_PROPERTY(
 IF(RV_TARGET_WINDOWS)
   SET_PROPERTY(
     TARGET Tiff::Tiff
-    PROPERTY IMPORTED_IMPLIB ${_lib_dir}/tiff.lib
+    PROPERTY IMPORTED_IMPLIB ${_lib_dir}/$<$<CONFIG:Release>:tiff.lib>$<$<CONFIG:Debug>:tiffd.lib>
   )
 ELSE()
   SET_PROPERTY(

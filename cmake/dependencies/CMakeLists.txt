@@ -76,6 +76,9 @@ INCLUDE(ocio)
 # src/pub: freetype: src/pub will be removed eventually, this path will needed to change.
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
 INCLUDE(oiio) # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
+IF(RV_TARGET_WINDOWS)
+  INCLUDE(pcre2)
+ENDIF()
 INCLUDE(yaml-cpp) # depends on OCIO
 
 INCLUDE(spdlog)
