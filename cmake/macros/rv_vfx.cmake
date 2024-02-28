@@ -5,57 +5,40 @@
 #
 
 #
-# RV_VFX_SET_DOWNLOAD_HASH output the right hash based on the VFX platform.
+# RV_VFX_SET_VARIABLE output the right value based on the VFX platform.
 # The value is choosen based on the RV_VFX_CY20XX variable.
-# Output variable: _download_hash
-macro(RV_VFX_SET_DOWNLOAD_HASH)
+# Output variable: ${_rv_vfx_variable_name}
+macro(RV_VFX_SET_VARIABLE _rv_vfx_variable_name)
   cmake_parse_arguments(
-      _rv_dep_hash
-      # options
+      # Prefix
+      _rv_dep_var
+      # Options
       ""
-      # one value keywords
-      "CY2023;CY2024"
-      # multi value keywords
+      # One value keywords
+      "${RV_VFX_SUPPORTED_OPTIONS}"
+      # Multi value keywords
       ""
-      # args
+      # Args
       ${ARGN}
   )
 
-  IF(RV_VFX_CY2023)
-    SET(_download_hash "${_rv_dep_hash_CY2023}")
-  ELSEIF(RV_VFX_CY2024)
-    SET(_download_hash "${_rv_dep_hash_CY2024}")
-  ENDIF()
+  # The implemenation covers a scenario where CY2023 is active, but only CY2024 is passed to the macro. (and vice versa)
+  # In the scenario above, the variable will not be set.
+  # The variable is only set if the the same CYXXXX is set and passed to the macro.
+  # The first CYXXXX that matches will win. It is based on the order in the list RV_VFX_SUPPORTED_OPTIONS.
+
+  # Loop all defined VFX platform.
+  FOREACH(_rv_vfx_platform_ ${RV_VFX_SUPPORTED_OPTIONS})
+    # If the VFX platform is defined and it was pass as option to RV_VFX_SET_VARIABLE, set the variable.
+    IF(RV_VFX_${_rv_vfx_platform_} AND _rv_dep_var_${_rv_vfx_platform_})
+      set(${_rv_vfx_variable_name} "${_rv_dep_var_${_rv_vfx_platform_}}")
+      # The order in RV_VFX_SUPPORTED_OPTIONS is IMPORTANT.
+      # Break on the first match.
+      break()
+    ENDIF()
+  ENDFOREACH()
 
   # Clean up
-  UNSET(_rv_dep_hash_CY2023)
-  UNSET(_rv_dep_hash_CY2024)
-endmacro()
-
-#
-# RV_VFX_SET_VERSION output the right version based on the VFX platform.
-# The value is choosen based on the RV_VFX_CY20XX variable.
-# Output variable: _ext_dep_version
-macro(RV_VFX_SET_VERSION)
-  cmake_parse_arguments(
-      _rv_dep_version
-      # options
-      ""
-      # one value keywords
-      "CY2023;CY2024"
-      # multi value keywords
-      ""
-      # args
-      ${ARGN}
-  )
-
-  IF(RV_VFX_CY2023)
-    SET(_ext_dep_version "${_rv_dep_version_CY2023}")
-  ELSEIF(RV_VFX_CY2024)
-    SET(_ext_dep_version "${_rv_dep_version_CY2024}")
-  ENDIF()
-
-  # Clean up
-  UNSET(_rv_dep_version_CY2023)
-  UNSET(_rv_dep_version_CY2024)
+  unset(_rv_dep_var_${_rv_vfx_platform_})
+  unset(_rv_vfx_platform_)
 endmacro()

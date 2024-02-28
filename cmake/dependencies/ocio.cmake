@@ -10,7 +10,8 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_VFX_SET_VERSION(
+RV_VFX_SET_VARIABLE(
+  _ext_dep_version
   CY2023 "2.2.1"
   CY2024 "2.3.2"
 )
@@ -35,7 +36,8 @@ ELSE()
   )
 ENDIF()
 
-RV_VFX_SET_DOWNLOAD_HASH(
+RV_VFX_SET_VARIABLE(
+  _download_hash
   CY2023 "372d6982cf01818a21a12f9628701a91"
   CY2024 "8af74fcb8c4820ab21204463a06ba490"
 )
@@ -53,15 +55,11 @@ IF(RV_TARGET_WINDOWS)
   ) # Empty out the List as it has the wrong DLL name: it doesn't have the version suffix
 
   # OpenColorIO shared library has the same name on Release and Debug.
-  IF(RV_VFX_CY2023)
-    SET(_ocio_win_sharedlibname
-        OpenColorIO_2_2.dll
-    )
-  ELSEIF(RV_VFX_CY2024)
-    SET(_ocio_win_sharedlibname
-        OpenColorIO_2_3.dll
-    )
-  ENDIF()
+  RV_VFX_SET_VARIABLE(
+    _ocio_win_sharedlibname
+    CY2023 "OpenColorIO_2_2.dll"
+    CY2024 "OpenColorIO_2_3.dll"
+  )
 
   SET(_ocio_win_sharedlib_path
       ${_bin_dir}/${_ocio_win_sharedlibname}
@@ -109,11 +107,10 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_VFX_CY2024)
-  SET(_pyocio_lib_dir
-    "${_pyocio_lib_dir}/PyOpenColorIO"
-  )
-ENDIF()
+RV_VFX_SET_VARIABLE(
+  _pyocio_lib_dir
+  CY2024 "${_pyocio_lib_dir}/PyOpenColorIO"
+)
 
 SET(_pyocio_lib
     "${_pyocio_lib_dir}/${_pyocio_libname}"
@@ -131,15 +128,14 @@ LIST(APPEND _configure_options "-DOCIO_BUILD_TESTS=ON")
 LIST(APPEND _configure_options "-DOCIO_BUILD_GPU_TESTS=OFF")
 LIST(APPEND _configure_options "-DOCIO_BUILD_PYTHON=ON") # This build PyOpenColorIO
 
-IF(RV_VFX_CY2023)
-  # SSE CPU performance optimizations
-  SET(_OCIO_SIMD_OPTIONS_STR "-DOCIO_USE_SSE=ON")
-ELSEIF(RV_VFX_CY2024)
-  # SIMD CPU performance optimizations
-  # OCIO 2.3.X utilize AVX (Intel) and ARM NEON (Apple M chips) SIMD instructions.
-  SET(_OCIO_SIMD_OPTIONS_STR "-DOCIO_USE_SIMD=ON")
-ENDIF()
-LIST(APPEND _configure_options "${_OCIO_SIMD_OPTIONS_STR}")
+# SIMD CPU performance optimizations
+# OCIO 2.3.X can utilize SSE/AVX (Intel) and ARM NEON (Apple M chips) SIMD instructions.
+RV_VFX_SET_VARIABLE(
+  _ocio_simd_options_str
+  CY2023 "-DOCIO_USE_SSE=ON"
+  CY2024 "-DOCIO_USE_SIMD=ON"
+)
+LIST(APPEND _configure_options "${_ocio_simd_options_str}")
 
 # Ref.: https://cmake.org/cmake/help/latest/module/FindPython.html#hints
 LIST(APPEND _configure_options "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
@@ -233,7 +229,7 @@ ELSE() # Windows
     "-DOCIO_BUILD_APPS=OFF"
     "-DOCIO_WARNING_AS_ERROR=OFF"
     "-DOCIO_BUILD_JAVA=OFF"
-    "${_OCIO_SIMD_OPTIONS_STR}"
+    "${_ocio_simd_options_str}"
     "-S ${_source_dir}"
     "-B ${_build_dir}"
   )
