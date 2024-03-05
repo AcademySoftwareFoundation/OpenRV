@@ -57,3 +57,18 @@ ELSEIF(MSVC)
 ELSE()
   MESSAGE(FATAL_ERROR "Couldn't determine compiler identity")
 ENDIF()
+
+#
+# VFX Platform option
+#
+
+# Add preprocessor variable for use in the code and cmake variable to
+# decide the version of an external dependencies based on the VFX platform.
+# Note that the macro in rv_vfx.cmake are dependant on those RV_VFX_CY20XX.
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  SET(RV_VFX_CY2024 ON)
+  ADD_COMPILE_DEFINITIONS(RV_VFX_CY2024)
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
+  SET(RV_VFX_CY2023 ON)
+  ADD_COMPILE_DEFINITIONS(RV_VFX_CY2023)
+ENDIF()
