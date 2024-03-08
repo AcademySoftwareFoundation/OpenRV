@@ -873,6 +873,15 @@ validateTimestamps(AVPacket* pkt, AVStream* stm, int64_t frameCount,
     if (pkt->duration > 0 && isAudio)
         pkt->duration =
             av_rescale_q(pkt->duration, stm->codec->time_base, stm->time_base);
+
+    // Video AVPacket's duration needs to be initialized starting with FFmpeg 4.4.3
+    // as the automatic computing of the frame duration code was removed from FFmpeg.
+    // Otherwise the exported media will have an incorrect duration (-1 frame) which
+    // will result in a slightly higher (incorrect) frame rate.
+    if (pkt->duration == 0 && !isAudio)
+    {
+        pkt->duration = av_rescale_q(1, stm->codec->time_base, stm->time_base);
+    }
 }
 
 void copyImage(AVPicture* dst, const AVPicture* src,
