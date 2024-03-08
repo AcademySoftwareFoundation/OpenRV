@@ -3429,8 +3429,12 @@ MovieFFMpegReader::decodeImageAtFrame(int inframe, VideoTrack* track)
     // Optimization: We will not seek if the last decoded frame is
     // within a Group Of Picture (GOP) size distance.
     // Note that videoCodecContext->gop_size is 0 for intra-frame compression
+    // Note that we also check for inter-frame compression codecs (m_info.slowRandomAccess)
+    // since we cannot blindly rely on videoCodecContext->gop_size because it is 
+    // initialized by default by FFmpeg with a default value of 12 even for intra-frame
+    // compression codecs (such as Apple Pro Res for example).
     const int nearFrameThreshold =
-        ( videoCodecContext->gop_size != 0 ) ? videoCodecContext->gop_size : 1;
+        ( m_info.slowRandomAccess && videoCodecContext->gop_size != 0 ) ? videoCodecContext->gop_size : 1;
     if (track->lastDecodedVideo == -1 ||
         track->lastDecodedVideo >= inframe ||
         track->lastDecodedVideo <  ( inframe - nearFrameThreshold ) )
