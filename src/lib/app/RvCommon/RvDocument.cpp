@@ -136,7 +136,7 @@ RvDocument::RvDocument()
 
     const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
 
-    setWindowIcon(QIcon(qApp->applicationDirPath() + QString("/../Resources/RV.ico")));
+    setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
 
     Rv::Options& opts = Options::sharedOptions();
 
@@ -594,7 +594,7 @@ RvDocument::receive( Notifier *originator,
 #ifdef PLATFORM_LINUX
         // Show the RV Icon-- otherwise the user has no idea where
         // this came from if RV isn't up yet.
-        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
 #else
         box.setIcon(QMessageBox::Critical);
 #endif
@@ -642,7 +642,7 @@ RvDocument::resetGLStateAndPrefs()
 #ifdef PLATFORM_LINUX
     // Show the RV Icon-- otherwise the user has no idea where
     // this came from if RV isn't up yet.
-    box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+    box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
 #else
     box.setIcon(QMessageBox::Critical);
 #endif
@@ -1969,7 +1969,7 @@ RvDocument::checkDriverVSync()
         box.setText(baseText + "\n\n" + detailedText);
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
         box.exec();
         opts.vsync = 0;
         m_vsyncDisabled = true;
@@ -1994,7 +1994,7 @@ RvDocument::warnOnDriverVSync()
                                     "playback. ");
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
         box.exec();
     }
 }
