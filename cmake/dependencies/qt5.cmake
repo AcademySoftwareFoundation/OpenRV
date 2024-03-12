@@ -77,18 +77,18 @@ ENDIF()
 IF(RV_TARGET_LINUX)
   EXECUTE_PROCESS(
     COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_LOCATION}/libexec" --destination
-            "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+            "${RV_STAGE_ROOT_DIR}/libexec" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
 ENDIF()
 
 IF(NOT RV_TARGET_DARWIN)
   EXECUTE_PROCESS(
     COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_RESOURCES_FOLDER}" --destination
-            "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+            "${RV_STAGE_ROOT_DIR}/resources" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
   EXECUTE_PROCESS(
     COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${RV_DEPS_QT5_TRANSLATIONS_FOLDER}"
-            --destination "${RV_STAGE_ROOT_DIR}" --no-override COMMAND_ERROR_IS_FATAL ANY
+            --destination "${RV_STAGE_ROOT_DIR}/translations" --no-override COMMAND_ERROR_IS_FATAL ANY
   )
 ENDIF()
 
@@ -193,5 +193,3 @@ IF(RV_TARGET_WINDOWS)
   )
   COPY_ONLY_LIBS_MATCHING_BUILD_TYPE(${RV_DEPS_QT5_BIN_DIR} ${RV_STAGE_BIN_DIR})
 ENDIF()
-
-MESSAGE(STATUS "${_qt_copy_message} -- DONE")

@@ -81,6 +81,13 @@ ENDIF()
 SET(_libname
     ${CMAKE_SHARED_LIBRARY_PREFIX}${_zlibname}${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
+
+IF(RV_TARGET_DARWIN)
+  SET(_libname
+      ${CMAKE_SHARED_LIBRARY_PREFIX}${_zlibname}.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+ENDIF()
+
 SET(_libpath
     ${_lib_dir}/${_libname}
 )

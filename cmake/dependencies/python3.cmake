@@ -309,13 +309,14 @@ ELSE()
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_LIB_DIR}/${_python3_lib_name}
-    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/lib" --destination
-            "${RV_STAGE_LIB_DIR}"
-    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/include" --destination
-            "${RV_STAGE_INCLUDE_DIR}"
-    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" --source "${_install_dir}/bin" --destination
-            "${RV_STAGE_BIN_DIR}"
-    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/fix_pyside2_qt_copy.py" --python-executable "${RV_STAGE_BIN_DIR}/python3" --libraries "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" 
+            --source "${_install_dir}/lib" --destination "${RV_STAGE_LIB_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" 
+            --source "${_install_dir}/include" --destination "${RV_STAGE_INCLUDE_DIR}"
+    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" 
+            --source "${_install_dir}/bin" --destination "${RV_STAGE_BIN_DIR}"
+    COMMAND python3 "${PROJECT_SOURCE_DIR}/src/build/fix_pyside2_qt_copy.py" 
+            --python-executable "${RV_STAGE_BIN_DIR}/python3" --libraries "${RV_STAGE_LIB_DIR}" 
             --plugins "${RV_STAGE_PLUGINS_QT_DIR}"
     DEPENDS ${_python3_target} ${${_pyside2_target}-build-flag} ${${_python3_target}-requirements-flag}
   )

@@ -21,6 +21,7 @@ LIST(LENGTH FILES_TO_COPY FILES_TO_COPY_LENGTH)
 SET(CURRENT_FILE_INDEX
     "0"
 )
+
 FOREACH(
   FILE_TO_COPY
   ${FILES_TO_COPY}
@@ -42,14 +43,23 @@ FOREACH(
   ENDIF()
 
   GET_FILENAME_COMPONENT(DESTINATION_FOLDER ${CMAKE_INSTALL_PREFIX}/${FILE_TO_COPY} DIRECTORY)
-  MESSAGE(STATUS "${CURRENT_PERCENTAGE}% -- Installing ${CMAKE_INSTALL_PREFIX}/${FILE_TO_COPY}")
+  MESSAGE(STATUS "${CURRENT_PERCENTAGE}% -- Adding ${CMAKE_INSTALL_PREFIX}/${FILE_TO_COPY}")
 
   FILE(MAKE_DIRECTORY ${DESTINATION_FOLDER})
 
-  EXECUTE_PROCESS(
-    COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${RV_APP_ROOT}" --source "${RV_APP_ROOT}/${FILE_TO_COPY}" --destination
-            "${CMAKE_INSTALL_PREFIX}/${FILE_TO_COPY}" COMMAND_ERROR_IS_FATAL ANY
-  )
-
+  LIST(APPEND _FILES_TO_COPY_ "${FILE_TO_COPY}\n")
   AFTER_COPY(${CMAKE_INSTALL_PREFIX}/${FILE_TO_COPY})
 ENDFOREACH()
+
+set(_output_file_copy_ "${RV_DEPS_BASE_DIR}/files_copy.txt")
+FILE(WRITE ${_output_file_copy_} ${_FILES_TO_COPY_})
+
+MESSAGE(STATUS "python3 \"${OPENRV_ROOT}/src/build/copy_third_party.py\" --build-root \"${CMAKE_BINARY_DIR}\" --stage-root \"${RV_APP_ROOT}\" --source-file \"${_output_file_copy_}\" --destination \"${CMAKE_INSTALL_PREFIX}\"")
+EXECUTE_PROCESS(
+  COMMAND python3 "${OPENRV_ROOT}/src/build/copy_third_party.py" --build-root "${CMAKE_BINARY_DIR}" 
+          --stage-root "${RV_APP_ROOT}" --source-file "${_output_file_copy_}" 
+          --destination "${CMAKE_INSTALL_PREFIX}" COMMAND_ERROR_IS_FATAL ANY
+)
+
+# Clean up
+FILE(REMOVE "${_output_file_copy_}")
