@@ -21,8 +21,16 @@ namespace IPCore
     OCIO::GpuShaderDesc::TextureType textureType =
         OCIO::GpuShaderDesc::TEXTURE_RGB_CHANNEL;
     OCIO::Interpolation interpolation = OCIO::INTERP_BEST;
+#if defined( RV_VFX_CY2023 )
+    // Older (pre OCIOv2 2.3.x) getTexture() function signature
     shaderDesc->getTexture( idx, textureName, samplerName, width, height,
                             textureType, interpolation );
+#else
+    OCIO::GpuShaderDesc::TextureDimensions _textureDim = 
+        OCIO::GpuShaderDesc::TextureDimensions::TEXTURE_1D;
+    shaderDesc->getTexture( idx, textureName, samplerName, width, height,
+                            textureType, _textureDim, interpolation );
+#endif
     if( !samplerName || !*samplerName || width == 0 )
     {
       TWK_THROW_EXC_STREAM( "The OCIO 1D LUT texture data is corrupted" );
