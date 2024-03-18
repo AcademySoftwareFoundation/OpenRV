@@ -5,23 +5,14 @@
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 3.24)
 
-SET(RV_MAJOR_VERSION
-    "2"
-    CACHE STRING "RV's version major"
-)
-SET(RV_MINOR_VERSION
-    "0"
-    CACHE STRING "RV's version minor"
-)
-SET(RV_REVISION_NUMBER
-    "0"
-    CACHE STRING "RV's revision number"
-)
-
-SET(RV_VERSION_YEAR
-    "2024"
-    CACHE STRING "RV's year of release."
-)
+# These variables are parsed by sphinx for the documentation.
+# One-line formatting facilitates parsing and readability.
+# cmake-format: off
+SET(RV_MAJOR_VERSION "2" CACHE STRING "RV's version major")
+SET(RV_MINOR_VERSION "0" CACHE STRING "RV's version minor")
+SET(RV_REVISION_NUMBER "0" CACHE STRING "RV's revision number")
+SET(RV_VERSION_YEAR "2024" CACHE STRING "RV's year of release.")
+# cmake-format: on
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE
@@ -101,6 +92,7 @@ INCLUDE(rv_options) # RV's build options
 INCLUDE(rv_targets) # RV's build platform definitions
 INCLUDE(rv_globals) # RV's CMake-build global variables
 INCLUDE(rv_stage) # RV's local appplication packaging
+INCLUDE(rv_vfx)
 INCLUDE(CTest)
 
 # The 'cxx_defaults' module will sets global C/C++ compiler defaults Note that variable such as 'CMAKE_CXX_COMPILER_ID' is only available after the 'project'
