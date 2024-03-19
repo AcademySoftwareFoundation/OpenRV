@@ -1011,6 +1011,7 @@ utf8Main(int argc, char *argv[])
 
 
 #ifdef PLATFORM_DARWIN
+    QCoreApplication qapp(argc, argv);
     TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 

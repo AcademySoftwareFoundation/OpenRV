@@ -474,7 +474,7 @@
                <string>.rvclips</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvdir.icns</string>
+            <string>rvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>RV Clip Bundle</string>
             <key>CFBundleTypeOSType</key>
@@ -493,7 +493,7 @@
                <string>aif</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvdir.icns</string>
+            <string>rvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>AIFF Audio File</string>
             <key>CFBundleTypeOSType</key>
@@ -511,7 +511,7 @@
                <string>aifc</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvdir.icns</string>
+            <string>rvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>Apple AIFC Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -529,7 +529,7 @@
                <string>wav</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvdir.icns</string>
+            <string>rvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>Microsoft WAVE Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -547,7 +547,7 @@
                <string>au</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvdir.icns</string>
+            <string>rvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>Sun Microsystems AU Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -565,7 +565,7 @@
                <string>.snd</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvdir.icns</string>
+            <string>rvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>NeXT Sound File</string>
             <key>CFBundleTypeOSType</key>
