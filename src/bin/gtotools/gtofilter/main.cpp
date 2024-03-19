@@ -19,7 +19,7 @@
 #include <sstream>
 
 #ifdef WIN32
-#include <pcreposix.h>
+#include <pcre2posix.h>
 #else
 #include <regex.h>
 #endif
