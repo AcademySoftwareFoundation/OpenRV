@@ -14,8 +14,8 @@
 #include <string>
 
 #ifdef MU_USE_PCRE
-    #include <pcre.h>
-    #include <pcreposix.h>
+    #include <pcre2.h>
+    #include <pcre2posix.h>
 #else
     #include <regex.h>
 #endif
