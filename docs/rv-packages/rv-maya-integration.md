@@ -70,7 +70,7 @@ The main point to remember about playblasting to RV is that if you leave RV open
 
 Open the Session Manager (from the *Tools* menu, or by hitting the *x* key) to see a list your playblasts and view them in different ways. Each playblast will have a name provided by Maya, plus a timestamp that RV adds to help you track them. If you want to rename a playblast to something more meaningful, just select it in the Session Manager, and select the *Edit View Info* button from the right-click menu, or hit the button with the *I* on it.
 
-At any point, you can save your Session to a Session File, so that you can easily pick up where you left off. When you return, render one playblast to get RV going, them *File→Merge* to bring in the Session File from the previous session.
+At any point, you can save your Session to a Session File, so that you can easily pick up where you left off. When you return, render one playblast to get RV going, then *File→Merge* to bring in the Session File from the previous session.
 
 ### Organizing and Comparing your Renders
 
