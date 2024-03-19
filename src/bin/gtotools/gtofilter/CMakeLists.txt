@@ -30,7 +30,7 @@ TARGET_LINK_LIBRARIES(
 IF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE pcre win_posix
+    PRIVATE pcre2-8 pcre2-posix win_posix
   )
 ENDIF()
 

@@ -79,7 +79,7 @@ TARGET_COMPILE_OPTIONS(
 IF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PUBLIC pcre
+    PUBLIC pcre2-8 pcre2-posix
   )
 ENDIF()
 
