@@ -2073,7 +2073,6 @@ MovieFFMpegReader::initializeAll()
             case AVMEDIA_TYPE_SUBTITLE:
                 DBL (DB_METADATA, "Subtitle Track: " << i);
                 {
-                    // TODO Need to allocate memory now in ffmpeg6
                     //#if DB_LEVEL & DB_SUBTITLES
                     //    ContextPool::Reservation reserve(this, i);
                     //    if (openAVCodec(i))
@@ -5110,7 +5109,6 @@ MovieFFMpegWriter::open(const MovieInfo& info,
     {
         TWK_THROW_EXC_STREAM("Unable to create output format");
     }
-    m_avOutputFormat = m_avFormatContext->oformat;
 
     // Check if the output supports video and/or audio
     MovieFFMpegIO::MFFormatMap formats = m_io->getFormats();
