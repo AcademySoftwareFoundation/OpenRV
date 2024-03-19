@@ -970,7 +970,7 @@ RvApplication::prefs()
         QPushButton* b1 = box.addButton(tr("Cancel"), QMessageBox::RejectRole);
         QPushButton* b2 = box.addButton(tr("Disable Presentation Mode"), QMessageBox::AcceptRole);
 #ifdef PLATFORM_LINUX
-        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
 #else
         box.setIcon(QMessageBox::Critical);
 #endif
@@ -1572,7 +1572,7 @@ RvApplication::setPresentationMode(bool value)
                     box.setText(baseText + "\n\n" + detailedText);
                     box.setWindowModality(Qt::WindowModal);
                     QPushButton* b0 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                    box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+                    box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
                     box.exec();
 
                     m_presentationMode = false;
@@ -1589,7 +1589,7 @@ RvApplication::setPresentationMode(bool value)
 		        box.setText(baseText + "\n\n" + exc.what());
                 box.setWindowModality(Qt::WindowModal);
                 QPushButton* b0 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-                box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString("/../Resources/RV.ico")).scaledToHeight(64));
+                box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
                 box.exec();
 
                 m_presentationMode = false;

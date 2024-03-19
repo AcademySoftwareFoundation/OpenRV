@@ -40,7 +40,7 @@ IF(RV_TARGET_WINDOWS)
   EXTERNALPROJECT_ADD_STEP(
     ${_target} bootstrap
     COMMENT "Calling bootstrap-vcpkg.bat"
-    COMMAND ${_base_dir}/src/bootstrap-vcpkg.bat
+    COMMAND ${_base_dir}/src/bootstrap-vcpkg.bat -disableMetrics
     DEPENDEES update
   )
 
