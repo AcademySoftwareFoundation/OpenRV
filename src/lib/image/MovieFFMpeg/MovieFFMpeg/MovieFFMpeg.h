@@ -358,7 +358,7 @@ class MovieFFMpegWriter : public MovieWriter
     bool                               m_canControlRequest;
     bool                               m_verbose;
     std::map<std::string,std::string>  m_parameters;
-    AVOutputFormat*                    m_avOutputFormat;
+    const AVOutputFormat*              m_avOutputFormat;
     AVFormatContext*                   m_avFormatContext;
     SampleTime                         m_audioFrameSize;
     void*                              m_audioSamples;
