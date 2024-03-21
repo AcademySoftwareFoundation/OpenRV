@@ -2073,6 +2073,7 @@ MovieFFMpegReader::initializeAll()
             case AVMEDIA_TYPE_SUBTITLE:
                 DBL (DB_METADATA, "Subtitle Track: " << i);
                 {
+                    // TODO Need to allocate memory now in ffmpeg6
                     //#if DB_LEVEL & DB_SUBTITLES
                     //    ContextPool::Reservation reserve(this, i);
                     //    if (openAVCodec(i))
@@ -3914,7 +3915,6 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
     AVCodecContext* avCodecContext = avcodec_alloc_context3(avCodec);
     if (isVideo)
     {
-        m_avOutputFormat->video_codec   = avCodec->id;
         avStream->time_base.num         = m_duration;
         avStream->time_base.den         = m_timeScale;
         avCodecContext->time_base.num   = m_duration;
@@ -4017,7 +4017,6 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
     }
     else
     {
-        m_avOutputFormat->audio_codec  = avCodec->id;
         avStream->time_base.num        = 1;
         avStream->time_base.den        = m_info.audioSampleRate;
         avCodecContext->time_base.num  = 1;
@@ -4071,6 +4070,11 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
     if (ret < 0)
     {
         TWK_THROW_EXC_STREAM("Could not open codec: " << avErr2Str(ret));
+    }
+
+    // Copy codec parameters from AVCodecContext to AVStream.
+    if (avcodec_parameters_from_context(avStream->codecpar, avCodecContext) < 0) {
+        TWK_THROW_EXC_STREAM("Failed to copy codec parameters from context to stream");
     }
 
     // Post codec open initializations
@@ -4527,6 +4531,8 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
         TWK_THROW_EXC_STREAM("Error encoding audio frame: " << avErr2Str(ret));
     }
 
+    //TODO Add back the audioFrame->pts assignation
+
     while (ret >= 0)
     {
         ret = avcodec_receive_packet(audioCodecContext, track->audioPacket);
@@ -4552,6 +4558,8 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
             }
         }
     }
+
+    //TODO Previously, we had logic to flush delayed audio packets, it got remove. Is it not needed anymore?
 
     return audioFinished;
 }
@@ -4623,6 +4631,7 @@ MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
                 "Error encoding video frame: " << avErr2Str(ret));
         }
 
+        track->lastEncodedVideo = track->videoFrame->pts;
         if (!ret && track->videoPacket->size)
         {
             track->videoPacket->stream_index = avStream->index;
@@ -4636,6 +4645,9 @@ MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
                     "Error while writing video frame: " << avErr2Str(ret));
             }
         }
+        track->videoFrame->pts = ++track->lastEncodedVideo;
+
+        //TODO Previously, we had logic to flush delayed video packets, it got remove. Is it not needed anymore?
     }
 
     DBL (DB_WRITE, "requested chans: " << m_info.numChannels
@@ -4968,7 +4980,7 @@ MovieFFMpegWriter::validateCodecs(string* videoCodec, string* audioCodec)
         vector<string> guesses;
         guesses.push_back(m_request.codec);
         guesses.push_back(RV_OUTPUT_VIDEO_CODEC);
-        guesses.push_back(string(avcodec_get_name(m_avOutputFormat->video_codec)));
+        guesses.push_back(string(avcodec_get_name(m_avFormatContext->oformat->video_codec)));
         *videoCodec = getWriterCodec("video", guesses);
     }
 
@@ -4977,7 +4989,7 @@ MovieFFMpegWriter::validateCodecs(string* videoCodec, string* audioCodec)
         vector<string> guesses;
         guesses.push_back(m_request.audioCodec);
         guesses.push_back(RV_OUTPUT_AUDIO_CODEC);
-        guesses.push_back(string(avcodec_get_name(m_avOutputFormat->audio_codec)));
+        guesses.push_back(string(avcodec_get_name(m_avFormatContext->oformat->audio_codec)));
         *audioCodec = getWriterCodec("audio", guesses);
     }
 
@@ -5080,6 +5092,7 @@ MovieFFMpegWriter::open(const MovieInfo& info,
     {
         TWK_THROW_EXC_STREAM("Unable to create output format");
     }
+    m_avOutputFormat = m_avFormatContext->oformat;
 
     // Check if the output supports video and/or audio
     MovieFFMpegIO::MFFormatMap formats = m_io->getFormats();
