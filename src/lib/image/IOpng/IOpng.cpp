@@ -35,10 +35,19 @@ IOpng::about() const
     return temp;
 }
 
+struct IOpngErrorContext {
+    bool error = false;
+    jmp_buf jmpbuf;
+};
+
 static
-void error_func(IOpng* self, png_const_charp es)
+void png_error_handler(png_structp png_ptr, png_const_charp error_msg)
 {
-    self->m_error = true;
+    IOpngErrorContext* context = static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
+    if (context) {
+        context->error = true;
+        longjmp(context->jmpbuf, 1);
+    }
 }
 
 static void 
@@ -136,13 +145,21 @@ readAttrs(FrameBuffer& fb, png_structp png_ptr, png_infop info_ptr)
 static void
 pngNoMessageHandler (png_structp png_ptr, png_const_charp error_message)
 {
-    #  ifdef USE_FAR_KEYWORD
-        jmp_buf jmpbuf;
-        png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
+#ifdef USE_FAR_KEYWORD
+    jmp_buf jmpbuf;
+    png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
+    IOpngErrorContext* context = static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
+    if (context) {
+        context->error = true;
         longjmp(jmpbuf, 1);
-    #  else
-        longjmp(png_jmpbuf(png_ptr), 1);
-    #  endif
+    }
+#else
+    IOpngErrorContext* context = static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
+    if (context) {
+        context->error = true;
+        longjmp(context->jmpbuf, 1);
+    }
+#endif
 }
 
 static void
@@ -166,17 +183,21 @@ IOpng::getImageInfo(const string& filename, FBInfo& fbi) const
         TWK_THROW_STREAM(IOException, "PNG: cannot open " << filename);
     }
 
+    IOpngErrorContext errorContext;
+    errorContext.error = m_error;
+
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 
-                                                 (void*)this, 
-                                                 (png_error_ptr)error_func,
+                                                 &errorContext,
+                                                 png_error_handler,
                                                  0);
+
     //
     //  Throttle error messages.
     //
     //png_set_error_fn (png_ptr, png_ptr->error_ptr, pngNoMessageHandler, png_ptr->warning_fn);
-    png_set_error_fn (png_ptr, 0, pngNoMessageHandler, 0);
+    png_set_error_fn (png_ptr, &errorContext, pngNoMessageHandler, 0);
 
-    if (!png_ptr || m_error) 
+    if (!png_ptr || errorContext.error) 
     {
         if (fp) 
         {
@@ -186,7 +207,7 @@ IOpng::getImageInfo(const string& filename, FBInfo& fbi) const
         TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
     }
 
-    if (setjmp(png_jmpbuf(png_ptr))) setjmpHandler(&png_ptr, 0, 0, fp, filename);
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, 0, 0, fp, filename);
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
 
@@ -204,7 +225,7 @@ IOpng::getImageInfo(const string& filename, FBInfo& fbi) const
         TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
     }
 
-    if (setjmp(png_jmpbuf(png_ptr))) setjmpHandler(&png_ptr, &info_ptr, 0, fp, filename);
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, &info_ptr, 0, fp, filename);
 
     png_infop end_info = png_create_info_struct(png_ptr);
 
@@ -224,7 +245,7 @@ IOpng::getImageInfo(const string& filename, FBInfo& fbi) const
     //	Wicked (ick) longjmp error handler
     //
 
-    if (setjmp(png_jmpbuf(png_ptr))) setjmpHandler(&png_ptr, &info_ptr, &end_info, fp, filename);
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, &info_ptr, &end_info, fp, filename);
     
     png_init_io(png_ptr, fp);
     png_set_sig_bytes(png_ptr, 0);
@@ -282,12 +303,15 @@ IOpng::readImage(FrameBuffer& fb,
         TWK_THROW_STREAM(IOException, "PNG: cannot open " << filename);
     }
 
+    IOpngErrorContext errorContext;
+    errorContext.error = m_error;
+
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 
-                                                 (void*)this, 
-                                                 (png_error_ptr)error_func, 
+                                                 &errorContext,
+                                                 png_error_handler,
                                                  0);
 
-    if (!png_ptr || m_error) 
+    if (!png_ptr || errorContext.error) 
     {
         if (fp) 
         {
@@ -297,7 +321,7 @@ IOpng::readImage(FrameBuffer& fb,
         TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
     }
 
-    if (setjmp(png_jmpbuf(png_ptr))) setjmpHandler(&png_ptr, 0, 0, fp, filename);
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, 0, 0, fp, filename);
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
 
@@ -315,7 +339,7 @@ IOpng::readImage(FrameBuffer& fb,
         TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
     }
 
-    if (setjmp(png_jmpbuf(png_ptr))) setjmpHandler(&png_ptr, &info_ptr, 0, fp, filename);
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, &info_ptr, 0, fp, filename);
 
     png_infop end_info = png_create_info_struct(png_ptr);
 
@@ -335,7 +359,7 @@ IOpng::readImage(FrameBuffer& fb,
     //	Wicked (ick) longjmp error handler
     //
 
-    if (setjmp(png_jmpbuf(png_ptr))) setjmpHandler(&png_ptr, &info_ptr, &end_info, fp, filename);
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, &info_ptr, &end_info, fp, filename);
     
     png_init_io(png_ptr, fp);
     png_set_sig_bytes(png_ptr, 0);
@@ -527,8 +551,11 @@ IOpng::writeImage(const FrameBuffer& img,
         flop(const_cast<FrameBuffer*>(outfb));
     }
 
+    IOpngErrorContext errorContext;
+    errorContext.error = m_error;
+
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 
-                                                  0, pngNoMessageHandler, 0);
+                                                  &errorContext, pngNoMessageHandler, 0);
     if (!png_ptr)
     {
         if (fp) 
@@ -538,6 +565,8 @@ IOpng::writeImage(const FrameBuffer& img,
         }
         TWK_THROW_STREAM(IOException, "PNG: error creating png_struct " << filename);
     }
+
+    if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, 0, 0, fp, filename);
 
     png_infop info_ptr = png_create_info_struct(png_ptr);
 
@@ -551,6 +580,9 @@ IOpng::writeImage(const FrameBuffer& img,
         }
         TWK_THROW_STREAM(IOException, "PNG: error creating info struct " << filename);
     }
+
+     if (setjmp(errorContext.jmpbuf)) setjmpHandler(&png_ptr, &info_ptr, 0, fp, filename);
+
     png_init_io(png_ptr, fp);
 
     int bit_depth = 0;
