@@ -72,7 +72,7 @@ ELSEIF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
   SET(_lib_dir
       ${_install_dir}/lib64
   )

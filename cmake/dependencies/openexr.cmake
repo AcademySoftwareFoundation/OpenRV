@@ -31,7 +31,7 @@ SET(${_target}_ROOT_DIR
     ${_install_dir}
 )
 
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
   SET(_lib_dir
       ${_install_dir}/lib64
   )

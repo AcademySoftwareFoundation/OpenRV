@@ -112,8 +112,6 @@ ELSEIF(UNIX)
     SET(RV_TARGET_IS_RHEL${RHEL_VERSION_MAJOR}
         BOOL TRUE "Detected a Redhat Entreprise Linux OS"
     )
-  ELSE()
-    MESSAGE(FATAL_ERROR "Unknown or unsupported Linux distribution version; stopping configuration!")
   ENDIF()
 ELSEIF(WIN32)
   MESSAGE(STATUS "Building RV for Microsoft Windows")

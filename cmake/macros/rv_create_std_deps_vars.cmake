@@ -33,7 +33,7 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   SET(_source_dir
       ${_base_dir}/src
   )
-  IF(RV_TARGET_LINUX)
+  IF(RHEL_VERBOSE)
     SET(_lib_dir
         ${_install_dir}/lib64
     )

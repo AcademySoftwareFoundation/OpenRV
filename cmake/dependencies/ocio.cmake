@@ -72,7 +72,7 @@ IF(RV_TARGET_WINDOWS)
       "${RV_DEPS_OCIO_DIST_DIR}/lib"
   )
 ENDIF()
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
   SET(_ociolib_dir
       "${RV_DEPS_OCIO_DIST_DIR}/lib64"
   )
