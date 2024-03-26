@@ -23,7 +23,7 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
   SET(_lib_dir
       ${RV_DEPS_OCIO_DIST_DIR}/lib64
   )

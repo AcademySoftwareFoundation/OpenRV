@@ -28,7 +28,7 @@ SET(_install_dir
 SET(_include_dir
     ${_install_dir}/include
 )
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
   SET(_lib_dir
       ${_install_dir}/lib64
   )
