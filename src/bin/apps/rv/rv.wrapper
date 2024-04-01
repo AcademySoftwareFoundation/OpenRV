@@ -47,7 +47,6 @@ fi
 
 # Unless the RV_USE_SYSTEM_OPENSSL environment variable is set, use the
 # OpenSSL provided with RV when the required OpenSSL version cannot be found.
-#
 if [ -z "$RV_USE_SYSTEM_OPENSSL" ]; then
      required_openssl_found=$( openssl version | grep 1.1.1 )
      if [ -z "$required_openssl_found" ]; then

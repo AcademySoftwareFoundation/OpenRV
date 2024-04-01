@@ -1,4 +1,4 @@
-#!/bin/tcsh -f
+#!/bin/sh
 
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
@@ -7,44 +7,53 @@
 #
 
 #
-#   This script sets the APP_HOME environment (if not already set),
-#   makes sure the plugins are the path and launches the actual binary.
+# This script sets the APP_HOME environment (if not already set),
+# makes sure the plugins are the path and launches the actual binary.
 #
-#   NOTE: doesn't properly set APP_HOME if invoked from a link to the script
-#   and APP_HOME is not already set
+# NOTE: doesn't properly set APP_HOME if invoked from a link to the script
+# and APP_HOME is not already set
 #
 
-set noglob
-set name = gtomerge
+set -o noglob
 
-if (! $?RV_HOME) then
-    set canonicalName = "`readlink -f $0`"
-    set binName = "$canonicalName:h"
-    setenv RV_HOME "$binName:h"
-endif
+name="$0"
 
-echo RV_HOME = $RV_HOME
-set platform = i386
-set bin = "$RV_HOME/bin/$name.bin.$platform"
+if [ -z "$RV_HOME" ]; then
+    canonicalName=$(readlink -f "$0")
+    binName=$(dirname "$canonicalName")
+    homeName=$(dirname "$binName")
+    export RV_HOME="$homeName"
+fi
 
-if (! (-e $bin) ) then
-    set bin = "$RV_HOME/bin/$name.bin"
-endif
+echo "RV_HOME=$RV_HOME"
+platform=i386
+bin="$RV_HOME/bin/$name.bin.$platform"
 
-if (! (-e $bin) ) then
-    echo "ERROR: binary " $bin " not found"
-    exit(-1)
-endif
+if [ ! -e "$bin" ]; then
+    bin="$RV_HOME/bin/$name.bin"
+fi
 
-unsetenv BUILD_ROOT
-setenv PATH "$RV_HOME/bin:${PATH}"
+if [ ! -e "$bin" ]; then
+    echo "ERROR: binary $bin not found"
+    exit 1
+fi
 
-if ($?LD_LIBRARY_PATH) then
-     setenv LD_LIBRARY_PATH "$RV_HOME/lib:$LD_LIBRARY_PATH"
+unset BUILD_ROOT
+export PATH="$RV_HOME/bin:$PATH"
+
+if [ -n "$LD_LIBRARY_PATH" ]; then
+     export LD_LIBRARY_PATH="$RV_HOME/lib:$LD_LIBRARY_PATH"
 else
-     setenv LD_LIBRARY_PATH "$RV_HOME/lib"
-endif
+     export LD_LIBRARY_PATH="$RV_HOME/lib"
+fi
 
-# exec binary
+# Unless the RV_USE_SYSTEM_OPENSSL environment variable is set, use the
+# OpenSSL provided with RV when the required OpenSSL version cannot be found.
+if [ -z "$RV_USE_SYSTEM_OPENSSL" ]; then
+     required_openssl_found=$(openssl version | grep 1.1.1)
+     if [ -z "$required_openssl_found" ]; then
+        export LD_LIBRARY_PATH "$RV_HOME/lib/OpenSSL:$LD_LIBRARY_PATH"
+     fi
+fi
 
-exec $bin $*:q
+exec "$bin" "$@"
