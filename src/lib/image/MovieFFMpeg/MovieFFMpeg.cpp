@@ -5093,7 +5093,6 @@ MovieFFMpegWriter::open(const MovieInfo& info,
     {
         TWK_THROW_EXC_STREAM("Unable to create output format");
     }
-    m_avOutputFormat = m_avFormatContext->oformat;
 
     // Check if the output supports video and/or audio
     MovieFFMpegIO::MFFormatMap formats = m_io->getFormats();
