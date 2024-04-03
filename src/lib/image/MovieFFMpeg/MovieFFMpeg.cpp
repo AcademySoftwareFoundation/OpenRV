@@ -4531,8 +4531,6 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
         TWK_THROW_EXC_STREAM("Error encoding audio frame: " << avErr2Str(ret));
     }
 
-    //TODO Add back the audioFrame->pts assignation
-
     while (ret >= 0)
     {
         ret = avcodec_receive_packet(audioCodecContext, track->audioPacket);
@@ -4556,7 +4554,10 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
                 TWK_THROW_EXC_STREAM(
                     "Error while writing audio frame: " << avErr2Str(ret));
             }
+            // Update the last time sample in seconds we encoded
+            m_lastAudioTime += samplesToTime(nsamps, m_info.audioSampleRate);
         }
+        track->audioFrame->pts = track->lastEncodedAudio;
     }
 
     //TODO Previously, we had logic to flush delayed audio packets, it got remove. Is it not needed anymore?
