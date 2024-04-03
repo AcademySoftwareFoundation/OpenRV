@@ -55,8 +55,8 @@
 
 #include <sys/types.h>
 #ifdef _MSC_VER
-    #include <pcre.h>
-    #include <pcreposix.h>
+    #include <pcre2.h>
+    #include <pcre2posix.h>
 #else
     #include <regex.h>
 #endif
