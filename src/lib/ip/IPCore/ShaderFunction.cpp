@@ -1345,6 +1345,7 @@ Function::hashAuxNames()
 
     static regex funcDefRE(" ?\\w+ (\\w+) ?\\([^\\{]+\\{\\}$");
     static regex varRE("const .*?(\\w+) ?=");
+    static regex varArrayRE("const .*?(\\w+)\\[\\w+] ?= ?\\w+\\[\\w+].*$");
 
     for (size_t i = 0; i < lines.size(); i++)
     {
@@ -1352,7 +1353,8 @@ Function::hashAuxNames()
         smatch sm;
 
         if (regex_search(line, sm, funcDefRE) ||
-            regex_search(line, sm, varRE))
+            regex_search(line, sm, varRE) ||
+            regex_search(line, sm, varArrayRE))
         {
             if (sm[1] != m_name)
             {

@@ -109,9 +109,15 @@ SET_PROPERTY(
   PROPERTY IMPORTED_LOCATION ${_libpath}
 )
 IF(RV_TARGET_WINDOWS)
+  IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    SET(_tiff_lib_name "tiff.lib")
+  ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    SET(_tiff_lib_name "tiffd.lib")
+  ENDIF()
+
   SET_PROPERTY(
     TARGET Tiff::Tiff
-    PROPERTY IMPORTED_IMPLIB ${_lib_dir}/tiff.lib
+    PROPERTY IMPORTED_IMPLIB ${_lib_dir}/${_tiff_lib_name}
   )
 ELSE()
   SET_PROPERTY(
