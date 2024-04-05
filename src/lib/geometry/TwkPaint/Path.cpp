@@ -348,6 +348,9 @@ Path::computeSegmentQuads(SegmentVector& segments,
         s.points[2] = p1 + vpn * w1;
         s.points[3] = p1 - vpn * w1;
 
+        s.vpn = vpn;
+        s.w0 = w0;
+
         if (usecolor)
         {
             const Color& c0  = fcolors[i];
@@ -463,6 +466,16 @@ Path::computeJoins(JoinVector& joins,
             //  addition, this test is basically arbitrary. 
             //
 
+            //
+            // When a path has variable widths the segment edges
+            // can become near collinear if the widths are just right. 
+            // This can causes the inner intersection point to 
+            // shoot off to infinity as the edges become more parallel, 
+            // creating ugly spikes. To avoid this, the intersection point 
+            // for both the positive and negative case is performed as if 
+            // path has a constant width.
+            //
+
             if (std::abs(c.z) < Scalar(.01))
             {
                 //
@@ -497,8 +510,13 @@ Path::computeJoins(JoinVector& joins,
                 //  |/       \|     x == other intersection
                 //  o         o  
 
-                Point ip = intersectionOfLines(Vec2d(s0.points[0]), Vec2d(s0.points[3]),
-                                               Vec2d(s1.points[0]), Vec2d(s1.points[3]));
+                const float w = s1.w0;
+                const Vec2d a = Vec2d(fpoints[i-1] - s0.vpn * w);
+                const Vec2d b = Vec2d(s0.points[3]);
+                const Vec2d c = Vec2d(s1.points[0]);
+                const Vec2d d = Vec2d(fpoints[i+1] - s1.vpn * w);
+
+                Point ip = intersectionOfLines(a, b, c, d);
 
                 if (dot(ip - fpoints[i],
                         normalize(fpoints[i-1] - fpoints[i])) >= m_width)
@@ -538,8 +556,13 @@ Path::computeJoins(JoinVector& joins,
                 //         
                 //       x
 
-                Point ip = intersectionOfLines(Vec2d(s0.points[1]), Vec2d(s0.points[2]),
-                                               Vec2d(s1.points[1]), Vec2d(s1.points[2]));
+                const float w = s1.w0;
+                const Vec2d a = Vec2d(fpoints[i-1] + s0.vpn * w);
+                const Vec2d b = Vec2d(s0.points[2]);
+                const Vec2d c = Vec2d(s1.points[1]);
+                const Vec2d d = Vec2d(fpoints[i+1] + s1.vpn * w); 
+
+                Point ip = intersectionOfLines(a, b, c, d);
 
                 if (dot(ip - fpoints[i],
                         normalize(fpoints[i+1] - fpoints[i])) >= m_width)
