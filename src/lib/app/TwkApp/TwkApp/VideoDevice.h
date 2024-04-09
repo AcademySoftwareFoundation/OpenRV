@@ -92,7 +92,11 @@ public:
         Y0CbY1Cr_8_422,         // aka yuvs or YUY2
         Y1CbY0Cr_8_422,
         YCrCb_AJA_10_422,       // v210
-        YCrCb_BM_10_422         // 
+        YCrCb_BM_10_422,        //
+
+        YCbCr_P216_16_422       // Semi-Planar, 4:2:2, 16-bit per component.
+                                // The first buffer is a 16bpp luminance buffer.
+	                            // Immediately after this is an interleaved buffer of 16bpp Cb, Cr pairs.
     };
 
     struct Resolution
