@@ -613,6 +613,192 @@ void packedUVYA16_to_planarYUVA16_MP(size_t width, size_t height,
 }
 
 //------------------------------------------------------------------------------
+//
+static inline float normalizeY10(
+   const uint32_t in_val
+)
+{
+   const float scale  =   1.0f /
+                          ( 940.0f-64.0f );
+   const float offset =  -64.0f /
+                          ( 940.0f-64.0f );
+
+   return in_val * scale + offset;
+}
+
+//------------------------------------------------------------------------------
+//
+static inline uint16_t clampAndRoundToUInt16(
+   const float val
+)
+{
+   if ( val <= 0.0f )
+   {
+      return 0;
+   }
+   else if ( val >= 65535.0f )
+   {
+      return 65535;
+   }
+   else
+   {
+      // Here was assume that val is always positive for rounding
+      return (uint16_t)( val + 0.5f );
+   }
+}
+
+//------------------------------------------------------------------------------
+//
+static inline uint16_t denormalizeY16(
+   const float in_val
+)
+{
+   const float scale  = ( 60160.0f-4096.0f );
+   const float offset = 4096.0f;
+
+   return clampAndRoundToUInt16( in_val * scale + offset );
+}
+
+//------------------------------------------------------------------------------
+//
+static inline float normalizeC10(
+   const uint32_t in_val
+)
+{
+   const float scale  =   1.0f /
+                          ( 960.0f-64.0f );
+   const float offset =  -512.0f /
+                          ( 960.0f-64.0f );
+
+   return in_val * scale + offset;
+}
+
+//------------------------------------------------------------------------------
+//
+static inline uint16_t denormalizeC16(
+   const float in_val
+)
+{
+   const float scale  = 61440.0f - 4096.0f;
+   const float offset = 32768.0f;
+
+   return clampAndRoundToUInt16( in_val * scale + offset );
+}
+
+//------------------------------------------------------------------------------
+// The following packedYUV444_10bits_to_P216 functions can be used to pass
+// from packed YUV444 with 10 bits per component to to semi-planar YUV-422 
+// 16-bits per component (P216)
+//
+#define Y10MASK 0x000003FF
+#define U10MASK 0x000FFC00
+#define V10MASK 0x3FF00000
+void packedYUV444_10bits_to_P216(size_t width, size_t height,
+                                 const uint32_t *FASTMEMCPYRESTRICT inBuf,
+                                 uint16_t *FASTMEMCPYRESTRICT outBufY,
+                                 uint16_t *FASTMEMCPYRESTRICT outBufCbCy,
+                                 size_t inBufStride, 
+                                 size_t outBufStride,
+                                 bool flip )
+{
+  const size_t nbPixelsPerLoop = 2;
+  const size_t nbPixelGroups = width/nbPixelsPerLoop;
+  for(size_t y=0; y<height; ++y)
+  {
+    size_t input_y = flip ? (height-1-y) : y;
+    const uint32_t *inYUV = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(inBuf) + input_y*inBufStride);
+    uint16_t *outY = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufY) + y*outBufStride);
+    uint16_t *outCbCr = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufCbCy) + y*outBufStride);
+    for(size_t i=0; i<nbPixelGroups; ++i)
+    {
+      *outY = denormalizeY16(normalizeY10((*inYUV) & Y10MASK)); ++outY;
+      *outCbCr = denormalizeC16(normalizeC10(((*inYUV) & U10MASK)>>10)); ++outCbCr;
+      *outCbCr = denormalizeC16(normalizeC10(((*inYUV) & V10MASK)>>20)); ++outCbCr;
+      ++inYUV;
+
+      *outY = denormalizeY16(normalizeY10((*inYUV) & Y10MASK)); ++outY;
+      ++inYUV;
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+class PackedYUV444_10bits_to_P216_Task : public Task
+{
+public:
+  PackedYUV444_10bits_to_P216_Task(TaskGroup *group, size_t width,
+                                   size_t height,
+                                   const uint32_t *FASTMEMCPYRESTRICT inBuf,
+                                   uint16_t *FASTMEMCPYRESTRICT outBufY,
+                                   uint16_t *FASTMEMCPYRESTRICT outBufCbCr,
+                                   size_t inBufStride, 
+                                   size_t outBufStride,
+                                   bool flip)
+      : Task(group), _width(width), _height(height), _inBuf(inBuf),
+        _outBufY(outBufY), _outBufCbCr(outBufCbCr), 
+        _inBufStride(inBufStride), _outBufStride(outBufStride),
+        _flip(flip) {}
+
+  virtual ~PackedYUV444_10bits_to_P216_Task() {}
+
+  virtual void execute() {
+    packedYUV444_10bits_to_P216( _width, _height, _inBuf, _outBufY, _outBufCbCr, 
+                                _inBufStride, _outBufStride, _flip );
+  }
+
+private:
+  const size_t _width;
+  const size_t _height;
+  const uint32_t * FASTMEMCPYRESTRICT _inBuf;
+  uint16_t * FASTMEMCPYRESTRICT _outBufY;
+  uint16_t * FASTMEMCPYRESTRICT _outBufCbCr;
+  const size_t _inBufStride;
+  const size_t _outBufStride;
+  bool _flip;
+};
+
+//------------------------------------------------------------------------------
+//
+void packedYUV444_10bits_to_P216_MP(size_t width, size_t height,
+                                    const uint32_t *FASTMEMCPYRESTRICT inBuf,
+                                    uint16_t *FASTMEMCPYRESTRICT outBufY,
+                                    uint16_t *FASTMEMCPYRESTRICT outBufCbCr,
+                                    size_t inBufStride,
+                                    size_t outBufStride,
+                                    bool flip)
+{
+  static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
+  if (use_standard_memcpy)
+  {
+    HOP_PROF("packedYUV444_10bits_to_P216()");
+    packedYUV444_10bits_to_P216( width, height, inBuf, outBufY, outBufCbCr,
+                                 inBufStride, outBufStride, flip );
+    return;
+  }
+
+  HOP_PROF_FUNC();
+
+  const size_t taskHeight = height / TwkFB::ThreadPool::getNumThreads();
+
+  size_t curY = 0;
+
+  TaskGroup taskGroup;
+
+  while (curY < height)
+  {
+    const size_t curHeight = std::min(taskHeight, height - curY);
+    size_t input_y = flip ? (height-curHeight-curY) : curY;
+    const uint32_t *FASTMEMCPYRESTRICT curInBuf = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(inBuf) + input_y * inBufStride);
+    uint16_t *curOutY = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufY) + curY * outBufStride);
+    uint16_t *curOutCbCr = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufCbCr) + curY * outBufStride);
+    TwkFB::ThreadPool::addTask( new PackedYUV444_10bits_to_P216_Task(
+      &taskGroup, width, curHeight, curInBuf, curOutY, curOutCbCr, inBufStride, outBufStride, flip ) );
+    curY += curHeight;
+  }
+}
+
+//------------------------------------------------------------------------------
 // The following packedBGRA64_to_packedABGR64 functions can be used to pass
 // from packed BGRA with 16 bits BE per component to packed ABGR with 16 bits LE
 // per component.
