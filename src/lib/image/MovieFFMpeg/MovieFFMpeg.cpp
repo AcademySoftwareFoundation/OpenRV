@@ -4412,6 +4412,47 @@ MovieFFMpegWriter::collectWriteInfo(string videoCodec, string audioCodec)
                 << " frames: " << m_frames.size());
 }
 
+void
+MovieFFMpegWriter::encodeAudio(AVCodecContext* audioCodecContext, AVFrame* frame, AVPacket* pkt, 
+                               AVStream* audioStream, SampleTime* nsamps, int64_t lastEncAudio)
+{
+    int ret = avcodec_send_frame(audioCodecContext, frame);
+    if (ret < 0)
+    {
+        TWK_THROW_EXC_STREAM("Error encoding audio frame: " << avErr2Str(ret));
+    }
+
+    while (ret >= 0)
+    {
+        ret = avcodec_receive_packet(audioCodecContext, pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            break;
+        }
+
+        if (ret < 0)
+        {
+            TWK_THROW_EXC_STREAM("Error encoding audio frame: " << avErr2Str(ret));
+        }
+        if (!ret && pkt->size)
+        {
+            pkt->stream_index = audioStream->index;
+            validateTimestamps(pkt, audioStream, audioCodecContext, 0, true);
+            ret = av_interleaved_write_frame(m_avFormatContext, pkt);
+            if (ret < 0)
+            {
+                TWK_THROW_EXC_STREAM("Error while writing audio frame: " << avErr2Str(ret));
+            }
+
+            // Update the last time sample in seconds we encoded
+            if (nsamps)
+            {
+                m_lastAudioTime += samplesToTime(*nsamps, m_info.audioSampleRate);
+            }
+        }
+        frame->pts = lastEncAudio;
+    }
+}
+
 bool
 MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
 {
@@ -4522,52 +4563,52 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
     {
         track->audioFrame->pts = track->lastEncodedAudio;
     }
-    track->lastEncodedAudio =
-        track->audioFrame->pts + track->audioFrame->nb_samples;
+    track->lastEncodedAudio = track->audioFrame->pts + track->audioFrame->nb_samples;
 
-    int ret = avcodec_send_frame(audioCodecContext, track->audioFrame);
-    if (ret < 0)
+    encodeAudio(audioCodecContext, track->audioFrame, track->audioPacket, 
+                audioStream, &nsamps, track->lastDecodedAudio);
+    if (lastPass)
     {
-        TWK_THROW_EXC_STREAM("Error encoding audio frame: " << avErr2Str(ret));
+        // It is important to call encodeAudio (above) to make sure that all frames as been sent
+        // to the encoder before entering draining mode by passing NULL.
+        // Send a NULL frame to enter draining mode.
+        encodeAudio(audioCodecContext, NULL, track->audioPacket, 
+                    audioStream, NULL, track->lastDecodedAudio);
+        // Returned value as no value at this point.
     }
-
-    while (ret >= 0)
-    {
-        ret = avcodec_receive_packet(audioCodecContext, track->audioPacket);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-          break;
-        }
-
-        if (ret < 0)
-        {
-            TWK_THROW_EXC_STREAM(
-                "Error encoding audio frame: " << avErr2Str(ret));
-        }
-        if (!ret && track->audioPacket->size)
-        {
-            track->audioPacket->stream_index = audioStream->index;
-            validateTimestamps(track->audioPacket, audioStream, audioCodecContext, 0, true);
-            ret = av_interleaved_write_frame(
-                    m_avFormatContext, track->audioPacket);
-            if (ret < 0)
-            {
-                TWK_THROW_EXC_STREAM(
-                    "Error while writing audio frame: " << avErr2Str(ret));
-            }
-            // Update the last time sample in seconds we encoded
-            m_lastAudioTime += samplesToTime(nsamps, m_info.audioSampleRate);
-        }
-        track->audioFrame->pts = track->lastEncodedAudio;
-    }
-
-    //TODO Previously, we had logic to flush delayed audio packets, it got remove. Is it not needed anymore?
 
     return audioFinished;
 }
 
+void 
+MovieFFMpegWriter::encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, 
+                               AVStream* stream, int lastEncVideo)
+{
+    int ret = avcodec_send_frame(ctx, frame);
+    if (ret < 0)
+    {
+        TWK_THROW_EXC_STREAM("Error encoding video frame: " << avErr2Str(ret));
+    }
+
+    while (ret >= 0)
+    {
+        ret = avcodec_receive_packet(ctx, pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            return;
+        }
+
+        pkt->stream_index = stream->index;
+        validateTimestamps(pkt, stream, ctx, lastEncVideo);
+        ret = av_interleaved_write_frame(m_avFormatContext, pkt);
+        if (ret != 0)
+        {
+            TWK_THROW_EXC_STREAM("Error while writing video frame: " << avErr2Str(ret));
+        }
+    }
+}
+
 void
-MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
-    bool lastPass)
+MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex, int frameIndex, bool lastPass)
 {
     VideoTrack* track = m_videoTracks[trackIndex];
     AVStream* avStream = m_avFormatContext->streams[track->number];
@@ -4611,44 +4652,20 @@ MovieFFMpegWriter::fillVideo(FrameBufferVector fbs, int trackIndex,
               track->outPicture->data,
               track->outPicture->linesize);
 
-    int ret = avcodec_send_frame(videoCodecContext, track->videoFrame);
+    // Send/Receive encoding and decoding API overview
+    // https://ffmpeg.org/doxygen/6.0/group__lavc__encdec.html
 
-    if (ret < 0)
+    // Set the PTS before sending the frame to the encoder.
+    track->lastEncodedVideo = track->videoFrame->pts;
+    track->videoFrame->pts = frameIndex;
+
+    encodeVideo(videoCodecContext, track->videoFrame, track->videoPacket, avStream, track->lastEncodedVideo);
+    if (lastPass)
     {
-        TWK_THROW_EXC_STREAM(
-            "Error encoding video frame: " << avErr2Str(ret));
-    }
-
-    while (ret >= 0)
-    {
-        ret = avcodec_receive_packet(videoCodecContext, track->videoPacket);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-          break;
-        }
-
-        if (ret < 0)
-        {
-            TWK_THROW_EXC_STREAM(
-                "Error encoding video frame: " << avErr2Str(ret));
-        }
-
-        track->lastEncodedVideo = track->videoFrame->pts;
-        if (!ret && track->videoPacket->size)
-        {
-            track->videoPacket->stream_index = avStream->index;
-            validateTimestamps(
-                track->videoPacket, avStream, videoCodecContext, track->lastEncodedVideo);
-            ret = av_interleaved_write_frame(
-                m_avFormatContext, track->videoPacket);
-            if (ret != 0)
-            {
-                TWK_THROW_EXC_STREAM(
-                    "Error while writing video frame: " << avErr2Str(ret));
-            }
-        }
-        track->videoFrame->pts = ++track->lastEncodedVideo;
-
-        //TODO Previously, we had logic to flush delayed video packets, it got remove. Is it not needed anymore?
+        // It is important to call encodeVideo (above) to make sure that all frames as been sent
+        // to the encoder before entering draining mode by passing NULL.
+        // Send a NULL frame to enter draining mode.
+        encodeVideo(videoCodecContext, NULL, track->videoPacket, avStream, track->lastEncodedVideo);
     }
 
     DBL (DB_WRITE, "requested chans: " << m_info.numChannels
@@ -5233,8 +5250,9 @@ MovieFFMpegWriter::write(Movie* inMovie)
         bool lastPass = q == (m_frames.size() - 1);
         FrameBufferVector fbs;
         inMovie->imagesAtFrame(Movie::ReadRequest(f, m_request.stereo), fbs);
-        if (m_writeVideo) fillVideo(fbs, 0, lastPass);
-        if (m_writeVideo && m_request.stereo) fillVideo(fbs, 1, lastPass);
+        if (m_writeVideo) fillVideo(fbs, 0, q, lastPass);
+        if (m_writeVideo && m_request.stereo) fillVideo(fbs, 1, q, lastPass);
+
         for (int v = 0; v < fbs.size(); v++) delete fbs[v];
 
         if (m_request.verbose)

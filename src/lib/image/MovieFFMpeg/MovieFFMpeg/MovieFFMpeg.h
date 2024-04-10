@@ -23,6 +23,7 @@ class AVFormatContext;
 class AVFrame;
 class AVOption;
 class AVOutputFormat;
+class AVPacket;
 class AVRational;
 class AVStream;
 
@@ -332,6 +333,8 @@ class MovieFFMpegWriter : public MovieWriter
     // Audio Methods
     //
 
+    void encodeAudio(AVCodecContext* audioCodecContext, AVFrame* frame, AVPacket* pkt, 
+                     AVStream* audioStream, SampleTime* nsamps, int64_t lastEncAudio);
     bool fillAudio(Movie* inMovie, double overflow, bool lastPass);
     template <typename T> void translateRVAudio(int audioChannels,
         TwkAudio::AudioBuffer* audioBuffer, double max, int offset,
@@ -341,7 +344,8 @@ class MovieFFMpegWriter : public MovieWriter
     // Video Methods
     //
 
-    void fillVideo(FrameBufferVector fbs, int trackIndex, bool lastPass);
+    void encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, AVStream* stream, int lastEncVideo);
+    void fillVideo(FrameBufferVector fbs, int trackIndex, int frameIndex, bool lastPass);
     void initVideoTrack(AVStream* avStream);
 
     //
