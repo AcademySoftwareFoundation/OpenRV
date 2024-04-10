@@ -76,6 +76,9 @@ INCLUDE(ocio)
 # src/pub: freetype: src/pub will be removed eventually, this path will needed to change.
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
 INCLUDE(oiio) # depends on openexr and most image formats above and ocio (actually, there's inter-dependency between ocio and oiio)
+IF(RV_TARGET_WINDOWS)
+  INCLUDE(pcre2)
+ENDIF()
 INCLUDE(yaml-cpp) # depends on OCIO
 
 INCLUDE(spdlog)
@@ -106,6 +109,9 @@ MESSAGE(STATUS "Using OpenColorIO   ${RV_DEPS_OCIO_VERSION}")
 MESSAGE(STATUS "Using OpenImageIO   ${RV_DEPS_OIIO_VERSION}")
 MESSAGE(STATUS "Using OpenJpeg:     ${RV_DEPS_OPENJPEG_VERSION}")
 MESSAGE(STATUS "Using OpenSSL:      ${RV_DEPS_OPENSSL_VERSION}")
+IF(RV_TARGET_WINDOWS)
+  MESSAGE(STATUS "Using PCRE2:        ${RV_DEPS_PCRE2_VERSION}")
+ENDIF()
 MESSAGE(STATUS "Using PNG:          ${RV_DEPS_PNG_VERSION}")
 MESSAGE(STATUS "Using Python3:      ${RV_DEPS_PYTHON3_VERSION}")
 MESSAGE(STATUS "Using PySide2:      ${RV_DEPS_PYSIDE2_VERSION}")
