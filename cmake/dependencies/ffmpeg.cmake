@@ -323,6 +323,12 @@ FOREACH(
   LIST(APPEND RV_DEPS_LIST ffmpeg::${_ffmpeg_lib})
 ENDFOREACH()
 
+
+TARGET_LINK_LIBRARIES(
+  ffmpeg::avutil
+  INTERFACE OpenSSL::Crypto
+)
+
 TARGET_LINK_LIBRARIES(
   ffmpeg::swresample
   INTERFACE ffmpeg::avutil
