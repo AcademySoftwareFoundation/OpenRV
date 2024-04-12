@@ -141,6 +141,12 @@ ELSE()
       ${_lib_dir}/${_ssl_lib_name}
   )
 
+  IF(RV_TARGET_WINDOWS)
+    SET(_implibpath
+        ${_lib_dir}/${CMAKE_IMPORT_LIBRARY_PREFIX}crypto${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+    )
+  ENDIF()
+
   EXTERNALPROJECT_ADD(
     ${_target}
     DOWNLOAD_NAME ${_target}_${_version}.zip
@@ -171,6 +177,12 @@ ELSE()
     TARGET OpenSSL::Crypto
     PROPERTY IMPORTED_SONAME ${_crypto_lib_name}
   )
+  IF(RV_TARGET_WINDOWS)
+    SET_PROPERTY(
+      TARGET OpenSSL::Crypto
+      PROPERTY IMPORTED_IMPLIB ${_implibpath}
+    )
+  ENDIF()
   TARGET_INCLUDE_DIRECTORIES(
     OpenSSL::Crypto
     INTERFACE ${_include_dir}
