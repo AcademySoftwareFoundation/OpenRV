@@ -63,7 +63,7 @@ RV_COPY_LIB_BIN_FOLDERS()
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
-ADD_LIBRARY(PNG::PNG STATIC IMPORTED GLOBAL)
+ADD_LIBRARY(PNG::PNG SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(PNG::PNG ${_target})
 IF(NOT RV_TARGET_WINDOWS)
   SET_PROPERTY(
@@ -75,7 +75,9 @@ IF(NOT RV_TARGET_WINDOWS)
     PROPERTY IMPORTED_SONAME ${_libname}
   )
 ELSE()
-  # PNG lib is a STATIC hence our lib & imp lib is a .lib
+  # An import library (.lib) file is often used to resolve references to 
+  # functions and variables in a DLL, enabling the linker to generate code 
+  # for loading the DLL and calling its functions at runtime.
   SET_PROPERTY(
     TARGET PNG::PNG
     PROPERTY IMPORTED_LOCATION "${_implibpath}"
