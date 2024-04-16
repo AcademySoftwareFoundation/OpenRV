@@ -12,6 +12,7 @@ import otio_reader
 class SyncReviewMarshal(MinorMode):
     updating_graph = False
     updating_playbacksettings = False
+    queue_name = ""
 
     def __init__(self):
         super(SyncReviewMarshal, self).__init__()
@@ -39,6 +40,11 @@ class SyncReviewMarshal(MinorMode):
                     self.receive_change_event,
                     "",
                 ),
+                (
+                    "sync-review-queue-name-change",
+                    self.set_queue_name,
+                    "",
+                )
             ],
             None,
         )
@@ -74,12 +80,12 @@ class SyncReviewMarshal(MinorMode):
         Sends an event with a json payload
         """
         if os.environ.get("DEBUG_SYNC_REVIEW"):
-            print(f"SEND MESSAGE: {payload}")
+            print(f"SEND MESSAGE to session {SyncReviewMarshal.queue_name}: {payload}")
 
         commands.sendInternalEvent(
             event_name,
             json.dumps(
-                {"schema": "SYNC_REVIEW_1.0", "payload": payload},
+                {"schema": "SYNC_REVIEW_1.0", "session": SyncReviewMarshal.queue_name, "payload": payload},
                 separators=(",", ":"),
                 indent=1,
                 sort_keys=True,
@@ -168,7 +174,9 @@ class SyncReviewMarshal(MinorMode):
         if SyncReviewMarshal.updating_playbacksettings:
             return
 
-        SyncReviewMarshal.marshal_playback_settings(playing=True)
+        SyncReviewMarshal.marshal_playback_settings(
+            playing=True, current_time=SyncReviewMarshal.get_current_otio_time()
+        )
 
     @staticmethod
     def send_playback_stop(event):
@@ -200,6 +208,14 @@ class SyncReviewMarshal(MinorMode):
         elif command_schema.startswith("PLAYBACK_SETTINGS_1"):
             print("Processing PLAYBACK_SETTINGS_1 Change")
             return SyncReviewMarshal.receive_playback_change(command)
+
+    @staticmethod
+    def set_queue_name(event):
+        """
+        Receives the current name of the message queue
+        """
+        event.reject()
+        SyncReviewMarshal.queue_name = event.contents() 
 
     @staticmethod
     def receive_graph_change(command):

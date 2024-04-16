@@ -242,6 +242,7 @@ class MessageQueueImplementation(MinorMode, QtCore.QObject):
     def mq_queue(self, value):
         self.__pika_current_queue = value
         defineModeMenu(self.menu_name.replace(" ", ""), self.menu, True)
+        sendInternalEvent("sync-review-queue-name-change", value or "")
 
     @property
     def mq_consumer_tag(self):
