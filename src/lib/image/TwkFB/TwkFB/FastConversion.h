@@ -109,6 +109,22 @@ TWKFB_EXPORT void packedUYVY16_to_planarYUV16_MP( size_t width, size_t height, c
 TWKFB_EXPORT void packedUVYA16_to_planarYUVA16( size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf, uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA, size_t strideY, size_t strideCb, size_t strideCr, size_t strideA );
 TWKFB_EXPORT void packedUVYA16_to_planarYUVA16_MP( size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf, uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA, size_t strideY, size_t strideCb, size_t strideCr, size_t strideA );
 
+/// @brief Converts packed YUV-444 10-bits to semi-planar YUV-422 16-bits (P216)
+///
+/// @param width The number of pixels per row.
+/// @param height The number of rows.
+/// @param inBuf The input buffer.
+/// @param outBufY The output buffer Y.
+/// @param outBufCbCr The output buffer CbCr
+/// @param inBufStride The stride of the output buffer in bytes.
+/// @param outBufStride The stride of the input buffer in bytes.
+TWKFB_EXPORT void packedYUV444_10bits_to_P216( size_t width, size_t height, const uint32_t*FASTMEMCPYRESTRICT inBuf, 
+    uint16_t*FASTMEMCPYRESTRICT outBufY, uint16_t*FASTMEMCPYRESTRICT outBufCbC, 
+    size_t inBufStride, size_t outBufStride, bool flip );
+TWKFB_EXPORT void packedYUV444_10bits_to_P216_MP( size_t width, size_t height, const uint32_t*FASTMEMCPYRESTRICT inBuf, 
+    uint16_t*FASTMEMCPYRESTRICT outBufY, uint16_t*FASTMEMCPYRESTRICT outBufCbC, 
+    size_t inBufStride, size_t outBufStride, bool flip );
+
 /// @brief Converts packed BGRA 64-bits BE to packed ABGR 64-bits LE.
 ///
 /// @param width The number of bytes per row.
