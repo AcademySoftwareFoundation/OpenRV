@@ -26,3 +26,4 @@ compile_commands.json
 cmake-*/*
 build/*
 _build/*
+_install/*
