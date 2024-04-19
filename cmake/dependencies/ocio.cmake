@@ -197,6 +197,13 @@ ELSE() # Windows
       ""
   )
   STRING(REPLACE "." "" PYTHON_VERSION_SHORT_NO_DOT ${RV_DEPS_PYTHON_VERSION_SHORT})
+  
+  # Windows only.
+  # Because of an issue in Debug with minizip-ng finding ZLIB at two locations,
+  # ZLIB_LIBRARY and ZLIB_INCLUDE_DIR is used for both Release and Debug. 
+  # ZLIB_ROOT is not enough to fix the issue.
+  GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_IMPLIB)
+  GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
 
   LIST(
     APPEND
@@ -206,7 +213,8 @@ ELSE() # Windows
     "-DOCIO_VERBOSE=ON"
     "-DCMAKE_INSTALL_PREFIX=${_install_dir}"
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}"
+    "-DZLIB_LIBRARY=${_zlib_library}"
+    "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
     # Using the expat build with /MD to match the CRT.
     "-Dexpat_DIR=${_vcpkg_path}/packages/expat_x64-windows-static-md/share/expat"
     "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
@@ -361,8 +369,8 @@ IF(RV_TARGET_WINDOWS)
       TARGET ${_target}
       POST_BUILD
       COMMENT "Rename PyOpenColorIO.py to PyOpenColorIO_d.py in '${_rv_stage_lib_site_package_dir}' and '${_ocio_stage_plugins_python_dir}."
-      COMMAND ${CMAKE_COMMAND} -E rename ${_rv_stage_lib_site_package_dir}/PyOpenColorIO.pyd ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
-      COMMAND ${CMAKE_COMMAND} -E rename ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}/PyOpenColorIO_d.pyd
+      COMMAND ${CMAKE_COMMAND} -E copy ${_rv_stage_lib_site_package_dir}/PyOpenColorIO.pyd ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
+      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}/PyOpenColorIO_d.pyd
     )
   ENDIF()
 ENDIF()
