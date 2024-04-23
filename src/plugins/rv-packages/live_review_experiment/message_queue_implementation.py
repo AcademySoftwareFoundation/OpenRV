@@ -332,6 +332,7 @@ class MessageQueueImplementation(MinorMode, QtCore.QObject):
         self.mq_channel.queue_bind(
             queue=queue_name,
             exchange=self.mq_exchange,
+            routing_key="#"
         )
 
         self.mq_queue = queue_name
