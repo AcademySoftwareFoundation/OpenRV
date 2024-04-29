@@ -103,6 +103,13 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _zlib_byproducts ${_implibpath})
 ENDIF()
 
+# The patch comes from the ZLIB port in Vcpkg repository.
+# The name of the patch is kept as is. See https://github.com/microsoft/vcpkg/tree/master/ports/zlib
+# Description: Fix unistd.h being incorrectly required when imported from a project defining HAVE_UNISTD_H=0
+SET(_patch_command 
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zlib_Prevent-invalid-inclusions-when-HAVE_-is-set-to-0.patch
+)
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}
@@ -112,6 +119,7 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   INSTALL_DIR ${_install_dir}
+  PATCH_COMMAND ${_patch_command}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${RV_DEPS_BASE_DIR}/${_target}/src
   BUILD_COMMAND ${_make_command} -j${_cpu_count}
@@ -125,6 +133,16 @@ EXTERNALPROJECT_ADD(
 FILE(MAKE_DIRECTORY "${_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
+  # FFmpeg expect "zlib" in Release and Debug.
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    ADD_CUSTOM_COMMAND(
+      TARGET ${_target}
+      POST_BUILD
+      COMMENT "Renaming the ZLIB import debug lib to the name FFmpeg is expecting (release name)"
+      COMMAND ${CMAKE_COMMAND} -E copy ${_implibpath} ${_lib_dir}/zlib.lib
+    )
+  ENDIF()
+
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
@@ -182,3 +200,24 @@ SET(RV_DEPS_ZLIB_VERSION
     ${_version}
     CACHE INTERNAL "" FORCE
 )
+
+# FFmpeg customization
+SET_PROPERTY(
+  GLOBAL APPEND
+  PROPERTY "RV_FFMPEG_DEPENDS" RV_DEPS_ZLIB
+)
+SET_PROPERTY(
+  GLOBAL APPEND
+  PROPERTY "RV_FFMPEG_EXTRA_C_OPTIONS" "--extra-cflags=-I${_include_dir}"
+)
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    GLOBAL APPEND
+    PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-LIBPATH:${_lib_dir}"
+  )
+ELSE()
+  SET_PROPERTY(
+    GLOBAL APPEND
+    PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-L${_lib_dir}"
+  )
+ENDIF()
