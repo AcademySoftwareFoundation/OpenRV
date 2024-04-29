@@ -121,6 +121,8 @@ ENDIF()
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND _python3_make_command "--opentimelineio-source-dir")
   LIST(APPEND _python3_make_command ${rv_deps_opentimelineio_SOURCE_DIR})
+  LIST(APPEND _python3_make_command "--python-version")
+  LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
 
 IF(${RV_OSX_EMULATION})

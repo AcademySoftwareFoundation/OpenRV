@@ -117,10 +117,14 @@ def get_python_interpreter_args(python_home: str) -> List[str]:
     :param python_home: Python home of a Python package
     :return: Path to the python interpreter
     """
+
+    build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
+    python_name_pattern = "python*" if not build_opentimelineio else "python_d*"
+
     python_interpreters = glob.glob(
-        os.path.join(python_home, "python*"), recursive=True
+        os.path.join(python_home, python_name_pattern), recursive=True
     )
-    python_interpreters += glob.glob(os.path.join(python_home, "bin", "python*"))
+    python_interpreters += glob.glob(os.path.join(python_home, "bin", python_name_pattern))
 
     # sort put python# before python#-config
     python_interpreters = sorted(
@@ -292,8 +296,9 @@ def test_python_distribution(python_home: str) -> None:
             my_env["OTIO_CXX_DEBUG_BUILD"] = "1"
 
             # Specify the location of the debug python import lib (eg. python39_d.lib)
-            python_lib_dir = os.path.join(tmp_python_home, "libs")
-            my_env["CMAKE_ARGS"] = f"-DCMAKE_LIBRARY_PATH={python_lib_dir}"
+            python_include_dirs = os.path.join(tmp_python_home, "include")
+            python_lib = os.path.join(tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib")
+            my_env["CMAKE_ARGS"] = f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
 
             opentimelineio_install_arg = python_interpreter_args + [
                 "-m",
@@ -684,6 +689,10 @@ if __name__ == "__main__":
         default="",
     )
 
+    if platform.system() == "Windows":
+        # Major and minor version of Python without dots. E.g. 3.10.3 -> 310
+        parser.add_argument("--python-version", dest="python_version", type=str, required=True, default="")
+
     parser.set_defaults(clean=False, configure=False, build=False, install=False)
 
     args = parser.parse_args()
@@ -695,6 +704,9 @@ if __name__ == "__main__":
     VARIANT = args.variant
     ARCH = args.arch
     OPENTIMELINEIO_SOURCE_DIR = args.otio_source_dir
+
+    if platform.system() == "Windows":
+        PYTHON_VERSION = args.python_version
 
     if args.clean:
         clean()
