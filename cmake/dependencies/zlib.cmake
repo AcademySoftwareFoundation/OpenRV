@@ -107,7 +107,8 @@ ENDIF()
 # The name of the patch is kept as is. See https://github.com/microsoft/vcpkg/tree/master/ports/zlib
 # Description: Fix unistd.h being incorrectly required when imported from a project defining HAVE_UNISTD_H=0
 SET(_patch_command 
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zlib_Prevent-invalid-inclusions-when-HAVE_-is-set-to-0.patch
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zconf.h.cmakein_prevent_invalid_inclusions.patch
+    && patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zconf.h.in_prevent_invalid_inclusions.patch
 )
 
 EXTERNALPROJECT_ADD(
