@@ -1,0 +1,413 @@
+diff --git a/cmake/OpenEXRConfig.h.in b/cmake/OpenEXRConfig.h.in
+index 403c9d6a..34a8ebff 100644
+--- a/cmake/OpenEXRConfig.h.in
++++ b/cmake/OpenEXRConfig.h.in
+@@ -59,6 +59,8 @@
+ #define OPENEXR_VERSION_STRING "@OPENEXR_VERSION@"
+ #define OPENEXR_PACKAGE_STRING "@OPENEXR_PACKAGE_NAME@"
+ 
++#define OPENEXR_ALLOW_PARTIAL_EXR_READ
++
+ #define OPENEXR_VERSION_RELEASE_TYPE "@OPENEXR_VERSION_RELEASE_TYPE@"
+ // Deprecated, for back compatibility:
+ #define OPENEXR_VERSION_EXTRA "@OPENEXR_VERSION_RELEASE_TYPE@"
+diff --git a/src/lib/OpenEXR/ImfDeepScanLineInputFile.cpp b/src/lib/OpenEXR/ImfDeepScanLineInputFile.cpp
+index f17d821c..c2082348 100644
+--- a/src/lib/OpenEXR/ImfDeepScanLineInputFile.cpp
++++ b/src/lib/OpenEXR/ImfDeepScanLineInputFile.cpp
+@@ -933,6 +933,9 @@ LineBufferTask::execute ()
+                     //
+ 
+                     int width = (_ifd->maxX - _ifd->minX + 1);
++                    double sliceFillValue = slice.fillValue;
++
++                    bool sliceFill = slice.fill;
+ 
+                     ptrdiff_t base;
+ 
+@@ -955,6 +958,15 @@ LineBufferTask::execute ()
+                                 static_cast<ptrdiff_t> (width);
+                     }
+ 
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++                    // If there was an exception reading the tile we
++                    // fill its channel values with black/zero.
++                    if (_lineBuffer->hasException)
++                    {
++                        sliceFill = true;
++                        sliceFillValue = 0.0; // black channel value
++                    }
++#endif
+                     copyIntoDeepFrameBuffer (
+                         readPtr,
+                         slice.base,
+@@ -971,8 +983,8 @@ LineBufferTask::execute ()
+                         slice.sampleStride,
+                         slice.xPointerStride,
+                         slice.yPointerStride,
+-                        slice.fill,
+-                        slice.fillValue,
++                        sliceFill,
++                        sliceFillValue,
+                         _lineBuffer->format,
+                         slice.typeInFrameBuffer,
+                         slice.typeInFile);
+@@ -1028,6 +1040,10 @@ newLineBufferTask (
+             lineBuffer->number           = number;
+             lineBuffer->uncompressedData = 0;
+ 
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++            lineBuffer->hasException = false;
++#endif
++
+             if (ifd->bigFile)
+             {
+ 
+@@ -1065,6 +1081,13 @@ newLineBufferTask (
+                 lineBuffer->unpackedDataSize);
+         }
+     }
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++    catch (...)
++    {
++        lineBuffer->exception = "incomplete deepscanline exr";
++        lineBuffer->hasException = true;
++    }
++#else
+     catch (std::exception& e)
+     {
+         if (!lineBuffer->hasException)
+@@ -1090,6 +1113,7 @@ newLineBufferTask (
+         lineBuffer->post ();
+         throw;
+     }
++#endif
+ 
+     scanLineMin = max (lineBuffer->minY, scanLineMin);
+     scanLineMax = min (lineBuffer->maxY, scanLineMax);
+diff --git a/src/lib/OpenEXR/ImfDeepTiledInputFile.cpp b/src/lib/OpenEXR/ImfDeepTiledInputFile.cpp
+index 7d1d882d..24437c04 100644
+--- a/src/lib/OpenEXR/ImfDeepTiledInputFile.cpp
++++ b/src/lib/OpenEXR/ImfDeepTiledInputFile.cpp
+@@ -680,6 +680,19 @@ TileBufferTask::execute ()
+                     // The frame buffer contains a slice for this channel.
+                     //
+ 
++                    bool sliceFill = slice.fill;
++                    double sliceFillValue = slice.fillValue;
++
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++                    // If there was an exception reading the tile we
++                    // fill its channel values with black/zero.
++                    if (_tileBuffer->hasException)
++                    {
++                        sliceFill = true;
++                        sliceFillValue = 0.0; // black channel value
++                    }
++#endif
++
+                     copyIntoDeepFrameBuffer (
+                         readPtr,
+                         slice.pointerArrayBase,
+@@ -696,8 +709,8 @@ TileBufferTask::execute ()
+                         slice.sampleStride,
+                         slice.xStride,
+                         slice.yStride,
+-                        slice.fill,
+-                        slice.fillValue,
++                        sliceFill,
++                        sliceFillValue,
+                         _tileBuffer->format,
+                         slice.typeInFrameBuffer,
+                         slice.typeInFile);
+@@ -754,6 +767,10 @@ newTileBufferTask (
+ 
+         tileBuffer->uncompressedData = 0;
+ 
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++        tileBuffer->hasException = false;
++#endif
++
+         readTileData (
+             ifd->_streamData,
+             ifd,
+@@ -767,6 +784,10 @@ newTileBufferTask (
+     }
+     catch (...)
+     {
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++        tileBuffer->hasException = true;
++        tileBuffer->exception = "incomplete deeptile exr";
++#else
+         //
+         // Reading from the file caused an exception.
+         // Signal that the tile buffer is free, and
+@@ -775,6 +796,7 @@ newTileBufferTask (
+ 
+         tileBuffer->post ();
+         throw;
++#endif
+     }
+ 
+     return new TileBufferTask (group, ifd, tileBuffer);
+diff --git a/src/lib/OpenEXR/ImfInputFile.cpp b/src/lib/OpenEXR/ImfInputFile.cpp
+index e5e4d218..29d5f468 100644
+--- a/src/lib/OpenEXR/ImfInputFile.cpp
++++ b/src/lib/OpenEXR/ImfInputFile.cpp
+@@ -228,6 +228,10 @@ bufferedReadPixels (InputFile::Data* ifd, int scanLine1, int scanLine2)
+     // the user's buffer
+     //
+ 
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++    bool hasReadTilesException = false;
++#endif
++
+     for (int j = yStart; j != yEnd; j += yStep)
+     {
+         Box2i tileRange = ifd->tFile->dataWindowForTile (0, j, 0);
+@@ -243,15 +247,36 @@ bufferedReadPixels (InputFile::Data* ifd, int scanLine1, int scanLine2)
+             // if no channels are being read that are present in file, cachedBuffer will be empty
+             //
+ 
+-            if (ifd->cachedBuffer &&
+-                ifd->cachedBuffer->begin () != ifd->cachedBuffer->end ())
++            if (ifd->cachedBuffer && ifd->cachedBuffer->begin () != ifd->cachedBuffer->end ())
+             {
+-                ifd->tFile->readTiles (0, ifd->tFile->numXTiles (0) - 1, j, j);
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++                try
++                {
++                    ifd->tFile->readTiles (0, ifd->tFile->numXTiles (0) - 1, j, j);
++                }
++                catch (...)
++                {
++                    hasReadTilesException = true;
++                }
++#else
++                 ifd->tFile->readTiles (0, ifd->tFile->numXTiles (0) - 1, j, j);
++#endif
+             }
+ 
+             ifd->cachedTileY = j;
+         }
+ 
++        //
++        //  Especially if we allow partial reading, then it's possible for the
++        //  above readTiles to fail so badly that the cachedBuffer is
++        //  non-existant, in that case throw instead of crashing.
++        //
++
++        if (! ifd->cachedBuffer)
++        {
++            throw IEX_NAMESPACE::ArgExc ("Cached framebuffer is empty");
++        }
++
+         //
+         // Copy the data from our cached framebuffer into the user's
+         // framebuffer.
+@@ -375,6 +400,16 @@ bufferedReadPixels (InputFile::Data* ifd, int scanLine1, int scanLine2)
+             }
+         }
+     }
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++    //
++    // We throw any readTiles exception only at the end; allowing 
++    // all missing tiles to be read as black tiles.
++    //
++    if (hasReadTilesException)
++    {
++        throw IEX_NAMESPACE::ArgExc ("Incomplete Tiled EXR.");
++    }
++#endif
+ }
+ 
+ } // namespace
+diff --git a/src/lib/OpenEXR/ImfScanLineInputFile.cpp b/src/lib/OpenEXR/ImfScanLineInputFile.cpp
+index adaaa9f8..29b403f6 100644
+--- a/src/lib/OpenEXR/ImfScanLineInputFile.cpp
++++ b/src/lib/OpenEXR/ImfScanLineInputFile.cpp
+@@ -366,7 +366,7 @@ readPixelData (
+     uint64_t lineOffset = ifd->lineOffsets[lineBufferNumber];
+ 
+     if (lineOffset == 0)
+-        THROW (IEX_NAMESPACE::InputExc, "Scan line " << minY << " is missing.");
++        THROW (IEX_NAMESPACE::InputExc, "Scan line " << minY << " is missing." << " dataSize=" << dataSize);
+ 
+     //
+     // Seek to the start of the scan line in the file,
+@@ -620,13 +620,27 @@ LineBufferTask::execute ()
+                     char* endPtr = reinterpret_cast<char*> (
+                         linePtr + intptr_t (dMaxX) * intptr_t (slice.xStride));
+ 
++                    bool sliceFill = slice.fill;
++                    double sliceFillValue = slice.fillValue;
++
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++                    // If there was an exception reading the tile we
++                    // fill its channel values with black/zero.
++                    if (_lineBuffer->hasException)
++                    {
++                        sliceFill = true;
++                        sliceFillValue = 0.0; // black channel value
++                    }
++#endif
++
++
+                     copyIntoFrameBuffer (
+                         readPtr,
+                         writePtr,
+                         endPtr,
+                         slice.xStride,
+-                        slice.fill,
+-                        slice.fillValue,
++                        sliceFill,
++                        sliceFillValue,
+                         _lineBuffer->format,
+                         slice.typeInFrameBuffer,
+                         slice.typeInFile);
+@@ -1073,6 +1087,9 @@ newLineBufferTask (
+             lineBuffer->number           = number;
+             lineBuffer->uncompressedData = 0;
+ 
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++             lineBuffer->hasException = false;
++#endif
+             readPixelData (
+                 streamData,
+                 ifd,
+@@ -1081,15 +1098,28 @@ newLineBufferTask (
+                 lineBuffer->dataSize);
+         }
+     }
+-    catch (std::exception& e)
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++    catch (...)
++    {
++        //
++        // Reading from the file caused an exception.
++        // Signal that the line buffer is free, and
++        // re-throw the exception.
++        //
++
++        lineBuffer->exception = "incomplete scanline exr";
++        lineBuffer->hasException = true;
++    }
++#else
++    catch (std::exception &e)
+     {
+         if (!lineBuffer->hasException)
+         {
+-            lineBuffer->exception    = e.what ();
++            lineBuffer->exception = e.what();
+             lineBuffer->hasException = true;
+         }
+         lineBuffer->number = -1;
+-        lineBuffer->post ();
++        lineBuffer->post();
+         throw;
+     }
+     catch (...)
+@@ -1099,13 +1129,14 @@ newLineBufferTask (
+         // Signal that the line buffer is free, and
+         // re-throw the exception.
+         //
+-
+-        lineBuffer->exception    = "unrecognized exception";
++        
++        lineBuffer->exception = "unrecognized exception";
+         lineBuffer->hasException = true;
+-        lineBuffer->number       = -1;
+-        lineBuffer->post ();
++        lineBuffer->number = -1;
++        lineBuffer->post();
+         throw;
+     }
++#endif
+ 
+     scanLineMin = max (lineBuffer->minY, scanLineMin);
+     scanLineMax = min (lineBuffer->maxY, scanLineMax);
+@@ -1113,7 +1144,12 @@ newLineBufferTask (
+     Task* retTask = 0;
+ 
+ #ifdef IMF_HAVE_SSE2
++
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++    if (optimizationMode._optimizable && !lineBuffer->hasException)
++#else
+     if (optimizationMode._optimizable)
++#endif
+     {
+ 
+         retTask = new LineBufferTaskIIF (
+diff --git a/src/lib/OpenEXR/ImfTiledInputFile.cpp b/src/lib/OpenEXR/ImfTiledInputFile.cpp
+index 58508beb..b0451087 100644
+--- a/src/lib/OpenEXR/ImfTiledInputFile.cpp
++++ b/src/lib/OpenEXR/ImfTiledInputFile.cpp
+@@ -652,13 +652,26 @@ TileBufferTask::execute ()
+                     char* endPtr =
+                         writePtr + (numPixelsPerScanLine - 1) * slice.xStride;
+ 
++                    bool sliceFill = slice.fill;
++                    double sliceFillValue = slice.fillValue;
++
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++                    // If there was an exception reading the tile we
++                    // fill its channel values with black/zero.
++                    if (_tileBuffer->hasException)
++                    {
++                        sliceFill = true;
++                        sliceFillValue = 0.0; // black channel value
++                    }
++#endif
++
+                     copyIntoFrameBuffer (
+                         readPtr,
+                         writePtr,
+                         endPtr,
+                         slice.xStride,
+-                        slice.fill,
+-                        slice.fillValue,
++                        sliceFill,
++                        sliceFillValue,
+                         _tileBuffer->format,
+                         slice.typeInFrameBuffer,
+                         slice.typeInFile);
+@@ -716,6 +729,10 @@ newTileBufferTask (
+ 
+         tileBuffer->uncompressedData = 0;
+ 
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++        tileBuffer->hasException = false;
++#endif
++
+         readTileData (
+             streamData,
+             ifd,
+@@ -728,14 +745,19 @@ newTileBufferTask (
+     }
+     catch (...)
+     {
+-        //
+-        // Reading from the file caused an exception.
+-        // Signal that the tile buffer is free, and
+-        // re-throw the exception.
+-        //
+-
+-        tileBuffer->post ();
+-        throw;
++#ifdef OPENEXR_ALLOW_PARTIAL_EXR_READ
++        tileBuffer->hasException = true;
++        tileBuffer->exception = "incomplete tile exr";
++#else
++	//
++	// Reading from the file caused an exception.
++	// Signal that the tile buffer is free, and
++	// re-throw the exception.
++	//
++
++	tileBuffer->post();
++	throw;
++#endif
+     }
+ 
+     return new TileBufferTask (group, ifd, tileBuffer);
