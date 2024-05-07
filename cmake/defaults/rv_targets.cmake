@@ -9,6 +9,53 @@ SET(CMAKE_SKIP_RPATH
 )
 
 IF(APPLE)
+  # TODO: Need to check to value of CMAKE_HOST_SYSTEM_PROCESSOR on M2 and M3.
+  #       It might returns only "arm".
+  SET(RV_DISABLE_APPLE_ARM64
+      OFF
+      CACHE BOOL "Prevent RV to be build for Apple ARM64 native build"
+  )
+
+  IF(RV_DISABLE_APPLE_ARM64)
+    # Force build to x86_64 even on Apple ARM because RV_DISABLE_APPLE_ARM64 is enabled.
+    SET(CMAKE_OSX_ARCHITECTURES
+        "x86_64"
+        CACHE STRING "Force compilation to x86_64" FORCE
+    )
+  ENDIF()
+
+  # If CMAKE_OSX_ARCHITECTURES is not set, set it to the host native build. (x86_64 or arm64)
+  IF(NOT DEFINED CMAKE_OSX_ARCHITECTURES OR CMAKE_OSX_ARCHITECTURES STREQUAL "")
+    SET(CMAKE_OSX_ARCHITECTURES
+        "${CMAKE_HOST_SYSTEM_PROCESSOR}"
+        CACHE STRING "Force compilation to the native architecture (${CMAKE_HOST_SYSTEM_PROCESSOR})" FORCE
+    )
+  ENDIF()
+
+  # Universal build (x86_64;arm64) are not supported and not tested.
+  # Set a variable to easily check if the current build is for x86_64 or arm64. Used in cmake/dependencies/*.cmake.
+  # Set a compile option to be used as define in the code.
+  IF(DEFINED CMAKE_OSX_ARCHITECTURES OR NOT CMAKE_OSX_ARCHITECTURES STREQUAL "")
+    IF("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "x86_64")
+      SET(RV_TARGET_APPLE_X86_64
+          ON
+          CACHE INTERNAL "Compile for x86_64 on Apple MacOS" FORCE
+      )
+      SET(__target_arch__ -DRV_ARCH_X86_64)
+    ELSEIF("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
+      SET(RV_TARGET_APPLE_ARM64
+          ON
+          CACHE INTERNAL "Compile for arm64 on Apple MacOS" FORCE
+      )
+      SET(__target_arch__ -DRV_ARCH_ARM64)
+    ELSEIF("${CMAKE_OSX_ARCHITECTURES}" MATCHES "(arm64;x86_64|x86_64;arm64)")
+      MESSAGE(FATAL "Universal build on MacOS is not supported.")
+    ENDIF()
+  ENDIF()
+
+  MESSAGE(STATUS "Building for ${CMAKE_OSX_ARCHITECTURES} (CMAKE_HOST_SYSTEM_PROCESSOR = ${CMAKE_HOST_SYSTEM_PROCESSOR})")
+  ADD_COMPILE_OPTIONS(${__target_arch__})
+
   # Darwin is the name of the mach BSD-base kernel :-)
   SET(RV_TARGET_DARWIN
       BOOL TRUE "Detected target is Apple's macOS"
@@ -18,18 +65,6 @@ IF(APPLE)
       "Darwin"
       CACHE INTERNAL ""
   )
-  SET(CMAKE_OSX_ARCHITECTURES
-      "x86_64"
-      CACHE STRING "Force compilation for Intel processors." FORCE
-  )
-
-  SET(RV_OSX_EMULATION
-      ON
-  )
-  SET(RV_OSX_EMULATION_ARCH
-      "-x86_64"
-      CACHE STRING "Architecture to use while building the dependencies" FORCE
-  ) # Set to empty string for native
 
   # The code makes extensive use of the 'PLATFORM_DARWIN' definition
   SET(PLATFORM

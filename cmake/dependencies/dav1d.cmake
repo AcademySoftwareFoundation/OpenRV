@@ -59,12 +59,21 @@ SET(_make_command
     ninja
 )
 
-IF(${RV_OSX_EMULATION})
-  SET(_meson_cross_file
-      "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
-  )
+IF(APPLE)
+  # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
+  # No extra options added to make command line.
+  IF(RV_TARGET_APPLE_X86_64)
+    SET(_meson_cross_file
+        "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
+    )
+  ELSEIF(RV_TARGET_APPLE_ARM64)
+    SET(_meson_cross_file
+      "${PROJECT_SOURCE_DIR}/src/build/meson_arch_arm64.txt"
+    )
+  ENDIF()
+
   SET(_configure_command
-      ${_configure_command} "--cross-file" ${_meson_cross_file}
+    ${_configure_command} "--cross-file" ${_meson_cross_file}
   )
 ENDIF()
 
