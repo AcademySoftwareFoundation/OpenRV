@@ -7,13 +7,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-SET(_target
-    "RV_DEPS_GLEW"
-)
-
-SET(_version
-    "e1a80a9f12d7def202d394f46e44cfced1104bfb"
-)
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "e1a80a9f12d7def202d394f46e44cfced1104bfb" "make" "")
 
 SET(_download_url
     "https://github.com/nigels-com/glew/archive/${_version}.zip"
@@ -50,18 +44,16 @@ SET(_glew_lib
     ${_lib_dir}/${_glew_lib_name}
 )
 
-SET(_make_command
-    make
-)
+IF(APPLE)
+  # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
+  # No extra options added to make command line.
+  IF(RV_TARGET_APPLE_X86_64)
+    SET(__glew_arch__ darwin-x86_64)
+  ELSEIF(RV_TARGET_APPLE_ARM64)
+    SET(__glew_arch__ darwin-arm64)
+  ENDIF()
 
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
+  SET(_make_command ${_make_command} SYSTEM=${__glew_arch__})
 ENDIF()
 
 EXTERNALPROJECT_ADD(
@@ -72,7 +64,7 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  CONFIGURE_COMMAND cd auto && ${_make_command}
+  CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
   INSTALL_COMMAND ${_make_command} install GLEW_DEST=${_install_dir}
   BUILD_IN_SOURCE TRUE

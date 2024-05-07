@@ -52,16 +52,17 @@ SET(_configure_command
     sh ./configure
 )
 
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
+IF(APPLE)
+  IF(RV_TARGET_APPLE_X86_64)
+    SET(__ffmpeg_arch__ x86_64)
+    SET(__ffmpeg_flags__ "-arch x86_64")
+  ELSEIF(RV_TARGET_APPLE_ARM64)
+    SET(__ffmpeg_arch__ aarch64)
+    SET(__ffmpeg_flags__ "-arch arm64")
+  ENDIF()
 
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
   SET(_configure_command
-      ${_darwin_x86_64} ${_configure_command}
+    ${_configure_command} --arch=${__ffmpeg_arch__} --extra-cflags=${__ffmpeg_flags__} --extra-ldflags=${__ffmpeg_flags__}
   )
 ENDIF()
 
