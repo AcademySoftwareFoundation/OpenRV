@@ -91,8 +91,9 @@ ELSE()
   ENDIF()
 
   IF(APPLE)
-    # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
-    # No extra options added to make command line.
+    # This is needed because if Rosetta is used to compile for x86_64 from ARM64,
+    # openssl build system detects it as "linux-x86_64" and it causes issues.
+
     IF(RV_TARGET_APPLE_X86_64)
       SET(__openssl_arch__ x86_64)
     ELSEIF(RV_TARGET_APPLE_ARM64)
