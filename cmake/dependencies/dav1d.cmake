@@ -54,8 +54,9 @@ SET(_make_command
 )
 
 IF(APPLE)
-  # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
-  # No extra options added to make command line.
+  # Cross-file must be specified because if Rosetta is used to compile for x86_64 from ARM64,
+  # Meson still detects ARM64 as the default architecture.
+
   IF(RV_TARGET_APPLE_X86_64)
     SET(_meson_cross_file
         "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"

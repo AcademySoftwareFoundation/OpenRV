@@ -125,18 +125,6 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
 
-# TODO: CMAKE_OSX_ARCHITECTURE; Clean up ARCH usage in make_python.py
-IF(APPLE)
-  # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
-  # No extra options added to make command line.
-  IF(RV_TARGET_APPLE_X86_64)
-    SET(__python3_arch__ x86_64)
-  ELSEIF(RV_TARGET_APPLE_ARM64)
-    SET(__python3_arch__ arm64)
-ENDIF()
-LIST(APPEND _python3_make_command --arch=-${__python3_arch__})
-ENDIF()
-
 SET(_pyside2_make_command_script
     "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
 )

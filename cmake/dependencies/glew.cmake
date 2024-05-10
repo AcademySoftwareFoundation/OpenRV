@@ -44,18 +44,6 @@ SET(_glew_lib
     ${_lib_dir}/${_glew_lib_name}
 )
 
-IF(APPLE)
-  # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
-  # No extra options added to make command line.
-  IF(RV_TARGET_APPLE_X86_64)
-    SET(__glew_arch__ darwin-x86_64)
-  ELSEIF(RV_TARGET_APPLE_ARM64)
-    SET(__glew_arch__ darwin-arm64)
-  ENDIF()
-
-  SET(_make_command ${_make_command} SYSTEM=${__glew_arch__})
-ENDIF()
-
 EXTERNALPROJECT_ADD(
   ${_target}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src

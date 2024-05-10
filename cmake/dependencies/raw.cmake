@@ -90,30 +90,6 @@ ELSE()
       "-L${RV_STAGE_LIB_DIR} -llcms"
   )
 
-  IF(APPLE)
-    # Use native build if CMAKE_OSX_ARCHITECTURE is not defined or empty.
-    # No extra options added to make command line.
-    IF(RV_TARGET_APPLE_X86_64)
-      SET(__raw_arch__ x86_64)
-    ELSEIF(RV_TARGET_APPLE_ARM64)
-      SET(__raw_arch__ arm64)
-    ENDIF()
-
-    SET(__raw_cc__ "-arch ${__raw_arch__}")
-    SET(__raw_cxx__ "-arch ${__raw_arch__}")
-
-    SET(_configure_command
-      ${CMAKE_COMMAND} -E env CFLAGS=${__raw_cc__}
-      ${CMAKE_COMMAND} -E env CXXFLAGS=${__raw_cxx__}
-      ${_configure_command}
-    )
-
-    SET(_configure_options
-        ${_configure_options}
-        --build=${__raw_arch__}-apple-darwin${CMAKE_SYSTEM_VERSION}
-    )
-  ENDIF()
-
   SET(_configure_command
     ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}'
     ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
