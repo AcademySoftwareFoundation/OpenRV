@@ -410,6 +410,7 @@ VideoDevice::pixelSizeInBytes(InternalDataFormat f)
       case Y1CbY0Cr_8_422:  return sizeof(unsigned char) * 3;
       case YCrCb_AJA_10_422:
       case YCrCb_BM_10_422: return sizeof(unsigned int);
+      case YCbCr_P216_16_422: return sizeof(unsigned short) * 2;
       default:
           abort();
     }   

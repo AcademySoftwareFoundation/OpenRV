@@ -23,6 +23,7 @@ class AVFormatContext;
 class AVFrame;
 class AVOption;
 class AVOutputFormat;
+class AVPacket;
 class AVRational;
 class AVStream;
 
@@ -180,7 +181,7 @@ class MovieFFMpegReader : public MovieReader
     void initializeVideo(int height, int width);
     void initializeAudio();
     bool openAVFormat();
-    bool openAVCodec(int index);
+    bool openAVCodec(int index, AVCodecContext** avCodecContext);
     void findStreamInfo();
 
     //
@@ -229,7 +230,7 @@ class MovieFFMpegReader : public MovieReader
     // Seek to the requested frame and perform drain if requested.
     // This function also flush the buffers and clear the timestamp track list.
     void seekToFrame(int inframe, double frameDur, AVStream* videoStream,
-        VideoTrack* track, bool drainRequested);
+        VideoTrack* track);
 
     // Read a packet from the video stream and updates the timestamp track
     // list if necessary.
@@ -238,24 +239,16 @@ class MovieFFMpegReader : public MovieReader
 
     // Send a packet as input to the decoder using avcodec_send_packet().
     // Note: This method can only be used with the new FFMpeg API.
-    void sendPacketToDecoder(AVStream* videoStream, VideoTrack* track);
+    void sendPacketToDecoder(VideoTrack* track);
 
     // Find the image with the closest timestamp to the goal timestamp, based
     // on the requested frame number and frame duration.
     // This function uses the new FFMpeg API.
     // i.e. It uses avcodec_send_packet() and avcodec_receive_frame() rather
     //      than avcodec_decode_video2().
-    bool findImageWithBestTimestamp(int inframe, int frameDur,
+    bool findImageWithBestTimestamp(int inframe, double frameDur,
                                     AVStream* videoStream, VideoTrack* track);
 
-  // Find the image with the closest timestamp to the goal timestamp, based
-  // on the requested frame number and frame duration.
-  // This function uses the legacy FFMpeg API.
-  // i.e. It uses avcodec_decode_video2() rather than
-  //      avcodec_send_packet() and avcodec_receive_frame().
-    bool findImageWithBestTimestamp_legacy(int inframe, double frameDur,
-        AVStream* videoStream, VideoTrack* track);
-    
     // check if the input format is jpeg_pipe or png_pipe
     bool isImageFormat(const char* iformat);
 
@@ -275,7 +268,6 @@ class MovieFFMpegReader : public MovieReader
     int                                m_dblline;
     bool                               m_multiTrackAudio;
     AudioState*                        m_audioState;
-    bool                               m_useNewVideoDecodingApi;
     bool                               m_cloning {false};
     bool                               m_mustReadFirstFrame{false};
 
@@ -341,6 +333,8 @@ class MovieFFMpegWriter : public MovieWriter
     // Audio Methods
     //
 
+    void encodeAudio(AVCodecContext* audioCodecContext, AVFrame* frame, AVPacket* pkt, 
+                     AVStream* audioStream, SampleTime* nsamps, int64_t lastEncAudio);
     bool fillAudio(Movie* inMovie, double overflow, bool lastPass);
     template <typename T> void translateRVAudio(int audioChannels,
         TwkAudio::AudioBuffer* audioBuffer, double max, int offset,
@@ -350,7 +344,8 @@ class MovieFFMpegWriter : public MovieWriter
     // Video Methods
     //
 
-    void fillVideo(FrameBufferVector fbs, int trackIndex, bool lastPass);
+    void encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, AVStream* stream, int lastEncVideo);
+    void fillVideo(FrameBufferVector fbs, int trackIndex, int frameIndex, bool lastPass);
     void initVideoTrack(AVStream* avStream);
 
     //
@@ -367,7 +362,7 @@ class MovieFFMpegWriter : public MovieWriter
     bool                               m_canControlRequest;
     bool                               m_verbose;
     std::map<std::string,std::string>  m_parameters;
-    AVOutputFormat*                    m_avOutputFormat;
+    const AVOutputFormat*              m_avOutputFormat;
     AVFormatContext*                   m_avFormatContext;
     SampleTime                         m_audioFrameSize;
     void*                              m_audioSamples;
