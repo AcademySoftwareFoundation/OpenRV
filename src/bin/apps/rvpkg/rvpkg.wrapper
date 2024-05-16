@@ -24,7 +24,7 @@ set -o noglob
 # interesting values (like fr_FR.UTF-8).
 unset LANG
 
-name="$0"
+name=$(basename "$0")
 
 if [ -z "$RV_HOME" ]; then
     canonicalName=$(readlink -f "$0")
