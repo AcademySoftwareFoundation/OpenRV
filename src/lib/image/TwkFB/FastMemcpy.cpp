@@ -19,8 +19,10 @@
 #include <TwkUtil/sgcHop.h>
 
 #include <cstring>      // for memcpy()
+#if defined(_USE_SIMD_MEMCPY)
 #include <mmintrin.h>
 #include <xmmintrin.h>
+#endif
 #include <cstdio>
 #include <algorithm>
 

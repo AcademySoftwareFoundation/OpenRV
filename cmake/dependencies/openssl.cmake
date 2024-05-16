@@ -90,11 +90,19 @@ ELSE()
     LIST(APPEND _make_command ${RV_DEPS_WIN_PERL_ROOT})
   ENDIF()
 
-  IF(${RV_OSX_EMULATION})
-    LIST(APPEND _make_command --arch=${RV_OSX_EMULATION_ARCH})
+  IF(APPLE)
+    # This is needed because if Rosetta is used to compile for x86_64 from ARM64,
+    # openssl build system detects it as "linux-x86_64" and it causes issues.
+
+    IF(RV_TARGET_APPLE_X86_64)
+      SET(__openssl_arch__ x86_64)
+    ELSEIF(RV_TARGET_APPLE_ARM64)
+      SET(__openssl_arch__ arm64)
+    ENDIF()
+
+    LIST(APPEND _make_command --arch=-${__openssl_arch__})
   ENDIF()
-
-
+  
   # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1`
   # and `libssl.so.1.1`.
 
