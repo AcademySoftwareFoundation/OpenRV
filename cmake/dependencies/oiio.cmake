@@ -175,8 +175,8 @@ IF(NOT RV_TARGET_WINDOWS)
             ffmpeg::swresample
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${_cmake_build_command}
-    INSTALL_COMMAND ${_cmake_install_command}
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
+    INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE FALSE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_byproducts}

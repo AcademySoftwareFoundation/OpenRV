@@ -7,7 +7,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "2.1.4" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "2.1.4" "make" "")
 
 SET(_download_url
     "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/${_version}.tar.gz"
@@ -97,8 +97,8 @@ EXTERNALPROJECT_ADD(
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
+  BUILD_COMMAND ${_make_command} -j${_cpu_count} 
+  INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_byproducts}

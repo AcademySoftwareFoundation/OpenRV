@@ -90,12 +90,6 @@ ELSE()
       "-L${RV_STAGE_LIB_DIR} -llcms"
   )
 
-  SET(_configure_command
-    ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}'
-    ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
-    ${_configure_command}
-  )
-
   EXTERNALPROJECT_ADD(
     ${_target}
     URL ${_download_url}
@@ -108,7 +102,7 @@ ELSE()
     DEPENDS ZLIB::ZLIB lcms
     CONFIGURE_COMMAND aclocal
     COMMAND autoreconf --install
-    COMMAND ${_configure_command} ${_configure_options}
+    COMMAND ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command} ${_configure_options}
     BUILD_COMMAND ${_make_command} -j${_cpu_count}
     INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE TRUE
