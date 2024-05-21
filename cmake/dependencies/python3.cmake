@@ -125,6 +125,10 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
 
+IF(${RV_OSX_EMULATION})
+  LIST(APPEND _python3_make_command --arch=${RV_OSX_EMULATION_ARCH})
+ENDIF()
+
 SET(_pyside2_make_command_script
     "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
 )

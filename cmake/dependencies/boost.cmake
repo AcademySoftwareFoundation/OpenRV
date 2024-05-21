@@ -159,6 +159,19 @@ ELSE()
   )
 ENDIF()
 
+IF(${RV_OSX_EMULATION})
+  SET(_darwin_x86_64
+      "arch" "${RV_OSX_EMULATION_ARCH}"
+  )
+
+  SET(_b2_command
+      ${_darwin_x86_64} ${_b2_command}
+  )
+  SET(_bootstrap_command
+      ${_darwin_x86_64} ${_bootstrap_command}
+  )
+ENDIF()
+
 IF(RV_TARGET_WINDOWS)
   SET(_boost_python_bin
       ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/python.exe
@@ -177,13 +190,6 @@ LIST(
           OUTPUT_VARIABLE _boost_with_list
 )
 
-SET(__boost_arch__ x86)
-IF(APPLE)
-  IF(RV_TARGET_APPLE_ARM64)
-    SET(__boost_arch__ arm)
-  ENDIF()
-ENDIF()
-
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS Python::Python
@@ -198,7 +204,7 @@ EXTERNALPROJECT_ADD(
   BUILD_COMMAND
     # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
     # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
-    ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=${__boost_arch__} address-model=64
+    ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=x86 address-model=64
     ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
   INSTALL_COMMAND echo "Boost was both built and installed in the build stage"
   BUILD_IN_SOURCE TRUE

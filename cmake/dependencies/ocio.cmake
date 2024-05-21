@@ -168,8 +168,8 @@ IF(NOT RV_TARGET_WINDOWS)
     INSTALL_DIR ${_install_dir}
     DEPENDS Boost::headers RV_DEPS_PYTHON3 Imath::Imath ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${_cmake_build_command}
-    INSTALL_COMMAND ${_cmake_install_command}
+    BUILD_COMMAND ${_make_command} -j${_cpu_count}
+    INSTALL_COMMAND ${_make_command} install
     BUILD_IN_SOURCE FALSE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_byproducts}
@@ -253,6 +253,16 @@ ELSE() # Windows
        # "--parallel"    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib. "${_cpu_count}"   # Moreover, our Zlib
        # isn't compatible with OCIO: tons of STD C++ missing symbols errors.
   )
+  LIST(
+    APPEND
+    _ocio_install_options
+    "--install"
+    "${_build_dir}"
+    "--prefix"
+    "${_install_dir}"
+    "--config"
+    "${CMAKE_BUILD_TYPE}" # for --config
+  )
 
   EXTERNALPROJECT_ADD(
     ${_target}
@@ -269,7 +279,7 @@ ELSE() # Windows
       python3 ${_pyopencolorio_patch_script_path} ${_pyopencolorio_cmakelists_path}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_ocio_build_options}
-    INSTALL_COMMAND ${_cmake_install_command}
+    INSTALL_COMMAND ${CMAKE_COMMAND} ${_ocio_install_options}
     BUILD_IN_SOURCE FALSE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_byproducts}
