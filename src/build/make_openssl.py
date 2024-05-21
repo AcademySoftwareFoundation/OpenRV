@@ -170,6 +170,9 @@ def configure() -> None:
         os.path.join(SOURCE_DIR, "Configure"),
     ]
 
+    if ARCH:
+        configure_args = ["arch", ARCH] + configure_args
+
     if platform.system() == "Darwin":
         if ARCH:
             configure_args.append(f"darwin64{ARCH}-cc")
@@ -201,6 +204,9 @@ def build() -> None:
     else:
         build_args = ["make", f"-j{os.cpu_count() or 1}"]
 
+    if ARCH:
+        build_args = ["arch", ARCH] + build_args
+
     print(f"Executing {build_args} from {SOURCE_DIR}")
     subprocess.run(build_args, cwd=SOURCE_DIR).check_returncode()
 
@@ -214,6 +220,9 @@ def install() -> None:
         install_args = ["nmake", "install_sw"]
     else:
         install_args = ["make", "install_sw", f"-j{os.cpu_count() or 1}"]
+
+    if ARCH:
+        install_args = ["arch", ARCH] + install_args
 
     print(f"Executing {install_args} from {SOURCE_DIR}")
     subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()

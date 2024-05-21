@@ -7,8 +7,13 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_ZLIB" "1.2.13" "" "")
+SET(_target
+    "RV_DEPS_ZLIB"
+)
 
+SET(_version
+    "1.2.13"
+)
 SET(_download_url
     "https://github.com/madler/zlib/archive/refs/tags/v${_version}.zip"
 )
@@ -36,6 +41,25 @@ SET(_lib_dir
 SET(_bin_dir
     ${_install_dir}/bin
 )
+
+SET(_make_command
+    make
+)
+
+IF(${RV_OSX_EMULATION})
+  SET(_darwin_x86_64
+      "arch" "${RV_OSX_EMULATION_ARCH}"
+  )
+  SET(_make_command
+      ${_darwin_x86_64} ${_make_command}
+  )
+ENDIF()
+IF(RV_TARGET_WINDOWS)
+  # MSYS2/CMake defaults to Ninja
+  SET(_make_command
+      ninja
+  )
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
@@ -97,9 +121,10 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   INSTALL_DIR ${_install_dir}
   PATCH_COMMAND ${_patch_command}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${RV_DEPS_BASE_DIR}/${_target}/src
+  BUILD_COMMAND ${_make_command} -j${_cpu_count}
+  INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_zlib_byproducts}

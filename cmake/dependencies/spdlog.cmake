@@ -7,7 +7,13 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "1.11.0" "" "")
+SET(_target
+    "RV_DEPS_SPDLOG"
+)
+
+SET(_version
+    "1.11.0"
+)
 
 SET(_download_url
     "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
@@ -60,7 +66,13 @@ ELSE()
   )
 ENDIF()
 
-LIST(APPEND _configure_options "-DSPDLOG_BUILD_EXAMPLE=OFF")
+SET(_cmake_configure_command
+    ${CMAKE_COMMAND}
+)
+LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
+LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+LIST(APPEND _cmake_configure_command "-DSPDLOG_BUILD_EXAMPLE=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -72,9 +84,9 @@ EXTERNALPROJECT_ADD(
   URL ${_download_url}
   URL_MD5 ${_download_hash}
   PATCH_COMMAND patch -N -u -b include/spdlog/tweakme.h -i "${PROJECT_SOURCE_DIR}/cmake/patches/spdlog_tweakme.h.patch" || true
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
+  CONFIGURE_COMMAND ${_cmake_configure_command} -B ./_build
+  BUILD_COMMAND ${_make_command} -j${_cpu_count} -C _build
+  INSTALL_COMMAND ${_make_command} -j${_cpu_count} -C _build install
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
