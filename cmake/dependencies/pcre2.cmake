@@ -25,17 +25,17 @@ SET(_install_dir
 # PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
 IF(RV_TARGET_WINDOWS)
     SET(_pcre2_libname
-        libpcre2-8-0${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libpcre2-8-0${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_pcre2_libname_posix
-        libpcre2-posix-3${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libpcre2-posix-3${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
 
     SET(_pcre2_implibname
-        libpcre2-8${RV_DEBUG_POSTFIX}.dll.a
+        libpcre2-8.dll.a
     )
     SET(_pcre2_implibname_posix
-        libpcre2-posix${RV_DEBUG_POSTFIX}.dll.a
+        libpcre2-posix.dll.a
     )
 
     SET(_pcre2_libpath
@@ -70,6 +70,10 @@ LIST(APPEND _pcre2_configure_args "--prefix=${_install_dir}")
 LIST(APPEND _pcre2_configure_args "--disable-static")
 LIST(APPEND _pcre2_configure_args "--disable-pcre2grep-libbz2")
 LIST(APPEND _pcre2_configure_args "--disable-pcre2grep-libz")
+
+IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    LIST(APPEND _pcre2_configure_args "--enable-debug")
+ENDIF()
 
 EXTERNALPROJECT_ADD(
     ${_target}

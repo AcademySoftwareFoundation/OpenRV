@@ -195,6 +195,7 @@ internalFormatFromDataFormat(VideoDevice::InternalDataFormat f)
       case VideoDevice::Y1CbY0Cr_8_422: return GL_RGB8;
       case VideoDevice::YCrCb_AJA_10_422: return GL_RGB10_A2;
       case VideoDevice::YCrCb_BM_10_422: return GL_RGB10_A2;
+      case VideoDevice::YCbCr_P216_16_422: return GL_RGB10_A2;
           
       default:
           return GL_RGBA16F_ARB;
@@ -227,7 +228,8 @@ textureFormatFromDataFormat(VideoDevice::InternalDataFormat f)
       case VideoDevice::Y0CbY1Cr_8_422:
       case VideoDevice::Y1CbY0Cr_8_422: return GLenumPair(GL_RGB, GL_UNSIGNED_BYTE);
       case VideoDevice::YCrCb_AJA_10_422:
-      case VideoDevice::YCrCb_BM_10_422: return GLenumPair(GL_RGBA, GL_UNSIGNED_INT_10_10_10_2);
+      case VideoDevice::YCrCb_BM_10_422: 
+      case VideoDevice::YCbCr_P216_16_422: return GLenumPair(GL_RGBA, GL_UNSIGNED_INT_10_10_10_2);
           
       default:
           return GLenumPair(GL_RGBA, GL_HALF_FLOAT_ARB);
