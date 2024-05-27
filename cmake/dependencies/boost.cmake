@@ -21,13 +21,44 @@ SET(_major_minor_version
     "1_80"
 )
 
+SET(_download_hash
+    077f074743ea7b0cb49c6ed43953ae95
+)
+
+# Note: Boost 1.80 cannot be built with XCode 15 which is now the only XCode version available on macOS Sonoma without a hack. Boost 1.81 has all the fixes
+# required to be able to be built with XCode 15, however it is not VFX Platform CY2023 compliant which specifies Boost version 1.80. With the aim of making the
+# OpenRV build on macOS smoother by default, we will use Boost 1.81 if XCode 15 or more recent.
+IF(RV_TARGET_DARWIN)
+  EXECUTE_PROCESS(
+    COMMAND clang --version
+    OUTPUT_VARIABLE CLANG_FULL_VERSION_STRING
+  )
+  STRING(
+    REGEX
+    REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${CLANG_FULL_VERSION_STRING}
+  )
+  IF(CLANG_VERSION_STRING VERSION_GREATER_EQUAL 15.0)
+    MESSAGE(STATUS "Clang version ${CLANG_VERSION_STRING} is not compatible with Boost 1.80, using Boost 1.81 instead. "
+                   "Install XCode 14.3.1 if you absolutely want to use Boost version 1.80 as per VFX reference platform CY2023"
+    )
+
+    SET(_version
+        "1.81.0"
+    )
+
+    SET(_major_minor_version
+        "1_81"
+    )
+
+    SET(_download_hash
+        4bf02e84afb56dfdccd1e6aec9911f4b
+    )
+  ENDIF()
+ENDIF()
+
 STRING(REPLACE "." "_" _version_with_underscore ${_version})
 SET(_download_url
     "https://archives.boost.io/release/${_version}/source/boost_${_version_with_underscore}.tar.gz"
-)
-
-SET(_download_hash
-    077f074743ea7b0cb49c6ed43953ae95
 )
 
 # Set _base_dir for Clean-<target>

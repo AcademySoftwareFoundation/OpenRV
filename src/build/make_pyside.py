@@ -86,16 +86,11 @@ def prepare() -> None:
     system = platform.system()
     if system == "Darwin":
         clang_version_search = re.search(
-            "version (\d+)\.(\d+)",
+            "version (\d+)\.(\d+)\.(\d+)",
             os.popen("clang --version").read(),
         )
-        clang_version_str = "".join(clang_version_search.groups())
-        clang_version_int = int(clang_version_str)
-
-        if clang_version_int <= 120:
-            clang_filename_suffix = clang_version_str + "-based-mac.7z"
-        else:
-            clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
+        clang_version_str = ".".join(clang_version_search.groups())
+        clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
     elif system == "Linux":
         clang_filename_suffix = "80-based-linux-Rhel7.2-gcc5.3-x86_64.7z"
     elif system == "Windows":
