@@ -22,24 +22,20 @@ SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
-IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    SET(_pcre2_debug_postfix_ "d")
-ENDIF()
-
 # PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
 IF(RV_TARGET_WINDOWS)
     SET(_pcre2_libname
-        pcre2-8${_pcre2_debug_postfix_}${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libpcre2-8-0${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_pcre2_libname_posix
-        pcre2-posix${_pcre2_debug_postfix_}${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libpcre2-posix-3${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
 
     SET(_pcre2_implibname
-        pcre2-8${_pcre2_debug_postfix_}.lib
+        libpcre2-8.dll.a
     )
     SET(_pcre2_implibname_posix
-        pcre2-posix${_pcre2_debug_postfix_}.lib
+        libpcre2-posix.dll.a
     )
 
     SET(_pcre2_libpath
@@ -61,39 +57,23 @@ SET(_pcre2_include_dir
     ${_install_dir}/include
 )
 
-LIST(APPEND _pcre2_cmake_configure_args "-G ${CMAKE_GENERATOR}")
-LIST(APPEND _pcre2_cmake_configure_args "-S ${_source_dir}")
-LIST(APPEND _pcre2_cmake_configure_args "-B ${_build_dir}")
+SET(_pcre2_configure_command
+    sh ./configure
+)
 
-LIST(APPEND _pcre2_cmake_configure_args "-DBUILD_SHARED_LIBS=ON")
-LIST(APPEND _pcre2_cmake_configure_args "-DBUILD_STATIC_LIBS=OFF")
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_BUILD_PCRE2GREP=OFF")
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_SUPPORT_LIBZ=OFF")
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_SUPPORT_LIBBZ2=OFF")
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_BUILD_TESTS=OFF")
+SET(_pcre2_autogen_command
+    sh ./autogen.sh
+)
 
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_STATIC_RUNTIME=OFF")
+LIST(APPEND _pcre2_configure_args "--prefix=${_install_dir}")
+# Build as shared library
+LIST(APPEND _pcre2_configure_args "--disable-static")
+LIST(APPEND _pcre2_configure_args "--disable-pcre2grep-libbz2")
+LIST(APPEND _pcre2_configure_args "--disable-pcre2grep-libz")
 
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_DEBUG=ON")
+    LIST(APPEND _pcre2_configure_args "--enable-debug")
 ENDIF()
-
-# Build PCRE2 using 8 bits options (same as PCRE "1").
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_BUILD_PCRE2_8=ON")
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_BUILD_PCRE2_16=OFF")
-LIST(APPEND _pcre2_cmake_configure_args "-DPCRE2_BUILD_PCRE2_32=OFF")
-
-LIST(APPEND _pcre2_cmake_build_args "--build" "${_build_dir}" "--config" "${CMAKE_BUILD_TYPE}")
-
-LIST(APPEND
-    _pcre2_cmake_install_args
-    "--install"
-    "${_build_dir}"
-    "--prefix"
-    "${_install_dir}"
-    "--config"
-    "${CMAKE_BUILD_TYPE}"
-)
 
 EXTERNALPROJECT_ADD(
     ${_target}
@@ -103,13 +83,11 @@ EXTERNALPROJECT_ADD(
     DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     SOURCE_DIR ${_source_dir}
-    BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ZLIB::ZLIB
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_pcre2_cmake_configure_args}
-    BUILD_COMMAND ${CMAKE_COMMAND} ${_pcre2_cmake_build_args}
-    INSTALL_COMMAND ${CMAKE_COMMAND} ${_pcre2_cmake_install_args}
-    BUILD_IN_SOURCE FALSE
+    CONFIGURE_COMMAND ${_pcre2_autogen_command} && ${_pcre2_configure_command} ${_pcre2_configure_args}
+    BUILD_COMMAND make -j${_cpu_count}
+    BUILD_IN_SOURCE TRUE
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_pcre2_libname} ${_pcre2_libname_posix} ${_pcre2_implibname} ${_pcre2_implibname_posix}
     USES_TERMINAL_BUILD TRUE

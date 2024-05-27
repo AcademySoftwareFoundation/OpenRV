@@ -45,6 +45,8 @@ class Path
     {
         Point points[4];
         Color colors[4];
+        Vec vpn;
+        float w0;
         bool none;
     };
     
