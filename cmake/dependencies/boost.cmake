@@ -30,7 +30,7 @@ SET(_download_hash
 # OpenRV build on macOS smoother by default, we will use Boost 1.81 if XCode 15 or more recent.
 IF(RV_TARGET_DARWIN)
   EXECUTE_PROCESS(
-    COMMAND clang --version
+    COMMAND xcrun clang --version
     OUTPUT_VARIABLE CLANG_FULL_VERSION_STRING
   )
   STRING(
