@@ -28,11 +28,17 @@ SET(_install_dir
 SET(_include_dir
     ${_install_dir}/include
 )
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
+  SET(_lib_dir_name
+      lib64
+  )
   SET(_lib_dir
       ${_install_dir}/lib64
   )
 ELSE()
+  SET(_lib_dir_name
+      lib
+  )
   SET(_lib_dir
       ${_install_dir}/lib
   )
@@ -81,7 +87,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  CONFIGURE_COMMAND ${_configure_command} ./_build --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false -Denable_tools=false
+  CONFIGURE_COMMAND ${_configure_command} ./_build --libdir=${_lib_dir_name} --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false -Denable_tools=false
   BUILD_COMMAND ${_make_command} -C _build
   INSTALL_COMMAND ${_make_command} -C _build install
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
