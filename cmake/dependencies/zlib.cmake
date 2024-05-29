@@ -26,9 +26,10 @@ SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
-# This file is pretty close to being ready to use the Standrd macros: (create_lib_bin especially but maybe rv_make_std_lib). One problem is debug names for Libs which is different but there's ways to fix this.
-SET(RV_DEPS_ZLIB_ROOT_DIR 
-  ${_install_dir}
+# This file is pretty close to being ready to use the Standrd macros: (create_lib_bin especially but maybe rv_make_std_lib). One problem is debug names for Libs
+# which is different but there's ways to fix this.
+SET(RV_DEPS_ZLIB_ROOT_DIR
+    ${_install_dir}
 )
 
 SET(_include_dir
@@ -103,12 +104,11 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _zlib_byproducts ${_implibpath})
 ENDIF()
 
-# The patch comes from the ZLIB port in Vcpkg repository.
-# The name of the patch is kept as is. See https://github.com/microsoft/vcpkg/tree/master/ports/zlib
+# The patch comes from the ZLIB port in Vcpkg repository. The name of the patch is kept as is. See https://github.com/microsoft/vcpkg/tree/master/ports/zlib
 # Description: Fix unistd.h being incorrectly required when imported from a project defining HAVE_UNISTD_H=0
-SET(_patch_command 
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zconf.h.cmakein_prevent_invalid_inclusions.patch
-    && patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zconf.h.in_prevent_invalid_inclusions.patch
+SET(_patch_command
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/zconf.h.cmakein_prevent_invalid_inclusions.patch && patch -p1 <
+    ${CMAKE_CURRENT_SOURCE_DIR}/patch/zconf.h.in_prevent_invalid_inclusions.patch
 )
 
 EXTERNALPROJECT_ADD(
@@ -154,6 +154,18 @@ IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
     DEPENDS ${RV_STAGE_BIN_DIR}/${_libname}
+  )
+ELSEIF(RV_TARGET_DARWIN)
+  ADD_CUSTOM_COMMAND(
+    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
+    OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
+    COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@rpath/${_libname}" "${_lib_dir}/${_libname}"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+    DEPENDS ${_target}
+  )
+  ADD_CUSTOM_TARGET(
+    ${_target}-stage-target ALL
+    DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
   )
 ELSE()
   ADD_CUSTOM_COMMAND(

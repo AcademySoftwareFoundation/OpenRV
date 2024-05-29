@@ -27,7 +27,7 @@ SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
-IF(RV_TARGET_LINUX)
+IF(RHEL_VERBOSE)
   SET(_lib_dir
       ${_install_dir}/lib64
   )
@@ -74,7 +74,7 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   CONFIGURE_COMMAND cd auto && ${_make_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
-  INSTALL_COMMAND ${_make_command} install GLEW_DEST=${_install_dir}
+  INSTALL_COMMAND ${_make_command} install LIBDIR=${_lib_dir} GLEW_DEST=${_install_dir}
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_glew_lib}
