@@ -294,7 +294,7 @@ OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformXYZToRec709()
 {
     if (!m_matrix_xyz_to_rec709)
     {
-        QMutexLocker(&this->m_lock);
+        QMutexLocker lock(&this->m_lock);
         if (!m_matrix_xyz_to_rec709)
         {
             m_matrix_xyz_to_rec709 = createMatrixTransformXYZToRec709();
@@ -308,7 +308,7 @@ OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformRec709ToXYZ()
 {
     if (!m_matrix_rec709_to_xyz)
     {
-        QMutexLocker(&this->m_lock);
+        QMutexLocker lock(&this->m_lock);
         if (!m_matrix_rec709_to_xyz)
         {
             m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
@@ -477,7 +477,7 @@ OCIOIPNode::evaluate(const Context& context)
 
             if (!m_transform)
             {
-                QMutexLocker(&this->m_lock);
+                QMutexLocker lock(&this->m_lock);
                 if (!m_transform)
                 {
                     m_transform = OCIO::GroupTransform::Create();
@@ -522,7 +522,7 @@ OCIOIPNode::evaluate(const Context& context)
 
             if (!m_transform)
             {
-                QMutexLocker(&this->m_lock);
+                QMutexLocker lock(&this->m_lock);
                 if (!m_transform)
                 {
                     m_transform = OCIO::GroupTransform::Create();
@@ -546,7 +546,7 @@ OCIOIPNode::evaluate(const Context& context)
         shaderName << "OCIO_sd_" << name() << "_" << hex << hashValue;
       }
 
-      QMutexLocker( &this->m_lock );
+      QMutexLocker lock(&this->m_lock);
       OCIO::GpuShaderDescRcPtr shaderDesc =
           OCIO::GpuShaderDesc::CreateShaderDesc();
       shaderDesc->setFunctionName( shaderName.str().c_str() );
