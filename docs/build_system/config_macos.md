@@ -15,6 +15,12 @@ Note that using an XCode version more recent than 14.3.1 will result in an FFmpe
 
 `xcode-select -p` should return `/Applications/Xcode.app/Contents/Developer`. If it's not the case, run `sudo xcode-select -s /Applications/Xcode.app`
 
+Note that XCode 15 is not compatible with Boost 1.80. If XCode 15 is installed, RV will automatically default to using Boost 1.81 instead. 
+Install XCode 14.3.1 if you absolutely want to use Boost version 1.80 as per VFX reference platform CY2023.
+
+Please reference [this workaround](https://forums.developer.apple.com/forums/thread/734709) to use XCode 14.3.1 on Sonoma, as it is no longer 
+compatible by default.
+
 ## Install Homebrew
 
 Homebrew is the one stop shop providing all the build requirements. You can install it following the instructions on the [Homebrew page](https://brew.sh).
