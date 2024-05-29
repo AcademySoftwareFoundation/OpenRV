@@ -37,6 +37,8 @@ Open RV is currently supported on the following operating systems:
 * [Windows 10 and 11](docs/build_system/config_windows.md)
 * [macOS Big Sur, Monterey and Ventura](docs/build_system/config_macos.md)
 * [Linux Centos 7](docs/build_system/config_linux_centos7.md)
+* [Linux Rocky 8](docs/build_system/config_linux_rocky8.md)
+* [Linux Rocky 9](docs/build_system/config_linux_rocky9.md)
 
 Support for other operating systems is on a best effort basis.
 
