@@ -16,11 +16,14 @@
 #include <iterator>
 #include <dlfcn.h>
 #include <sys/types.h>
+#include <mutex>
 
 /* AJG - stricmp */
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif
+
+std::mutex plugin_mutex;
 
 static bool TwkFB_GenericIO_debug = false;
 TWKFB_EXPORT void TwkFB_GenericIO_setDebug(bool b)
@@ -463,7 +466,14 @@ GenericIO::addPlugin(FrameBufferIO* plugin)
 FrameBufferIO*
 GenericIO::loadFromProxy(Plugins::iterator i)
 {
+    std::lock_guard<std::mutex> guard(plugin_mutex);
+
     ProxyFBIO* pio = dynamic_cast<ProxyFBIO*>(*i);
+    if (pio == nullptr)
+    {
+        std::cerr << "ERROR: Multi-thread related invalid iterator or object has already been deleted." << std::endl;
+        return nullptr;
+    }
 
     if (FrameBufferIO* newio = loadPlugin(pio->pathToPlugin()))
     {
