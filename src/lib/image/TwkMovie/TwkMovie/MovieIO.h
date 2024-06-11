@@ -13,7 +13,6 @@
 #include <map>
 #include <algorithm>
 #include <TwkFB/FrameBuffer.h>
-#include <TwkFB/PluginsLocker.h>
 #include <TwkFB/IO.h>
 #include <TwkMovie/Movie.h>
 #include <TwkMovie/MovieReader.h>
@@ -451,8 +450,6 @@ class TWKMOVIE_EXPORT GenericIO
     static Plugins* m_plugins;
     static bool m_loadedAll;
     static bool m_dnxhdDecodingAllowed;
-
-    static TwkFB::PluginsLocker* m_locker;
 };
 
 
