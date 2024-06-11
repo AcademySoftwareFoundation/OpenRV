@@ -174,6 +174,9 @@ class PackageManager
     virtual bool installPackage(Package&);
     virtual bool uninstallPackage(Package&);
 
+    virtual bool isBundle(const QString&);
+    virtual std::vector<QString> handleBundle(const QString&, const QString&);
+
     virtual ModeEntryList loadModeFile(const QString&);
     virtual void writeModeFile(const QString&, const ModeEntryList&, int version=0);
 
@@ -182,7 +185,7 @@ class PackageManager
 
     virtual bool allowLoading(Package&,bool,int d=0);
     virtual bool makeSupportDirTree(QDir& root);
-    
+
     //
     //  Override these for UI versions. The defaults use cin/cout to
     //  collect responses from the user.

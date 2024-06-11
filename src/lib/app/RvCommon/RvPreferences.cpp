@@ -2937,7 +2937,7 @@ RvPreferences::addPackage(bool)
     QFileDialog* fileDialog = new QFileDialog(this, 
                                               "Select rvpkg RV package files",
                                               dirname,
-                                              "rvpkg Package Files (*.zip *.rvpkg)");
+                                              "rvpkg Package Files (*.zip *.rvpkg *.rvpkgs)");
 
     QStringList files;
     if (fileDialog->exec()) files = fileDialog->selectedFiles();
@@ -2961,7 +2961,7 @@ RvPreferences::addPackage(bool)
     QStringList files = QFileDialog::getOpenFileNames(this, 
                                                       "Select rvpkg RV package files",
                                                       dirname,
-                                                      "rvpkg Package Files (*.zip *.rvpkg)",
+                                                      "rvpkg Package Files (*.zip *.rvpkg *.rvpkgs, *.rvpkgs)",
                                                       &selectedFilter,
                                                       options);
 #endif
@@ -3119,7 +3119,7 @@ RvPreferences::installDependantPackages(const QString& msg)
 {
     QMessageBox box(this);
     box.setWindowTitle(tr("Some Packages Depend on This One"));
-    box.setText(tr("Can't uninstall package because some other packages dependend on this one. Try and uninstall them first?\n\nDetails:\n") + msg);
+    box.setText(tr("Can't install package because some other packages dependend on this one. Try and install them first?\n\nDetails:\n") + msg);
 
     box.setWindowModality(Qt::WindowModal);
     QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
@@ -4026,5 +4026,3 @@ RvPreferences::formatProfileChanged(int index)
 
 
 } // Rv
-
-
