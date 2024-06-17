@@ -477,12 +477,12 @@ FUNCTION(rv_stage)
         )
 
         # Generate a file to store the list of files to be included from outside of package
-        SET(_temp_include_file
+        SET(_include_list
             "${CMAKE_CURRENT_BINARY_DIR}/includelist.txt"
         )
 
-        # Remove the file if it exists
-        FILE(REMOVE ${_temp_include_file})
+        # Remove the file if it already exists
+        FILE(REMOVE ${_include_list})
 
         # Getting paths of files to be included and adding to list
         FILE(
@@ -495,14 +495,14 @@ FUNCTION(rv_stage)
           LISTS _include_files
         )
           FILE(
-            APPEND ${_temp_include_file}
+            APPEND ${_include_list}
             "${file}\n"
           )
         ENDFOREACH()
 
-        # Creating a zip file to hold the included files
+        # Creating a zip file to hold the included files within the CMAKE binary directory
         EXECUTE_PROCESS(
-          COMMAND bash -c "tar cfv ${CMAKE_CURRENT_BINARY_DIR}/included-files.zip --format=zip --files-from=${_temp_include_file}"
+          COMMAND bash -c "tar cfv ${CMAKE_CURRENT_BINARY_DIR}/included-files.zip --format=zip --files-from=${_include_list}"
           WORKING_DIRECTORY ${arg_INCLUDE_DIR}
         )
 
@@ -512,17 +512,44 @@ FUNCTION(rv_stage)
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
 
-        # Creating the final .rvpkg file
-        EXECUTE_PROCESS(
-          COMMAND bash -c "cd tmp && zip -r ${_package_filename} *"
-          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        # Generate a file to store the list of files to be included in the final package
+        SET(_final_list
+            "${CMAKE_CURRENT_BINARY_DIR}/finallist.txt"
+        )
+        FILE(REMOVE ${_final_list})
+
+        # Getting paths of files to be included in the final package and adding to list
+        FILE(
+          GLOB_RECURSE _tmp_files
+          RELATIVE ${CMAKE_CURRENT_BINARY_DIR}/tmp
+          "${CMAKE_CURRENT_BINARY_DIR}/tmp/*"
+        )
+        FOREACH(
+          file IN
+          LISTS _tmp_files
+        )
+          FILE(
+            APPEND ${_final_list}
+            "${file}\n"
+          )
+        ENDFOREACH()
+
+        # Create the package zip file
+        ADD_CUSTOM_COMMAND(
+          COMMENT "Creating ${_package_filename} ..."
+          OUTPUT ${_package_filename}
+          DEPENDS ${_final_list} ${_package_file}
+          COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_final_list}
+          COMMAND ${CMAKE_COMMAND} -E rm -rf ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall ${CMAKE_CURRENT_BINARY_DIR}/tmp ${CMAKE_CURRENT_BINARY_DIR}/raw-package.zip ${CMAKE_CURRENT_BINARY_DIR}/included-files.zip ${CMAKE_CURRENT_BINARY_DIR}/finallist.txt
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tmp
+        )
+        
+        ADD_CUSTOM_TARGET(
+          ${arg_TARGET}-${_pkg_version}.rvpkg ALL
+          DEPENDS ${_package_filename}
         )
 
-        # Cleanup
-        EXECUTE_PROCESS(
-          COMMAND bash -c "rm -rf tmp raw-package.zip included-files.zip ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall"
-          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        )
+        ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
         
       ELSE()
 
