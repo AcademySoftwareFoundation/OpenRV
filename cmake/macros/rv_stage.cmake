@@ -520,8 +520,7 @@ FUNCTION(rv_stage)
 
         # Cleanup
         EXECUTE_PROCESS(
-          COMMAND bash -c "rm -rf tmp raw-package.zip included-files.zip"
-          COMMAND bash -c "rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall"
+          COMMAND bash -c "rm -rf tmp raw-package.zip included-files.zip ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall"
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
         
