@@ -41,7 +41,7 @@ FUNCTION(rv_stage)
       ""
   )
   SET(listArgs
-      TYPE TARGET FILES PATH
+      TYPE TARGET FILES PATH INCLUDE_DIR
   )
 
   CMAKE_PARSE_ARGUMENTS(arg "${flags}" "${args}" "${listArgs}" ${ARGN})
@@ -52,6 +52,7 @@ FUNCTION(rv_stage)
   MESSAGE(DEBUG "--- TARGET                  : '${arg_TARGET}'")
   MESSAGE(DEBUG "--- FILES                   : '${arg_FILES}'")
   MESSAGE(DEBUG "--- PATH                    : '${arg_PATH}'")
+  MESSAGE(DEBUG "--- INDLUDE_DIR             : '${arg_INCLUDE_DIR}'")
   MESSAGE(DEBUG "--- UNPARSED_ARGUMENTS      : '${arg_UNPARSED_ARGUMENTS}'")
   MESSAGE(DEBUG "--- KEYWORDS_MISSING_VALUES : '${arg_KEYWORDS_MISSING_VALUES}'")
 
@@ -61,6 +62,11 @@ FUNCTION(rv_stage)
 
   IF(NOT arg_TYPE)
     MESSAGE(FATAL_ERROR "The 'TYPE' parameter was not specified.")
+  ENDIF()
+
+  # Inluding directories is currently only supported in the creation of RVPKGs
+  IF(NOT ${arg_TYPE} STREQUAL "RVPKG" AND arg_INCLUDE_DIR)
+    MESSAGE(FATAL_ERROR "The 'INCLUDE_DIR' parameter is only supported for 'RVPKGS' type.")
   ENDIF()
 
   IF(RV_TARGET_LINUX)
@@ -461,22 +467,86 @@ FUNCTION(rv_stage)
         )
       ENDFOREACH()
 
-      # Create the package zip file
-      ADD_CUSTOM_COMMAND(
-        COMMENT "Creating ${_package_filename} ..."
-        OUTPUT ${_package_filename}
-        DEPENDS ${_temp_file} ${_files} ${_package_file}
-        COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
-        COMMAND ${CMAKE_COMMAND} -E rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      )
+      # Special action must be taken if there is an additional directory to be included
+      IF(arg_INCLUDE_DIR)
 
-      ADD_CUSTOM_TARGET(
-        ${arg_TARGET}-${_pkg_version}.rvpkg ALL
-        DEPENDS ${_package_filename}
-      )
+        # Creating zip to hold regular package contents
+        EXECUTE_PROCESS(
+          COMMAND bash -c "tar cfv ${CMAKE_CURRENT_BINARY_DIR}/raw-package.zip --format=zip --files-from=${_temp_file}"
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        )
 
-      ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
+        # Generate a file to store the list of files to be included from outside of package
+        SET(_temp_include_file
+            "${CMAKE_CURRENT_BINARY_DIR}/includelist.txt"
+        )
+
+        # Remove the file if it exists
+        FILE(REMOVE ${_temp_include_file})
+
+        # Getting paths of files to be included and adding to list
+        FILE(
+          GLOB_RECURSE _include_files
+          RELATIVE ${arg_INCLUDE_DIR}
+          "${arg_INCLUDE_DIR}/*"
+        )
+        FOREACH(
+          file IN
+          LISTS _include_files
+        )
+          FILE(
+            APPEND ${_temp_include_file}
+            "${file}\n"
+          )
+        ENDFOREACH()
+
+        # Creating a zip file to hold the included files
+        EXECUTE_PROCESS(
+          COMMAND bash -c "tar cfv ${CMAKE_CURRENT_BINARY_DIR}/included-files.zip --format=zip --files-from=${_temp_include_file}"
+          WORKING_DIRECTORY ${arg_INCLUDE_DIR}
+        )
+
+        # Combining the included zip and the package zip
+        EXECUTE_PROCESS(
+          COMMAND bash -c "mkdir -p tmp && unzip included-files.zip -d tmp && unzip raw-package.zip -d tmp"
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+
+        # Creating the final .rvpkg file
+        EXECUTE_PROCESS(
+          COMMAND bash -c "cd tmp && zip -r ${_package_filename} *"
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+
+        # Cleanup
+        EXECUTE_PROCESS(
+          COMMAND bash -c "rm -rf tmp raw-package.zip included-files.zip"
+          COMMAND bash -c "rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall"
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        )
+        
+      ELSE()
+
+        # Create the package zip file
+        ADD_CUSTOM_COMMAND(
+          COMMENT "Creating ${_package_filename} ..."
+          OUTPUT ${_package_filename}
+          DEPENDS ${_temp_file} ${_files} ${_package_file}
+          COMMAND ${CMAKE_COMMAND} -E tar "cfv" ${_package_filename} --format=zip --files-from=${_temp_file}
+          COMMAND ${CMAKE_COMMAND} -E rm -f ${RV_STAGE_PLUGINS_PACKAGES_DIR}/rvinstall
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+
+        
+        ADD_CUSTOM_TARGET(
+          ${arg_TARGET}-${_pkg_version}.rvpkg ALL
+          DEPENDS ${_package_filename}
+        )
+
+        ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
+
+      ENDIF()
+
     ENDIF()
 
   ELSEIF(${arg_TYPE} STREQUAL "IMAGE_FORMAT")
