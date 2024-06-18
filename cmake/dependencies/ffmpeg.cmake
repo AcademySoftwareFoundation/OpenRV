@@ -194,32 +194,53 @@ ENDIF()
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
 IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
-  LIST(APPEND _disabled_decoders "--disable-decoder=bink")
-  LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_dct")
-  LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_rdft")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_cuvid")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_mediacodec")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_qsv")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_rkmpp")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_v4l2m2m")
-  LIST(APPEND _disabled_decoders "--disable-decoder=dnxhd")
-  LIST(APPEND _disabled_decoders "--disable-decoder=prores")
-  LIST(APPEND _disabled_decoders "--disable-decoder=qtrle")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac_at")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac_fixed")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac_latm")
-  LIST(APPEND _disabled_decoders "--disable-decoder=dvvideo")
+  SET(NON_FREE_DECODERS_TO_DISABLE
+      "aac"
+      "aac_at"
+      "aac_fixed"
+      "aac_latm"
+      "bink"
+      "binkaudio_dct"
+      "binkaudio_rdft"
+      "dnxhd"
+      "dvvideo"
+      "prores"
+      "qtrle"
+      "vp9"
+      "vp9_cuvid"
+      "vp9_mediacodec"
+      "vp9_qsv"
+      "vp9_rkmpp"
+      "vp9_v4l2m2m"
+  )
 
-  LIST(APPEND _disabled_encoders "--disable-encoder=dnxhd")
-  LIST(APPEND _disabled_encoders "--disable-encoder=prores")
-  LIST(APPEND _disabled_encoders "--disable-encoder=qtrle")
-  LIST(APPEND _disabled_encoders "--disable-encoder=aac")
-  LIST(APPEND _disabled_encoders "--disable-encoder=aac_mf")
-  LIST(APPEND _disabled_encoders "--disable-encoder=vp9_qsv")
-  LIST(APPEND _disabled_encoders "--disable-encoder=vp9_vaapi")
-  LIST(APPEND _disabled_encoders "--disable-encoder=dvvideo")
+  FOREACH(
+    NON_FREE_DECODER_TO_DISABLE
+    ${NON_FREE_DECODERS_TO_DISABLE}
+  )
+    IF(NOT NON_FREE_DECODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE)
+      LIST(APPEND _disabled_decoders "--disable-decoder=${NON_FREE_DECODER_TO_DISABLE}")
+    ENDIF()
+  ENDFOREACH()
+
+  SET(NON_FREE_ENCODERS_TO_DISABLE
+      "aac"
+      "aac_mf"
+      "dnxhd"
+      "dvvideo"
+      "prores"
+      "qtrle"
+      "vp9_qsv"
+      "vp9_vaapi"
+  )
+  FOREACH(
+    NON_FREE_ENCODER_TO_DISABLE
+    ${NON_FREE_ENCODERS_TO_DISABLE}
+  )
+    IF(NOT NON_FREE_ENCODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE)
+      LIST(APPEND _disabled_encoders "--disable-encoder=${NON_FREE_ENCODER_TO_DISABLE}")
+    ENDIF()
+  ENDFOREACH()
 
   LIST(APPEND _disabled_parsers "--disable-parser=vp9")
 
@@ -323,7 +344,6 @@ FOREACH(
 
   LIST(APPEND RV_DEPS_LIST ffmpeg::${_ffmpeg_lib})
 ENDFOREACH()
-
 
 TARGET_LINK_LIBRARIES(
   ffmpeg::avutil
