@@ -22,7 +22,7 @@
 #define strcasecmp _stricmp
 #endif
 
-std::mutex plugin_mutex;
+static std::mutex plugin_mutex;
 
 static bool TwkFB_GenericIO_debug = false;
 TWKFB_EXPORT void TwkFB_GenericIO_setDebug(bool b)

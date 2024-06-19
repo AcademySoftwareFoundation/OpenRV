@@ -27,7 +27,7 @@
 #define strcasecmp _stricmp
 #endif
 
-std::mutex plugin_mutex;
+static std::mutex plugin_mutex;
 
 static bool TwkMovie_GenericIO_debug = false;
 TWKMOVIE_EXPORT void TwkMovie_GenericIO_setDebug(bool b)
