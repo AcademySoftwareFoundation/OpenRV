@@ -32,15 +32,33 @@ using namespace boost;
 //
 
 static const char* disallowedCodecsArray[] = {
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_ac3)
     "ac3",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_hevc)
     "hevc",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_mpeg2video)
     "mpeg2video",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_prores)
     "prores",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_prores_aw)
     "prores_aw",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_prores_ks)
     "prores_ks",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_prores_lgpl)
     "prores_lgpl",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_svq1)
     "svq1",
+#endif
+#if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_svq3)
     "svq3",
+#endif
     0 };
 
 extern "C" {
