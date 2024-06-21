@@ -1499,7 +1499,7 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
                 sideRotation = av_display_rotation_get((int32_t *)sd->data);
             }
         }
-        rotation = (int)sideRotation;
+        rotation = std::lround(sideRotation);
     }
 
     bool rotate = false;
