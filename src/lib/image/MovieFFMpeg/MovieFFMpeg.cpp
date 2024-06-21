@@ -1491,7 +1491,7 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
     rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
 
     // If rotation metadata not in metadata, try to get it from side data
-    if (rotation == 0 && videoStream->nb_side_data > 0) {
+    if (!rotEntry && videoStream->nb_side_data > 0) {
         double sideRotation = 0;
         for (int i = 0; i < videoStream->nb_side_data; ++i) {
             const AVPacketSideData *sd = &videoStream->side_data[i];
