@@ -6,7 +6,6 @@
 //******************************************************************************
 #include <TwkFB/IO.h>
 #include <TwkFB/Exception.h>
-#include <TwkFB/PluginsLocker.h>
 #include <TwkUtil/File.h>
 #include <iostream>
 #include <assert.h>
@@ -16,11 +15,14 @@
 #include <iterator>
 #include <dlfcn.h>
 #include <sys/types.h>
+#include <mutex>
 
 /* AJG - stricmp */
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif
+
+static std::mutex plugin_mutex;
 
 static bool TwkFB_GenericIO_debug = false;
 TWKFB_EXPORT void TwkFB_GenericIO_setDebug(bool b)
@@ -258,7 +260,6 @@ double FrameBufferIO::getDoubleAttribute(const std::string& name) const { return
 void FrameBufferIO::setDoubleAttribute(const std::string& name, double value) const {}
 
 GenericIO::Plugins* GenericIO::m_plugins = 0;
-PluginsLocker* GenericIO::m_locker = 0;
 bool GenericIO::m_loadedAll = false;
 
 string ProxyFBIO::about() const
@@ -271,8 +272,7 @@ string ProxyFBIO::about() const
 void 
 GenericIO::init()
 {
-    if (!m_plugins) m_plugins = new Plugins; 
-    if (!m_locker) m_locker = new PluginsLocker;
+    if (!m_plugins) m_plugins = new Plugins;
 }
 
 void 
@@ -288,12 +288,6 @@ GenericIO::shutdown()
         }
         delete m_plugins;
         m_plugins = 0;
-    }
-
-    if (m_locker) 
-    {
-        delete m_locker;
-        m_locker = 0;
     }
 
     m_loadedAll = false;
@@ -492,7 +486,7 @@ GenericIO::findByExtension(const string& extension,
 {
     if (!plugins().empty())
     {
-        TwkFB::PluginsLockerGuard lockerGuard( m_locker );
+        std::lock_guard<std::mutex> guard(plugin_mutex);
         for (bool restart = true; restart;)
         {
             restart = false;
@@ -547,7 +541,7 @@ GenericIO::findByBruteForce(const std::string& filename,
         cerr << "INFO: trying brute force to find an image reader for " 
              << basename(filename) << endl;
 
-        TwkFB::PluginsLockerGuard lockerGuard( m_locker );
+        std::lock_guard<std::mutex> guard(plugin_mutex);
         for (bool restart = true; restart;)
         {
             restart = false;
