@@ -36,6 +36,8 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/algorithm/string.hpp>
 #include <mp4v2Utils/mp4v2Utils.h>
+#include <string>
+#include <cstring>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -1491,15 +1493,31 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
     rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
 
     // If rotation metadata not in metadata, try to get it from side data
-    if (!rotEntry && videoStream->nb_side_data > 0) {
-        double sideRotation = 0;
-        for (int i = 0; i < videoStream->nb_side_data; ++i) {
+    if (!rotEntry && videoStream->nb_side_data > 0) 
+    {
+        double rotationFromSideData = 0;
+        for (int i = 0; i < videoStream->nb_side_data; ++i) 
+        {
             const AVPacketSideData *sd = &videoStream->side_data[i];
-            if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) {
-                sideRotation = av_display_rotation_get((int32_t *)sd->data);
+            if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) 
+            {
+                rotationFromSideData = av_display_rotation_get((int32_t *)sd->data);
             }
         }
-        rotation = std::lround(sideRotation);
+
+        // Getting rid of negative rotation metadata
+        rotation = rotationFromSideData < 0 ? lround(rotationFromSideData) + 360 : lround(rotationFromSideData);
+        
+        // Setting rotation
+        char charRotation[5]; // Expecting a number between -360 and 360 (inclusive)
+        sprintf(charRotation, "%lu", rotation);
+        if (av_dict_set(
+            &videoStream->metadata, "rotate", charRotation, 0) < 0) 
+        {
+            cout << "ERROR: Unable to rotate video, unable to parse rotation metadata." << endl;
+        } else {
+            m_info.proxy.attribute<string>("Rotation") = charRotation;
+        }
     }
 
     bool rotate = false;
