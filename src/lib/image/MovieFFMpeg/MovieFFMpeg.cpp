@@ -44,6 +44,7 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/timecode.h>
+#include <libavutil/display.h>
 #include <libswscale/swscale.h>
 //#include <libavcodec/ass_split.h>
 }
@@ -1484,20 +1485,38 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
 
     int rotation = 0;
     AVDictionaryEntry *rotEntry;
+
+    // Trying to get rotation from metadata
     rotEntry = av_dict_get(videoStream->metadata, "rotate", NULL, 0);
     rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
+
+    // If rotation metadata not in metadata, try to get it from side data
+    if (rotation == 0 && videoStream->nb_side_data > 0) {
+        double sideRotation = 0;
+        for (int i = 0; i < videoStream->nb_side_data; ++i) {
+            const AVPacketSideData *sd = &videoStream->side_data[i];
+            if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) {
+                sideRotation = av_display_rotation_get((int32_t *)sd->data);
+            }
+        }
+        rotation = (int)sideRotation;
+    }
+
     bool rotate = false;
     switch (rotation)
     {
         case 270:
+        case -90:
             track->fb.setOrientation(FrameBuffer::BOTTOMRIGHT);
             track->rotate = yuvPlanar;
             rotate = true;
             break;
         case 180:
+        case -180:
             track->fb.setOrientation(FrameBuffer::BOTTOMRIGHT);
             break;
         case 90:
+        case -270:
             track->fb.setOrientation(FrameBuffer::TOPLEFT);
             track->rotate = yuvPlanar;
             rotate = true;
