@@ -39,6 +39,11 @@ PaintIPNode::PaintIPNode(const std::string& name,
     declareProperty<IntProperty>("paint.show", 1);
     declareProperty<StringProperty>("paint.exclude");
     declareProperty<StringProperty>("paint.include");
+    declareProperty<IntProperty>("paint.onionShow", 0);
+    declareProperty<IntProperty>("paint.onionBeforeFrame", 5);
+    declareProperty<IntProperty>("paint.onionAfterFrame", 5);
+    declareProperty<Vec4fProperty>("paint.onionBeforeColor", Vec4f(1,0,0,1));
+    declareProperty<Vec4fProperty>("paint.onionAfterColor", Vec4f(0,1,0,1));
 
     m_tag = createComponent("tag");
 }
@@ -75,6 +80,7 @@ PaintIPNode::compilePenComponent(Component* c)
     const int          eye     = eyeP     && eyeP->size()     ? eyeP->front()     : 2;
 
     p.width          = width;
+    p.baseColor      = color;
     p.color          = color;
     p.brush          = brush;
     p.debug          = debug;
@@ -137,6 +143,7 @@ PaintIPNode::compileTextComponent(Component* c)
     p.scale    = 1.0 / 80.0 / 10.0 * scale;
     p.pos      = pos;
     p.spacing  = space;
+    p.baseColor= color;
     p.color    = color;
     p.font     = font;
     p.text     = text;
@@ -326,6 +333,33 @@ PaintIPNode::readCompleted(const string& typeName, unsigned int version)
     IPNode::readCompleted(typeName, version);
 }
 
+static Vec4f onionSkinColor(
+    const Vec4f& colorIn, 
+    const Vec4f& colorBase, 
+    const Vec4f& colorBefore, 
+    const Vec4f& colorAfter, 
+    float alpha,
+    int i, 
+    int frame)
+{
+    Vec4f color;
+    if (i < frame)
+    {
+        color = colorBefore;
+        color[3] = color[3] * alpha * colorBase[3];
+    }
+    else if (i > frame)
+    {
+        color = colorAfter;
+        color[3] = color[3] * alpha * colorBase[3];
+    }
+    else
+    {
+        color = colorBase;
+    }
+    return color;
+}
+
 IPImage*
 PaintIPNode::evaluate(const Context& context)
 {
@@ -341,50 +375,83 @@ PaintIPNode::evaluate(const Context& context)
     IntProperty*    showP = property<IntProperty>("paint", "show");
     StringProperty* incP  = property<StringProperty>("paint", "include");
     StringProperty* excP  = property<StringProperty>("paint", "exclude");
+    IntProperty*    onionShowP = property<IntProperty>("paint", "onionShow");
+    IntProperty*    onionBFP = property<IntProperty>("paint", "onionBeforeFrame");
+    IntProperty*    onionAFP = property<IntProperty>("paint", "onionAfterFrame");
+    Vec4fProperty*  onionBCP = property<Vec4fProperty>("paint", "onionBeforeColor");
+    Vec4fProperty*  onionACP = property<Vec4fProperty>("paint", "onionAfterColor");
 
     bool showPaint = !showP || showP->empty() || showP->front() == 1;
 
     if (showPaint)
     {
-        if (m_frameMap.count(frame) != 0)
+        bool onionShow = onionShowP && !onionShowP->empty() && onionShowP->front() == 1;
+        int rb, ra;
+        Vec4f cb, ca;
+        if (onionShow)
         {
-            Components& comps = m_frameMap[frame];
-            size_t s = comps.size();
-
-            for (size_t q = 0; q < s; q++)
+            rb = onionBFP && !onionBFP->empty() ? onionBFP->front() : 0;
+            ra = onionAFP && !onionAFP->empty() ? onionAFP->front() : 0;
+            rb = std::max(0, rb + 1);
+            ra = std::max(0, ra + 1);
+            cb = onionBCP && onionBCP->size() ? onionBCP->front() : Vec4f(1,0,0,1);
+            ca = onionACP && onionACP->size() ? onionACP->front() : Vec4f(0,1,0,1);
+        }
+        else
+        {
+            rb = 0;
+            ra = 0;
+            cb = Vec4f(1,0,0,1);
+            ca = Vec4f(0,1,0,1);
+        }
+        for(size_t i=frame-rb; i<=frame+ra; i++)
+        {
+            if (m_frameMap.count(i) != 0)
             {
-                Component* c = comps[q];
-                int numProps = c->properties().size();
-                    
-                if (m_penStrokes.count(c) >= 1)
-                {
-                    if (numProps == 0)
-                    {
-                        m_penStrokes.erase(c);
-                    }
-                    else
-                    {
-                        LocalPolyLine& pl = m_penStrokes[c];
+                float alpha = i < frame
+                    ? (rb > 0 ? 1.0f - (frame - i) / float(rb) : 1.0f)
+                    : (ra > 0 ? 1.0f - (i - frame) / float(ra) : 1.0f);
 
-                        if (pl.eye == 2 || (pl.eye == context.eye))
+                Components& comps = m_frameMap[i];
+                size_t s = comps.size();
+
+                for (size_t q = 0; q < s; q++)
+                {
+                    Component* c = comps[q];
+                    int numProps = c->properties().size();
+                        
+                    if (m_penStrokes.count(c) >= 1)
+                    {
+                        if (numProps == 0)
                         {
-                            head->commands.push_back(&pl);
+                            m_penStrokes.erase(c);
+                        }
+                        else
+                        {
+                            LocalPolyLine& pl = m_penStrokes[c];
+
+                            if (pl.eye == 2 || (pl.eye == context.eye))
+                            {
+                                pl.color = onionSkinColor(pl.color, pl.baseColor, cb, ca, alpha, i, frame);
+                                head->commands.push_back(&pl);
+                            }
                         }
                     }
-                }
-                else if (m_texts.count(c) >= 1)
-                {
-                    if (numProps == 0)
+                    else if (m_texts.count(c) >= 1)
                     {
-                        m_texts.erase(c);
-                    }
-                    else
-                    {
-                        LocalText& t = m_texts[c];
-
-                        if (t.eye == 2 || (t.eye == context.eye))
+                        if (numProps == 0)
                         {
-                            head->commands.push_back(&t);
+                            m_texts.erase(c);
+                        }
+                        else
+                        {
+                            LocalText& t = m_texts[c];
+
+                            if (t.eye == 2 || (t.eye == context.eye))
+                            {
+                                t.color = onionSkinColor(t.color, t.baseColor, cb, ca, alpha, i, frame);
+                                head->commands.push_back(&t);
+                            }
                         }
                     }
                 }
