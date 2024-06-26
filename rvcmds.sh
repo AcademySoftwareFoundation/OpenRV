@@ -29,6 +29,7 @@ if [[ "$OSTYPE" == "linux"* ]]; then
 
   # Searching for a Qt installation path if it has not already been set
   if [ -z "$QT_HOME" ]; then
+    echo "Searching for Qt installation..."
     QT_HOME=$(mdfind -name Qt | grep gcc_64 | head -n 1 | sed 's|\(.*clang_64\).*|\1|')
     if [ -z "$QT_HOME" ]; then
       echo "Could not find Qt installation. Please set QT_HOME to the correct path in .bashrc or .zshrc."
@@ -46,6 +47,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 
   # Searching for a Qt installation path if it has not already been set
   if [ -z "$QT_HOME" ]; then
+    echo "Searching for Qt installation..."
     QT_HOME=$(mdfind -name Qt | grep clang_64 | head -n 1 | sed 's|\(.*clang_64\).*|\1|')
     if [ -z "$QT_HOME" ]; then
       echo "Could not find Qt installation. Please set QT_HOME to the correct path in .bashrc or .zshrc."
@@ -63,6 +65,7 @@ elif [[ "$OSTYPE" == "msys"* ]]; then
 
   # Searching for a Qt installation path if it has not already been set
   if [ -z "$QT_HOME" ]; then
+    echo "Searching for Qt installation..."
     QT_HOME=$(find c:/Qt -name 'qmake.exe' | grep msvc2019_64 | head -n 1 | sed 's|/bin/qmake.exe||') # Assuming use of msvc2019_64
     if [ -z "$QT_HOME" ]; then
       echo "Could not find Qt installation. Please set QT_HOME to the correct path in your environment variables."
