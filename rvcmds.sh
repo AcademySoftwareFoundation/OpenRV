@@ -24,17 +24,14 @@ fi
 # Linux
 if [[ "$OSTYPE" == "linux"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
-  QT_REGEX=$(mdfind -name Qt | grep gcc_64 | head -n 1 | sed 's|\(.*clang_64\).*|\1|')
 
 # MacOS
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
-  QT_REGEX=$(mdfind -name Qt | grep clang_64 | head -n 1 | sed 's|\(.*clang_64\).*|\1|')
 
 # Windows
 elif [[ "$OSTYPE" == "msys"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Visual Studio 17 2022}"
-  QT_REGEX=$(find c:/Qt -name 'qmake.exe' | grep msvc2019_64 | head -n 1 | sed 's|/bin/qmake.exe||') # Assuming use of msvc2019_64
   WIN_PERL="${WIN_PERL:-c:/Strawberry/perl/bin}"
   CMAKE_WIN_ARCH="${CMAKE_WIN_ARCH:--A x64}"
   SETUPTOOLS_USE_DISTUTILS=stdlib
@@ -47,7 +44,14 @@ fi
 # Searching for a Qt installation path if it has not already been set
 if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
-  QT_HOME="$QT_REGEX"
+
+  if [[ "$OSTYPE" == "linux"* ]]; then
+    QT_HOME=$(find ~/Qt* -type d -maxdepth 4 -path '*/gcc_64' | head -n 1)
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    QT_HOME=$(find ~/Qt* -type d -maxdepth 4 -path '*/clang_64' | head -n 1)
+  elif [[ "$OSTYPE" == "msys"* ]]; then
+    QT_HOME=$(find c:/Qt* -type d -maxdepth 4 -path '*/msvc2019_64' | head -n 1)
+  fi
 
   # Could not find Qt installation
   if [ -z "$QT_HOME" ]; then
