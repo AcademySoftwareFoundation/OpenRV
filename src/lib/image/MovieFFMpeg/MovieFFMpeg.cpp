@@ -843,7 +843,7 @@ isMetadataField(string check)
 
 
 bool
-ignoreMetadataField(string check)
+ignoreMetadataField(const string& check)
 {
     for (const char** p = ignoreMetadataFieldsArray; *p; p++)
     {
