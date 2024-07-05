@@ -840,7 +840,7 @@ isMetadataField(string check)
 
 
 bool
-ignoreMetadataField(string check)
+ignoreMetadataField(const string& check)
 {
     for (const char** p = ignoreMetadataFieldsArray; *p; p++)
     {
@@ -1252,6 +1252,14 @@ MovieFFMpegReader::openAVCodec(int index, AVCodecContext** avCodecContext)
         cout << "ERROR: MovieFFMpeg: Unsupported codec_id '" <<
             avStream->codecpar->codec_id << "' in " << m_filename << endl;
         return false;
+    }
+
+    if (avCodec->name == "libdav1d"){
+        const AVCodec *avCodec1 = avcodec_find_decoder_by_name("av1_nvdec");
+        if (avCodec1){
+            cerr << "WARNING: Using av1_nvdec codec rather than Dav1d\n";
+            avCodec = avCodec1; 
+        }
     }
 
     *avCodecContext = avcodec_alloc_context3(avCodec);
@@ -5492,26 +5500,19 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
                 sdparams);
     }
 
-    // Note : No longer using the global context pool (since FFmpeg 6.0)
-    // Rationale: The global context pool was based on the premise that a context 
-    // could be opened and closed multiple times. 
-    // However, with FFmpeg 6.0, this premise is no longer valid and was causing crashes.
-    // As per the FFmpeg 6 documentation: https://ffmpeg.org/doxygen/trunk/deprecated.html:
-    // "Opening and closing a codec context multiple times is not supported anymore – use multiple codec contexts instead."
-
-    // if (!globalContextPool)
-    // {
-    //     int poolSize = 500;
-    //     if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
-    //     {
-    //         int poolSize = atoi(c);
-    //     }
-    //     if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
-    //     else
-    //     {
-    //         report("Disabling mio_ffmpeg context thread pool.", true);
-    //     }
-    // }
+    if (!globalContextPool)
+    {
+        int poolSize = 500;
+        if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
+        {
+            poolSize = atoi(c);
+        }
+        if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
+        else
+        {
+            report("Disabling mio_ffmpeg context thread pool.", true);
+        }
+    }
 }
 
 MovieFFMpegIO::~MovieFFMpegIO()
