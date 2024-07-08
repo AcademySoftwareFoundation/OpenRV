@@ -620,6 +620,12 @@ const char* metadataFieldsArray[] = {
     "lyrics", "network", "rotate", "show", "synopsis", "title", "track", "year",
     0 };
 
+const char* ignoreMetadataFieldsArray[] = { 
+    "major_brand", "minor_version","compatible_brands", "handler_name",
+    "vendor_id", "language",
+    "duration", // We ignore it here, since its explicitly added elsewhere.
+    0};
+
 //----------------------------------------------------------------------
 //
 // Static Helpers
@@ -829,6 +835,17 @@ bool
 isMetadataField(string check)
 {
     for (const char** p = metadataFieldsArray; *p; p++)
+    {
+        if (*p == check) return true;
+    }
+    return false;
+}
+
+
+bool
+ignoreMetadataField(const string& check)
+{
+    for (const char** p = ignoreMetadataFieldsArray; *p; p++)
     {
         if (*p == check) return true;
     }
@@ -1385,13 +1402,21 @@ MovieFFMpegReader::snagMetadata(AVDictionary* dict, string source,
     AVDictionaryEntry *tag = 0;
     while ((tag = av_dict_get(dict, "", tag, AV_DICT_IGNORE_SUFFIX)))
     {
-        string key = tag->key;
+        // We force the key to lower case, since the mkv file format has all its
+        // metadata in uppercase, and mov and mp4 are in lowercase.
+        string lckey = tag->key;
+        for( int i = 0; i < lckey.length(); i++ ) lckey[i] = tolower( lckey[i] );
+
+        // Then we make a version of the key with first letter caps for display only.
+        string key = lckey;
         key[0] = toupper(key[0]);
+
         ostringstream attrKey, attrValue;
         attrKey << source << "/" << key;
         attrValue << tag->value;
         DBL (DB_METADATA, attrKey.str() << ": " << attrValue.str());
-        if (filter && !(isMetadataField(string(tag->key)))) continue;
+        if( filter && ignoreMetadataField( string( lckey ) ) ) continue;
+
         fb->newAttribute(attrKey.str(), attrValue.str());
     }
 }
