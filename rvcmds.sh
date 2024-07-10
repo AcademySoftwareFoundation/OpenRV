@@ -46,17 +46,17 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/gcc_64' | head -n 1)
+    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/gcc_64' | sort -V | tail -n 1)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/macos' | head -n 1)
+    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/macos' | sort -V | tail -n 1)
 
     # If no macos installation found, try clang_64
     if [ -z "$QT_HOME" ]; then
-      QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | head -n 1)
+      QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
     fi
     
   elif [[ "$OSTYPE" == "msys"* ]]; then
-    QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | head -n 1)
+    QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
   fi
 
   # Could not find Qt installation
