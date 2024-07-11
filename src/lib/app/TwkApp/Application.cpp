@@ -26,6 +26,9 @@ Application::Application() : TwkUtil::Notifier()
 Application::~Application()
 {
     m_app = 0;
+
+    // Make sure to release all the video modules before we unload the plugins
+    m_videoModules.clear();
 }
 
 void
@@ -58,7 +61,7 @@ Application::receive(Notifier* originator,
 VideoModule* 
 Application::primaryVideoModule() const
 {
-    return m_videoModules.empty() ? 0 : m_videoModules.front();
+    return m_videoModules.empty() ? 0 : m_videoModules.front().get();
 }
 
 void
