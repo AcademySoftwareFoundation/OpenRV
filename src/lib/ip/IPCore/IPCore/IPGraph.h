@@ -126,7 +126,7 @@ public:
     typedef IPNode::IPNodes                     IPNodes;
     typedef TwkApp::VideoModule                 VideoModule;
     typedef TwkApp::VideoDevice                 VideoDevice;
-    typedef std::vector<VideoModule*>           VideoModules;
+    typedef std::vector<std::shared_ptr<VideoModule>> VideoModules;
     typedef std::vector<DisplayGroupIPNode*>    DisplayGroups;
     typedef IPImage::InternalGLMatricesContext  InternalGLMatricesContext;
     typedef int                                 WorkItemID;
