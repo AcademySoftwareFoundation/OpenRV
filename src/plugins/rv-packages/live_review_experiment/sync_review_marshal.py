@@ -44,6 +44,11 @@ class SyncReviewMarshal(MinorMode):
                     "sync-review-queue-name-change",
                     self.set_queue_name,
                     "",
+                ),
+                (
+                    "before-clear-session",
+                    self.send_clear_session,
+                    "Send clear sync review payload",
                 )
             ],
             None,
@@ -222,7 +227,8 @@ class SyncReviewMarshal(MinorMode):
         """
         Receives a graph change message and updates the graph
         """
-        if command.get("event") != "SET":
+        event_type = command.get("event")
+        if event_type not in ["CLEAR", "SET"]:
             return
 
         payload = command.get("payload")
@@ -276,6 +282,23 @@ class SyncReviewMarshal(MinorMode):
                     if frame:
                         commands.setFrame(frame)
         SyncReviewMarshal.updating_playbacksettings = False
+
+    @staticmethod
+    def send_clear_session(event):
+        """
+        Send a sync review playback message to clear the session
+        """
+        event.reject()
+        SyncReviewMarshal.send_sync_review_event(
+            "sync-review-change",
+            {
+                "command_schema": "OTIO_SESSION_1.0",
+                "command": {
+                    "event": "CLEAR",
+                    "payload": None,
+                },
+            },
+        )
 
 
 _mode = None
