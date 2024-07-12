@@ -46,11 +46,6 @@ class SyncReviewMarshal(MinorMode):
                     "",
                 ),
                 (
-                    "play-stop",
-                    self.send_playback_stop,
-                    "Turn the playack settings into a sync review payload",
-                ),
-                (
                     "before-clear-session",
                     self.send_clear_session,
                     "Send clear sync review payload",
