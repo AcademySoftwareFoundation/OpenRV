@@ -10,7 +10,7 @@ import otio_reader
 
 
 class SyncReviewMarshal(MinorMode):
-    updating_graph = False
+    sending_event = False
     updating_playbacksettings = False
     queue_name = ""
 
@@ -21,7 +21,7 @@ class SyncReviewMarshal(MinorMode):
             "sync_review_marshal",
             [
                 (
-                    "graph-node-inputs-changed",
+                    "after-progressive-loading",
                     self.send_graph_change,
                     "Turn the visible graph into a sync review payload",
                 ),
@@ -44,6 +44,11 @@ class SyncReviewMarshal(MinorMode):
                     "sync-review-queue-name-change",
                     self.set_queue_name,
                     "",
+                ),
+                (
+                    "play-stop",
+                    self.send_playback_stop,
+                    "Turn the playack settings into a sync review payload",
                 ),
                 (
                     "before-clear-session",
@@ -84,6 +89,9 @@ class SyncReviewMarshal(MinorMode):
         """
         Sends an event with a json payload
         """
+        if SyncReviewMarshal.sending_event:
+            return
+
         if os.environ.get("DEBUG_SYNC_REVIEW"):
             print(f"SEND MESSAGE to session {SyncReviewMarshal.queue_name}: {payload}")
 
@@ -136,6 +144,9 @@ class SyncReviewMarshal(MinorMode):
         """
         Extracts a message payload for the supplied command_schema
         """
+        if os.environ.get("DEBUG_SYNC_REVIEW"):
+            print(f"RECEIVE MESSAGE from session {SyncReviewMarshal.queue_name}: {message}")
+
         message_json = json.loads(message)
         if message_json.get("schema") != "SYNC_REVIEW_1.0":
             print(f"Unhandled message schema: {message_json.get('schema')}")
@@ -164,9 +175,6 @@ class SyncReviewMarshal(MinorMode):
         Takes the currently viewed node and turns it into sync review message
         """
         event.reject()
-        if SyncReviewMarshal.updating_graph:
-            return
-
         SyncReviewMarshal.marshal_node(commands.viewNode())
 
     @staticmethod
@@ -232,11 +240,12 @@ class SyncReviewMarshal(MinorMode):
             return
 
         payload = command.get("payload")
-        if payload is None:
-            return
 
-        new_otio = payload.get("otio")
-        new_otio = json.dumps(new_otio, indent=1, sort_keys=True)
+        if payload:
+            new_otio = payload.get("otio")
+            new_otio = json.dumps(new_otio, indent=1, sort_keys=True)
+        else:
+            new_otio = "{}"
 
         # Not really optimal, but required to compare both otio strings
         old_otio = otio_writer.write_otio_string(commands.viewNode())
@@ -248,13 +257,13 @@ class SyncReviewMarshal(MinorMode):
 
         print(f"Updating Graph using OTIO\n{new_otio}")
 
-        SyncReviewMarshal.updating_graph = True
+        SyncReviewMarshal.sending_event = True
         commands.clearSession()
 
         if new_otio != "{}":
             root_node = otio_reader.read_otio_string(new_otio)
             commands.setViewNode(root_node)
-        SyncReviewMarshal.updating_graph = False
+        SyncReviewMarshal.sending_event = False
 
     @staticmethod
     def receive_playback_change(command):
