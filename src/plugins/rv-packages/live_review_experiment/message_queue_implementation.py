@@ -146,6 +146,12 @@ class MessageQueueImplementation(MinorMode, QtCore.QObject):
             self.mq_credentials = creds
             self.connect_mq()
 
+
+    def create_review_session(self, session_name):
+        self.mq_exchange = session_name
+        self.create_channel()
+        self.declare_exchange()
+
     def create_review(self, event=None):
         sw = qtutils.sessionWindow()
         id, ok = QtWidgets.QInputDialog.getText(
@@ -156,9 +162,12 @@ class MessageQueueImplementation(MinorMode, QtCore.QObject):
         )
 
         if ok:
-            self.mq_exchange = id
-            self.create_channel()
-            self.declare_exchange()
+            self.create_review_session(id)
+
+    def join_review_session(self, session_name):
+        self.mq_exchange = session_name
+        self.create_channel()
+        self.declare_queue()
 
     def join_review(self, event=None):
         sw = qtutils.sessionWindow()
@@ -170,9 +179,7 @@ class MessageQueueImplementation(MinorMode, QtCore.QObject):
         )
 
         if ok:
-            self.mq_exchange = id
-            self.create_channel()
-            self.declare_queue()
+            self.join_review_session(id)
 
     def leave_review(self, event=None):
         self.close_channel()
