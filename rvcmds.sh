@@ -93,7 +93,7 @@ alias rvmkd="rvcfgd && rvbuildd"
 
 # ALIASES: Setup, Config and Build
 
-alias rvbootstrap="rvenv && rvsetup && rvmk"
+alias rvbootstrap="rvsetup && rvmk"
 alias rvbootstrapd="rvsetup && rvmkd"
 
 echo "Please ensure you have installed any required dependencies from doc/build_system/config_[os]"
