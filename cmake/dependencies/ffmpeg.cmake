@@ -191,6 +191,11 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
 ENDIF()
 
+# Controls the EXTERNALPROJECT_ADD/BUILD_ALWAYS option
+SET(${_force_rebuild}
+    FALSE
+)
+
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
 IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
@@ -220,6 +225,8 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   )
     IF(NOT NON_FREE_DECODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE)
       LIST(APPEND _disabled_decoders "--disable-decoder=${NON_FREE_DECODER_TO_DISABLE}")
+    ELSE()
+      MESSAGE(STATUS "FFmpeg decoder ${NON_FREE_DECODER_TO_DISABLE} enabled")
     ENDIF()
   ENDFOREACH()
 
@@ -239,6 +246,8 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   )
     IF(NOT NON_FREE_ENCODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE)
       LIST(APPEND _disabled_encoders "--disable-encoder=${NON_FREE_ENCODER_TO_DISABLE}")
+    ELSE()
+      MESSAGE(STATUS "FFmpeg encoder ${NON_FREE_ENCODER_TO_DISABLE} enabled")
     ENDIF()
   ENDFOREACH()
 
@@ -253,6 +262,16 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   SET(RV_FFMPEG_CONFIG_OPTIONS
       ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   )
+
+  IF(NOT RV_FFMPEG_CONFIG_OPTIONS STREQUAL RV_FFMPEG_CONFIG_OPTIONS_CACHE)
+    SET(${_force_rebuild}
+        TRUE
+    )
+    SET(RV_FFMPEG_CONFIG_OPTIONS_CACHE
+        ${RV_FFMPEG_CONFIG_OPTIONS}
+        CACHE STRING "FFmpeg config options" FORCE
+    )
+  ENDIF()
 ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
@@ -305,7 +324,7 @@ EXTERNALPROJECT_ADD(
   BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
+  BUILD_ALWAYS ${_force_rebuild}
   BUILD_BYPRODUCTS ${_build_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
@@ -387,14 +406,16 @@ IF(RV_TARGET_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
     COMMAND cmake -E touch ${${_target}-stage-flag}
+    BYPRODUCTS ${${_target}-stage-flag}
   )
 ELSE()
   ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${${_target}-stage-flag}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
     COMMAND cmake -E touch ${${_target}-stage-flag}
-    DEPENDS ${_target}
+    BYPRODUCTS ${${_target}-stage-flag}
   )
 ENDIF()
 

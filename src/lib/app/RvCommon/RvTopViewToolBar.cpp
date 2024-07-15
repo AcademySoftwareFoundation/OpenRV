@@ -485,20 +485,12 @@ RvTopViewToolBar::receiveEvent(const Event& event)
                     const string deviceName = contents.substr(p+1);
                     const string moduleName = contents.substr(0, p);
 
-                    const IPCore::Application::VideoModules& modules = RvApp()->videoModules();
-
-                    for (size_t i = 0; i < modules.size(); i++)
+                    for (const auto module : RvApp()->videoModules())
                     {
-                        const VideoModule* module = modules[i];
-
                         if (module->name() == moduleName)
                         {
-                            const VideoModule::VideoDevices& devices = module->devices();
-                        
-                            for (size_t q = 0; q < devices.size(); q++)
+                            for (const auto device : module->devices())
                             {
-                                const VideoDevice* device = devices[q];
-
                                 if (device->name() == deviceName)
                                 {
                                     m_outputDevice = device;
@@ -1025,17 +1017,10 @@ RvTopViewToolBar::monitorMenuUpdate()
 
     QString html = "<style type=\"text/css\"> td { padding: 4px; } </style><table>";
 
-    const IPCore::Application::VideoModules& modules = RvApp()->videoModules();
-
-    for (size_t i = 0; i < modules.size(); i++)
+    for (const auto module : RvApp()->videoModules())
     {
-        const VideoModule* module = modules[i];
-        const VideoModule::VideoDevices& devices = module->devices();
-
-        for (size_t q = 0; q < devices.size(); q++)
+        for (const auto device : module->devices())
         {
-            const VideoDevice* device = devices[q];
-
             VideoDevice::VideoFormat format = device->videoFormatAtIndex(device->currentVideoFormat());
             VideoDevice::DataFormat data = device->dataFormatAtIndex(device->currentDataFormat());
 

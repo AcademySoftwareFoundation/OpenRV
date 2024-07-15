@@ -4,9 +4,9 @@ Each RV user has a Preferences file where her personal rv settings are stored. M
 
 | Platform | Location |
 | --- | --- |
-| macOS | $HOME/Library/Preferences/com.autodesk.OpenRV.plist |
-| Linux | $HOME/.config/Autodesk/OpenRV.conf |
-| Windows 7 | ~$HOME/AppData/Roaming/Autodesk/OpenRV.ini |
+| macOS | $HOME/Library/Preferences/com.aswf.OpenRV.plist |
+| Linux | $HOME/.config/ASWF/OpenRV.conf |
+| Windows 7 | ~$HOME/AppData/Roaming/ASWF/OpenRV.ini |
 
 Initial values of preferences can be overridden on a site-wide or show-wide basis by setting the environment variable RV_PREFS_OVERRIDE_PATH to point to one or more directories that contain files of the name and type listed in the above table. For example, if you have your RV.conf file under $HOME/Documents/ you can set RV_PREFS_OVERRIDE_PATH=$HOME/Documents. Each of these overriding preferences file can provide default values for one or more preferences. A value from one of these overriding files will override the users's preference only if the user's preferences file has no value for this preference yet.In the simplest case, if you want to provide overriding initial values for all preferences, you should
 

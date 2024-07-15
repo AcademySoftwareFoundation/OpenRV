@@ -712,7 +712,7 @@ IPGraph::setPhysicalDevicesInternal(const VideoModules& modules)
     {
         for (size_t i = 0; i < modules.size(); i++)
         {
-            const VideoModule* module = modules[i];
+            const VideoModule* module = modules[i].get();
             const TwkApp::VideoModule::VideoDevices& devices = module->devices();
 
             for (size_t j = 0; j < devices.size(); j++)
