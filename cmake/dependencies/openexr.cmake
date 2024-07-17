@@ -7,20 +7,22 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-SET(_target
-    "RV_DEPS_OPENEXR"
+RV_VFX_SET_VARIABLE(
+  _ext_openexr_version
+  CY2023 "3.1.7"
+  CY2024 "3.2.4"
 )
 
-SET(_version
-    "3.1.7"
-)
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${_ext_openexr_version}" "" "")
 
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
 )
 
-SET(_download_hash
-    "a278571601083a74415d40d2497d205c"
+RV_VFX_SET_VARIABLE(
+  _download_hash
+  CY2023 "a278571601083a74415d40d2497d205c"
+  CY2024 "11e713886a0e1c6a2c147e9704bbbe68"
 )
 
 SET(_install_dir
@@ -58,35 +60,42 @@ IF(RV_TARGET_WINDOWS)
       ninja
   )
 ENDIF()
+RV_VFX_SET_VARIABLE(
+  _openexr_libname_suffix_
+  CY2023 "3_1"
+  CY2024 "3_2"
+)
 
 IF(RV_TARGET_WINDOWS)
   SET(_openexr_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXR-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXR-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSE()
   SET(_openexr_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXR-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXR-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ENDIF()
 SET(_openexr_lib
     ${_lib_dir}/${_openexr_name}
 )
 
-SET(LIB_VERSION_SUFFIX
-    "30.7.1"
+RV_VFX_SET_VARIABLE(
+  LIB_VERSION_SUFFIX
+  CY2023 "30.7.1"
+  CY2024 "31.3.2.4"
 )
 
 IF(RV_TARGET_DARWIN)
   SET(_openexrcore_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-3_1${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSEIF(RV_TARGET_LINUX)
   SET(_openexrcore_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
   )
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_openexrcore_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ENDIF()
 
@@ -96,15 +105,15 @@ SET(_openexrcore_lib
 
 IF(RV_TARGET_DARWIN)
   SET(_ilmthread_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-3_1${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSEIF(RV_TARGET_LINUX)
   SET(_ilmthread_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
   )
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_ilmthread_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ENDIF()
 
@@ -114,15 +123,15 @@ SET(_ilmthread_lib
 
 IF(RV_TARGET_DARWIN)
   SET(_iex_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-3_1${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSEIF(RV_TARGET_LINUX)
   SET(_iex_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
   )
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_iex_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-3_1${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ENDIF()
 
@@ -134,20 +143,26 @@ LIST(APPEND _openexr_byproducts ${_openexr_lib} ${_ilmthread_lib} ${_iex_lib})
 
 IF(RV_TARGET_WINDOWS)
   SET(_openexr_implib
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}OpenEXR-3_1${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}OpenEXR-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
   SET(_ilmthread_implib
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}IlmThread-3_1${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
   SET(_iex_implib
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}Iex-3_1${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
 
   LIST(APPEND _openexr_byproducts ${_openexr_implib} ${_ilmthread_implib} ${_iex_implib})
 ENDIF()
 
+RV_VFX_SET_VARIABLE(
+  _openexr_patch_name_
+  CY2023 "openexr_3.1.7_invalid_to_black"
+  CY2024 "openexr_3.2.4_invalid_to_black"
+)
+
 SET(_patch_command 
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/openexr_invalid_to_black.patch
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/${_openexr_patch_name_}.patch
 )
 
 SET(_cmake_configure_command
