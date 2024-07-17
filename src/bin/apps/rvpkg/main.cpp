@@ -298,18 +298,18 @@ utf8Main(int argc, char *argv[])
 
     if (inputArgs.empty() && !list && !info && !env)
     {
-        cout << "ERROR: use -help for usage" << endl;
+        cerr << "ERROR: use -help for usage" << endl;
     }
 
     if (add && remove)
     {
-        cout << "ERROR: only one of -add or -remove allowed" << endl;
+        cerr << "ERROR: only one of -add or -remove allowed" << endl;
         exit(-1);
     }
 
     if (onlyDir && (withDir || addDir))
     {
-        cout << "ERROR: -only cannot be used with -include or -add" << endl;
+        cerr << "ERROR: -only cannot be used with -include or -add" << endl;
         exit(-1);
     }
 
@@ -320,25 +320,25 @@ utf8Main(int argc, char *argv[])
 
     if ((remove && install) || (add && uninstall))
     {
-        cout << "ERROR: conflicting arguments" << endl;
+        cerr << "ERROR: conflicting arguments" << endl;
         exit(-1);
     }
 
     if ((remove || add || install || uninstall) && (list || info))
     {
-        cout << "ERROR: -list and -info do not work with other arguments" << endl;
+        cerr << "ERROR: -list and -info do not work with other arguments" << endl;
         exit(-1);
     }
 
     if (list && info)
     {
-        cout << "ERROR: only one of -list or -info allowed" << endl;
+        cerr << "ERROR: only one of -list or -info allowed" << endl;
         exit(-1);
     }
 
     if ((info || install || uninstall || remove || add) && inputArgs.empty())
     {
-        cout << "ERROR: need more arguments" << endl;
+        cerr << "ERROR: need more arguments" << endl;
         exit(-1);
     }
 
@@ -489,7 +489,7 @@ utf8Main(int argc, char *argv[])
 
             if (!p.optional)
             {
-                cout << "ERROR: " << p.file.toUtf8().constData()
+                cerr << "ERROR: " << p.file.toUtf8().constData()
                      << " is not an optional package -- ignoring"
                      << endl;
                 continue;
@@ -500,7 +500,7 @@ utf8Main(int argc, char *argv[])
 
             if (!info.exists())
             {
-                cout << "ERROR: " << p.file.toUtf8().constData() << " doesn't exist -- ignoring" << endl;
+                cerr << "ERROR: " << p.file.toUtf8().constData() << " doesn't exist -- ignoring" << endl;
                 continue;
             }
 
@@ -512,7 +512,7 @@ utf8Main(int argc, char *argv[])
 
             if (!rvloadInfo.exists())
             {
-                cout << "ERROR: missing rvload2 file at "
+                cerr << "ERROR: missing rvload2 file at "
                      << rvload2.toUtf8().constData()
                      << " -- ignoring"
                      << endl;
@@ -551,9 +551,49 @@ utf8Main(int argc, char *argv[])
     {
         QStringList files;
 
+        // Will hold added packages from a bundle if an bundle is passes
+        std::vector<QString> addedPackages = {};
+
         for (size_t i = 0; i < inputArgs.size(); i++)
         {
-            files.push_back(inputArgs[i].c_str());
+            string curFile = inputArgs[i];
+
+            // Checking to see if the file is a bundle
+            if (manager.isBundle(QString::fromStdString(curFile))) {
+                cout << "INFO: Bundle detected, unpacking now." << endl;
+
+                // Unpacking bundle
+                QString toUnzip = QString::fromStdString(curFile);
+                string addDirStr = addDir;
+                QString outputDir = QString::fromStdString(addDirStr.append("/Packages"));
+                addedPackages = manager.handleBundle(toUnzip, outputDir);
+
+                // Ensuring that the bundle unpacked successfully
+                if (addedPackages.size() > 0) 
+                {
+                    cout << "INFO: Bundle unpacked successfully " << endl;
+                    cout << "INFO: Added the following packages..." << endl;
+
+                    for (QString s : addedPackages) 
+                    {
+                        cout << s.toStdString() << endl;
+                    }
+                } else {
+                    cerr << "ERROR: Unable to install bundle." << endl;
+                }
+            } else {
+                files.push_back(inputArgs[i].c_str());
+            }
+        }
+
+        // Adding bundle subpackages to input arguments to allow for chain calls (e.g. -install -add ...)
+        if (addedPackages.size() > 0) 
+        {
+
+            for (QString s : addedPackages)
+            {
+                inputArgs.push_back(s.toStdString());
+            }
         }
 
         if (!manager.addPackages(files, addDir))
@@ -571,19 +611,24 @@ utf8Main(int argc, char *argv[])
         {
             QString name(inputArgs[i].c_str());
             QString base = name.split("/").back();
+            
+            // Bundles do not need to be modified and should instead be removed
+            if (manager.isBundle(base)) continue;
+
             QDir dir(addDir);
-            dir.cd("Packages");
+            dir.cd("Packages"); // Automatically navigating into the Packages directory
             if (!dir.exists()) exit(-1);
 
             QString path = dir.absoluteFilePath(base);
             inputArgs[i] = path.toUtf8().constData();
-            cout << inputArgs[i] << endl;
         }
     }
 
 
     if (install)
     {
+        cout << "INFO: Installing package..." << endl;
+
         vector<int> indices;
         matchingPackages(packages, indices);
 
@@ -596,17 +641,19 @@ utf8Main(int argc, char *argv[])
         {
             PackageManager::Package& p = packages[indices[i]];
 
+            // Ensuring package not installed already
             if (p.installed)
             {
                 cout << "WARNING: " << p.name << " is already installed" << endl;
-            }
+            }        
+
             else
             {
                 cout << "INFO: installing " << p.file << endl;
 
                 if (!manager.installPackage(p))
                 {
-                    cout << "ERROR: failed to install " << p.file << endl;
+                    cerr << "ERROR: failed to install " << p.file << endl;
                 }
             }
         }

@@ -44,7 +44,7 @@ class Application : public TwkApp::Application
     typedef std::vector<std::string>                    StringVector;
     typedef std::map<std::string,std::string>           PropEnvMap;
     typedef TwkApp::VideoModule                         VideoModule;
-    typedef std::vector<VideoModule*>                   VideoModules;
+    typedef std::vector<std::shared_ptr<VideoModule>>   VideoModules;
     typedef size_t                                      DispatchID;
     typedef std::function<void(DispatchID)>             DispatchCallback;
 

@@ -1033,6 +1033,9 @@ utf8Main(int argc, char *argv[])
     Imf::staticInitialize();
     IPCore::Application::cacheEnvVars();
 
+    TwkFB::GenericIO::init(); // Initialize TwkFB::GenericIO plugins statics
+    TwkMovie::GenericIO::init(); // Initialize TwkMovie::GenericIO plugins statics
+
     IPCore::AudioRenderer::setNoAudio(true);
 
 #ifdef PLATFORM_WINDOWS
@@ -1703,6 +1706,9 @@ utf8Main(int argc, char *argv[])
     pthread_win32_thread_detach_np();
     pthread_win32_process_detach_np();
 #endif
+
+    TwkMovie::GenericIO::shutdown(); // Shutdown TwkMovie::GenericIO plugins
+    TwkFB::GenericIO::shutdown(); // Shutdown TwkFB::GenericIO plugins
 
     TwkFB::ThreadPool::shutdown();
     return 0;

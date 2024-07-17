@@ -36,6 +36,8 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/algorithm/string.hpp>
 #include <mp4v2Utils/mp4v2Utils.h>
+#include <string>
+#include <cstring>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -44,6 +46,7 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
 #include <libavutil/timecode.h>
+#include <libavutil/display.h>
 #include <libswscale/swscale.h>
 //#include <libavcodec/ass_split.h>
 }
@@ -604,7 +607,7 @@ const char* slowRandomAccessCodecsArray[] = {
     "div6", "divx", "dnxhd", "dx50", "h263", "h264", "i263", "iv31", "iv32",
     "m4s2", "mp42", "mp43", "mp4s", "mp4v", "mpeg4", "mpg1", "mpg3", "mpg4",
     "pim1", "s263", "svq1", "svq3", "u263", "vc1", "vc1_vdpau", "vc1image",
-    "viv1", "wmv3", "wmv3_vdpau", "wmv3image", "xith", "xvid",
+    "viv1", "wmv3", "wmv3_vdpau", "wmv3image", "xith", "xvid", "libdav1d",
     0 };
 
 const char* supportedEncodingCodecsArray[] = {
@@ -616,6 +619,12 @@ const char* metadataFieldsArray[] = {
     "copyright", "description", "encoder", "episode_id", "genre", "grouping",
     "lyrics", "network", "rotate", "show", "synopsis", "title", "track", "year",
     0 };
+
+const char* ignoreMetadataFieldsArray[] = { 
+    "major_brand", "minor_version","compatible_brands", "handler_name",
+    "vendor_id", "language",
+    "duration", // We ignore it here, since its explicitly added elsewhere.
+    0};
 
 //----------------------------------------------------------------------
 //
@@ -826,6 +835,17 @@ bool
 isMetadataField(string check)
 {
     for (const char** p = metadataFieldsArray; *p; p++)
+    {
+        if (*p == check) return true;
+    }
+    return false;
+}
+
+
+bool
+ignoreMetadataField(const string& check)
+{
+    for (const char** p = ignoreMetadataFieldsArray; *p; p++)
     {
         if (*p == check) return true;
     }
@@ -1382,13 +1402,21 @@ MovieFFMpegReader::snagMetadata(AVDictionary* dict, string source,
     AVDictionaryEntry *tag = 0;
     while ((tag = av_dict_get(dict, "", tag, AV_DICT_IGNORE_SUFFIX)))
     {
-        string key = tag->key;
+        // We force the key to lower case, since the mkv file format has all its
+        // metadata in uppercase, and mov and mp4 are in lowercase.
+        string lckey = tag->key;
+        for( int i = 0; i < lckey.length(); i++ ) lckey[i] = tolower( lckey[i] );
+
+        // Then we make a version of the key with first letter caps for display only.
+        string key = lckey;
         key[0] = toupper(key[0]);
+
         ostringstream attrKey, attrValue;
         attrKey << source << "/" << key;
         attrValue << tag->value;
         DBL (DB_METADATA, attrKey.str() << ": " << attrValue.str());
-        if (filter && !(isMetadataField(string(tag->key)))) continue;
+        if( filter && ignoreMetadataField( string( lckey ) ) ) continue;
+
         fb->newAttribute(attrKey.str(), attrValue.str());
     }
 }
@@ -1484,20 +1512,54 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
 
     int rotation = 0;
     AVDictionaryEntry *rotEntry;
+
+    // Trying to get rotation from metadata
     rotEntry = av_dict_get(videoStream->metadata, "rotate", NULL, 0);
     rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
+
+    // If rotation metadata not in metadata, try to get it from side data
+    if (!rotEntry && videoStream->nb_side_data > 0) 
+    {
+        double rotationFromSideData = 0;
+        for (int i = 0; i < videoStream->nb_side_data; ++i) 
+        {
+            const AVPacketSideData *sd = &videoStream->side_data[i];
+            if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) 
+            {
+                rotationFromSideData = av_display_rotation_get((int32_t *)sd->data);
+            }
+        }
+
+        // Getting rid of negative rotation metadata
+        rotation = rotationFromSideData < 0 ? lround(rotationFromSideData) + 360 : lround(rotationFromSideData);
+        
+        // Setting rotation
+        char charRotation[5]; // Expecting a number between -360 and 360 (inclusive)
+        sprintf(charRotation, "%lu", rotation);
+        if (av_dict_set(
+            &videoStream->metadata, "rotate", charRotation, 0) < 0) 
+        {
+            cout << "ERROR: Unable to rotate video, unable to parse rotation metadata." << endl;
+        } else {
+            m_info.proxy.attribute<string>("Rotation") = charRotation;
+        }
+    }
+
     bool rotate = false;
     switch (rotation)
     {
         case 270:
+        case -90:
             track->fb.setOrientation(FrameBuffer::BOTTOMRIGHT);
             track->rotate = yuvPlanar;
             rotate = true;
             break;
         case 180:
+        case -180:
             track->fb.setOrientation(FrameBuffer::BOTTOMRIGHT);
             break;
         case 90:
+        case -270:
             track->fb.setOrientation(FrameBuffer::TOPLEFT);
             track->rotate = yuvPlanar;
             rotate = true;
@@ -5467,19 +5529,26 @@ MovieFFMpegIO::MovieFFMpegIO(CodecFilterFunction codecFilter,
                 sdparams);
     }
 
-    if (!globalContextPool)
-    {
-        int poolSize = 500;
-        if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
-        {
-            poolSize = atoi(c);
-        }
-        if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
-        else
-        {
-            report("Disabling mio_ffmpeg context thread pool.", true);
-        }
-    }
+    // Note : No longer using the global context pool (since FFmpeg 6.0)
+    // Rationale: The global context pool was based on the premise that a context 
+    // could be opened and closed multiple times. 
+    // However, with FFmpeg 6.0, this premise is no longer valid and was causing crashes.
+    // As per the FFmpeg 6 documentation: https://ffmpeg.org/doxygen/trunk/deprecated.html:
+    // "Opening and closing a codec context multiple times is not supported anymore – use multiple codec contexts instead."
+
+    // if (!globalContextPool)
+    // {
+    //     int poolSize = 500;
+    //     if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
+    //     {
+    //         int poolSize = atoi(c);
+    //     }
+    //     if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
+    //     else
+    //     {
+    //         report("Disabling mio_ffmpeg context thread pool.", true);
+    //     }
+    // }
 }
 
 MovieFFMpegIO::~MovieFFMpegIO()

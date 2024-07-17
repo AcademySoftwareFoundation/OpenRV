@@ -98,6 +98,18 @@ QT5 package.
 
 Use the `rvcfg` (the common build alias) to run the configuration step. You can also use `rvcfgd` to configure in Debug.
 
+#### How to enable non free FFmpeg codecs
+
+Legal Notice: Non free FFmpeg codecs are disabled by default. Please check with your legal department whether you have the proper licenses and rights to use these codecs. 
+ASWF is not responsible for any unlicensed use of these codecs.
+
+The RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE and RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE can optionally be specified at configure time to enable non free FFmpeg decoders and encoders respectively.
+
+Example:
+```bash
+rvcfg -DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE="aac;hevc" -DRV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE="aac"
+```
+
 #### Manually
 
 ##### Windows

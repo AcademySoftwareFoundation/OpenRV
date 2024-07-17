@@ -1787,7 +1787,7 @@ RvApplication::findPresentationDevice(const std::string& dpath) const
 
         if (mindex >= 0)
         {
-            VideoModule* m = videoModules()[mindex];
+            VideoModule* m = videoModules()[mindex].get();
             openVideoModule(m);
             const VideoModule::VideoDevices& devs = m->devices();
             string dname = parts[1].toUtf8().constData();

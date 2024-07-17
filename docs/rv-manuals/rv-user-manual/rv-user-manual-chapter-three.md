@@ -85,9 +85,9 @@ You can also access the logs at the following locations:
 
 | OS | Logs location |
 | --- | --- |
-| Linux | ~/.local/share/Autodesk/RV/RV.log |
-| macOS | ~/Library/Logs/Autodesk/RV.log |
-| Windows | %AppData%\Roaming\Autodesk\RV\RV.log |
+| Linux | ~/.local/share/ASWF/OpenRV/OpenRV.log |
+| macOS | ~/Library/Logs/ASWF/OpenRV.log |
+| Windows | %AppData%\Roaming\ASWF\OpenRV\OpenRV.log |
 
 These logs contain anything that is written in the RV Console.
 
