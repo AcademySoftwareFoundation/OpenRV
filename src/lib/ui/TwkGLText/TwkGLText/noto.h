@@ -5,10 +5,9 @@
 // 
 //******************************************************************************
 
-#ifndef __NOTO_H__
-#define __NOTO_H__
+#pragma once
+
+// Sourced from Noto Sans Simplified: https://fonts.google.com/noto/specimen/Noto+Sans+SC
 
 extern const unsigned char notoFont[];
 const unsigned int notoFontSize = 10560380;
-
-#endif    // End #ifdef __NOTO_H__
