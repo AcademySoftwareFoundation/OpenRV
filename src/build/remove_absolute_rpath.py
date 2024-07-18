@@ -8,11 +8,21 @@
 #
 # *****************************************************************************
 import argparse
-import subprocess
+import concurrent.futures
+import logging
 import os
-
+import pathlib
 from pathlib import Path
+import subprocess
+import threading
 
+from typing import Iterable
+
+future_lock = threading.Lock()
+
+# Configure logging.
+logging.basicConfig(format='-- %(message)s')
+logger = logging.getLogger().setLevel(logging.INFO)
 
 def get_object_files(target):
     target = Path(target)
@@ -88,7 +98,16 @@ def change_shared_library_path(object_file_path, old_library_path):
 
 def fix_rpath(target, root):
     for file in get_object_files(target):
-        print(f"Fixing rpaths for {file}")
+        logging.info(f"Fixing rpaths for {file}")
+
+        # Skipping numpy because there are some dylib in .dylibs in number folder that
+        # become invalid due to our rpath fixing logic.
+        # IMPORTANT:
+        #    Numpy was the only issue found, but it could happend again if new dependencies are added.
+        is_numpy = file._str.find(f"numpy")
+        if is_numpy > -1:
+            logging.info(f"Skipping {file} because numpy")
+            return
 
         for rpath in get_rpaths(file):
             output = f"\trpath: {rpath}"
@@ -97,9 +116,9 @@ def fix_rpath(target, root):
                 delete_rpath(file, rpath)
                 output += " (Deleted)"
 
-            print(output)
+            logging.info(output)
 
-        print(f"Fixing shared library paths for {file}")
+        logging.info(f"Fixing shared library paths for {file}")
 
         for library_path in get_shared_library_paths(file):
             output = f"\tlibrary path: {library_path}"
@@ -109,23 +128,51 @@ def fix_rpath(target, root):
                  new_library_path = change_shared_library_path(file, library_path)
                  output += f" (Changed to {new_library_path})"
 
-            print(output)
+            logging.info(output)
 
+def read_paths_from_file(file_path):
+    paths = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            paths.append(line.strip()) # strip() removes newline characters
+    return paths
+
+def fix_rpath_with_lock(path, root_dir):
+    with future_lock:
+        return fix_rpath(str(path), str(root_dir))
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--target", type=Path, help="Target to sanitize", required=True)
-    parser.add_argument("--root", type=Path, help="Root directory", required=True)
+    parser.add_argument("--file", type=pathlib.Path, dest="file", help="Target to sanitize")
+    parser.add_argument("--files-list", type=pathlib.Path, dest="files_list", help="Files to sanitize")
+    parser.add_argument("--root", type=pathlib.Path, dest="root_dir", help="Root directory", required=True)
 
     args = parser.parse_args()
 
-    if args.target.exists() is False:
-        raise FileNotFoundError(f"Unable to locate {args.target.absolute()}")
-    if args.root.exists() is False:
-        raise FileNotFoundError(f"Unable to locate {args.root.absolute()}")
+    if args.file is None and args.files_list is None:
+        parser.error("At least one of --file or --files-list is required.")
 
-    # fail if target is not in root
-    if args.target.resolve().relative_to(args.root.resolve()) is False:
-        raise ValueError(f"Target {args.target.absolute()} is not in root {args.root.absolute()}")
-
-    fix_rpath(str(args.target.resolve().absolute()), str(args.root.resolve().absolute()))
+    if args.file and args.file.exists() is False:
+        raise FileNotFoundError(f"Unable to locate {args.file.absolute()}")
+    elif args.files_list and args.files_list.exists() is False:
+        raise FileNotFoundError(f"Unable to locate {args.files_list.absolute()}")
+    if args.root_dir.exists() is False:
+        raise FileNotFoundError(f"Unable to locate {args.root_dir.absolute()}")
+    
+    # file option has priority over files-list.
+    if args.file:
+        # Fail if file is not in root
+        if args.file.resolve().relative_to(args.root_dir.resolve()) is False:
+            raise ValueError(f"File {args.file.absolute()} is not in root {args.root_dir.absolute()}")
+    elif args.files_list:
+        paths = read_paths_from_file(str(args.files_list.resolve().absolute()))
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            # Create a list of futures for each path to be processed.
+            futures = [executor.submit(fix_rpath_with_lock, pathlib.Path(path), args.root_dir.resolve().absolute()) for path in paths]
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    result = future.result()
+                except Exception as e:
+                    logging.error(f"Error processing path: {result}, Error: {e}")
+                    raise e
