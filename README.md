@@ -86,6 +86,11 @@ Note that on Windows, use the following command instead from an MSYS2-MinGW64 sh
 SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
 ```
 
+### NDI&reg; Video Output Support (Optional)
+
+Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
+This must be done before the `configure` step.
+
 ### Configure
 
 The project uses CMake and requires a `configure` step before building. It is during the configure step that you provide
@@ -202,3 +207,6 @@ Use the `rvinst` common build alias to install OpenRV.
 ```shell
 cmake --install _build --prefix _install
 ```
+
+See [THIRD-PARTY.md](THIRD-PARTY.md) for license information
+about portions of Open RV that have been imported from other projects.
