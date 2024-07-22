@@ -86,6 +86,15 @@ Note that on Windows, use the following command instead from an MSYS2-MinGW64 sh
 SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
 ```
 
+### Blackmagicdesign&reg; Video Output Support (Optional)
+
+Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): https://www.blackmagicdesign.com/desktopvideo_sdk<br>
+Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
+Example:
+```bash
+rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'
+```
+
 ### NDI&reg; Video Output Support (Optional)
 
 Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
