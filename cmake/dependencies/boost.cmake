@@ -4,6 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# IMPORTANT: CMake minimum version need to be increased everytime Boost version is increased.
+#            e.g. CMake 3.27 is needed for Boost 1.82 to be found by FindBoost.cmake.
+#
+#            Starting from CMake 3.30, FindBoost.cmake has been removed in favor of BoostConfig.cmake (Boost 1.70+).
+#            This behavior is covered by CMake policy CMP0167.
+
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
@@ -23,7 +29,6 @@ IF(RV_TARGET_DARWIN)
     MESSAGE(STATUS "Clang version ${CLANG_VERSION_STRING} is not compatible with Boost 1.80, using Boost 1.81 instead. "
                    "Install XCode 14.3.1 if you absolutely want to use Boost version 1.80 as per VFX reference platform CY2023"
     )
-
     SET(_BOOST_DETECTED_XCODE_15_ ON)
   ENDIF()
 ENDIF()
@@ -56,6 +61,7 @@ ELSE()
   # XCode 15 and above. (Need Boost 1.81+)
   RV_VFX_SET_VARIABLE(
     _ext_boost_version
+    # Use Boost 1.81.0 for VFX2023 (Boost 1.80.0 does not work with XCode 15)
     CY2023 "1.81.0"
     CY2024 "${_BOOST_VFX2024_VERSION_}"
   )
@@ -210,19 +216,6 @@ ELSE()
   )
 ENDIF()
 
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-
-  SET(_b2_command
-      ${_darwin_x86_64} ${_b2_command}
-  )
-  SET(_bootstrap_command
-      ${_darwin_x86_64} ${_bootstrap_command}
-  )
-ENDIF()
-
 IF(RV_TARGET_WINDOWS)
   SET(_boost_python_bin
       ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/python.exe
@@ -241,6 +234,13 @@ LIST(
           OUTPUT_VARIABLE _boost_with_list
 )
 
+SET(__boost_arch__ x86)
+IF(APPLE)
+  IF(RV_TARGET_APPLE_ARM64)
+    SET(__boost_arch__ arm)
+  ENDIF()
+ENDIF()
+
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS Python::Python
@@ -255,7 +255,7 @@ EXTERNALPROJECT_ADD(
   BUILD_COMMAND
     # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
     # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
-    ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=x86 address-model=64
+    ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=${__boost_arch__} address-model=64
     ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
   INSTALL_COMMAND echo "Boost was both built and installed in the build stage"
   BUILD_IN_SOURCE TRUE
