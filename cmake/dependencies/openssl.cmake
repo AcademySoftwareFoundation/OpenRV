@@ -37,6 +37,7 @@ ELSE()
   SET(_version
       "1.1.1u"
   )
+  string(REPLACE "." "_" _version_underscored ${_version})
 
   IF(RV_TARGET_WINDOWS
      AND (NOT RV_DEPS_WIN_PERL_ROOT
@@ -68,7 +69,7 @@ ELSE()
   )
 
   SET(_download_url
-      "https://www.openssl.org/source/openssl-${_version}.tar.gz"
+      "https://github.com/openssl/openssl/releases/download/OpenSSL_${_version_underscored}/openssl-${_version}.tar.gz"
   )
   SET(_download_hash
       "72f7ba7395f0f0652783ba1089aa0dcc"
