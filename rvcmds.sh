@@ -21,22 +21,54 @@ if [[ $SOURCED == 0 ]]; then
   exit 1
 fi
 
-QT_VERSION="${QT_VERSION:-5.15.2}"
+# Linux
 if [[ "$OSTYPE" == "linux"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
-  QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/gcc_64}"
+
+# MacOS
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
-  QT_HOME="${QT_HOME:-$HOME/Qt/${QT_VERSION}/clang_64}"
+
+# Windows
 elif [[ "$OSTYPE" == "msys"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Visual Studio 17 2022}"
-  QT_HOME="${QT_HOME:-c:/Qt/${QT_VERSION}/msvc2019_64}"
   WIN_PERL="${WIN_PERL:-c:/Strawberry/perl/bin}"
   CMAKE_WIN_ARCH="${CMAKE_WIN_ARCH:--A x64}"
   SETUPTOOLS_USE_DISTUTILS=stdlib
+
 else
   echo "OS does not seem to be linux, darwin or msys. Exiting."
   exit 1
+fi
+
+# Searching for a Qt installation path if it has not already been set
+if [ -z "$QT_HOME" ]; then
+  echo "Searching for Qt installation..."
+
+  if [[ "$OSTYPE" == "linux"* ]]; then
+    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/gcc_64' | sort -V | tail -n 1)
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/macos' | sort -V | tail -n 1)
+
+    # If no macos installation found, try clang_64
+    if [ -z "$QT_HOME" ]; then
+      QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
+    fi
+    
+  elif [[ "$OSTYPE" == "msys"* ]]; then
+    QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
+  fi
+
+  # Could not find Qt installation
+  if [ -z "$QT_HOME" ]; then
+    echo "Could not find Qt installation. Please set QT_HOME to the correct path in your environment variables."
+  else 
+    echo "Found Qt installation at $QT_HOME"
+  fi
+
+# Qt installation path already set
+else 
+  echo "Using Qt installation already set at $QT_HOME"
 fi
 
 # VARIABLES

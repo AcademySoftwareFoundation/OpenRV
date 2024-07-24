@@ -40,6 +40,10 @@ FUNCTION(before_copy_platform FILE_PATH RET_VAL)
   RETURN()
 ENDFUNCTION()
 
-FUNCTION(after_copy_platform FILE_PATH)
+FUNCTION(after_copy_platform FILE_PATH FILES_TO_FIX_RPATH)
 
 ENDFUNCTION()
+
+MACRO(post_install_platform)
+
+ENDMACRO()

@@ -4,5 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+ADD_SUBDIRECTORY(output)
 ADD_SUBDIRECTORY(python)
 ADD_SUBDIRECTORY(rv-packages)

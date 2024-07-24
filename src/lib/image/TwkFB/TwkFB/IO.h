@@ -608,8 +608,6 @@ private:
 //  This class should not be instantiated. Just call the static functions.
 //
 
-class PluginsLocker;
-
 class TWKFB_EXPORT GenericIO
 {
 public:
@@ -740,7 +738,6 @@ private:
     static Plugins& plugins();
 
     static Plugins* m_plugins;
-    static PluginsLocker* m_locker;
 };
 #endif
 

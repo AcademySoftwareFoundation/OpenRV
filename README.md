@@ -86,6 +86,20 @@ Note that on Windows, use the following command instead from an MSYS2-MinGW64 sh
 SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
 ```
 
+### Blackmagicdesign&reg; Video Output Support (Optional)
+
+Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): https://www.blackmagicdesign.com/desktopvideo_sdk<br>
+Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
+Example:
+```bash
+rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'
+```
+
+### NDI&reg; Video Output Support (Optional)
+
+Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
+This must be done before the `configure` step.
+
 ### Configure
 
 The project uses CMake and requires a `configure` step before building. It is during the configure step that you provide
@@ -97,6 +111,18 @@ QT5 package.
 #### Common build alias
 
 Use the `rvcfg` (the common build alias) to run the configuration step. You can also use `rvcfgd` to configure in Debug.
+
+#### How to enable non free FFmpeg codecs
+
+Legal Notice: Non free FFmpeg codecs are disabled by default. Please check with your legal department whether you have the proper licenses and rights to use these codecs. 
+ASWF is not responsible for any unlicensed use of these codecs.
+
+The RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE and RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE can optionally be specified at configure time to enable non free FFmpeg decoders and encoders respectively.
+
+Example:
+```bash
+rvcfg -DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE="aac;hevc" -DRV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE="aac"
+```
 
 #### Manually
 
@@ -190,3 +216,6 @@ Use the `rvinst` common build alias to install OpenRV.
 ```shell
 cmake --install _build --prefix _install
 ```
+
+See [THIRD-PARTY.md](THIRD-PARTY.md) for license information
+about portions of Open RV that have been imported from other projects.

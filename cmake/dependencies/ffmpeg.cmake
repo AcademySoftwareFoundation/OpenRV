@@ -52,19 +52,6 @@ SET(_configure_command
     sh ./configure
 )
 
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
-  SET(_configure_command
-      ${_darwin_x86_64} ${_configure_command}
-  )
-ENDIF()
-
 SET(_include_dir
     ${_install_dir}/include
 )
@@ -191,35 +178,65 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
 ENDIF()
 
+# Controls the EXTERNALPROJECT_ADD/BUILD_ALWAYS option
+SET(${_force_rebuild}
+    FALSE
+)
+
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
 IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
-  LIST(APPEND _disabled_decoders "--disable-decoder=bink")
-  LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_dct")
-  LIST(APPEND _disabled_decoders "--disable-decoder=binkaudio_rdft")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_cuvid")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_mediacodec")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_qsv")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_rkmpp")
-  LIST(APPEND _disabled_decoders "--disable-decoder=vp9_v4l2m2m")
-  LIST(APPEND _disabled_decoders "--disable-decoder=dnxhd")
-  LIST(APPEND _disabled_decoders "--disable-decoder=prores")
-  LIST(APPEND _disabled_decoders "--disable-decoder=qtrle")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac_at")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac_fixed")
-  LIST(APPEND _disabled_decoders "--disable-decoder=aac_latm")
-  LIST(APPEND _disabled_decoders "--disable-decoder=dvvideo")
+  SET(NON_FREE_DECODERS_TO_DISABLE
+      "aac"
+      "aac_at"
+      "aac_fixed"
+      "aac_latm"
+      "bink"
+      "binkaudio_dct"
+      "binkaudio_rdft"
+      "dnxhd"
+      "dvvideo"
+      "prores"
+      "qtrle"
+      "vp9"
+      "vp9_cuvid"
+      "vp9_mediacodec"
+      "vp9_qsv"
+      "vp9_rkmpp"
+      "vp9_v4l2m2m"
+  )
 
-  LIST(APPEND _disabled_encoders "--disable-encoder=dnxhd")
-  LIST(APPEND _disabled_encoders "--disable-encoder=prores")
-  LIST(APPEND _disabled_encoders "--disable-encoder=qtrle")
-  LIST(APPEND _disabled_encoders "--disable-encoder=aac")
-  LIST(APPEND _disabled_encoders "--disable-encoder=aac_mf")
-  LIST(APPEND _disabled_encoders "--disable-encoder=vp9_qsv")
-  LIST(APPEND _disabled_encoders "--disable-encoder=vp9_vaapi")
-  LIST(APPEND _disabled_encoders "--disable-encoder=dvvideo")
+  FOREACH(
+    NON_FREE_DECODER_TO_DISABLE
+    ${NON_FREE_DECODERS_TO_DISABLE}
+  )
+    IF(NOT NON_FREE_DECODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE)
+      LIST(APPEND _disabled_decoders "--disable-decoder=${NON_FREE_DECODER_TO_DISABLE}")
+    ELSE()
+      MESSAGE(STATUS "FFmpeg decoder ${NON_FREE_DECODER_TO_DISABLE} enabled")
+    ENDIF()
+  ENDFOREACH()
+
+  SET(NON_FREE_ENCODERS_TO_DISABLE
+      "aac"
+      "aac_mf"
+      "dnxhd"
+      "dvvideo"
+      "prores"
+      "qtrle"
+      "vp9_qsv"
+      "vp9_vaapi"
+  )
+  FOREACH(
+    NON_FREE_ENCODER_TO_DISABLE
+    ${NON_FREE_ENCODERS_TO_DISABLE}
+  )
+    IF(NOT NON_FREE_ENCODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE)
+      LIST(APPEND _disabled_encoders "--disable-encoder=${NON_FREE_ENCODER_TO_DISABLE}")
+    ELSE()
+      MESSAGE(STATUS "FFmpeg encoder ${NON_FREE_ENCODER_TO_DISABLE} enabled")
+    ENDIF()
+  ENDFOREACH()
 
   LIST(APPEND _disabled_parsers "--disable-parser=vp9")
 
@@ -232,6 +249,16 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   SET(RV_FFMPEG_CONFIG_OPTIONS
       ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   )
+
+  IF(NOT RV_FFMPEG_CONFIG_OPTIONS STREQUAL RV_FFMPEG_CONFIG_OPTIONS_CACHE)
+    SET(${_force_rebuild}
+        TRUE
+    )
+    SET(RV_FFMPEG_CONFIG_OPTIONS_CACHE
+        ${RV_FFMPEG_CONFIG_OPTIONS}
+        CACHE STRING "FFmpeg config options" FORCE
+    )
+  ENDIF()
 ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
@@ -284,7 +311,7 @@ EXTERNALPROJECT_ADD(
   BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
+  BUILD_ALWAYS ${_force_rebuild}
   BUILD_BYPRODUCTS ${_build_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
@@ -323,7 +350,6 @@ FOREACH(
 
   LIST(APPEND RV_DEPS_LIST ffmpeg::${_ffmpeg_lib})
 ENDFOREACH()
-
 
 TARGET_LINK_LIBRARIES(
   ffmpeg::avutil
@@ -367,14 +393,16 @@ IF(RV_TARGET_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
     COMMAND cmake -E touch ${${_target}-stage-flag}
+    BYPRODUCTS ${${_target}-stage-flag}
   )
 ELSE()
   ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
     COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${${_target}-stage-flag}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
     COMMAND cmake -E touch ${${_target}-stage-flag}
-    DEPENDS ${_target}
+    BYPRODUCTS ${${_target}-stage-flag}
   )
 ENDIF()
 

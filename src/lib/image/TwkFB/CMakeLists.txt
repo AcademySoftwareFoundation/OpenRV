@@ -23,7 +23,6 @@ SET(_sources
     TwkFBThreadPool.cpp
     FastMemcpy.cpp
     FastConversion.cpp
-    PluginsLocker.cpp
 )
 
 ADD_LIBRARY(

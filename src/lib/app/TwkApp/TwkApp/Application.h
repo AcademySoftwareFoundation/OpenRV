@@ -10,9 +10,9 @@
 #include <TwkUtil/Notifier.h>
 #include <TwkApp/Document.h>
 #include <TwkApp/OutputPlugins.h>
+#include <TwkApp/VideoModule.h>
 
 namespace TwkApp {
-class VideoModule;
 
 //
 //  class Application
@@ -38,7 +38,7 @@ class Application : public TwkUtil::Notifier
     //
 
     typedef std::vector<Document*>    Documents;
-    typedef std::vector<VideoModule*> VideoModules;
+    typedef std::vector<std::shared_ptr<VideoModule>> VideoModules;
     typedef TwkUtil::Notifier         Notifier;
 
     //
@@ -59,7 +59,7 @@ class Application : public TwkUtil::Notifier
 
     void loadOutputPlugins(const std::string& envvar);
     void unloadOutputPlugins();
-    void addVideoModule(VideoModule* m) { m_videoModules.push_back(m); }
+    void addVideoModule(VideoModule* m) { m_videoModules.push_back(std::shared_ptr<VideoModule>(m)); }
     virtual VideoModule* primaryVideoModule() const;
     const VideoModules& videoModules() const { return m_videoModules; }
 

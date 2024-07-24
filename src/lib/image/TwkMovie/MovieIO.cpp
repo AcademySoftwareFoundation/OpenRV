@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <stl_ext/string_algo.h>
 #include <dlfcn.h>
+#include <mutex>
 
 #ifndef PLATFORM_WINDOWS
 #include <unistd.h>
@@ -25,6 +26,8 @@
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif
+
+static std::mutex plugin_mutex;
 
 static bool TwkMovie_GenericIO_debug = false;
 TWKMOVIE_EXPORT void TwkMovie_GenericIO_setDebug(bool b)
@@ -261,13 +264,11 @@ ProxyMovieIO::about() const
 GenericIO::Plugins* GenericIO::m_plugins = 0;
 bool GenericIO::m_loadedAll = false;
 bool GenericIO::m_dnxhdDecodingAllowed = true;
-TwkFB::PluginsLocker* GenericIO::m_locker = 0;
 
 void 
 GenericIO::init()
 {
     if (!m_plugins) m_plugins = new Plugins();
-    if (!m_locker) m_locker = new TwkFB::PluginsLocker();
 }
 
 void 
@@ -283,12 +284,6 @@ GenericIO::shutdown()
         }
         delete m_plugins;
         m_plugins = 0;
-    }
-
-    if (m_locker)
-    {
-        delete m_locker;
-        m_locker = 0;
     }
 
     m_loadedAll = false;
@@ -546,7 +541,7 @@ GenericIO::findByExtension(const string& extension,
 {
     if (!plugins().empty())
     {
-        TwkFB::PluginsLockerGuard lockerGuard( m_locker );
+        std::lock_guard<std::mutex> guard(plugin_mutex);
         for (bool restart = true; restart;)
         {
             restart = false;
@@ -599,7 +594,7 @@ GenericIO::findAllByExtension(const string& extension,
 
     if (!plugins().empty())
     {
-        TwkFB::PluginsLockerGuard lockerGuard( m_locker );
+        std::lock_guard<std::mutex> guard(plugin_mutex);
         for (bool restart = true; restart;)
         {
             restart = false;
@@ -650,7 +645,7 @@ GenericIO::findByBruteForce(const std::string& filename,
         cerr << "INFO: trying brute force to find an image reader for " 
              << basename(filename) << endl;
 
-        TwkFB::PluginsLockerGuard lockerGuard( m_locker );
+        std::lock_guard<std::mutex> guard(plugin_mutex);
         for (bool restart = true; restart;)
         {
             restart = false;
