@@ -622,9 +622,22 @@ class: AnnotateMinorMode : MinorMode
         populateAnnotationList();
     }
 
-    method: getTextFromClipboard(string;)
+    method: getTextFromClipboard (void; Event event)
     {
+        // Getting text directly from the users clipboard
+        let text = commands.getTextFromClipboard();
 
+        if (text == "") {
+            print("WARNING: Clipboard is empty");
+
+        } else {
+            _textPlacementMode = true;
+
+            for (int i = 0; i < text.size(); i++)
+                _textBuffer.push_back(text[i]);
+
+            setText(_textBuffer);
+        }
     }
 
     //----------------------------------------------------------------------
@@ -1108,12 +1121,6 @@ class: AnnotateMinorMode : MinorMode
         commands.setCursor(d.cursor);
         updateDrawModeUI();
         _toolSliderLabel.setText(if d.sliderName eq nil then "Opacity" else d.sliderName);
-    }
-
-    method: getClipboard(string;)
-    {
-        print("DEBUG: Getting clipboard from Mu file");
-        commands.getTextFromClipboard();
     }
 
     method: locationChangedSlot (void; Qt.DockWidgetArea area)
@@ -2159,14 +2166,14 @@ class: AnnotateMinorMode : MinorMode
                           ("key-down--backspace", backwardDeleteChar, "Back Char"),
                           ("key-down--delete", backwardDeleteChar, "Back Char"),
                           ("key-down--control--a", killLine, ""),
-                          ("key-down--meta--backspace", backwardsKillWord, ""),
+                          //("key-down--meta--backspace", backwardsKillWord, ""),
                           ("key-down--alt--backspace", backwardsKillWord, ""),
                           ("key-down--shift--backspace", backwardsKillWord, ""),
-                          ("key-down--control--backspace", backwardsKillWord, ""),
+                          //("key-down--control--backspace", backwardsKillWord, ""),
+                          ("key-down--meta--backspace", getTextFromClipboard, ""),
                           ("key-down--meta--a", killLine, ""),
                           ("key-down--alt--a", killLine, ""),
-                          // ("key-down--space", insertChar, ""),
-                          ("key-down--space", getClipboard, ""),
+                          ("key-down--space", insertChar, ""),
                           ("key-down--enter", insertNL, ""),
                           ("key-down--control--enter", commitText(false,), ""),
                           ("key-down--meta--enter", commitText(false,), ""),
