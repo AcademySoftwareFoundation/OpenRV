@@ -51,6 +51,9 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QTextEdit>
+#include <QApplication>
+#include <QClipboard>
+#include <QString>
 
 #ifndef PLATFORM_WINDOWS
 extern char **environ;
@@ -1444,6 +1447,26 @@ RvApplication::putUrlOnClipboard(string url, string title, bool doEncode)
         clipboard->clear (QClipboard::Clipboard);
         clipboard->setText(fullUrl, QClipboard::Clipboard);
     #endif
+}
+
+std::string
+RvApplication::getTextFromClipboard()
+{
+    QString text;
+    QClipboard *clipboard = QApplication::clipboard();
+
+    #if defined(PLATFORM_DARWIN)
+        text = clipboard->text(QClipboard::Clipboard);
+    #elif defined(PLATFORM_WINDOWS)
+        text = clipboard->text(QClipboard::Clipboard);
+    #else
+        text = clipboard->text(QClipboard::Selection);
+        if (text.isEmpty()) {
+            text = clipboard->text(QClipboard::Clipboard);
+        }
+    #endif
+
+    return text.toUtf8().constData();
 }
 
 void

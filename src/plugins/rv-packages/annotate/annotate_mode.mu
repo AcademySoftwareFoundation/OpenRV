@@ -622,6 +622,11 @@ class: AnnotateMinorMode : MinorMode
         populateAnnotationList();
     }
 
+    method: getTextFromClipboard(string;)
+    {
+
+    }
+
     //----------------------------------------------------------------------
 
     method: pointerLocation ((string, Point); Event event)
@@ -1103,6 +1108,12 @@ class: AnnotateMinorMode : MinorMode
         commands.setCursor(d.cursor);
         updateDrawModeUI();
         _toolSliderLabel.setText(if d.sliderName eq nil then "Opacity" else d.sliderName);
+    }
+
+    method: getClipboard(string;)
+    {
+        print("DEBUG: Getting clipboard from Mu file");
+        commands.getTextFromClipboard();
     }
 
     method: locationChangedSlot (void; Qt.DockWidgetArea area)
@@ -2154,7 +2165,8 @@ class: AnnotateMinorMode : MinorMode
                           ("key-down--control--backspace", backwardsKillWord, ""),
                           ("key-down--meta--a", killLine, ""),
                           ("key-down--alt--a", killLine, ""),
-                          ("key-down--space", insertChar, ""),
+                          // ("key-down--space", insertChar, ""),
+                          ("key-down--space", getClipboard, ""),
                           ("key-down--enter", insertNL, ""),
                           ("key-down--control--enter", commitText(false,), ""),
                           ("key-down--meta--enter", commitText(false,), ""),
