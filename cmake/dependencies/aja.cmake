@@ -7,13 +7,8 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-SET(_target
-    "RV_DEPS_AJA"
-)
-
-SET(_version
-    "16.2"
-)
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_AJA" "16.2" "make" "")
+RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_patch
     "bugfix5"
@@ -100,10 +95,11 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   INSTALL_DIR ${_install_dir}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -G Ninja -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DAJA_BUILD_APPS=OFF ${RV_DEPS_BASE_DIR}/${_target}/src
-  BUILD_COMMAND ${_make_command} -j${_cpu_count}
-  INSTALL_COMMAND ${_make_command} install
+  # Not using _cmake_build_command and _cmake_install_command since the build dir need to change.
+  BUILD_COMMAND ${CMAKE_COMMAND} --build ${RV_DEPS_BASE_DIR}/${_target}/src --config ${CMAKE_BUILD_TYPE} -j${_cpu_count}
+  INSTALL_COMMAND ${CMAKE_COMMAND} --install ${RV_DEPS_BASE_DIR}/${_target}/src --prefix ${_install_dir} --config ${CMAKE_BUILD_TYPE}
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_aja_ntv2_lib}
