@@ -1450,7 +1450,7 @@ RvApplication::putUrlOnClipboard(string url, string title, bool doEncode)
 }
 
 std::string
-RvApplication::getTextFromClipboard()
+RvApplication::pasteTextFromClipboard()
 {
     QString text;
     QClipboard *clipboard = QApplication::clipboard();

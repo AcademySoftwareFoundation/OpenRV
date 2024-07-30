@@ -279,7 +279,7 @@ void initUICommands(MuLangContext* context)
                                       new Param(c, "doEncode", "bool", Value(true)), 
                                       End),
 
-                         new Function(c, "getTextFromClipboard", getTextFromClipboard, None,
+                         new Function(c, "pasteTextFromClipboard", pasteTextFromClipboard, None,
                                       Return, "string",
                                       End),
 
@@ -470,7 +470,7 @@ NODE_DECLARATION(putUrlOnClipboard, void)
 {
 }
 
-NODE_DECLARAION(getTextFromClipboard, Mu::Pointer)
+NODE_DECLARAION(pasteTextFromClipboard, Mu::Pointer)
 {
     NODE_RETURN(0); // Will represent a string
 }

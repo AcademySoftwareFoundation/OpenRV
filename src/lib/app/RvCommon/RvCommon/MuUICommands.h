@@ -61,7 +61,7 @@ NODE_DECLARATION(httpPutString, void);
 NODE_DECLARATION(httpPutData, void);
 NODE_DECLARATION(sessionFromUrl, void);
 NODE_DECLARATION(putUrlOnClipboard, void);
-NODE_DECLARATION(getTextFromClipboard, Mu::Pointer);
+NODE_DECLARATION(pasteTextFromClipboard, Mu::Pointer);
 NODE_DECLARATION(myNetworkPort, int);
 NODE_DECLARATION(myNetworkHost, Mu::Pointer);
 NODE_DECLARATION(encodePassword, Mu::Pointer);

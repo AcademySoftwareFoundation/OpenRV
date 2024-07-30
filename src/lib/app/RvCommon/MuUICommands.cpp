@@ -491,7 +491,7 @@ void initUICommands()
                                       new Param(c, "doEncode", "bool", Value(true)),
                                       End),
 
-                         new Function(c, "getTextFromClipboard", getTextFromClipboard, None,
+                         new Function(c, "pasteTextFromClipboard", pasteTextFromClipboard, None,
                                       Return, "string",
                                       End),
 
@@ -2042,9 +2042,9 @@ NODE_IMPLEMENTATION(sessionFromUrl, void)
     RvApp()->sessionFromUrl(url->c_str());
 }
 
-NODE_IMPLEMENTATION(getTextFromClipboard, Pointer) {
+NODE_IMPLEMENTATION(pasteTextFromClipboard, Pointer) {
     const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
-    std::string s = RvApp()->getTextFromClipboard(); // Getting text from the clipboard
+    std::string s = RvApp()->pasteTextFromClipboard(); // Getting text from the clipboard
     Mu::Pointer p = stype->allocate(s.c_str());
     NODE_RETURN(p);
 }
