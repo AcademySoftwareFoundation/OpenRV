@@ -1454,18 +1454,7 @@ RvApplication::pasteTextFromClipboard()
 {
     QString text;
     QClipboard *clipboard = QApplication::clipboard();
-
-    #if defined(PLATFORM_DARWIN)
-        text = clipboard->text(QClipboard::Clipboard);
-    #elif defined(PLATFORM_WINDOWS)
-        text = clipboard->text(QClipboard::Clipboard);
-    #else
-        text = clipboard->text(QClipboard::Selection);
-        if (text.isEmpty()) {
-            text = clipboard->text(QClipboard::Clipboard);
-        }
-    #endif
-
+    text = clipboard->text(QClipboard::Clipboard);
     return text.toUtf8().constData();
 }
 
