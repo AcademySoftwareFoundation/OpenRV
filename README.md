@@ -83,13 +83,15 @@ Use the `rvsetup` common build alias to run the bootstrap step.
 
 #### Manually
 
+See the **Using a Python Virtual Environment** before running any of the commands in this section. Python packages should be installed inside of a virtual environment. 
+
 ```bash
-python3 -m pip install --user --upgrade -r requirements.txt
+python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt
 ```
 
 Note that on Windows, use the following command instead from an MSYS2-MinGW64 shell:
 ```bash
-SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
+SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --upgrade -r requirements.txt
 ```
 
 ### Configure
