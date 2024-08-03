@@ -11,7 +11,7 @@ SET(_target
 )
 
 SET(_sources
-    GLT.cpp TwkGLText.cpp defaultFont.cpp
+    GLT.cpp TwkGLText.cpp defaultFont.cpp noto.cpp
 )
 
 FIND_PACKAGE(OpenGL REQUIRED)

@@ -6,6 +6,7 @@
 //******************************************************************************
 #include <TwkGLText/TwkGLText.h>
 #include <TwkGLText/defaultFont.h>
+#include <TwkGLText/noto.h>
 #include <TwkGLText/GLT.h>
 #include <FTGL/ftgl.h>
 #include <TwkExc/TwkExcException.h>
@@ -41,7 +42,7 @@ void gltFace(const std::string& fontName, size_t fontSize)
 
     if (!face)
     {
-        face = new GLTFace(default_font, 67548); 
+        face = new GLTFace(notoFont, notoFontSize); 
         face->FaceSize(fontSize);
         cache[d] = face;
     }
