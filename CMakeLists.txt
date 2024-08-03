@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-CMAKE_MINIMUM_REQUIRED(VERSION 3.24)
+
+# Need 3.27 for Boost 1.82 (FindBoost.cmake).
+CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 
 # These variables are parsed by sphinx for the documentation. One-line formatting facilitates parsing and readability.
 # cmake-format: off

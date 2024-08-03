@@ -14,6 +14,9 @@
 
 #include <Python.h>
 
+#include <array>
+#include <string_view>
+
 namespace
 {
   static ENVVAR_BOOL( evUseMediaLibraryPlugins, "RV_USE_MEDIA_LIBRARY_PLUGINS",
