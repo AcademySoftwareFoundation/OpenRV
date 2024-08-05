@@ -76,7 +76,7 @@ bool fileExistsWithLongPathSupport(const string& filePath)
         return true;
     } else {
         DWORD error = GetLastError();
-        return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
+        return false;
     }
 }
 #endif
@@ -226,8 +226,7 @@ bool fileExists( const char *fname )
 #ifdef PLATFORM_WINDOWS
 
     string filePath = fname; // Casting to string
-    bool fileExists = (filePath.length() > 260) && fileExistsWithLongPathSupport(filePath);
-    if fileExists return true; 
+    if (filePath.length() > 260) return fileExistsWithLongPathSupport(filePath);
 
 #endif
 
