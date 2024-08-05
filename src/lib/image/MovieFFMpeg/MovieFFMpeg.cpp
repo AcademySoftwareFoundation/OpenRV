@@ -38,6 +38,7 @@
 #include <mp4v2Utils/mp4v2Utils.h>
 #include <string>
 #include <cstring>
+#include <iostream>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -121,6 +122,38 @@ using namespace TwkAudio;
 // The MovieTimer and TimingDetails debugging helper classes that are used to
 // keep track of time spent in various parts of the seeking and decoding loops.
 //
+
+#ifdef PLATFORM_WINDOWS
+#include <windows.h>
+
+bool checkForLongFilePath(const string& filePath)
+{
+    // Convert the filepath to a wide string to accomodate all UTF-8 characters
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, filePath.c_str(), -1, nullptr, 0);
+    wstring wFilePath(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, filePath.c_str(), -1, &wFilePath[0], size_needed);
+
+    wstring extendedFilePath = L"\\\\?\\" + wFilePath;
+
+    HANDLE fileHandle = CreateFileW(
+        extendedFilePath.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr
+    );
+
+    if (fileHandle != INVALID_HANDLE_VALUE) {
+        CloseHandle(fileHandle);
+        return true;
+    } else {
+        DWORD error = GetLastError();
+        return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
+    }
+}
+#endif
 
 struct MovieTimer
 {
@@ -1143,7 +1176,17 @@ bool
 MovieFFMpegReader::openAVFormat()
 {
     const bool filepathIsURL = TwkUtil::pathIsURL(m_filename);
-    const bool fileExists = !filepathIsURL && boost::filesystem::exists(UNICODE_STR(m_filename));
+    bool fileExists = !filepathIsURL && boost::filesystem::exists(UNICODE_STR(m_filename));
+
+    // If the filepath is longer that 260 characters in Windows
+    #ifdef PLATFORM_WINDOWS
+    if (m_filename.length() > 260)
+    {
+        // Check if the file exists using the extended path
+        fileExists = checkForLongFilePath(m_filename);
+    }
+    #endif
+
     if (!filepathIsURL && !fileExists)
     {
         TWK_THROW_EXC_STREAM(
