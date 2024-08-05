@@ -55,7 +55,7 @@ string to_utf8(const wchar_t *wc)
 }
 
 #ifdef PLATFORM_WINDOWS
-bool detectLongPathInWindows(const string& filePath)
+bool fileExistsWithLongPathSupport(const string& filePath)
 {
     // Convert the filepath to a wide string to accomodate all UTF-8 characters
     wstring wFilePath = to_wstring(filePath.c_str());
@@ -223,15 +223,15 @@ bool fileExists( const char *fname )
     struct stat statBuf;
 #endif
 
-    int status = TwkUtil::stat( fname, &statBuf );
-
 #ifdef PLATFORM_WINDOWS
 
-    string filePath = fname;
-    bool fileExists = (filePath.length() > 260) && detectLongPathInWindows(filePath);
-    status = fileExists ? 0 : 1;
+    string filePath = fname; // Casting to string
+    bool fileExists = (filePath.length() > 260) && fileExistsWithLongPathSupport(filePath);
+    if fileExists return true; 
 
 #endif
+
+    int status = TwkUtil::stat( fname, &statBuf );
 
     if ( status != 0 )
     {
