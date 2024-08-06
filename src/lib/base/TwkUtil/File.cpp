@@ -57,7 +57,7 @@ string to_utf8(const wchar_t *wc)
 #ifdef PLATFORM_WINDOWS
 bool fileExistsWithLongPathSupport(const string& filePath)
 {
-    // Convert the filepath to a wide string to accomodate all UTF-8 characters
+    // Convert the filepath to a wide string to accommodate all UTF-8 characters
     wstring wFilePath = to_wstring(filePath.c_str());
     wstring extendedFilePath = L"\\\\?\\" + wFilePath;
 
@@ -74,10 +74,8 @@ bool fileExistsWithLongPathSupport(const string& filePath)
     if (fileHandle != INVALID_HANDLE_VALUE) {
         CloseHandle(fileHandle);
         return true;
-    } else {
-        DWORD error = GetLastError();
-        return false;
     }
+    return false;
 }
 #endif
 
