@@ -2778,11 +2778,11 @@ namespace IPCore
     const bool filepathIsURL = TwkUtil::pathIsURL( filename );
     if( !filepathIsURL )
     {
-      boost::filesystem::path p( UNICODE_STR( filename ) );
-      if( boost::filesystem::exists( p ) )
+      if(TwkUtil::fileExists(filename.c_str()))
       {
         try
         {
+          boost::filesystem::path p( UNICODE_STR( filename ) );
           const auto size = boost::filesystem::file_size( p );
 
           //

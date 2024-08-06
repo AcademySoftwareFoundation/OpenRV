@@ -1143,7 +1143,7 @@ bool
 MovieFFMpegReader::openAVFormat()
 {
     const bool filepathIsURL = TwkUtil::pathIsURL(m_filename);
-    const bool fileExists = !filepathIsURL && boost::filesystem::exists(UNICODE_STR(m_filename));
+    const bool fileExists = !filepathIsURL && TwkUtil::fileExists(m_filename.c_str());
     if (!filepathIsURL && !fileExists)
     {
         TWK_THROW_EXC_STREAM(

@@ -3770,12 +3770,12 @@ RvSession::checkForStereoPaths(const string& filename, StringVector& movies)
             {
                 string Vfilename = swapV(vfilename, "%V", m_VStrings[j]);
                 ExistingFileList Vfiles = existingFilesInSequence(Vfilename);
-                if (Vfiles.size() > 0 && boost::filesystem::exists(Vfiles[0].name))
+                if (Vfiles.size() > 0 && TwkUtil::fileExists(Vfiles[0].name.c_str()))
                 {
                     movies.push_back(Vfilename);
                     string rfilename = swapV(swapV(filename, "%v", m_vStrings[i+1]), "%V", m_VStrings[j+1]);
                     ExistingFileList rfiles = existingFilesInSequence(rfilename);
-                    if (rfiles.size() > 0 && boost::filesystem::exists(rfiles[0].name))
+                    if (rfiles.size() > 0 && TwkUtil::fileExists(rfiles[0].name.c_str()))
                     {
                         movies.push_back(rfilename);
                     }

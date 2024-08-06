@@ -33,6 +33,7 @@
 #include <stl_ext/string_algo.h>
 
 #ifdef PLATFORM_WINDOWS
+#include <windows.h>
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 std::mutex g_perms_mutex;
 #endif
@@ -52,6 +53,31 @@ string to_utf8(const wchar_t *wc)
     wstring_convert<codecvt_utf8_utf16<wchar_t>, wchar_t> wstr;
     return wstr.to_bytes(wc);
 }
+
+#ifdef PLATFORM_WINDOWS
+bool fileExistsWithLongPathSupport(const string& filePath)
+{
+    // Convert the filepath to a wide string to accommodate all UTF-8 characters
+    wstring wFilePath = to_wstring(filePath.c_str());
+    wstring extendedFilePath = L"\\\\?\\" + wFilePath;
+
+    HANDLE fileHandle = CreateFileW(
+        extendedFilePath.c_str(),
+        GENERIC_READ,
+        FILE_SHARE_READ,
+        nullptr,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr
+    );
+
+    if (fileHandle != INVALID_HANDLE_VALUE) {
+        CloseHandle(fileHandle);
+        return true;
+    }
+    return false;
+}
+#endif
 
 int stat(const char *c, struct _stat64 *buffer)
 {
@@ -194,6 +220,14 @@ bool fileExists( const char *fname )
 #else
     struct stat statBuf;
 #endif
+
+#ifdef PLATFORM_WINDOWS
+
+    string filePath = fname; // Casting to string
+    if (filePath.length() > 260) return fileExistsWithLongPathSupport(filePath);
+
+#endif
+
     int status = TwkUtil::stat( fname, &statBuf );
 
     if ( status != 0 )
