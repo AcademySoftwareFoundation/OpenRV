@@ -598,10 +598,16 @@ def install() -> None:
     if platform.system() == "Windows":
         build_path = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
         parent = os.path.dirname(SOURCE_DIR)
+
+        # Using the python that OpenRV built to execute the script because it seems
+        # like it need to be the same dot release. (e.g. run the script with 3.11 to install a 3.11)
+        python_executable = "python"
+        if VARIANT == "Debug":
+            python_executable = "python_d"
+        python_executable = os.path.join(build_path, python_executable)
+
         install_args = [
-            # Using the python that OpenRV built to execute the script because it seems
-            # like it need to be the same dot release. (e.g. run the script with 3.11 to install a 3.11)
-            os.path.join(build_path, "python"),
+            python_executable,
             os.path.join(SOURCE_DIR, "PC", "layout", "main.py"),
             "-vv",
             "--source",
@@ -620,6 +626,9 @@ def install() -> None:
             "--flat-dlls"
         ]
 
+        if VARIANT == "Debug":
+            install_args.append("--debug")
+
         subprocess.run(
             install_args,
             cwd=SOURCE_DIR
@@ -634,6 +643,7 @@ def install() -> None:
             src_python_exe = "python_d.exe"
         else:
             src_python_exe = "python.exe"
+
         src_file = os.path.join(OUTPUT_DIR, src_python_exe)
         dst_file = os.path.join(dst_dir, "python3.exe")
         print(f"Copy {src_file} to {dst_file}")
@@ -647,9 +657,23 @@ def install() -> None:
 
         # Manually move python3.lib because the script provided do not copy it.
         python3_lib = "python3.lib"
-        python311_lib = f"python{PYTHON_VERSION}.lib"
+        python3xx_lib = f"python{PYTHON_VERSION}.lib"
+
+        if VARIANT == "Debug":
+            python3_lib = "python3_d.lib"
+            python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
+
         shutil.copy(os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib))
-        shutil.copy(os.path.join(build_path, python311_lib), os.path.join(dst_dir, python311_lib))
+        shutil.copy(os.path.join(build_path, python3xx_lib), os.path.join(dst_dir, python3xx_lib))
+
+        # Tcl and Tk DLL are not copied by the main.py script in Debug.
+        # Assuming that Tcl and Tk are not built in debug.
+        # Manually copy the DLL.
+        if VARIANT == "Debug":
+            tcl_dll = os.path.join(build_path, "tcl86t.dll")
+            tk_dll = os.path.join(build_path, "tk86t.dll")
+            shutil.copyfile(tcl_dll, os.path.join(dst_dir, "tcl86t.dll"))
+            shutil.copyfile(tk_dll, os.path.join(dst_dir, "tk86t.dll"))
 
     else:
         make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]
