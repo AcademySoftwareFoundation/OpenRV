@@ -20,12 +20,16 @@ SET(PYTHON_VERSION_MAJOR
     3
 )
 
-SET(PYTHON_VERSION_MINOR
-    10
+RV_VFX_SET_VARIABLE(
+  PYTHON_VERSION_MINOR
+  CY2023 "10"
+  CY2024 "11"
 )
 
-SET(PYTHON_VERSION_PATCH
-    13
+RV_VFX_SET_VARIABLE(
+  PYTHON_VERSION_PATCH
+  CY2023 "13"
+  CY2024 "9"
 )
 
 SET(_python3_version
@@ -43,15 +47,20 @@ SET(_opentimelineio_version
     "0.15"
 )
 
-SET(_pyside2_version
-    "5.15.10"
+RV_VFX_SET_VARIABLE(
+  _pyside2_version
+  CY2023 "5.15.10"
+  # Need 5.15.11+ to support Python 3.11.
+  CY2024 "5.15.11"
 )
 
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
-SET(_python3_download_hash
-    "21b32503f31386b37f0c42172dfe5637"
+RV_VFX_SET_VARIABLE(
+  _python3_download_hash
+  CY2023 "21b32503f31386b37f0c42172dfe5637"
+  CY2024 "392eccd4386936ffcc46ed08057db3e7"
 )
 
 SET(_opentimelineio_download_url
@@ -64,8 +73,10 @@ SET(_opentimelineio_git_tag
 SET(_pyside2_archive_url
     "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside2_version}-src/pyside-setup-opensource-src-${_pyside2_version}.zip"
 )
-SET(_pyside2_download_hash
-    "87841aaced763b6b52e9b549e31a493f"
+RV_VFX_SET_VARIABLE(
+  _pyside2_download_hash
+  CY2023 "87841aaced763b6b52e9b549e31a493f"
+  CY2024 "8f652b08c1c74f9a80a2c0f16ff2a4ca"
 )
 
 SET(_install_dir
@@ -147,6 +158,8 @@ LIST(APPEND _pyside2_make_command "--python-dir")
 LIST(APPEND _pyside2_make_command ${_install_dir})
 LIST(APPEND _pyside2_make_command "--qt-dir")
 LIST(APPEND _pyside2_make_command ${RV_DEPS_QT5_LOCATION})
+LIST(APPEND _pyside2_make_command "--python-version")
+LIST(APPEND _pyside2_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
 
 IF(RV_TARGET_WINDOWS)
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
@@ -222,6 +235,23 @@ SET(_requirements_install_command
     "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
 )
 
+IF(RV_TARGET_WINDOWS)
+  SET(_patch_python3_11_command 
+      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.openssl.props.patch &&\
+       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.python.props.patch &&\
+       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.get_externals.bat.patch"
+  )
+
+  RV_VFX_SET_VARIABLE(
+    _patch_command
+    CY2023 ""
+    CY2024 "${_patch_python3_11_command}"
+  )
+  # Split the command into a semi-colon separated list.
+  separate_arguments(_patch_command)
+  STRING(REGEX REPLACE ";+" ";" _patch_command "${_patch_command}")
+ENDIF()
+
 EXTERNALPROJECT_ADD(
   ${_python3_target}
   DOWNLOAD_NAME ${_python3_target}_${_python3_version}.zip
@@ -232,6 +262,7 @@ EXTERNALPROJECT_ADD(
   URL ${_python3_download_url}
   URL_MD5 ${_python3_download_hash}
   DEPENDS OpenSSL::Crypto OpenSSL::SSL
+  PATCH_COMMAND "${_patch_command}"
   CONFIGURE_COMMAND ${_python3_make_command} --configure
   BUILD_COMMAND ${_python3_make_command} --build
   INSTALL_COMMAND ${_python3_make_command} --install
