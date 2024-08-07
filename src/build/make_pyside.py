@@ -189,7 +189,6 @@ def remove_broken_shortcuts(python_home: str) -> None:
             if filename not in [
                 "python",
                 "python3",
-                # TODO: Need to check if VFX2023 or 2024 and use python3.10 or python3.11 here.
                 f"python{PYTHON_VERSION}",
             ]:
                 print(f"Removing {filepath}...")
