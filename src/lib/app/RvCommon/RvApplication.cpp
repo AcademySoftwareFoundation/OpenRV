@@ -718,8 +718,13 @@ RvApplication::newSessionFromFiles(const StringVector& files)
                 cerr << "ERROR: DesktopVideoModule failed" << endl;
         }
 
-        // Load audio/video output plugins
-        loadOutputPlugins("TWK_OUTPUT_PLUGIN_PATH");
+        if (!getenv("RV_SKIP_LOADING_VIDEO_OUTPUT_PLUGINS")) {
+
+            // Load audio/video output plugins
+            loadOutputPlugins("TWK_OUTPUT_PLUGIN_PATH");
+        } else {
+            cout << "WARNING: Skipping loading of video output plugins" << endl;
+        }
     }
 
     doc->session()->graph().setPhysicalDevices(videoModules());
