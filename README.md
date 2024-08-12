@@ -67,6 +67,12 @@ pre-commit install
 To clean your build directory and restart from a clean slate, use the `rvclean` common build alias, or delete
 the `_build` folder.
 
+### Using a Python Virtual Environment
+
+Open RV automatically sets up a Python virtual environment when the user bootstraps (`rvbootstrap`), builds (`rvbuild`) or configures (`rvcfg`) their project. After each of these commands, you should see that the executing instance of the terminal is using a virtual environment with the name `_virtualenv`.
+
+If this is not the case or if you would like to set up your virtual environment directly, you can run the command `rvenv`.
+
 ### Bootstrap
 
 Before first your first Open RV build, you must install some python dependencies.
@@ -77,28 +83,16 @@ Use the `rvsetup` common build alias to run the bootstrap step.
 
 #### Manually
 
+See the **Using a Python Virtual Environment** before running any of the commands in this section. Python packages should be installed inside of a virtual environment. 
+
 ```bash
-python3 -m pip install --user --upgrade -r requirements.txt
+python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt
 ```
 
 Note that on Windows, use the following command instead from an MSYS2-MinGW64 shell:
 ```bash
-SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
+SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --upgrade -r requirements.txt
 ```
-
-### Blackmagicdesign&reg; Video Output Support (Optional)
-
-Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): https://www.blackmagicdesign.com/desktopvideo_sdk<br>
-Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
-Example:
-```bash
-rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'
-```
-
-### NDI&reg; Video Output Support (Optional)
-
-Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
-This must be done before the `configure` step.
 
 ### Configure
 
