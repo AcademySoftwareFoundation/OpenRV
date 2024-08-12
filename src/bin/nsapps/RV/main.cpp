@@ -135,11 +135,16 @@ void thread_priority_init()
 
     len = sizeof(bus_speed);
 
-    if (sysctl (mib, 2, &bus_speed, &len, NULL, 0) < 0)
+#if !defined(__aarch64__)
+    int ret2 = sysctl (mib, 2, &bus_speed, &len, NULL, 0);
+    if (ret2 < 0)
     {
-        cout << "ERROR: unable to get system bus frequency" << endl;
+        cout << "ERROR: unable to get system bus frequency: " << ret2 << endl;
         return;
     }
+#else
+    bus_speed = 100000000;
+#endif
 
     //
     //  The period is the number of cycles over which we are guaranteed

@@ -59,12 +59,22 @@ SET(_make_command
     ninja
 )
 
-IF(${RV_OSX_EMULATION})
-  SET(_meson_cross_file
-      "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
-  )
+IF(APPLE)
+  # Cross-file must be specified because if Rosetta is used to compile for x86_64 from ARM64,
+  # Meson still detects ARM64 as the default architecture.
+
+  IF(RV_TARGET_APPLE_X86_64)
+    SET(_meson_cross_file
+        "${PROJECT_SOURCE_DIR}/src/build/meson_arch_x86_64.txt"
+    )
+  ELSEIF(RV_TARGET_APPLE_ARM64)
+    SET(_meson_cross_file
+      "${PROJECT_SOURCE_DIR}/src/build/meson_arch_arm64.txt"
+    )
+  ENDIF()
+
   SET(_configure_command
-      ${_configure_command} "--cross-file" ${_meson_cross_file}
+    ${_configure_command} "--cross-file" ${_meson_cross_file}
   )
 ENDIF()
 

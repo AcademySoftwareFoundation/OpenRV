@@ -32,7 +32,15 @@ sudo dnf config-manager --set-disabled devel
 
 ### GLU
 
-You may or may not have libGLU on your system depending on your graphics driver setup.  To know you can check if you have the lib /usr/lib64/libGLU.so.1.  If it's there you can skip this step, there's nothing further to do in this section.  If not, you can install the graphics drivers for your system. As as last resort, you can install a software (mesa) libGLU version, but you may not have ideal performance with this option.  To do so:
+You may or may not have libGLU on your system depending on your graphics driver setup. 
+
+Check for the existance of the following files:
+
+* `/usr/lib64/libGLU.so.1`
+* `/usr/lib64/libGLU.so`
+* `/usr/include/GL/glu.h`
+
+If `libGLU.so.1` is present but `libGLU.so` is not, create a symlink between them with `sudo ln -s /usr/lib64/libGLU.so.1 /usr/lib64/libGLU.so`. If `/usr/include/GL/glu.h` is missing, install `mesa-libGLU-devel` to get this required header file. If libGLU is missing entirely, you can install the graphics drivers for your system. As as last resort, you can install a software (mesa) libGLU version, but you may not have ideal performance with this option:
 
 ```bash
 sudo dnf install mesa-libGLU mesa-libGLU-devel
@@ -48,6 +56,6 @@ python3 -m pip install -r requirements.txt
 
 ## Install Qt
 
-Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
+Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). During Qt Setup's Select Components phase, check the "Archive" box on the right side of the window then click on "Filter" to see Qt 5.15.x options. Logs, Android, iOS and WebAssembly are not required to build OpenRV. Make sure to note the destination of the Qt install, as you will have to set the `QT_HOME` environment variable to this location's build dir.
 
 WARNING: If you fetch Qt from another source, make sure to build it with SSL support, that it contains everything required to build PySide2, and that the file structure is similar to the official package.

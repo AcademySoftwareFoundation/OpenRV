@@ -25,18 +25,33 @@
 #define MU_GC_PTR void*
 
 #ifdef PLATFORM_DARWIN
+
 #include <mach/thread_act.h>
+#if defined(RV_ARCH_X86_64)
 #include <mach/thread_status.h>
+#elif defined(RV_ARCH_ARM64)
+#include <mach/arm/thread_state.h>
+#include <mach/arm/thread_status.h>
+#endif
+
 #ifdef ARCH_PPC32
 #define darwin_thread_state ppc_thread_state
 #define DARWIN_THREAD_STATE_COUNT PPC_THREAD_STATE_COUNT
 #define DARWIN_THREAD_STATE PPC_THREAD_STATE
 #endif
+
 #if defined(ARCH_IA32) || defined(ARCH_IA32_64)
 #define darwin_thread_state i386_thread_state
 #define DARWIN_THREAD_STATE_COUNT i386_THREAD_STATE_COUNT
 #define DARWIN_THREAD_STATE i386_THREAD_STATE
 #endif
+
+#if defined(RV_ARCH_ARM64)
+#define darwin_thread_state arm_thread_state64_t
+#define DARWIN_THREAD_STATE_COUNT ARM_THREAD_STATE64_COUNT
+#define DARWIN_THREAD_STATE ARM_THREAD_STATE64
+#endif
+
 #endif
 
 #ifdef PLATFORM_LINUX

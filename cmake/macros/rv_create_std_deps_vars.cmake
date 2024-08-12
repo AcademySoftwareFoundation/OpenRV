@@ -61,14 +61,10 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
       ${make_command}
   )
 
-  IF(${RV_OSX_EMULATION})
-    SET(_darwin_x86_64
-        "arch" "${RV_OSX_EMULATION_ARCH}"
-    )
-    SET(_make_command
-        ${_darwin_x86_64} ${_make_command}
-    )
-  ENDIF()
+  SET(_cmake_build_command
+    ${CMAKE_COMMAND} --build ${_build_dir} --config ${CMAKE_BUILD_TYPE} -j${_cpu_count}
+  )
+
   IF(RV_TARGET_WINDOWS)
     # MSYS2/CMake defaults to Ninja
     SET(_make_command
@@ -77,20 +73,11 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   ENDIF()
 
   #
-  # Create locally used copnfigure command
+  # Create locally used configure command
   #
   SET(_configure_command
       ${configure_command}
   )
-
-  IF(${RV_OSX_EMULATION})
-    SET(_darwin_x86_64
-        "arch" "${RV_OSX_EMULATION_ARCH}"
-    )
-    SET(_configure_command
-        ${_darwin_x86_64} ${_configure_command}
-    )
-  ENDIF()
 
   #
   # Also reset a number of secondary list variables
@@ -106,6 +93,11 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   LIST(APPEND _configure_options "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
   LIST(APPEND _configure_options "-S ${_source_dir}")
   LIST(APPEND _configure_options "-B ${_build_dir}")
+
+
+  SET(_cmake_install_command
+    ${CMAKE_COMMAND} --install ${_build_dir} --prefix ${_install_dir} --config ${CMAKE_BUILD_TYPE}
+  )
 
   #
   # Finally add a clean-<target-name> target

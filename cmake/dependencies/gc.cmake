@@ -7,13 +7,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-SET(_target
-    "RV_DEPS_GC"
-)
-
-SET(_version
-    "8.2.2"
-)
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "8.2.2" "" "")
 
 SET(_download_url
     "https://github.com/ivmai/bdwgc/archive/refs/tags/v${_version}.zip"
@@ -26,41 +20,15 @@ SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
-SET(_make_command
-    make
-)
-SET(_autogen_command
-    sh ./autogen.sh
-)
-SET(_configure_command
-    sh ./configure
-)
-
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
+IF(RV_TARGET_LINUX)
+  SET(_lib_dir
+      ${_install_dir}/lib64
   )
-
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
-  SET(_autogen_command
-      ${_darwin_x86_64} ${_autogen_command}
-  )
-  SET(_configure_command
-      ${_darwin_x86_64} ${_configure_command}
+ELSE()
+  SET(_lib_dir
+      ${_install_dir}/lib
   )
 ENDIF()
-IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
-  )
-ENDIF()
-
-SET(_lib_dir
-    ${_install_dir}/lib
-)
 
 SET(_gc_lib_name
     ${CMAKE_SHARED_LIBRARY_PREFIX}gc.1${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -115,63 +83,32 @@ SET(_include_dir
 )
 FILE(MAKE_DIRECTORY ${_include_dir})
 
+LIST(APPEND _configure_options "-Denable_parallel_mark=ON")
+LIST(APPEND _configure_options "-Denable_cplusplus=ON")
 IF(RV_TARGET_WINDOWS)
-  SET(_cmake_configure_command
-      ${CMAKE_COMMAND}
-  )
-  LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
-  LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
-  LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-  LIST(APPEND _cmake_configure_command "-Denable_parallel_mark=ON")
-  LIST(APPEND _cmake_configure_command "-Denable_cplusplus=ON")
-  LIST(APPEND _cmake_configure_command "-DCMAKE_USE_WIN32_THREADS_INIT=1")
-  LIST(APPEND _cmake_configure_command "${RV_DEPS_BASE_DIR}/${_target}/src")
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-    INSTALL_DIR ${_install_dir}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${_cmake_configure_command}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} 
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${RV_DEPS_BASE_DIR}/${_target}/src/include ${_include_dir}/gc
-    COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_BASE_DIR}/${_target}/src/${_gc_lib_name} ${_gc_lib}
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_gc_byproducts}
-    USES_TERMINAL_BUILD TRUE
-  )
-  ADD_LIBRARY(BDWGC::Gc STATIC IMPORTED GLOBAL)
+  LIST(APPEND _configure_options "-DCMAKE_USE_WIN32_THREADS_INIT=1")
 ELSE()
-  SET(_configure_args
-      "--enable-cplusplus"
-  )
-  LIST(APPEND _configure_args "--prefix=${_install_dir}")
-
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-    INSTALL_DIR ${_install_dir}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${_autogen_command} && ${_configure_command} ${_configure_args}
-    BUILD_COMMAND ${_make_command} -j${_cpu_count} 
-    INSTALL_COMMAND ${_make_command} install
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir} ${CMAKE_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_gc_byproducts}
-    USES_TERMINAL_BUILD TRUE
-  )
-  ADD_LIBRARY(BDWGC::Gc SHARED IMPORTED GLOBAL)
+  LIST(APPEND _configure_options "-DCMAKE_USE_PTHREADS_INIT=1")
 ENDIF()
+
+EXTERNALPROJECT_ADD(
+  ${_target}
+  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  INSTALL_DIR ${_install_dir}
+  URL ${_download_url}
+  URL_MD5 ${_download_hash}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+  BUILD_COMMAND ${_cmake_build_command}
+  INSTALL_COMMAND ${_cmake_install_command}
+  BUILD_IN_SOURCE TRUE
+  BUILD_ALWAYS FALSE
+  BUILD_BYPRODUCTS ${_gc_byproducts}
+  USES_TERMINAL_BUILD TRUE
+)
+ADD_LIBRARY(BDWGC::Gc STATIC IMPORTED GLOBAL)
 
 ADD_DEPENDENCIES(BDWGC::Gc ${_target})
 SET_PROPERTY(

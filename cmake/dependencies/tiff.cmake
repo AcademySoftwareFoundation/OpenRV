@@ -18,7 +18,7 @@ INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 # OpenImageIO required >= 3.9, using latest 4.0
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "4.6.0" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "4.6.0" "" "")
 
 SET(_download_url
     "https://gitlab.com/libtiff/libtiff/-/archive/v${_version}/libtiff-v${_version}.tar.gz"
@@ -81,8 +81,8 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   DEPENDS ZLIB::ZLIB jpeg-turbo::jpeg
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count}
-  INSTALL_COMMAND ${_make_command} install
+  BUILD_COMMAND ${_cmake_build_command}
+  INSTALL_COMMAND ${_cmake_install_command}
   BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_libpath}

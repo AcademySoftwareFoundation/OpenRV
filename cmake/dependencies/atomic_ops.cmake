@@ -56,22 +56,6 @@ SET(_autogen_command
     sh ./autogen.sh
 )
 
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
-  SET(_configure_command
-      ${_darwin_x86_64} ${_configure_command}
-  )
-  SET(_autogen_command
-      ${_darwin_x86_64} ${_autogen_command}
-  )
-ENDIF()
-
 # Make sure NOT to enable GPL
 SET(_configure_args
     "--disable-gpl"
