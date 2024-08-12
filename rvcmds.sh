@@ -46,17 +46,11 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/gcc_64' | sort -V | tail -n 1)
+    QT_HOME=$(find ~/Qt* -type d -maxdepth 4 -path '*/gcc_64' | head -n 1)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/macos' | sort -V | tail -n 1)
-
-    # If no macos installation found, try clang_64
-    if [ -z "$QT_HOME" ]; then
-      QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
-    fi
-    
+    QT_HOME=$(find ~/Qt* -type d -maxdepth 4 -path '*/clang_64' | head -n 1)
   elif [[ "$OSTYPE" == "msys"* ]]; then
-    QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
+    QT_HOME=$(find c:/Qt* -type d -maxdepth 4 -path '*/msvc2019_64' | head -n 1)
   fi
 
   # Could not find Qt installation
@@ -79,17 +73,18 @@ RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.
 
 # ALIASES: Basic commands
 
-alias rvsetup="SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --user --upgrade -r ${RV_HOME}/requirements.txt"
-alias rvcfg="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvcfgd="cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvbuildt="cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
-alias rvbuildtd="cmake --build ${RV_BUILD} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
-alias rvbuild="rvbuildt main_executable"
-alias rvbuildd="rvbuildtd main_executable"
-alias rvtest="ctest --test-dir ${RV_BUILD} --extra=verbose"
-alias rvinst="cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Release"
-alias rvinstd="cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Debug"
-alias rvclean="rm -rf ${RV_BUILD}"
+alias rvenv="[ -d "_virtualenv" ] && source _virtualenv/bin/activate || (python3 -m venv _virtualenv && source _virtualenv/bin/activate)"
+alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
+alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvcfgd="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvbuildt="rvenv && cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
+alias rvbuildtd="rvenv && cmake --build ${RV_BUILD} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
+alias rvbuild="rvenv && rvbuildt main_executable"
+alias rvbuildd="rvenv && rvbuildtd main_executable"
+alias rvtest="rvenv && ctest --test-dir ${RV_BUILD} --extra=verbose"
+alias rvinst="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Release"
+alias rvinstd="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Debug"
+alias rvclean="rm -rf ${RV_BUILD} && rm -rf _virtualenv"
 
 # ALIASES: Config and Build
 
