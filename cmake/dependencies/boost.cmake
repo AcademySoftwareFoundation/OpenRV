@@ -172,17 +172,13 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-SET(_boost_b2_options
-    "-s NO_LZMA=1"
-)
+LIST(APPEND _boost_b2_options "-s")
+LIST(APPEND _boost_b2_options "NO_LZMA=1")
+
 IF(RV_VERBOSE_INVOCATION)
-  SET(_boost_b2_options
-      "${_boost_b2_options} -d+2"
-  )
+  LIST(APPEND _boost_b2_options "-d+2")
 ELSE()
-  SET(_boost_b2_options
-      "${_boost_b2_options} -d+0"
-  )
+  LIST(APPEND _boost_b2_options "-d+0")
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
