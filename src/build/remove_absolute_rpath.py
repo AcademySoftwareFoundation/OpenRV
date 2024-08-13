@@ -109,11 +109,14 @@ def fix_rpath(target, root):
             logging.info(f"Skipping {file} because numpy")
             return
 
+        # Prevent delete the same rpath multiple time (e.g. MacOS fat binary).
+        deletedRPATH = []
         for rpath in get_rpaths(file):
             output = f"\trpath: {rpath}"
 
-            if rpath.startswith("@") is False and rpath.startswith(".") is False:
+            if rpath.startswith("@") is False and rpath.startswith(".") is False and not rpath in deletedRPATH:
                 delete_rpath(file, rpath)
+                deletedRPATH.append(rpath)
                 output += " (Deleted)"
 
             logging.info(output)
