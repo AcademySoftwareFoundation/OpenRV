@@ -9,7 +9,7 @@
 #include <TwkApp/Bundle.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
-#include <TwkUtil/file.h>
+#include <TwkUtil/File.h>
 
 namespace TwkApp {
 using namespace std;
