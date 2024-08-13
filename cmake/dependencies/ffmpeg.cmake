@@ -235,6 +235,9 @@ GET_PROPERTY(
 )
 
 # Make a list of common FFmpeg config options
+IF(RV_TARGET_DARWIN)
+  LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-videotoolbox")
+ENDIF()
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-shared")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-static")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-iconv")
