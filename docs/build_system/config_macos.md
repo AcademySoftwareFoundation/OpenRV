@@ -54,3 +54,8 @@ Download the last version of Qt 5.15.x that you can get using the online install
 WARNING: If you fetch Qt from another source, make sure to build it with SSL support, that it contains everything required to build PySide2, and that the file structure is similar to the official package.
 
 Note: Qt5 from homebrew is known to not work well with OpenRV.
+
+## Allow Terminal to update or delete other applications
+
+From the macOS System Settings/Privacy & Security/App Management, allow Terminal to update or delete other applications.
+
