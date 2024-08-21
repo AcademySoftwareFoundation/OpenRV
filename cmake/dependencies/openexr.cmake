@@ -165,23 +165,16 @@ SET(_patch_command
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/${_openexr_patch_name_}.patch
 )
 
-SET(_cmake_configure_command
-    ${CMAKE_COMMAND}
-)
-LIST(APPEND _cmake_configure_command "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
-LIST(APPEND _cmake_configure_command "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
-LIST(APPEND _cmake_configure_command "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-LIST(APPEND _cmake_configure_command "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
-LIST(APPEND _cmake_configure_command "-DBUILD_TESTING=OFF")
-LIST(APPEND _cmake_configure_command "${RV_DEPS_BASE_DIR}/${_target}/src")
+LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
+LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(_zlib_implibpath ZLIB::ZLIB IMPORTED_IMPLIB)
-  LIST(APPEND _cmake_configure_command "-DZLIB_INCLUDE_DIR=${RV_DEPS_ZLIB_INCLUDE_DIR}")
-  LIST(APPEND _cmake_configure_command "-DZLIB_LIBRARY=${_zlib_implibpath}")
+  LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${RV_DEPS_ZLIB_INCLUDE_DIR}")
+  LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_zlib_implibpath}")
 ENDIF()
 
 # OpenEXR tools are not needed.
-LIST(APPEND _cmake_configure_command "-DOPENEXR_BUILD_TOOLS=OFF")
+LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -193,10 +186,10 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   DEPENDS Imath::Imath ZLIB::ZLIB
   INSTALL_DIR ${_install_dir}
-  CONFIGURE_COMMAND ${_cmake_configure_command}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} 
   PATCH_COMMAND ${_patch_command}
-  INSTALL_COMMAND ${_make_command} install
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+  BUILD_COMMAND ${_cmake_build_command}
+  INSTALL_COMMAND ${_cmake_install_command}
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_openexr_byproducts}

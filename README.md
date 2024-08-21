@@ -35,7 +35,7 @@ git submodule update --init --recursive
 Open RV is currently supported on the following operating systems:
 
 * [Windows 10 and 11](docs/build_system/config_windows.md)
-* [macOS Big Sur, Monterey and Ventura](docs/build_system/config_macos.md)
+* [macOS](docs/build_system/config_macos.md)
 * [Linux Centos 7](docs/build_system/config_linux_centos7.md)
 * [Linux Rocky 8](docs/build_system/config_linux_rocky8.md)
 * [Linux Rocky 9](docs/build_system/config_linux_rocky9.md)
@@ -85,6 +85,20 @@ Note that on Windows, use the following command instead from an MSYS2-MinGW64 sh
 ```bash
 SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
 ```
+
+### Blackmagicdesign&reg; Video Output Support (Optional)
+
+Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): https://www.blackmagicdesign.com/desktopvideo_sdk<br>
+Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
+Example:
+```bash
+rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'
+```
+
+### NDI&reg; Video Output Support (Optional)
+
+Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
+This must be done before the `configure` step.
 
 ### Configure
 
@@ -202,3 +216,6 @@ Use the `rvinst` common build alias to install OpenRV.
 ```shell
 cmake --install _build --prefix _install
 ```
+
+See [THIRD-PARTY.md](THIRD-PARTY.md) for license information
+about portions of Open RV that have been imported from other projects.

@@ -9,6 +9,7 @@
 #include <TwkApp/Bundle.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <TwkUtil/File.h>
 
 namespace TwkApp {
 using namespace std;
@@ -56,7 +57,7 @@ bool
 Bundle::hasCacheItem(const string& cacheName, const CacheItemName& item)
 {
     Path cachePath = cacheItemPath(cacheName, item);
-    return cachePath != "" && boost::filesystem::exists(cachePath);
+    return cachePath != "" && TwkUtil::fileExists(cachePath.c_str());
 }
 
 Bundle::Path 

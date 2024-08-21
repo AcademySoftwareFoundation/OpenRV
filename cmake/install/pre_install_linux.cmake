@@ -46,7 +46,7 @@ SET(STRIP_IGNORE_LIST
   "zip"
 )
 
-FUNCTION(after_copy_platform FILE_PATH)
+FUNCTION(after_copy_platform FILE_PATH FILES_TO_FIX_RPATH)
   IF(CMAKE_INSTALL_CONFIG_NAME MATCHES "^Release$")
     EXECUTE_PROCESS(COMMAND file --mime-type ${FILE_PATH} OUTPUT_VARIABLE FILE_CMD_OUT)
     IF(${FILE_CMD_OUT} MATCHES ": application\/(.+)\n")
@@ -59,3 +59,7 @@ FUNCTION(after_copy_platform FILE_PATH)
     ENDIF()
   ENDIF()
 ENDFUNCTION()
+
+MACRO(post_install_platform)
+
+ENDMACRO()

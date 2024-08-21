@@ -448,9 +448,7 @@ def configure() -> None:
         CPPFLAGS = []
         LD_LIBRARY_PATH = []
 
-        if ARCH:
-            configure_args = ["arch", ARCH] + configure_args
-
+        if platform.system() == "Darwin":
             readline_prefix_proc = subprocess.run(
                 ["brew", "--prefix", "readline"], capture_output=True
             )
@@ -576,9 +574,6 @@ def build() -> None:
     else:
         make_args = ["make", f"-j{os.cpu_count() or 1}"]
 
-        if ARCH:
-            make_args = ["arch", ARCH] + make_args
-
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
         if OPENSSL_OUTPUT_DIR:
@@ -639,9 +634,6 @@ def install() -> None:
 
     else:
         make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]
-
-        if ARCH:
-            make_args = ["arch", ARCH] + make_args
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
