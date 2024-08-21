@@ -73,11 +73,11 @@ fi
 
 # Must be executed in a function as it changes the shell environment
 rvenv_shell() {
-  if [ -d "_venv" ]; then
-    source _venv/bin/activate
+  if [ -d ".venv" ]; then
+    source .venv/bin/activate
   else
     python3 -m venv _venv
-    source _venv/bin/activate
+    source .venv/bin/activate
   fi
 }
 
