@@ -34,8 +34,8 @@ struct Options
     {
         SourceArgs() : audioOffset(0), rangeOffset(0), volume(1), fps(0),
                        pixelAspect(0), stereoRelativeOffset(0), stereoRightOffset(0),
-                       hascrop(false), hasuncrop(false), singleSource (false),
-                       noMovieAudio(false)
+                       hascrop(false), hasuncrop(false), singleSource(false),
+                       noMovieAudio(false), addSourceToDefaultView(true)
             {
                 cutIn  = (std::numeric_limits<int>::max)();
                 cutOut = (std::numeric_limits<int>::max)();
@@ -59,6 +59,7 @@ struct Options
         float        stereoRightOffset;
         int          cutIn;
         int          cutOut;
+        bool         addSourceToDefaultView;
         std::string  fcdl;
         std::string  lcdl;
         std::string  flut;
@@ -340,6 +341,8 @@ struct Options
     int          presentAudio;
     int          fontSize1;
     int          fontSize2;
+
+    bool         addSourceToDefaultView;
 
     SendExternalEventVector  sendEvents;
 };

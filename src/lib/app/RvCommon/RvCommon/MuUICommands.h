@@ -88,6 +88,7 @@ NODE_DECLARATION(validateShotgunToken, Mu::Pointer);
 NODE_DECLARATION(launchTLI, void);
 NODE_DECLARATION(rvioSetup, void);
 NODE_DECLARATION(javascriptMuExport, void);
+NODE_DECLARATION(setConnectNewSourcesToDefaultViews, void);
 
 
 } // Rv
