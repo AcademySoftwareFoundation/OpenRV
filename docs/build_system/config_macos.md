@@ -9,6 +9,7 @@
   - [Install tools and build dependencies](#install-tools-and-build-dependencies)
   - [Install the python requirements](#install-the-python-requirements)
   - [Install Qt](#install-qt)
+  - [Allow Terminal to update or delete other applications](#allow-terminal-to-update-or-delete-other-applications)
 
 ## Install XCode
 
@@ -42,7 +43,7 @@ In that case, you can create one with this command `ln -s python3 $(dirname $(wh
 
 ## Install the python requirements
 
-See the **Using a Python Virtual Environment** in `README.md` in the root directory before running any of the commands in this section. Python packages should be installed inside of a virtual environment. 
+See the **Using a Python Virtual Environment** in `README.md` in the root directory before running any of the commands in this section. Python packages should be installed inside of a virtual environment.
 
 Some of the RV build scripts requires extra python packages. They can be installed using the requirements.txt at the root of the repository.
 

@@ -71,6 +71,16 @@ else
   echo "Using Qt installation already set at $QT_HOME"
 fi
 
+# Must be executed in a function as it changes the shell environment
+rvenv_shell() {
+  if [ -d "_venv" ]; then
+    source _venv/bin/activate
+  else
+    python3 -m venv _venv
+    source _venv/bin/activate
+  fi
+}
+
 # VARIABLES
 RV_HOME="${RV_HOME:-$SCRIPT_HOME}"
 RV_BUILD="${RV_BUILD:-${RV_HOME}/_build}"
@@ -79,7 +89,7 @@ RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.
 
 # ALIASES: Basic commands
 
-alias rvenv="[ -d "_virtualenv" ] && source _virtualenv/bin/activate || (python3 -m venv _virtualenv && source _virtualenv/bin/activate)"
+alias rvenv="rvenv_shell"
 alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
 alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvcfgd="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
