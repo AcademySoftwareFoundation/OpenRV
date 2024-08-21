@@ -189,7 +189,7 @@ def remove_broken_shortcuts(python_home: str) -> None:
             if filename not in [
                 "python",
                 "python3",
-                "python3.10",
+                f"python{PYTHON_VERSION}",
             ]:
                 print(f"Removing {filepath}...")
                 os.remove(filepath)
@@ -300,6 +300,10 @@ if __name__ == "__main__":
 
     parser.add_argument("--variant", dest="variant", type=str, required=True)
 
+
+    # Major and minor version with dots.
+    parser.add_argument("--python-version", dest="python_version", type=str, required=True, default="")
+
     parser.set_defaults(prepare=False, build=False)
 
     args = parser.parse_args()
@@ -311,8 +315,8 @@ if __name__ == "__main__":
     PYTHON_OUTPUT_DIR = args.python
     QT_OUTPUT_DIR = args.qt
     VARIANT = args.variant
-
-    args = parser.parse_args()
+    PYTHON_VERSION = args.python_version
+    
     print(args)
 
     if args.prepare:
