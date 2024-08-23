@@ -97,7 +97,7 @@ alias rvbuildt="rvenv && cmake --build ${RV_BUILD} --config Release -v --paralle
 alias rvbuildtd="rvenv && cmake --build ${RV_BUILD} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuild="rvenv && rvbuildt main_executable"
 alias rvbuildd="rvenv && rvbuildtd main_executable"
-alias rvtest="rvenv && ctest --test-dir ${RV_BUILD} --extra=verbose"
+alias rvtest="rvenv && ctest --test-dir ${RV_BUILD} --extra-verbose"
 alias rvinst="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Release"
 alias rvinstd="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Debug"
 alias rvclean="rm -rf ${RV_BUILD} && rm -rf .venv"
