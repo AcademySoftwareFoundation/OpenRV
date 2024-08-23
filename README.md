@@ -83,8 +83,10 @@ Use the `rvsetup` common build alias to run the bootstrap step.
 
 #### Manually
 
+Please ensure that a virtual environment is running before this command is executed.
+
 ```bash
-python3 -m pip install --user --upgrade -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 Note that on Windows, use the following command instead from an MSYS2-MinGW64 shell:
