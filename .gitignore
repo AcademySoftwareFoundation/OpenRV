@@ -27,4 +27,4 @@ cmake-*/*
 build/*
 _build/*
 _install/*
-_venv/*
+.venv/*
