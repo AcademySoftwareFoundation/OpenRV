@@ -76,7 +76,7 @@ rvenv_shell() {
   if [ -d ".venv" ]; then
     source .venv/bin/activate
   else
-    python3 -m venv _venv
+    python3 -m venv .venv
     source .venv/bin/activate
   fi
 }
@@ -100,7 +100,7 @@ alias rvbuildd="rvenv && rvbuildtd main_executable"
 alias rvtest="rvenv && ctest --test-dir ${RV_BUILD} --extra=verbose"
 alias rvinst="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Release"
 alias rvinstd="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Debug"
-alias rvclean="rm -rf ${RV_BUILD} && rm -rf _virtualenv"
+alias rvclean="rm -rf ${RV_BUILD} && rm -rf .venv"
 
 # ALIASES: Config and Build
 

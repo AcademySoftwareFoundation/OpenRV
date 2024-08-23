@@ -69,7 +69,7 @@ the `_build` folder.
 
 ### Using a Python Virtual Environment
 
-Open RV automatically sets up a Python virtual environment when the user bootstraps (`rvbootstrap`), builds (`rvbuild`) or configures (`rvcfg`) their project. After each of these commands, you should see that the executing instance of the terminal is using a virtual environment with the name `_virtualenv`.
+Open RV automatically sets up a Python virtual environment when the user bootstraps (`rvbootstrap`), builds (`rvbuild`) or configures (`rvcfg`) their project. After each of these commands, you should see that the executing instance of the terminal is using a virtual environment with the name `.venv`.
 
 If this is not the case or if you would like to set up your virtual environment directly, you can run the command `rvenv`.
 
