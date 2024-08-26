@@ -1,0 +1,462 @@
+name: OpenRV
+
+on:
+  push:
+    # Skip jobs when only those files are changed.
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'Notice.txt'
+
+  pull_request:
+    # Skip jobs when only those files are changed.
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'Notice.txt'
+
+  schedule:
+    # Midnight build every day
+    - cron: "0 0 * * *"
+
+  workflow_dispatch:
+    # This allows manual triggering of the workflow from the web
+     
+jobs:
+  rocky-linux:
+    name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
+      <qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       cmake=${{ matrix.cmake-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    runs-on: ${{ matrix.os }}
+    container: 
+      image: ${{ matrix.image }}
+      volumes:
+        - /usr/local/lib/android:/github/home/android
+        - /usr/share/dotnet:/github/home/dotnet
+        - /opt/ghc:/github/home/ghc
+        - /usr/local/.ghcup:/github/home/.ghcup
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-latest"
+            rocky-version: "8"
+            image: "amd64/rockylinux:8"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "5.15.2"
+            cmake-version: "3.29.8"
+            python-version: "3.11.8"
+            vfx-platform: "CY2023"
+            extra_repo: "powertools"
+          - os: "ubuntu-latest"
+            rocky-version: "9"
+            image: "amd64/rockylinux:9"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "5.15.2"
+            cmake-version: "3.29.8"
+            python-version: "3.11.8"
+            vfx-platform: "CY2023"
+            extra_repo: "crb"
+    steps:
+      - name: Display disk space
+        run: |
+          df -h /
+          
+      - name: Clear up some spaces on disk
+        run: |
+          # Delete files from host through the volumes
+          # It will have some "cannot remove" message, but but atleast 10GB will be cleared.
+          rm -rf /github/home/android || true
+          rm -rf /github/home/dotnet || true
+          rm -rf /github/home/ghc || true
+          rm -rf /github/home/.ghcup || true   
+
+      - name: Display disk space
+        run: |
+          df -h /
+
+      - name: Install system dependencies
+        run: |
+          dnf install -y epel-release
+          dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel
+          dnf groupinstall "Development Tools" -y
+          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget
+          dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
+
+      - name: Install other system dependencies
+        if: ${{ matrix.rocky-version == '9' }}
+        run: |
+          dnf install -y perl-CPAN
+          cpan FindBin
+
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
+
+      - name: Install pyenv
+        run: |
+          curl https://pyenv.run | bash
+
+          export PYENV_ROOT="$HOME/.pyenv"
+          echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
+          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+          
+      - name: Setup pyenv
+        run: |
+          echo $PATH
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
+
+      - name: Display Python installation location
+        run: |
+          python -c "import sys; print(sys.executable)"
+
+      - name: Install Ninja
+        run: |
+          wget https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-linux.zip
+          unzip ninja-linux.zip -d ./ninja
+          echo "$(pwd)/ninja" >> $GITHUB_PATH
+          ninja --version
+          
+      - name: Cache CMake for Rocky Linux 8
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        id: rocky8-cmake-cache
+        with:
+          path: |
+            /opt/cmake-${{ matrix.cmake-version }}/bin/cmake
+            /usr/local/bin/cmake
+          key: ${{ matrix.image }}-cmake-${{ matrix.cmake-version }}
+          
+      - name: Install CMake
+        if: steps.rocky8-cmake-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -SL -o cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v${{ matrix.cmake-version }}/cmake-${{ matrix.cmake-version }}-Linux-x86_64.tar.gz
+          tar -xzf cmake.tar.gz
+          ls
+          mv cmake-${{ matrix.cmake-version }}-linux-x86_64 ./cmake-${{ matrix.cmake-version }}
+          echo "$(pwd)/cmake-${{ matrix.cmake-version }}/bin" >> $GITHUB_PATH
+
+      - name: Prepare Qt folder
+        run: |
+          mkdir -p "${{ github.workspace }}/deps"
+
+      - name: Install Qt ${{ matrix.qt-version }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '${{ matrix.qt-version }}'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          dir: "${{ github.workspace }}/deps"
+          install-deps: 'false'
+          modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+          archives: 'icu qt3d qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwayland qtwebchannel qtwebsockets qtwebview qtx11extras qtxmlpatterns'
+          cache: true
+          cache-key-prefix: 'rocky-install-qt-action'
+          setup-python: 'false'
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.1.*'
+        
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user --upgrade -r requirements.txt
+
+      - name: Configure OpenRV
+        run: |
+          git config --global --add safe.directory /__w/OpenRV/OpenRV
+          export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ matrix.qt-version}}/gcc_64
+          cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+   
+      - name: Build OpenRV dependencies
+        run: |
+          cmake --build _build --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+
+      - name: Build OpenRV main executable
+        run: |
+          cmake --build _build --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+
+      - name: Tests
+        run: |
+          ctest --test-dir _build -C Release --extra-verbose
+
+      - name: Install OpenRV
+        run: |
+          cmake --install _build --prefix $(pwd)/_install --config Release
+
+  macos:
+    name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
+      <qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "macos-13"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "5.15.2"
+            python-version: "3.11"
+            vfx-platform: "CY2023"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
+        
+      - name: Activate Python ${{ matrix.python-version }}
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
+        with:
+          python-version: '${{ matrix.python-version }}'
+
+      - name: Display Python installation location
+        run: |
+          python -c "import sys; print(sys.executable)"
+
+      - name: Prepare Qt folder
+        run: |
+          mkdir -p "${{ github.workspace }}/deps"
+
+      - name: Install Qt ${{ matrix.qt-version }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '${{ matrix.qt-version }}'
+          host: 'mac'
+          target: 'desktop'
+          arch: 'clang_64'
+          dir: "${{ github.workspace }}/deps"
+          install-deps: 'false'
+          modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+          archives: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+          cache: true
+          cache-key-prefix: '${{ matrix.os }}-install-qt-action'
+          setup-python: 'false'
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.1.*'
+
+      - name: Patch Qt ${{ matrix.qt-version }}
+        # There is an issue with Clang15 and Qt < 5.15.15.
+        run: |
+          curl -o file.zip https://codereview.qt-project.org/changes/qt%2Fqtbase~503172/revisions/3/files/mkspecs%2Ffeatures%2Ftoolchain.prf/download
+          unzip file.zip
+          cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64/mkspecs/features/toolchain.prf
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user --upgrade -r requirements.txt
+  
+      - name: Install Homebrew dependencies
+        run: |
+          brew install --quiet --formula cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+
+      - name: Configure OpenRV
+        run: |
+          export QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64
+          cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+   
+      - name: Build OpenRV dependencies
+        run: |
+          cmake --build _build --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+          ls -al _build
+          
+      - name: Build OpenRV main executable
+        run: |
+          cmake --build _build --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+
+      - name: Tests
+        run: |
+          ctest --test-dir _build -C Release --extra-verbose
+
+      - name: Install OpenRV
+        run: |
+          cmake --install _build --prefix $(pwd)/_install --config Release
+
+  windows:
+    name: 'Windows ${{ matrix.vfx-platform }}
+      <${{ matrix.os }}
+       msvc=${{ matrix.msvc-component }},
+       qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       cmake=${{ matrix.cmake-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "5.15.2"
+            python-version: "3.11"
+            cmake-version: "3.29.8"
+            vfx-platform: "CY2023"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
+
+      - name: Install MSVC components ${{ matrix.msvc-component }}
+        run: |
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToRemove= @(
+            "Microsoft.VisualStudio.Component.VC.${{ matrix.msvc-component }}"
+            "Microsoft.VisualStudio.Component.VC.1${{ matrix.msvc-component }}.Spectre"
+          )
+          [string]$workloadArgs = $componentsToRemove | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          # should be run twice
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          
+      - name: Set up MSVC ${{ matrix.msvc-compiler }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: ${{ matrix.msvc-compiler }}
+          arch: '${{ matrix.arch-type }}'
+
+      - name: Setup msys2 and install dependencies
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          cache: true
+          install: >-
+            mingw-w64-x86_64-autotools
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-cmake-cmcldeps
+            mingw-w64-x86_64-glew
+            mingw-w64-x86_64-libarchive
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-meson
+            mingw-w64-x86_64-toolchain
+            autoconf
+            automake
+            bison
+            flex
+            git
+            libtool
+            nasm
+            p7zip
+            patch
+            unzip
+            zip
+    
+      - name: Activate Python ${{ matrix.python-version }}
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
+        with:
+          python-version: '${{ matrix.python-version }}'
+
+      - name: Display Python installation location
+        run: |
+          python -c "import sys; print(sys.executable)"
+
+      - name: Cache CMake for Windows
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        id: windows-cmake-cache
+        with:
+          path: "C:/Program Files/CMake"
+          key: ${{ runner.os }}-cmake-${{ matrix.cmake-version }}
+
+      - name: Install CMake ${{ matrix.cmake-version }} with chocolatey
+        if: steps.windows-cmake-cache.outputs.cache-hit != 'true'
+        run: |
+          choco install cmake --version=${{ matrix.cmake-version }}
+          
+      - name: Set PATH environment variable
+        run: |
+          echo "export PATH=\"/c/Program Files/CMake/bin:/c/hostedtoolcache/windows/Python/3.11.9/x64:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin\"" >> ~/.bash_profile
+        shell: msys2 {0}
+
+      - name: Set ACLOCAL_PATH environment variable
+        run: |
+          echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
+        shell: msys2 {0}
+
+      - name: Display environment variables
+        run: |
+          echo $PATH
+          echo $ACLOCAL_PATH
+          which python
+          which python3
+          which cmake
+        shell: msys2 {0}
+    
+      - name: Prepare Qt folder
+        run: |
+          mkdir -p /c/qt
+        shell: msys2 {0}
+
+      - name: Install Qt ${{ matrix.qt-version }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '${{ matrix.qt-version }}'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          dir: "c:/"
+          install-deps: 'false'
+          modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+          archives: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+          cache: true
+          cache-key-prefix: '${{ matrix.os }}-install-qt-action'
+          setup-python: 'false'
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.1.*'
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user --upgrade -r ./requirements.txt
+        shell: msys2 {0}
+
+      - name: Configure OpenRV
+        run: |
+          export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
+          cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+        shell: msys2 {0}
+          
+      - name: Build OpenRV dependencies
+        run: |
+          cmake --build _build --config Release --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+        shell: msys2 {0}
+        id: build_deps
+
+      - name: Build OpenRV main executable
+        run: |
+          cmake --build _build --config Release --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+        shell: msys2 {0}
+
+      - name: Tests
+        continue-on-error: true
+        run: |
+          ls -al _build/stage/app/bin
+          ctest --test-dir _build -C Release --extra-verbose
+        shell: msys2 {0}
+
+      - name: Install OpenRV
+        run: |
+          cmake --install _build --prefix $(pwd)/_install --config Release
+        shell: msys2 {0}
