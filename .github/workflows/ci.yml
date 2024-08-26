@@ -1,0 +1,28 @@
+name: OpenRV
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install Python 3.10.X
+      run: |
+        @echo off
+        set PYVERSION=3.10.14  # specify the exact version you need
+        set PYEXE=%PYVERSION%.msi
+        curl -sS https://www.python.org/ftp/python/%PYVERSION%/%PYEXE% -o %PYEXE%
+        msiexec /i %PYEXE% /qn
+        del %PYEXE%
+
+    - name: Install Strawberry Perl
+      run: |
+        @echo off
+        curl -sS https://strawberryperl.com/download/Strawberry-PERL-5.34.0-4.exe -o strawberryperl.exe
+        strawberryperl.exe /S
+        del strawberryperl.exe
