@@ -1,0 +1,118 @@
+  # ubuntu-latest:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Display disk space before clean up
+  #       run: |
+  #         df -h /
+          
+  #     - name: Clear up some spaces on disk
+  #       run: |
+  #         # Android library
+  #         sudo rm -rf /usr/local/lib/android || true
+  #         # .NET runtime
+  #         sudo rm -rf /usr/share/dotnet || true
+  #         # Haskell runtime
+  #         sudo rm -rf /opt/ghc || true
+  #         sudo rm -rf /usr/local/.ghcup || true
+  #         # Remove existing Docker images
+  #         sudo docker image prune --all --force || true
+
+  #     - name: Display disk space after the clean up
+  #       run: |
+  #         df -h /
+
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+
+  #     - name: Rocky Linux ${{ matrix.rocky-version }} container
+  #       run: |
+  #         docker run --name rocky -d -it ${{ matrix.image }} /bin/bash -c "sleep infinity"
+
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.11'
+
+  #     - name: Display Python installation location
+  #       run: |
+  #         python -c "import sys; print(sys.executable)"
+
+  #     - name: Prepare Qt folder
+  #       run: |
+  #         mkdir -p "${{ github.workspace }}/deps"
+
+  #     - name: Install Qt
+  #       uses: jurplel/install-qt-action@v4
+  #       with:
+  #         version: '5.15.2'
+  #         host: 'linux'
+  #         target: 'desktop'
+  #         arch: 'gcc_64'
+  #         dir: "${{ github.workspace }}/deps"
+  #         install-deps: 'false'
+  #         modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+  #         archives: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtx11extras qtxmlpatterns'
+  #         cache: true
+  #         cache-key-prefix: 'install-qt-action'
+  #         setup-python: 'false'
+  #         tools: 'tools_qtcreator'
+  #         set-env: 'true'
+  #         tools-only: 'false'
+  #         aqtversion: '==3.1.*'
+
+  #     - name: Display Qt installation
+  #       run: |
+  #         ls -al "${{ github.workspace }}/deps/Qt/5.15.2/gcc_64"
+  #         ls -al ${{ github.workspace }}/deps/Qt/5.15.2/gcc_64/bin
+
+  #     - name: Install Python dependencies
+  #       run: |
+  #         python3 -m pip install --user --upgrade -r requirements.txt
+        
+  #     - name: Install dependencies using apt-get
+  #       run: |
+  #         sudo apt update -y
+  #         sudo apt search readline
+  #         sudo apt install -y build-essential
+  #         sudo apt install -y libicu70 libicu-dev libasound2-dev autoconf automake bison libbz2-dev cmake curl libcurl4-openssl-dev flex gcc libgcc-11-dev libxcomposite-dev libxi-dev libaio-dev libffi-dev nasm libncurses-dev libnss3-dev libtool libxkbcommon-dev libxcomposite-dev libxdamage-dev libxrandr-dev libxtst-dev libxcursor-dev mesa-common-dev mesa-utils ninja-build openssl libssl-dev patch perl libpulse-dev ocl-icd-libopencl1 ocl-icd-dev opencl-headers python3 python3-dev libreadline8 libreadline-dev qtbase5-dev sqlite3 libsqlite3-dev tcl-dev tcsh tk-dev yasm zip zlib1g-dev
+
+  #     # - name: Display
+  #     #   run: |
+  #     #     sudo ls -al /usr/lib/x86_64-linux-gnu/libicu*
+  #     #     otool -Ll /home/runner/work/OpenRV/OpenRV/deps/Qt/5.15.2/gcc_64/lib/libQt5Core.so.5.15.2 
+
+  #     - name: Create symlinks for libicu files
+  #       run: |
+  #         for file in /usr/lib/x86_64-linux-gnu/libicu*; do
+  #           base=$(basename "$file")
+  #           new_base=${base/.70/.56}
+  #           new_base=${new_base/.70.1/.56}
+  #           ln -s "$file" "/home/runner/work/OpenRV/OpenRV/deps/Qt/5.15.2/gcc_64/lib/$new_base"
+  #         done
+
+  #     - name: Install GLU related packages
+  #       run: |
+  #         sudo apt install libgl1-mesa-dev libglu1-mesa libglu1-mesa-dev libosmesa6 libosmesa6-dev
+
+  #     - name: Configure
+  #       run: |
+  #         export QT_HOME=${{ github.workspace }}/deps/Qt/5.15.2/gcc_64
+  #         cmake -B _build -G Ninja -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=CY2023
+              
+  #     - name: Build dependencies
+  #       run: |
+  #         cmake --build _build --target dependencies --parallel=1 -v
+          
+  #     - name: Build main executable
+  #       run: |
+  #         cmake --build _build --target main_executable --parallel -v
+  
+  #     - name: Tests
+  #       run: |
+  #         ctest --test-dir _build --extra-verbose
