@@ -48,6 +48,13 @@ IOoiio::IOoiio() : FrameBufferIO("IOoiio", "n") // OIIO after any defaults of ou
     addType("ptx", "Disney PTex", r, codecs);
     addType("rla", "Wavefront RLA", rw, codecs);
     addType("iff", "IFF", rw, codecs);
+    addType("bmp", "Windows Bitmap", rw, codecs);
+    addType("dds", "Direct Draw Surface", rw, codecs);
+    addType("gif", "Graphics Interchange Format", r, codecs);
+    addType("ico", "Palette", r, codecs);
+    addType("pbm", "Portable Network Graphics", rw, codecs);
+    addType("pgm", "Portable Network Graphics", rw, codecs);
+    addType("ppm", "Portable Network Grapics", rw, codecs);
 
     // These are handled by their respective plugins
     // io_<something> in RV. This code is here to
@@ -61,8 +68,6 @@ IOoiio::IOoiio() : FrameBufferIO("IOoiio", "n") // OIIO after any defaults of ou
     addType("jp2", "JPEG-2000 Image", r, codecs);
     // addType("png", "Portable Network Graphics Image", rw, codecs);
     // addType("z", "Pixar Z-Depth", r, codecs);
-
-
 }
 
 IOoiio::~IOoiio() {}
