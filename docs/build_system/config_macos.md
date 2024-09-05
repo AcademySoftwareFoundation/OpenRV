@@ -2,11 +2,14 @@
 
 ## Summary
 
-1. [Install XCode](#install-xcode)
-1. [Install Homebrew](#install-homebrew)
-1. [Install tools and build dependencies](#install-tools-and-build-dependencies)
-1. [Install the python requirements](#install-the-python-requirements)
-1. [Install Qt](#install-qt)
+- [Building Open RV on macOS](#building-open-rv-on-macos)
+  - [Summary](#summary)
+  - [Install XCode](#install-xcode)
+  - [Install Homebrew](#install-homebrew)
+  - [Install tools and build dependencies](#install-tools-and-build-dependencies)
+  - [Install the python requirements](#install-the-python-requirements)
+  - [Install Qt](#install-qt)
+  - [Allow Terminal to update or delete other applications](#allow-terminal-to-update-or-delete-other-applications)
 
 ## Install XCode
 
@@ -39,6 +42,8 @@ Make sure `python` resolves in your terminal. In some case, depending on how the
 In that case, you can create one with this command `ln -s python3 $(dirname $(which python3))/python`.
 
 ## Install the python requirements
+
+See the **Using a Python Virtual Environment** in `README.md` in the root directory before running any of the commands in this section. Python packages should be installed inside of a virtual environment.
 
 Some of the RV build scripts requires extra python packages. They can be installed using the requirements.txt at the root of the repository.
 

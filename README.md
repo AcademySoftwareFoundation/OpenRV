@@ -67,6 +67,12 @@ pre-commit install
 To clean your build directory and restart from a clean slate, use the `rvclean` common build alias, or delete
 the `_build` folder.
 
+### Using a Python Virtual Environment
+
+Open RV automatically sets up a Python virtual environment when the user bootstraps (`rvbootstrap`), builds (`rvbuild`) or configures (`rvcfg`) their project. After each of these commands, you should see that the executing instance of the terminal is using a virtual environment with the name `.venv`.
+
+If this is not the case or if you would like to set up your virtual environment directly, you can run the command `rvenv`.
+
 ### Bootstrap
 
 Before first your first Open RV build, you must install some python dependencies.
@@ -77,8 +83,10 @@ Use the `rvsetup` common build alias to run the bootstrap step.
 
 #### Manually
 
+Please ensure that a virtual environment is running before this command is executed.
+
 ```bash
-python3 -m pip install --user --upgrade -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 Note that on Windows, use the following command instead from an MSYS2-MinGW64 shell:
