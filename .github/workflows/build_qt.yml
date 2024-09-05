@@ -1,0 +1,115 @@
+name: Build Qt Open Source
+
+on:
+    push:
+      branches:
+        - 'feature/**'
+      paths:
+        - .github/workflows/build_qt.yml
+  
+    pull_request:
+      branches:
+        - 'feature/**'
+      paths:
+        - .github/workflows/build_qt.yml
+
+jobs:
+  macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+        build: [1]
+        include:
+          - build: 1
+            qt-version: "5.15.15"
+            python3-version: "3.11.9"
+            python2-version: "2.7.18"
+
+    steps:
+      - name: Install Homebrew dependencies
+        run: |
+          brew install --quiet --formula libiconv libpng libpq libtool libuv libxau libxcb libxdmcp
+          brew install --quiet --formula autoconf automake cmake pcre2 harfbuzz freetype node@18 nspr nss
+          brew install --quiet --formula xcb-proto xcb-util xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm
+          brew install --quiet --formula brotli bzip2 dbus glew icu4c jpeg md4c openssl@1.1 pkg-config sqlite xorgproto zlib zstd
+          brew list openssl@1.1
+      
+      - name: Get Opt Directories
+        id: opt_dirs
+        run: |
+          echo "Checking permissions for /opt/homebrew/opt..."
+          ls -al /opt/homebrew/opt
+          echo "Running find command..."
+          find "/opt/homebrew/opt" -mindepth 1 -maxdepth 1 -type d | 
+          while read dir; do
+            echo "Processing directory: $dir"
+            echo "-I $dir/include -L $dir/lib"
+          done || {
+            echo "No directories found in /opt/homebrew/opt"
+            exit 1
+          }
+          
+      # - name: Display Opt Directories
+      #   run: cat opt_dirs.txt
+
+      # Use Ninja 1.11.1 because Qt need to be patched for Ninja 1.12.1.
+      - name: Install Ninja 1.11.1
+        run: |
+          wget https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-mac.zip
+          unzip ninja-mac.zip -d ./ninja
+          echo "$(pwd)/ninja" >> $GITHUB_PATH
+
+      - name: Display ninja version
+        run: |
+          ninja --version
+
+      - name: Install pyenv
+        run: |
+          curl https://pyenv.run | bash
+
+          export PYENV_ROOT="$HOME/.pyenv"
+          echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
+          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+        
+      - name: Setup pyenv
+        run: |
+          echo $PATH
+          pyenv install ${{ matrix.python3-version }} ${{ matrix.python2-version }}
+          pyenv global ${{ matrix.python3-version }} ${{ matrix.python2-version }}
+
+      - name: Display Python installation location
+        run: |
+          python -c "import sys; print(sys.executable)"
+          python2 -c "import sys; print(sys.executable)"
+
+      - name: Download Qt ${{ matrix.qt-version }} source
+        run: |
+          git clone git://code.qt.io/qt/qt5.git
+          cd qt5
+          git checkout 5.15
+          ./init-repository
+
+      - name: Create directory for build
+        run: |
+          mkdir -p qt-build
+
+      - name: Configure Qt ${{ matrix.qt-version }}
+        run: |
+           ../qt5/configure -release -prefix ./release -nomake examples -nomake tests QMAKE_APPLE_DEVICE_ARCHS=arm64 \
+           -opensource -confirm-license -c++std c++17 -openssl-linked -opengl desktop -release -skip qtlocation \
+           -I /opt/homebrew/Cellar/openssl@1.1/1.1.1w/include -L //opt/homebrew/Cellar/openssl@1.1/1.1.1w/lib
+        env:
+          OPENSSL_LIBS: '-L/opt/homebrew/Cellar/openssl@1.1/1.1.1w/lib -lssl -lcrypto'
+        working-directory: ${{ github.workspace }}/qt-build
+
+      - name: Build Qt
+        run: |
+          make -j$(python -c 'import os; print(os.cpu_count())')
+        working-directory: ${{ github.workspace }}/qt-build
+
+      - name: Display release folder
+        run: |
+          ls -al ./release
+        working-directory: ${{ github.workspace }}/qt-build
