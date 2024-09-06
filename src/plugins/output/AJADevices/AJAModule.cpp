@@ -19,11 +19,8 @@
 #endif
 #include <sstream>
 #include "ajatypes.h"
-#include "ntv2enums.h"
-#include "ntv2devicefeatures.h"
 #include "ntv2devicescanner.h"
 #include <ntv2card.h>
-#include "ntv2utils.h"
 
 namespace AJADevices
 {
