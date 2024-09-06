@@ -308,7 +308,7 @@ namespace AJADevices
     //  stereo, or quad 4K, can be used.
     //
 
-    KonaVideoDevice( AJAModule*, const std::string& name, int devicenum,
+    KonaVideoDevice( AJAModule*, const std::string& name, unsigned int devicenum,
                      unsigned int appID, OperationMode mode = OperationMode::ProMode );
 
     virtual ~KonaVideoDevice();
@@ -448,9 +448,8 @@ namespace AJADevices
 
    private:
     unsigned int m_appID{ 0 };
-    int m_devicenum{ 0 };
+    unsigned int m_devicenum{ 0 };
     NTV2DeviceID m_deviceID{ DEVICE_ID_INVALID };
-    NTV2DeviceInfo* m_info{ nullptr };
     CNTV2Card* m_card{ nullptr };
     NTV2EveryFrameTaskMode m_taskMode{ NTV2_TASK_MODE_INVALID };
     OperationMode m_operationMode{ OperationMode::ProMode };

@@ -38,16 +38,9 @@ namespace AJADevices
     virtual void close();
     virtual bool isOpen() const;
 
-    void* deviceScan() const
-    {
-      return m_devicescan;
-    }
-
    private:
-    void* m_devicescan{ nullptr };
     OperationMode m_mode{ OperationMode::ProMode };
     unsigned int m_appID{ 0 };
   };
 
 }  // namespace AJADevices
-
