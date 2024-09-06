@@ -25,29 +25,21 @@
 #include <GL/glu.h>
 #endif
 
-#if defined( PLATFORM_DARWIN )
-#include <TwkGLF/GL.h>
-#endif
-
 #include <TwkGLF/GLFBO.h>
 #include <TwkGLF/GLFence.h>
 #include <iostream>
 #include <stl_ext/thread_group.h>
 #include "ajatypes.h"
 #include "ntv2enums.h"
-#include "ntv2devicefeatures.h"
-#include "ntv2devicescanner.h"
-#include "ntv2utils.h"
 #include "ntv2card.h"
-#include "ntv2vpid.h"
 
 namespace AJADevices
 {
   class AJAModule;
 
-  typedef boost::mutex::scoped_lock ScopedLock;
-  typedef boost::mutex Mutex;
-  typedef boost::condition_variable Condition;
+  using ScopedLock = boost::mutex::scoped_lock;
+  using Mutex = boost::mutex;
+  using Condition = boost::condition_variable;
 
   struct KonaAudioFormat
   {
@@ -90,8 +82,8 @@ namespace AJADevices
     unsigned int flags{ 0 };
   };
 
-  typedef std::vector<KonaVideoFormat> KonaVideoFormatVector;
-  typedef std::vector<KonaDataFormat> KonaDataFormatVector;
+  using KonaVideoFormatVector = std::vector<KonaVideoFormat>;
+  using KonaDataFormatVector = std::vector<KonaDataFormat>;
 
   struct KonaSyncMode
   {
@@ -188,17 +180,17 @@ namespace AJADevices
     //  Types
     //
 
-    typedef TwkUtil::Timer Timer;
-    typedef TwkGLF::GLFence GLFence;
-    typedef std::vector<unsigned char*> BufferVector;
-    typedef stl_ext::thread_group ThreadGroup;
-    typedef std::vector<int> AudioBuffer;
-    typedef std::vector<AudioBuffer> AudioBufferVector;
-    typedef std::vector<Time> TimeVector;
-    typedef TwkGLF::GLFBO GLFBO;
-    typedef AUTOCIRCULATE_TRANSFER_STATUS_STRUCT StatusStruct;
-    typedef std::vector<NTV2Channel> ChannelVector;
-    typedef std::vector<std::pair<ULWord, ULWord> > VPIDVector;
+    using Timer =  TwkUtil::Timer;
+    using GLFence = TwkGLF::GLFence;
+    using BufferVector = std::vector<unsigned char*>;
+    using ThreadGroup = stl_ext::thread_group;
+    using AudioBuffer = std::vector<int>;
+    using AudioBufferVector = std::vector<AudioBuffer>;
+    using TimeVector = std::vector<Time>;
+    using GLFBO = TwkGLF::GLFBO;
+    using StatusStruct = AUTOCIRCULATE_TRANSFER_STATUS_STRUCT;
+    using ChannelVector = std::vector<NTV2Channel>;
+    using VPIDVector = std::vector<std::pair<ULWord, ULWord>>;
 
     //
     //  This is basically the ring buffer element. Each method uses
@@ -244,7 +236,7 @@ namespace AJADevices
       Mutex stateMutex;
     };
 
-    typedef std::vector<FrameData> FrameDataVector;
+    using FrameDataVector = std::vector<FrameData>;
 
     //
     //  VideoChannel is a logical indepenent output. For example the
@@ -273,7 +265,7 @@ namespace AJADevices
       FrameDataVector data;
     };
 
-    typedef std::vector<VideoChannel*> VideoChannelVector;
+    using VideoChannelVector = std::vector<VideoChannel*>;
 
     //
     //  See next comment for explanation
@@ -308,92 +300,92 @@ namespace AJADevices
     //  stereo, or quad 4K, can be used.
     //
 
-    KonaVideoDevice( AJAModule*, const std::string& name, unsigned int devicenum,
+    KonaVideoDevice( AJAModule*, const std::string& name, unsigned int deviceIndex,
                      unsigned int appID, OperationMode mode = OperationMode::ProMode );
 
-    virtual ~KonaVideoDevice();
+    ~KonaVideoDevice() override;
 
     //
     //  KonaVideoDevice API
     //
 
-    virtual Time outputTime() const;
-    virtual Time inputTime() const;
-    virtual void resetClock() const;
+    Time outputTime() const override;
+    Time inputTime() const override;
+    void resetClock() const override;
 
-    virtual void beginTransfer() const;
-    virtual void endTransfer() const;
+    void beginTransfer() const override;
+    void endTransfer() const override;
 
     //
     //  GLBindableVideoDevice API
     //
 
-    virtual bool isStereo() const;
-    virtual bool isDualStereo() const;
+    bool isStereo() const override;
+    bool isDualStereo() const override;
 
-    virtual bool willBlockOnTransfer() const;
-    virtual void bind( const TwkGLF::GLVideoDevice* ) const;
-    virtual void bind2( const TwkGLF::GLVideoDevice*,
-                        const TwkGLF::GLVideoDevice* ) const;
-    virtual void transfer( const TwkGLF::GLFBO* ) const;
-    virtual void transfer2( const TwkGLF::GLFBO*, const TwkGLF::GLFBO* ) const;
+    bool willBlockOnTransfer() const override;
+    void bind( const TwkGLF::GLVideoDevice* ) const override;
+    void bind2( const TwkGLF::GLVideoDevice*,
+                        const TwkGLF::GLVideoDevice* ) const override;
+    void transfer( const TwkGLF::GLFBO* ) const override;
+    void transfer2( const TwkGLF::GLFBO*, const TwkGLF::GLFBO* ) const override;
 
-    virtual void unbind() const;
+    void unbind() const override;
 
     //
     //  VideoDevice Audio API
     //
-    virtual size_t numAudioFormats() const;
-    virtual AudioFormat audioFormatAtIndex( size_t ) const;
-    virtual void setAudioFormat( size_t );
-    virtual size_t currentAudioFormat() const;
-    virtual void audioFrameSizeSequence( AudioFrameSizeVector& ) const;
-    virtual void transferAudio( void* interleavedData, size_t n ) const;
+    size_t numAudioFormats() const override;
+    AudioFormat audioFormatAtIndex( size_t ) const override;
+    void setAudioFormat( size_t ) override;
+    size_t currentAudioFormat() const override;
+    void audioFrameSizeSequence( AudioFrameSizeVector& ) const override;
+    void transferAudio( void* interleavedData, size_t n ) const override;
 
     //
     //  VideoDevice Video API
     //
 
-    virtual size_t asyncMaxMappedBuffers() const;
-    virtual Time deviceLatency() const;
+    size_t asyncMaxMappedBuffers() const override;
+    Time deviceLatency() const override;
 
-    virtual size_t numVideoFormats() const;
-    virtual VideoFormat videoFormatAtIndex( size_t ) const;
-    virtual void setVideoFormat( size_t );
-    virtual size_t currentVideoFormat() const;
+    size_t numVideoFormats() const override;
+    VideoFormat videoFormatAtIndex( size_t ) const override;
+    void setVideoFormat( size_t ) override;
+    size_t currentVideoFormat() const override;
 
-    virtual size_t numVideo4KTransports() const;
-    virtual Video4KTransport video4KTransportAtIndex( size_t ) const;
-    virtual void setVideo4KTransport( size_t );
-    virtual size_t currentVideo4KTransport() const;
+    size_t numVideo4KTransports() const override;
+    Video4KTransport video4KTransportAtIndex( size_t ) const override;
+    void setVideo4KTransport( size_t ) override;
+    size_t currentVideo4KTransport() const override;
 
-    virtual size_t numDataFormats() const;
-    virtual DataFormat dataFormatAtIndex( size_t ) const;
-    virtual void setDataFormat( size_t );
-    virtual size_t currentDataFormat() const;
+    size_t numDataFormats() const override;
+    DataFormat dataFormatAtIndex( size_t ) const override;
+    void setDataFormat( size_t ) override;
+    size_t currentDataFormat() const override;
 
-    virtual size_t numSyncModes() const;
-    virtual SyncMode syncModeAtIndex( size_t ) const;
-    virtual void setSyncMode( size_t );
-    virtual size_t currentSyncMode() const;
+    size_t numSyncModes() const override;
+    SyncMode syncModeAtIndex( size_t ) const override;
+    void setSyncMode( size_t ) override;
+    size_t currentSyncMode() const override;
 
-    virtual size_t numSyncSources() const;
-    virtual SyncSource syncSourceAtIndex( size_t ) const;
-    virtual void setSyncSource( size_t );
-    virtual size_t currentSyncSource() const;
+    size_t numSyncSources() const override;
+    SyncSource syncSourceAtIndex( size_t ) const override;
+    void setSyncSource( size_t ) override;
+    size_t currentSyncSource() const override;
 
-    virtual Resolution resolution() const;
-    virtual Offset offset() const;  // defaults to 0,0
-    virtual Timing timing() const;
-    virtual VideoFormat format() const;
-    virtual size_t width() const;
-    virtual size_t height() const;
-    virtual void open( const StringVector& );
-    virtual void close();
-    virtual bool isOpen() const;
+    Resolution resolution() const override;
+    Offset offset() const override;  // defaults to 0,0
+    Timing timing() const override;
+    VideoFormat format() const override;
+    size_t width() const override;
+    size_t height() const override;
+    void open( const StringVector& ) override;
+    void close() override;
+    bool isOpen() const override;
     virtual void makeCurrent() const;
-    virtual void clearCaches() const;
-    virtual void syncBuffers() const;
+    void clearCaches() const override;
+    void syncBuffers() const override;
 
     void threadMain();
     void lockDevice( bool lock, const char* threadName = "" ) const;
@@ -446,9 +438,8 @@ namespace AJADevices
     void routeHDMI( NTV2Standard standard, const KonaDataFormat& d,
                     bool tsiEnabled, bool outputIsRGB );
 
-   private:
     unsigned int m_appID{ 0 };
-    unsigned int m_devicenum{ 0 };
+    unsigned int m_deviceIndex{ 0 };
     NTV2DeviceID m_deviceID{ DEVICE_ID_INVALID };
     CNTV2Card* m_card{ nullptr };
     NTV2EveryFrameTaskMode m_taskMode{ NTV2_TASK_MODE_INVALID };
