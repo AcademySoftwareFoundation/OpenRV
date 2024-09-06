@@ -22,6 +22,7 @@
 #include "ntv2enums.h"
 #include "ntv2devicefeatures.h"
 #include "ntv2devicescanner.h"
+#include <ntv2card.h>
 #include "ntv2utils.h"
 
 namespace AJADevices
@@ -30,11 +31,8 @@ namespace AJADevices
 
   AJAModule::AJAModule( NativeDisplayPtr p, unsigned int appID,
                         OperationMode mode )
-      : VideoModule(), m_devicescan( 0 ), m_mode( mode ), m_appID( appID )
+      : VideoModule(), m_mode( mode ), m_appID( appID )
   {
-    m_devicescan = new CNTV2DeviceScanner();
-    // cout << "m_devicescan: " << hex << m_devicescan << endl;
-    // cout << "opening AJA ...." << endl;
     open();
 
     if( !isOpen() )
@@ -46,7 +44,6 @@ namespace AJADevices
   AJAModule::~AJAModule()
   {
     close();
-    delete reinterpret_cast<CNTV2DeviceScanner*>( m_devicescan );
   }
 
   string AJAModule::name() const
@@ -69,22 +66,22 @@ namespace AJADevices
 
   void AJAModule::open()
   {
-    if( isOpen() ) return;
-
-    reinterpret_cast<CNTV2DeviceScanner*>( m_devicescan )->ScanHardware();
-
-    const NTV2DeviceInfoList& deviceList =
-        reinterpret_cast<CNTV2DeviceScanner*>( m_devicescan )
-            ->GetDeviceInfoList();
-
-    for( size_t i = 0; i < deviceList.size(); i++ )
+    if (isOpen())
     {
-      const NTV2DeviceInfo& info = deviceList[i];
-      // cout << "info.deviceIdentifier: " << info.deviceIdentifier << " Mode: "
-      // << m_mode << endl;
-      m_devices.push_back(
-          new KonaVideoDevice( this, info.deviceIdentifier, i, m_appID,
-                               (KonaVideoDevice::OperationMode)m_mode ) );
+      return;
+    }
+
+    CNTV2Card device;
+    ULWord deviceIndex = 0;
+
+    while (CNTV2DeviceScanner::GetDeviceAtIndex(deviceIndex, device))
+    {
+      auto konaVideoDevice = std::make_unique<KonaVideoDevice>(this, device.GetDisplayName(), deviceIndex, m_appID,
+                              static_cast<KonaVideoDevice::OperationMode>(m_mode));
+      
+      m_devices.push_back(konaVideoDevice.release());
+
+      deviceIndex++;
     }
   }
 
