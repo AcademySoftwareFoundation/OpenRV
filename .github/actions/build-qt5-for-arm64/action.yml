@@ -1,0 +1,167 @@
+name: Build Qt for Apple ARM64
+description: Build Qt for Apple ARM64 using Clang 14
+inputs:
+  qt-version:
+    description: 'Qt version to build'
+    required: true
+  python3-version:
+    description: 'Python 3 version'
+    required: true
+  python2-version:
+    description: 'Python 2 version'
+    required: true
+  xcode-version:
+    description: 'Xcode version'
+    required: true
+  qt-output:
+    description: 'qt output'
+    required: true
+outputs:
+  qt-cache-hit:
+    description: "Qt Cache hit"
+    value: ${{ steps.arm64-qt-cache.outputs.cached }}
+runs:
+  using: "composite"
+  steps:
+      - name: Cache Qt ${{ inputs.qt-version }}
+        uses: actions/cache@v4
+        id: arm64-qt
+        with:
+          path: ./${{ inputs.qt-output }}
+          key: arm64-qt-${{ inputs.qt-version }}
+
+      - name: Set output for action
+        id: arm64-qt-cache
+        run: |
+          echo "cached=${{ steps.arm64-qt.outputs.cache-hit }}" >> $GITHUB_OUTPUT
+        shell: bash
+          
+      - name: Switch to XCode 14
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          sudo xcode-select -switch /Applications/Xcode_${{ inputs.xcode-version }}.app
+        shell: bash
+
+      - name: Install Homebrew dependencies
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          brew install --quiet --formula libiconv libpng libpq libtool libuv libxau libxcb libxdmcp
+          brew install --quiet --formula autoconf automake cmake pcre2 harfbuzz freetype node@18 nspr nss
+          brew install --quiet --formula xcb-proto xcb-util xcb-util-cursor xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-wm
+          brew install --quiet --formula brotli bzip2 dbus glew icu4c jpeg md4c openssl@1.1 pkg-config sqlite xorgproto zlib zstd
+          brew list openssl@1.1
+        shell: bash
+
+      # Use Ninja 1.11.1 because Qt need to be patched for Ninja 1.12.1.
+      - name: Install Ninja 1.11.1
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          wget https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-mac.zip
+          unzip ninja-mac.zip -d ./ninja
+          echo "$(pwd)/ninja" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Display ninja version
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          ninja --version
+        shell: bash
+
+      - name: Install pyenv
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          curl https://pyenv.run | bash
+
+          export PYENV_ROOT="$HOME/.pyenv"
+          echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
+          echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+        shell: bash
+        
+      - name: Setup pyenv
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          echo $PATH
+          pyenv install ${{ inputs.python3-version }} ${{ inputs.python2-version }}
+          pyenv global ${{ inputs.python3-version }} ${{ inputs.python2-version }}
+        shell: bash
+
+      - name: Display Python installation location
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          python -c "import sys; print(sys.executable)"
+          python2 -c "import sys; print(sys.executable)"
+        shell: bash
+
+      - name: Download Qt ${{ inputs.qt-version }} source
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          curl https://www.nic.funet.fi/pub/mirrors/download.qt-project.org/official_releases/qt/5.15/${{ inputs.qt-version }}/single/qt-everywhere-opensource-src-${{ inputs.qt-version }}.tar.xz -o qt.tar.xz
+          tar xf qt.tar.xz
+          mv qt-everywhere-src-${{ inputs.qt-version }} qt-src
+        shell: bash
+
+      - name: Create directory for build
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p qt-build
+        shell: bash
+
+      - name: Configure Qt ${{ inputs.qt-version }}
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          ../qt-src/configure \
+          --prefix="../${{ inputs.qt-output }}" \
+          -no-strip \
+          -no-rpath \
+          -opensource \
+          -plugin-sql-sqlite \
+          -openssl \
+          -verbose \
+          -opengl desktop \
+          -no-warnings-are-errors \
+          -no-libudev \
+          -no-egl \
+          -nomake examples \
+          -nomake tests \
+          -c++std c++14 \
+          -confirm-license \
+          -no-use-gold-linker \
+          -release \
+          -no-sql-mysql \
+          -no-xcb \
+          -qt-libjpeg \
+          -qt-libpng \
+          -bundled-xcb-xinput \
+          -sysconfdir /etc/xdg \
+          -qt-pcre \
+          -qt-harfbuzz \
+          -R . \
+          -icu \
+          -skip qtnetworkauth \
+          -skip qtpurchasing \
+          -skip qtlocation \
+          -I /opt/homebrew/Cellar/openssl@1.1/1.1.1w/include -L /opt/homebrew/Cellar/openssl@1.1/1.1.1w/lib \
+          -I /opt/homebrew/Cellar/icu4c/74.2/include -L /opt/homebrew/Cellar/icu4c/74.2/lib
+        working-directory: ${{ github.workspace }}/qt-build
+        shell: bash
+
+      - name: Build Qt ${{ inputs.qt-version }}
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          make -j$(python -c 'import os; print(os.cpu_count())')
+        working-directory: ${{ github.workspace }}/qt-build
+        shell: bash
+
+      - name: Install Qt ${{ inputs.qt-version }}
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          make install -j$(python -c 'import os; print(os.cpu_count())')
+        working-directory: ${{ github.workspace }}/qt-build
+        shell: bash
+
+      - name: Display release folder and architecture
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
+        run: |
+          ls -al ./${{ inputs.qt-output }}
+          file ./${{ inputs.qt-output }}/bin/qmake
+        shell: bash
