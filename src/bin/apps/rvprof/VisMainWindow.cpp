@@ -475,7 +475,7 @@ VisMainWindow::rangeChanged()
 //----------------------------------------------------------------------
 
 GLView::GLView(QWidget* parent, QTextEdit* readout, VisMainWindow* visWin)
-    : QGLWidget(QGLFormat(QGL::DoubleBuffer|QGL::SampleBuffers|QGL::Rgba), parent, NULL, Qt::Widget),
+    : QOpenGLWidget(parent, Qt::Widget),
       m_scale(1.0),
       m_xtran(0),
       m_ytran(0),
@@ -492,6 +492,13 @@ GLView::GLView(QWidget* parent, QTextEdit* readout, VisMainWindow* visWin)
       m_computedFPS(0.0),
       m_visWin(visWin)
 {
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setVersion(3, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    setFormat(format);
+
     m_matrix.makeIdentity();
     setMouseTracking(true);
 }
@@ -522,7 +529,7 @@ GLView::setRange(int start, int end)
         }
     }
 
-    updateGL();
+    update();
 }
 
 void 
@@ -551,7 +558,7 @@ GLView::setTimeRange(float start, float end)
         }
     }
     //  cerr << "rangeEnd " << m_rangeEnd << " index " << m_rangeEndIndex << endl;
-    updateGL();
+    update();
 }
 
 void
@@ -590,7 +597,7 @@ GLView::setData(const DataVector& data)
     m_matrix = scaleMatrix<float>(Vec(d, d, 1)) 
                 * translationMatrix<float>(Vec(-m_startTime , y, 0));
 
-    updateGL();
+    update();
 }
 
 void
@@ -603,35 +610,35 @@ void
 GLView::setActualFPS(float fps) 
 { 
     m_actualFPS = fps; 
-    updateGL();
+    update();
 }
 
 void
 GLView::setShowEvalTiming(bool b)
 {
     m_showEvalTiming = b;
-    updateGL();
+    update();
 }
 
 void 
 GLView::setShowIdealFrames(bool b) 
 { 
     m_showIdealFrames = b; 
-    updateGL();
+    update();
 }
 
 void
 GLView::setComputedRefresh(float rate)
 {
     m_computedRefresh = 1.0 / rate;
-    updateGL();
+    update();
 }
 
 void
 GLView::setComputedFPS(float fps)
 {
     m_computedFPS = fps;
-    updateGL();
+    update();
 }
 
 int
@@ -881,7 +888,7 @@ GLView::mouseMoveEvent(QMouseEvent* event)
         m_matrix = translationMatrix<float>(t) * m_matrix; 
     }
     m_mouseDown = event->pos();
-    updateGL();
+    update();
 }
 
 void
@@ -958,7 +965,7 @@ GLView::mousePressEvent(QMouseEvent* event)
             autoRangeProcessing();
         }
     }
-    updateGL();
+    update();
 }
 
 void 
@@ -985,7 +992,7 @@ GLView::wheelEvent(QWheelEvent* event)
         * translationMatrix<float>(-t)
         * m_matrix; 
 
-    updateGL();
+    update();
 }
 
 void
@@ -994,13 +1001,15 @@ GLView::initializeGL()
     Context c = GLtext::newContext();
     GLtext::setContext(c);
     GLtext::init();
+
+    initializeOpenGLFunctions();
 }
 
 void
 GLView::resizeGL(int, int) 
 { 
     glViewport(0, 0, width(), height());
-    updateGL(); 
+    update(); 
 }
 
 static void drawBox(
