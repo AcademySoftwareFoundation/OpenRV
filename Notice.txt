@@ -966,11 +966,7 @@ We are required to state that
 
 Libaio
 
-libaio is licensed under the GNU Lesser General Public License v.2.1, which can be found at https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html.   
-
-libDevil 1.6.8
-
-libDevil is licensed under the GNU Lesser General Public License v.2.1, which can be found at https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html.   
+libaio is licensed under the GNU Lesser General Public License v.2.1, which can be found at https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html.    
 
 Libexif
 
