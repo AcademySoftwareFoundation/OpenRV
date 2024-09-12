@@ -26,16 +26,22 @@ using namespace TwkApp;
 
 //----------------------------------------------------------------------
 
-class ScreenView : public QGLWidget
+class ScreenView : public QOpenGLWidget
 {
   public:
-    ScreenView(const QGLFormat& fmt,
+    ScreenView(const QSurfaceFormat& fmt,
                QWidget* parent,
-               QGLWidget* share,
+               QOpenGLWidget* share,
                Qt::WindowFlags flags)
-        : QGLWidget(fmt, parent, share, flags)
+        : QOpenGLWidget(parent, flags)
         {
-            setAutoBufferSwap(false);
+            // NOTE_QT: setAutoBUfferSwap does not exist anymore.
+            //setAutoBufferSwap(false);
+            setFormat(fmt);
+            if (share)
+            {
+                context()->setShareContext(share->context());
+            }
         }
 
     ~ScreenView() {}
@@ -70,7 +76,7 @@ QTDesktopVideoDevice::~QTDesktopVideoDevice()
 
 
 void
-QTDesktopVideoDevice::setWidget(QGLWidget* widget)
+QTDesktopVideoDevice::setWidget(QOpenGLWidget* widget)
 {
     m_view = widget;
     m_translator = new QTTranslator(this, m_view);
@@ -99,7 +105,7 @@ QTDesktopVideoDevice::redrawImmediately() const
     if (m_view && m_view->isVisible()) 
     {
         ScopedLock lock(m_mutex);
-        m_view->updateGL();
+        m_view->update();
     }
     else 
     {
@@ -114,7 +120,8 @@ QTDesktopVideoDevice::syncBuffers() const
     {
         ScopedLock lock(m_mutex);
         makeCurrent();
-        m_view->swapBuffers();
+        // NOTE_QT: swapBuffer is under the context now.
+        m_view->context()->swapBuffers(m_view->context()->surface());
     }
 }
 
@@ -125,7 +132,9 @@ QTDesktopVideoDevice::open(const StringVector& args)
     //  always make the fullscreen device synced
     //
 
-    QGLFormat fmt = shareDevice()->widget()->format();
+    // NOTE_QT: QSurfaceFormat replace QGLFormat.
+
+    QSurfaceFormat fmt = shareDevice()->widget()->format();
     fmt.setSwapInterval(m_vsync ? 1 : 0);
     ScreenView* s = new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
     setWidget(s);

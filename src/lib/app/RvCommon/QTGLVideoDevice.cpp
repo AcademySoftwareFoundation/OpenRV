@@ -23,7 +23,7 @@ using namespace std;
 using namespace TwkGLF;
 using namespace TwkApp;
 
-QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QGLWidget *view) 
+QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWidget *view) 
     : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow ),
       m_view(view),
       m_translator(new QTTranslator(this, view)),
@@ -43,7 +43,7 @@ QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name)
 {
 }
 
-QTGLVideoDevice::QTGLVideoDevice(const string& name, QGLWidget *view) 
+QTGLVideoDevice::QTGLVideoDevice(const string& name, QOpenGLWidget *view) 
     : GLVideoDevice(NULL, name, NoCapabilities ),
       m_view(view),
       m_translator(new QTTranslator(this, view)),
@@ -60,7 +60,7 @@ QTGLVideoDevice::~QTGLVideoDevice()
 } 
 
 void
-QTGLVideoDevice::setWidget(QGLWidget* widget)
+QTGLVideoDevice::setWidget(QOpenGLWidget* widget)
 {
     m_view = widget;
     m_translator = new QTTranslator(this, m_view);
@@ -69,14 +69,16 @@ QTGLVideoDevice::setWidget(QGLWidget* widget)
 GLVideoDevice* 
 QTGLVideoDevice::newSharedContextWorkerDevice() const
 {
-    QGLWidget* w = new QGLWidget(m_view->parentWidget(), m_view);
+    // NOTE_QT: QOpenGLWidget does not take a share parameter anymore. Try to share with setShareContext.
+    QOpenGLWidget* w = new QOpenGLWidget(m_view->parentWidget());
+    w->context()->setShareContext(m_view->context());
     return new QTGLVideoDevice(name() + "-workerContextDevice", w);
 }
 
 void 
 QTGLVideoDevice::makeCurrent() const 
 { 
-    if (m_view->context()->contextHandle() && m_view->context()->isValid()) m_view->makeCurrent();
+    if (m_view->context() && m_view->context()->isValid()) m_view->makeCurrent();
     if (!isWorkerDevice()) GLVideoDevice::makeCurrent(); 
 }
 
@@ -112,7 +114,7 @@ QTGLVideoDevice::redrawImmediately() const
             m_view->setAttribute(Qt::WA_Mapped);
 #endif
 
-            m_view->updateGL();
+            m_view->update();
         }
         else 
         {
@@ -193,7 +195,8 @@ QTGLVideoDevice::syncBuffers() const
     if (!isWorkerDevice())
     {
         makeCurrent();
-        m_view->swapBuffers();
+        // NOTE_QT: swapBuffers() does not exist in the QOpenGLWidget. It under the context.
+        m_view->context()->swapBuffers(m_view->context()->surface());
     }
 }
 

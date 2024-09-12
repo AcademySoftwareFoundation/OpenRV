@@ -8,7 +8,9 @@
 #ifndef __rv_qt__GLView__h__
 #define __rv_qt__GLView__h__
 #include <TwkGLF/GL.h>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QSurfaceFormat>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <TwkUtil/Timer.h>
@@ -19,7 +21,7 @@ class RvDocument;
 class QTFrameBuffer;
 class QTGLVideoDevice;
 
-class GLView : public QGLWidget
+class GLView : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -27,7 +29,7 @@ public:
     typedef TwkUtil::Timer Timer;
 
     GLView(QWidget* parent, 
-           const QGLWidget* share, 
+           const QOpenGLWidget* share, 
            RvDocument* doc, 
            bool stereo=false,
            bool vsync=true,
@@ -39,13 +41,13 @@ public:
            bool noResize=true);
     ~GLView();
 
-    static QGLFormat rvGLFormat(bool stereo=false,
-                                bool vsync=true,
-                                bool doubleBuffer=true,
-                                int red=8,
-                                int green=8,
-                                int blue=8,
-                                int alpha=8);
+    static QSurfaceFormat rvGLFormat(bool stereo=false,
+                                     bool vsync=true,
+                                     bool doubleBuffer=true,
+                                     int red=8,
+                                     int green=8,
+                                     int blue=8,
+                                     int alpha=8);
 
     void absolutePosition(int& x, int& y) const;
 
