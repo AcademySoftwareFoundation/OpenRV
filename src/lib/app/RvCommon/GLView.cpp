@@ -111,9 +111,9 @@ class ThreadTrampoline
 }
 
 GLView::GLView(QWidget* parent,
-               const QGLWidget* share,
+               const QOpenGLWidget* share,
                RvDocument* doc,
-               bool strereo,
+               bool stereo,
                bool vsync,
                bool doubleBuffer,
                int red,
@@ -121,9 +121,7 @@ GLView::GLView(QWidget* parent,
                int blue,
                int alpha,
                bool noResize)
-    : QGLWidget(GLView::rvGLFormat(strereo, vsync, doubleBuffer, red, green, blue, alpha), 
-                parent, 
-                share),
+    : QOpenGLWidget(parent),
       m_doc(doc),
       m_red(red),
       m_green(green),
@@ -140,6 +138,9 @@ GLView::GLView(QWidget* parent,
       m_stopProcessingEvents(false),
       m_syncThreadData(0)
 {
+    setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
+    if (share) context()->setShareContext(share->context());
+
     setObjectName((m_doc->session()) ?  m_doc->session()->name().c_str() : "no session");
     //m_frameBuffer = new QTFrameBuffer( this );
     ostringstream str;
@@ -149,12 +150,13 @@ GLView::GLView(QWidget* parent,
     setMouseTracking(true);
     setAcceptDrops(true);
     setFocusPolicy(Qt::StrongFocus);
-    setAutoBufferSwap(false);
+
+    // NOTE_QT: setAutoBufferSwap does not exist anymore.
+    // QUESTON_QT: Is there something else?
+    //setAutoBufferSwap(false);
 
     m_eventProcessingTimer.setSingleShot(true);
     connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
-
-    QGLFormat f = format();
 }
 
 GLView::~GLView()
@@ -204,7 +206,7 @@ GLView::absolutePosition(int& x, int& y) const
     y = gp.y();
 }
 
-QGLFormat 
+QSurfaceFormat 
 GLView::rvGLFormat(bool stereo,
                    bool vsync,
                    bool doubleBuffer,
@@ -215,12 +217,12 @@ GLView::rvGLFormat(bool stereo,
 {
     const Rv::Options& opts = Rv::Options::sharedOptions();
 
-    QGLFormat fmt;
-    fmt.setDepthBufferSize(0);
-    fmt.setDoubleBuffer(doubleBuffer);
+    // NOTE_QT6: QGLFormat into QSurfaceFormat
+    // NOTE_QT6: setStencil, setDepth does not exist anymore. Trying to use setDepthBufferSize and setStencilBufferSize.
+    QSurfaceFormat fmt;
+    fmt.setDepthBufferSize(24);
+    fmt.setSwapBehavior(doubleBuffer ? QSurfaceFormat::DoubleBuffer : QSurfaceFormat::SingleBuffer);
     fmt.setStencilBufferSize(8);
-    fmt.setStencil(true);
-    fmt.setDepth(false);
     fmt.setStereo(stereo);
 
     //
@@ -233,7 +235,7 @@ GLView::rvGLFormat(bool stereo,
     if (blue  >  0) fmt.setBlueBufferSize(blue);
     if (alpha >= 0)
     {
-        fmt.setAlpha(alpha != 0);
+        // NOTE_QT6: setAlpha does not exist anymore. Using only setAlphaBufferSize.
         fmt.setAlphaBufferSize(alpha);
     }
 
@@ -248,10 +250,16 @@ GLView::initializeGL()
     //
     //  At this point the format is known. Can't do this in the constructor
     //
+    initializeOpenGLFunctions();
 
-    if (isValid())
+    // QUESTION_QT6: Should we use isValid from QOpenGLWidget or directly using from QOpenGLContext?
+    // NOTE_QT6: Returns true if the widget and OpenGL resources, like the context, have been successfully initialized. 
+    //           Note that the return value is always false until the widget is shown.
+    // NOTE_QT6: QOpenGLContext: Returns if this context is valid, i.e. has been successfully created.
+    if (context()->isValid())
     {
-        QGLFormat f = context()->format();
+        // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
+        QSurfaceFormat f = context()->format();
 
 #ifndef PLATFORM_DARWIN
         //
@@ -289,8 +297,8 @@ GLView::initializeGL()
             // box.exec();
         }
 #endif
-
-        if (!f.stencil())
+        // NOTE_QT6: stencil does not exist anymore
+        if (f.stencilBufferSize() == 0)
         {
             cout << "WARNING: no stencil buffer available" << endl;
         }
@@ -449,7 +457,8 @@ GLView::paintGL()
 #ifdef PLATFORM_DARWIN
             session->outputVideoDevice()->syncBuffers();
             makeCurrent();
-            swapBuffers();
+            // NOTE_QT6: swapBuffers is under the QOpenGLContext object in Qt6.
+            context()->swapBuffers(context()->surface());
 #else
             session->outputVideoDevice()->syncBuffers();
             makeCurrent();
@@ -458,7 +467,8 @@ GLView::paintGL()
         }
         else
         {
-            swapBuffers();
+            // NOTE_QT6: swapBuffers is under the QOpenGLContext object in Qt6.
+            context()->swapBuffers(context()->surface());
         }
 
         trecord.swapEnd = session->profilingElapsedTime();
@@ -497,7 +507,8 @@ GLView::paintGL()
             //session->outputVideoDevice()->syncBuffers();
 
             makeCurrent();
-            swapBuffers();
+            // NOTE_QT6: swapBuffers is under the QOpenGLContext object in Qt6.
+            context()->swapBuffers(context()->surface());
 #else
             session->outputVideoDevice()->syncBuffers();
             makeCurrent();
@@ -506,7 +517,8 @@ GLView::paintGL()
         }
         else
         {
-            swapBuffers();
+            // NOTE_QT6: swapBuffers is under the QOpenGLContext object in Qt6.
+            context()->swapBuffers(context()->surface());
         }
     }
 
@@ -670,7 +682,7 @@ GLView::event(QEvent* event)
                 session->userGenericEvent("view-resized", contents.str());
             }
         }
-        return QGLWidget::event(event);
+        return QOpenGLWidget::event(event);
     }
 
     if (session && session->outputVideoDevice() &&
@@ -736,7 +748,7 @@ GLView::event(QEvent* event)
     }
     else
     {
-        bool result = QGLWidget::event(event);
+        bool result = QOpenGLWidget::event(event);
 
         return result;
     }
