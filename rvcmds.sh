@@ -73,11 +73,16 @@ fi
 
 # Must be executed in a function as it changes the shell environment
 rvenv_shell() {
+  local activate_path=".venv/bin/activate"
+  if [[ "$OSTYPE" == "msys"* ]]; then
+    activate_path=".venv/Scripts/activate"
+  fi
+
   if [ -d ".venv" ]; then
-    source .venv/bin/activate
+    source "$activate_path"
   else
     python3 -m venv .venv
-    source .venv/bin/activate
+    source "$activate_path"
   fi
 }
 
