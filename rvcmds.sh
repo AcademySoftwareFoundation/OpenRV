@@ -71,10 +71,18 @@ else
   echo "Using Qt installation already set at $QT_HOME"
 fi
 
-# Must be executed in a function as it changes the shell environment
+if [[ "$(python -c 'import sys; print(sys.prefix)')" =~ ^/usr|^/mingw64 ]]; then
+  # Python from MSYS2.
+  PYTHON_FROM_MSYS2=1
+else
+  # Native Windows.
+  PYTHON_FROM_MSYS2=0
+fi
+
+# Must be executed in a function as it changes the shell environment.
 rvenv_shell() {
   local activate_path=".venv/bin/activate"
-  if [[ "$OSTYPE" == "msys"* ]]; then
+  if [[ PYTHON_FROM_MSYS2 -eq 0 ]]; then
     activate_path=".venv/Scripts/activate"
   fi
 
