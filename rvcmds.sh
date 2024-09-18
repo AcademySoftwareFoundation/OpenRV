@@ -73,11 +73,12 @@ fi
 
 # Must be executed in a function as it changes the shell environment
 rvenv_shell() {
+  local activate_path=".venv/Scripts/activate"
   if [ -d ".venv" ]; then
-    source .venv/bin/activate
+    source "$activate_path"
   else
     python3 -m venv .venv
-    source .venv/bin/activate
+    source "$activate_path"
   fi
 }
 

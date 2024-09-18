@@ -2,68 +2,289 @@
 
 ## Summary
 
-1. [Install Microsoft Visual Studio](#1-install-microsoft-visual-studio)
-1. [Install Qt](#2-install-qt)
-1. [Install Strawberry Perl](#3-install-strawberry-perl)
-1. [Install MSYS2](#4-install-msys2)
-1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](#5-install-required-msys2-pacman-packages)
+1. [Microsoft Visual Studio](mvs)
+2. [Setup default MSVC compiler](setup_default_msvc_compiler)
+3. [Install Python 3](install_python)
+    1. [Copy python.exe and rename it to python3.exe](copy_python3)
+4. [Install CMake](install_cmake)
+5. [Install Qt](install_qt)
+6. [Install Strawberry Perl](install_strawberry_perl)
+7. [Install MSYS2](install_msys2)
+    1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](install_msys2_packages)
+8. [Setup environment variables](setup_env)
+9. [Build Open RV](build_openrv)
 
 
-## 1. Install Microsoft Visual Studio
+````{warning}
+You should be cloning the repository later in the steps, but if you must clone it beforehand, clone it into the root 
+of a drive (e.g. ````c:````). See [Get Open RV source code](build_openrv2).
+````
 
-Install Microsoft Visual Studio 2022.
+(mvs)=
+## 1. Microsoft Visual Studio
 
-Any edition of Microsoft Visual Studio 2022 should do, even the Microsoft Visual Studio 2022 Community Edition. Download it from the Microsoft [older downloads page](https://visualstudio.microsoft.com/vs/older-downloads/).
+````{warning}
+Open RV will not compile with Microsoft Visual Studio 2022 version 17.11.X with the default compiler because of issues 
+between PySide2 and that version of the compiler.
+\
+\
+You can still install 17.11.X, but you will need to install MSVC v143 version 14.40 to compile Open RV itself and 
+MSVC v143 14.39.X to compile Boost.
+````
 
-Make sure to select the "Desktop development with C++" and the latest SDK for Windows 10 or Windows 11 features when installing Microsoft Visual Studio.
+Any variant of Microsoft Visual Studio 2022 will work with Open RV (e.g. Enterprise, Professional or Community).
+You can select the version on [Visual Studio website](https://visualstudio.microsoft.com/downloads).
 
-You select the Windows SDK based on the target Windows version you plan on running the compiled application on.
+### Installation
 
-## 2. Install Qt
+````{note}
+**Quick guide**:
+- You must select **Desktop Development with C++**
+- In the individual components section, you must install **MSVC v143 14.40.X** for Open RV and **MSVC v143 14.39.X** to compile Boost.
+````
 
-Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). Logs, Android, iOS and WebAssembly are not required to build OpenRV.
+````{carousel}
+:show_controls:
+:show_indicators:
+:show_captions_below:
+:show_shadows:
+:data-bs-interval: false
 
-Note: You will also need `jom`, and it is included with Qt Creator (available from the Qt online installer). If you do not want to install Qt Creator, you can download it from [here](https://download.qt.io/official_releases/jom/) and copy the executable and other files into the QT installation root directory under the Tools/QtCreator/bin/jom folder.
+```{figure} ../images/windows/msvc/msvc1.png
 
-WARNING: If you fetch Qt from another source, make sure to build it with SSL support, that it contains everything required to build PySide2, and that the file structure is similar to the official package. 
+Step 1 - Select Desktop Development with C++
 
-Note: Qt from MSYS2 is missing QtWebEngine.
+Select the Desktop Development with C++ component
 
-## 3. Install Strawberry Perl
+```
+
+```{figure} ../images/windows/msvc/msvc2.png
+
+Step 1 - Individual components
+
+Click on the Individual components tab, and search for ````msvc````. Select the following components:
+MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.39-17.9) and MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.40-17.10).
+
+```
+
+````
+
+(setup_default_msvc_compiler)=
+## 2. Setup default MSVC compiler
+
+If Microsoft Visual Studio 2022 was installed for the first time (using steps above), MSVC v143 v14.40 is *should* be 
+the default compiler, although varying setup may affect this. 
+\
+\
+To ensure compatibility with Open RV, we need to make sure that MSVC v143 v14.40 is the default compiler.
+\
+\
+Here are the possible methods to set the default compiler:
+
+### Method 1: Check default props file
+
+The first solution is to modify the `Microsoft.VCToolsVersion.v143.default.props` under `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`.
+The path will vary depending if the variant is Enterprise, Profressional or Community.
+
+Make sure that the *VCToolsVersion* is set to `14.40.33807`. The file should look similar to this:
+
+```xml
+<?xml version = "1.0" encoding="utf-8"?> 
+<Project ToolsVersion = "4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003"> 
+  <Import Project="$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)Microsoft.VCRedistVersion.v143.default.props))"/> 
+  <PropertyGroup> 
+    <VCToolsVersion Condition = "'$(VCToolsVersion)' == ''" >14.40.33807</VCToolsVersion> 
+  </PropertyGroup>      
+</Project>     
+```
+
+If the version is different, change it to `14.40.33807` in the file.
+
+(install_python)=
+## 3. Install Python 3
+
+### 3.1 VFX Reference Platform 2023
+You must installed Python 3.10 using the official Python installer. The latest version with installer is **3.10.11**.
+On [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
+the correct version will be **Windows installer (64-bit)**.
+
+### 3.2 VFX Reference Platform 2023
+Same as VFX 2023 but download and install the latest [Python 3.11 with binaries](https://www.python.org/downloads/release/python-3119/).
+
+### 3.3 Installation
+
+The carousel below shows how to install Python. The images refers to Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
+
+````{carousel}
+:show_controls:
+:show_indicators:
+:show_captions_below:
+:show_shadows:
+:data-bs-interval: false
+
+```{figure} ../images/windows/python/python1.png
+
+Step 1 - Customize installation
+
+Click on the Customize installation button to customize the installation location.
+
+```
+
+```{figure} ../images/windows/python/python2.png
+
+Step 2 - Advanced Options
+
+It is recommended to choose an installation location with a shorter path length (as shown in the image above).
+
+```
+
+```{figure} ../images/windows/python/python3.png
+
+Step 3 - Setup was successful
+
+Click on Disable path length limit
+```
+
+````
+
+````{note}
+Take note of the installation path for Python 3, as it will be required in a subsequent step.\
+The **recommended** path is `C:\Python310` for VFX 2023 and `C:\Python311` for VFX 2024.
+````
+
+(copy_python3)=
+### 3.1 Copy python.exe and rename it to python3.exe
+
+Copy the Python executable as **python3.exe** to ensure compatibility with Open RV, which requires the `python3` command. 
+This also aligns with Linux and macOS conventions, where both python and python3 are valid commands.
+
+(install_cmake)=
+## 4. Install CMake
+
+````{warning}
+Minimum **recommended** version for CMake is **3.27.X**.
+````
+
+Download the lastest version of CMake from the [official CMake website](https://cmake.org/download/). Typically,
+the correct version will be **Windows x64 Installer**. Follow the installation wizard prompts to complete the setup. 
+There are no special considerations or unique configuration options required.
+
+````{note}
+Take note of the installation path for CMake, as it will be required in a subsequent step.\
+The default path is `C:\Program Files\CMake`.
+````
+
+(install_qt)=
+## 5. Install Qt
+
+````{warning}
+
+When obtaining Qt from a third-party source, ensure it includes **OpenSSL** support and check for the following essential modules that may not be included by default: **QtWebEngine**, **QtWebSockets**, **QtMultimedia**, and **QtDeclarative**.
+\
+\
+For example, Qt from MSYS2 is missing QtWebEngine.
+````
+
+Download the latest version of Qt 5.15.x from the [official Qt website](https://www.qt.io/download-open-source) using the online installer. It is **recommended** to install Qt in a location with a **short path length**. (e.g. `C:\Qt`)
+
+Additionally, ensure you have jom, which is included with Qt Creator, available through the Qt online installer. If you prefer not to install Qt Creator, you can download jom separately from the official Qt repository and copy the executable and supporting files to the Tools/QtCreator/bin/jom directory within your Qt installation.
+
+````{carousel}
+:show_controls:
+:show_indicators:
+:show_captions_below:
+:show_shadows:
+:data-bs-interval: false
+
+```{figure} ../images/windows/qt/qt1.png
+
+Step 1 - After log in
+
+Open the setup, log in with your credentials, and proceed through the prompts until you reach this step.
+
+```
+
+```{figure} ../images/windows/qt/qt2.png
+
+Step 2 - Enable archive packages
+
+Select the 'Archives' checkbox on the right-hand side to enable and display the archive packages.
+
+```
+
+```{figure} ../images/windows/qt/qt3.png
+
+Step 3 - Filter and load archive packages
+
+Click the Filter button to load the archive packages and view available options.
+
+```
+
+```{figure} ../images/windows/qt/qt4.png
+
+Step 4 - Check Qt 5.15.2
+
+Once the archive packages are loaded, scroll down to Qt 5.15.2, select the checkbox, and click the small arrow icon beside it to expand the options.
+
+```
+
+```{figure} ../images/windows/qt/qt5.png
+
+Step 5 - Uncheck optional packages and install Qt 5.15.2
+
+Uncheck all optional packages (as shown in the image above) and click the 'Next' button to proceed.
+
+```
+````
+
+````{note}
+Take note of the installation path for Qt 5.15.2, as it will be required in a subsequent step.\
+Based on the recommendation above, the path would be `C:\Qt`.
+````
+
+(install_strawberry_perl)=
+## 6. Install Strawberry Perl
 
 Download and install the 64-bit version of [Strawberry Perl](https://strawberryperl.com/)
 
-## 4. Install MSYS2
+````{note}
+Take note of the installation path for Strawberry Perl, as it will be required in a subsequent step.\
+The default path is `C:\Strawberry`.
+````
 
-Download and install the latest [MSYS2](https://www.msys2.org/).
+(install_msys2)=
+## 7. Install MSYS2
 
-Note that RV is NOT a mingw64 build. It is a Microscoft Visual Studio 2022 build.
+````{warning}
 
-RV is built with Microsoft Visual Studio 2022 via the cmake "Visual Studio 17 2022" generator.
-
-msys2 is only used for convenience as it comes with a package manager with utility packages required for the RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
-
-NOTE: The Windows' WSL2 feature conflict with MSYS2. For simplicity, it is highly recommended to disable Windows' WSL or WSL2 feature entirely.
-
+The Windows' WSL2 feature conflict with MSYS2. For simplicity, it is highly recommended to **disable** Windows' WSL or WSL2 feature entirely.\
+\
 Additional information can be found on the [MSYS2 github](https://github.com/msys2/setup-msys2/issues/52).
 
-## 5. Install required MSYS2 pacman packages
+````
 
+Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NOT** a mingw64 build. It is a Microscoft Visual Studio 2022 build. Open RV is built with Microsoft Visual Studio 2022 via the cmake "Visual Studio 17 2022" generator.
+
+MSYS2 is only used for convenience as it comes with a package manager with utility packages required for the Open RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
+
+(install_msys2_packages)=
+### 7.1 Install required MSYS2 pacman packages
+
+````{note}
+The MSYS2 MingGW64 terminal MUST be used.\
 ![MSYS2-MinGW64](../images/rv-msys2-mingw64-shortcut.png)
 
-From an MSYS2-MinGW64 shell, install the following packages which are required to build RV:
+````
+
+From an MSYS2-MinGW64 shell, install the following packages which are required to build Open RV:
 
 ```shell
 pacman -Sy --needed \
         mingw-w64-x86_64-autotools \
-        mingw-w64-x86_64-cmake \
-        mingw-w64-x86_64-cmake-cmcldeps \
         mingw-w64-x86_64-glew \
         mingw-w64-x86_64-libarchive \
         mingw-w64-x86_64-make \
         mingw-w64-x86_64-meson \
-        mingw-w64-x86_64-python-pip \
-        mingw-w64-x86_64-python-psutil \
         mingw-w64-x86_64-toolchain \
         autoconf  \
         automake \
@@ -82,48 +303,161 @@ While installing the MSYS packages, review the list for any missing package. Som
 
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
-### Setting the PATH
+(setup_env)=
+### 8. Setup environment variables
 
-The path to MSYS2's mingw64/bin folder must be added to the path.
-To set your PATH correctly: edit the MSYS2's ~/.bashrc file and add the following line:
-`PATH=/c/msys64/mingw64/bin:${PATH}`
+````{note}
+This is the step where the path of Strawberry Perl, Python, CMake and Qt will be needed.
 
-Also add the following line to your ~/.bashrc file:
-`export ACLOCAL_PATH=/c/msys64/usr/share/aclocal/`
+````
 
-### Python
+Some environment variables need to be set within MSYS2 for Open RV build system. The **PATH** environment variable must be
+modified, new environment variables called **ACLOCAL_PATH** and **QT_HOME** must be created.
 
-You must use Python from mingw64 (msys64/mingw64/bin/python.exe) or your own. Therefore, you must set your PATH EnvVar correctly. Python must be BEFORE **msys64/usr/bin**.
+These modifications will be added to the `.bash_profile` file located in the User's home directory within the MSYS2 environment. By modifiying `.bash_profile`, these environment variable will be modified everytime a new MSYS2 MINGW64 terminal is opened.
 
-Reminder: you must install, via pip, the requirements which are contained at the root of the project in the file requirements.txt. You must start pip from your mingw64 python executable. If there's any errors while installing via pip, see build_system/build_errors.md.
+#### PATH environment variable
 
-**Building DEBUG**
+````{note}
+Update the CMake, Strawberry Perl and Python location to reflect your installation path, using **forward slashes (/)** for a Unix-style path 
+to prevent issues later on.
+(e.g., C:\Python310 becomes /c/Python310).
+````
 
-To successfully build Open RV in debug on Windows, you must also install a Windows-native python3 ([download page](https://www.python.org/downloads/)) as it is required to build the opentimelineio python wheel in debug.
+The following paths **must** be added to the PATH environment variable within MSYS2:
+- CMake binary directory
+- Python binary directory
+- MSYS2's `mingw64/bin`
+- Strawberry perl directory
 
-This step is not required if you do not intend to build the debug version of RV.
+**The order is important**. Do not put Strawberry perl location before MSYS2's `mingw64/bin` directory.
 
-### Ninja
+```shell
+echo 'export PATH="/c/Program Files/CMake/bin:/c/Python310:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
+```
 
-A large part of the RV build on Windows uses Ninja. To use Ninja on MSYS, you must add **msys64/mingw64/bin** to your PATH. Ninja is installed as a dependency for `meson` hence it doesn't need to be manually installed.
+#### ACLOCAL_PATH
 
-### CMake
+```shell
+echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
+```
 
-If you have your own install of CMake on your computer, your PATH will need to pick mingw's CMake and not your own. `cmake --help` must return that the default is Ninja e.g. : `* Ninja`. Usually CMake on Windows will default to **Visual Studio** but mingw's CMake defaults to **Ninja which OpenRV is dependent on**.
+#### QT_HOME
 
-Symptoms of using Windows' (and not mingw64) CMake:
-- During the build, Python scripts such as quoteFile.py, make_openssl.py and make_python.py fail: either they don't work or they aren't found.
-- `build.ninja not found` during the build of a dependency. (cmake/dependencies) Reason: CMake in ExternalProject_Add *configured* the Project with the Visual Studio Generator whereas OpenRV's ExternalProject_Add build command expects that Ninja will be used.
+````{note}
+Update the Qt location to reflect your installation path, using forward slashes (/) for a Unix-style path 
+(e.g., C:\Qt\5.15.2\mingw_64 becomes /c/Qt/5.15.2/mingw_64).
+````
 
+```shell
+echo "export QT_HOME=/c/Qt/5.15.2/msvc2019_64" >> ~/.bash_profile
+```
 
-### NOTE: Before starting a build
+#### Apply changes to MSYS2 MINGW64
 
-To maximize your chances of successfully building RV, you must:
+All the environment variables changes above must be applied. You can do that by **closing and re-opening** 
+the MSYS2 MINGW64 terminal or by **running** the following command:
+
+```shell
+source ~/.bash_profile
+```
+
+(build_openrv)=
+## 9. Build Open RV
+
+````{warning}
+Even as of Windows 11, for legacy reason, a default system path length is still limited to 254 bytes long.
+For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
+````
+
+(build_openrv1)=
+### Before executing any commands
+
+To maximize your chances of successfully building Open RV, you must:
 - Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
 - Fix all conflicts due to updating the code.
 - Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
 
-### NOTE: Path Length
+(build_openrv2)=
+### Get Open RV source code
 
-Even as of Windows 11, for legacy reason, a default system path length is still limited to 254 bytes long.
-For that reason we strongly suggest cloning `OpenRV` into drive's root directory e.g.: `C:\`
+````{warning}
+Open RV repository **should** be cloned into the root of a drive (e.g. ````c:````).\
+\
+Otherwise, PySide2 compilation could be failing due to path being too long. If you can't do that, please take a look 
+at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.
+````
+Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
+
+Using a password-protected SSH key:
+```shell
+git checkout --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
+cd OpenRV
+```
+
+Using the web URL:
+```shell
+git checkout --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
+cd OpenRV
+```
+
+(build_openrv3)=
+### Load aliases for Open RV
+
+From the Open RV directory:
+```shell
+source rvcmds.sh
+```
+
+(build_openrv4)=
+### Install Python dependencies
+
+````{note}
+This section need to be done only one time when a fresh Open RV repository is cloned. 
+The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
+````
+
+From the Open RV directory, the following command will download and install the Python dependencies.
+```shell
+rvsetup
+```
+
+(build_openrv5)=
+### Configure the project
+
+````{note}
+After executing ````rvcfg```` command, make sure that you see those lines at the begining for the logs:
+
+```
+-- The CXX compiler identification is MSVC 19.40.33815.0
+-- The C compiler identification is MSVC 19.40.33815.0
+```
+
+It **must** use **MSVC 19.40.X** (not 19.41.X).
+````
+
+From the Open RV directory, the following command will configure CMake for the build:
+```shell
+rvcfg
+```
+
+(build_openrv6)=
+### Build the dependencies
+
+From the Open RV directory, the following command will build the dependencies:
+```shell
+rvbuildt dependencies
+```
+
+(build_openrv7)=
+### Build the main executable
+
+From the Open RV directory, the following command will build the main executable:
+```shell
+rvbuildt main_executable
+```
+
+(build_openrv8)=
+### Opening Open RV executable
+
+Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/bin/rv.exe`.
