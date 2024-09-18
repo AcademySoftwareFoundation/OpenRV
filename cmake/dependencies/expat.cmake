@@ -32,7 +32,7 @@ RV_MAKE_STANDARD_LIB_NAME("libexpat" "" "SHARED" "d")
 
 # Remove the -S argument from _configure_options, and adjust the path for Expat.
 list(REMOVE_ITEM _configure_options "-S ${_source_dir}")
-# Expat source is under expat folder and not directly under repostiory root.
+# Expat source is under expat folder and not directly under repository root.
 LIST(APPEND _configure_options "-S ${_source_dir}/expat")
 
 LIST(APPEND _configure_options "-DEXPAT_BUILD_DOCS=OFF")
@@ -50,7 +50,7 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${_source_dir}
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -S ${_source_dir}/expat ${_configure_options}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_IN_SOURCE FALSE
