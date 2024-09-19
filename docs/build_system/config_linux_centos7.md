@@ -35,7 +35,7 @@ scl enable devtoolset-9 $SHELL
 Most of the build requirements can be installed using the following command:
 
 ```bash
-sudo yum install alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex glew-devel libXcomposite libXi-devel libaio-devel libffi-devel ncurses-devel libtool libxkbcommon meson ninja-build openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 mesa-libOSMesa mesa-libOSMesa-devel ocl-icd opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zlib-devel  
+sudo yum install alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex glew-devel libXcomposite libXi-devel libaio-devel libffi-devel libtool libxkbcommon mesa-libOSMesa mesa-libOSMesa-devel meson ncurses-devel ninja-build ocl-icd openssl-devel opencl-headers patch pulseaudio-libs pulseaudio-libs-glib2 python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zlib-devel  
 ```
 
 ### Install the python requirements
