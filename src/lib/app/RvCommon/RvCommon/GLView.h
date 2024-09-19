@@ -11,6 +11,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QSurfaceFormat>
+#include <QOffscreenSurface>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <TwkUtil/Timer.h>
@@ -29,7 +30,7 @@ public:
     typedef TwkUtil::Timer Timer;
 
     GLView(QWidget* parent, 
-           const QOpenGLWidget* share, 
+           QOpenGLContext* sharedContext, 
            RvDocument* doc, 
            bool stereo=false,
            bool vsync=true,
@@ -69,6 +70,8 @@ public:
 
     void* syncClosure() const { return m_syncThreadData; }
 
+    void readyToPaint() { m_readyToPaint = true; }
+
 public slots:
     void eventProcessingTimeout();
 
@@ -101,6 +104,11 @@ private:
     bool             m_postFirstNonEmptyRender;
     bool             m_stopProcessingEvents;
     void*            m_syncThreadData;
+
+    QOffscreenSurface* m_offscreenSurface;
+    QOpenGLContext* m_context;
+    QOpenGLContext* m_sharedContext;
+    bool m_readyToPaint;
 };
 
 } // Rv

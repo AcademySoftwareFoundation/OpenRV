@@ -181,7 +181,7 @@ RvDocument::RvDocument()
 
         //
         //  Make the GL context valid ASAP so we can query it later
-        //
+        //  
 
         // NOTE_QT6: This can't be done like this in Qt6. The context becomes valid only when the widget is shown.
         // if (!m_glView->isValid())
@@ -197,7 +197,7 @@ RvDocument::RvDocument()
     {
         RvSession* s = static_cast<RvSession*>(docs.front());
         RvDocument *rvDoc = (RvDocument*)s->opaquePointer();
-        m_glView = new GLView(this, rvDoc->view(), this,
+        m_glView = new GLView(this, rvDoc->view()->context(), this,
                               opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                               opts.vsync != 0 && !m_vsyncDisabled,
                               true, // double buffer
@@ -219,14 +219,13 @@ RvDocument::RvDocument()
         // }
     }
 
-
     m_stackedLayout = new QStackedLayout(m_centralWidget);
     m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
     m_stackedLayout->addWidget(m_glView);
-
+    
     setCentralWidget(m_viewContainerWidget);
 
-    //QTFrameBuffer* fb = m_glView->frameBuffer();
+    //QTFrameBuffer* fb = m_glView->frameBuffer(
     m_glView->setFocus(Qt::OtherFocusReason);
     //qApp->installEventFilter(m_glView);
 
@@ -245,56 +244,11 @@ RvDocument::RvDocument()
     m_glView->makeCurrent();
     initializeGLExtensions();
 
-    m_session = new RvSession;
-    //m_session->setFrameBuffer(fb);
+    // NOTE_QT6 RvSession code was here. RvSession initialize the session and nodes.
+    //          Node initialization assumes that the context is valid
+    //initializeSession();
 
-#ifdef PLATFORM_DARWIN
-    m_displayLink = new DisplayLink(this);
-    if (m_displayLink) m_session->useExternalVSyncTiming(true);
-#endif
-
-    //RvApp()->addVideoDevice(m_glView->videoDevice());
-    m_session->setControlVideoDevice(m_glView->videoDevice());
-
-    m_session->setRendererType("Composite");
-    m_session->setOpaquePointer( this );
-    m_session->makeActive();
-    m_session->postInitialize();
-    char nm[64]; 
-    sprintf (nm, "session%03d", sessionCount++);
-    m_session->setEventNodeName(nm);
-    setObjectName(QString("rv-") + QString(nm));
-
-    mergeMenu(m_session->menu());
-
-    setAttribute(Qt::WA_DeleteOnClose);
-    setAttribute(Qt::WA_QuitOnClose);
-
-    m_topViewToolBar->setSession(m_session);
-    m_bottomViewToolBar->setSession(m_session);
-
-    // 10.5 looks better without it (no longer has the 100% white top)
-    //setAttribute(Qt::WA_MacBrushedMetal);
-
-    m_session->addNotification(this, IPCore::Session::updateMessage());
-    m_session->addNotification(this, IPCore::Session::updateLoadingMessage());
-    m_session->addNotification(this, IPCore::Session::fullScreenOnMessage());
-    m_session->addNotification(this, IPCore::Session::fullScreenOffMessage());
-    m_session->addNotification(this, IPCore::Session::stereoHardwareOnMessage());
-    m_session->addNotification(this, IPCore::Session::stereoHardwareOffMessage());
-    m_session->addNotification(this, TwkApp::Document::deleteMessage());
-    m_session->addNotification(this, TwkApp::Document::menuChangedMessage());
-    m_session->addNotification(this, TwkApp::Document::activeMessage());
-    m_session->addNotification(this, TwkApp::Document::filenameChangedMessage());
-    m_session->addNotification(this, IPCore::Session::audioUnavailbleMessage());
-    m_session->addNotification(this, IPCore::Session::eventDeviceChangedMessage());
-    m_session->addNotification(this, IPCore::Session::stopPlayMessage());
-
-    m_session->playStartSignal().connect(boost::bind(&RvDocument::playStartSlot, this, std::placeholders::_1));
-    m_session->playStopSignal().connect(boost::bind(&RvDocument::playStopSlot, this, std::placeholders::_1));
-    m_session->physicalVideoDeviceChangedSignal().connect(boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this, std::placeholders::_1));
-
-    if (resetGLPrefs) resetGLStateAndPrefs();
+    //if (resetGLPrefs) resetGLStateAndPrefs();
 
 #ifdef PLATFORM_LINUX
 
@@ -320,6 +274,63 @@ RvDocument::RvDocument()
     {
         Qt::WindowFlags flags = windowFlags();
         setWindowFlags(flags | Qt::FramelessWindowHint);
+    }
+}
+
+void RvDocument::initializeSession()
+{
+    if (!m_session)
+    {
+        std::cout << "!!! initializeSession" << std::endl;
+
+        m_session = new RvSession;
+        //m_session->setFrameBuffer(fb);
+
+    #ifdef PLATFORM_DARWIN
+        m_displayLink = new DisplayLink(this);
+        if (m_displayLink) m_session->useExternalVSyncTiming(true);
+    #endif
+
+        //RvApp()->addVideoDevice(m_glView->videoDevice());
+        m_session->setControlVideoDevice(m_glView->videoDevice());
+
+        m_session->setRendererType("Composite");
+        m_session->setOpaquePointer( this );
+        m_session->makeActive();
+        m_session->postInitialize();
+        char nm[64]; 
+        sprintf (nm, "session%03d", sessionCount++);
+        m_session->setEventNodeName(nm);
+        setObjectName(QString("rv-") + QString(nm));
+
+        mergeMenu(m_session->menu());
+
+        setAttribute(Qt::WA_DeleteOnClose);
+        setAttribute(Qt::WA_QuitOnClose);
+
+        m_topViewToolBar->setSession(m_session);
+        m_bottomViewToolBar->setSession(m_session);
+
+        // 10.5 looks better without it (no longer has the 100% white top)
+        //setAttribute(Qt::WA_MacBrushedMetal);
+
+        m_session->addNotification(this, IPCore::Session::updateMessage());
+        m_session->addNotification(this, IPCore::Session::updateLoadingMessage());
+        m_session->addNotification(this, IPCore::Session::fullScreenOnMessage());
+        m_session->addNotification(this, IPCore::Session::fullScreenOffMessage());
+        m_session->addNotification(this, IPCore::Session::stereoHardwareOnMessage());
+        m_session->addNotification(this, IPCore::Session::stereoHardwareOffMessage());
+        m_session->addNotification(this, TwkApp::Document::deleteMessage());
+        m_session->addNotification(this, TwkApp::Document::menuChangedMessage());
+        m_session->addNotification(this, TwkApp::Document::activeMessage());
+        m_session->addNotification(this, TwkApp::Document::filenameChangedMessage());
+        m_session->addNotification(this, IPCore::Session::audioUnavailbleMessage());
+        m_session->addNotification(this, IPCore::Session::eventDeviceChangedMessage());
+        m_session->addNotification(this, IPCore::Session::stopPlayMessage());
+
+        m_session->playStartSignal().connect(boost::bind(&RvDocument::playStartSlot, this, std::placeholders::_1));
+        m_session->playStopSignal().connect(boost::bind(&RvDocument::playStopSlot, this, std::placeholders::_1));
+        m_session->physicalVideoDeviceChangedSignal().connect(boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this, std::placeholders::_1));
     }
 }
 
@@ -757,7 +768,7 @@ RvDocument::rebuildGLView(bool stereo,
     Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
     oldGLView->stopProcessingEvents();
 
-    GLView* newGLView = new GLView(this, view(), this,
+    GLView* newGLView = new GLView(this, view()->context(), this,
                                    stereo, vsync, doubleBuffer,
                                    red, green, blue, alpha);
 
@@ -775,7 +786,7 @@ RvDocument::rebuildGLView(bool stereo,
     if (!newGLView->isValid())
     {
         delete newGLView;
-        newGLView = new GLView(this, view(), this);
+        newGLView = new GLView(this, view()->context(), this);
         resetGLPrefs = true;
     }
     

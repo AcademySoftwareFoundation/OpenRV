@@ -24,6 +24,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 #include <QtWidgets/QMenu>
+#include <QDebug>
 
 namespace Rv {
 using namespace boost;
@@ -111,7 +112,7 @@ class ThreadTrampoline
 }
 
 GLView::GLView(QWidget* parent,
-               const QOpenGLWidget* share,
+               QOpenGLContext* sharedContext,
                RvDocument* doc,
                bool stereo,
                bool vsync,
@@ -122,6 +123,7 @@ GLView::GLView(QWidget* parent,
                int alpha,
                bool noResize)
     : QOpenGLWidget(parent),
+      m_sharedContext(sharedContext),
       m_doc(doc),
       m_red(red),
       m_green(green),
@@ -138,14 +140,16 @@ GLView::GLView(QWidget* parent,
       m_stopProcessingEvents(false),
       m_syncThreadData(0)
 {
+    m_readyToPaint = false;
     setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
-    if (share) context()->setShareContext(share->context());
 
-    setObjectName((m_doc->session()) ?  m_doc->session()->name().c_str() : "no session");
-    //m_frameBuffer = new QTFrameBuffer( this );
     ostringstream str;
     str << UI_APPLICATION_NAME " Main Window" << "/" << m_doc;
     m_videoDevice = new QTGLVideoDevice(0, str.str(), this);
+
+    setObjectName((m_doc->session()) ?  m_doc->session()->name().c_str() : "no session");
+    //m_frameBuffer = new QTFrameBuffer( this );
+
     m_activityTimer.start();
     setMouseTracking(true);
     setAcceptDrops(true);
@@ -244,20 +248,84 @@ GLView::rvGLFormat(bool stereo,
     return fmt;
 }
 
+void APIENTRY glDebugOutput(GLenum source, 
+                            GLenum type, 
+                            unsigned int id, 
+                            GLenum severity, 
+                            GLsizei length, 
+                            const char *message, 
+                            const void *userParam)
+{
+    // ignore non-significant error/warning codes
+    if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return; 
+
+    std::cout << "---------------" << std::endl;
+    std::cout << "Debug message (" << id << "): " <<  message << std::endl;
+
+    switch (source)
+    {
+        case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
+        case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
+        case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
+    } std::cout << std::endl;
+
+    switch (type)
+    {
+        case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break; 
+        case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
+        case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
+        case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
+        case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
+        case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
+    } std::cout << std::endl;
+    
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
+        case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
+        case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
+    } std::cout << std::endl;
+    std::cout << std::endl;
+}
+
 void
 GLView::initializeGL()
 {
     //
     //  At this point the format is known. Can't do this in the constructor
     //
-    initializeOpenGLFunctions();
 
     // QUESTION_QT6: Should we use isValid from QOpenGLWidget or directly using from QOpenGLContext?
     // NOTE_QT6: Returns true if the widget and OpenGL resources, like the context, have been successfully initialized. 
     //           Note that the return value is always false until the widget is shown.
     // NOTE_QT6: QOpenGLContext: Returns if this context is valid, i.e. has been successfully created.
     if (context()->isValid())
-    {
+    {   
+        std::cout << "!!! GLView::initializeGL()-context()="<<context()<<std::endl;
+        std::cout << "!!! GLView::initializeGL()-isValid()()="<<isValid()<<std::endl;
+        
+        initializeOpenGLFunctions();
+
+        glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback(glDebugOutput, nullptr);
+
+        if (m_sharedContext)
+        {
+            context()->setShareContext(m_sharedContext);
+        }
+
+        if (m_doc)
+        {
+            m_doc->initializeSession();
+        }
+
         // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
         QSurfaceFormat f = context()->format();
 
@@ -336,6 +404,11 @@ GLView::swapBuffersNoSync()
 void
 GLView::paintGL()
 {
+    if (!m_readyToPaint)
+    {
+        return;
+    }
+
     IPCore::Session* session = m_doc->session();
     bool debug = IPCore::debugProfile && session;
 
@@ -394,7 +467,13 @@ GLView::paintGL()
         absolutePosition(x, y);
         m_videoDevice->setAbsolutePosition(x, y);
 
+        // NOTE_QT
+        // Paint the center widget all blue.. works.
+        // There is an issue somewhere in session->render()
+        //glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT);
         session->render();
+
         m_firstPaintCompleted = true;
 
         // Starting with Qt 5.12.1, the resulting texture is later composited over 
@@ -538,6 +617,8 @@ GLView::eventProcessingTimeout()
 bool
 GLView::event(QEvent* event)
 {
+    qDebug() << "Event type: " << event->type();
+
     bool keyevent = false;
     Rv::Session* session = m_doc->session();
 
