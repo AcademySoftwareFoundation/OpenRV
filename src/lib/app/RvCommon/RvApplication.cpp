@@ -472,6 +472,7 @@ static void
 callRunCreateSession(void* a)
 {
     RvApplication* app = reinterpret_cast<RvApplication*>(a);
+    std::cout << "??? Calling runCreateSession" << std::endl;
     app->runCreateSession();
 }
 
@@ -547,6 +548,7 @@ RvApplication::quitAll()
 void
 RvApplication::runCreateSession()
 {
+    std::cout << "!!! Calling runCreateSession" << std::endl;
     if (m_newSessions.size())
     {
         // Make sure that the RV application has been initialized
@@ -612,10 +614,21 @@ RvDocument*
 RvApplication::newSessionFromFiles(const StringVector& files)
 {
     DB ("RvApplication::newSessionFromFiles()");
+    std::cout << "!!! Instanciating RvDocument" << std::endl;
     Rv::RvDocument *doc = new Rv::RvDocument;
+
+    doc->show();
+
+#ifndef PLATFORM_LINUX
+    doc->raise();
+#endif
+
+    doc->view()->readyToPaint();
+
     //doc->ensurePolished();
     Rv::RvSession* s = doc->session();
 
+    std::cout << "!!! Calling queryAndStoreGLInfo from session - will crash in this code path if no context" << std::endl;
     s->queryAndStoreGLInfo();
 
     Rv::Options& opts = Rv::Options::sharedOptions();
@@ -696,11 +709,11 @@ RvApplication::newSessionFromFiles(const StringVector& files)
         }
     }
 
-    doc->show();
+//     doc->show();
 
-#ifndef PLATFORM_LINUX
-    doc->raise();
-#endif
+// #ifndef PLATFORM_LINUX
+//     doc->raise();
+// #endif
 
     if (videoModules().empty())
     {
@@ -806,8 +819,8 @@ RvApplication::createNewSessionFromFiles(const StringVector& files)
             m_newTimer->setObjectName("m_newTimer");
             connect(m_newTimer, SIGNAL(timeout()), this, SLOT(runCreateSession()));
         }
-
-        m_newTimer->start(int(1.0 / 192.0 * 1000.0));
+        // TODO_CED TIMER
+        m_newTimer->start(int(1.0 / 50.0 * 1000.0));
     }
 
     m_newSessions.push_back(sv);
