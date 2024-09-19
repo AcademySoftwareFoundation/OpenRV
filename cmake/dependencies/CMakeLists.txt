@@ -43,7 +43,7 @@ IF(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/pub/CMakeLists.txt")
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  INCLUDE(vcpkg)
+  INCLUDE(expat)
 ENDIF()
 INCLUDE(qt5)
 INCLUDE(openssl) # Python3 requirement
