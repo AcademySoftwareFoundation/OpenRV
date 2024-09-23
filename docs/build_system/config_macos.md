@@ -210,6 +210,7 @@ Once this is all done, you can now go ahead with the typical workflow to build O
 ````bash
 # In the OpenRV directory:
 source rvcmds.sh
+rvsetup
 rvcfg
 rvbuildt dependencies
 rvbuildt main_executable

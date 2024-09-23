@@ -42,14 +42,11 @@ copyright = matches[3]
 
 extensions = [
     'myst_parser',
-    'sphinx_carousel.carousel',
-    'sphinx_copybutton',
     'sphinx.ext.duration',
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'sphinx_tabs.tabs',
     'sphinx_rtd_theme'
 ]
 
