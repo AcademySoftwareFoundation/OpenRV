@@ -1,23 +1,22 @@
 # Building Open RV on macOS
 
+(summary)=
 ## Summary
 
-- [Building Open RV on macOS](#building-open-rv-on-macos)
-  - [Summary](#summary)
-  - [Allow Terminal to update or delete other applications](#allow-terminal-to-update-or-delete-other-applications)
-  - [Install XCode](#install-xcode)
-  - [Install Homebrew](#install-homebrew)
-  - [Install tools and build dependencies](#install-tools-and-build-dependencies)
-  - [Install the python requirements](#install-the-python-requirements)
-  - [Install Qt](#install-qt)
-
+- [Summary](summary)
+- [Allow Terminal to update or delete other applications](allow_terminal)
+- [Install XCode](install_xcode)
+- [Install Homebrew](install_homebrew)
+- [Install tools and build dependencies](install_tools_and_build_dependencies)
+- [Install Qt](install_qt)
+- [Build Open RV](build_openrv)
 
 ````{warning}
 **Qt Open Source version 5.15.2** is the latest with publicly available binaries, but it lacks *arm64* libraries. 
 Therefore, OpenRV builds using **Qt 5.15.2** are limited to *x86_64* architecture. To build natively on *arm64*, you will
 have to build a recent version of Qt 5 from source or use the commercial version.
 
-See [Qt](#install-qt) section for more information
+See [Qt](install_qt) section for more information
 ````
 
 ````{note}
@@ -27,10 +26,12 @@ OpenRV can be build for *x86_64* by changing the architecture of the terminal to
 **It is important to use that *x86_64* terminal for all the subsequent steps.**
 ````
 
+(allow_terminal)=
 ## Allow Terminal to update or delete other applications
 
 From the macOS System Settings/Privacy & Security/App Management, allow Terminal to update or delete other applications.
 
+(install_xcode)=
 ## Install XCode
 
 From the App Store, download XCode 14.3.1. Make sure that it's the source of the active developer directory.
@@ -44,12 +45,14 @@ Install XCode 14.3.1 if you absolutely want to use Boost version 1.80 as per VFX
 Please reference [this workaround](https://forums.developer.apple.com/forums/thread/734709) to use XCode 14.3.1 on Sonoma, as it is no longer 
 compatible by default.
 
+(install_homebrew)=
 ## Install Homebrew
 
 Homebrew is the one stop shop providing all the build requirements. You can install it following the instructions on the [Homebrew page](https://brew.sh).
 
 Make sure Homebrew's binary directory is in your PATH and that `brew` is resolved from your terminal.
 
+(install_tools_and_build_dependencies)=
 ## Install tools and build dependencies
 
 Most of the build requirements can be installed by running the following brew install command:
@@ -61,16 +64,7 @@ brew install cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libto
 Make sure `python` resolves in your terminal. In some case, depending on how the python formula is built, there's no `python` symbolic link.
 In that case, you can create one with this command `ln -s python3 $(dirname $(which python3))/python`.
 
-## Install the python requirements
-
-See the **Using a Python Virtual Environment** in `README.md` in the root directory before running any of the commands in this section. Python packages should be installed inside of a virtual environment.
-
-Some of the RV build scripts requires extra python packages. They can be installed using the requirements.txt at the root of the repository.
-
-```bash
-python3 -m pip install -r requirements.txt 
-```
-
+(install_qt)=
 ## Install Qt
 
 ````{warning}
@@ -206,13 +200,81 @@ echo "export QT_HOME=<path to...>/myQt/Qt/5.15.15/clang_64" >> ~/.zprofile
 source ~/.zprofile
 ````
 
-Once this is all done, you can now go ahead with the typical workflow to build OpenRV:
-````bash
-# In the OpenRV directory:
+(build_openrv)=
+## 8. Build Open RV
+
+(build_openrv1)=
+### Before executing any commands
+
+To maximize your chances of successfully building Open RV, you must:
+- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
+- Fix all conflicts due to updating the code.
+- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
+
+(build_openrv2)=
+### Get Open RV source code
+
+Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
+
+Using a password-protected SSH key:
+```shell
+git checkout --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
+cd OpenRV
+```
+
+Using the web URL:
+```shell
+git checkout --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
+cd OpenRV
+```
+
+(build_openrv3)=
+### Load aliases for Open RV
+
+From the Open RV directory:
+```shell
 source rvcmds.sh
-rvsetup
-rvcfg
-rvbuildt dependencies
-rvbuildt main_executable
+```
+
+(build_openrv4)=
+### Install Python dependencies
+
+````{note}
+This section need to be done only one time when a fresh Open RV repository is cloned. 
+The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
 ````
+
+From the Open RV directory, the following command will download and install the Python dependencies.
+```shell
+rvsetup
+```
+
+(build_openrv5)=
+### Configure the project
+
+From the Open RV directory, the following command will configure CMake for the build:
+```shell
+rvcfg
+```
+
+(build_openrv6)=
+### Build the dependencies
+
+From the Open RV directory, the following command will build the dependencies:
+```shell
+rvbuildt dependencies
+```
+
+(build_openrv7)=
+### Build the main executable
+
+From the Open RV directory, the following command will build the main executable:
+```shell
+rvbuildt main_executable
+```
+
+(build_openrv8)=
+### Opening Open RV executable
+
+Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/app/RV.app/Contents/MacOS/RV`.
 
