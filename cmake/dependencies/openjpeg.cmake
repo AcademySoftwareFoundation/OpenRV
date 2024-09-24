@@ -30,7 +30,12 @@ SET(_download_hash
     "5cbb822a1203dd75b85639da4f4ecaab"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("openjp2" "2.5.0" "SHARED" "")
+IF(RV_TARGET_WINDOWS)
+  RV_MAKE_STANDARD_LIB_NAME("openjp2" "" "SHARED" "")
+ELSE()
+  RV_MAKE_STANDARD_LIB_NAME("openjp2" "2.5.0" "SHARED" "")
+ENDIF()
+
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 
@@ -65,20 +70,24 @@ RV_COPY_LIB_BIN_FOLDERS()
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
 ADD_LIBRARY(OpenJpeg::OpenJpeg SHARED IMPORTED GLOBAL)
+ADD_DEPENDENCIES(OpenJpeg::OpenJpeg ${_target})
+
 SET_PROPERTY(
   TARGET OpenJpeg::OpenJpeg
   PROPERTY IMPORTED_LOCATION ${_libpath}
 )
+
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET OpenJpeg::OpenJpeg
+    PROPERTY IMPORTED_IMPLIB ${_bin_dir}/${_implibname}
+  )
+ENDIF()
+
 SET_PROPERTY(
   TARGET OpenJpeg::OpenJpeg
   PROPERTY IMPORTED_SONAME ${_libname}
 )
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET OpenJpeg::OpenJpeg
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
 
 # It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 SET(_openjpeg_include_dir
