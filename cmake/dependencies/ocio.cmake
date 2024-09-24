@@ -189,9 +189,6 @@ ELSE() # Windows
     FILE(REMOVE ${_backup_pyopencolorio_cmakelists_path})
   ENDIF()
 
-  GET_TARGET_PROPERTY(_vcpkg_location VCPKG::VCPKG IMPORTED_LOCATION)
-  GET_FILENAME_COMPONENT(_vcpkg_path ${_vcpkg_location} DIRECTORY)
-
   # Some options are not multi-platform so we start clean.
   SET(_configure_options
       ""
@@ -215,8 +212,7 @@ ELSE() # Windows
     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
     "-DZLIB_LIBRARY=${_zlib_library}"
     "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
-    # Using the expat build with /MD to match the CRT.
-    "-Dexpat_DIR=${_vcpkg_path}/packages/expat_x64-windows-static-md/share/expat"
+    "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
     "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
     "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
     # Mandatory param: OCIO CMake code finds Python.
@@ -264,7 +260,7 @@ ELSE() # Windows
     SOURCE_DIR ${_source_dir}
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
-    DEPENDS Boost::headers RV_DEPS_PYTHON3 Imath::Imath VCPKG::VCPKG ZLIB::ZLIB
+    DEPENDS Boost::headers RV_DEPS_PYTHON3 Imath::Imath ZLIB::ZLIB EXPAT::EXPAT
     PATCH_COMMAND 
       python3 ${_pyopencolorio_patch_script_path} ${_pyopencolorio_cmakelists_path}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
@@ -274,35 +270,6 @@ ELSE() # Windows
     BUILD_ALWAYS FALSE
     BUILD_BYPRODUCTS ${_byproducts}
     USES_TERMINAL_BUILD TRUE
-  )
-
-  # To update the baseline property in the OCIO VCPKG JSON:
-  # See https://learn.microsoft.com/en-us/vcpkg/users/versioning#baselines
-  # vcpkg x-update-baseline
-  # Caveat: the file must be called vcpkg.json to work.
-  # Workaround: change ocio_vcpkg.json to vcpkg.json, update the baseline, and rename it back.
-  SET(_vcpkg_manifest
-      "${RV_PKGMANCONFIG_DIR}/ocio_vcpkg.json"
-  )
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} add_vcpkg_manifest
-    COMMENT "Copying the VCPKG manifest"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_vcpkg_manifest} "${_source_dir}/vcpkg.json"
-    DEPENDERS configure
-  )
-
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} install_vcpkg_manifest
-    COMMENT "Installing OCIO dependencies via VCPKG"
-    # IMPORTANT: VCPKG Manifest mode (using a .json) does not support differents triplets per dependencies.
-    #            This is not a problem right now because only expat is installed with vcpkg.
-    #            Expat is installed with vcpkg because there's an expat library that comes with MSYS2 on Windows,
-    #            and it is causing compiler error.
-    #            OCIO installs the remaining dependencies (yaml-cpp, pystring, pybind11 and minizip-ng).
-    COMMAND ${_vcpkg_location} install --triplet x64-windows-static-md
-    DEPENDEES add_vcpkg_manifest
-    DEPENDERS configure
-    WORKING_DIRECTORY "${_source_dir}"
   )
 ENDIF()
 
