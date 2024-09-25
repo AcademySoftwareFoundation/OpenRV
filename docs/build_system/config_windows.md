@@ -7,17 +7,17 @@
 3. [Install Python 3](install_python)
     1. [Copy python.exe and rename it to python3.exe](copy_python3)
 4. [Install CMake](install_cmake)
-5. [Install Qt](install_qt)
+5. [Install Qt](install_windows_qt)
 6. [Install Strawberry Perl](install_strawberry_perl)
 7. [Install MSYS2](install_msys2)
     1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](install_msys2_packages)
 8. [Setup environment variables](setup_env)
-9. [Build Open RV](build_openrv)
+9. [Build Open RV](build_windows_openrv)
 
 
 ````{warning}
 You should be cloning the repository later in the steps, but if you must clone it beforehand, clone it into the root 
-of a drive (e.g. ````c:````). See [Get Open RV source code](build_openrv2).
+of a drive (e.g. ````c:````). See [Get Open RV source code](build_windows_openrv2).
 ````
 
 (mvs)=
@@ -174,7 +174,7 @@ Take note of the installation path for CMake, as it will be required in a subseq
 The default path is `C:\Program Files\CMake`.
 ````
 
-(install_qt)=
+(install_windows_qt)=
 ## 5. Install Qt
 
 ````{warning}
@@ -362,7 +362,7 @@ the MSYS2 MINGW64 terminal or by **running** the following command:
 source ~/.bash_profile
 ```
 
-(build_openrv)=
+(build_windows_openrv)=
 ## 9. Build Open RV
 
 ````{warning}
@@ -370,7 +370,7 @@ Even as of Windows 11, for legacy reasons, a default system path length is still
 For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
 ````
 
-(build_openrv1)=
+(build_windows_openrv1)=
 ### Before executing any commands
 
 To maximize your chances of successfully building Open RV, you must:
@@ -378,7 +378,7 @@ To maximize your chances of successfully building Open RV, you must:
 - Fix all conflicts due to updating the code.
 - Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
 
-(build_openrv2)=
+(build_windows_openrv2)=
 ### Get Open RV source code
 
 ````{warning}
@@ -401,7 +401,7 @@ git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 
-(build_openrv3)=
+(build_windows_openrv3)=
 ### Load aliases for Open RV
 
 From the Open RV directory:
@@ -409,7 +409,7 @@ From the Open RV directory:
 source rvcmds.sh
 ```
 
-(build_openrv4)=
+(build_windows_openrv4)=
 ### Install Python dependencies
 
 ````{note}
@@ -422,7 +422,7 @@ From the Open RV directory, the following command will download and install the 
 rvsetup
 ```
 
-(build_openrv5)=
+(build_windows_openrv5)=
 ### Configure the project
 
 ````{note}
@@ -437,27 +437,52 @@ It **must** use **MSVC 19.40.X** (not 19.41.X).
 ````
 
 From the Open RV directory, the following command will configure CMake for the build:
-```shell
+
+````{tabs}
+```{code-tab} bash Release
 rvcfg
 ```
+```{code-tab} bash Debug
+rvcfgd
+```
+````
 
-(build_openrv6)=
+(build_windows_openrv6)=
 ### Build the dependencies
 
 From the Open RV directory, the following command will build the dependencies:
-```shell
+
+````{tabs}
+```{code-tab} bash Release
 rvbuildt dependencies
 ```
+```{code-tab} bash Debug
+rvbuildtd dependencies
+```
+````
 
-(build_openrv7)=
+(build_windows_openrv7)=
 ### Build the main executable
 
 From the Open RV directory, the following command will build the main executable:
-```shell
+
+````{tabs}
+```{code-tab} bash Release
 rvbuildt main_executable
 ```
+```{code-tab} bash Debug
+rvbuildtd main_executable
+```
+````
 
-(build_openrv8)=
+(build_windows_openrv8)=
 ### Opening Open RV executable
 
+````{tabs}
+```{tab} Release
 Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/bin/rv.exe`.
+```
+```{tab} Debug
+Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/bin/rv.exe`.
+```
+````
