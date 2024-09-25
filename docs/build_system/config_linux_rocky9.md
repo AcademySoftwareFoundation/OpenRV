@@ -6,6 +6,9 @@
 1. [Install tools and build dependencies](#install-tools-and-build-dependencies)
 1. [Install CMake](#install-cmake)
 1. [Install Qt5](#install-qt)
+1. [Build Open RV](build_rocky9_openrv)
+    1. [Building from command line](building_rocky9_from_command_line)
+    1. [Building with Docker](building_rocky9_with_docker)
 
 ## Install Basics
 
@@ -59,3 +62,155 @@ python3 -m pip install -r requirements.txt
 Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). During Qt Setup's Select Components phase, check the "Archive" box on the right side of the window then click on "Filter" to see Qt 5.15.x options. Logs, Android, iOS and WebAssembly are not required to build OpenRV. Make sure to note the destination of the Qt install, as you will have to set the `QT_HOME` environment variable to this location's build dir.
 
 WARNING: If you fetch Qt from another source, make sure to build it with SSL support, that it contains everything required to build PySide2, and that the file structure is similar to the official package.
+
+
+(build_rocky9_openrv)=
+## Build Open RV
+
+(building_rocky9_from_command_line)=
+### Building from command line
+
+(build_rocky9_openrv1)=
+#### Before executing any commands
+
+To maximize your chances of successfully building Open RV, you must:
+- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
+- Fix all conflicts due to updating the code.
+- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
+
+(build_rocky9_openrv2)=
+#### Get Open RV source code
+
+Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
+
+Using a password-protected SSH key:
+```shell
+git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
+cd OpenRV
+```
+
+Using the web URL:
+```shell
+git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
+cd OpenRV
+```
+
+(build_rocky9_openrv3)=
+#### Load aliases for Open RV
+
+From the Open RV directory:
+```shell
+source rvcmds.sh
+```
+
+(build_rocky9_openrv4)=
+#### Install Python dependencies
+
+````{note}
+This section need to be done only one time when a fresh Open RV repository is cloned. 
+The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
+````
+
+From the Open RV directory, the following command will download and install the Python dependencies.
+```shell
+rvsetup
+```
+
+(build_rocky9_openrv5)=
+#### Configure the project
+
+From the Open RV directory, the following command will configure CMake for the build:
+
+````{tabs}
+```{code-tab} bash Release
+rvcfg
+```
+```{code-tab} bash Debug
+rvcfgd
+```
+````
+
+(build_rocky9_openrv6)=
+#### Build the dependencies
+
+From the Open RV directory, the following command will build the dependencies:
+
+````{tabs}
+```{code-tab} bash Release
+rvbuildt dependencies
+```
+```{code-tab} bash Debug
+rvbuildtd dependencies
+```
+````
+
+(build_rocky9_openrv7)=
+#### Build the main executable
+
+From the Open RV directory, the following command will build the main executable:
+
+````{tabs}
+```{code-tab} bash Release
+rvbuildt main_executable
+```
+```{code-tab} bash Debug
+rvbuildtd main_executable
+```
+````
+
+(build_rocky9_openrv8)=
+#### Opening Open RV executable
+
+````{tabs}
+```{tab} Release
+Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/app/bin/rv`.
+```
+```{tab} Debug
+Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/app/bin/rv``.
+```
+````
+
+(building_rocky9_with_docker)=
+### Building with Docker (Optional)
+
+To build Open RV using Docker, utilize the provided Dockerfile, which includes all required dependencies. 
+
+(build_rocky9_image)=
+#### Build the image
+```bash
+cd dockerfiles
+docker build -t openrv-rocky9 -f Dockerfile.Linux-Rocky9 .
+```
+
+(run_rocky9_image)=
+#### Create the container
+```bash
+docker run -d openrv-rocky9 /bin/bash -c "sleep infinity"
+```
+
+(go_into_the_rocky9_container)=
+#### Go into the container
+```bash
+# Lookup the container id for openrv-rocky9
+docker container ls
+
+# Use the container id to go into it.
+# e.g.
+# CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS     NAMES
+# 1f6a1104a1f4   openrv-rocky9   "/bin/bash -c 'sleep…"   25 minutes ago   Up 25 minutes             busy_sanderson
+# In this example, the <id> would be 1f6a1104a1f4.
+docker container exec -it <id> /bin/bash
+```
+
+Once you are into the container, you can follow the [standard process](build_rocky9_openrv2).
+
+#### Copy the stage folder outside of the container
+
+If you are on a host that is compatible with Rocky Linux 9, you can copy the stage folder outside of the container and 
+execute Open RV.
+
+Container id is the same as the one used in the step [Go into the container](go_into_the_rocky9_container).
+
+```bash
+docker cp <container id>:/home/rv/OpenRV/_build/stage ./openrv_stage
+```
