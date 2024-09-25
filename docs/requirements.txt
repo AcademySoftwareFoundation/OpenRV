@@ -1,2 +1,5 @@
 myst-parser       # License: MIT License (MIT)
 sphinx_rtd_theme  # License: MIT License (MIT)
+sphinx-carousel
+sphinx-copybutton
+sphinx-tabs
