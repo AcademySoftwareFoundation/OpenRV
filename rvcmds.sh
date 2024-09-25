@@ -73,7 +73,13 @@ fi
 
 # Must be executed in a function as it changes the shell environment
 rvenv_shell() {
-  local activate_path=".venv/Scripts/activate"
+  local activate_path=".venv/bin/activate"
+
+  # Using msys2 as a way to detect if the script is running on Windows.
+  if [[ "$OSTYPE" == "msys"* ]]; then
+    activate_path=".venv/Scripts/activate"
+  fi
+
   if [ -d ".venv" ]; then
     source "$activate_path"
   else

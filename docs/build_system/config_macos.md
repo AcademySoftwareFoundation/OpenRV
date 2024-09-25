@@ -218,13 +218,13 @@ Clone the Open RV repository and change directory into the newly created folder.
 
 Using a password-protected SSH key:
 ```shell
-git checkout --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
+git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 
 Using the web URL:
 ```shell
-git checkout --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
+git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 

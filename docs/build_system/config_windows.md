@@ -33,7 +33,7 @@ MSVC v143 14.39.X to compile Boost.
 ````
 
 Any variant of Microsoft Visual Studio 2022 will work with Open RV (e.g. Enterprise, Professional or Community).
-You can select the version on [Visual Studio website](https://visualstudio.microsoft.com/downloads).
+You can select the version on the [Visual Studio website](https://visualstudio.microsoft.com/downloads).
 
 ### Installation
 
@@ -72,7 +72,7 @@ MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.39-17.9) and MSVC v143 - VS 202
 (setup_default_msvc_compiler)=
 ## 2. Setup default MSVC compiler
 
-If Microsoft Visual Studio 2022 was installed for the first time (using steps above), MSVC v143 v14.40 is *should* be 
+If Microsoft Visual Studio 2022 was installed for the first time (using the steps above), MSVC v143 v14.40 *should* be 
 the default compiler, although varying setup may affect this. 
 \
 \
@@ -84,7 +84,7 @@ Here are the possible methods to set the default compiler:
 ### Method 1: Check default props file
 
 The first solution is to modify the `Microsoft.VCToolsVersion.v143.default.props` under `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`.
-The path will vary depending if the variant is Enterprise, Profressional or Community.
+The path will vary depending on whether the variant is Enterprise, Profressional or Community.
 
 Make sure that the *VCToolsVersion* is set to `14.40.33807`. The file should look similar to this:
 
@@ -104,8 +104,8 @@ If the version is different, change it to `14.40.33807` in the file.
 ## 3. Install Python 3
 
 ### 3.1 VFX Reference Platform 2023
-You must installed Python 3.10 using the official Python installer. The latest version with installer is **3.10.11**.
-On [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
+You must install Python 3.10 using the official Python installer. The latest version with an installer is **3.10.11**.
+On the [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
 the correct version will be **Windows installer (64-bit)**.
 
 ### 3.2 VFX Reference Platform 2023
@@ -113,7 +113,7 @@ Same as VFX 2023 but download and install the latest [Python 3.11 with binaries]
 
 ### 3.3 Installation
 
-The carousel below shows how to install Python. The images refers to Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
+The carousel below shows how to install Python. The images refer to Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
 
 ````{carousel}
 :show_controls:
@@ -263,7 +263,7 @@ Additional information can be found on the [MSYS2 github](https://github.com/msy
 
 ````
 
-Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NOT** a mingw64 build. It is a Microscoft Visual Studio 2022 build. Open RV is built with Microsoft Visual Studio 2022 via the cmake "Visual Studio 17 2022" generator.
+Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NOT** a mingw64 build. It is a Microscoft Visual Studio 2022 build. Open RV is built with Microsoft Visual Studio 2022 via the CMake "Visual Studio 17 2022" generator.
 
 MSYS2 is only used for convenience as it comes with a package manager with utility packages required for the Open RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
 
@@ -276,7 +276,7 @@ The MSYS2 MingGW64 terminal MUST be used.\
 
 ````
 
-From an MSYS2-MinGW64 shell, install the following packages which are required to build Open RV:
+From a MSYS2-MinGW64 shell, install the following packages which are required to build Open RV:
 
 ```shell
 pacman -Sy --needed \
@@ -311,7 +311,7 @@ This is the step where the path of Strawberry Perl, Python, CMake and Qt will be
 
 ````
 
-Some environment variables need to be set within MSYS2 for Open RV build system. The **PATH** environment variable must be
+Some environment variables need to be set within MSYS2 for the Open RV build system. The **PATH** environment variable must be
 modified, new environment variables called **ACLOCAL_PATH** and **QT_HOME** must be created.
 
 These modifications will be added to the `.bash_profile` file located in the User's home directory within the MSYS2 environment. By modifiying `.bash_profile`, these environment variable will be modified everytime a new MSYS2 MINGW64 terminal is opened.
@@ -366,7 +366,7 @@ source ~/.bash_profile
 ## 9. Build Open RV
 
 ````{warning}
-Even as of Windows 11, for legacy reason, a default system path length is still limited to 254 bytes long.
+Even as of Windows 11, for legacy reasons, a default system path length is still limited to 254 bytes long.
 For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
 ````
 
@@ -384,20 +384,20 @@ To maximize your chances of successfully building Open RV, you must:
 ````{warning}
 Open RV repository **should** be cloned into the root of a drive (e.g. ````c:````).\
 \
-Otherwise, PySide2 compilation could be failing due to path being too long. If you can't do that, please take a look 
+Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look 
 at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.
 ````
 Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
 
 Using a password-protected SSH key:
 ```shell
-git checkout --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
+git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 
 Using the web URL:
 ```shell
-git checkout --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
+git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 
@@ -426,7 +426,7 @@ rvsetup
 ### Configure the project
 
 ````{note}
-After executing ````rvcfg```` command, make sure that you see those lines at the begining for the logs:
+After executing the ````rvcfg```` command, make sure that you see those lines at the begining for the logs:
 
 ```
 -- The CXX compiler identification is MSVC 19.40.33815.0
