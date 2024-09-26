@@ -3,12 +3,12 @@
 ## Summary
 
 1. [Install Basics](#install-basics)
-1. [Install tools and build dependencies](#install-tools-and-build-dependencies)
-1. [Install CMake](#install-cmake)
-1. [Install Qt5](#install-qt)
-1. [Build Open RV](build_rocky9_openrv)
+2. [Install tools and build dependencies](#install-tools-and-build-dependencies)
+3. [Install CMake](#install-cmake)
+4. [Install Qt5](#install-qt)
+5. [Build Open RV](build_rocky9_openrv)
     1. [Building from command line](building_rocky9_from_command_line)
-    1. [Building with Docker](building_rocky9_with_docker)
+    2. [Building with Docker](building_rocky9_with_docker)
 
 ## Install Basics
 
@@ -107,7 +107,7 @@ source rvcmds.sh
 #### Install Python dependencies
 
 ````{note}
-This section need to be done only one time when a fresh Open RV repository is cloned. 
+This section needs to be done only one time when a fresh Open RV repository is cloned. 
 The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
 ````
 
