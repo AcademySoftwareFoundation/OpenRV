@@ -15,7 +15,6 @@
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
-#include <RvCommon/InitGL.h>
 //#include <RvCommon/QTFrameBuffer.h>
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
@@ -178,20 +177,6 @@ RvDocument::RvDocument()
                               opts.dispAlphaBits,
                               !m_startupResize
                               );
-
-        //
-        //  Make the GL context valid ASAP so we can query it later
-        //  
-
-        // NOTE_QT6: This can't be done like this in Qt6. The context becomes valid only when the widget is shown.
-        // if (!m_glView->isValid())
-        // {
-        //     delete m_glView;
-        //     //cout << "ERROR: reverting to known GL state" << endl;
-        //     //cout << "ERROR: check the rendering preferences" << endl;
-        //     m_glView = new GLView(this, 0, this);
-        //     resetGLPrefs = true;
-        // }
     }
     else
     {
@@ -207,16 +192,6 @@ RvDocument::RvDocument()
                               opts.dispAlphaBits,
                               !m_startupResize
                               );
-
-        // NOTE_QT6: This can't be done like this in Qt6. The context becomes valid only when the widget is shown.
-        // if (!m_glView->isValid())
-        // {
-        //     delete m_glView;
-        //     //cout << "ERROR: reverting to known GL state" << endl;
-        //     //cout << "ERROR: check the rendering preferences" << endl;
-        //     m_glView = new GLView(this, rvDoc->view(), this);
-        //     resetGLPrefs = true;
-        // }
     }
 
     m_stackedLayout = new QStackedLayout(m_centralWidget);
@@ -240,13 +215,6 @@ RvDocument::RvDocument()
     m_menuTimer = new QTimer(this);
     m_menuTimer->setInterval(50);
     connect(m_menuTimer, SIGNAL(timeout()), this, SLOT(buildMenu()));
-
-    m_glView->makeCurrent();
-    initializeGLExtensions();
-
-    // NOTE_QT6 RvSession code was here. RvSession initialize the session and nodes.
-    //          Node initialization assumes that the context is valid
-    //initializeSession();
 
     //if (resetGLPrefs) resetGLStateAndPrefs();
 

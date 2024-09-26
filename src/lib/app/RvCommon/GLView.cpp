@@ -15,6 +15,7 @@
 #include <RvCommon/GLView.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <TwkGLF/GLFence.h>
+#include <RvCommon/InitGL.h>
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
 #include <iostream>
@@ -24,7 +25,6 @@
 #include <boost/thread/condition_variable.hpp>
 
 #include <QtWidgets/QMenu>
-#include <QDebug>
 
 namespace Rv {
 using namespace boost;
@@ -261,9 +261,7 @@ GLView::initializeGL()
     // NOTE_QT6: QOpenGLContext: Returns if this context is valid, i.e. has been successfully created.
     if (context()->isValid())
     {   
-        std::cout << "!!! GLView::initializeGL()-context()="<<context()<<std::endl;
-        std::cout << "!!! GLView::initializeGL()-isValid()()="<<isValid()<<std::endl;
-        
+        initializeGLExtensions();
         initializeOpenGLFunctions();
 
         if (m_sharedContext)
