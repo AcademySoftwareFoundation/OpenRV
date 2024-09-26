@@ -160,7 +160,7 @@ IF(NOT RV_TARGET_WINDOWS)
             jpeg-turbo::jpeg
             Tiff::Tiff
             OpenEXR::OpenEXR
-            RV_DEPS_OPENJPEG
+            OpenJpeg::OpenJpeg
             jpeg-turbo::turbojpeg
             PNG::PNG
             Boost::headers
