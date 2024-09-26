@@ -218,13 +218,13 @@ Clone the Open RV repository and change directory into the newly created folder.
 
 Using a password-protected SSH key:
 ```shell
-git checkout --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
+git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 
 Using the web URL:
 ```shell
-git checkout --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
+git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 cd OpenRV
 ```
 
@@ -253,28 +253,53 @@ rvsetup
 ### Configure the project
 
 From the Open RV directory, the following command will configure CMake for the build:
-```shell
+
+````{tabs}
+```{code-tab} bash Release
 rvcfg
 ```
+```{code-tab} bash Debug
+rvcfgd
+```
+````
 
 (build_openrv6)=
 ### Build the dependencies
 
 From the Open RV directory, the following command will build the dependencies:
-```shell
+
+````{tabs}
+```{code-tab} bash Release
 rvbuildt dependencies
 ```
+```{code-tab} bash Debug
+rvbuildtd dependencies
+```
+````
 
 (build_openrv7)=
 ### Build the main executable
 
 From the Open RV directory, the following command will build the main executable:
-```shell
+
+````{tabs}
+```{code-tab} bash Release
 rvbuildt main_executable
 ```
+```{code-tab} bash Debug
+rvbuildtd main_executable
+```
+````
 
 (build_openrv8)=
 ### Opening Open RV executable
 
+````{tabs}
+```{tab} Release
 Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/app/RV.app/Contents/MacOS/RV`.
+```
+```{tab} Debug
+Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/app/RV.app/Contents/MacOS/RV`.
+```
+````
 
