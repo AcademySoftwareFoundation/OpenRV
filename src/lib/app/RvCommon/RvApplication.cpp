@@ -548,7 +548,6 @@ RvApplication::quitAll()
 void
 RvApplication::runCreateSession()
 {
-    std::cout << "!!! Calling runCreateSession" << std::endl;
     if (m_newSessions.size())
     {
         // Make sure that the RV application has been initialized
@@ -614,7 +613,6 @@ RvDocument*
 RvApplication::newSessionFromFiles(const StringVector& files)
 {
     DB ("RvApplication::newSessionFromFiles()");
-    std::cout << "!!! Instanciating RvDocument" << std::endl;
     Rv::RvDocument *doc = new Rv::RvDocument;
 
     doc->show();
@@ -623,12 +621,9 @@ RvApplication::newSessionFromFiles(const StringVector& files)
     doc->raise();
 #endif
 
-    doc->view()->readyToPaint();
-
     //doc->ensurePolished();
     Rv::RvSession* s = doc->session();
 
-    std::cout << "!!! Calling queryAndStoreGLInfo from session - will crash in this code path if no context" << std::endl;
     s->queryAndStoreGLInfo();
 
     Rv::Options& opts = Rv::Options::sharedOptions();

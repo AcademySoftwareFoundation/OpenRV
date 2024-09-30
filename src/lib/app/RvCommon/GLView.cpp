@@ -140,7 +140,6 @@ GLView::GLView(QWidget* parent,
       m_stopProcessingEvents(false),
       m_syncThreadData(0)
 {
-    m_readyToPaint = false;
     setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
 
     ostringstream str;
@@ -228,7 +227,16 @@ GLView::rvGLFormat(bool stereo,
     fmt.setSwapBehavior(doubleBuffer ? QSurfaceFormat::DoubleBuffer : QSurfaceFormat::SingleBuffer);
     fmt.setStencilBufferSize(8);
     fmt.setStereo(stereo);
-    
+
+    fmt.setRenderableType(QSurfaceFormat::OpenGL);
+
+    // NOTE_QT: Set to version 2.1 for now.
+    fmt.setMajorVersion(2);
+    fmt.setMinorVersion(1);
+
+    //fmt.setProfile(QSurfaceFormat::CoreProfile);
+    //fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+
     //
     //  The default value for these buffer sizes is -1, but it is
     //  illegal to set to that value so test for positive red, not
@@ -352,11 +360,6 @@ GLView::swapBuffersNoSync()
 void
 GLView::paintGL()
 {
-    if (!m_readyToPaint)
-    {
-        return;
-    }
-
     IPCore::Session* session = m_doc->session();
     bool debug = IPCore::debugProfile && session;
 
@@ -423,6 +426,16 @@ GLView::paintGL()
         // white which creates undesirable artifacts.
         // As a work around, we set the resulting alpha channel to 1 to make sure 
         // that the resulting texture is fully opaque.
+
+        // NOTE_QT: That code seems to fix an issue on MacOS only. (Not on Linux, not test on Windows)
+        //          The issue I see on MacOS that the background is brown istead of black with the default background.
+
+        // NOTE_QT: glClear causes an issue on MacOS. We need to call glBindFramebuffer.
+
+        // Not sure why it is not complaining on Linux or Windows, but this make sure that we are drawing onto the
+        // default framebuffer with those OpenGL functions below.
+        glBindFramebuffer(GL_FRAMEBUFFER, QOpenGLContext::currentContext()->defaultFramebufferObject());
+
         glPushAttrib( GL_COLOR_BUFFER_BIT ); TWK_GLDEBUG;
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE); TWK_GLDEBUG;
         glClearColor(0.f, 0.f, 0.f, 1.0f); TWK_GLDEBUG;

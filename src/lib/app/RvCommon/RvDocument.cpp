@@ -249,8 +249,6 @@ void RvDocument::initializeSession()
 {
     if (!m_session)
     {
-        std::cout << "!!! initializeSession" << std::endl;
-
         m_session = new RvSession;
         //m_session->setFrameBuffer(fb);
 

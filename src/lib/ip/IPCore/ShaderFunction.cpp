@@ -70,14 +70,12 @@ unsigned int glslMinor = 0;
 void 
 initGLSLVersion()
 {
-    std::cout<<"!!! initGLSLVersion() "<<std::endl;
     if (glslMajor == 0)
     {
         //
         //  NOTE: its much better to have assigned 
         if (const char* glVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION))
         {
-            std::cout<<"!!! version ..." << glVersion <<std::endl;
             Shader::Function::useShadingLanguageVersion(glVersion);
         }
         else
