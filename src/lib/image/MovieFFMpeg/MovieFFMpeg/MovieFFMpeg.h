@@ -16,6 +16,8 @@
 // AVClass Forward Declaration Placeholders
 //
 
+
+class AVChannelLayout;
 class AVClass;
 class AVCodecContext;
 class AVDictionary;
@@ -212,7 +214,7 @@ class MovieFFMpegReader : public MovieReader
     // Audio Methods
     //
 
-    ChannelsVector idAudioChannels(uint64_t layout, int numChannels);
+    ChannelsVector idAudioChannels(AVChannelLayout layout, int numChannels);
     SampleTime oneTrackAudioFillBuffer(AudioTrack* track);
     int decodeAudioForBuffer(AudioTrack* track);
     template <typename T> int translateAVAudio(AudioTrack* track, double max, int offset);
