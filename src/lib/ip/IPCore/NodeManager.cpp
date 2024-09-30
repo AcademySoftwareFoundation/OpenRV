@@ -33,7 +33,7 @@ using namespace boost;
 using namespace boost::filesystem;
 using namespace TwkUtil;
 
-bool NodeManager::m_debug = true;
+bool NodeManager::m_debug = false;
 
 NodeManager::NodeManager()
 {
