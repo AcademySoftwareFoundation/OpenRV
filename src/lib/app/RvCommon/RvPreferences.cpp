@@ -35,7 +35,6 @@
 #include <ImfThreading.h>
 #include <QtGui/QtGui>
 #include <QtWidgets/QStyleFactory>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 #include <TwkQtCoreUtil/QtConvert.h>
@@ -469,7 +468,9 @@ RvPreferences::update()
 
     m_ui.startupScreenCombo->clear();
     m_ui.startupScreenCombo->addItem("Follow Pointer");
-    for (int i = 0; i < QApplication::desktop()->screenCount(); ++i)
+
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    for (int i = 0; i < screens.size(); i++)
     {
         m_ui.startupScreenCombo->addItem(QString("Screen %1").arg((unsigned int)(i)));
     }
