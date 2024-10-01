@@ -46,7 +46,7 @@
 #include <stl_ext/string_algo.h>
 
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QDesktopWidget>
+#include <QScreen>
 
 #ifdef PLATFORM_LINUX
 #include <QtX11Extras/QX11Info>
@@ -878,9 +878,13 @@ RvDocument::view() const
 void
 RvDocument::center()
 {
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    QRect ssize = desktop->availableGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+    QRect ssize = screen->availableGeometry(); 
 
     int sw = ssize.width();
     int sh = ssize.height();
@@ -917,11 +921,15 @@ RvDocument::resizeView(int w, int h)
     //  top of an existing one.
     //
 
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    
-    QRect ssize = desktop->availableGeometry(screen);
-    QRect ts = desktop->screenGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry();
+    QRect ts = screen->geometry();
     float sw = float(ssize.width());
     float sh = float(ssize.height());
 
@@ -1033,12 +1041,16 @@ RvDocument::resizeToFit(bool placement, bool firstTime)
     float w = 0;
     float h = 0;
 
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    
-    QRect ssize = desktop->availableGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry(); 
     DB ("resizeToFit available geom w " << ssize.width() << " h " << ssize.height());
-    QRect ts = desktop->screenGeometry(screen);
+    QRect ts = screen->geometry();
     float sw = float(ssize.width());
     float sh = float(ssize.height());
 
@@ -1244,9 +1256,15 @@ void
 RvDocument::toggleFullscreen(bool firstTime)
 {
     DB ("toggleFullScreen currently " << isFullScreen());
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    QRect ssize = desktop->screenGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry(); 
+
     int sw = ssize.width();
     int sh = ssize.height();
 
@@ -1259,7 +1277,7 @@ RvDocument::toggleFullscreen(bool firstTime)
 
     if (isFullScreen())
     {
-        ssize = desktop->availableGeometry(screen);
+        ssize = screen->geometry();
         showNormal();
     }
     else

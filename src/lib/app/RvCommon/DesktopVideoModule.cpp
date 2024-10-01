@@ -22,8 +22,8 @@
 #include <IOKit/graphics/IOGraphicsInterface.h>
 #endif
 
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QApplication>
+#include <QScreen>
 
 namespace Rv {
 using namespace std;
@@ -42,8 +42,6 @@ static void KeyArrayCallback (const void* key, const void* value, void* context)
 DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np, QTGLVideoDevice* shareDevice) : VideoModule()
 {
     bool useQt = true;
-    QDesktopWidget* desktop = QApplication::desktop();
-    int nscreens = desktop->screenCount();
 
 #ifdef PLATFORM_DARWIN
     useQt = false;
@@ -128,15 +126,17 @@ DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np, QTGLVideoDevice* sha
 
     if (useQt)
     {
-        for (int screen = 0; screen < desktop->screenCount(); screen++)
+        const auto screens = QGuiApplication::screens();
+        for (int screen = 0; screen < screens.size(); screen++)
         {
-            QWidget* w = desktop->screen(screen);
-            ostringstream name;
-            name << w->screen()->manufacturer().toUtf8().data();
-            name << " " << w->screen()->model().toUtf8().data();
-            name << " " << w->screen()->name().toUtf8().data();
-            QTDesktopVideoDevice* sd = 
-                new QTDesktopVideoDevice(this, name.str(), screen, shareDevice);
+            const QScreen* w = screens[screen];
+            QString name = QString("%1 %2 %3")
+                .arg(w->manufacturer())
+                .arg(w->model())
+                .arg(w->name());
+
+            QTDesktopVideoDevice* sd =
+                new QTDesktopVideoDevice(this, name.toUtf8().constData(), screen, shareDevice);
             m_devices.push_back(sd);
         }
     }
@@ -198,25 +198,30 @@ DesktopVideoModule::deviceFromPosition(int x, int y) const
 
     #else // PLATFORM_LINUX or PLATFORM_WINDOWS
 
-	int screen = QApplication::desktop()->screenNumber(QPoint(x, y));
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    for (int screen = 0; screen < screens.size(); ++screen)
+    {
+        // Check if the point is part of the screen.
+        if (screens[screen]->geometry().contains(QPoint(x, y)))
+        {
+            for (int i = 0; i < m_devices.size(); ++i)
+            {
+                //
+                //  These devices may be NVDesktopVideoDevices or QTDeskTopVideoDevices.
+                //
+                TwkApp::VideoDevice* d = m_devices[i];
 
-	for (int i = 0; i < m_devices.size(); ++i)
-	{
-	    //
-	    //  These devices may be NVDesktopVideoDevices or QTDeskTopVideoDevices.
-	    //
-	    TwkApp::VideoDevice* d = m_devices[i];
-
-	    if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(d))
-	    {
-                if (dd->qtScreen() == screen)
+                if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(d))
                 {
-                    device = d;
-                    break;
+                        if (dd->qtScreen() == screen)
+                        {
+                            device = d;
+                            break;
+                        }
                 }
-	    }
-	}
-
+            }
+        }
+    }
     #endif
 
     return device;

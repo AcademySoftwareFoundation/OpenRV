@@ -15,8 +15,8 @@
 #include <RvCommon/QTDesktopVideoDevice.h>
 #include <TwkGLF/GLFBO.h>
 #include <QtGui/QtGui>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QApplication>
+#include <QScreen>
 
 namespace Rv {
 
@@ -61,8 +61,16 @@ QTDesktopVideoDevice::QTDesktopVideoDevice(VideoModule* m,
       m_x(0),
       m_y(0)
 {
-    const QDesktopWidget* desktop = qApp->desktop();
-    QRect rect = desktop->screenGeometry(screen);
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    if (screen < 0 || screen >= screens.size())
+    {
+        // Handle invalid screen index.
+        // TODO_QT
+        std::cout << "Screen index is out of range" << std::endl;
+    }
+
+    const QRect rect = screens[screen]->geometry();
+
     ostringstream str;
     str << rect.width() << " x " << rect.height();
     m_videoFormats.push_back(VideoFormat(rect.width(), rect.height(), 1.0, 1.0, 0.0, str.str()));
@@ -140,7 +148,8 @@ QTDesktopVideoDevice::open(const StringVector& args)
     setWidget(s);
     setViewDevice(new QTGLVideoDevice(0, "local view", s));
 
-    QRect g = QApplication::desktop()->screenGeometry(m_screen);
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    QRect g = screens[m_screen]->geometry();
     widget()->move(g.x(), g.y());
     widget()->setWindowState(Qt::WindowFullScreen);
     widget()->show();
@@ -172,28 +181,32 @@ QTDesktopVideoDevice::close()
 VideoDevice::Resolution
 QTDesktopVideoDevice::resolution() const
 {
-    QRect g = QApplication::desktop()->screenGeometry(m_screen);
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    QRect g = screens[m_screen]->geometry();
     return Resolution(g.width(), g.height(), 1.0, 1.0);
 }
 
 size_t 
 QTDesktopVideoDevice::width() const
 {
-    QRect g = QApplication::desktop()->screenGeometry(m_screen);
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    QRect g = screens[m_screen]->geometry();
     return g.width();
 }
 
 size_t 
 QTDesktopVideoDevice::height() const
 {
-    QRect g = QApplication::desktop()->screenGeometry(m_screen);
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    QRect g = screens[m_screen]->geometry();
     return g.height();
 }
 
 VideoDevice::VideoFormat
 QTDesktopVideoDevice::format() const
 {
-    QRect g = QApplication::desktop()->screenGeometry(m_screen);
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    QRect g = screens[m_screen]->geometry();
     ostringstream str;
     str << g.width() << " x " << g.height();
     const float pa = 1.0;
@@ -223,8 +236,8 @@ QTDesktopVideoDevice::colorProfile() const
     //
 
     // Get the context for this screen
-    QDesktopWidget* desktop = QApplication::desktop();
-    WId id = desktop->screen(m_screen)->effectiveWinId();
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    WId id = screens[m_screen]->effectiveWinId();
     HDC hdc = GetDC (reinterpret_cast<HWND>(id));
 
     if (hdc)
