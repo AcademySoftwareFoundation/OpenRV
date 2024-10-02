@@ -736,12 +736,6 @@ RvApplication::newSessionFromFiles(const StringVector& files)
         }
     }
 
-//     doc->show();
-
-// #ifndef PLATFORM_LINUX
-//     doc->raise();
-// #endif
-
     if (videoModules().empty())
     {
         doc->view()->makeCurrent();
