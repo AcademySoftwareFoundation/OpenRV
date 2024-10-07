@@ -61,8 +61,8 @@ SET(_shaders
 FIND_PACKAGE(OpenGL REQUIRED)
 
 FIND_PACKAGE(
-  Qt5
-  COMPONENTS Core Gui OpenGL
+  ${RV_QT_PACKAGE_NAME}
+  COMPONENTS Core Gui OpenGL Widgets
   REQUIRED
 )
 
@@ -91,10 +91,10 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target} 
   TwkApp TwkFB TwkGLText TwkUtil TwkAudio
-  Qt5::Core
-  Qt5::Gui
-  Qt5::Widgets
-  Qt5::OpenGL
+  Qt::Core
+  Qt::Gui
+  Qt::Widgets
+  Qt::OpenGL
 )
 
 IF(RV_TARGET_WINDOWS)
