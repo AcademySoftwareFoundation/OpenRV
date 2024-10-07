@@ -16,7 +16,7 @@ SET(_font_path
     ${PROJECT_SOURCE_DIR}/src/lib/app/RvCommon/qrc/fonts/fontawesome-webfont.ttf
 )
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Widgets Core Gui
   REQUIRED
 )
@@ -31,7 +31,7 @@ ADD_EXECUTABLE(
 )
 TARGET_LINK_LIBRARIES(
   ${_target_qt}
-  PRIVATE QTBundle Qt5::Widgets Qt5::Gui Qt5::Core doctest
+  PRIVATE QTBundle Qt::Widgets Qt::Gui Qt::Core doctest
 )
 ADD_TEST(
   NAME ${_target_qt}
