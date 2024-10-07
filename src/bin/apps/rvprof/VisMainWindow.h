@@ -8,6 +8,7 @@
 #ifndef __playbackVis__VisMainWindow__h__
 #define __playbackVis__VisMainWindow__h__
 #include <iostream>
+#include <QFileDialog>
 #include <QtGui/QtGui>
 #include <QtOpenGL/QtOpenGL>
 #include <QOpenGLWidget>

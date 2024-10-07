@@ -983,7 +983,12 @@ GLView::wheelEvent(QWheelEvent* event)
           .5 * (m_endTime - m_startTime) * (h / w),
           0);
 
+#if defined( RV_VFX_CY2023 )
     float a = event->delta() * .8;
+#else
+    float a = event->angleDelta().y()  * .8;
+#endif
+
     a *= 0.001;
     a += 1.0;
     m_matrix = 
