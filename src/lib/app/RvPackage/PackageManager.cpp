@@ -328,7 +328,7 @@ namespace Rv
 
     QStringList deps = package.
                          requires
-        .split( " ", QString::SkipEmptyParts );
+        .split( " ", Qt::SkipEmptyParts );
     QStringList missing;
     QStringList notinstalled;
     QFileInfo info( package.file );
@@ -1370,7 +1370,7 @@ namespace Rv
       }
       else
       {
-        QStringList parts = line.split( ",", QString::KeepEmptyParts );
+        QStringList parts = line.split( ",", Qt::KeepEmptyParts );
 
         if( parts.size() >= 7 && parts[0] != "#" )
         {
@@ -1541,7 +1541,7 @@ namespace Rv
       Package& package = m_packages[i];
       QStringList deps = package.
                            requires
-          .split( " ", QString::SkipEmptyParts );
+          .split( " ", Qt::SkipEmptyParts );
 
       for( size_t q = 0; q < deps.size(); q++ )
       {
