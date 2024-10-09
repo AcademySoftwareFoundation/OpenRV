@@ -26,6 +26,7 @@
 
 #include "ntv2devicefeatures.h"
 #include "ntv2formatdescriptor.h"
+#include "ntv2vpid.h"
 #include <stl_ext/replace_alloc.h>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -600,7 +601,7 @@ namespace AJADevices
   bool KonaVideoDevice::m_infoFeedback = false;
 
   KonaVideoDevice::KonaVideoDevice( AJAModule* m, const string& name,
-                                    int devicenum, unsigned int appID,
+                                    unsigned int deviceIndex, unsigned int appID,
                                     OperationMode mode )
       : GLBindableVideoDevice( m, name,
                                BlockingTransfer | ASyncReadBack | ImageOutput |
@@ -608,7 +609,7 @@ namespace AJADevices
                                    NormalizedCoordinates | FlippedImage |
                                    Clock | AudioOutput ),
         m_appID( appID ),
-        m_devicenum( devicenum ),
+        m_deviceIndex( deviceIndex ),
         m_card( 0 ),
         m_operationMode( mode ),
         m_bound( false ),
@@ -654,12 +655,6 @@ namespace AJADevices
         m_writeBufferIndex( 0 ),
         m_writeBufferCount( 0 )
   {
-    //
-    //  Default ringbuffer size is now 4, but allow setting of size by env var
-    //  just in case.
-    //
-    m_info = &reinterpret_cast<CNTV2DeviceScanner*>( m->deviceScan() )
-                  ->GetDeviceInfoList()[devicenum];
 
     //
     //  Query the card on construction so we can find out its
@@ -716,7 +711,7 @@ namespace AJADevices
     //
     //        Again, this affects *only* 4K timings.
 
-    m_card = new CNTV2Card( m_info->deviceIndex );
+    m_card = new CNTV2Card( m_deviceIndex );
     bool ok = m_card->IsOpen();
 
     if( ok )
@@ -727,7 +722,7 @@ namespace AJADevices
       m_deviceNumVideoChannels = NTV2DeviceGetNumVideoChannels( m_deviceID );
       m_deviceHasDualLink = NTV2DeviceCanDoDualLink( m_deviceID );
       m_deviceHas3G = NTV2DeviceCanDo3GOut(
-          m_deviceID, 0 );  // XXX this 0 might need to be m_info->deviceIndex
+          m_deviceID, 0 );
       m_deviceHDMIVersion = NTV2DeviceGetHDMIVersion( m_deviceID );
       m_deviceHasHDMIStereo = NTV2DeviceCanDoHDMIOutStereo( m_deviceID );
       m_deviceHasCSC = NTV2DeviceCanDoWidget( m_deviceID, NTV2_WgtCSC1 );
@@ -897,7 +892,7 @@ namespace AJADevices
     m_actualVideoFormat = videoFormatsCP[0];
     m_actualDataFormat = dataFormatsCP[0];
 
-    if( !m_open ) m_card = new CNTV2Card( m_info->deviceIndex );
+    if( !m_open ) m_card = new CNTV2Card( m_deviceIndex );
 
     m_channelVector.clear();
 
@@ -1126,7 +1121,7 @@ namespace AJADevices
       cout << "INFO: simple-routing = " << (int)m_simpleRouting << endl;
     }
 
-    m_card = new CNTV2Card( m_info->deviceIndex );
+    m_card = new CNTV2Card( m_deviceIndex );
 
     m_open = m_card->IsOpen();
 
@@ -2426,9 +2421,9 @@ namespace AJADevices
 
     // Connect mux inputs to framestore outputs.
     m_card->Connect( NTV2_Xpt425Mux1AInput, NTV2_XptFrameBuffer1RGB );
-    m_card->Connect( NTV2_Xpt425Mux1BInput, NTV2_XptFrameBuffer1_425RGB );
+    m_card->Connect( NTV2_Xpt425Mux1BInput, NTV2_XptFrameBuffer1_DS2RGB );
     m_card->Connect( NTV2_Xpt425Mux2AInput, NTV2_XptFrameBuffer2RGB );
-    m_card->Connect( NTV2_Xpt425Mux2BInput, NTV2_XptFrameBuffer2_425RGB );
+    m_card->Connect( NTV2_Xpt425Mux2BInput, NTV2_XptFrameBuffer2_DS2RGB );
   }
 
   void KonaVideoDevice::routeCSC( bool tsiEnabled, bool outputIsRGB )
