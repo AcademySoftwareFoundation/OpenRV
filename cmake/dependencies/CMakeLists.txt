@@ -48,9 +48,9 @@ ENDIF()
 
 # TODO_QT: Not generic enough.. But maybe we could use something like NOT CY2023
 #          since after 2023, it is Qt6
-IF("${RV_VFX_PLATFORM}" STREQUAL "CY2023")
+IF(RV_VFX_PLATFORM STREQUAL CY2023)
   INCLUDE(qt5)
-ELSEIF("${RV_VFX_PLATFORM}" STREQUAL "CY2024")
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   INCLUDE(qt6)
 ENDIF()
 

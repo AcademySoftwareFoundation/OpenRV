@@ -57,6 +57,12 @@ FIND_PACKAGE(
   REQUIRED
 )
 
+get_target_property(MOC_EXECUTABLE Qt6::moc IMPORTED_LOCATION)
+get_target_property(UIC_EXECUTABLE Qt6::uic IMPORTED_LOCATION)
+
+SET(QT_MOC_EXECUTABLE "${MOC_EXECUTABLE}" CACHE STRING "Qt MOC executable")
+SET(QT_UIC_EXECUTABLE "${UIC_EXECUTABLE}" CACHE STRING "Qt UIC executable")
+
 SET(_qt_copy_message
     "Copying Qt into ${RV_STAGE_ROOT_DIR}"
 )
