@@ -3,6 +3,6 @@
 // 
 // SPDX-License-Identifier: Apache-2.0 
 //
-#include <MuQt5/QVariantType.h>
-#include <MuQt5/QTimerEventType.h>
-#include <MuQt5/QEventType.h>
+#include <MuQt6/QVariantType.h>
+#include <MuQt6/QTimerEventType.h>
+#include <MuQt6/QEventType.h>

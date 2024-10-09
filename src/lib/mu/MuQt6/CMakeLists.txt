@@ -38,7 +38,7 @@ SET(CMAKE_AUTORCC
 )
 
 SET(_target
-    "MuQt5"
+    "MuQt6"
 )
 
 SET(_sources
@@ -245,7 +245,7 @@ ENDFOREACH()
 FILE(
   GLOB _files_to_moc
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  MuQt5/*.h
+  MuQt6/*.h
 )
 
 LIST(REMOVE_ITEM _files_to_moc SignalSpy.h)

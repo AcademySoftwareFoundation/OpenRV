@@ -183,7 +183,7 @@ TARGET_LINK_LIBRARIES(
          ${QT6_QOPENGLWIDGET_TARGET}
   PRIVATE Python::Python
           IPBaseNodes
-          MuQt5
+          ${RV_QT_MU_TARGET}
           MuPy
           PyTwkApp
           QTAudioRenderer

@@ -22,7 +22,7 @@ static NODE_IMPLEMENTATION(findChild, Pointer)
                                          NODE_ARG(1, Pointer)) );
 }
 
-#include <MuQt5/QVariantType.h>
+#include <MuQt6/QVariantType.h>
 
 static bool
 setProperty_bool_Object_string_qt_QVariant(Thread& NODE_THREAD,

@@ -3,8 +3,8 @@
 // 
 // SPDX-License-Identifier: Apache-2.0 
 //
-#include <MuQt5/qtModule.h>
-#include <MuQt5/qtModuleIncludes.h>
-#include <MuQt5/qtUtils.h>
-#include <MuQt5/QtColorTriangleType.h>
+#include <MuQt6/qtModule.h>
+#include <MuQt6/qtModuleIncludes.h>
+#include <MuQt6/qtUtils.h>
+#include <MuQt6/QtColorTriangleType.h>
 #include <qtcolortriangle/qtcolortriangle.h>
