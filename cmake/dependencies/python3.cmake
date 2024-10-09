@@ -143,7 +143,7 @@ ENDIF()
 # TODO_QT: Maybe we could use something like NOT CY2023
 #          since after 2023, it is Qt6
 # TODO_QT: Below code could be simplified, but for now it is faster to test.
-IF("${RV_VFX_PLATFORM}" STREQUAL "CY2023")
+IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_pyside2_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
   )
@@ -171,7 +171,7 @@ IF("${RV_VFX_PLATFORM}" STREQUAL "CY2023")
   LIST(APPEND _pyside2_make_command ${RV_DEPS_QT5_LOCATION})
   LIST(APPEND _pyside2_make_command "--python-version")
   LIST(APPEND _pyside2_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
-ELSEIF("${RV_VFX_PLATFORM}" STREQUAL "CY2024")
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   SET(_pyside2_make_command_script
     "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
   )
@@ -341,17 +341,25 @@ SET(${_pyside2_target}-build-flag
     ${_install_dir}/${_pyside2_target}-build-flag
 )
 
-# ADD_CUSTOM_COMMAND(
-#   COMMENT "Building PySide2 using ${_pyside2_make_command_script}"
-#   OUTPUT ${${_pyside2_target}-build-flag}
-#   # First PySide build script on Windows which doesn't respect '--debug' option
-#   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
-#           ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
-#   COMMAND ${_pyside2_make_command} --prepare --build
-#   COMMAND cmake -E touch ${${_pyside2_target}-build-flag}
-#   DEPENDS ${_python3_target} ${_pyside2_make_command_script} ${${_python3_target}-requirements-flag}
-#   USES_TERMINAL
-# )
+
+# TODO_QT: Maybe we could use something like NOT CY2023
+#          since after 2023, it is Qt6
+# TODO_QT: Below code could be simplified, but for now it is faster to test.
+IF(RV_VFX_PLATFORM STREQUAL CY2023)
+  ADD_CUSTOM_COMMAND(
+    COMMENT "Building PySide2 using ${_pyside2_make_command_script}"
+    OUTPUT ${${_pyside2_target}-build-flag}
+    # First PySide build script on Windows which doesn't respect '--debug' option
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
+            ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
+    COMMAND ${_pyside2_make_command} --prepare --build
+    COMMAND cmake -E touch ${${_pyside2_target}-build-flag}
+    DEPENDS ${_python3_target} ${_pyside2_make_command_script} ${${_python3_target}-requirements-flag}
+    USES_TERMINAL
+  )
+
+  SET(_build_flag_depends ${${_pyside2_target}-build-flag})
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
@@ -360,7 +368,7 @@ IF(RV_TARGET_WINDOWS)
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
   )
   ADD_CUSTOM_TARGET(
     ${_python3_target}-stage-target ALL
@@ -373,7 +381,7 @@ ELSE()
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
   )
   ADD_CUSTOM_TARGET(
     ${_python3_target}-stage-target ALL

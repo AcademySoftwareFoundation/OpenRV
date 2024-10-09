@@ -49,7 +49,11 @@
 #include <QScreen>
 
 #ifdef PLATFORM_LINUX
+#if defined( RV_VFX_CY2023 )
+#include <QtX11Extras/QX11Info>
+#else
 #include <QtGui/private/qtx11extras_p.h>
+#endif
 #include <X11/Xlib.h>
 #endif
 

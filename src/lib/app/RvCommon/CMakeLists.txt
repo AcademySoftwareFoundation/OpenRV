@@ -91,7 +91,7 @@ FOREACH(
   )
   ADD_CUSTOM_COMMAND(
     OUTPUT ${outfile}
-    COMMAND ${QtWidgets_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
+    COMMAND ${QT_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
     MAIN_DEPENDENCY ${infile}
     VERBATIM
   )
@@ -131,7 +131,7 @@ FOREACH(
   )
   ADD_CUSTOM_COMMAND(
     OUTPUT ${outfile}
-    COMMAND ${QtCore_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+    COMMAND ${QT_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
     MAIN_DEPENDENCY ${infile}
     VERBATIM
   )
@@ -229,14 +229,22 @@ ENDIF()
 # To enable private headers use QT += gui-private with qmake, or add a project dependency to Qt::GuiPrivate with CMake.
 
 IF(RV_TARGET_LINUX)
+  IF(RV_VFX_PLATFORM STREQUAL CY2023)
+    SET(_rvcommon_qt_components X11Extras)
+    SET(_rvcommon_link_libraries Qt::X11Extras)
+  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+    SET(_rvcommon_qt_components Gui)
+    SET(_rvcommon_link_libraries Qt::GuiPrivate)
+  ENDIF()
+
   FIND_PACKAGE(
     ${RV_QT_PACKAGE_NAME}
-    COMPONENTS Gui
+    COMPONENTS ${_rvcommon_qt_components}
     REQUIRED
   )
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE X11 Qt::GuiPrivate
+    PRIVATE X11 ${_rvcommon_link_libraries}
   )
 ENDIF()
 
