@@ -45,7 +45,9 @@ SET(_sources
     qtModule.cpp
     Bridge.cpp
     qtUtils.cpp
-    qtGlobals.cpp
+    # TODO_QT: Remove if everything works.
+    # Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
+    #qtGlobals.cpp
     SignalSpy.cpp
     RvNetworkAccessManager.cpp
     QtColorTriangleType.cpp
@@ -76,7 +78,7 @@ SET(_autotypes
     LayoutItem
     PaintDevice
     Image
-    RegExp
+    RegularExpression
     TextCursor
     TextOption
     TextBlock
@@ -169,13 +171,14 @@ SET(_autotypes
     HostAddress
     HostInfo
     LocalSocket
-    DesktopWidget
+    Screen
     ItemSelectionRange
     ItemSelection
     ItemSelectionModel
     Gradient
     Brush
-    Matrix
+    Matrix4x4
+    GenericMatrix
     Transform
     ConicalGradient
     LinearGradient
@@ -210,7 +213,7 @@ SET(_autotypes
     WheelEvent
     WindowStateChangeEvent
     TextStream
-    TextCodec
+    StringConverter
     TextBrowser
     NetworkCookieJar
     NetworkCookie
