@@ -59,6 +59,21 @@ class NoNodeFromHook(otio.exceptions.OTIOError):
     pass
 
 
+def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object | None:
+    """
+    Main entry point to expand a given otio string into the current RV session.
+
+    Returns the top level node created that represents this otio
+    timeline.
+    """
+    otio_obj = otio.adapters.read_from_string(otio_string)
+    timeline = otio_obj["otio"]
+
+    context = {"sg_url": host_prefix} if host_prefix else None
+
+    return create_rv_node_from_otio(timeline, context), timeline.global_start_time
+
+
 def read_otio_file(otio_file):
     """
     Main entry point to expand a given otio (or file otio can read)
@@ -276,7 +291,7 @@ def _create_track(in_seq, context=None):
     return new_seq
 
 
-def _get_global_transform(tl):
+def _get_global_transform(tl) -> dict:
     # since there's no global scale in otio, calculate the minimum box size
     # that can contain all clips
     def find_display_bounds(tl):
@@ -491,8 +506,11 @@ def _create_sources(item, context=None):
     return source_group, active_source
 
 
-def _get_media_path(target_url, context=None):
+def _get_media_path(target_url: str, context: dict | None = None) -> str:
     context = context or {}
+
+    if "sg_url" in context:
+        return context.get("sg_url") + target_url
 
     if not os.path.isabs(target_url):
         # if this is a relative file path, assume relative to the otio file
