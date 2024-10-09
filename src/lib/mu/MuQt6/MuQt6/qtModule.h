@@ -17,7 +17,9 @@ class qtModule : public Module
     qtModule(Context* c, const char *name = "qt");
     virtual ~qtModule();
 
-    void loadGlobals();
+    // TODO_QT: Remove if everything works.
+    // Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
+    //void loadGlobals();
     virtual void load();
 };
 

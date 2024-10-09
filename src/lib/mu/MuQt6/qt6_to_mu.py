@@ -123,6 +123,7 @@ baseHTML = [
     "qevent",
     # # Qt6: Removed for QRegularExpression
     # "qregexp",
+    "qregularexpression",
     "qregion",
     "qcolor",
     "qlistwidgetitem",
@@ -145,8 +146,10 @@ baseHTML = [
     "qgradient",
     "qmargins",
     "qbrush",
-    # Qt6: Removed
+    # Qt6: Removed, replaced by Either QTransform, QMatrix4x4 or QGenericMatrix depending on the use case.
     # "qmatrix",
+    "qmatrix4x4",
+    "qgenericmatrix",
     "qtransform",
     "qpointf",
     "qpalette",
@@ -154,6 +157,7 @@ baseHTML = [
     "qtextstream",
     # Qt6: Removed for QStringConverter
     # "qtextcodec",
+    "qstringconverter",
     "qpainter",
     "qpainterpath",
     "qrectf",  # "qstyleoption",
@@ -259,6 +263,7 @@ baseHTML = [
     "qudpsocket",
     # Qt6: Removed for QScreen and QApplication::desktop()
     # "qdesktopwidget",
+    "qscreen",
     "qitemselectionmodel",
     "qspaceritem",
     "qwidgetitem",
@@ -329,6 +334,7 @@ baseHTML = [
     "qudpsocket",
     # Qt6: Removed for QScreen and QApplication::desktop()
     # "qdesktopwidget",
+    "qscreen",
     "qitemselectionmodel",
     "qspaceritem",
     "qwidgetitem",
@@ -356,6 +362,7 @@ primitiveTypes = set(
         "QPointF",
         # Qt6: Removed for QRegularExpression
         # "QRegExp",
+        "QRegularExpression",
         "QIcon",
         "QPixmap",
         "QBitmap",
@@ -384,6 +391,8 @@ primitiveTypes = set(
         "QGradient",
         # Qt6: Removed
         # "QMatrix",
+        "QMatrix4x4",
+        "QGenericMatrix",
         "QTransform",
         "QConicalGradient",
         "QLinearGradient",
@@ -437,6 +446,7 @@ copyOnWriteTypes = [
     "QQueue",
     # Qt6: Removed for QRegularExpression
     # "QRegExp",
+    "QRegularExpression",
     "QRegion",
     "QSet",
     "QSqlField",
@@ -494,6 +504,7 @@ pointerTypes = set(
         "QGestureEvent",
         # Qt6: Removed for QStringConverter
         # "QTextCodec",
+        "QStringConverter",
         "QWebEngineSettings",
         "QWebEngineHistory",
         "QWindowStateChangeEvent",
@@ -566,7 +577,7 @@ translationMap = {
     # "const QPointF &"           : "qt.QPointF",
     # "const QLineF &"            : "qt.QLineF",
     # "const QRectF &"            : "qt.QRectF",
-    # "const QRegExp &"           : "qt.QRegExp",
+    # "const QRegularExpression &"           : "qt.QRegularExpression",
     # "const QLine &"             : "qt.QLine",
     # "const QDate &"             : "qt.QDate",
     # "const QTime &"             : "qt.QTime",
@@ -739,6 +750,7 @@ includeClasses = set(
         "QTimer",
         # Qt6: Removed for QScreen and QApplication::desktop()
         # "QDesktopWidget",
+        "QScreen",
         "QFileInfo",
         "QItemSelection",
         "QItemSelectionRange",
@@ -747,6 +759,8 @@ includeClasses = set(
         "QBrush",
         # Qt6: Removed
         # "QMatrix",
+        "QMatrix4x4",
+        "QGenericMatrix",
         "QTransform",
         "QConicalGradient",
         "QLinearGradient",
@@ -786,6 +800,7 @@ includeClasses = set(
         "QFileOpenEvent",
         # Qt6: Removed for QRegularExpression
         # "QRegExp",
+        "QRegularExpression",
         "QTextCursor",
         "QTextOption",
         "QTextBlock",
@@ -795,6 +810,7 @@ includeClasses = set(
         "QNetworkCookie",
         # Qt6: Removed for QStringConverter
         # "QTextCodec",
+        "QStringConverter",
         "QTextStream",
         "QTextBrowser",
         "QNetworkCookieJar",
@@ -3348,10 +3364,11 @@ class MuClass:
         cppout = None
 
         if name == "Global":
+            print("OPENING qtGlobals.cpp for WRITE")
             cppout = open("qtGlobals.cpp", "w")
         else:
             cppout = open(name + "Type.cpp", "w")
-
+        
         cppout.writelines(cpplines)
         cppout.close()
 
