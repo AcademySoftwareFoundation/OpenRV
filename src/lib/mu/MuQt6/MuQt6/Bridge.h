@@ -7,7 +7,7 @@
 #ifndef __MuQt__Bridge__h__
 #define __MuQt__Bridge__h__
 #include <iostream>
-#include <MuQt5/qtUtils.h>
+#include <MuQt6/qtUtils.h>
 #include <QtCore/QtCore>
 #include <QtNetwork/QtNetwork>
 #include <Mu/Type.h>

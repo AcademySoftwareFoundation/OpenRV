@@ -11,18 +11,18 @@
 #include <MuLang/StringType.h>
 #include <MuLang/DynamicArray.h>
 #include <MuLang/MuLangContext.h>
-#include <MuQt5/QObjectType.h>
-#include <MuQt5/QPixmapType.h>
-#include <MuQt5/QModelIndexType.h>
-#include <MuQt5/QStandardItemType.h>
-#include <MuQt5/QListWidgetItemType.h>
-#include <MuQt5/QTreeWidgetItemType.h>
-#include <MuQt5/QTableWidgetItemType.h>
-#include <MuQt5/QPaintDeviceType.h>
-#include <MuQt5/QLayoutItemType.h>
-#include <MuQt5/QItemSelectionType.h>
-#include <MuQt5/QFileInfoType.h>
-#include <MuQt5/QNetworkCookieType.h>
+#include <MuQt6/QObjectType.h>
+#include <MuQt6/QPixmapType.h>
+#include <MuQt6/QModelIndexType.h>
+#include <MuQt6/QStandardItemType.h>
+#include <MuQt6/QListWidgetItemType.h>
+#include <MuQt6/QTreeWidgetItemType.h>
+#include <MuQt6/QTableWidgetItemType.h>
+#include <MuQt6/QPaintDeviceType.h>
+#include <MuQt6/QLayoutItemType.h>
+#include <MuQt6/QItemSelectionType.h>
+#include <MuQt6/QFileInfoType.h>
+#include <MuQt6/QNetworkCookieType.h>
 
 Q_DECLARE_METATYPE(QTreeWidgetItem*);
 Q_DECLARE_METATYPE(QListWidgetItem*);

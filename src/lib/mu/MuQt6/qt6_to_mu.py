@@ -26,10 +26,10 @@ forceParse = False
 
 pp = pprint.PrettyPrinter()
 
-htmlDir = "/Users/cfuoco/Qt5.15.2/Docs/Qt-5.15.2"
+htmlDir = "/home/cfuoco/Qt6.5.3/Docs/Qt-6.5.3"
 objectHTML = "%s/qtcore/qobject.html" % htmlDir
 qtHTML = "%s/qtcore/qt.html" % htmlDir
-qtapifile = "qt515api.p"
+qtapifile = "qt6api.p"
 templateObjectH = "templates/TemplateObjectType.h"
 templateObjectCPP = "templates/TemplateObjectType.cpp"
 templateLayoutItemH = "templates/TemplateLayoutItemType.h"
@@ -121,7 +121,8 @@ baseHTML = [
     "qdate",
     "qkeysequence",
     "qevent",
-    "qregexp",
+    # # Qt6: Removed for QRegularExpression
+    # "qregexp",
     "qregion",
     "qcolor",
     "qlistwidgetitem",
@@ -144,13 +145,15 @@ baseHTML = [
     "qgradient",
     "qmargins",
     "qbrush",
-    "qmatrix",
+    # Qt6: Removed
+    # "qmatrix",
     "qtransform",
     "qpointf",
     "qpalette",
     "qnetworkcookie",
     "qtextstream",
-    "qtextcodec",
+    # Qt6: Removed for QStringConverter
+    # "qtextcodec",
     "qpainter",
     "qpainterpath",
     "qrectf",  # "qstyleoption",
@@ -254,7 +257,8 @@ baseHTML = [
     "qprocess",
     "qfile",
     "qudpsocket",
-    "qdesktopwidget",
+    # Qt6: Removed for QScreen and QApplication::desktop()
+    # "qdesktopwidget",
     "qitemselectionmodel",
     "qspaceritem",
     "qwidgetitem",
@@ -323,7 +327,8 @@ baseHTML = [
     "qprocess",
     "qfile",
     "qudpsocket",
-    "qdesktopwidget",
+    # Qt6: Removed for QScreen and QApplication::desktop()
+    # "qdesktopwidget",
     "qitemselectionmodel",
     "qspaceritem",
     "qwidgetitem",
@@ -349,7 +354,8 @@ primitiveTypes = set(
         "QRectF",
         "QPoint",
         "QPointF",
-        "QRegExp",
+        # Qt6: Removed for QRegularExpression
+        # "QRegExp",
         "QIcon",
         "QPixmap",
         "QBitmap",
@@ -376,7 +382,8 @@ primitiveTypes = set(
         "QItemSelection",
         "QBrush",
         "QGradient",
-        "QMatrix",
+        # Qt6: Removed
+        # "QMatrix",
         "QTransform",
         "QConicalGradient",
         "QLinearGradient",
@@ -428,7 +435,8 @@ copyOnWriteTypes = [
     "QPolygon",
     "QPolygonF",
     "QQueue",
-    "QRegExp",
+    # Qt6: Removed for QRegularExpression
+    # "QRegExp",
     "QRegion",
     "QSet",
     "QSqlField",
@@ -484,7 +492,8 @@ pointerTypes = set(
         "QHideEvent",
         "QHoverEvent",
         "QGestureEvent",
-        "QTextCodec",
+        # Qt6: Removed for QStringConverter
+        # "QTextCodec",
         "QWebEngineSettings",
         "QWebEngineHistory",
         "QWindowStateChangeEvent",
@@ -728,14 +737,16 @@ includeClasses = set(
         "QHostInfo",
         "QLocalSocket",
         "QTimer",
-        "QDesktopWidget",
+        # Qt6: Removed for QScreen and QApplication::desktop()
+        # "QDesktopWidget",
         "QFileInfo",
         "QItemSelection",
         "QItemSelectionRange",
         "QItemSelectionModel",
         "QGradient",
         "QBrush",
-        "QMatrix",
+        # Qt6: Removed
+        # "QMatrix",
         "QTransform",
         "QConicalGradient",
         "QLinearGradient",
@@ -773,7 +784,8 @@ includeClasses = set(
         "QHoverEvent",
         "QHelpEvent",
         "QFileOpenEvent",
-        "QRegExp",
+        # Qt6: Removed for QRegularExpression
+        # "QRegExp",
         "QTextCursor",
         "QTextOption",
         "QTextBlock",
@@ -781,7 +793,8 @@ includeClasses = set(
         "QCloseEvent",
         "QClipboard",
         "QNetworkCookie",
-        "QTextCodec",
+        # Qt6: Removed for QStringConverter
+        # "QTextCodec",
         "QTextStream",
         "QTextBrowser",
         "QNetworkCookieJar",
@@ -960,7 +973,7 @@ exclusionMap = {
     "QWidget::render": None,  # QPainter*
     "QWidget::redirected": None,
     # @Version Qt5.15 'WindowFlags' does not exist in QWidget
-    "QWidget::WindowFlags": None,
+    #"QWidget::WindowFlags": None,
     "QProcess::setNativeArguments": None,
     "QProcess::nativeArguments": None,
     "QProcess::createProcessArgumentsModifier": None,
@@ -974,6 +987,7 @@ exclusionMap = {
     "QPainterPath::elementAt": None,
     "QPainter::QPainter": None,  # handrolled
     "QKeySequence::QVariant": None,
+    "QPdfWriter::QPdfWriter": None,
     "QPixmap::handle": None,
     "QPixmap::x11PictureHandle": None,
     "QPixmap::HBitmapFormat": None,
@@ -1040,7 +1054,7 @@ exclusionMap = {
     "QFileDialog::getOpenFileUrls": None,
     "QFileDialog::getSaveFileName": None,
     "QFileDialog::getSaveFileUrl": None,
-    # @Version Qt5.15 Issue with std::function syntax
+    # @Version Qt5.15 Issue with std::function
     "QFileDialog::getOpenFileContent": None,
     # these are shadowing get prop funcs of the same names"
     "QCoreApplication::applicationName": None,
@@ -1600,7 +1614,7 @@ class API:
 
 
 api = API()
-verbose = False
+verbose = True
 
 
 def message(s):
@@ -1680,6 +1694,34 @@ def parseParameter(param, n):
         return (name, type, default)
 
 
+def parse_cpp_function(function_signature):
+    # Updated regular expression to handle operator overloading
+    pattern = r'^((?:template\s+)?(?:virtual\s+)?(?:explicit\s+)?(?:[\w:]+(?:<.*?>)?(?:\s*[\*&])?\s+)+)?\s*(\~?\w+(?:::\w+)*|\w+\s*(?:<.*?>)?::(?:~?\w+|operator\s*\S+)|operator\s*\S+)\s*(\(.*?\))(?:\s*((?:const)?\s*(?:noexcept)?\s*(?:override)?\s*(?:final)?\s*(?:&)?\s*(?:->.*?)?(?:=\s*\w+)?))?$'
+    
+    match = re.match(pattern, function_signature.strip())
+    
+    if not match:
+        return None, None, None, None
+    
+    return_type, function_name, parameters, after_parameters = match.groups()
+    
+    # Clean up the matches
+    if return_type:
+        return_type = return_type.strip()
+    else:
+        return_type = ""
+    
+    function_name = function_name.strip()
+    
+    parameters = parameters.strip('()')
+    
+    if after_parameters:
+        after_parameters = after_parameters.strip()
+    else:
+        after_parameters = ""
+    
+    return return_type, function_name, parameters, after_parameters
+
 def parseFunction(func, qtnamespace):
     # parts = func.split("(")
     # in 5.6 they added some crap and * and & are no longer separated by spaces
@@ -1688,6 +1730,10 @@ def parseFunction(func, qtnamespace):
         message("WARNING: " + func)
     if "(shadows)" in func:
         message("WARNING: " + func)
+    # Qt6: Do not parse obsolete function.
+    if "(obsolete)" in func:
+        message("WARNING: Obsolete: " + func)
+        return None
     func = func.replace("(deprecated) ", "")
     func = func.replace("(shadows) ", "")
     func = func.replace("*", "* ")
@@ -1697,19 +1743,32 @@ def parseFunction(func, qtnamespace):
     demoted = False
     if len(func) == 0:
         return None
+    
+    message("Processing function " + func)
     if func[-1] == "@":
         # demote virtual props to not props otherwise we can't create
         # the _func array because they won't exist in time
         demoted = "virtual" in func
         prop = not demoted
         func = func[0:-1]
-    sindex = func.find("(")
-    eindex = func.rfind(")")
-    thistype = sstrip(func[eindex + 1 :])
-    func = func[0:eindex]
-    if sindex == -1:
-        return None
-    parts = [func[0:sindex], func[sindex + 1 :]]
+
+    try:
+        groups = parse_cpp_function(func)
+        parts = [groups[0] + " " + groups[1], groups[2]]
+        thistype = groups[3]
+        message("CEDRIK Parts: " + str(parts))
+        message("CEDRIK thistype: " + groups[3])
+    except:
+        # Fall back to previous method
+        sindex = func.find("(")
+        eindex = func.rfind(")")
+        thistype = sstrip(func[eindex + 1 :])
+        func = func[0:eindex]
+        if sindex == -1:
+            return None
+        parts = [func[0:sindex], func[sindex + 1 :]]
+        message("Parts: " + str(parts))
+        message("thistype = " + thistype)
 
     if len(parts) == 2:
         nameproto = parts[0].split()
@@ -1743,17 +1802,27 @@ def parseFunction(func, qtnamespace):
         if len(allparams) != 0:
             params.append(parseParameter(current, count))
 
+        message("Params: " + str(params))
+
         # make new name for params with same name as func
         for i in range(0, len(params)):
             p = params[i]
+            # Compare the first element of p and the last element of nameproto.
+            message("Before comparison: " + str(p) + " with " + str(nameproto))
+            # if nameproto:
+            # message("Comparing: " + p[0] + " with " + nameproto[-1])
             if p[0] == nameproto[-1]:
+                # Append underscore
                 params[i] = (p[0] + "_", p[1], p[2])
 
-        v = (nameproto[-1], thistype, params, string.join(nameproto[0:-1]), prop)
-        if demoted:
-            qtnamespace.demotedProps.append(v)
-            # message("PROP demoted " + str(func))
-        return v
+        if nameproto:
+            v = (nameproto[-1], thistype, params, string.join(nameproto[0:-1]), prop)
+            if demoted:
+                qtnamespace.demotedProps.append(v)
+                # message("PROP demoted " + str(func))
+            return v
+        else:
+            message("WARNING: Nameproto empty for " + func) 
 
     return None
 
@@ -2790,7 +2859,7 @@ class MuClass:
                     itypes.add(itype)
 
         for t in itypes:
-            cpplines.insert(endinclude + 1, "#include <MuQt5/%s.h>\n" % t)
+            cpplines.insert(endinclude + 1, "#include <MuQt6/%s.h>\n" % t)
 
     def outputEnumDeclarations(self):
         out = "addSymbols(\n"
@@ -3850,6 +3919,7 @@ def recursiveParse(url):
     except (IOError):
         print("FAILED: (IOError)", url)
     except:
+        sys.stdout.flush()
         print("FAILED:", url)
         print(traceback.print_exc())
 
@@ -4011,7 +4081,7 @@ if outputModuleParts:
     for cname in outputClasses:
         if muapi.classes.has_key(cname):
             if cname in includeClasses:
-                includes += "#include <MuQt5/%sType.h>\n" % cname
+                includes += "#include <MuQt6/%sType.h>\n" % cname
     f = open("qtModuleIncludes.h", "w")
     f.write(includes)
     f.close()
