@@ -79,9 +79,9 @@ SET_PROPERTY(
 )
 
 #
-# FFMpeg option
+# FFmpeg option
 #
-# This option is to control the version of ffmpeg
+# This option is to control the version of FFmpeg
 # that OpenRV downloads and installs.
 #
 # There will be one version used by default per
@@ -90,7 +90,7 @@ SET_PROPERTY(
 # major version.
 #
 
-# Supported FFMpeg versions.
+# Supported FFmpeg versions.
 SET(RV_FFMPEG_SUPPORTED_OPTIONS 6 7)
  # Default option
 SET(_RV_FFMPEG "6")
@@ -105,7 +105,7 @@ ENDIF()
 # Overwrite the cache variable
 SET(RV_FFMPEG
   "${_RV_FFMPEG}"
-  CACHE STRING "Set FFMpeg version for installing external depdendency" FORCE
+  CACHE STRING "Set FFmpeg version for installing external depdendency" FORCE
 )
 SET_PROPERTY(
   CACHE RV_FFMPEG

@@ -41,9 +41,9 @@ ELSEIF(RV_FFMPEG_6)
   )
 ELSE()
   # This shouldn't happen, but it could if there are changes the acceptable
-  # versions of ffmpeg in ffmpeg.cmake and this section is not
+  # versions of FFmpeg in ffmpeg.cmake and this section is not
   # updated accordingly.
-  message( FATAL_ERROR "The requested version of FFMPEG is not supported." )
+  message( FATAL_ERROR "The requested version of FFmpeg is not supported." )
 ENDIF()
 
 SET(_download_url
@@ -184,9 +184,9 @@ ELSEIF(RV_FFMPEG_6)
   ENDIF()
 ELSE()
   # This shouldn't happen. But it could if there are changes the acceptable
-  # versions of ffmpeg in ffmpeg.cmake and this section is not
+  # versions of FFmpeg in ffmpeg.cmake and this section is not
   # updated accordingly.
-  message( FATAL_ERROR "The requested version of FFMPEG is not supported." )
+  message( FATAL_ERROR "The requested version of FFmpeg is not supported." )
 ENDIF()
 
 SET(_ffmpeg_libs
