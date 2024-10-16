@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QUrlType.h>
 
@@ -93,14 +94,6 @@ Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string(Mu::Thread& NODE_THREA
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QString  arg1 = qstring(param_queryString);
-    setqtype<QUrlQueryType>(param_this,QUrlQuery(arg1));
-    return param_this;
-}
-
-Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_list)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    std::initializer_list<QPair<QString, QString>> arg1 = (QString>>)(param_list);
     setqtype<QUrlQueryType>(param_this,QUrlQuery(arg1));
     return param_this;
 }
@@ -240,11 +233,6 @@ static NODE_IMPLEMENTATION(_n_QUrlQuery2, Pointer)
     NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_QUrlQuery3, Pointer)
-{
-    NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_addQueryItem0, void)
 {
     qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
@@ -356,7 +344,6 @@ addSymbols(
     new Function(c, "QUrlQuery", _n_QUrlQuery0, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery, Return, "qt.QUrlQuery", Parameters, new Param(c, "this", "qt.QUrlQuery"), End),
     new Function(c, "QUrlQuery", _n_QUrlQuery1, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl, Return, "qt.QUrlQuery", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "url", "qt.QUrl"), End),
     new Function(c, "QUrlQuery", _n_QUrlQuery2, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string, Return, "qt.QUrlQuery", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "queryString", "string"), End),
-    new Function(c, "QUrlQuery", _n_QUrlQuery3, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_int, Return, "qt.QUrlQuery", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "list", "int"), End),
     // MISSING: QUrlQuery (QUrlQuery; QUrlQuery this, QUrlQuery other)
     // MISSING: QUrlQuery (QUrlQuery; QUrlQuery this, "QUrlQuery & &" other)
     new Function(c, "addQueryItem", _n_addQueryItem0, None, Compiled, qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string, Return, "void", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"), new Param(c, "value", "string"), End),

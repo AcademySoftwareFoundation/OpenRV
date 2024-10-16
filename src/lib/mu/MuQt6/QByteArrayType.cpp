@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 //
 // Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
@@ -228,13 +229,6 @@ Pointer qt_QByteArray_toBase64_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD
     return makeqtype<QByteArrayType>(c,arg0.toBase64(arg1),"qt.QByteArray");
 }
 
-int qt_QByteArray_toEcmaUint8Array_int_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
-    return int(arg0.toEcmaUint8Array());
-}
-
 Pointer qt_QByteArray_toLower_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -318,13 +312,6 @@ Pointer qt_QByteArray_fromBase64_QByteArray_QByteArray_int(Mu::Thread& NODE_THRE
     const QByteArray  arg0 = getqtype<QByteArrayType>(param_base64);
     QByteArray::Base64Options arg1 = (QByteArray::Base64Options)(param_options);
     return makeqtype<QByteArrayType>(c,QByteArray::fromBase64(arg0, arg1),"qt.QByteArray");
-}
-
-Pointer qt_QByteArray_fromEcmaUint8Array_QByteArray_int(Mu::Thread& NODE_THREAD, int param_uint8array)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    emscripten::val arg0 = (emscripten::val)(param_uint8array);
-    return makeqtype<QByteArrayType>(c,QByteArray::fromEcmaUint8Array(arg0),"qt.QByteArray");
 }
 
 Pointer qt_QByteArray_fromHex_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_hexEncoded)
@@ -438,11 +425,6 @@ static NODE_IMPLEMENTATION(_n_toBase640, Pointer)
     NODE_RETURN(qt_QByteArray_toBase64_QByteArray_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
 }
 
-static NODE_IMPLEMENTATION(_n_toEcmaUint8Array0, int)
-{
-    NODE_RETURN(qt_QByteArray_toEcmaUint8Array_int_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_toLower0, Pointer)
 {
     NODE_RETURN(qt_QByteArray_toLower_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -496,11 +478,6 @@ static NODE_IMPLEMENTATION(_n_operatorGT_EQ_0, bool)
 static NODE_IMPLEMENTATION(_n_fromBase640, Pointer)
 {
     NODE_RETURN(qt_QByteArray_fromBase64_QByteArray_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_fromEcmaUint8Array0, Pointer)
-{
-    NODE_RETURN(qt_QByteArray_fromEcmaUint8Array_QByteArray_int(NODE_THREAD, NODE_ARG(0, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_fromHex0, Pointer)
@@ -708,7 +685,6 @@ addSymbols(
     new Function(c, "toBase64", _n_toBase640, None, Compiled, qt_QByteArray_toBase64_QByteArray_QByteArray_int, Return, "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "options", "int", Value((int)QByteArray::Base64Encoding)), End),
     // MISSING: toCFData ("CFDataRef"; QByteArray this)
     // MISSING: toDouble (double; QByteArray this, "bool *" ok)
-    new Function(c, "toEcmaUint8Array", _n_toEcmaUint8Array0, None, Compiled, qt_QByteArray_toEcmaUint8Array_int_QByteArray, Return, "int", Parameters, new Param(c, "this", "qt.QByteArray"), End),
     // MISSING: toFloat ("float"; QByteArray this, "bool *" ok)
     // MISSING: toHex (QByteArray; QByteArray this, "char" separator)
     // MISSING: toInt (int; QByteArray this, "bool *" ok, int base)
@@ -732,7 +708,6 @@ addSymbols(
     // static functions
     new Function(c, "fromBase64", _n_fromBase640, None, Compiled, qt_QByteArray_fromBase64_QByteArray_QByteArray_int, Return, "qt.QByteArray", Parameters, new Param(c, "base64", "qt.QByteArray"), new Param(c, "options", "int", Value((int)QByteArray::Base64Encoding)), End),
     // MISSING: fromCFData (QByteArray; "CFDataRef" data)
-    new Function(c, "fromEcmaUint8Array", _n_fromEcmaUint8Array0, None, Compiled, qt_QByteArray_fromEcmaUint8Array_QByteArray_int, Return, "qt.QByteArray", Parameters, new Param(c, "uint8array", "int"), End),
     new Function(c, "fromHex", _n_fromHex0, None, Compiled, qt_QByteArray_fromHex_QByteArray_QByteArray, Return, "qt.QByteArray", Parameters, new Param(c, "hexEncoded", "qt.QByteArray"), End),
     // MISSING: fromNSData (QByteArray; "const NSData *" data)
     // MISSING: fromPercentEncoding (QByteArray; QByteArray input, "char" percent)

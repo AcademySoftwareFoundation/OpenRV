@@ -36,6 +36,8 @@ templateLayoutItemH = "templates/TemplateLayoutItemType.h"
 templateLayoutItemCPP = "templates/TemplateLayoutItemType.cpp"
 templatePaintDeviceH = "templates/TemplatePaintDeviceType.h"
 templatePaintDeviceCPP = "templates/TemplatePaintDeviceType.cpp"
+templateIODeviceBaseH = "templates/TemplateIODeviceBaseType.h"
+templateIODeviceBaseCPP = "templates/TemplateIODeviceBaseType.cpp"
 templateTypeH = "templates/TemplateType.h"
 templateTypeCPP = "templates/TemplateType.cpp"
 templatePointerTypeH = "templates/TemplatePointerType.h"
@@ -96,7 +98,6 @@ baseHTML = [
     "qinputmethodevent",
     "qinputmethodqueryevent",
     "qkeyevent",
-    "qinputevent",
     "qmoveevent",
     "qpaintevent",
     "qresizeevent",
@@ -121,8 +122,6 @@ baseHTML = [
     "qdate",
     "qkeysequence",
     "qevent",
-    # # Qt6: Removed for QRegularExpression
-    # "qregexp",
     "qregularexpression",
     "qregion",
     "qcolor",
@@ -143,24 +142,18 @@ baseHTML = [
     "qdatastream",
     "qitemselectionrange",
     "qitemselection",
-    "qgradient",
     "qmargins",
     "qbrush",
-    # Qt6: Removed, replaced by Either QTransform, QMatrix4x4 or QGenericMatrix depending on the use case.
-    # "qmatrix",
     "qmatrix4x4",
-    "qgenericmatrix",
     "qtransform",
     "qpointf",
     "qpalette",
     "qnetworkcookie",
     "qtextstream",
-    # Qt6: Removed for QStringConverter
-    # "qtextcodec",
     "qstringconverter",
     "qpainter",
     "qpainterpath",
-    "qrectf",  # "qstyleoption",
+    "qrectf",
     "qtextcursor",
     "qtextoption",
     "qtextblock",
@@ -168,7 +161,6 @@ baseHTML = [
     "qprocessenvironment",
     "qcursor",
     "qaction",
-    "qactiongroup",
     "qbuttongroup",
     "qcompleter",
     "qstandarditemmodel",
@@ -201,7 +193,6 @@ baseHTML = [
     "qwebchannel",
     "qwebenginehistory",
     "qwebenginehistoryitem",
-    "qwebenginesettings",
     "qboxlayout",
     "qformlayout",
     "qgridlayout",
@@ -258,11 +249,10 @@ baseHTML = [
     "qeventloop",
     "qgroupbox",
     "qiodevice",
+    "qiodevicebase",
     "qprocess",
     "qfile",
     "qudpsocket",
-    # Qt6: Removed for QScreen and QApplication::desktop()
-    # "qdesktopwidget",
     "qscreen",
     "qitemselectionmodel",
     "qspaceritem",
@@ -273,77 +263,8 @@ baseHTML = [
     "qmouseevent",
     "qwheelevent",
     "qtextbrowser",
-    "qboxlayout",
-    "qformlayout",
-    "qgridlayout",
-    "qstackedlayout",
-    "qhboxlayout",
-    "qvboxlayout",
-    "qdockwidget",
-    "qtoolbar",
-    "qmainwindow",
-    "qslider",
-    "qdial",
-    "qlineedit",
-    "qframe",
-    "qabstractslider",
-    "qabstractbutton",
-    "qcheckbox",
-    "qpushbutton",
-    "qradiobutton",
-    "qtoolbutton",
-    "qmenu",
-    "qcombobox",
-    "qfiledialog",
-    "qabstractitemmodel",
-    "qabstractlistmodel",
-    "qabstracttablemodel",
-    "qabstractitemview",
-    "qcolordialog",
-    "qdialog",
-    "qcolumnview",
-    "qheaderview",
-    "qlistview",
-    "qtableview",
-    "qtreeview",
-    "qlistwidget",
-    "qtreewidget",
-    "qtablewidget",
-    "qcoreapplication",
-    "qlabel",
-    "qmenubar",
-    "qplaintextedit",
-    "qprogressbar",
-    "qscrollarea",
-    "qspinbox",
-    "qsplitter",
-    "qstackedwidget",
-    "qstatusbar",
-    "qtabbar",
-    "qtabwidget",
-    "qtextedit",
-    "qtoolbox",
-    "qabstractspinbox",
-    "qabstractscrollarea",
-    "qinputdialog",
-    "qeventloop",
-    "qgroupbox",
-    "qiodevice",
-    "qprocess",
-    "qfile",
-    "qudpsocket",
-    # Qt6: Removed for QScreen and QApplication::desktop()
-    # "qdesktopwidget",
-    "qscreen",
-    "qitemselectionmodel",
-    "qspaceritem",
-    "qwidgetitem",
-    "qmimedata",
-    "qtimerevent",
-    "qdragenterevent",
-    "qmouseevent",
-    "qwheelevent",
-    "qtextbrowser",
+    "qsinglepointevent",
+    "qpointerevent"
 ]
 
 #
@@ -360,8 +281,6 @@ primitiveTypes = set(
         "QRectF",
         "QPoint",
         "QPointF",
-        # Qt6: Removed for QRegularExpression
-        # "QRegExp",
         "QRegularExpression",
         "QIcon",
         "QPixmap",
@@ -389,10 +308,7 @@ primitiveTypes = set(
         "QItemSelection",
         "QBrush",
         "QGradient",
-        # Qt6: Removed
-        # "QMatrix",
         "QMatrix4x4",
-        "QGenericMatrix",
         "QTransform",
         "QConicalGradient",
         "QLinearGradient",
@@ -502,17 +418,17 @@ pointerTypes = set(
         "QHideEvent",
         "QHoverEvent",
         "QGestureEvent",
-        # Qt6: Removed for QStringConverter
-        # "QTextCodec",
         "QStringConverter",
         "QWebEngineSettings",
-        "QWebEngineHistory",
+        # "QWebEngineHistory",
         "QWindowStateChangeEvent",
+        "QSinglePointEvent",
+        "QPointerEvent"
     ]
 )
 # "QTouchEvent",
 
-notInheritableTypes = set(["QNetworkReply", "QIODevice", "QClipboard"])
+notInheritableTypes = set(["QNetworkReply", "QIODevice", "QIODeviceBase", "QClipboard"])
 
 
 def isAPrimitiveType(name):
@@ -631,6 +547,7 @@ convertFromMap = {
     "qt.QSpacerItem": ("layoutitem<$T>($E)", "$T*"),
     "qt.QWidgetItem": ("layoutitem<$T>($E)", "$T*"),
     # "qt.QTreeWidgetItem[]" : ("qpointerlist<$T>($E)", "$T*"),
+    "qt.QIODeviceBase": ("iodevicebase<$T>($E)", "$T*"),
 }
 
 convertToMap = {
@@ -736,6 +653,7 @@ includeClasses = set(
         "QEventLoop",
         "QGroupBox",
         "QIODevice",
+        "QIODeviceBase",
         "QDateTime",
         "QProcess",
         "QFile",
@@ -748,8 +666,6 @@ includeClasses = set(
         "QHostInfo",
         "QLocalSocket",
         "QTimer",
-        # Qt6: Removed for QScreen and QApplication::desktop()
-        # "QDesktopWidget",
         "QScreen",
         "QFileInfo",
         "QItemSelection",
@@ -757,10 +673,7 @@ includeClasses = set(
         "QItemSelectionModel",
         "QGradient",
         "QBrush",
-        # Qt6: Removed
-        # "QMatrix",
         "QMatrix4x4",
-        "QGenericMatrix",
         "QTransform",
         "QConicalGradient",
         "QLinearGradient",
@@ -793,13 +706,13 @@ includeClasses = set(
         "QContextMenuEvent",
         "QKeyEvent",
         "QMouseEvent",
+        "QSinglePointEvent",
+        "QPointerEvent",
         "QWindowStateChangeEvent",
         "QHideEvent",
         "QHoverEvent",
         "QHelpEvent",
         "QFileOpenEvent",
-        # Qt6: Removed for QRegularExpression
-        # "QRegExp",
         "QRegularExpression",
         "QTextCursor",
         "QTextOption",
@@ -854,6 +767,7 @@ abstractClasses = [
     re.compile("QAbstract.*"),
     re.compile("QLayout"),
     re.compile("QIODevice"),
+    re.compile("QIODeviceBase")
 ]
 
 
@@ -908,7 +822,7 @@ def indexOf(element, sequence):
 #
 
 forceEnumOutput = {
-    "QIODevice": ["OpenModeFlag"],
+    "QIODeviceBase": ["OpenModeFlag"],
     "QProcess": [
         "ExitStatus",
         "ProcessChannel",
@@ -932,6 +846,10 @@ forceEnumOutput = {
 # functions.
 #
 doProps = ["QInputDialog"]
+
+doPropsIfFuncToo = [
+    "primaryScreen"
+]
 
 noHFileOutput = []  # ["QObject"]
 
@@ -988,12 +906,12 @@ exclusionMap = {
     "QWidget::setupUi": None,
     "QWidget::render": None,  # QPainter*
     "QWidget::redirected": None,
-    # @Version Qt5.15 'WindowFlags' does not exist in QWidget
-    #"QWidget::WindowFlags": None,
+    "QWidget::WindowFlags": None,
     "QProcess::setNativeArguments": None,
     "QProcess::nativeArguments": None,
     "QProcess::createProcessArgumentsModifier": None,
     "QProcess::setCreateProcessArgumentsModifier": None,
+    "QProcess::setChildProcessModifier": None,
     "QMenuBar::defaultAction": None,
     "QMenuBar::setDefaultAction": None,
     "QPlainTextEdit::extraSelections": None,
@@ -1058,8 +976,10 @@ exclusionMap = {
     # "QByteArray::fromStdString" : [ ('fromStdString', '', [('str', 'const std::string &', None)], 'QByteArray', False) ],
     "QByteArray::toStdString": None,
     "QByteArray::fromStdString": None,
-    # @Version Qt5.15 cannot convert from 'QByteArray::FromBase64Result' to 'int'
+    # cannot convert from 'QByteArray::FromBase64Result' to 'int'
     "QByteArray::fromBase64Encoding": None,
+    "QByteArray::toEcmaUint8Array": None,
+    "QByteArray::fromEcmaUint8Array": None,
     "QRegion::setRects": None,
     # these use QString* to pass default args of 0: they need to be implemented by hand
     "QFileDialog::getOpenFileName": None,
@@ -1070,7 +990,7 @@ exclusionMap = {
     "QFileDialog::getOpenFileUrls": None,
     "QFileDialog::getSaveFileName": None,
     "QFileDialog::getSaveFileUrl": None,
-    # @Version Qt5.15 Issue with std::function
+    # Issue with std::function
     "QFileDialog::getOpenFileContent": None,
     # these are shadowing get prop funcs of the same names"
     "QCoreApplication::applicationName": None,
@@ -1083,7 +1003,7 @@ exclusionMap = {
     "QCoreApplication::setOrganizationDomain": None,
     "QCoreApplication::isQuitLockEnabled": None,
     "QCoreApplication::setQuitLockEnabled": None,
-    # @Version Qt5.15 Issue with protected enum
+    # Issue with protected enum
     "QDial::sliderChange": None,
     # deprecated (its gone?)
     "QApplication::keypadNavigationEnabled": None,
@@ -1139,11 +1059,11 @@ exclusionMap = {
     "QGuiApplication::applicationDisplayName": None,
     "QGuiApplication::setApplicationDisplayName": None,
     "QGuiApplication::platformName": None,
-    # @Version Qt5.15 Same as above properties, issue generating a Mu::NodeFunc for it
+    # Same as above properties, issue generating a Mu::NodeFunc for it
     "QGuiApplication::desktopFileName": None,
-    # @Version Qt5.15 Same as above properties, issue generating a Mu::NodeFunc for it
+    # Same as above properties, issue generating a Mu::NodeFunc for it
     "QGuiApplication::setDesktopFileName": None,
-    # @Version Qt5.15 Don't seem to exist in the doc, but it gets generated
+    # Don't seem to exist in the doc, but it gets generated
     "QGuiApplication::Cursor": None,
     "QAbstractSpinBox::stepEnabled": None,  # needs to be done by hand
     "QAbstractListModel::columnCount": None,  # private
@@ -1151,7 +1071,7 @@ exclusionMap = {
     "QAbstractListModel::hasChildren": None,  # private
     "QAbstractTableModel::parent": None,  # private
     "QAbstractTableModel::hasChildren": None,  # private
-    # @Version Qt5.15 Issue with CheckIndexOption type.
+    # Issue with CheckIndexOption type.
     "QAbstractItemModel::checkIndex": None,
     "QHeaderView::indexAt": None,  # protected -- FIX ME?
     "QHeaderView::scrollTo": None,  # protected -- FIX ME?
@@ -1163,6 +1083,7 @@ exclusionMap = {
     "QItemSelection::split": None,
     "QVariant::canConvert": None,
     "QVariant::PointArray": None,
+    "QVariant::canView": None,
     "QBrush::gradient": None,
     "QTextDocument::drawContents": None,  # QPainter*
     # these two are "shadowing" the constructor that takes an int
@@ -1170,9 +1091,35 @@ exclusionMap = {
         ("QVariant", "", [("color", "Qt::GlobalColor", None)], "", False),
         ("QVariant", "", [("type", "QVariant::Type", None)], "", False),
     ],
-    # @Version Qt5.15 Issue with std::variant and Types: "const std::variant<Types...>"
+    # Issue with std::variant and Types: "const std::variant<Types...>"
     "QVariant::fromStdVariant": None,
-    # @Version Qt5.15 Issue with conversion QString to QString *
+    "QFile::QFile":[
+        ('QFile', '', [('name', 'const std::filesystem::path &', None)], '', False),
+        ('QFile', '', [('name', 'const std::filesystem::path &', None), ('parent', 'QObject *', None)], '', False)
+    ],
+    "QFile::filesystemFileName": None,
+    "QFile::filesystemSymLinkTarget": None,
+    "QFile::link":[
+        ('link', '', [('newName', 'const std::filesystem::path &', None)], 'bool', False)
+    ],
+    "QFile::rename":[
+        ('rename', '', [('newName', 'const std::filesystem::path &', None)], 'bool', False)
+    ],
+    "QFile::setFileName":[
+        ('setFileName', '', [('name', 'const std::filesystem::path &', None)], 'void', False)
+    ],
+    "QFile::permissions":[
+        ('permissions', '', [('filename', 'const std::filesystem::path &', None)], 'QFileDevice::Permissions', False)
+    ],
+    "QFile::copy":[
+        ('copy', '', [('newName', 'const std::filesystem::path &', None)], 'bool', False)
+    ],
+    "QFile::setPermissions":[
+        ('setPermissions', '', [('permissions', 'QFileDevice::Permissions', None)], 'virtual bool', False),
+        ('setPermissions', '', [('fileName', 'const QString &', None), ('permissions', 'QFileDevice::Permissions', None)], 'bool', False),
+        ('setPermissions', '', [('filename', 'const std::filesystem::path &', None), ('permissionSpec', 'QFileDevice::Permissions', None)], 'bool', False)
+    ],
+    # Issue with conversion QString to QString *
     "QFile::moveToTrash": [
         (
             "moveToTrash", 
@@ -1185,13 +1132,13 @@ exclusionMap = {
     # QFile has funky semantics which screw things up in QFileInfo
     # so these have to be done manually
     "QFileInfo::QFileInfo": [
-        ("QFileInfo", "", [("file", "const QFile &", None)], "", False)
+        ('QFileInfo', '', [('file', 'const QFileDevice &', None)], '', False),
+        ('QFileInfo', '', [('dir', 'const QDir &', None), ('file', 'const std::filesystem::path &', None)], '', False),
+        ('QFileInfo', '', [('file', 'const std::filesystem::path &', None)], '', False)
     ],
     "QFileInfo::setFile": [
-        ("setFile", "", [("file", "const QFile &", None)], "void", False)
-    ],
-    "QFileInfo::setFile": [
-        ("setFile", "", [("file", "const QFile &", None)], "void", False)
+        ('setFile', '', [('file', 'const std::filesystem::path &', None)], 'void', False),
+        ('setFile', '', [('file', 'const QFileDevice &', None)], 'void', False)
     ],
     "QFileInfo::operator!=": [
         (
@@ -1212,7 +1159,7 @@ exclusionMap = {
         )
     ],
     "QFileOpenEvent::openFile": None,  # 4.8 added this: can't deal with QFile* <-> QFile& conversion yet
-    # @Version Qt5.15 cannot convert from 'QFormLayout::TakeRowResult' to 'int'
+    # cannot convert from 'QFormLayout::TakeRowResult' to 'int'
     "QFormLayout::takeRow": None,
     "QStandardItem::operator<": None,
     "QListWidgetItem::operator<": None,
@@ -1221,19 +1168,20 @@ exclusionMap = {
     "QTreeWidget::setModel": None,  # private
     "QListWidget::setModel": None,  # private
     "QTableWidget::setModel": None,  # private
-    # @Version Qt5.15 Was adding an header for QPicture that don't exist
     "QLabel::picture": None,
-    # @Version Qt5.15 Issue with protected enum
+    "QLabel::resourceProvider": None,
+    "QLabel::setResourceProvider": None,
+    # Issue with protected enum
     "QListWidget::moveCursor": None,
-    # @Version Qt5.15 Issue with protected enum
+    # Issue with protected enum
     "QTableWidget::moveCursor": None,
-    # @Version Qt5.15 Issue with protected enum
+    # Issue with protected enum
     "QColumnView::moveCursor": None,
-    # @Version Qt5.15 Issue with protected enum
+    # Issue with protected enum
     "QTableView::moveCursor": None,
-    # @Version Qt5.15 Issue with protected enum
+    # Issue with protected enum
     "QTreeView::moveCursor": None,
-    # @Version Qt5.15 Issue with protected enum
+    # Issue with protected enum
     "QTreeWidget::moveCursor": None,
     "QFont::QFont": [
         (
@@ -1245,7 +1193,7 @@ exclusionMap = {
         )
     ],
     "QFont::macFontID": None,
-    # @Version Qt5.15 Trouble with QNetworkReply::RawHeaderPair (QPair<QByteArray, QByteArray>)
+    # Trouble with QNetworkReply::RawHeaderPair (QPair<QByteArray, QByteArray>)
     "QNetworkReply::rawHeaderPairs": None,
     # "QWebFrame::render" : None, # QPainter*
     # "QWebPage::javaScriptPrompt" : None, # QString*
@@ -1253,7 +1201,7 @@ exclusionMap = {
     "QWebEngineHistory::forwardItem": None,
     "QWebEngineHistory::currentItem": None,
     "QWebEngineHistory::itemAt": None,
-    # @Version Qt5.15 Issue with std::function
+    # Issue with std::function
     "QWebEngineCookieStore::setCookieFilter": None,
     "QEvent::ChildInserted": None,
     "QEvent::EnterEditFocus": None,  # ????
@@ -1266,58 +1214,31 @@ exclusionMap = {
     "QTextDocument::undo": None,  # Takes a TextCursor* needs manual imp
     "QTextDocument::redo": None,  # same
     "QSlider::sliderChange": None,  # protected
-    # @Version Qt5.15 Introduce in 5.14, issue with the "feature" argument.
+    # Issue with the "feature" argument.
     "QTextDocument::setMarkdown": None,
-    # @Version Qt5.15 Introduce in 5.14, issue with the "feature" argument.
+    # Issue with the "feature" argument.
     "QTextDocument::toMarkdown": None,
-    # @Version Qt5.15 Problem with QTextEdit::ExtraSelectiType struct
+    "QTextDocument::setDefaultResourceProvider": None,
+    "QTextDocument::resourceProvider": None,
+    "QTextDocument::setResourceProvider": None,
+    "QTextDocument::defaultResourceProvider": None,
+    "QTextDocument::setDefaultResourceProvider": None,
     "QTextEdit::extraSelections": None,
-    # @Version Qt5.15 Issue with const QList<QTextOption::Tab>  arg1 = (&)(param_tabStops);
+    # Issue with const QList<QTextOption::Tab>  arg1 = (&)(param_tabStops);
     "QTextOption::setTabs": None,
-    # @Version Qt5.15 Issue with the generated "QTextOption::TType". Does not exist.
+    # Issue with the generated "QTextOption::TType". Does not exist.
     "QTextOption::tabs": None,
-    # @Version Qt5.15 Syntax error with "const QList<QTextEdit::ExtraSelection>  arg1 = (&)(param_selections);"
+    # Syntax error with "const QList<QTextEdit::ExtraSelection>  arg1 = (&)(param_selections);"
     "QTextEdit::setExtraSelections": None,
-    "QTextStream::QTextStream": [
-        (
-            "QTextStream",
-            "",
-            [
-                ("string", "QString *", None),
-                ("openMode", "QIODevice::OpenMode", "QIODevice::ReadWrite"),
-            ],
-            "",
-            False,
-        ),
-        (
-            "QTextStream",
-            "",
-            [
-                ("array", "QByteArray *", None),
-                ("openMode", "QIODevice::OpenMode", "QIODevice::ReadWrite"),
-            ],
-            "",
-            False,
-        ),
-        (
-            "QTextStream",
-            "",
-            [
-                ("array", "const QByteArray &", None),
-                ("openMode", "QIODevice::OpenMode", "QIODevice::ReadOnly"),
-            ],
-            "",
-            False,
-        ),
-    ],
+    "QTextStream::QTextStream": None, # handrolled
     "QTextStream::setString": None,
     "QTextStream::string": None,
     "QTextStream::readLineInto": None,
     "QTextStream::operator<<": None,
     "QTextStream::operator>>": None,
-    # @Version Qt5.15 cannot convert from 'std::chrono::milliseconds' to 'int'
+    # cannot convert from 'std::chrono::milliseconds' to 'int'
     "QTimer::intervalAsDuration": None,
-    # @Version Qt5.15 cannot convert from 'std::chrono::milliseconds' to 'int'
+    # cannot convert from 'std::chrono::milliseconds' to 'int'
     "QTimer::remainingTimeAsDuration": None,
     "QCursor::bitmap": None,
     "QCursor::mask": None,
@@ -1325,21 +1246,28 @@ exclusionMap = {
     "QMargins::operator-=": None,
     "QMargins::operator*=": None,
     "QMargins::operator/=": None,
+    "QWebEnginePage::findText": None,
     "QWebEnginePage::javaScriptPrompt": None,
+    "QWebEnginePage::runJavaScript": None,
+    "QWebEnginePage::toHtml": None,
+    "QWebEnginePage::toPlainText": None,
     "QWebEngineProfile::setNotificationPresenter": None,
+    "QWebEngineProfile::requestIconForIconURL": None,
+    "QWebEngineProfile::requestIconForPageURL": None,
+    "QWebEngineView::findText": None,
     "QMenu::setAsDockMenu": None,
-    # @Version Qt5.15 Trouble with std::initializer_list
+    # Trouble with std::initializer_list
     # syntax error: std::initializer_list<QPair<QString, QString> > arg1 = (>)(param_list);  
     "QUrlQuery::QUrlQuery": [
         (
             "QUrlQuery",
             "",
             [
-                ("list", "std::initializer_list<QPair<QString, QString> >", None),
+                ("list", "std::initializer_list<QPair<QString, QString>>", None),
             ],
             "",
             False,
-        ),
+        )
     ],
     "QQuickItem::itemChange":[
         (
@@ -1350,8 +1278,81 @@ exclusionMap = {
             False
         )
     ],
-    # @Version Qt5.15 Syntax issue with 'const QVector<QQmlContext::PropertyPair>  arg1 = (&)(param_properties);'
-    "QQmlContext::setContextProperties": None
+    # Syntax issue with 'const QVector<QQmlContext::PropertyPair>  arg1 = (&)(param_properties);'
+    "QQmlContext::setContextProperties": None,
+    "QRectF::toDOMRect": None,
+    "QRectF::fromDOMRect": None,
+    # Requires C++20 and new method in Qt 6.4.
+    "QDateTime::toStdSysSeconds": None,
+    # Requires C++20 and new method in Qt 6.4.
+    "QDateTime::toStdSysMilliseconds": None,
+    # Requires C++20 and new method in Qt 6.4.
+    "QDateTime::fromStdTimePoint": None,
+    # Requires C++20 and new method in Qt 6.4.
+    "QDate::toStdSysDays": None,
+    # Requires C++20 and new method in Qt 6.4.
+    "QDate::addDuration": None,
+    # Requires C++20 and new method in Qt 6.4.
+    "QDate::QDate": [
+        (
+            "QDate",
+            "",
+            [
+                ("ymd", "int", None),
+            ],
+            "",
+            False,
+        ),
+        (
+            "QDate",
+            "",
+            [
+                ("ymd", "std::chrono::year_month_day_last ymd", None),
+            ],
+            "",
+            False,
+        ),
+        (
+            "QDate",
+            "",
+            [
+                ("ymd", "std::chrono::year_month_weekday ymd", None),
+            ],
+            "",
+            False,
+        ),
+        (
+            "QDate",
+            "",
+            [
+                ("ymd", "std::chrono::year_month_weekday_last ymd", None),
+            ],
+            "",
+            False,
+        ),
+    ],
+    "QDir::QDir": [
+        ('QDir', '', [('path', 'const std::filesystem::path &', None), ('nameFilter', 'const QString &', None), ('sort', 'QDir::SortFlags', 'SortFlags(Name | IgnoreCase)'), ('filters', 'QDir::Filters', 'AllEntries')], '', False),
+        ('QDir', '', [('path', 'const std::filesystem::path &', None)], '', False)
+    ],
+    "QDir::filesystemAbsolutePath": None,
+    "QDir::filesystemCanonicalPath": None,
+    "QDir::filesystemPath": None,
+    "QDir::setPath": [
+        ('setPath', '', [('path', 'const std::filesystem::path &', None)], 'void', False)
+    ],
+    "QDir::addSearchPath": [
+        ('addSearchPath', '', [('prefix', 'const QString &', None), ('path', 'const std::filesystem::path &', None)], 'void', False)
+    ],
+    "QFileInfo::filesystemAbsoluteFilePath": None,
+    "QFileInfo::filesystemAbsolutePath": None,
+    "QFileInfo::filesystemCanonicalFilePath": None,
+    "QFileInfo::filesystemCanonicalPath": None,
+    "QFileInfo::filesystemFilePath": None,
+    "QFileInfo::filesystemJunctionTarget": None,
+    "QFileInfo::filesystemPath": None,
+    "QFileInfo::filesystemReadSymLink": None,
+    "QFileInfo::filesystemSymLinkTarget": None,
 }
 
 customNativeFuncsHeader = {
@@ -1502,6 +1503,8 @@ def convertTo(expr, ktype):
             return 'makelayoutitem<%sType>(c,%s,"qt.%s")' % (ktype, expr, ktype)
         elif muclass.isAByName("QPaintDevice"):
             return 'makepaintdevice<%sType>(c,%s,"qt.%s")' % (ktype, expr, ktype)
+        elif muclass.isAByName("QIODeviceBase"):
+            return 'makeiodevicebase<%sType>(c,%s,"qt.%s")' % (ktype, expr, ktype)
         else:
             print("ERROR: can't convertTo", expr, ktype)
             return "NOT_CONVERTED(%s,%s)" % (expr, ktype)
@@ -1729,7 +1732,8 @@ def parse_cpp_function(function_signature):
     
     function_name = function_name.strip()
     
-    parameters = parameters.strip('()')
+    # Fix this as this remove () for thing like Qt::WindowsFlag()
+    parameters = parameters[1:-1]
     
     if after_parameters:
         after_parameters = after_parameters.strip()
@@ -1739,6 +1743,7 @@ def parse_cpp_function(function_signature):
     return return_type, function_name, parameters, after_parameters
 
 def parseFunction(func, qtnamespace):
+    orig_func = func
     # parts = func.split("(")
     # in 5.6 they added some crap and * and & are no longer separated by spaces
     # 5.9 has override in the const portion
@@ -1768,14 +1773,25 @@ def parseFunction(func, qtnamespace):
         prop = not demoted
         func = func[0:-1]
 
+    # try:
+    #     groups = parse_cpp_function(func)
+    #     parts = [groups[0] + " " + groups[1], groups[2]]
+    #     thistype = groups[3]
+    #     message("CEDRIK Parts: " + str(parts))
+    #     message("CEDRIK thistype: " + groups[3])
+    # except:
+    #     # Fall back to previous method
+    #     sindex = func.find("(")
+    #     eindex = func.rfind(")")
+    #     thistype = sstrip(func[eindex + 1 :])
+    #     func = func[0:eindex]
+    #     if sindex == -1:
+    #         return None
+    #     parts = [func[0:sindex], func[sindex + 1 :]]
+    #     message("Parts: " + str(parts))
+    #     message("thistype = " + thistype)
+
     try:
-        groups = parse_cpp_function(func)
-        parts = [groups[0] + " " + groups[1], groups[2]]
-        thistype = groups[3]
-        message("CEDRIK Parts: " + str(parts))
-        message("CEDRIK thistype: " + groups[3])
-    except:
-        # Fall back to previous method
         sindex = func.find("(")
         eindex = func.rfind(")")
         thistype = sstrip(func[eindex + 1 :])
@@ -1786,60 +1802,64 @@ def parseFunction(func, qtnamespace):
         message("Parts: " + str(parts))
         message("thistype = " + thistype)
 
-    if len(parts) == 2:
-        nameproto = parts[0].split()
-        allparams = parts[1]
+        if len(parts) == 2:
+            nameproto = parts[0].split()
+            allparams = parts[1]
 
-        bracketlevel = 0
-        current = ""
-        params = []
-        count = 0
+            bracketlevel = 0
+            current = ""
+            params = []
+            count = 0
 
-        for c in allparams:
-            if c == "," or c == ")":
-                if bracketlevel == 0:
-                    params.append(parseParameter(current, count))
-                    current = ""
-                else:
-                    if c == ")":
-                        bracketlevel -= 1
+            for c in allparams:
+                if c == "," or c == ")":
+                    if bracketlevel == 0:
+                        params.append(parseParameter(current, count))
+                        current = ""
+                    else:
+                        if c == ")":
+                            bracketlevel -= 1
+                        current += c
+                elif c == "<" or c == "(":
+                    bracketlevel += 1
                     current += c
-            elif c == "<" or c == "(":
-                bracketlevel += 1
-                current += c
-            elif c == ">" or c == ")":
-                bracketlevel -= 1
-                current += c
+                elif c == ">" or c == ")":
+                    bracketlevel -= 1
+                    current += c
+                else:
+                    current += c
+
+                count = count + 1
+
+            if len(allparams) != 0:
+                params.append(parseParameter(current, count))
+
+            message("Params: " + str(params))
+
+            # make new name for params with same name as func
+            for i in range(0, len(params)):
+                p = params[i]
+                # Compare the first element of p and the last element of nameproto.
+                message("Before comparison: " + str(p) + " with " + str(nameproto))
+                # if nameproto:
+                # message("Comparing: " + p[0] + " with " + nameproto[-1])
+                if p[0] == nameproto[-1]:
+                    # Append underscore
+                    params[i] = (p[0] + "_", p[1], p[2])
+
+            if nameproto:
+                v = (nameproto[-1], thistype, params, string.join(nameproto[0:-1]), prop)
+                if demoted:
+                    qtnamespace.demotedProps.append(v)
+                    # message("PROP demoted " + str(func))
+                return v
             else:
-                current += c
-
-            count = count + 1
-
-        if len(allparams) != 0:
-            params.append(parseParameter(current, count))
-
-        message("Params: " + str(params))
-
-        # make new name for params with same name as func
-        for i in range(0, len(params)):
-            p = params[i]
-            # Compare the first element of p and the last element of nameproto.
-            message("Before comparison: " + str(p) + " with " + str(nameproto))
-            # if nameproto:
-            # message("Comparing: " + p[0] + " with " + nameproto[-1])
-            if p[0] == nameproto[-1]:
-                # Append underscore
-                params[i] = (p[0] + "_", p[1], p[2])
-
-        if nameproto:
-            v = (nameproto[-1], thistype, params, string.join(nameproto[0:-1]), prop)
-            if demoted:
-                qtnamespace.demotedProps.append(v)
-                # message("PROP demoted " + str(func))
-            return v
-        else:
-            message("WARNING: Nameproto empty for " + func) 
-
+                message("WARNING: Nameproto empty for " + func) 
+    except:
+        # Skip any function that has issue with the simple parsing above.
+        print("Error parsing function.. skipping: {0}".format(orig_func))
+        return None
+    
     return None
 
 
@@ -2060,6 +2080,10 @@ class MuEnum:
         self.symbols = []
         for e in enumeration.enums:
             if e.name != "\n":
+                # TODO: Might not be the right place to do it, but it works.
+                # Remove anything parenthesis and spacing in the name.
+                pattern = r'\([^)]*\)'
+                e.name = re.sub(pattern, '', e.name).strip()
                 name_without_class_name = e.name.split(muclass.name, 1)[1]
                 # Could use e.name for val, but let's keep the logic similar.
                 val = muclass.name + name_without_class_name
@@ -2101,6 +2125,10 @@ class MuFunction:
         if c.name in doProps:
             isprop = False
 
+        # Manual list that says that the function is a properties as well.
+        if qtfunc[0] in doPropsIfFuncToo:
+            isprop = False
+
         count = 0
         if muclass.funcCount.has_key(name):
             count = muclass.funcCount[name]
@@ -2126,6 +2154,9 @@ class MuFunction:
         self.isconst = "const" in const
         self.purevirtual = "= 0" in qtfunc[1]
 
+        print("Processing function {0}".format(qtfunc))
+        print("failed: {0}, isprop: {1}, isprotected: {2}".format(str(self.failed), str(self.isprop), str(self.isprotected)))
+
         if self.operator:
             self.name = name[8 : len(name)]
 
@@ -2140,7 +2171,6 @@ class MuFunction:
         # if "operator" in self.name:
         #    self.failed = True
         # message("%s failed because of operator in name" % name)
-
         for omit in ["virtual", "Q_INVOKABLE"]:
             rtype = sstrip(string.replace(rtype, omit, ""))
 
@@ -2221,6 +2251,8 @@ class MuFunction:
         for a in self.args:
             self.compiled += "_%s" % mangleName(conditionType(a[1]))
 
+        print("self.compiled={0}, {1}".format(self.compiled, self.failed))
+
     def unpackReturnValue(self, expr):
         rtype = conditionType(self.rtype)
         rep = repMapFind(rtype)
@@ -2272,6 +2304,7 @@ class MuFunction:
         return out
 
     def nodeImplementation(self):
+        print("nodeImplementation -> {0}".format(self.name))
         if self.failed:
             return "// MISSING NODE: %s" % self.muDeclaration()
         if self.abstract and self.isconstructor and not self.muclass.inheritable:
@@ -2340,9 +2373,12 @@ class MuFunction:
             else:
                 print("FAILED to find", self.rtype)
 
+        print("Compiled function for {0}".format(muclass.name))
+
         isQObject = muclass.isAByName("QObject")
         isQPaintDevice = muclass.isAByName("QPaintDevice")
         isQLayoutItem = muclass.isAByName("QLayoutItem")
+        isQIODeviceBase = muclass.isAByName("QIODeviceBase")
         inheritable = muclass.inheritable
 
         setter = None
@@ -2368,6 +2404,11 @@ class MuFunction:
             getter = "paintdevice"
             maker = "makepaintdevice"
             isafunc = "isMuQtPaintDevice"
+        elif isQIODeviceBase:
+            setter = "setiodevicebase"
+            getter = "iodevicebase"
+            maker = "makeiodevicebase"
+            isafunc = "isMuQtIODeviceBase"
 
         if self.failed:
             return "// MISSING FUNC: %s" % self.muDeclaration()
@@ -2514,6 +2555,7 @@ class MuFunction:
             and not self.rtype.split(".")[-1] in pointerTypes
             and not self.rtype.split(".")[-1] in primitiveTypes
         )
+        rtypeIODeviceBase = muapi.isAByName(self.rtype, "QIODeviceBase")
         rmaker = None
 
         if rtypeObject:
@@ -2522,8 +2564,10 @@ class MuFunction:
             rmaker = "makelayoutitem"
         elif rtypePaintDevice:
             rmaker = "makepaintdevice"
+        elif rtypeIODeviceBase:
+            rmaker = "makeiodevicebase"
 
-        if isQObject or isQLayoutItem or isQPaintDevice:
+        if isQObject or isQLayoutItem or isQPaintDevice or isQIODeviceBase:
             if self.isconstructor:
                 body += "    %s(param_this, %s);\n    return param_this;\n" % (
                     setter,
@@ -2715,7 +2759,8 @@ class MuClass:
             fname = f[0]
             cppname = qtnamespace.name + "::" + fname
             exclude = isFunctionExcluded(qtnamespace, f)
-            message("staticfuncs fname = %s, cppname = %s" % (fname, cppname))
+            print(qtnamespace)
+            message("staticfuncs fname = %s, cppname = %s, exclude = %s" % (fname, cppname, str(exclude)))
             if not exclude:
                 self.statics.append(
                     MuFunction(
@@ -2826,6 +2871,8 @@ class MuClass:
 
     def outputNodeImplementations(self):
         out = ""
+        print("self.statics for {0}".format(self.name))
+
         for f in filter(
             self.F_trans, self.functions + self.statics + self.castoperators
         ):
@@ -3159,9 +3206,11 @@ class MuClass:
         if not allowInheritance or not self.inheritable:
             return ""
 
+        isQWebEngineHistory = self.isAByName("QWebEngineHistory")
+
         out = "// Inheritable object\n\n"
         out += "class MuQt_%s : public %s\n{\n  public:\n" % (self.name, self.name)
-        if self.hasdestructor:
+        if self.hasdestructor or isQWebEngineHistory:
             out += "    virtual ~MuQt_" + self.name + "();\n"
 
         # constructors
@@ -3278,6 +3327,9 @@ class MuClass:
         elif self.isAByName("QPaintDevice") and not self.isAByName("QObject"):
             templateCPP = templatePaintDeviceCPP
             templateH = templatePaintDeviceH
+        elif self.isAByName("QIODeviceBase") and not self.isAByName("QObject"):
+            templateCPP = templateIODeviceBaseCPP
+            templateH = templateIODeviceBaseH
         else:
             templateCPP = templateObjectCPP
             templateH = templateObjectH
@@ -3416,6 +3468,8 @@ class MuClass:
                         hlines.append("    struct Struct { QLayoutItem* object; };\n")
                     if self.name == "QPaintDevice":
                         hlines.append("    struct Struct { QPaintDevice* object; };\n")
+                    if self.name == "QIODeviceBase":
+                        hlines.append("    struct Struct { QIODeviceBase* object; };\n")
                     if not self.inheritable:
                         hlines.append("    typedef " + name + " MuQt_" + name + ";\n")
                 else:
@@ -3435,7 +3489,9 @@ class MuClass:
         inherits = filter(lambda x: not x.isinterface, self.inherits)
         inherits.sort(inheritCMP)
         if self not in finishedMap:
+            print("Processing {0}...".format(self.name))
             if self.name in includeClasses:
+                print("... is in includeClasses")
                 if len(inherits) > 0:
                     out += '    %sType* t_%s = new %sType(c, "%s"' % (
                         self.name,
@@ -3447,6 +3503,7 @@ class MuClass:
                         out += ", t_%s" % inherits[i].name
                     out += ");"
                 else:
+                    print("... no inherits")
                     out += '    %sType* t_%s = new %sType(c, "%s");' % (
                         self.name,
                         self.name,
@@ -3491,8 +3548,9 @@ class MuAPI:
             isQObject = c.isAByName("QObject")
             isQPaintDevice = c.isAByName("QPaintDevice")
             isQLayoutItem = c.isAByName("QLayoutItem")
+            isQIODeviceBase = c.isAByName("QIODeviceBase")
             c.inheritable = (
-                (isQObject or isQLayoutItem or isQPaintDevice)
+                (isQObject or isQLayoutItem or isQPaintDevice or isQIODeviceBase)
                 and (not c.name in notInheritableTypes)
                 and allowInheritance
             )
@@ -4076,7 +4134,6 @@ if outputModuleParts:
     muOutputClasses = []
 
     for cname in outputClasses:
-        print("output classes: ", cname)
         if muapi.classes.has_key(cname):
             c = muapi.classes[cname]
             muOutputClasses.append(c)
@@ -4086,6 +4143,7 @@ if outputModuleParts:
     muOutputClasses = sortHierarchically(muOutputClasses)
 
     for c in muOutputClasses:
+        print("output module definition for {0}".format(c.name))
         out += c.outputModuleDefinition(finishedMap)
 
     out += "return t_QWidget;\n"

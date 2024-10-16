@@ -144,7 +144,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
         for (size_t i = 0; i < _argTypes.size(); i++)
         {
-            //QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+            //QMetaType type = QMetaType(this->args.at(i));
             //cout << "type = " << QMetaType::typeName(type) << endl;
 
             switch (_argTypes[i])
@@ -201,7 +201,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
               case TreeItemArg:
                   {
-                      QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+                      QMetaType type = QMetaType(this->args.at(i));
                       QVariant v(type, a[i+1]);
                       QTreeWidgetItem* o = v.value<QTreeWidgetItem*>();
                       args[i]._Pointer = !o ? NULL :
@@ -211,7 +211,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
               case TableItemArg:
                   {
-                      QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+                      QMetaType type = QMetaType(this->args.at(i));
                       QVariant v(type, a[i+1]);
                       QTableWidgetItem* o = v.value<QTableWidgetItem*>();
                       args[i]._Pointer = !o ? NULL :
@@ -221,7 +221,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
               case ListItemArg:
                   {
-                      QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+                      QMetaType type = QMetaType(this->args.at(i));
                       QVariant v(type, a[i+1]);
                       QListWidgetItem* o = v.value<QListWidgetItem*>();
                       args[i]._Pointer = !o ? NULL :
@@ -231,7 +231,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
               case StandardItemArg:
                   {
-                      QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+                      QMetaType type = QMetaType(this->args.at(i));
                       QVariant v(type, a[i+1]);
                       QStandardItem* o = v.value<QStandardItem*>();
                       args[i]._Pointer = !o ? NULL :
@@ -241,7 +241,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
               case ModelIndexArg:
                   {
-                      QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+                      QMetaType type = QMetaType(this->args.at(i));
                       QVariant v(type, a[i+1]);
                       QModelIndex o = v.value<QModelIndex>();
                       args[i]._Pointer = makeqtype<QModelIndexType>((Context*)c,o,"qt.QModelIndex");
@@ -250,7 +250,7 @@ int SignalSpy::qt_metacall(QMetaObject::Call call, int methodId, void **a)
 
               case ItemSelectionArg:
                   {
-                      QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
+                      QMetaType type = QMetaType(this->args.at(i));
                       QVariant v(type, a[i+1]);
                       QItemSelection o = v.value<QItemSelection>();
                       args[i]._Pointer = makeqtype<QItemSelectionType>((Context*)c,o,"qt.QItemSelection");

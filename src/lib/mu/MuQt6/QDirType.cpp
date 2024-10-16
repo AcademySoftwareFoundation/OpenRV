@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 
 namespace Mu {
@@ -85,25 +86,6 @@ Pointer qt_QDir_QDir_QDir_QDir_string_string_int_int(Mu::Thread& NODE_THREAD, Po
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QString  arg1 = qstring(param_path);
-    const QString  arg2 = qstring(param_nameFilter);
-    QDir::SortFlags arg3 = (QDir::SortFlags)(param_sort);
-    QDir::Filters arg4 = (QDir::Filters)(param_filters);
-    setqtype<QDirType>(param_this,QDir(arg1, arg2, arg3, arg4));
-    return param_this;
-}
-
-Pointer qt_QDir_QDir_QDir_QDir_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_path)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg1 = (&)(param_path);
-    setqtype<QDirType>(param_this,QDir(arg1));
-    return param_this;
-}
-
-Pointer qt_QDir_QDir_QDir_QDir_int_string_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_path, Pointer param_nameFilter, int param_sort, int param_filters)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg1 = (&)(param_path);
     const QString  arg2 = qstring(param_nameFilter);
     QDir::SortFlags arg3 = (QDir::SortFlags)(param_sort);
     QDir::Filters arg4 = (QDir::Filters)(param_filters);
@@ -214,27 +196,6 @@ Pointer qt_QDir_filePath_string_QDir_string(Mu::Thread& NODE_THREAD, Pointer par
     const QDir& arg0 = getqtype<QDirType>(param_this);
     const QString  arg1 = qstring(param_fileName);
     return makestring(c,arg0.filePath(arg1));
-}
-
-int qt_QDir_filesystemAbsolutePath_int_QDir(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QDir& arg0 = getqtype<QDirType>(param_this);
-    return int(arg0.filesystemAbsolutePath());
-}
-
-int qt_QDir_filesystemCanonicalPath_int_QDir(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QDir& arg0 = getqtype<QDirType>(param_this);
-    return int(arg0.filesystemCanonicalPath());
-}
-
-int qt_QDir_filesystemPath_int_QDir(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QDir& arg0 = getqtype<QDirType>(param_this);
-    return int(arg0.filesystemPath());
 }
 
 int qt_QDir_filter_int_QDir(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -409,15 +370,6 @@ void qt_QDir_setPath_void_QDir_string(Mu::Thread& NODE_THREAD, Pointer param_thi
     setqtype<QDirType>(param_this,arg0);
 }
 
-void qt_QDir_setPath_void_QDir_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_path)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QDir& arg0 = getqtype<QDirType>(param_this);
-    const std::filesystem::path  arg1 = (&)(param_path);
-    arg0.setPath(arg1);
-    setqtype<QDirType>(param_this,arg0);
-}
-
 void qt_QDir_setSorting_void_QDir_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_sort)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -464,14 +416,6 @@ void qt_QDir_addSearchPath_void_string_string(Mu::Thread& NODE_THREAD, Pointer p
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QString  arg0 = qstring(param_prefix);
     const QString  arg1 = qstring(param_path);
-    QDir::addSearchPath(arg0, arg1);
-}
-
-void qt_QDir_addSearchPath_void_string_int(Mu::Thread& NODE_THREAD, Pointer param_prefix, int param_path)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QString  arg0 = qstring(param_prefix);
-    const std::filesystem::path  arg1 = (&)(param_path);
     QDir::addSearchPath(arg0, arg1);
 }
 
@@ -613,16 +557,6 @@ static NODE_IMPLEMENTATION(_n_QDir1, Pointer)
     NODE_RETURN(qt_QDir_QDir_QDir_QDir_string_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int), NODE_ARG(4, int)));
 }
 
-static NODE_IMPLEMENTATION(_n_QDir2, Pointer)
-{
-    NODE_RETURN(qt_QDir_QDir_QDir_QDir_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_QDir3, Pointer)
-{
-    NODE_RETURN(qt_QDir_QDir_QDir_QDir_int_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, Pointer), NODE_ARG(3, int), NODE_ARG(4, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_absoluteFilePath0, Pointer)
 {
     NODE_RETURN(qt_QDir_absoluteFilePath_string_QDir_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
@@ -686,21 +620,6 @@ static NODE_IMPLEMENTATION(_n_exists1, bool)
 static NODE_IMPLEMENTATION(_n_filePath0, Pointer)
 {
     NODE_RETURN(qt_QDir_filePath_string_QDir_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemAbsolutePath0, int)
-{
-    NODE_RETURN(qt_QDir_filesystemAbsolutePath_int_QDir(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemCanonicalPath0, int)
-{
-    NODE_RETURN(qt_QDir_filesystemCanonicalPath_int_QDir(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemPath0, int)
-{
-    NODE_RETURN(qt_QDir_filesystemPath_int_QDir(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_filter0, int)
@@ -813,11 +732,6 @@ static NODE_IMPLEMENTATION(_n_setPath0, void)
     qt_QDir_setPath_void_QDir_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
 }
 
-static NODE_IMPLEMENTATION(_n_setPath1, void)
-{
-    qt_QDir_setPath_void_QDir_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
-}
-
 static NODE_IMPLEMENTATION(_n_setSorting0, void)
 {
     qt_QDir_setSorting_void_QDir_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
@@ -846,11 +760,6 @@ static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
 static NODE_IMPLEMENTATION(_n_addSearchPath0, void)
 {
     qt_QDir_addSearchPath_void_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_addSearchPath1, void)
-{
-    qt_QDir_addSearchPath_void_string_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_cleanPath0, Pointer)
@@ -1019,8 +928,6 @@ addSymbols(
     // member functions
     new Function(c, "QDir", _n_QDir0, None, Compiled, qt_QDir_QDir_QDir_QDir_string, Return, "qt.QDir", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "path", "string"), End),
     new Function(c, "QDir", _n_QDir1, None, Compiled, qt_QDir_QDir_QDir_QDir_string_string_int_int, Return, "qt.QDir", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "path", "string"), new Param(c, "nameFilter", "string"), new Param(c, "sort", "int", Value((int)QDir::SortFlags(QDir::Name | QDir::IgnoreCase))), new Param(c, "filters", "int", Value((int)QDir::AllEntries)), End),
-    new Function(c, "QDir", _n_QDir2, None, Compiled, qt_QDir_QDir_QDir_QDir_int, Return, "qt.QDir", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "path", "int"), End),
-    new Function(c, "QDir", _n_QDir3, None, Compiled, qt_QDir_QDir_QDir_QDir_int_string_int_int, Return, "qt.QDir", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "path", "int"), new Param(c, "nameFilter", "string"), new Param(c, "sort", "int", Value((int)QDir::SortFlags(QDir::Name | QDir::IgnoreCase))), new Param(c, "filters", "int", Value((int)QDir::AllEntries)), End),
     // MISSING: QDir (QDir; QDir this, QDir dir)
     new Function(c, "absoluteFilePath", _n_absoluteFilePath0, None, Compiled, qt_QDir_absoluteFilePath_string_QDir_string, Return, "string", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "fileName", "string"), End),
     new Function(c, "absolutePath", _n_absolutePath0, None, Compiled, qt_QDir_absolutePath_string_QDir, Return, "string", Parameters, new Param(c, "this", "qt.QDir"), End),
@@ -1036,12 +943,9 @@ addSymbols(
     new Function(c, "exists", _n_exists0, None, Compiled, qt_QDir_exists_bool_QDir_string, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "name", "string"), End),
     new Function(c, "exists", _n_exists1, None, Compiled, qt_QDir_exists_bool_QDir, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), End),
     new Function(c, "filePath", _n_filePath0, None, Compiled, qt_QDir_filePath_string_QDir_string, Return, "string", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "fileName", "string"), End),
-    new Function(c, "filesystemAbsolutePath", _n_filesystemAbsolutePath0, None, Compiled, qt_QDir_filesystemAbsolutePath_int_QDir, Return, "int", Parameters, new Param(c, "this", "qt.QDir"), End),
-    new Function(c, "filesystemCanonicalPath", _n_filesystemCanonicalPath0, None, Compiled, qt_QDir_filesystemCanonicalPath_int_QDir, Return, "int", Parameters, new Param(c, "this", "qt.QDir"), End),
-    new Function(c, "filesystemPath", _n_filesystemPath0, None, Compiled, qt_QDir_filesystemPath_int_QDir, Return, "int", Parameters, new Param(c, "this", "qt.QDir"), End),
     new Function(c, "filter", _n_filter0, None, Compiled, qt_QDir_filter_int_QDir, Return, "int", Parameters, new Param(c, "this", "qt.QDir"), End),
     new Function(c, "isAbsolute", _n_isAbsolute0, None, Compiled, qt_QDir_isAbsolute_bool_QDir, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), End),
-    new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QDir_isEmpty_bool_QDir_int, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "filters", "int", Value((int)QDir::Filters(QDir::AllEntries | QDir::NoDotAndDotDot)), End),
+    new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QDir_isEmpty_bool_QDir_int, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "filters", "int", Value((int)QDir::Filters(QDir::AllEntries | QDir::NoDotAndDotDot))), End),
     new Function(c, "isReadable", _n_isReadable0, None, Compiled, qt_QDir_isReadable_bool_QDir, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), End),
     new Function(c, "isRelative", _n_isRelative0, None, Compiled, qt_QDir_isRelative_bool_QDir, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), End),
     new Function(c, "isRoot", _n_isRoot0, None, Compiled, qt_QDir_isRoot_bool_QDir, Return, "bool", Parameters, new Param(c, "this", "qt.QDir"), End),
@@ -1061,13 +965,11 @@ addSymbols(
     new Function(c, "setFilter", _n_setFilter0, None, Compiled, qt_QDir_setFilter_void_QDir_int, Return, "void", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "filters", "int"), End),
     new Function(c, "setNameFilters", _n_setNameFilters0, None, Compiled, qt_QDir_setNameFilters_void_QDir_stringBSB_ESB_, Return, "void", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "nameFilters", "string[]"), End),
     new Function(c, "setPath", _n_setPath0, None, Compiled, qt_QDir_setPath_void_QDir_string, Return, "void", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "path", "string"), End),
-    new Function(c, "setPath", _n_setPath1, None, Compiled, qt_QDir_setPath_void_QDir_int, Return, "void", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "path", "int"), End),
     new Function(c, "setSorting", _n_setSorting0, None, Compiled, qt_QDir_setSorting_void_QDir_int, Return, "void", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "sort", "int"), End),
     new Function(c, "sorting", _n_sorting0, None, Compiled, qt_QDir_sorting_int_QDir, Return, "int", Parameters, new Param(c, "this", "qt.QDir"), End),
     new Function(c, "swap", _n_swap0, None, Compiled, qt_QDir_swap_void_QDir_QDir, Return, "void", Parameters, new Param(c, "this", "qt.QDir"), new Param(c, "other", "qt.QDir"), End),
     // static functions
     new Function(c, "addSearchPath", _n_addSearchPath0, None, Compiled, qt_QDir_addSearchPath_void_string_string, Return, "void", Parameters, new Param(c, "prefix", "string"), new Param(c, "path", "string"), End),
-    new Function(c, "addSearchPath", _n_addSearchPath1, None, Compiled, qt_QDir_addSearchPath_void_string_int, Return, "void", Parameters, new Param(c, "prefix", "string"), new Param(c, "path", "int"), End),
     new Function(c, "cleanPath", _n_cleanPath0, None, Compiled, qt_QDir_cleanPath_string_string, Return, "string", Parameters, new Param(c, "path", "string"), End),
     new Function(c, "current", _n_current0, None, Compiled, qt_QDir_current_QDir, Return, "qt.QDir", End),
     new Function(c, "currentPath", _n_currentPath0, None, Compiled, qt_QDir_currentPath_string, Return, "string", End),

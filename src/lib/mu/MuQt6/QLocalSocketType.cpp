@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -818,8 +819,8 @@ addSymbols(
     new Function(c, "QLocalSocket", _n_QLocalSocket0, None, Compiled, qt_QLocalSocket_QLocalSocket_QLocalSocket_QLocalSocket_QObject, Return, "qt.QLocalSocket", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "parent", "qt.QObject"), End),
     new Function(c, "abort", _n_abort0, None, Compiled, qt_QLocalSocket_abort_void_QLocalSocket, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
     // PROP: bindableSocketOptions (flags QBindable<QLocalSocket::SocketOptions>; QLocalSocket this)
-    new Function(c, "connectToServer", _n_connectToServer0, None, Compiled, qt_QLocalSocket_connectToServer_void_QLocalSocket_int, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "openMode", "int", Value((int)ReadWrite)), End),
-    new Function(c, "connectToServer", _n_connectToServer1, None, Compiled, qt_QLocalSocket_connectToServer_void_QLocalSocket_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "name", "string"), new Param(c, "openMode", "int", Value((int)ReadWrite)), End),
+    new Function(c, "connectToServer", _n_connectToServer0, None, Compiled, qt_QLocalSocket_connectToServer_void_QLocalSocket_int, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "openMode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
+    new Function(c, "connectToServer", _n_connectToServer1, None, Compiled, qt_QLocalSocket_connectToServer_void_QLocalSocket_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "name", "string"), new Param(c, "openMode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
     new Function(c, "disconnectFromServer", _n_disconnectFromServer0, None, Compiled, qt_QLocalSocket_disconnectFromServer_void_QLocalSocket, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
     new Function(c, "error", _n_error0, None, Compiled, qt_QLocalSocket_error_int_QLocalSocket, Return, "int", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
     new Function(c, "flush", _n_flush0, None, Compiled, qt_QLocalSocket_flush_bool_QLocalSocket, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
@@ -841,7 +842,7 @@ addSymbols(
     _func[2] = new MemberFunction(c, "canReadLine", _n_canReadLine0, None, Compiled, qt_QLocalSocket_canReadLine_bool_QLocalSocket, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
     _func[3] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QLocalSocket_close_void_QLocalSocket, Return, "void", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
     _func[4] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QLocalSocket_isSequential_bool_QLocalSocket, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), End),
-    _func[5] = new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QLocalSocket_open_bool_QLocalSocket_int, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "openMode", "int", Value((int)ReadWrite)), End),
+    _func[5] = new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QLocalSocket_open_bool_QLocalSocket_int, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "openMode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
     _func[6] = new MemberFunction(c, "waitForBytesWritten", _n_waitForBytesWritten0, None, Compiled, qt_QLocalSocket_waitForBytesWritten_bool_QLocalSocket_int, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
     _func[7] = new MemberFunction(c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled, qt_QLocalSocket_waitForReadyRead_bool_QLocalSocket_int, Return, "bool", Parameters, new Param(c, "this", "qt.QLocalSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
     // MISSING: readData (int64; QLocalSocket this, "char *" data, int64 c) // protected

@@ -597,7 +597,8 @@ qtModule::load()
                    //new SymbolicConstant(c, "DefaultLocaleLongDate", "int", Value(int(?))),
                    new SymbolicConstant(c, "SystemLocaleDate", "int", Value(int(2))),
                    //new SymbolicConstant(c, "LocaleDate", "int", Value(int(?))),
-                   new SymbolicConstant(c, "LocalDate", "int", Value(int(Qt::SystemLocaleDate))),
+                   // TODO_QT: Does not exist in Qt6 and not used in our code. Must be replace a function call from QLocale.
+                   //new SymbolicConstant(c, "LocalDate", "int", Value(int(Qt::SystemLocaleDate))),
                    new Alias(c, "DayOfWeek", "int"),
                    new SymbolicConstant(c, "Monday", "int", Value(int(1))),
                    new SymbolicConstant(c, "Tuesday", "int", Value(int(2))),

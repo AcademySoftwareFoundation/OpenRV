@@ -2,7 +2,7 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
+// SPDX-License-Identifier: Apache-2.0
 // 
 #ifndef __MuQt__qtUtils__h__
 #define __MuQt__qtUtils__h__
@@ -19,6 +19,7 @@
 #include <MuQt6/QTreeWidgetItemType.h>
 #include <MuQt6/QTableWidgetItemType.h>
 #include <MuQt6/QPaintDeviceType.h>
+#include <MuQt6/QIODeviceBaseType.h>
 #include <MuQt6/QLayoutItemType.h>
 #include <MuQt6/QItemSelectionType.h>
 #include <MuQt6/QFileInfoType.h>
@@ -43,6 +44,7 @@ namespace Mu {
 bool isMuQtObject(QObject*);
 bool isMuQtLayoutItem(QLayoutItem*);
 bool isMuQtPaintDevice(QPaintDevice*);
+bool isMuQtIODeviceBase(QIODeviceBase*);
 
 template <class T>
 T* object (Pointer obj)
@@ -97,6 +99,20 @@ void setpaintdevice (Pointer obj, const QPaintDevice& object)
 {
     if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
         i->data<QPaintDeviceType::Struct>()->object = (QPaintDevice*)&object;
+}
+
+inline
+void setiodevicebase (Pointer obj, const QIODeviceBase* object)
+{
+    if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
+        i->data<QIODeviceBaseType::Struct>()->object = (QIODeviceBase*)object;
+}
+
+inline
+void setiodevicebase (Pointer obj, const QIODeviceBase& object)
+{
+    if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
+        i->data<QIODeviceBaseType::Struct>()->object = (QIODeviceBase*)&object;
 }
 
 template <class Type>

@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -515,13 +516,6 @@ Pointer qt_QTextDocument_resource_QVariant_QTextDocument_int_QUrl(Mu::Thread& NO
     return makeqtype<QVariantType>(c,arg0->resource(arg1, arg2),"qt.QVariant");
 }
 
-int qt_QTextDocument_resourceProvider_int_QTextDocument(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QTextDocument* arg0 = object<QTextDocument>(param_this);
-    return int(arg0->resourceProvider());
-}
-
 int qt_QTextDocument_revision_int_QTextDocument(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -592,14 +586,6 @@ void qt_QTextDocument_setPlainText_void_QTextDocument_string(Mu::Thread& NODE_TH
     QTextDocument* arg0 = object<QTextDocument>(param_this);
     const QString  arg1 = qstring(param_text);
     arg0->setPlainText(arg1);
-}
-
-void qt_QTextDocument_setResourceProvider_void_QTextDocument_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_provider)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QTextDocument* arg0 = object<QTextDocument>(param_this);
-    const QTextDocument::ResourceProvider  arg1 = (&)(param_provider);
-    arg0->setResourceProvider(arg1);
 }
 
 void qt_QTextDocument_setSubScriptBaseline_void_QTextDocument_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_baseline)
@@ -695,19 +681,6 @@ void qt_QTextDocument_timerEvent_void_QTextDocument_QTimerEvent(Mu::Thread& NODE
     QTimerEvent * arg1 = getqpointer<QTimerEventType>(param_event);
     if (isMuQtObject(arg0)) ((MuQt_QTextDocument*)arg0)->timerEvent_pub_parent(arg1);
     else ((MuQt_QTextDocument*)arg0)->timerEvent_pub(arg1);
-}
-
-int qt_QTextDocument_defaultResourceProvider_int(Mu::Thread& NODE_THREAD)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    return int(QTextDocument::defaultResourceProvider());
-}
-
-void qt_QTextDocument_setDefaultResourceProvider_void_int(Mu::Thread& NODE_THREAD, int param_provider)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QTextDocument::ResourceProvider  arg0 = (&)(param_provider);
-    QTextDocument::setDefaultResourceProvider(arg0);
 }
 
 
@@ -881,11 +854,6 @@ static NODE_IMPLEMENTATION(_n_resource0, Pointer)
     NODE_RETURN(qt_QTextDocument_resource_QVariant_QTextDocument_int_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_resourceProvider0, int)
-{
-    NODE_RETURN(qt_QTextDocument_resourceProvider_int_QTextDocument(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_revision0, int)
 {
     NODE_RETURN(qt_QTextDocument_revision_int_QTextDocument(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -929,11 +897,6 @@ static NODE_IMPLEMENTATION(_n_setMetaInformation0, void)
 static NODE_IMPLEMENTATION(_n_setPlainText0, void)
 {
     qt_QTextDocument_setPlainText_void_QTextDocument_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_setResourceProvider0, void)
-{
-    qt_QTextDocument_setResourceProvider_void_QTextDocument_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_setSubScriptBaseline0, void)
@@ -994,16 +957,6 @@ static NODE_IMPLEMENTATION(_n_customEvent0, void)
 static NODE_IMPLEMENTATION(_n_timerEvent0, void)
 {
     qt_QTextDocument_timerEvent_void_QTextDocument_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_defaultResourceProvider0, int)
-{
-    NODE_RETURN(qt_QTextDocument_defaultResourceProvider_int(NODE_THREAD));
-}
-
-static NODE_IMPLEMENTATION(_n_setDefaultResourceProvider0, void)
-{
-    qt_QTextDocument_setDefaultResourceProvider_void_int(NODE_THREAD, NODE_ARG(0, int));
 }
 
 
@@ -1072,10 +1025,10 @@ addSymbols(
     // MISSING: documentLayout ("QAbstractTextDocumentLayout *"; QTextDocument this)
     // PROP: documentMargin (double; QTextDocument this)
     new Function(c, "end", _n_end0, None, Compiled, qt_QTextDocument_end_QTextBlock_QTextDocument, Return, "qt.QTextBlock", Parameters, new Param(c, "this", "qt.QTextDocument"), End),
-    new Function(c, "find", _n_find0, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_string_QTextCursor_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "subString", "string"), new Param(c, "cursor", "qt.QTextCursor"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
-    new Function(c, "find", _n_find1, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_string_int_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "subString", "string"), new Param(c, "position", "int", Value((int)0)), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
-    new Function(c, "find", _n_find2, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_QRegularExpression_int_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "expr", "qt.QRegularExpression"), new Param(c, "from", "int", Value((int)0)), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
-    new Function(c, "find", _n_find3, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_QRegularExpression_QTextCursor_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "expr", "qt.QRegularExpression"), new Param(c, "cursor", "qt.QTextCursor"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
+    new Function(c, "find", _n_find0, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_string_QTextCursor_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "subString", "string"), new Param(c, "cursor", "qt.QTextCursor"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+    new Function(c, "find", _n_find1, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_string_int_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "subString", "string"), new Param(c, "position", "int", Value((int)0)), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+    new Function(c, "find", _n_find2, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_QRegularExpression_int_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "expr", "qt.QRegularExpression"), new Param(c, "from", "int", Value((int)0)), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+    new Function(c, "find", _n_find3, None, Compiled, qt_QTextDocument_find_QTextCursor_QTextDocument_QRegularExpression_QTextCursor_int, Return, "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "expr", "qt.QRegularExpression"), new Param(c, "cursor", "qt.QTextCursor"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
     new Function(c, "findBlock", _n_findBlock0, None, Compiled, qt_QTextDocument_findBlock_QTextBlock_QTextDocument_int, Return, "qt.QTextBlock", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "pos", "int"), End),
     new Function(c, "findBlockByLineNumber", _n_findBlockByLineNumber0, None, Compiled, qt_QTextDocument_findBlockByLineNumber_QTextBlock_QTextDocument_int, Return, "qt.QTextBlock", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "lineNumber", "int"), End),
     new Function(c, "findBlockByNumber", _n_findBlockByNumber0, None, Compiled, qt_QTextDocument_findBlockByNumber_QTextBlock_QTextDocument_int, Return, "qt.QTextBlock", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "blockNumber", "int"), End),
@@ -1099,7 +1052,6 @@ addSymbols(
     // MISSING: pageSize ("QSizeF"; QTextDocument this)
     // MISSING: print (void; QTextDocument this, "QPagedPaintDevice *" printer)
     new Function(c, "resource", _n_resource0, None, Compiled, qt_QTextDocument_resource_QVariant_QTextDocument_int_QUrl, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "type", "int"), new Param(c, "name", "qt.QUrl"), End),
-    new Function(c, "resourceProvider", _n_resourceProvider0, None, Compiled, qt_QTextDocument_resourceProvider_int_QTextDocument, Return, "int", Parameters, new Param(c, "this", "qt.QTextDocument"), End),
     new Function(c, "revision", _n_revision0, None, Compiled, qt_QTextDocument_revision_int_QTextDocument, Return, "int", Parameters, new Param(c, "this", "qt.QTextDocument"), End),
     // MISSING: rootFrame ("QTextFrame *"; QTextDocument this)
     // PROP: setBaseUrl (void; QTextDocument this, QUrl url)
@@ -1117,7 +1069,6 @@ addSymbols(
     new Function(c, "setMetaInformation", _n_setMetaInformation0, None, Compiled, qt_QTextDocument_setMetaInformation_void_QTextDocument_int_string, Return, "void", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "info", "int"), new Param(c, "string", "string"), End),
     // MISSING: setPageSize (void; QTextDocument this, "const QSizeF &" size)
     new Function(c, "setPlainText", _n_setPlainText0, None, Compiled, qt_QTextDocument_setPlainText_void_QTextDocument_string, Return, "void", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "text", "string"), End),
-    new Function(c, "setResourceProvider", _n_setResourceProvider0, None, Compiled, qt_QTextDocument_setResourceProvider_void_QTextDocument_int, Return, "void", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "provider", "int"), End),
     new Function(c, "setSubScriptBaseline", _n_setSubScriptBaseline0, None, Compiled, qt_QTextDocument_setSubScriptBaseline_void_QTextDocument_double, Return, "void", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "baseline", "double"), End),
     new Function(c, "setSuperScriptBaseline", _n_setSuperScriptBaseline0, None, Compiled, qt_QTextDocument_setSuperScriptBaseline_void_QTextDocument_double, Return, "void", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "baseline", "double"), End),
     // PROP: setTextWidth (void; QTextDocument this, double width)
@@ -1142,8 +1093,6 @@ addSymbols(
     // MISSING: disconnectNotify (void; QTextDocument this, "const QMetaMethod &" signal) // protected
     _func[5] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QTextDocument_timerEvent_void_QTextDocument_QTimerEvent, Return, "void", Parameters, new Param(c, "this", "qt.QTextDocument"), new Param(c, "event", "qt.QTimerEvent"), End),
     // static functions
-    new Function(c, "defaultResourceProvider", _n_defaultResourceProvider0, None, Compiled, qt_QTextDocument_defaultResourceProvider_int, Return, "int", End),
-    new Function(c, "setDefaultResourceProvider", _n_setDefaultResourceProvider0, None, Compiled, qt_QTextDocument_setDefaultResourceProvider_void_int, Return, "void", Parameters, new Param(c, "provider", "int"), End),
     EndArguments);
 globalScope()->addSymbols(
     EndArguments);

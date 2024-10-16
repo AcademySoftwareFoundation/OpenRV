@@ -71,6 +71,7 @@ bool isMuQtObject(QObject* o)
 
 bool isMuQtLayoutItem(QLayoutItem* o) { return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false; }
 bool isMuQtPaintDevice(QPaintDevice* o) { return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false; }
+bool isMuQtIODeviceBase(QIODeviceBase* o) { return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false; }
 
 #if 0
 static MuQtQObjectFinalizer(void* obj, void* data)

@@ -17,6 +17,7 @@ FIND_PACKAGE(
              Quick
              QuickWidgets
              Svg
+             SvgWidgets
              Test
              UiTools
              WebChannel
@@ -158,6 +159,7 @@ SET(_autotypes
     NetworkReply
     Timer
     IODevice
+    IODeviceBase
     FileDevice
     Process
     ProcessEnvironment
@@ -178,7 +180,6 @@ SET(_autotypes
     Gradient
     Brush
     Matrix4x4
-    GenericMatrix
     Transform
     ConicalGradient
     LinearGradient
@@ -195,6 +196,8 @@ SET(_autotypes
     InputEvent
     MoveEvent
     PaintEvent
+    SinglePointEvent
+    PointerEvent
     ShortcutEvent
     ShowEvent
     TimerEvent
@@ -361,6 +364,7 @@ TARGET_LINK_LIBRARIES(
          Qt::Quick
          Qt::QuickWidgets
          Qt::Svg
+         Qt::SvgWidgets
          Qt::Test
          Qt::WebChannel
          Qt::WebEngineCore

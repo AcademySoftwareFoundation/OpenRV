@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -397,16 +398,6 @@ void qt_QWebEnginePage_download_void_QWebEnginePage_QUrl_string(Mu::Thread& NODE
     arg0->download(arg1, arg2);
 }
 
-void qt_QWebEnginePage_findText_void_QWebEnginePage_string_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subString, int param_options, int param_resultCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
-    const QString  arg1 = qstring(param_subString);
-    QWebEnginePage::FindFlags arg2 = (QWebEnginePage::FindFlags)(param_options);
-    const std::function<void (const QWebEngineFindTextResult & )>  arg3 = (&)(param_resultCallback);
-    arg0->findText(arg1, arg2, arg3);
-}
-
 Pointer qt_QWebEnginePage_history_QWebEngineHistory_QWebEnginePage(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -442,25 +433,6 @@ void qt_QWebEnginePage_replaceMisspelledWord_void_QWebEnginePage_string(Mu::Thre
     QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
     const QString  arg1 = qstring(param_replacement);
     arg0->replaceMisspelledWord(arg1);
-}
-
-void qt_QWebEnginePage_runJavaScript_void_QWebEnginePage_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_scriptSource, int param_resultCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
-    const QString  arg1 = qstring(param_scriptSource);
-    const std::function<void (const QVariant & )>  arg2 = (&)(param_resultCallback);
-    arg0->runJavaScript(arg1, arg2);
-}
-
-void qt_QWebEnginePage_runJavaScript_void_QWebEnginePage_string_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_scriptSource, int param_worldId, int param_resultCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
-    const QString  arg1 = qstring(param_scriptSource);
-    quint32 arg2 = (int)(param_worldId);
-    const std::function<void (const QVariant & )>  arg3 = (&)(param_resultCallback);
-    arg0->runJavaScript(arg1, arg2, arg3);
 }
 
 void qt_QWebEnginePage_save_void_QWebEnginePage_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_filePath, int param_format)
@@ -531,22 +503,6 @@ Pointer qt_QWebEnginePage_settings_QWebEngineSettings_QWebEnginePage(Mu::Thread&
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
     return makeqpointer<QWebEngineSettingsType>(c,arg0->settings(),"qt.QWebEngineSettings");
-}
-
-void qt_QWebEnginePage_toHtml_void_QWebEnginePage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_resultCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
-    const std::function<void (const QString & )>  arg1 = (&)(param_resultCallback);
-    arg0->toHtml(arg1);
-}
-
-void qt_QWebEnginePage_toPlainText_void_QWebEnginePage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_resultCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
-    const std::function<void (const QString & )>  arg1 = (&)(param_resultCallback);
-    arg0->toPlainText(arg1);
 }
 
 void qt_QWebEnginePage_triggerAction_void_QWebEnginePage_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_action, bool param_checked)
@@ -686,11 +642,6 @@ static NODE_IMPLEMENTATION(_n_download0, void)
     qt_QWebEnginePage_download_void_QWebEnginePage_QUrl_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
 }
 
-static NODE_IMPLEMENTATION(_n_findText0, void)
-{
-    qt_QWebEnginePage_findText_void_QWebEnginePage_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
-}
-
 static NODE_IMPLEMENTATION(_n_history0, Pointer)
 {
     NODE_RETURN(qt_QWebEnginePage_history_QWebEngineHistory_QWebEnginePage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -714,16 +665,6 @@ static NODE_IMPLEMENTATION(_n_profile0, Pointer)
 static NODE_IMPLEMENTATION(_n_replaceMisspelledWord0, void)
 {
     qt_QWebEnginePage_replaceMisspelledWord_void_QWebEnginePage_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_runJavaScript0, void)
-{
-    qt_QWebEnginePage_runJavaScript_void_QWebEnginePage_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
-}
-
-static NODE_IMPLEMENTATION(_n_runJavaScript1, void)
-{
-    qt_QWebEnginePage_runJavaScript_void_QWebEnginePage_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
 }
 
 static NODE_IMPLEMENTATION(_n_save0, void)
@@ -764,16 +705,6 @@ static NODE_IMPLEMENTATION(_n_setWebChannel0, void)
 static NODE_IMPLEMENTATION(_n_settings0, Pointer)
 {
     NODE_RETURN(qt_QWebEnginePage_settings_QWebEngineSettings_QWebEnginePage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_toHtml0, void)
-{
-    qt_QWebEnginePage_toHtml_void_QWebEnginePage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
-}
-
-static NODE_IMPLEMENTATION(_n_toPlainText0, void)
-{
-    qt_QWebEnginePage_toPlainText_void_QWebEnginePage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_triggerAction0, void)
@@ -886,7 +817,6 @@ addSymbols(
     // MISSING: contentsSize ("QSizeF"; QWebEnginePage this)
     new Function(c, "devToolsPage", _n_devToolsPage0, None, Compiled, qt_QWebEnginePage_devToolsPage_QWebEnginePage_QWebEnginePage, Return, "qt.QWebEnginePage", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),
     new Function(c, "download", _n_download0, None, Compiled, qt_QWebEnginePage_download_void_QWebEnginePage_QUrl_string, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "url", "qt.QUrl"), new Param(c, "filename", "string"), End),
-    new Function(c, "findText", _n_findText0, None, Compiled, qt_QWebEnginePage_findText_void_QWebEnginePage_string_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "subString", "string"), new Param(c, "options", "int", Value((int){})), new Param(c, "resultCallback", "int", Value((int)...)), End),
     // PROP: hasSelection (bool; QWebEnginePage this)
     new Function(c, "history", _n_history0, None, Compiled, qt_QWebEnginePage_history_QWebEngineHistory_QWebEnginePage, Return, "qt.QWebEngineHistory", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),
     // PROP: icon (QIcon; QWebEnginePage this)
@@ -906,8 +836,6 @@ addSymbols(
     // PROP: renderProcessPid (int64; QWebEnginePage this)
     new Function(c, "replaceMisspelledWord", _n_replaceMisspelledWord0, None, Compiled, qt_QWebEnginePage_replaceMisspelledWord_void_QWebEnginePage_string, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "replacement", "string"), End),
     // PROP: requestedUrl (QUrl; QWebEnginePage this)
-    new Function(c, "runJavaScript", _n_runJavaScript0, None, Compiled, qt_QWebEnginePage_runJavaScript_void_QWebEnginePage_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "scriptSource", "string"), new Param(c, "resultCallback", "int"), End),
-    new Function(c, "runJavaScript", _n_runJavaScript1, None, Compiled, qt_QWebEnginePage_runJavaScript_void_QWebEnginePage_string_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "scriptSource", "string"), new Param(c, "worldId", "int", Value((int)0)), new Param(c, "resultCallback", "int", Value((int){})), End),
     new Function(c, "save", _n_save0, None, Compiled, qt_QWebEnginePage_save_void_QWebEnginePage_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "filePath", "string"), new Param(c, "format", "int", Value((int)QWebEngineDownloadRequest::MimeHtmlSaveFormat)), End),
     // MISSING: scripts ("QWebEngineScriptCollection &"; QWebEnginePage this)
     // PROP: scrollPosition (QPointF; QWebEnginePage this)
@@ -927,8 +855,6 @@ addSymbols(
     // PROP: setZoomFactor (void; QWebEnginePage this, double factor)
     new Function(c, "settings", _n_settings0, None, Compiled, qt_QWebEnginePage_settings_QWebEngineSettings_QWebEnginePage, Return, "qt.QWebEngineSettings", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),
     // PROP: title (string; QWebEnginePage this)
-    new Function(c, "toHtml", _n_toHtml0, None, Compiled, qt_QWebEnginePage_toHtml_void_QWebEnginePage_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "resultCallback", "int"), End),
-    new Function(c, "toPlainText", _n_toPlainText0, None, Compiled, qt_QWebEnginePage_toPlainText_void_QWebEnginePage_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "resultCallback", "int"), End),
     _func[0] = new MemberFunction(c, "triggerAction", _n_triggerAction0, None, Compiled, qt_QWebEnginePage_triggerAction_void_QWebEnginePage_int_bool, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "action", "int"), new Param(c, "checked", "bool"), End),
     // PROP: url (QUrl; QWebEnginePage this)
     new Function(c, "webChannel", _n_webChannel0, None, Compiled, qt_QWebEnginePage_webChannel_QWebChannel_QWebEnginePage, Return, "qt.QWebChannel", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),

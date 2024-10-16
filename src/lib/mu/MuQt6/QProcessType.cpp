@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -397,13 +398,6 @@ Pointer qt_QProcess_arguments_stringBSB_ESB__QProcess(Mu::Thread& NODE_THREAD, P
     return makestringlist(c,arg0->arguments());
 }
 
-int qt_QProcess_childProcessModifier_int_QProcess(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QProcess* arg0 = object<QProcess>(param_this);
-    return int(arg0->childProcessModifier());
-}
-
 void qt_QProcess_closeReadChannel_void_QProcess_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_channel)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -502,14 +496,6 @@ void qt_QProcess_setArguments_void_QProcess_stringBSB_ESB_(Mu::Thread& NODE_THRE
     QProcess* arg0 = object<QProcess>(param_this);
     const QStringList  arg1 = qstringlist(param_arguments);
     arg0->setArguments(arg1);
-}
-
-void qt_QProcess_setChildProcessModifier_void_QProcess_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_modifier)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QProcess* arg0 = object<QProcess>(param_this);
-    const std::function<void ()>  arg1 = (&)(param_modifier);
-    arg0->setChildProcessModifier(arg1);
 }
 
 void qt_QProcess_setInputChannelMode_void_QProcess_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
@@ -794,11 +780,6 @@ static NODE_IMPLEMENTATION(_n_arguments0, Pointer)
     NODE_RETURN(qt_QProcess_arguments_stringBSB_ESB__QProcess(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_childProcessModifier0, int)
-{
-    NODE_RETURN(qt_QProcess_childProcessModifier_int_QProcess(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_closeReadChannel0, void)
 {
     qt_QProcess_closeReadChannel_void_QProcess_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
@@ -867,11 +848,6 @@ static NODE_IMPLEMENTATION(_n_readChannel0, int)
 static NODE_IMPLEMENTATION(_n_setArguments0, void)
 {
     qt_QProcess_setArguments_void_QProcess_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_setChildProcessModifier0, void)
-{
-    qt_QProcess_setChildProcessModifier_void_QProcess_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_setInputChannelMode0, void)
@@ -1117,7 +1093,6 @@ addSymbols(
     // member functions
     new Function(c, "QProcess", _n_QProcess0, None, Compiled, qt_QProcess_QProcess_QProcess_QProcess_QObject, Return, "qt.QProcess", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "parent", "qt.QObject"), End),
     new Function(c, "arguments", _n_arguments0, None, Compiled, qt_QProcess_arguments_stringBSB_ESB__QProcess, Return, "string[]", Parameters, new Param(c, "this", "qt.QProcess"), End),
-    new Function(c, "childProcessModifier", _n_childProcessModifier0, None, Compiled, qt_QProcess_childProcessModifier_int_QProcess, Return, "int", Parameters, new Param(c, "this", "qt.QProcess"), End),
     new Function(c, "closeReadChannel", _n_closeReadChannel0, None, Compiled, qt_QProcess_closeReadChannel_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "channel", "int"), End),
     new Function(c, "closeWriteChannel", _n_closeWriteChannel0, None, Compiled, qt_QProcess_closeWriteChannel_void_QProcess, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), End),
     new Function(c, "error", _n_error0, None, Compiled, qt_QProcess_error_int_QProcess, Return, "int", Parameters, new Param(c, "this", "qt.QProcess"), End),
@@ -1132,20 +1107,19 @@ addSymbols(
     new Function(c, "readAllStandardOutput", _n_readAllStandardOutput0, None, Compiled, qt_QProcess_readAllStandardOutput_QByteArray_QProcess, Return, "qt.QByteArray", Parameters, new Param(c, "this", "qt.QProcess"), End),
     new Function(c, "readChannel", _n_readChannel0, None, Compiled, qt_QProcess_readChannel_int_QProcess, Return, "int", Parameters, new Param(c, "this", "qt.QProcess"), End),
     new Function(c, "setArguments", _n_setArguments0, None, Compiled, qt_QProcess_setArguments_void_QProcess_stringBSB_ESB_, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "arguments", "string[]"), End),
-    new Function(c, "setChildProcessModifier", _n_setChildProcessModifier0, None, Compiled, qt_QProcess_setChildProcessModifier_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "modifier", "int"), End),
     new Function(c, "setInputChannelMode", _n_setInputChannelMode0, None, Compiled, qt_QProcess_setInputChannelMode_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int"), End),
     new Function(c, "setProcessChannelMode", _n_setProcessChannelMode0, None, Compiled, qt_QProcess_setProcessChannelMode_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int"), End),
     new Function(c, "setProcessEnvironment", _n_setProcessEnvironment0, None, Compiled, qt_QProcess_setProcessEnvironment_void_QProcess_QProcessEnvironment, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "environment", "qt.QProcessEnvironment"), End),
     new Function(c, "setProgram", _n_setProgram0, None, Compiled, qt_QProcess_setProgram_void_QProcess_string, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "program", "string"), End),
     new Function(c, "setReadChannel", _n_setReadChannel0, None, Compiled, qt_QProcess_setReadChannel_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "channel", "int"), End),
-    new Function(c, "setStandardErrorFile", _n_setStandardErrorFile0, None, Compiled, qt_QProcess_setStandardErrorFile_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "fileName", "string"), new Param(c, "mode", "int", Value((int)Truncate)), End),
+    new Function(c, "setStandardErrorFile", _n_setStandardErrorFile0, None, Compiled, qt_QProcess_setStandardErrorFile_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "fileName", "string"), new Param(c, "mode", "int", Value((int)QIODeviceBase::Truncate)), End),
     new Function(c, "setStandardInputFile", _n_setStandardInputFile0, None, Compiled, qt_QProcess_setStandardInputFile_void_QProcess_string, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "fileName", "string"), End),
-    new Function(c, "setStandardOutputFile", _n_setStandardOutputFile0, None, Compiled, qt_QProcess_setStandardOutputFile_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "fileName", "string"), new Param(c, "mode", "int", Value((int)Truncate)), End),
+    new Function(c, "setStandardOutputFile", _n_setStandardOutputFile0, None, Compiled, qt_QProcess_setStandardOutputFile_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "fileName", "string"), new Param(c, "mode", "int", Value((int)QIODeviceBase::Truncate)), End),
     new Function(c, "setStandardOutputProcess", _n_setStandardOutputProcess0, None, Compiled, qt_QProcess_setStandardOutputProcess_void_QProcess_QProcess, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "destination", "qt.QProcess"), End),
     new Function(c, "setWorkingDirectory", _n_setWorkingDirectory0, None, Compiled, qt_QProcess_setWorkingDirectory_void_QProcess_string, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "dir", "string"), End),
-    new Function(c, "start", _n_start0, None, Compiled, qt_QProcess_start_void_QProcess_string_stringBSB_ESB__int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "program", "string"), new Param(c, "arguments", "string[]"), new Param(c, "mode", "int", Value((int)ReadWrite)), End),
-    new Function(c, "start", _n_start1, None, Compiled, qt_QProcess_start_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int", Value((int)ReadWrite)), End),
-    new Function(c, "startCommand", _n_startCommand0, None, Compiled, qt_QProcess_startCommand_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "command", "string"), new Param(c, "mode", "int", Value((int)ReadWrite)), End),
+    new Function(c, "start", _n_start0, None, Compiled, qt_QProcess_start_void_QProcess_string_stringBSB_ESB__int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "program", "string"), new Param(c, "arguments", "string[]"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
+    new Function(c, "start", _n_start1, None, Compiled, qt_QProcess_start_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
+    new Function(c, "startCommand", _n_startCommand0, None, Compiled, qt_QProcess_startCommand_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "command", "string"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
     // MISSING: startDetached (bool; QProcess this, "qint64 *" pid)
     new Function(c, "state", _n_state0, None, Compiled, qt_QProcess_state_int_QProcess, Return, "int", Parameters, new Param(c, "this", "qt.QProcess"), End),
     new Function(c, "waitForFinished", _n_waitForFinished0, None, Compiled, qt_QProcess_waitForFinished_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "msecs", "int", Value((int)30000)), End),
@@ -1154,7 +1128,7 @@ addSymbols(
     _func[0] = new MemberFunction(c, "bytesToWrite", _n_bytesToWrite0, None, Compiled, qt_QProcess_bytesToWrite_int64_QProcess, Return, "int64", Parameters, new Param(c, "this", "qt.QProcess"), End),
     _func[1] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QProcess_close_void_QProcess, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), End),
     _func[2] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QProcess_isSequential_bool_QProcess, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), End),
-    _func[3] = new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QProcess_open_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int", Value((int)ReadWrite)), End),
+    _func[3] = new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QProcess_open_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
     _func[4] = new MemberFunction(c, "waitForBytesWritten", _n_waitForBytesWritten0, None, Compiled, qt_QProcess_waitForBytesWritten_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "msecs", "int", Value((int)30000)), End),
     _func[5] = new MemberFunction(c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled, qt_QProcess_waitForReadyRead_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "msecs", "int", Value((int)30000)), End),
     new Function(c, "setProcessState", _n_setProcessState0, None, Compiled, qt_QProcess_setProcessState_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "state", "int"), End),

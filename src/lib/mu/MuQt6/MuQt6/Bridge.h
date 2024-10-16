@@ -21,7 +21,7 @@ const char* qtType(const Mu::Type* t);
 
 void populate(Class*, const QMetaObject&, const char** propExclusions = 0);
 
-QGenericArgument argument(STLVector<Pointer>::Type& gcCache, const Type* T, Value& v, QString& s, QVariant& qv);
+QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache, const Type* T, Value& v, QString& s, QVariant& qv);
 
 } // Mu
 

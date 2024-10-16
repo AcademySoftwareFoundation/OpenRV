@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QSizeType.h>
 #include <MuQt6/QDateType.h>
@@ -227,13 +228,6 @@ Pointer qt_QVariant_QVariant_QVariant_QVariant_QRect(Mu::Thread& NODE_THREAD, Po
     QRect arg1 = getqtype<QRectType>(param_val);
     setqtype<QVariantType>(param_this,QVariant(arg1));
     return param_this;
-}
-
-bool qt_QVariant_canView_bool_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QVariant& arg0 = getqtype<QVariantType>(param_this);
-    return arg0.canView();
 }
 
 void qt_QVariant_clear_void_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -486,11 +480,6 @@ static NODE_IMPLEMENTATION(_n_QVariant40, Pointer)
     NODE_RETURN(qt_QVariant_QVariant_QVariant_QVariant_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_canView0, bool)
-{
-    NODE_RETURN(qt_QVariant_canView_bool_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_clear0, void)
 {
     qt_QVariant_clear_void_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
@@ -716,7 +705,6 @@ addSymbols(
     new Function(c, "QVariant", _n_QVariant40, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_QRect, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "qt.QRect"), End),
     // MISSING: QVariant (QVariant; QVariant this, QVariant p)
     // MISSING: QVariant (QVariant; QVariant this, "QVariant & &" other)
-    new Function(c, "canView", _n_canView0, None, Compiled, qt_QVariant_canView_bool_QVariant, Return, "bool", Parameters, new Param(c, "this", "qt.QVariant"), End),
     new Function(c, "clear", _n_clear0, None, Compiled, qt_QVariant_clear_void_QVariant, Return, "void", Parameters, new Param(c, "this", "qt.QVariant"), End),
     // MISSING: constData ("const void *"; QVariant this)
     // MISSING: convert (bool; QVariant this, "QMetaType" targetType)

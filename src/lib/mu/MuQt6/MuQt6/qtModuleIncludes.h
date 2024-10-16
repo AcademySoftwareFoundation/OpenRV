@@ -1,6 +1,7 @@
+#include <MuQt6/QPointerEventType.h>
+#include <MuQt6/QSinglePointEventType.h>
 #include <MuQt6/QStringConverterType.h>
 #include <MuQt6/QMatrix4x4Type.h>
-#include <MuQt6/QGenericMatrixType.h>
 #include <MuQt6/QScreenType.h>
 #include <MuQt6/QRegularExpressionType.h>
 #include <MuQt6/QColorType.h>
@@ -54,6 +55,7 @@
 #include <MuQt6/QWebChannelType.h>
 #include <MuQt6/QPaintEventType.h>
 #include <MuQt6/QIODeviceType.h>
+#include <MuQt6/QIODeviceBaseType.h>
 #include <MuQt6/QCompleterType.h>
 #include <MuQt6/QHelpEventType.h>
 #include <MuQt6/QQuickItemType.h>

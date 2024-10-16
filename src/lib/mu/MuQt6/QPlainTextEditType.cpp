@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1508,8 +1509,8 @@ addSymbols(
     new Function(c, "document", _n_document0, None, Compiled, qt_QPlainTextEdit_document_QTextDocument_QPlainTextEdit, Return, "qt.QTextDocument", Parameters, new Param(c, "this", "qt.QPlainTextEdit"), End),
     // PROP: documentTitle (string; QPlainTextEdit this)
     new Function(c, "ensureCursorVisible", _n_ensureCursorVisible0, None, Compiled, qt_QPlainTextEdit_ensureCursorVisible_void_QPlainTextEdit, Return, "void", Parameters, new Param(c, "this", "qt.QPlainTextEdit"), End),
-    new Function(c, "find", _n_find0, None, Compiled, qt_QPlainTextEdit_find_bool_QPlainTextEdit_string_int, Return, "bool", Parameters, new Param(c, "this", "qt.QPlainTextEdit"), new Param(c, "exp", "string"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
-    new Function(c, "find", _n_find1, None, Compiled, qt_QPlainTextEdit_find_bool_QPlainTextEdit_QRegularExpression_int, Return, "bool", Parameters, new Param(c, "this", "qt.QPlainTextEdit"), new Param(c, "exp", "qt.QRegularExpression"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
+    new Function(c, "find", _n_find0, None, Compiled, qt_QPlainTextEdit_find_bool_QPlainTextEdit_string_int, Return, "bool", Parameters, new Param(c, "this", "qt.QPlainTextEdit"), new Param(c, "exp", "string"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+    new Function(c, "find", _n_find1, None, Compiled, qt_QPlainTextEdit_find_bool_QPlainTextEdit_QRegularExpression_int, Return, "bool", Parameters, new Param(c, "this", "qt.QPlainTextEdit"), new Param(c, "exp", "qt.QRegularExpression"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
     // PROP: isReadOnly (bool; QPlainTextEdit this)
     // PROP: isUndoRedoEnabled (bool; QPlainTextEdit this)
     // PROP: lineWrapMode (flags QPlainTextEdit::LineWrapMode; QPlainTextEdit this)

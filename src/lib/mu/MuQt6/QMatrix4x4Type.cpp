@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QRectFType.h>
 #include <MuQt6/QPointFType.h>
@@ -431,8 +432,6 @@ addSymbols(
     EndArguments);
 globalScope()->addSymbols(
     new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorBang_EQ__bool_QMatrix4x4_QMatrix4x4, Return, "bool", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
-    // MISSING:  ("const float &"; QMatrix4x4 this, int row, int column)
-    // MISSING:  ("float &"; QMatrix4x4 this, int row, int column)
     new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorPlus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
     new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorMinus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
     // MISSING: /= (QMatrix4x4; QMatrix4x4 this, "float" divisor)

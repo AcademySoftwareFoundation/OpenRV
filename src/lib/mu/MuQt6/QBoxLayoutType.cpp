@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1073,14 +1074,14 @@ addSymbols(
     new Function(c, "addSpacing", _n_addSpacing0, None, Compiled, qt_QBoxLayout_addSpacing_void_QBoxLayout_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "size", "int"), End),
     new Function(c, "addStretch", _n_addStretch0, None, Compiled, qt_QBoxLayout_addStretch_void_QBoxLayout_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "stretch", "int", Value((int)0)), End),
     new Function(c, "addStrut", _n_addStrut0, None, Compiled, qt_QBoxLayout_addStrut_void_QBoxLayout_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "size", "int"), End),
-    new Function(c, "addWidget", _n_addWidget0, None, Compiled, qt_QBoxLayout_addWidget_void_QBoxLayout_QWidget_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "widget", "qt.QWidget"), new Param(c, "stretch", "int", Value((int)0)), new Param(c, "alignment", "int", Value((int)Qt::Alignment)), End),
+    new Function(c, "addWidget", _n_addWidget0, None, Compiled, qt_QBoxLayout_addWidget_void_QBoxLayout_QWidget_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "widget", "qt.QWidget"), new Param(c, "stretch", "int", Value((int)0)), new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
     new Function(c, "direction", _n_direction0, None, Compiled, qt_QBoxLayout_direction_int_QBoxLayout, Return, "int", Parameters, new Param(c, "this", "qt.QBoxLayout"), End),
     new Function(c, "insertItem", _n_insertItem0, None, Compiled, qt_QBoxLayout_insertItem_void_QBoxLayout_int_QLayoutItem, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "item", "qt.QLayoutItem"), End),
     new Function(c, "insertLayout", _n_insertLayout0, None, Compiled, qt_QBoxLayout_insertLayout_void_QBoxLayout_int_QLayout_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "layout", "qt.QLayout"), new Param(c, "stretch", "int", Value((int)0)), End),
     // MISSING: insertSpacerItem (void; QBoxLayout this, int index, "QSpacerItem *" spacerItem)
     new Function(c, "insertSpacing", _n_insertSpacing0, None, Compiled, qt_QBoxLayout_insertSpacing_void_QBoxLayout_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "size", "int"), End),
     new Function(c, "insertStretch", _n_insertStretch0, None, Compiled, qt_QBoxLayout_insertStretch_void_QBoxLayout_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "stretch", "int", Value((int)0)), End),
-    new Function(c, "insertWidget", _n_insertWidget0, None, Compiled, qt_QBoxLayout_insertWidget_void_QBoxLayout_int_QWidget_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "widget", "qt.QWidget"), new Param(c, "stretch", "int", Value((int)0)), new Param(c, "alignment", "int", Value((int)Qt::Alignment)), End),
+    new Function(c, "insertWidget", _n_insertWidget0, None, Compiled, qt_QBoxLayout_insertWidget_void_QBoxLayout_int_QWidget_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "widget", "qt.QWidget"), new Param(c, "stretch", "int", Value((int)0)), new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
     new Function(c, "setDirection", _n_setDirection0, None, Compiled, qt_QBoxLayout_setDirection_void_QBoxLayout_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "direction", "int"), End),
     new Function(c, "setStretch", _n_setStretch0, None, Compiled, qt_QBoxLayout_setStretch_void_QBoxLayout_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "index", "int"), new Param(c, "stretch", "int"), End),
     new Function(c, "setStretchFactor", _n_setStretchFactor0, None, Compiled, qt_QBoxLayout_setStretchFactor_bool_QBoxLayout_QWidget_int, Return, "bool", Parameters, new Param(c, "this", "qt.QBoxLayout"), new Param(c, "widget", "qt.QWidget"), new Param(c, "stretch", "int"), End),

@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 //
 // Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
@@ -97,36 +98,11 @@ Pointer qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_string(Mu::Thread& NODE_THREA
     return param_this;
 }
 
-Pointer qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QFileDevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_file)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileDevice  arg1 = object<QFileDevice>(param_file);
-    setqtype<QFileInfoType>(param_this,QFileInfo(arg1));
-    return param_this;
-}
-
 Pointer qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dir, Pointer param_file)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QDir  arg1 = getqtype<QDirType>(param_dir);
     const QString  arg2 = qstring(param_file);
-    setqtype<QFileInfoType>(param_this,QFileInfo(arg1, arg2));
-    return param_this;
-}
-
-Pointer qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_file)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg1 = (&)(param_file);
-    setqtype<QFileInfoType>(param_this,QFileInfo(arg1));
-    return param_this;
-}
-
-Pointer qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dir, int param_file)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QDir  arg1 = getqtype<QDirType>(param_dir);
-    const std::filesystem::path  arg2 = (&)(param_file);
     setqtype<QFileInfoType>(param_this,QFileInfo(arg1, arg2));
     return param_this;
 }
@@ -242,62 +218,6 @@ Pointer qt_QFileInfo_fileTime_QDateTime_QFileInfo_int(Mu::Thread& NODE_THREAD, P
     const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
     QFile::FileTime arg1 = (QFile::FileTime)(param_time);
     return makeqtype<QDateTimeType>(c,arg0.fileTime(arg1),"qt.QDateTime");
-}
-
-int qt_QFileInfo_filesystemAbsoluteFilePath_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemAbsoluteFilePath());
-}
-
-int qt_QFileInfo_filesystemAbsolutePath_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemAbsolutePath());
-}
-
-int qt_QFileInfo_filesystemCanonicalFilePath_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemCanonicalFilePath());
-}
-
-int qt_QFileInfo_filesystemCanonicalPath_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemCanonicalPath());
-}
-
-int qt_QFileInfo_filesystemFilePath_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemFilePath());
-}
-
-int qt_QFileInfo_filesystemJunctionTarget_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemJunctionTarget());
-}
-
-int qt_QFileInfo_filesystemPath_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemPath());
-}
-
-int qt_QFileInfo_filesystemSymLinkTarget_int_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    return int(arg0.filesystemSymLinkTarget());
 }
 
 Pointer qt_QFileInfo_group_string_QFileInfo(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -523,15 +443,6 @@ void qt_QFileInfo_setFile_void_QFileInfo_string(Mu::Thread& NODE_THREAD, Pointer
     setqtype<QFileInfoType>(param_this,arg0);
 }
 
-void qt_QFileInfo_setFile_void_QFileInfo_QFileDevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_file)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    const QFileDevice  arg1 = object<QFileDevice>(param_file);
-    arg0.setFile(arg1);
-    setqtype<QFileInfoType>(param_this,arg0);
-}
-
 void qt_QFileInfo_setFile_void_QFileInfo_QDir_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dir, Pointer param_file)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -539,15 +450,6 @@ void qt_QFileInfo_setFile_void_QFileInfo_QDir_string(Mu::Thread& NODE_THREAD, Po
     const QDir  arg1 = getqtype<QDirType>(param_dir);
     const QString  arg2 = qstring(param_file);
     arg0.setFile(arg1, arg2);
-    setqtype<QFileInfoType>(param_this,arg0);
-}
-
-void qt_QFileInfo_setFile_void_QFileInfo_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_file)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFileInfo& arg0 = getqtype<QFileInfoType>(param_this);
-    const std::filesystem::path  arg1 = (&)(param_file);
-    arg0.setFile(arg1);
     setqtype<QFileInfoType>(param_this,arg0);
 }
 
@@ -609,22 +511,7 @@ static NODE_IMPLEMENTATION(_n_QFileInfo1, Pointer)
 
 static NODE_IMPLEMENTATION(_n_QFileInfo2, Pointer)
 {
-    NODE_RETURN(qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QFileDevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_QFileInfo3, Pointer)
-{
     NODE_RETURN(qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_QFileInfo4, Pointer)
-{
-    NODE_RETURN(qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_QFileInfo5, Pointer)
-{
-    NODE_RETURN(qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_absoluteDir0, Pointer)
@@ -705,46 +592,6 @@ static NODE_IMPLEMENTATION(_n_filePath0, Pointer)
 static NODE_IMPLEMENTATION(_n_fileTime0, Pointer)
 {
     NODE_RETURN(qt_QFileInfo_fileTime_QDateTime_QFileInfo_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemAbsoluteFilePath0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemAbsoluteFilePath_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemAbsolutePath0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemAbsolutePath_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemCanonicalFilePath0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemCanonicalFilePath_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemCanonicalPath0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemCanonicalPath_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemFilePath0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemFilePath_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemJunctionTarget0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemJunctionTarget_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemPath0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemPath_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemSymLinkTarget0, int)
-{
-    NODE_RETURN(qt_QFileInfo_filesystemSymLinkTarget_int_QFileInfo(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_group0, Pointer)
@@ -904,17 +751,7 @@ static NODE_IMPLEMENTATION(_n_setFile0, void)
 
 static NODE_IMPLEMENTATION(_n_setFile1, void)
 {
-    qt_QFileInfo_setFile_void_QFileInfo_QFileDevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_setFile2, void)
-{
     qt_QFileInfo_setFile_void_QFileInfo_QDir_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_setFile3, void)
-{
-    qt_QFileInfo_setFile_void_QFileInfo_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_size0, int64)
@@ -987,10 +824,7 @@ addSymbols(
     // member functions
     new Function(c, "QFileInfo", _n_QFileInfo0, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "QFileInfo", _n_QFileInfo1, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_string, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "file", "string"), End),
-    new Function(c, "QFileInfo", _n_QFileInfo2, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QFileDevice, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "file", "qt.QFileDevice"), End),
-    new Function(c, "QFileInfo", _n_QFileInfo3, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_string, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "dir", "qt.QDir"), new Param(c, "file", "string"), End),
-    new Function(c, "QFileInfo", _n_QFileInfo4, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_int, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "file", "int"), End),
-    new Function(c, "QFileInfo", _n_QFileInfo5, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_int, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "dir", "qt.QDir"), new Param(c, "file", "int"), End),
+    new Function(c, "QFileInfo", _n_QFileInfo2, None, Compiled, qt_QFileInfo_QFileInfo_QFileInfo_QFileInfo_QDir_string, Return, "qt.QFileInfo", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "dir", "qt.QDir"), new Param(c, "file", "string"), End),
     // MISSING: QFileInfo (QFileInfo; QFileInfo this, QFileInfo fileinfo)
     new Function(c, "absoluteDir", _n_absoluteDir0, None, Compiled, qt_QFileInfo_absoluteDir_QDir_QFileInfo, Return, "qt.QDir", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "absoluteFilePath", _n_absoluteFilePath0, None, Compiled, qt_QFileInfo_absoluteFilePath_string_QFileInfo, Return, "string", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
@@ -1008,14 +842,6 @@ addSymbols(
     new Function(c, "fileName", _n_fileName0, None, Compiled, qt_QFileInfo_fileName_string_QFileInfo, Return, "string", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "filePath", _n_filePath0, None, Compiled, qt_QFileInfo_filePath_string_QFileInfo, Return, "string", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "fileTime", _n_fileTime0, None, Compiled, qt_QFileInfo_fileTime_QDateTime_QFileInfo_int, Return, "qt.QDateTime", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "time", "int"), End),
-    new Function(c, "filesystemAbsoluteFilePath", _n_filesystemAbsoluteFilePath0, None, Compiled, qt_QFileInfo_filesystemAbsoluteFilePath_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemAbsolutePath", _n_filesystemAbsolutePath0, None, Compiled, qt_QFileInfo_filesystemAbsolutePath_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemCanonicalFilePath", _n_filesystemCanonicalFilePath0, None, Compiled, qt_QFileInfo_filesystemCanonicalFilePath_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemCanonicalPath", _n_filesystemCanonicalPath0, None, Compiled, qt_QFileInfo_filesystemCanonicalPath_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemFilePath", _n_filesystemFilePath0, None, Compiled, qt_QFileInfo_filesystemFilePath_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemJunctionTarget", _n_filesystemJunctionTarget0, None, Compiled, qt_QFileInfo_filesystemJunctionTarget_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemPath", _n_filesystemPath0, None, Compiled, qt_QFileInfo_filesystemPath_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
-    new Function(c, "filesystemSymLinkTarget", _n_filesystemSymLinkTarget0, None, Compiled, qt_QFileInfo_filesystemSymLinkTarget_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "group", _n_group0, None, Compiled, qt_QFileInfo_group_string_QFileInfo, Return, "string", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "groupId", _n_groupId0, None, Compiled, qt_QFileInfo_groupId_int_QFileInfo, Return, "int", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "isAbsolute", _n_isAbsolute0, None, Compiled, qt_QFileInfo_isAbsolute_bool_QFileInfo, Return, "bool", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
@@ -1047,9 +873,7 @@ addSymbols(
     new Function(c, "refresh", _n_refresh0, None, Compiled, qt_QFileInfo_refresh_void_QFileInfo, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "setCaching", _n_setCaching0, None, Compiled, qt_QFileInfo_setCaching_void_QFileInfo_bool, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "enable", "bool"), End),
     new Function(c, "setFile", _n_setFile0, None, Compiled, qt_QFileInfo_setFile_void_QFileInfo_string, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "file", "string"), End),
-    new Function(c, "setFile", _n_setFile1, None, Compiled, qt_QFileInfo_setFile_void_QFileInfo_QFileDevice, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "file", "qt.QFileDevice"), End),
-    new Function(c, "setFile", _n_setFile2, None, Compiled, qt_QFileInfo_setFile_void_QFileInfo_QDir_string, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "dir", "qt.QDir"), new Param(c, "file", "string"), End),
-    new Function(c, "setFile", _n_setFile3, None, Compiled, qt_QFileInfo_setFile_void_QFileInfo_int, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "file", "int"), End),
+    new Function(c, "setFile", _n_setFile1, None, Compiled, qt_QFileInfo_setFile_void_QFileInfo_QDir_string, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), new Param(c, "dir", "qt.QDir"), new Param(c, "file", "string"), End),
     new Function(c, "size", _n_size0, None, Compiled, qt_QFileInfo_size_int64_QFileInfo, Return, "int64", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "stat", _n_stat0, None, Compiled, qt_QFileInfo_stat_void_QFileInfo, Return, "void", Parameters, new Param(c, "this", "qt.QFileInfo"), End),
     new Function(c, "suffix", _n_suffix0, None, Compiled, qt_QFileInfo_suffix_string_QFileInfo, Return, "string", Parameters, new Param(c, "this", "qt.QFileInfo"), End),

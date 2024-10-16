@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1070,7 +1071,7 @@ QInputDialogType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QInputDialog", _n_QInputDialog0, None, Compiled, qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int, Return, "qt.QInputDialog", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QInputDialog", _n_QInputDialog0, None, Compiled, qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int, Return, "qt.QInputDialog", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags())), End),
     new Function(c, "cancelButtonText", _n_cancelButtonText0, None, Compiled, qt_QInputDialog_cancelButtonText_string_QInputDialog, Return, "string", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
     new Function(c, "comboBoxItems", _n_comboBoxItems0, None, Compiled, qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog, Return, "string[]", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
     new Function(c, "doubleDecimals", _n_doubleDecimals0, None, Compiled, qt_QInputDialog_doubleDecimals_int_QInputDialog, Return, "int", Parameters, new Param(c, "this", "qt.QInputDialog"), End),

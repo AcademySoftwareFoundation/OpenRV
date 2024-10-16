@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1213,14 +1214,6 @@ Pointer qt_QWidget_nextInFocusChain_QWidget_QWidget(Mu::Thread& NODE_THREAD, Poi
     return makeinstance<QWidgetType>(c, arg0->nextInFocusChain(), "qt.QWidget");
 }
 
-void qt_QWidget_WindowFlags_void_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWidget* arg0 = object<QWidget>(param_this);
-    Qt::WindowFlags arg1 = (Qt::WindowFlags)(param_flags);
-    arg0->WindowFlags(arg1);
-}
-
 Pointer qt_QWidget_parentWidget_QWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -2233,11 +2226,6 @@ static NODE_IMPLEMENTATION(_n_nextInFocusChain0, Pointer)
     NODE_RETURN(qt_QWidget_nextInFocusChain_QWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_WindowFlags0, void)
-{
-    qt_QWidget_WindowFlags_void_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
-}
-
 static NODE_IMPLEMENTATION(_n_parentWidget0, Pointer)
 {
     NODE_RETURN(qt_QWidget_parentWidget_QWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -2709,26 +2697,6 @@ static NODE_IMPLEMENTATION(_n_QWidget_setWindowFlags_void_int, void)
     arg0->setWindowFlags(Qt::WindowFlags(NODE_ARG(0, int)));
 }
 
-static NODE_IMPLEMENTATION(_n_QWidget_getContentsMargins, Pointer)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWidget* arg0 = object<QWidget>(NODE_ARG(0,Pointer));
-
-    MuLangContext::TypeVector types(4);
-    const Type* t = c->intType();
-    types[0] = t;
-    types[1] = t;
-    types[2] = t;
-    types[3] = t;
-
-    struct Tuple { int a, b, c, d; };
-    
-    ClassInstance* obj = ClassInstance::allocate(c->tupleType(types));
-    Tuple* tuple = (Tuple*)obj->structure();
-    arg0->getContentsMargins(&tuple->a, &tuple->b, &tuple->c, &tuple->d);
-    NODE_RETURN(obj);
-}
-
 void
 QWidgetType::load()
 {
@@ -2770,7 +2738,7 @@ QWidgetType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QWidget", _n_QWidget0, None, Compiled, qt_QWidget_QWidget_QWidget_QWidget_QWidget_int, Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QWidget", _n_QWidget0, None, Compiled, qt_QWidget_QWidget_QWidget_QWidget_QWidget_int, Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
     // PROP: acceptDrops (bool; QWidget this)
     // PROP: accessibleDescription (string; QWidget this)
     // PROP: accessibleName (string; QWidget this)
@@ -2818,7 +2786,7 @@ addSymbols(
     // PROP: frameSize (QSize; QWidget this)
     // PROP: geometry (QRect; QWidget this)
     new Function(c, "grab", _n_grab0, None, Compiled, qt_QWidget_grab_QPixmap_QWidget_QRect, Return, "qt.QPixmap", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "rectangle", "qt.QRect"), End),
-    new Function(c, "grabGesture", _n_grabGesture0, None, Compiled, qt_QWidget_grabGesture_void_QWidget_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "gesture", "int"), new Param(c, "flags", "int", Value((int)Qt::GestureFlags)), End),
+    new Function(c, "grabGesture", _n_grabGesture0, None, Compiled, qt_QWidget_grabGesture_void_QWidget_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "gesture", "int"), new Param(c, "flags", "int", Value((int)Qt::GestureFlags())), End),
     new Function(c, "grabKeyboard", _n_grabKeyboard0, None, Compiled, qt_QWidget_grabKeyboard_void_QWidget, Return, "void", Parameters, new Param(c, "this", "qt.QWidget"), End),
     new Function(c, "grabMouse", _n_grabMouse0, None, Compiled, qt_QWidget_grabMouse_void_QWidget, Return, "void", Parameters, new Param(c, "this", "qt.QWidget"), End),
     new Function(c, "grabMouse", _n_grabMouse1, None, Compiled, qt_QWidget_grabMouse_void_QWidget_QCursor, Return, "void", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "cursor", "qt.QCursor"), End),
@@ -2876,7 +2844,6 @@ addSymbols(
     new Function(c, "nativeParentWidget", _n_nativeParentWidget0, None, Compiled, qt_QWidget_nativeParentWidget_QWidget_QWidget, Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QWidget"), End),
     new Function(c, "nextInFocusChain", _n_nextInFocusChain0, None, Compiled, qt_QWidget_nextInFocusChain_QWidget_QWidget, Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QWidget"), End),
     // PROP: normalGeometry (QRect; QWidget this)
-    new Function(c, "WindowFlags", _n_WindowFlags0, None, Compiled, qt_QWidget_WindowFlags_void_QWidget_int, Return, "void", Parameters, new Param(c, "this", "qt.QWidget"), new Param(c, "flags", "int"), End),
     // PROP: palette (QPalette; QWidget this)
     new Function(c, "parentWidget", _n_parentWidget0, None, Compiled, qt_QWidget_parentWidget_QWidget_QWidget, Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QWidget"), End),
     // PROP: pos (QPoint; QWidget this)
@@ -3083,12 +3050,6 @@ addSymbols(
                         Parameters,
                         new Param(c, "this", "qt.QWidget"),
                         new Param(c, "windowFlags", "int"),
-                        End),
-
-           new Function(c, "getContentsMargins", _n_QWidget_getContentsMargins, None,
-                        Return, "(int,int,int,int)",
-                        Parameters,
-                        new Param(c, "this", "qt.QWidget"),
                         End),
           
            EndArguments);

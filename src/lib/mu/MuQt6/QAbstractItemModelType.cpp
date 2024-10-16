@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1747,7 +1748,7 @@ addSymbols(
     new Function(c, "insertRow", _n_insertRow0, None, Compiled, qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex, Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
     _func[13] = new MemberFunction(c, "insertRows", _n_insertRows0, None, Compiled, qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex, Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"), new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
     // MISSING: itemData ("QMap<int, QVariant>"; QAbstractItemModel this, QModelIndex index)
-    _func[14] = new MemberFunction(c, "match", _n_match0, None, Compiled, qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int, Return, "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "start", "qt.QModelIndex"), new Param(c, "role", "int"), new Param(c, "value", "qt.QVariant"), new Param(c, "hits", "int", Value((int)1)), new Param(c, "flags", "int", Value((int)Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap)), End),
+    _func[14] = new MemberFunction(c, "match", _n_match0, None, Compiled, qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int, Return, "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "start", "qt.QModelIndex"), new Param(c, "role", "int"), new Param(c, "value", "qt.QVariant"), new Param(c, "hits", "int", Value((int)1)), new Param(c, "flags", "int", Value((int)Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap))), End),
     _func[15] = new MemberFunction(c, "mimeData", _n_mimeData0, None, Compiled, qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_, Return, "qt.QMimeData", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "indexes", "qt.QModelIndex[]"), End),
     _func[16] = new MemberFunction(c, "mimeTypes", _n_mimeTypes0, None, Compiled, qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel, Return, "string[]", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
     new Function(c, "moveColumn", _n_moveColumn0, None, Compiled, qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int, Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "sourceParent", "qt.QModelIndex"), new Param(c, "sourceColumn", "int"), new Param(c, "destinationParent", "qt.QModelIndex"), new Param(c, "destinationChild", "int"), End),
