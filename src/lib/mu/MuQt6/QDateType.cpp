@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QDateTimeType.h>
 
@@ -91,28 +92,12 @@ Pointer qt_QDate_QDate_QDate_QDate_int_int_int(Mu::Thread& NODE_THREAD, Pointer 
     return param_this;
 }
 
-Pointer qt_QDate_QDate_QDate_QDate_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_ymd)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    int arg1 = (int)(param_ymd);
-    setqtype<QDateType>(param_this,QDate(arg1));
-    return param_this;
-}
-
 Pointer qt_QDate_addDays_QDate_QDate_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_ndays)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QDate arg0 = getqtype<QDateType>(param_this);
     qint64 arg1 = (int64)(param_ndays);
     return makeqtype<QDateType>(c,arg0.addDays(arg1),"qt.QDate");
-}
-
-Pointer qt_QDate_addDuration_QDate_QDate_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_ndays)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QDate arg0 = getqtype<QDateType>(param_this);
-    int arg1 = (int)(param_ndays);
-    return makeqtype<QDateType>(c,arg0.addDuration(arg1),"qt.QDate");
 }
 
 Pointer qt_QDate_addMonths_QDate_QDate_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_nmonths)
@@ -226,13 +211,6 @@ int64 qt_QDate_toJulianDay_int64_QDate(Mu::Thread& NODE_THREAD, Pointer param_th
     return arg0.toJulianDay();
 }
 
-int qt_QDate_toStdSysDays_int_QDate(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QDate arg0 = getqtype<QDateType>(param_this);
-    return arg0.toStdSysDays();
-}
-
 Pointer qt_QDate_toString_string_QDate_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_format)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -296,19 +274,9 @@ static NODE_IMPLEMENTATION(_n_QDate1, Pointer)
     NODE_RETURN(qt_QDate_QDate_QDate_QDate_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int)));
 }
 
-static NODE_IMPLEMENTATION(_n_QDate2, Pointer)
-{
-    NODE_RETURN(qt_QDate_QDate_QDate_QDate_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_addDays0, Pointer)
 {
     NODE_RETURN(qt_QDate_addDays_QDate_QDate_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
-}
-
-static NODE_IMPLEMENTATION(_n_addDuration0, Pointer)
-{
-    NODE_RETURN(qt_QDate_addDuration_QDate_QDate_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_addMonths1, Pointer)
@@ -386,11 +354,6 @@ static NODE_IMPLEMENTATION(_n_toJulianDay0, int64)
     NODE_RETURN(qt_QDate_toJulianDay_int64_QDate(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_toStdSysDays0, int)
-{
-    NODE_RETURN(qt_QDate_toStdSysDays_int_QDate(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_toString1, Pointer)
 {
     NODE_RETURN(qt_QDate_toString_string_QDate_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
@@ -466,9 +429,7 @@ addSymbols(
     // member functions
     new Function(c, "QDate", _n_QDate0, None, Compiled, qt_QDate_QDate_QDate_QDate, Return, "qt.QDate", Parameters, new Param(c, "this", "qt.QDate"), End),
     new Function(c, "QDate", _n_QDate1, None, Compiled, qt_QDate_QDate_QDate_QDate_int_int_int, Return, "qt.QDate", Parameters, new Param(c, "this", "qt.QDate"), new Param(c, "y", "int"), new Param(c, "m", "int"), new Param(c, "d", "int"), End),
-    new Function(c, "QDate", _n_QDate2, None, Compiled, qt_QDate_QDate_QDate_QDate_int, Return, "qt.QDate", Parameters, new Param(c, "this", "qt.QDate"), new Param(c, "ymd", "int"), End),
     new Function(c, "addDays", _n_addDays0, None, Compiled, qt_QDate_addDays_QDate_QDate_int64, Return, "qt.QDate", Parameters, new Param(c, "this", "qt.QDate"), new Param(c, "ndays", "int64"), End),
-    new Function(c, "addDuration", _n_addDuration0, None, Compiled, qt_QDate_addDuration_QDate_QDate_int, Return, "qt.QDate", Parameters, new Param(c, "this", "qt.QDate"), new Param(c, "ndays", "int"), End),
     // MISSING: addMonths (QDate; QDate this, int nmonths, "QCalendar" cal)
     new Function(c, "addMonths", _n_addMonths1, None, Compiled, qt_QDate_addMonths_QDate_QDate_int, Return, "qt.QDate", Parameters, new Param(c, "this", "qt.QDate"), new Param(c, "nmonths", "int"), End),
     // MISSING: addYears (QDate; QDate this, int nyears, "QCalendar" cal)
@@ -496,7 +457,6 @@ addSymbols(
     // MISSING: startOfDay (QDateTime; QDate this, "const QTimeZone &" zone)
     new Function(c, "startOfDay", _n_startOfDay1, None, Compiled, qt_QDate_startOfDay_QDateTime_QDate, Return, "qt.QDateTime", Parameters, new Param(c, "this", "qt.QDate"), End),
     new Function(c, "toJulianDay", _n_toJulianDay0, None, Compiled, qt_QDate_toJulianDay_int64_QDate, Return, "int64", Parameters, new Param(c, "this", "qt.QDate"), End),
-    new Function(c, "toStdSysDays", _n_toStdSysDays0, None, Compiled, qt_QDate_toStdSysDays_int_QDate, Return, "int", Parameters, new Param(c, "this", "qt.QDate"), End),
     // MISSING: toString (string; QDate this, string format, "QCalendar" cal)
     new Function(c, "toString", _n_toString1, None, Compiled, qt_QDate_toString_string_QDate_int, Return, "string", Parameters, new Param(c, "this", "qt.QDate"), new Param(c, "format", "int", Value((int)Qt::TextDate)), End),
     // MISSING: toString (string; QDate this, "QStringView" format, "QCalendar" cal)

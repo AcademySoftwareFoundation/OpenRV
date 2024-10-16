@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -423,13 +424,6 @@ Pointer qt_QLabel_buddy_QWidget_QLabel(Mu::Thread& NODE_THREAD, Pointer param_th
     return makeinstance<QWidgetType>(c, arg0->buddy(), "qt.QWidget");
 }
 
-int qt_QLabel_resourceProvider_int_QLabel(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QLabel* arg0 = object<QLabel>(param_this);
-    return int(arg0->resourceProvider());
-}
-
 int qt_QLabel_selectionStart_int_QLabel(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -443,14 +437,6 @@ void qt_QLabel_setBuddy_void_QLabel_QWidget(Mu::Thread& NODE_THREAD, Pointer par
     QLabel* arg0 = object<QLabel>(param_this);
     QWidget * arg1 = object<QWidget>(param_buddy);
     arg0->setBuddy(arg1);
-}
-
-void qt_QLabel_setResourceProvider_void_QLabel_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_provider)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QLabel* arg0 = object<QLabel>(param_this);
-    const QTextDocument::ResourceProvider  arg1 = (&)(param_provider);
-    arg0->setResourceProvider(arg1);
 }
 
 void qt_QLabel_setSelection_void_QLabel_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_start, int param_length)
@@ -597,11 +583,6 @@ static NODE_IMPLEMENTATION(_n_buddy0, Pointer)
     NODE_RETURN(qt_QLabel_buddy_QWidget_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_resourceProvider0, int)
-{
-    NODE_RETURN(qt_QLabel_resourceProvider_int_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_selectionStart0, int)
 {
     NODE_RETURN(qt_QLabel_selectionStart_int_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -610,11 +591,6 @@ static NODE_IMPLEMENTATION(_n_selectionStart0, int)
 static NODE_IMPLEMENTATION(_n_setBuddy0, void)
 {
     qt_QLabel_setBuddy_void_QLabel_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_setResourceProvider0, void)
-{
-    qt_QLabel_setResourceProvider_void_QLabel_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_setSelection0, void)
@@ -735,8 +711,8 @@ QLabelType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QLabel", _n_QLabel0, None, Compiled, qt_QLabel_QLabel_QLabel_QLabel_QWidget_int, Return, "qt.QLabel", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags)), End),
-    new Function(c, "QLabel", _n_QLabel1, None, Compiled, qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int, Return, "qt.QLabel", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "text", "string"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QLabel", _n_QLabel0, None, Compiled, qt_QLabel_QLabel_QLabel_QLabel_QWidget_int, Return, "qt.QLabel", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
+    new Function(c, "QLabel", _n_QLabel1, None, Compiled, qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int, Return, "qt.QLabel", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "text", "string"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
     // PROP: alignment (flags Qt::Alignment; QLabel this)
     new Function(c, "buddy", _n_buddy0, None, Compiled, qt_QLabel_buddy_QWidget_QLabel, Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QLabel"), End),
     // PROP: hasScaledContents (bool; QLabel this)
@@ -746,7 +722,6 @@ addSymbols(
     // MISSING: movie ("QMovie *"; QLabel this)
     // PROP: openExternalLinks (bool; QLabel this)
     // PROP: pixmap (QPixmap; QLabel this)
-    new Function(c, "resourceProvider", _n_resourceProvider0, None, Compiled, qt_QLabel_resourceProvider_int_QLabel, Return, "int", Parameters, new Param(c, "this", "qt.QLabel"), End),
     // PROP: selectedText (string; QLabel this)
     new Function(c, "selectionStart", _n_selectionStart0, None, Compiled, qt_QLabel_selectionStart_int_QLabel, Return, "int", Parameters, new Param(c, "this", "qt.QLabel"), End),
     // PROP: setAlignment (void; QLabel this, flags Qt::Alignment _p13)
@@ -754,7 +729,6 @@ addSymbols(
     // PROP: setIndent (void; QLabel this, int _p3)
     // PROP: setMargin (void; QLabel this, int _p3)
     // PROP: setOpenExternalLinks (void; QLabel this, bool open)
-    new Function(c, "setResourceProvider", _n_setResourceProvider0, None, Compiled, qt_QLabel_setResourceProvider_void_QLabel_int, Return, "void", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "provider", "int"), End),
     // PROP: setScaledContents (void; QLabel this, bool _p4)
     new Function(c, "setSelection", _n_setSelection0, None, Compiled, qt_QLabel_setSelection_void_QLabel_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "start", "int"), new Param(c, "length", "int"), End),
     // PROP: setTextFormat (void; QLabel this, flags Qt::TextFormat _p14)

@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -331,26 +332,6 @@ void qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray(Mu::
     arg0->removeUrlScheme(arg1);
 }
 
-void qt_QWebEngineProfile_requestIconForIconURL_void_QWebEngineProfile_QUrl_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url, int param_desiredSizeInPixel, int param_iconAvailableCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
-    const QUrl  arg1 = getqtype<QUrlType>(param_url);
-    int arg2 = (int)(param_desiredSizeInPixel);
-    std::function<void (const QIcon & , const QUrl & )> arg3 = ()>)(param_iconAvailableCallback);
-    arg0->requestIconForIconURL(arg1, arg2, arg3);
-}
-
-void qt_QWebEngineProfile_requestIconForPageURL_void_QWebEngineProfile_QUrl_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url, int param_desiredSizeInPixel, int param_iconAvailableCallback)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
-    const QUrl  arg1 = getqtype<QUrlType>(param_url);
-    int arg2 = (int)(param_desiredSizeInPixel);
-    std::function<void (const QIcon & , const QUrl & , const QUrl & )> arg3 = ()>)(param_iconAvailableCallback);
-    arg0->requestIconForPageURL(arg1, arg2, arg3);
-}
-
 void qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -605,16 +586,6 @@ static NODE_IMPLEMENTATION(_n_removeUrlScheme0, void)
     qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
 }
 
-static NODE_IMPLEMENTATION(_n_requestIconForIconURL0, void)
-{
-    qt_QWebEngineProfile_requestIconForIconURL_void_QWebEngineProfile_QUrl_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
-}
-
-static NODE_IMPLEMENTATION(_n_requestIconForPageURL0, void)
-{
-    qt_QWebEngineProfile_requestIconForPageURL_void_QWebEngineProfile_QUrl_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
-}
-
 static NODE_IMPLEMENTATION(_n_setCachePath0, void)
 {
     qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
@@ -780,8 +751,6 @@ addSymbols(
     new Function(c, "removeAllUrlSchemeHandlers", _n_removeAllUrlSchemeHandlers0, None, Compiled, qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile, Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
     new Function(c, "removeUrlScheme", _n_removeUrlScheme0, None, Compiled, qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray, Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "scheme", "qt.QByteArray"), End),
     // MISSING: removeUrlSchemeHandler (void; QWebEngineProfile this, "QWebEngineUrlSchemeHandler *" handler)
-    new Function(c, "requestIconForIconURL", _n_requestIconForIconURL0, None, Compiled, qt_QWebEngineProfile_requestIconForIconURL_void_QWebEngineProfile_QUrl_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "url", "qt.QUrl"), new Param(c, "desiredSizeInPixel", "int"), new Param(c, "iconAvailableCallback", "int"), End),
-    new Function(c, "requestIconForPageURL", _n_requestIconForPageURL0, None, Compiled, qt_QWebEngineProfile_requestIconForPageURL_void_QWebEngineProfile_QUrl_int_int, Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "url", "qt.QUrl"), new Param(c, "desiredSizeInPixel", "int"), new Param(c, "iconAvailableCallback", "int"), End),
     // MISSING: scripts ("QWebEngineScriptCollection *"; QWebEngineProfile this)
     new Function(c, "setCachePath", _n_setCachePath0, None, Compiled, qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string, Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "path", "string"), End),
     new Function(c, "setDownloadPath", _n_setDownloadPath0, None, Compiled, qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string, Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "path", "string"), End),

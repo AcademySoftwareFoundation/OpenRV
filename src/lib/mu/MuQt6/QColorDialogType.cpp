@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -700,7 +701,7 @@ addSymbols(
     // static functions
     new Function(c, "customColor", _n_customColor0, None, Compiled, qt_QColorDialog_customColor_QColor_int, Return, "qt.QColor", Parameters, new Param(c, "index", "int"), End),
     new Function(c, "customCount", _n_customCount0, None, Compiled, qt_QColorDialog_customCount_int, Return, "int", End),
-    new Function(c, "getColor", _n_getColor0, None, Compiled, qt_QColorDialog_getColor_QColor_QColor_QWidget_string_int, Return, "qt.QColor", Parameters, new Param(c, "initial", "qt.QColor"), new Param(c, "parent", "qt.QWidget"), new Param(c, "title", "string"), new Param(c, "options", "int", Value((int)QColorDialog::ColorDialogOptions)), End),
+    new Function(c, "getColor", _n_getColor0, None, Compiled, qt_QColorDialog_getColor_QColor_QColor_QWidget_string_int, Return, "qt.QColor", Parameters, new Param(c, "initial", "qt.QColor"), new Param(c, "parent", "qt.QWidget"), new Param(c, "title", "string"), new Param(c, "options", "int", Value((int)QColorDialog::ColorDialogOptions())), End),
     new Function(c, "setCustomColor", _n_setCustomColor0, None, Compiled, qt_QColorDialog_setCustomColor_void_int_QColor, Return, "void", Parameters, new Param(c, "index", "int"), new Param(c, "color", "qt.QColor"), End),
     new Function(c, "setStandardColor", _n_setStandardColor0, None, Compiled, qt_QColorDialog_setStandardColor_void_int_QColor, Return, "void", Parameters, new Param(c, "index", "int"), new Param(c, "color", "qt.QColor"), End),
     new Function(c, "standardColor", _n_standardColor0, None, Compiled, qt_QColorDialog_standardColor_QColor_int, Return, "qt.QColor", Parameters, new Param(c, "index", "int"), End),

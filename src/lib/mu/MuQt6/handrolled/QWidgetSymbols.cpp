@@ -31,11 +31,5 @@ addSymbols(
                         new Param(c, "this", "qt.QWidget"),
                         new Param(c, "windowFlags", "int"),
                         End),
-
-           new Function(c, "getContentsMargins", _n_QWidget_getContentsMargins, None,
-                        Return, "(int,int,int,int)",
-                        Parameters,
-                        new Param(c, "this", "qt.QWidget"),
-                        End),
           
            EndArguments);

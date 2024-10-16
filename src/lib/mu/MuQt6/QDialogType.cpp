@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1298,7 +1299,7 @@ QDialogType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QDialog", _n_QDialog0, None, Compiled, qt_QDialog_QDialog_QDialog_QDialog_QWidget_int, Return, "qt.QDialog", Parameters, new Param(c, "this", "qt.QDialog"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QDialog", _n_QDialog0, None, Compiled, qt_QDialog_QDialog_QDialog_QDialog_QWidget_int, Return, "qt.QDialog", Parameters, new Param(c, "this", "qt.QDialog"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
     // PROP: isSizeGripEnabled (bool; QDialog this)
     new Function(c, "result", _n_result0, None, Compiled, qt_QDialog_result_int_QDialog, Return, "int", Parameters, new Param(c, "this", "qt.QDialog"), End),
     // PROP: setModal (void; QDialog this, bool modal)

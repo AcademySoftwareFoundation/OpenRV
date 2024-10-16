@@ -13,8 +13,10 @@ addSymbols( new Function(c, "print", printTextStream, None,
                          new Param(c, "outputString", "string"),
                          End),
 
+            new Function(c, "QTextStream", _n_QTextStream0, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), End),
+            new Function(c, "QTextStream", _n_QTextStream1, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "device", "qt.QIODevice"), End),
             // Can't use this one yet
             //new Function(c, "QTextStream", _n_QTextStream3, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "string", "string"), new Param(c, "openMode", "int"), End),
-            new Function(c, "QTextStream", _n_QTextStream4, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "array", "qt.QByteArray"), new Param(c, "openMode", "int"), End),
+            new Function(c, "QTextStream", _n_QTextStream5, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "array", "qt.QByteArray"), new Param(c, "openMode", "int"), End),
 
             EndArguments);

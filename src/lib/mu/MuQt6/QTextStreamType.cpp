@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -52,39 +53,6 @@ QTextStreamType::~QTextStreamType()
 //----------------------------------------------------------------------
 //  PRE-COMPILED FUNCTIONS
 
-Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    setqpointer<QTextStreamType>(param_this,new QTextStream());
-    return param_this;
-}
-
-Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_device)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QIODevice * arg1 = object<QIODevice>(param_device);
-    setqpointer<QTextStreamType>(param_this,new QTextStream(arg1));
-    return param_this;
-}
-
-Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_string, int param_openMode)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QString * arg1 = qstring(param_string);
-    QIODeviceBase::OpenMode arg2 = (QIODeviceBase::OpenMode)(param_openMode);
-    setqpointer<QTextStreamType>(param_this,new QTextStream(arg1, arg2));
-    return param_this;
-}
-
-Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_array, int param_openMode)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QByteArray * arg1 = getqtype<QByteArrayType>(param_array);
-    QIODeviceBase::OpenMode arg2 = (QIODeviceBase::OpenMode)(param_openMode);
-    setqpointer<QTextStreamType>(param_this,new QTextStream(arg1, arg2));
-    return param_this;
-}
-
 bool qt_QTextStream_atEnd_bool_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -103,7 +71,7 @@ Pointer qt_QTextStream_device_QIODevice_QTextStream(Mu::Thread& NODE_THREAD, Poi
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
-    return makeinstance<QIODeviceType>(c,arg0->device(),"qt.QIODevice");
+    return makeinstance<QIODeviceType>(c, arg0->device(), "qt.QIODevice");
 }
 
 int qt_QTextStream_encoding_int_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -132,7 +100,6 @@ void qt_QTextStream_flush_void_QTextStream(Mu::Thread& NODE_THREAD, Pointer para
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     arg0->flush();
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 bool qt_QTextStream_generateByteOrderMark_bool_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -205,7 +172,6 @@ void qt_QTextStream_reset_void_QTextStream(Mu::Thread& NODE_THREAD, Pointer para
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     arg0->reset();
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_resetStatus_void_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -213,7 +179,6 @@ void qt_QTextStream_resetStatus_void_QTextStream(Mu::Thread& NODE_THREAD, Pointe
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     arg0->resetStatus();
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 bool qt_QTextStream_seek_bool_QTextStream_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_pos)
@@ -230,7 +195,6 @@ void qt_QTextStream_setAutoDetectUnicode_void_QTextStream_bool(Mu::Thread& NODE_
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     bool arg1 = (bool)(param_enabled);
     arg0->setAutoDetectUnicode(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setDevice_void_QTextStream_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_device)
@@ -239,7 +203,6 @@ void qt_QTextStream_setDevice_void_QTextStream_QIODevice(Mu::Thread& NODE_THREAD
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     QIODevice * arg1 = object<QIODevice>(param_device);
     arg0->setDevice(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setEncoding_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_encoding)
@@ -248,7 +211,6 @@ void qt_QTextStream_setEncoding_void_QTextStream_int(Mu::Thread& NODE_THREAD, Po
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     QStringConverter::Encoding arg1 = (QStringConverter::Encoding)(param_encoding);
     arg0->setEncoding(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setFieldAlignment_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
@@ -257,7 +219,6 @@ void qt_QTextStream_setFieldAlignment_void_QTextStream_int(Mu::Thread& NODE_THRE
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     QTextStream::FieldAlignment arg1 = (QTextStream::FieldAlignment)(param_mode);
     arg0->setFieldAlignment(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setFieldWidth_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
@@ -266,7 +227,6 @@ void qt_QTextStream_setFieldWidth_void_QTextStream_int(Mu::Thread& NODE_THREAD, 
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     int arg1 = (int)(param_width);
     arg0->setFieldWidth(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setGenerateByteOrderMark_void_QTextStream_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_generate)
@@ -275,7 +235,6 @@ void qt_QTextStream_setGenerateByteOrderMark_void_QTextStream_bool(Mu::Thread& N
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     bool arg1 = (bool)(param_generate);
     arg0->setGenerateByteOrderMark(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setIntegerBase_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_base)
@@ -284,7 +243,6 @@ void qt_QTextStream_setIntegerBase_void_QTextStream_int(Mu::Thread& NODE_THREAD,
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     int arg1 = (int)(param_base);
     arg0->setIntegerBase(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setNumberFlags_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
@@ -293,7 +251,6 @@ void qt_QTextStream_setNumberFlags_void_QTextStream_int(Mu::Thread& NODE_THREAD,
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     QTextStream::NumberFlags arg1 = (QTextStream::NumberFlags)(param_flags);
     arg0->setNumberFlags(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setRealNumberNotation_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_notation)
@@ -302,7 +259,6 @@ void qt_QTextStream_setRealNumberNotation_void_QTextStream_int(Mu::Thread& NODE_
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     QTextStream::RealNumberNotation arg1 = (QTextStream::RealNumberNotation)(param_notation);
     arg0->setRealNumberNotation(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setRealNumberPrecision_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_precision)
@@ -311,7 +267,6 @@ void qt_QTextStream_setRealNumberPrecision_void_QTextStream_int(Mu::Thread& NODE
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     int arg1 = (int)(param_precision);
     arg0->setRealNumberPrecision(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_setStatus_void_QTextStream_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_status)
@@ -320,7 +275,6 @@ void qt_QTextStream_setStatus_void_QTextStream_int(Mu::Thread& NODE_THREAD, Poin
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     QTextStream::Status arg1 = (QTextStream::Status)(param_status);
     arg0->setStatus(arg1);
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 void qt_QTextStream_skipWhiteSpace_void_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -328,7 +282,6 @@ void qt_QTextStream_skipWhiteSpace_void_QTextStream(Mu::Thread& NODE_THREAD, Poi
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QTextStream * arg0 = getqpointer<QTextStreamType>(param_this);
     arg0->skipWhiteSpace();
-    setqpointer<QTextStreamType>(param_this,arg0);
 }
 
 int qt_QTextStream_status_int_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -338,26 +291,6 @@ int qt_QTextStream_status_int_QTextStream(Mu::Thread& NODE_THREAD, Pointer param
     return int(arg0->status());
 }
 
-
-static NODE_IMPLEMENTATION(_n_QTextStream0, Pointer)
-{
-    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_QTextStream1, Pointer)
-{
-    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_QTextStream3, Pointer)
-{
-    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_QTextStream4, Pointer)
-{
-    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
-}
 
 static NODE_IMPLEMENTATION(_n_atEnd0, bool)
 {
@@ -535,11 +468,26 @@ static NODE_IMPLEMENTATION(_n_status0, int)
 //     return param_this;
 // }
 
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_device)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QIODevice * arg1 = object<QIODevice>(param_device);
+    setqpointer<QTextStreamType>(param_this,new QTextStream(arg1));
+    return param_this;
+}
+
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    setqpointer<QTextStreamType>(param_this,new QTextStream());
+    return param_this;
+}
+
 Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_array, int param_openMode)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QByteArray * arg1 = &getqtype<QByteArrayType>(param_array);
-    QIODevice::OpenMode arg2 = (QIODevice::OpenMode)(param_openMode);
+    QIODeviceBase::OpenMode arg2 = (QIODeviceBase::OpenMode)(param_openMode);
     setqpointer<QTextStreamType>(param_this,new QTextStream(arg1, arg2));
     return param_this;
 }
@@ -558,7 +506,17 @@ print_void_qt_QTextStream_string(Thread& NODE_THREAD, Pointer obj, Pointer p)
 //     NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
 // }
 
-static NODE_IMPLEMENTATION(_n_QTextStream4, Pointer)
+static NODE_IMPLEMENTATION(_n_QTextStream0, Pointer)
+{
+    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_QTextStream1, Pointer)
+{
+    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_QTextStream5, Pointer)
 {
     NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
 }
@@ -630,12 +588,6 @@ addSymbols(
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QTextStream", _n_QTextStream0, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), End),
-    new Function(c, "QTextStream", _n_QTextStream1, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "device", "qt.QIODevice"), End),
-    // MISSING: QTextStream (QTextStream; QTextStream this, "FILE *" fileHandle, flags QIODeviceBase::OpenMode openMode)
-    new Function(c, "QTextStream", _n_QTextStream3, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "string", "string"), new Param(c, "openMode", "int", Value((int)ReadWrite)), End),
-    new Function(c, "QTextStream", _n_QTextStream4, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "array", "qt.QByteArray"), new Param(c, "openMode", "int", Value((int)ReadWrite)), End),
-    // MISSING: QTextStream (QTextStream; QTextStream this, QByteArray array, flags QIODeviceBase::OpenMode openMode)
     new Function(c, "atEnd", _n_atEnd0, None, Compiled, qt_QTextStream_atEnd_bool_QTextStream, Return, "bool", Parameters, new Param(c, "this", "qt.QTextStream"), End),
     new Function(c, "autoDetectUnicode", _n_autoDetectUnicode0, None, Compiled, qt_QTextStream_autoDetectUnicode_bool_QTextStream, Return, "bool", Parameters, new Param(c, "this", "qt.QTextStream"), End),
     new Function(c, "device", _n_device0, None, Compiled, qt_QTextStream_device_QIODevice_QTextStream, Return, "qt.QIODevice", Parameters, new Param(c, "this", "qt.QTextStream"), End),
@@ -694,9 +646,11 @@ addSymbols( new Function(c, "print", printTextStream, None,
                          new Param(c, "outputString", "string"),
                          End),
 
+            new Function(c, "QTextStream", _n_QTextStream0, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), End),
+            new Function(c, "QTextStream", _n_QTextStream1, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "device", "qt.QIODevice"), End),
             // Can't use this one yet
             //new Function(c, "QTextStream", _n_QTextStream3, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "string", "string"), new Param(c, "openMode", "int"), End),
-            new Function(c, "QTextStream", _n_QTextStream4, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "array", "qt.QByteArray"), new Param(c, "openMode", "int"), End),
+            new Function(c, "QTextStream", _n_QTextStream5, None, Compiled, qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int, Return, "qt.QTextStream", Parameters, new Param(c, "this", "qt.QTextStream"), new Param(c, "array", "qt.QByteArray"), new Param(c, "openMode", "int"), End),
 
             EndArguments);
 }

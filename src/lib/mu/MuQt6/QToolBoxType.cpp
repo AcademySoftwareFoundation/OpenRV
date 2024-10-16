@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -622,7 +623,7 @@ QToolBoxType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QToolBox", _n_QToolBox0, None, Compiled, qt_QToolBox_QToolBox_QToolBox_QToolBox_QWidget_int, Return, "qt.QToolBox", Parameters, new Param(c, "this", "qt.QToolBox"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QToolBox", _n_QToolBox0, None, Compiled, qt_QToolBox_QToolBox_QToolBox_QToolBox_QWidget_int, Return, "qt.QToolBox", Parameters, new Param(c, "this", "qt.QToolBox"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
     new Function(c, "addItem", _n_addItem0, None, Compiled, qt_QToolBox_addItem_int_QToolBox_QWidget_QIcon_string, Return, "int", Parameters, new Param(c, "this", "qt.QToolBox"), new Param(c, "widget", "qt.QWidget"), new Param(c, "iconSet", "qt.QIcon"), new Param(c, "text", "string"), End),
     new Function(c, "addItem", _n_addItem1, None, Compiled, qt_QToolBox_addItem_int_QToolBox_QWidget_string, Return, "int", Parameters, new Param(c, "this", "qt.QToolBox"), new Param(c, "w", "qt.QWidget"), new Param(c, "text", "string"), End),
     // PROP: count (int; QToolBox this)

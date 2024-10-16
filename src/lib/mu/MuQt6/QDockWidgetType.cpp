@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1306,8 +1307,8 @@ QDockWidgetType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QDockWidget", _n_QDockWidget0, None, Compiled, qt_QDockWidget_QDockWidget_QDockWidget_QDockWidget_string_QWidget_int, Return, "qt.QDockWidget", Parameters, new Param(c, "this", "qt.QDockWidget"), new Param(c, "title", "string"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags)), End),
-    new Function(c, "QDockWidget", _n_QDockWidget1, None, Compiled, qt_QDockWidget_QDockWidget_QDockWidget_QDockWidget_QWidget_int, Return, "qt.QDockWidget", Parameters, new Param(c, "this", "qt.QDockWidget"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QDockWidget", _n_QDockWidget0, None, Compiled, qt_QDockWidget_QDockWidget_QDockWidget_QDockWidget_string_QWidget_int, Return, "qt.QDockWidget", Parameters, new Param(c, "this", "qt.QDockWidget"), new Param(c, "title", "string"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags())), End),
+    new Function(c, "QDockWidget", _n_QDockWidget1, None, Compiled, qt_QDockWidget_QDockWidget_QDockWidget_QDockWidget_QWidget_int, Return, "qt.QDockWidget", Parameters, new Param(c, "this", "qt.QDockWidget"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags())), End),
     // PROP: allowedAreas (flags Qt::DockWidgetAreas; QDockWidget this)
     // PROP: features (flags QDockWidget::DockWidgetFeatures; QDockWidget this)
     new Function(c, "isAreaAllowed", _n_isAreaAllowed0, None, Compiled, qt_QDockWidget_isAreaAllowed_bool_QDockWidget_int, Return, "bool", Parameters, new Param(c, "this", "qt.QDockWidget"), new Param(c, "area", "int"), End),

@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1663,7 +1664,7 @@ QMainWindowType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QMainWindow", _n_QMainWindow0, None, Compiled, qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int, Return, "qt.QMainWindow", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QMainWindow", _n_QMainWindow0, None, Compiled, qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int, Return, "qt.QMainWindow", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "parent", "qt.QWidget"), new Param(c, "flags", "int", Value((int)Qt::WindowFlags())), End),
     new Function(c, "addDockWidget", _n_addDockWidget0, None, Compiled, qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget, Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"), new Param(c, "dockwidget", "qt.QDockWidget"), End),
     new Function(c, "addDockWidget", _n_addDockWidget1, None, Compiled, qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int, Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"), new Param(c, "dockwidget", "qt.QDockWidget"), new Param(c, "orientation", "int"), End),
     new Function(c, "addToolBar", _n_addToolBar0, None, Compiled, qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar, Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"), new Param(c, "toolbar", "qt.QToolBar"), End),

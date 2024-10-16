@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -280,6 +281,12 @@ Pointer qt_QGuiApplication_palette_QPalette(Mu::Thread& NODE_THREAD)
     return makeqtype<QPaletteType>(c,QGuiApplication::palette(),"qt.QPalette");
 }
 
+Pointer qt_QGuiApplication_primaryScreen_QScreen(Mu::Thread& NODE_THREAD)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    return makeinstance<QScreenType>(c, QGuiApplication::primaryScreen(), "qt.QScreen");
+}
+
 int qt_QGuiApplication_queryKeyboardModifiers_int(Mu::Thread& NODE_THREAD)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -439,6 +446,11 @@ static NODE_IMPLEMENTATION(_n_mouseButtons0, int)
 static NODE_IMPLEMENTATION(_n_palette0, Pointer)
 {
     NODE_RETURN(qt_QGuiApplication_palette_QPalette(NODE_THREAD));
+}
+
+static NODE_IMPLEMENTATION(_n_primaryScreen0, Pointer)
+{
+    NODE_RETURN(qt_QGuiApplication_primaryScreen_QScreen(NODE_THREAD));
 }
 
 static NODE_IMPLEMENTATION(_n_queryKeyboardModifiers0, int)

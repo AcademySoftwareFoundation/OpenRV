@@ -13,11 +13,26 @@
 //     return param_this;
 // }
 
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_device)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QIODevice * arg1 = object<QIODevice>(param_device);
+    setqpointer<QTextStreamType>(param_this,new QTextStream(arg1));
+    return param_this;
+}
+
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    setqpointer<QTextStreamType>(param_this,new QTextStream());
+    return param_this;
+}
+
 Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_array, int param_openMode)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QByteArray * arg1 = &getqtype<QByteArrayType>(param_array);
-    QIODevice::OpenMode arg2 = (QIODevice::OpenMode)(param_openMode);
+    QIODeviceBase::OpenMode arg2 = (QIODeviceBase::OpenMode)(param_openMode);
     setqpointer<QTextStreamType>(param_this,new QTextStream(arg1, arg2));
     return param_this;
 }
@@ -36,7 +51,17 @@ print_void_qt_QTextStream_string(Thread& NODE_THREAD, Pointer obj, Pointer p)
 //     NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
 // }
 
-static NODE_IMPLEMENTATION(_n_QTextStream4, Pointer)
+static NODE_IMPLEMENTATION(_n_QTextStream0, Pointer)
+{
+    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_QTextStream1, Pointer)
+{
+    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_QTextStream5, Pointer)
 {
     NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
 }

@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -635,7 +636,7 @@ QLayoutItemType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QLayoutItem", _n_QLayoutItem0, None, Compiled, qt_QLayoutItem_QLayoutItem_QLayoutItem_QLayoutItem_int, Return, "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QLayoutItem"), new Param(c, "alignment", "int", Value((int)Qt::Alignment)), End),
+    new Function(c, "QLayoutItem", _n_QLayoutItem0, None, Compiled, qt_QLayoutItem_QLayoutItem_QLayoutItem_QLayoutItem_int, Return, "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QLayoutItem"), new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
     new Function(c, "alignment", _n_alignment0, None, Compiled, qt_QLayoutItem_alignment_int_QLayoutItem, Return, "int", Parameters, new Param(c, "this", "qt.QLayoutItem"), End),
     _func[0] = new MemberFunction(c, "controlTypes", _n_controlTypes0, None, Compiled, qt_QLayoutItem_controlTypes_int_QLayoutItem, Return, "int", Parameters, new Param(c, "this", "qt.QLayoutItem"), End),
     _func[1] = new MemberFunction(c, "expandingDirections", _n_expandingDirections0, None, Compiled, qt_QLayoutItem_expandingDirections_int_QLayoutItem, Return, "int", Parameters, new Param(c, "this", "qt.QLayoutItem"), End),

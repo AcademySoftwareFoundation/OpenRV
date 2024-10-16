@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1229,7 +1230,7 @@ QFrameType::load()
 addSymbols(
     // enums
     // member functions
-    new Function(c, "QFrame", _n_QFrame0, None, Compiled, qt_QFrame_QFrame_QFrame_QFrame_QWidget_int, Return, "qt.QFrame", Parameters, new Param(c, "this", "qt.QFrame"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags)), End),
+    new Function(c, "QFrame", _n_QFrame0, None, Compiled, qt_QFrame_QFrame_QFrame_QFrame_QWidget_int, Return, "qt.QFrame", Parameters, new Param(c, "this", "qt.QFrame"), new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
     // PROP: frameRect (QRect; QFrame this)
     // PROP: frameShadow (flags QFrame::Shadow; QFrame this)
     // PROP: frameShape (flags QFrame::Shape; QFrame this)

@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1153,7 +1154,7 @@ addSymbols(
     _func[11] = new MemberFunction(c, "insertColumns", _n_insertColumns0, None, Compiled, qt_QAbstractListModel_insertColumns_bool_QAbstractListModel_int_int_QModelIndex, Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractListModel"), new Param(c, "column", "int"), new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
     _func[12] = new MemberFunction(c, "insertRows", _n_insertRows0, None, Compiled, qt_QAbstractListModel_insertRows_bool_QAbstractListModel_int_int_QModelIndex, Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractListModel"), new Param(c, "row", "int"), new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
     // MISSING: itemData ("QMap<int, QVariant>"; QAbstractListModel this, QModelIndex index)
-    _func[13] = new MemberFunction(c, "match", _n_match0, None, Compiled, qt_QAbstractListModel_match_qt__QModelIndexBSB_ESB__QAbstractListModel_QModelIndex_int_QVariant_int_int, Return, "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QAbstractListModel"), new Param(c, "start", "qt.QModelIndex"), new Param(c, "role", "int"), new Param(c, "value", "qt.QVariant"), new Param(c, "hits", "int", Value((int)1)), new Param(c, "flags", "int", Value((int)Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap)), End),
+    _func[13] = new MemberFunction(c, "match", _n_match0, None, Compiled, qt_QAbstractListModel_match_qt__QModelIndexBSB_ESB__QAbstractListModel_QModelIndex_int_QVariant_int_int, Return, "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QAbstractListModel"), new Param(c, "start", "qt.QModelIndex"), new Param(c, "role", "int"), new Param(c, "value", "qt.QVariant"), new Param(c, "hits", "int", Value((int)1)), new Param(c, "flags", "int", Value((int)Qt::MatchFlags(Qt::MatchStartsWith|Qt::MatchWrap))), End),
     _func[14] = new MemberFunction(c, "mimeData", _n_mimeData0, None, Compiled, qt_QAbstractListModel_mimeData_QMimeData_QAbstractListModel_qt__QModelIndexBSB_ESB_, Return, "qt.QMimeData", Parameters, new Param(c, "this", "qt.QAbstractListModel"), new Param(c, "indexes", "qt.QModelIndex[]"), End),
     _func[15] = new MemberFunction(c, "mimeTypes", _n_mimeTypes0, None, Compiled, qt_QAbstractListModel_mimeTypes_stringBSB_ESB__QAbstractListModel, Return, "string[]", Parameters, new Param(c, "this", "qt.QAbstractListModel"), End),
     _func[16] = new MemberFunction(c, "moveColumns", _n_moveColumns0, None, Compiled, qt_QAbstractListModel_moveColumns_bool_QAbstractListModel_QModelIndex_int_int_QModelIndex_int, Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractListModel"), new Param(c, "sourceParent", "qt.QModelIndex"), new Param(c, "sourceColumn", "int"), new Param(c, "count", "int"), new Param(c, "destinationParent", "qt.QModelIndex"), new Param(c, "destinationChild", "int"), End),

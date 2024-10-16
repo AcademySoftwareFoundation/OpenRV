@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -326,7 +327,7 @@ addSymbols(
       new SymbolicConstant(c, "PolishRequest", "int", Value(int(QEvent::PolishRequest))),
       new SymbolicConstant(c, "QueryWhatsThis", "int", Value(int(QEvent::QueryWhatsThis))),
       new SymbolicConstant(c, "Quit", "int", Value(int(QEvent::Quit))),
-      new SymbolicConstant(c, "ReadOnlyChange (since Qt 5.4)", "int", Value(int(QEvent::ReadOnlyChange (since Qt 5.4)))),
+      new SymbolicConstant(c, "ReadOnlyChange", "int", Value(int(QEvent::ReadOnlyChange))),
       new SymbolicConstant(c, "RequestSoftwareInputPanel", "int", Value(int(QEvent::RequestSoftwareInputPanel))),
       new SymbolicConstant(c, "Resize", "int", Value(int(QEvent::Resize))),
       new SymbolicConstant(c, "ScrollPrepare", "int", Value(int(QEvent::ScrollPrepare))),
@@ -345,7 +346,7 @@ addSymbols(
       new SymbolicConstant(c, "TabletRelease", "int", Value(int(QEvent::TabletRelease))),
       new SymbolicConstant(c, "TabletEnterProximity", "int", Value(int(QEvent::TabletEnterProximity))),
       new SymbolicConstant(c, "TabletLeaveProximity", "int", Value(int(QEvent::TabletLeaveProximity))),
-      new SymbolicConstant(c, "TabletTrackingChange (since Qt 5.9)", "int", Value(int(QEvent::TabletTrackingChange (since Qt 5.9)))),
+      new SymbolicConstant(c, "TabletTrackingChange", "int", Value(int(QEvent::TabletTrackingChange))),
       new SymbolicConstant(c, "ThreadChange", "int", Value(int(QEvent::ThreadChange))),
       new SymbolicConstant(c, "Timer", "int", Value(int(QEvent::Timer))),
       new SymbolicConstant(c, "ToolBarChange", "int", Value(int(QEvent::ToolBarChange))),

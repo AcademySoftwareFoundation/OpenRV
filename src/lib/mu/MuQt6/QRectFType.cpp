@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QPointFType.h>
 #include <MuQt6/QRectType.h>
@@ -490,13 +491,6 @@ Pointer qt_QRectF_toAlignedRect_QRect_QRectF(Mu::Thread& NODE_THREAD, Pointer pa
     return makeqtype<QRectType>(c,arg0.toAlignedRect(),"qt.QRect");
 }
 
-int qt_QRectF_toDOMRect_int_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QRectF arg0 = getqtype<QRectFType>(param_this);
-    return int(arg0.toDOMRect());
-}
-
 Pointer qt_QRectF_toRect_QRect_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -619,13 +613,6 @@ Pointer qt_QRectF_operatorPipe_EQ__QRectF_QRectF_QRectF(Mu::Thread& NODE_THREAD,
     QRectF arg0 = getqtype<QRectFType>(param_this);
     const QRectF  arg1 = getqtype<QRectFType>(param_rectangle);
     return makeqtype<QRectFType>(c,arg0.operator|=(arg1),"qt.QRectF");
-}
-
-Pointer qt_QRectF_fromDOMRect_QRectF_int(Mu::Thread& NODE_THREAD, int param_domRect)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    emscripten::val arg0 = (emscripten::val)(param_domRect);
-    return makeqtype<QRectFType>(c,QRectF::fromDOMRect(arg0),"qt.QRectF");
 }
 
 
@@ -869,11 +856,6 @@ static NODE_IMPLEMENTATION(_n_toAlignedRect0, Pointer)
     NODE_RETURN(qt_QRectF_toAlignedRect_QRect_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_toDOMRect0, int)
-{
-    NODE_RETURN(qt_QRectF_toDOMRect_int_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_toRect0, Pointer)
 {
     NODE_RETURN(qt_QRectF_toRect_QRect_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -952,11 +934,6 @@ static NODE_IMPLEMENTATION(_n_operatorPipe_0, Pointer)
 static NODE_IMPLEMENTATION(_n_operatorPipe_EQ_0, Pointer)
 {
     NODE_RETURN(qt_QRectF_operatorPipe_EQ__QRectF_QRectF_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_fromDOMRect0, Pointer)
-{
-    NODE_RETURN(qt_QRectF_fromDOMRect_QRectF_int(NODE_THREAD, NODE_ARG(0, int)));
 }
 
 
@@ -1053,7 +1030,6 @@ addSymbols(
     // MISSING: size ("QSizeF"; QRectF this)
     new Function(c, "toAlignedRect", _n_toAlignedRect0, None, Compiled, qt_QRectF_toAlignedRect_QRect_QRectF, Return, "qt.QRect", Parameters, new Param(c, "this", "qt.QRectF"), End),
     // MISSING: toCGRect ("CGRect"; QRectF this)
-    new Function(c, "toDOMRect", _n_toDOMRect0, None, Compiled, qt_QRectF_toDOMRect_int_QRectF, Return, "int", Parameters, new Param(c, "this", "qt.QRectF"), End),
     new Function(c, "toRect", _n_toRect0, None, Compiled, qt_QRectF_toRect_QRect_QRectF, Return, "qt.QRect", Parameters, new Param(c, "this", "qt.QRectF"), End),
     new Function(c, "top", _n_top0, None, Compiled, qt_QRectF_top_double_QRectF, Return, "double", Parameters, new Param(c, "this", "qt.QRectF"), End),
     new Function(c, "topLeft", _n_topLeft0, None, Compiled, qt_QRectF_topLeft_QPointF_QRectF, Return, "qt.QPointF", Parameters, new Param(c, "this", "qt.QRectF"), End),
@@ -1070,7 +1046,6 @@ addSymbols(
     // MISSING: = ("QRectF & operator&"; QRectF this, QRectF rectangle)
     // static functions
     // MISSING: fromCGRect (QRectF; "CGRect" rect)
-    new Function(c, "fromDOMRect", _n_fromDOMRect0, None, Compiled, qt_QRectF_fromDOMRect_QRectF_int, Return, "qt.QRectF", Parameters, new Param(c, "domRect", "int"), End),
     EndArguments);
 globalScope()->addSymbols(
     new Function(c, "&", _n_operatorAmp_0, Op, Compiled, qt_QRectF_operatorAmp__QRectF_QRectF_QRectF, Return, "qt.QRectF", Parameters, new Param(c, "this", "qt.QRectF"), new Param(c, "rectangle", "qt.QRectF"), End),

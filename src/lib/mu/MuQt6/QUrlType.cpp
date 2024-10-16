@@ -32,6 +32,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QUrlQueryType.h>
 #include <MuQt6/QByteArrayType.h>
@@ -929,12 +930,12 @@ addSymbols(
     new Function(c, "setUserName", _n_setUserName0, None, Compiled, qt_QUrl_setUserName_void_QUrl_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "userName", "string"), new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)), End),
     new Function(c, "swap", _n_swap0, None, Compiled, qt_QUrl_swap_void_QUrl_QUrl, Return, "void", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "other", "qt.QUrl"), End),
     // MISSING: toCFURL ("CFURLRef"; QUrl this)
-    new Function(c, "toDisplayString", _n_toDisplayString0, None, Compiled, qt_QUrl_toDisplayString_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded)), End),
+    new Function(c, "toDisplayString", _n_toDisplayString0, None, Compiled, qt_QUrl_toDisplayString_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
     new Function(c, "toEncoded", _n_toEncoded0, None, Compiled, qt_QUrl_toEncoded_QByteArray_QUrl_int, Return, "qt.QByteArray", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyEncoded)), End),
     new Function(c, "toLocalFile", _n_toLocalFile0, None, Compiled, qt_QUrl_toLocalFile_string_QUrl, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), End),
     // MISSING: toNSURL ("NSURL *"; QUrl this)
-    new Function(c, "toString", _n_toString0, None, Compiled, qt_QUrl_toString_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded)), End),
-    new Function(c, "url", _n_url0, None, Compiled, qt_QUrl_url_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded)), End),
+    new Function(c, "toString", _n_toString0, None, Compiled, qt_QUrl_toString_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
+    new Function(c, "url", _n_url0, None, Compiled, qt_QUrl_url_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
     new Function(c, "userInfo", _n_userInfo0, None, Compiled, qt_QUrl_userInfo_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)), End),
     new Function(c, "userName", _n_userName0, None, Compiled, qt_QUrl_userName_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
     // static functions
@@ -950,7 +951,7 @@ addSymbols(
     new Function(c, "setIdnWhitelist", _n_setIdnWhitelist0, None, Compiled, qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_, Return, "void", Parameters, new Param(c, "list", "string[]"), End),
     new Function(c, "toAce", _n_toAce0, None, Compiled, qt_QUrl_toAce_QByteArray_string_int, Return, "qt.QByteArray", Parameters, new Param(c, "domain", "string"), new Param(c, "options", "int", Value((int){})), End),
     new Function(c, "toPercentEncoding", _n_toPercentEncoding0, None, Compiled, qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray, Return, "qt.QByteArray", Parameters, new Param(c, "input", "string"), new Param(c, "exclude", "qt.QByteArray"), new Param(c, "include", "qt.QByteArray"), End),
-    new Function(c, "toStringList", _n_toStringList0, None, Compiled, qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int, Return, "string[]", Parameters, new Param(c, "urls", "qt.QUrl[]"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded)), End),
+    new Function(c, "toStringList", _n_toStringList0, None, Compiled, qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int, Return, "string[]", Parameters, new Param(c, "urls", "qt.QUrl[]"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
     EndArguments);
 globalScope()->addSymbols(
     new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl, Return, "bool", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "url", "qt.QUrl"), End),

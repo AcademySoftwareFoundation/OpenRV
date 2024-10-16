@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1540,8 +1541,8 @@ addSymbols(
     // PROP: document (QTextDocument; QTextEdit this)
     // PROP: documentTitle (string; QTextEdit this)
     new Function(c, "ensureCursorVisible", _n_ensureCursorVisible0, None, Compiled, qt_QTextEdit_ensureCursorVisible_void_QTextEdit, Return, "void", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
-    new Function(c, "find", _n_find0, None, Compiled, qt_QTextEdit_find_bool_QTextEdit_string_int, Return, "bool", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "exp", "string"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
-    new Function(c, "find", _n_find1, None, Compiled, qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int, Return, "bool", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "exp", "qt.QRegularExpression"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags)), End),
+    new Function(c, "find", _n_find0, None, Compiled, qt_QTextEdit_find_bool_QTextEdit_string_int, Return, "bool", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "exp", "string"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+    new Function(c, "find", _n_find1, None, Compiled, qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int, Return, "bool", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "exp", "qt.QRegularExpression"), new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
     new Function(c, "fontFamily", _n_fontFamily0, None, Compiled, qt_QTextEdit_fontFamily_string_QTextEdit, Return, "string", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
     new Function(c, "fontItalic", _n_fontItalic0, None, Compiled, qt_QTextEdit_fontItalic_bool_QTextEdit, Return, "bool", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
     new Function(c, "fontPointSize", _n_fontPointSize0, None, Compiled, qt_QTextEdit_fontPointSize_double_QTextEdit, Return, "double", Parameters, new Param(c, "this", "qt.QTextEdit"), End),

@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -75,16 +76,6 @@ MuQt_QFile::MuQt_QFile(Pointer muobj, const CallEnvironment* ce, const QString &
     _baseType = c->findSymbolOfTypeByQualifiedName<QFileType>(c->internName("qt.QFile"));
 }
 
-MuQt_QFile::MuQt_QFile(Pointer muobj, const CallEnvironment* ce, const std::filesystem::path & name) 
- : QFile(name)
-{
-    _env = ce;
-    _obj = reinterpret_cast<ClassInstance*>(muobj);
-    _obj->retainExternal();
-    MuLangContext* c = (MuLangContext*)_env->context();
-    _baseType = c->findSymbolOfTypeByQualifiedName<QFileType>(c->internName("qt.QFile"));
-}
-
 MuQt_QFile::MuQt_QFile(Pointer muobj, const CallEnvironment* ce, QObject * parent) 
  : QFile(parent)
 {
@@ -96,16 +87,6 @@ MuQt_QFile::MuQt_QFile(Pointer muobj, const CallEnvironment* ce, QObject * paren
 }
 
 MuQt_QFile::MuQt_QFile(Pointer muobj, const CallEnvironment* ce, const QString & name, QObject * parent) 
- : QFile(name, parent)
-{
-    _env = ce;
-    _obj = reinterpret_cast<ClassInstance*>(muobj);
-    _obj->retainExternal();
-    MuLangContext* c = (MuLangContext*)_env->context();
-    _baseType = c->findSymbolOfTypeByQualifiedName<QFileType>(c->internName("qt.QFile"));
-}
-
-MuQt_QFile::MuQt_QFile(Pointer muobj, const CallEnvironment* ce, const std::filesystem::path & name, QObject * parent) 
  : QFile(name, parent)
 {
     _env = ce;
@@ -193,31 +174,11 @@ bool MuQt_QFile::resize(qint64 sz)
     }
 }
 
-bool MuQt_QFile::setPermissions(QFileDevice::Permissions permissions) 
-{
-    if (!_env) return QFile::setPermissions(permissions);
-    MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[4];
-    const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
-    if (F != F0) 
-    {
-        Function::ArgumentVector args(2);
-        args[0] = Value(Pointer(_obj));
-        args[1] = Value(int(permissions));
-        Value rval = _env->call(F, args);
-        return (bool)(rval._bool);
-    }
-    else
-    {
-        return QFile::setPermissions(permissions);
-    }
-}
-
 qint64 MuQt_QFile::size() const
 {
     if (!_env) return QFile::size();
     MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[5];
+    const MemberFunction* F0 = _baseType->_func[4];
     const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
     if (F != F0) 
     {
@@ -236,7 +197,7 @@ bool MuQt_QFile::atEnd() const
 {
     if (!_env) return QFile::atEnd();
     MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[6];
+    const MemberFunction* F0 = _baseType->_func[5];
     const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
     if (F != F0) 
     {
@@ -255,7 +216,7 @@ void MuQt_QFile::close()
 {
     if (!_env) { QFile::close(); return; }
     MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[7];
+    const MemberFunction* F0 = _baseType->_func[6];
     const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
     if (F != F0) 
     {
@@ -273,7 +234,7 @@ bool MuQt_QFile::isSequential() const
 {
     if (!_env) return QFile::isSequential();
     MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[8];
+    const MemberFunction* F0 = _baseType->_func[7];
     const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
     if (F != F0) 
     {
@@ -292,7 +253,7 @@ qint64 MuQt_QFile::pos() const
 {
     if (!_env) return QFile::pos();
     MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[9];
+    const MemberFunction* F0 = _baseType->_func[8];
     const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
     if (F != F0) 
     {
@@ -311,7 +272,7 @@ bool MuQt_QFile::seek(qint64 pos)
 {
     if (!_env) return QFile::seek(pos);
     MuLangContext* c = (MuLangContext*)_env->context();
-    const MemberFunction* F0 = _baseType->_func[10];
+    const MemberFunction* F0 = _baseType->_func[9];
     const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
     if (F != F0) 
     {
@@ -388,14 +349,6 @@ Pointer qt_QFile_QFile_QFile_QFile_string(Mu::Thread& NODE_THREAD, Pointer param
     return param_this;
 }
 
-Pointer qt_QFile_QFile_QFile_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_name)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg1 = (&)(param_name);
-    setobject(param_this, new MuQt_QFile(param_this, NODE_THREAD.process()->callEnv(), arg1));
-    return param_this;
-}
-
 Pointer qt_QFile_QFile_QFile_QFile_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -413,28 +366,11 @@ Pointer qt_QFile_QFile_QFile_QFile_string_QObject(Mu::Thread& NODE_THREAD, Point
     return param_this;
 }
 
-Pointer qt_QFile_QFile_QFile_QFile_int_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, int param_name, Pointer param_parent)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg1 = (&)(param_name);
-    QObject * arg2 = object<QObject>(param_parent);
-    setobject(param_this, new MuQt_QFile(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
-    return param_this;
-}
-
 bool qt_QFile_copy_bool_QFile_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_newName)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QFile* arg0 = object<QFile>(param_this);
     const QString  arg1 = qstring(param_newName);
-    return arg0->copy(arg1);
-}
-
-bool qt_QFile_copy_bool_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_newName)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    const std::filesystem::path  arg1 = (&)(param_newName);
     return arg0->copy(arg1);
 }
 
@@ -445,33 +381,11 @@ bool qt_QFile_exists_bool_QFile(Mu::Thread& NODE_THREAD, Pointer param_this)
     return arg0->exists();
 }
 
-int qt_QFile_filesystemFileName_int_QFile(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    return int(arg0->filesystemFileName());
-}
-
-int qt_QFile_filesystemSymLinkTarget_int_QFile(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    return int(arg0->filesystemSymLinkTarget());
-}
-
 bool qt_QFile_link_bool_QFile_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_linkName)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QFile* arg0 = object<QFile>(param_this);
     const QString  arg1 = qstring(param_linkName);
-    return arg0->link(arg1);
-}
-
-bool qt_QFile_link_bool_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_newName)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    const std::filesystem::path  arg1 = (&)(param_newName);
     return arg0->link(arg1);
 }
 
@@ -516,27 +430,11 @@ bool qt_QFile_rename_bool_QFile_string(Mu::Thread& NODE_THREAD, Pointer param_th
     return arg0->rename(arg1);
 }
 
-bool qt_QFile_rename_bool_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_newName)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    const std::filesystem::path  arg1 = (&)(param_newName);
-    return arg0->rename(arg1);
-}
-
 void qt_QFile_setFileName_void_QFile_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QFile* arg0 = object<QFile>(param_this);
     const QString  arg1 = qstring(param_name);
-    arg0->setFileName(arg1);
-}
-
-void qt_QFile_setFileName_void_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_name)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    const std::filesystem::path  arg1 = (&)(param_name);
     arg0->setFileName(arg1);
 }
 
@@ -575,14 +473,6 @@ bool qt_QFile_resize_bool_QFile_int64(Mu::Thread& NODE_THREAD, Pointer param_thi
     QFile* arg0 = object<QFile>(param_this);
     qint64 arg1 = (int64)(param_sz);
     return isMuQtObject(arg0) ? arg0->QFile::resize(arg1) : arg0->resize(arg1);
-}
-
-bool qt_QFile_setPermissions_bool_QFile_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_permissions)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QFile* arg0 = object<QFile>(param_this);
-    QFileDevice::Permissions arg1 = (QFileDevice::Permissions)(param_permissions);
-    return isMuQtObject(arg0) ? arg0->QFile::setPermissions(arg1) : arg0->setPermissions(arg1);
 }
 
 int64 qt_QFile_size_int64_QFile(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -658,13 +548,6 @@ bool qt_QFile_exists_bool_string(Mu::Thread& NODE_THREAD, Pointer param_fileName
     return QFile::exists(arg0);
 }
 
-int qt_QFile_filesystemSymLinkTarget_int_int(Mu::Thread& NODE_THREAD, int param_fileName)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg0 = (&)(param_fileName);
-    return int(QFile::filesystemSymLinkTarget(arg0));
-}
-
 bool qt_QFile_link_bool_string_string(Mu::Thread& NODE_THREAD, Pointer param_fileName, Pointer param_linkName)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -677,13 +560,6 @@ int qt_QFile_permissions_int_string(Mu::Thread& NODE_THREAD, Pointer param_fileN
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QString  arg0 = qstring(param_fileName);
-    return int(QFile::permissions(arg0));
-}
-
-int qt_QFile_permissions_int_int(Mu::Thread& NODE_THREAD, int param_filename)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg0 = (&)(param_filename);
     return int(QFile::permissions(arg0));
 }
 
@@ -710,22 +586,6 @@ bool qt_QFile_resize_bool_string_int64(Mu::Thread& NODE_THREAD, Pointer param_fi
     return QFile::resize(arg0, arg1);
 }
 
-bool qt_QFile_setPermissions_bool_string_int(Mu::Thread& NODE_THREAD, Pointer param_fileName, int param_permissions)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QString  arg0 = qstring(param_fileName);
-    QFileDevice::Permissions arg1 = (QFileDevice::Permissions)(param_permissions);
-    return QFile::setPermissions(arg0, arg1);
-}
-
-bool qt_QFile_setPermissions_bool_int_int(Mu::Thread& NODE_THREAD, int param_filename, int param_permissionSpec)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const std::filesystem::path  arg0 = (&)(param_filename);
-    QFileDevice::Permissions arg1 = (QFileDevice::Permissions)(param_permissionSpec);
-    return QFile::setPermissions(arg0, arg1);
-}
-
 Pointer qt_QFile_symLinkTarget_string_string(Mu::Thread& NODE_THREAD, Pointer param_fileName)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -746,22 +606,12 @@ static NODE_IMPLEMENTATION(_n_QFile1, Pointer)
 
 static NODE_IMPLEMENTATION(_n_QFile2, Pointer)
 {
-    NODE_RETURN(qt_QFile_QFile_QFile_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+    NODE_RETURN(qt_QFile_QFile_QFile_QFile_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_QFile3, Pointer)
 {
-    NODE_RETURN(qt_QFile_QFile_QFile_QFile_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_QFile4, Pointer)
-{
     NODE_RETURN(qt_QFile_QFile_QFile_QFile_string_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_QFile5, Pointer)
-{
-    NODE_RETURN(qt_QFile_QFile_QFile_QFile_int_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_copy0, bool)
@@ -769,34 +619,14 @@ static NODE_IMPLEMENTATION(_n_copy0, bool)
     NODE_RETURN(qt_QFile_copy_bool_QFile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_copy1, bool)
-{
-    NODE_RETURN(qt_QFile_copy_bool_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_exists0, bool)
 {
     NODE_RETURN(qt_QFile_exists_bool_QFile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_filesystemFileName0, int)
-{
-    NODE_RETURN(qt_QFile_filesystemFileName_int_QFile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_filesystemSymLinkTarget0, int)
-{
-    NODE_RETURN(qt_QFile_filesystemSymLinkTarget_int_QFile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_link0, bool)
 {
     NODE_RETURN(qt_QFile_link_bool_QFile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
-}
-
-static NODE_IMPLEMENTATION(_n_link1, bool)
-{
-    NODE_RETURN(qt_QFile_link_bool_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_moveToTrash0, bool)
@@ -824,19 +654,9 @@ static NODE_IMPLEMENTATION(_n_rename0, bool)
     NODE_RETURN(qt_QFile_rename_bool_QFile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_rename1, bool)
-{
-    NODE_RETURN(qt_QFile_rename_bool_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_setFileName0, void)
 {
     qt_QFile_setFileName_void_QFile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_setFileName1, void)
-{
-    qt_QFile_setFileName_void_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
 }
 
 static NODE_IMPLEMENTATION(_n_symLinkTarget0, Pointer)
@@ -862,11 +682,6 @@ static NODE_IMPLEMENTATION(_n_permissions0, int)
 static NODE_IMPLEMENTATION(_n_resize0, bool)
 {
     NODE_RETURN(qt_QFile_resize_bool_QFile_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
-}
-
-static NODE_IMPLEMENTATION(_n_setPermissions0, bool)
-{
-    NODE_RETURN(qt_QFile_setPermissions_bool_QFile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_size0, int64)
@@ -899,7 +714,7 @@ static NODE_IMPLEMENTATION(_n_seek0, bool)
     NODE_RETURN(qt_QFile_seek_bool_QFile_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
 }
 
-static NODE_IMPLEMENTATION(_n_copy2, bool)
+static NODE_IMPLEMENTATION(_n_copy1, bool)
 {
     NODE_RETURN(qt_QFile_copy_bool_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
@@ -919,12 +734,7 @@ static NODE_IMPLEMENTATION(_n_exists1, bool)
     NODE_RETURN(qt_QFile_exists_bool_string(NODE_THREAD, NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_filesystemSymLinkTarget1, int)
-{
-    NODE_RETURN(qt_QFile_filesystemSymLinkTarget_int_int(NODE_THREAD, NODE_ARG(0, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_link2, bool)
+static NODE_IMPLEMENTATION(_n_link1, bool)
 {
     NODE_RETURN(qt_QFile_link_bool_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
@@ -934,17 +744,12 @@ static NODE_IMPLEMENTATION(_n_permissions1, int)
     NODE_RETURN(qt_QFile_permissions_int_string(NODE_THREAD, NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_permissions2, int)
-{
-    NODE_RETURN(qt_QFile_permissions_int_int(NODE_THREAD, NODE_ARG(0, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_remove1, bool)
 {
     NODE_RETURN(qt_QFile_remove_bool_string(NODE_THREAD, NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_rename2, bool)
+static NODE_IMPLEMENTATION(_n_rename1, bool)
 {
     NODE_RETURN(qt_QFile_rename_bool_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
@@ -952,16 +757,6 @@ static NODE_IMPLEMENTATION(_n_rename2, bool)
 static NODE_IMPLEMENTATION(_n_resize1, bool)
 {
     NODE_RETURN(qt_QFile_resize_bool_string_int64(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
-}
-
-static NODE_IMPLEMENTATION(_n_setPermissions1, bool)
-{
-    NODE_RETURN(qt_QFile_setPermissions_bool_string_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
-static NODE_IMPLEMENTATION(_n_setPermissions2, bool)
-{
-    NODE_RETURN(qt_QFile_setPermissions_bool_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_symLinkTarget1, Pointer)
@@ -1014,56 +809,43 @@ addSymbols(
     // member functions
     new Function(c, "QFile", _n_QFile0, None, Compiled, qt_QFile_QFile_QFile_QFile, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), End),
     new Function(c, "QFile", _n_QFile1, None, Compiled, qt_QFile_QFile_QFile_QFile_string, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "string"), End),
-    new Function(c, "QFile", _n_QFile2, None, Compiled, qt_QFile_QFile_QFile_QFile_int, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "int"), End),
-    new Function(c, "QFile", _n_QFile3, None, Compiled, qt_QFile_QFile_QFile_QFile_QObject, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "parent", "qt.QObject"), End),
-    new Function(c, "QFile", _n_QFile4, None, Compiled, qt_QFile_QFile_QFile_QFile_string_QObject, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "string"), new Param(c, "parent", "qt.QObject"), End),
-    new Function(c, "QFile", _n_QFile5, None, Compiled, qt_QFile_QFile_QFile_QFile_int_QObject, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "int"), new Param(c, "parent", "qt.QObject"), End),
+    new Function(c, "QFile", _n_QFile2, None, Compiled, qt_QFile_QFile_QFile_QFile_QObject, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "parent", "qt.QObject"), End),
+    new Function(c, "QFile", _n_QFile3, None, Compiled, qt_QFile_QFile_QFile_QFile_string_QObject, Return, "qt.QFile", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "string"), new Param(c, "parent", "qt.QObject"), End),
     new Function(c, "copy", _n_copy0, None, Compiled, qt_QFile_copy_bool_QFile_string, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "newName", "string"), End),
-    new Function(c, "copy", _n_copy1, None, Compiled, qt_QFile_copy_bool_QFile_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "newName", "int"), End),
     new Function(c, "exists", _n_exists0, None, Compiled, qt_QFile_exists_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
-    new Function(c, "filesystemFileName", _n_filesystemFileName0, None, Compiled, qt_QFile_filesystemFileName_int_QFile, Return, "int", Parameters, new Param(c, "this", "qt.QFile"), End),
-    new Function(c, "filesystemSymLinkTarget", _n_filesystemSymLinkTarget0, None, Compiled, qt_QFile_filesystemSymLinkTarget_int_QFile, Return, "int", Parameters, new Param(c, "this", "qt.QFile"), End),
     new Function(c, "link", _n_link0, None, Compiled, qt_QFile_link_bool_QFile_string, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "linkName", "string"), End),
-    new Function(c, "link", _n_link1, None, Compiled, qt_QFile_link_bool_QFile_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "newName", "int"), End),
     new Function(c, "moveToTrash", _n_moveToTrash0, None, Compiled, qt_QFile_moveToTrash_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
     new Function(c, "open", _n_open0, None, Compiled, qt_QFile_open_bool_QFile_int_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "mode", "int"), new Param(c, "permissions", "int"), End),
     // MISSING: open (bool; QFile this, "FILE *" fh, flags QIODeviceBase::OpenMode mode, flags QFileDevice::FileHandleFlags handleFlags)
     new Function(c, "open", _n_open2, None, Compiled, qt_QFile_open_bool_QFile_int_int_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "fd", "int"), new Param(c, "mode", "int"), new Param(c, "handleFlags", "int", Value((int)QFileDevice::DontCloseHandle)), End),
     new Function(c, "remove", _n_remove0, None, Compiled, qt_QFile_remove_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
     new Function(c, "rename", _n_rename0, None, Compiled, qt_QFile_rename_bool_QFile_string, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "newName", "string"), End),
-    new Function(c, "rename", _n_rename1, None, Compiled, qt_QFile_rename_bool_QFile_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "newName", "int"), End),
     new Function(c, "setFileName", _n_setFileName0, None, Compiled, qt_QFile_setFileName_void_QFile_string, Return, "void", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "string"), End),
-    new Function(c, "setFileName", _n_setFileName1, None, Compiled, qt_QFile_setFileName_void_QFile_int, Return, "void", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "name", "int"), End),
     new Function(c, "symLinkTarget", _n_symLinkTarget0, None, Compiled, qt_QFile_symLinkTarget_string_QFile, Return, "string", Parameters, new Param(c, "this", "qt.QFile"), End),
     _func[0] = new MemberFunction(c, "fileName", _n_fileName0, None, Compiled, qt_QFile_fileName_string_QFile, Return, "string", Parameters, new Param(c, "this", "qt.QFile"), End),
     _func[1] = new MemberFunction(c, "open", _n_open3, None, Compiled, qt_QFile_open_bool_QFile_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "mode", "int"), End),
     _func[2] = new MemberFunction(c, "permissions", _n_permissions0, None, Compiled, qt_QFile_permissions_int_QFile, Return, "int", Parameters, new Param(c, "this", "qt.QFile"), End),
     _func[3] = new MemberFunction(c, "resize", _n_resize0, None, Compiled, qt_QFile_resize_bool_QFile_int64, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "sz", "int64"), End),
-    _func[4] = new MemberFunction(c, "setPermissions", _n_setPermissions0, None, Compiled, qt_QFile_setPermissions_bool_QFile_int, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "permissions", "int"), End),
-    _func[5] = new MemberFunction(c, "size", _n_size0, None, Compiled, qt_QFile_size_int64_QFile, Return, "int64", Parameters, new Param(c, "this", "qt.QFile"), End),
-    _func[6] = new MemberFunction(c, "atEnd", _n_atEnd0, None, Compiled, qt_QFile_atEnd_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
-    _func[7] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QFile_close_void_QFile, Return, "void", Parameters, new Param(c, "this", "qt.QFile"), End),
-    _func[8] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QFile_isSequential_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
-    _func[9] = new MemberFunction(c, "pos", _n_pos0, None, Compiled, qt_QFile_pos_int64_QFile, Return, "int64", Parameters, new Param(c, "this", "qt.QFile"), End),
-    _func[10] = new MemberFunction(c, "seek", _n_seek0, None, Compiled, qt_QFile_seek_bool_QFile_int64, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "pos", "int64"), End),
+    _func[4] = new MemberFunction(c, "size", _n_size0, None, Compiled, qt_QFile_size_int64_QFile, Return, "int64", Parameters, new Param(c, "this", "qt.QFile"), End),
+    _func[5] = new MemberFunction(c, "atEnd", _n_atEnd0, None, Compiled, qt_QFile_atEnd_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
+    _func[6] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QFile_close_void_QFile, Return, "void", Parameters, new Param(c, "this", "qt.QFile"), End),
+    _func[7] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QFile_isSequential_bool_QFile, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), End),
+    _func[8] = new MemberFunction(c, "pos", _n_pos0, None, Compiled, qt_QFile_pos_int64_QFile, Return, "int64", Parameters, new Param(c, "this", "qt.QFile"), End),
+    _func[9] = new MemberFunction(c, "seek", _n_seek0, None, Compiled, qt_QFile_seek_bool_QFile_int64, Return, "bool", Parameters, new Param(c, "this", "qt.QFile"), new Param(c, "pos", "int64"), End),
     // MISSING: readData (int64; QFile this, "char *" data, int64 len) // protected
     // MISSING: readLineData (int64; QFile this, "char *" data, int64 maxlen) // protected
     // MISSING: writeData (int64; QFile this, "const char *" data, int64 len) // protected
     // static functions
-    new Function(c, "copy", _n_copy2, None, Compiled, qt_QFile_copy_bool_string_string, Return, "bool", Parameters, new Param(c, "fileName", "string"), new Param(c, "newName", "string"), End),
+    new Function(c, "copy", _n_copy1, None, Compiled, qt_QFile_copy_bool_string_string, Return, "bool", Parameters, new Param(c, "fileName", "string"), new Param(c, "newName", "string"), End),
     new Function(c, "decodeName", _n_decodeName0, None, Compiled, qt_QFile_decodeName_string_QByteArray, Return, "string", Parameters, new Param(c, "localFileName", "qt.QByteArray"), End),
     // MISSING: decodeName (string; "const char *" localFileName)
     new Function(c, "encodeName", _n_encodeName0, None, Compiled, qt_QFile_encodeName_QByteArray_string, Return, "qt.QByteArray", Parameters, new Param(c, "fileName", "string"), End),
     new Function(c, "exists", _n_exists1, None, Compiled, qt_QFile_exists_bool_string, Return, "bool", Parameters, new Param(c, "fileName", "string"), End),
-    new Function(c, "filesystemSymLinkTarget", _n_filesystemSymLinkTarget1, None, Compiled, qt_QFile_filesystemSymLinkTarget_int_int, Return, "int", Parameters, new Param(c, "fileName", "int"), End),
-    new Function(c, "link", _n_link2, None, Compiled, qt_QFile_link_bool_string_string, Return, "bool", Parameters, new Param(c, "fileName", "string"), new Param(c, "linkName", "string"), End),
+    new Function(c, "link", _n_link1, None, Compiled, qt_QFile_link_bool_string_string, Return, "bool", Parameters, new Param(c, "fileName", "string"), new Param(c, "linkName", "string"), End),
     new Function(c, "permissions", _n_permissions1, None, Compiled, qt_QFile_permissions_int_string, Return, "int", Parameters, new Param(c, "fileName", "string"), End),
-    new Function(c, "permissions", _n_permissions2, None, Compiled, qt_QFile_permissions_int_int, Return, "int", Parameters, new Param(c, "filename", "int"), End),
     new Function(c, "remove", _n_remove1, None, Compiled, qt_QFile_remove_bool_string, Return, "bool", Parameters, new Param(c, "fileName", "string"), End),
-    new Function(c, "rename", _n_rename2, None, Compiled, qt_QFile_rename_bool_string_string, Return, "bool", Parameters, new Param(c, "oldName", "string"), new Param(c, "newName", "string"), End),
+    new Function(c, "rename", _n_rename1, None, Compiled, qt_QFile_rename_bool_string_string, Return, "bool", Parameters, new Param(c, "oldName", "string"), new Param(c, "newName", "string"), End),
     new Function(c, "resize", _n_resize1, None, Compiled, qt_QFile_resize_bool_string_int64, Return, "bool", Parameters, new Param(c, "fileName", "string"), new Param(c, "sz", "int64"), End),
-    new Function(c, "setPermissions", _n_setPermissions1, None, Compiled, qt_QFile_setPermissions_bool_string_int, Return, "bool", Parameters, new Param(c, "fileName", "string"), new Param(c, "permissions", "int"), End),
-    new Function(c, "setPermissions", _n_setPermissions2, None, Compiled, qt_QFile_setPermissions_bool_int_int, Return, "bool", Parameters, new Param(c, "filename", "int"), new Param(c, "permissionSpec", "int"), End),
     new Function(c, "symLinkTarget", _n_symLinkTarget1, None, Compiled, qt_QFile_symLinkTarget_string_string, Return, "string", Parameters, new Param(c, "fileName", "string"), End),
     EndArguments);
 globalScope()->addSymbols(

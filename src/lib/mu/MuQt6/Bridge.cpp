@@ -220,11 +220,11 @@ getmethod(const Node& NODE_THIS, Thread& NODE_THREAD, QObject* o)
 
         rstr << "\\)";
 
-        QRegExp re(rstr.str().c_str());
+        QRegularExpression re(rstr.str().c_str());
 
         for (size_t i = 0; i < metaObject->methodCount(); i++)
         {
-            if (re.exactMatch(metaObject->method(i).methodSignature()))
+            if (re.match(metaObject->method(i).methodSignature()).hasMatch())
             {
                 methodIndex = i;
                 //cout << "MATCHED: " << metaObject->method(i).signature() << endl;
@@ -300,7 +300,7 @@ NODE_IMPLEMENTATION(getpropIcon, Pointer)
     QVariant v = prop.read(o);
     QIconType::Instance* i = new QIconType::Instance(iconType);
 
-    if (v.canConvert(QVariant::Icon))
+    if (v.canConvert<QIcon>())
     {
         i->value = v.value<QIcon>();
     }
@@ -319,7 +319,7 @@ NODE_IMPLEMENTATION(getpropSize, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::Size))
+    if (v.canConvert<QSize>())
     {
         i = makeqtype<QSizeType>(sizeType, v.value<QSize>());
     }
@@ -338,7 +338,7 @@ NODE_IMPLEMENTATION(getpropRect, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::Rect))
+    if (v.canConvert<QRect>())
     {
         i = makeqtype<QRectType>(rectType, v.value<QRect>());
     }
@@ -357,7 +357,7 @@ NODE_IMPLEMENTATION(getpropPoint, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::Point))
+    if (v.canConvert<QPoint>())
     {
         i = makeqtype<QPointType>(pointType, v.value<QPoint>());
     }
@@ -376,7 +376,7 @@ NODE_IMPLEMENTATION(getpropFont, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::Font))
+    if (v.canConvert<QFont>())
     {
         i = makeqtype<QFontType>(type, v.value<QFont>());
     }
@@ -395,7 +395,7 @@ NODE_IMPLEMENTATION(getpropUrl, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::Url))
+    if (v.canConvert<QUrl>())
     {
         i = makeqtype<QUrlType>(type, v.value<QUrl>());
     }
@@ -414,7 +414,7 @@ NODE_IMPLEMENTATION(getpropKeySeq, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::KeySequence))
+    if (v.canConvert<QKeySequence>())
     {
         i = makeqtype<QKeySequenceType>(type, v.value<QKeySequence>());
     }
@@ -433,7 +433,7 @@ NODE_IMPLEMENTATION(getpropColor, Pointer)
     QVariant v = prop.read(o);
     ClassInstance* i = 0;
 
-    if (v.canConvert(QVariant::Color))
+    if (v.canConvert<QColor>())
     {
         i = makeqtype<QColorType>(type, v.value<QColor>());
     }
@@ -640,7 +640,7 @@ NODE_IMPLEMENTATION(putpropColor, void)
 struct QActionArg { QAction* a; };
 struct QObjectArg { QObject* a; };
 
-QGenericArgument
+QMetaMethodArgument
 argument(STLVector<Pointer>::Type& gcCache,
          const Type* T, 
          Value& v, 
@@ -649,7 +649,7 @@ argument(STLVector<Pointer>::Type& gcCache,
 {
     //
     //  NOTE: this function is tricky. It has to return a ValueType**
-    //  as a QGenericArgument using the Q_ARG macro. The problem is
+    //  as a QMetaMethodArgument using the Q_ARG macro. The problem is
     //  that you have to be pointing at memory that survives this
     //  function invocation. In the case of QString and primitive
     //  types, an object on the callers stack is passed in to make the

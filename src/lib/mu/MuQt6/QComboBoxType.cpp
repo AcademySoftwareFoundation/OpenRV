@@ -15,6 +15,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 #include <QtSvg/QtSvg>
+#include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QActionType.h>
@@ -1651,7 +1652,7 @@ addSymbols(
     // PROP: currentIndex (int; QComboBox this)
     // PROP: currentText (string; QComboBox this)
     // PROP: duplicatesEnabled (bool; QComboBox this)
-    new Function(c, "findData", _n_findData0, None, Compiled, qt_QComboBox_findData_int_QComboBox_QVariant_int_int, Return, "int", Parameters, new Param(c, "this", "qt.QComboBox"), new Param(c, "data", "qt.QVariant"), new Param(c, "role", "int", Value((int)Qt::UserRole)), new Param(c, "flags", "int", Value((int)static_cast<Qt::MatchFlags>(Qt::MatchExactly|Qt::MatchCaseSensitive)), End),
+    new Function(c, "findData", _n_findData0, None, Compiled, qt_QComboBox_findData_int_QComboBox_QVariant_int_int, Return, "int", Parameters, new Param(c, "this", "qt.QComboBox"), new Param(c, "data", "qt.QVariant"), new Param(c, "role", "int", Value((int)Qt::UserRole)), new Param(c, "flags", "int", Value((int)static_cast<Qt::MatchFlags>(Qt::MatchExactly|Qt::MatchCaseSensitive))), End),
     new Function(c, "findText", _n_findText0, None, Compiled, qt_QComboBox_findText_int_QComboBox_string_int, Return, "int", Parameters, new Param(c, "this", "qt.QComboBox"), new Param(c, "text", "string"), new Param(c, "flags", "int", Value((int)Qt::MatchExactly|Qt::MatchCaseSensitive)), End),
     // PROP: hasFrame (bool; QComboBox this)
     _func[0] = new MemberFunction(c, "hidePopup", _n_hidePopup0, None, Compiled, qt_QComboBox_hidePopup_void_QComboBox, Return, "void", Parameters, new Param(c, "this", "qt.QComboBox"), End),
