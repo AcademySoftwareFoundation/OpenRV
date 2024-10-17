@@ -396,8 +396,8 @@ def _create_transition(rv_trx, *args, **kwargs):
     :param node_name: `str`
     :return: `otio.schema.Transition`
     """
-    pre_item = kwargs.get("pre_item")
-    pre_item = kwargs.get("post_item")
+    pre_item = kwargs.get("pre_item")[0]
+    post_item = kwargs.get("post_item")
 
     transition_type = TRANSITION_TYPE_MAP.get(
         commands.nodeType(rv_trx), otio.schema.TransitionTypes.Custom
@@ -438,12 +438,12 @@ def _create_transition(rv_trx, *args, **kwargs):
         rate=fps,
     )
 
-    if pre_item.source_range:
+    if pre_item.source_range is not None:
         if not is_same_media(out_source, pre_item):
             return None
         pre_item.source_range = pre_item.source_range.duration_extended_by(in_offset)
 
-    if post_item.source_range:
+    if post_item.source_range is not None:
         if not is_same_media(in_source, post_item):
             return None
         post_item.source_range = otio.opentime.TimeRange(
