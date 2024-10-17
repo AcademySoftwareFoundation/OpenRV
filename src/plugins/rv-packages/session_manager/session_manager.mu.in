@@ -794,7 +794,7 @@ class: NodeTreeView : QTreeView
 
     method: dragMoveEvent (void; QDragMoveEvent event)
     {
-        let index = indexAt(event.pos()),
+        let index = indexAt(@MU_QT_QDRAGMOVEEVENT_POSITION@),
             item  = _viewModel.itemFromIndex(index);
 
         if (item eq nil) 
@@ -1025,7 +1025,7 @@ class: SessionManagerMode : MinorMode
 
     method: colorAdjustedIcon (QIcon; string rpath, bool invertSense)
     {
-        let bg = QApplication.palette().color(QPalette.Active, QPalette.Background),
+        let bg = QApplication.palette().color(QPalette.Active, @MU_QT_QPALETTE_COLORROLE@),
             icon0 = QImage(regex.replace("48x48", rpath, "out"), nil),
             icon1 = QImage(rpath, nil),
             swap = invertSense != _darkUI,

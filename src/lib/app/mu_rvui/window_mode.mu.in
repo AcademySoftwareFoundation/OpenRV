@@ -77,8 +77,10 @@ class: WindowMinorMode : MinorMode
         //
 
         let mainWin = commands.mainWindowWidget(),
-            mainRect = mainWin.frameGeometry(),
-            usedRect = qt.QApplication.desktop().availableGeometry(mainWin);
+            mainRect = mainWin.frameGeometry();
+
+        // IMPORTANT: SEE src/lib/app/mu_rvui/CMakeLists.txt
+        @MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY@
 
         let outRight = usedRect.width() + usedRect.x() - mainWin.x() - mainRect.width(),
             outBelow = usedRect.height() + usedRect.y() - mainWin.y() - mainRect.height(),

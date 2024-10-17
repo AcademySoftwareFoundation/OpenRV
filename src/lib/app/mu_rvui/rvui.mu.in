@@ -4200,7 +4200,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         cmd    = "\"%s\" \"%s\"" % (rv, target);
 
     saveSession(target, true, true);
-    qt.QProcess.startDetached (cmd, string[] {""});
+
+    // Qt5: qt.QProcess.startDetached (cmd); 
+    // Qt6: qt.QProcess.startDetached (cmd, string[] {""}); 
+
+    // IMPORTANT: SEE src/lib/app/mu_rvui/CMakeLists.txt
+    @MU_QT_QPROCESS_STARTDETACHED@
 }
 
 \: cloneSyncedRV (void; Event ev)
