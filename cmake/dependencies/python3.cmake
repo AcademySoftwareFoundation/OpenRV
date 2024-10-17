@@ -13,8 +13,10 @@ SET(_opentimelineio_target
     "RV_DEPS_OPENTIMELINEIO"
 )
 
-SET(_pyside2_target
-    "RV_DEPS_PYSIDE2"
+RV_VFX_SET_VARIABLE(
+  _pyside_target
+  CY2023 "RV_DEPS_PYSIDE2"
+  CY2024 "RV_DEPS_PYSIDE6"
 )
 
 SET(PYTHON_VERSION_MAJOR
@@ -49,7 +51,7 @@ SET(_opentimelineio_version
 )
 
 RV_VFX_SET_VARIABLE(
-  _pyside2_version
+  _pyside_version
   CY2023 "5.15.10"
   CY2024 "6.5.3"
 )
@@ -71,13 +73,13 @@ SET(_opentimelineio_git_tag
 )
 
 RV_VFX_SET_VARIABLE(
-  _pyside2_archive_url
-  CY2023 "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside2_version}-src/pyside-setup-opensource-src-${_pyside2_version}.zip"
-  CY2024 "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside2_version}-src/pyside-setup-everywhere-src-${_pyside2_version}.zip"
+  _pyside_archive_url
+  CY2023 "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside_version}-src/pyside-setup-opensource-src-${_pyside_version}.zip"
+  CY2024 "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside_version}-src/pyside-setup-everywhere-src-${_pyside_version}.zip"
 )
 
 RV_VFX_SET_VARIABLE(
-  _pyside2_download_hash
+  _pyside_download_hash
   CY2023 "87841aaced763b6b52e9b549e31a493f"
   CY2024 "515d3249c6e743219ff0d7dd25b8c8d8"
 )
@@ -106,13 +108,13 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 FETCHCONTENT_DECLARE(
-  ${_pyside2_target}
-  URL ${_pyside2_archive_url}
-  URL_HASH MD5=${_pyside2_download_hash}
+  ${_pyside_target}
+  URL ${_pyside_archive_url}
+  URL_HASH MD5=${_pyside_download_hash}
   SOURCE_SUBDIR "sources" # Avoids the top level CMakeLists.txt
 )
 
-FETCHCONTENT_MAKEAVAILABLE(${_pyside2_target})
+FETCHCONTENT_MAKEAVAILABLE(${_pyside_target})
 
 SET(_python3_make_command_script
     "${PROJECT_SOURCE_DIR}/src/build/make_python.py"
@@ -144,61 +146,61 @@ ENDIF()
 #          since after 2023, it is Qt6
 # TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
-  SET(_pyside2_make_command_script
+  SET(_pyside_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
   )
-  SET(_pyside2_make_command
-      python3 "${_pyside2_make_command_script}"
+  SET(_pyside_make_command
+      python3 "${_pyside_make_command_script}"
   )
 
-  LIST(APPEND _pyside2_make_command "--variant")
-  LIST(APPEND _pyside2_make_command ${CMAKE_BUILD_TYPE})
-  LIST(APPEND _pyside2_make_command "--source-dir")
-  LIST(APPEND _pyside2_make_command ${rv_deps_pyside2_SOURCE_DIR})
-  LIST(APPEND _pyside2_make_command "--output-dir")
-  LIST(APPEND _pyside2_make_command ${_install_dir})
-  LIST(APPEND _pyside2_make_command "--temp-dir")
-  LIST(APPEND _pyside2_make_command ${_build_dir})
+  LIST(APPEND _pyside_make_command "--variant")
+  LIST(APPEND _pyside_make_command ${CMAKE_BUILD_TYPE})
+  LIST(APPEND _pyside_make_command "--source-dir")
+  LIST(APPEND _pyside_make_command ${rv_deps_pyside2_SOURCE_DIR})
+  LIST(APPEND _pyside_make_command "--output-dir")
+  LIST(APPEND _pyside_make_command ${_install_dir})
+  LIST(APPEND _pyside_make_command "--temp-dir")
+  LIST(APPEND _pyside_make_command ${_build_dir})
 
   IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
-    LIST(APPEND _pyside2_make_command "--openssl-dir")
-    LIST(APPEND _pyside2_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
+    LIST(APPEND _pyside_make_command "--openssl-dir")
+    LIST(APPEND _pyside_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
   ENDIF()
 
-  LIST(APPEND _pyside2_make_command "--python-dir")
-  LIST(APPEND _pyside2_make_command ${_install_dir})
-  LIST(APPEND _pyside2_make_command "--qt-dir")
-  LIST(APPEND _pyside2_make_command ${RV_DEPS_QT5_LOCATION})
-  LIST(APPEND _pyside2_make_command "--python-version")
-  LIST(APPEND _pyside2_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
+  LIST(APPEND _pyside_make_command "--python-dir")
+  LIST(APPEND _pyside_make_command ${_install_dir})
+  LIST(APPEND _pyside_make_command "--qt-dir")
+  LIST(APPEND _pyside_make_command ${RV_DEPS_QT5_LOCATION})
+  LIST(APPEND _pyside_make_command "--python-version")
+  LIST(APPEND _pyside_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
-  SET(_pyside2_make_command_script
+  SET(_pyside_make_command_script
     "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
   )
-  SET(_pyside2_make_command
-    python3 "${_pyside2_make_command_script}"
+  SET(_pyside_make_command
+    python3 "${_pyside_make_command_script}"
   )
 
-  LIST(APPEND _pyside2_make_command "--variant")
-  LIST(APPEND _pyside2_make_command ${CMAKE_BUILD_TYPE})
-  LIST(APPEND _pyside2_make_command "--source-dir")
-  LIST(APPEND _pyside2_make_command ${rv_deps_pyside2_SOURCE_DIR})
-  LIST(APPEND _pyside2_make_command "--output-dir")
-  LIST(APPEND _pyside2_make_command ${_install_dir})
-  LIST(APPEND _pyside2_make_command "--temp-dir")
-  LIST(APPEND _pyside2_make_command ${_build_dir})
+  LIST(APPEND _pyside_make_command "--variant")
+  LIST(APPEND _pyside_make_command ${CMAKE_BUILD_TYPE})
+  LIST(APPEND _pyside_make_command "--source-dir")
+  LIST(APPEND _pyside_make_command ${rv_deps_pyside6_SOURCE_DIR})
+  LIST(APPEND _pyside_make_command "--output-dir")
+  LIST(APPEND _pyside_make_command ${_install_dir})
+  LIST(APPEND _pyside_make_command "--temp-dir")
+  LIST(APPEND _pyside_make_command ${_build_dir})
 
   IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
-    LIST(APPEND _pyside2_make_command "--openssl-dir")
-    LIST(APPEND _pyside2_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
+    LIST(APPEND _pyside_make_command "--openssl-dir")
+    LIST(APPEND _pyside_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
   ENDIF()
 
-  LIST(APPEND _pyside2_make_command "--python-dir")
-  LIST(APPEND _pyside2_make_command ${_install_dir})
-  LIST(APPEND _pyside2_make_command "--qt-dir")
-  LIST(APPEND _pyside2_make_command ${RV_DEPS_QT6_LOCATION})
-  LIST(APPEND _pyside2_make_command "--python-version")
-  LIST(APPEND _pyside2_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
+  LIST(APPEND _pyside_make_command "--python-dir")
+  LIST(APPEND _pyside_make_command ${_install_dir})
+  LIST(APPEND _pyside_make_command "--qt-dir")
+  LIST(APPEND _pyside_make_command ${RV_DEPS_QT6_LOCATION})
+  LIST(APPEND _pyside_make_command "--python-version")
+  LIST(APPEND _pyside_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
@@ -337,8 +339,8 @@ IF(RV_TARGET_WINDOWS
   )
 ENDIF()
 
-SET(${_pyside2_target}-build-flag
-    ${_install_dir}/${_pyside2_target}-build-flag
+SET(${_pyside_target}-build-flag
+    ${_install_dir}/${_pyside_target}-build-flag
 )
 
 
@@ -347,18 +349,29 @@ SET(${_pyside2_target}-build-flag
 # TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   ADD_CUSTOM_COMMAND(
-    COMMENT "Building PySide2 using ${_pyside2_make_command_script}"
-    OUTPUT ${${_pyside2_target}-build-flag}
+    COMMENT "Building PySide2 using ${_pyside_make_command_script}"
+    OUTPUT ${${_pyside_target}-build-flag}
     # First PySide build script on Windows which doesn't respect '--debug' option
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/src/build/patch_PySide2/windows_desktop.py
             ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
-    COMMAND ${_pyside2_make_command} --prepare --build
-    COMMAND cmake -E touch ${${_pyside2_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside2_make_command_script} ${${_python3_target}-requirements-flag}
+    COMMAND ${_pyside_make_command} --prepare --build
+    COMMAND cmake -E touch ${${_pyside_target}-build-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
     USES_TERMINAL
   )
 
-  SET(_build_flag_depends ${${_pyside2_target}-build-flag})
+  SET(_build_flag_depends ${${_pyside_target}-build-flag})
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+  ADD_CUSTOM_COMMAND(
+    COMMENT "Building PySide6 using ${_pyside_make_command_script}"
+    OUTPUT ${${_pyside_target}-build-flag}
+    COMMAND ${_pyside_make_command} --prepare --build
+    COMMAND cmake -E touch ${${_pyside_target}-build-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    USES_TERMINAL
+  )
+
+  SET(_build_flag_depends ${${_pyside_target}-build-flag})
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
@@ -418,8 +431,8 @@ SET(RV_DEPS_PYTHON3_VERSION
     ${_python3_version}
     CACHE INTERNAL "" FORCE
 )
-SET(RV_DEPS_PYSIDE2_VERSION
-    ${_pyside2_version}
+SET(RV_DEPS_PYSIDE_VERSION
+    ${_pyside_version}
     CACHE INTERNAL "" FORCE
 )
 

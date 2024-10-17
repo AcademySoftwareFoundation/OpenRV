@@ -126,6 +126,14 @@ Pointer qt_QVariant_QVariant_QVariant_QVariant_double(Mu::Thread& NODE_THREAD, P
     return param_this;
 }
 
+Pointer qt_QVariant_QVariant_QVariant_QVariant_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_val)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    float arg1 = (float)(param_val);
+    setqtype<QVariantType>(param_this,QVariant(arg1));
+    return param_this;
+}
+
 Pointer qt_QVariant_QVariant_QVariant_QVariant_QDate(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_val)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -415,6 +423,11 @@ static NODE_IMPLEMENTATION(_n_QVariant13, Pointer)
     NODE_RETURN(qt_QVariant_QVariant_QVariant_QVariant_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double)));
 }
 
+static NODE_IMPLEMENTATION(_n_QVariant14, Pointer)
+{
+    NODE_RETURN(qt_QVariant_QVariant_QVariant_QVariant_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float)));
+}
+
 static NODE_IMPLEMENTATION(_n_QVariant16, Pointer)
 {
     NODE_RETURN(qt_QVariant_QVariant_QVariant_QVariant_QDate(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
@@ -676,7 +689,7 @@ addSymbols(
     // MISSING: QVariant (QVariant; QVariant this, "qulonglong" val)
     new Function(c, "QVariant", _n_QVariant12, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_bool, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "bool"), End),
     new Function(c, "QVariant", _n_QVariant13, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_double, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "double"), End),
-    // MISSING: QVariant (QVariant; QVariant this, "float" val)
+    new Function(c, "QVariant", _n_QVariant14, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_float, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "float"), End),
     // MISSING: QVariant (QVariant; QVariant this, "QChar" c)
     new Function(c, "QVariant", _n_QVariant16, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_QDate, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "qt.QDate"), End),
     new Function(c, "QVariant", _n_QVariant17, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_QTime, Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "qt.QTime"), End),
@@ -725,7 +738,7 @@ addSymbols(
     new Function(c, "toDateTime", _n_toDateTime0, None, Compiled, qt_QVariant_toDateTime_QDateTime_QVariant, Return, "qt.QDateTime", Parameters, new Param(c, "this", "qt.QVariant"), End),
     // MISSING: toDouble (double; QVariant this, "bool *" ok)
     // MISSING: toEasingCurve ("QEasingCurve"; QVariant this)
-    // MISSING: toFloat ("float"; QVariant this, "bool *" ok)
+    // MISSING: toFloat (float; QVariant this, "bool *" ok)
     // MISSING: toHash ("QHash<QString, QVariant>"; QVariant this)
     // MISSING: toInt (int; QVariant this, "bool *" ok)
     // MISSING: toJsonArray ("QJsonArray"; QVariant this)

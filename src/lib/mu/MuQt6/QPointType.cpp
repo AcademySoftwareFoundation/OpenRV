@@ -292,7 +292,7 @@ addSymbols(
     new Function(c, "transposed", _n_transposed0, None, Compiled, qt_QPoint_transposed_QPoint_QPoint, Return, "qt.QPoint", Parameters, new Param(c, "this", "qt.QPoint"), End),
     new Function(c, "x", _n_x0, None, Compiled, qt_QPoint_x_int_QPoint, Return, "int", Parameters, new Param(c, "this", "qt.QPoint"), End),
     new Function(c, "y", _n_y0, None, Compiled, qt_QPoint_y_int_QPoint, Return, "int", Parameters, new Param(c, "this", "qt.QPoint"), End),
-    // MISSING: = ("QPoint & operator*"; QPoint this, "float" factor)
+    // MISSING: = ("QPoint & operator*"; QPoint this, float factor)
     // MISSING: = ("QPoint & operator*"; QPoint this, double factor)
     // MISSING: = ("QPoint & operator*"; QPoint this, int factor)
     // static functions

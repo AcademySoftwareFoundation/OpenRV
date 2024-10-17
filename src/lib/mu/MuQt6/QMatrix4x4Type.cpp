@@ -86,6 +86,29 @@ Pointer qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4(Mu::Thread& NODE_THREAD, 
     return param_this;
 }
 
+Pointer qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_m11, float param_m12, float param_m13, float param_m14, float param_m21, float param_m22, float param_m23, float param_m24, float param_m31, float param_m32, float param_m33, float param_m34, float param_m41, float param_m42, float param_m43, float param_m44)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    float arg1 = (float)(param_m11);
+    float arg2 = (float)(param_m12);
+    float arg3 = (float)(param_m13);
+    float arg4 = (float)(param_m14);
+    float arg5 = (float)(param_m21);
+    float arg6 = (float)(param_m22);
+    float arg7 = (float)(param_m23);
+    float arg8 = (float)(param_m24);
+    float arg9 = (float)(param_m31);
+    float arg10 = (float)(param_m32);
+    float arg11 = (float)(param_m33);
+    float arg12 = (float)(param_m34);
+    float arg13 = (float)(param_m41);
+    float arg14 = (float)(param_m42);
+    float arg15 = (float)(param_m43);
+    float arg16 = (float)(param_m44);
+    setqtype<QMatrix4x4Type>(param_this,QMatrix4x4(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16));
+    return param_this;
+}
+
 Pointer qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4_QTransform(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_transform)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -99,6 +122,29 @@ double qt_QMatrix4x4_determinant_double_QMatrix4x4(Mu::Thread& NODE_THREAD, Poin
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
     return arg0.determinant();
+}
+
+void qt_QMatrix4x4_fill_void_QMatrix4x4_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_value)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_value);
+    arg0.fill(arg1);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
+void qt_QMatrix4x4_frustum_void_QMatrix4x4_float_float_float_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_left, float param_right, float param_bottom, float param_top, float param_nearPlane, float param_farPlane)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_left);
+    float arg2 = (float)(param_right);
+    float arg3 = (float)(param_bottom);
+    float arg4 = (float)(param_top);
+    float arg5 = (float)(param_nearPlane);
+    float arg6 = (float)(param_farPlane);
+    arg0.frustum(arg1, arg2, arg3, arg4, arg5, arg6);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
 }
 
 bool qt_QMatrix4x4_isAffine_bool_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -155,6 +201,20 @@ void qt_QMatrix4x4_optimize_void_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer par
     setqtype<QMatrix4x4Type>(param_this,arg0);
 }
 
+void qt_QMatrix4x4_ortho_void_QMatrix4x4_float_float_float_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_left, float param_right, float param_bottom, float param_top, float param_nearPlane, float param_farPlane)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_left);
+    float arg2 = (float)(param_right);
+    float arg3 = (float)(param_bottom);
+    float arg4 = (float)(param_top);
+    float arg5 = (float)(param_nearPlane);
+    float arg6 = (float)(param_farPlane);
+    arg0.ortho(arg1, arg2, arg3, arg4, arg5, arg6);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
 void qt_QMatrix4x4_ortho_void_QMatrix4x4_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -173,6 +233,60 @@ void qt_QMatrix4x4_ortho_void_QMatrix4x4_QRectF(Mu::Thread& NODE_THREAD, Pointer
     setqtype<QMatrix4x4Type>(param_this,arg0);
 }
 
+void qt_QMatrix4x4_perspective_void_QMatrix4x4_float_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_verticalAngle, float param_aspectRatio, float param_nearPlane, float param_farPlane)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_verticalAngle);
+    float arg2 = (float)(param_aspectRatio);
+    float arg3 = (float)(param_nearPlane);
+    float arg4 = (float)(param_farPlane);
+    arg0.perspective(arg1, arg2, arg3, arg4);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
+void qt_QMatrix4x4_rotate_void_QMatrix4x4_float_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_angle, float param_x, float param_y, float param_z)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_angle);
+    float arg2 = (float)(param_x);
+    float arg3 = (float)(param_y);
+    float arg4 = (float)(param_z);
+    arg0.rotate(arg1, arg2, arg3, arg4);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
+void qt_QMatrix4x4_scale_void_QMatrix4x4_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_x, float param_y)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_x);
+    float arg2 = (float)(param_y);
+    arg0.scale(arg1, arg2);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
+void qt_QMatrix4x4_scale_void_QMatrix4x4_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_x, float param_y, float param_z)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_x);
+    float arg2 = (float)(param_y);
+    float arg3 = (float)(param_z);
+    arg0.scale(arg1, arg2, arg3);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
+void qt_QMatrix4x4_scale_void_QMatrix4x4_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_factor)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_factor);
+    arg0.scale(arg1);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
 void qt_QMatrix4x4_setToIdentity_void_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -188,11 +302,54 @@ Pointer qt_QMatrix4x4_toTransform_QTransform_QMatrix4x4(Mu::Thread& NODE_THREAD,
     return makeqtype<QTransformType>(c,arg0.toTransform(),"qt.QTransform");
 }
 
+Pointer qt_QMatrix4x4_toTransform_QTransform_QMatrix4x4_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_distanceToPlane)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_distanceToPlane);
+    return makeqtype<QTransformType>(c,arg0.toTransform(arg1),"qt.QTransform");
+}
+
+void qt_QMatrix4x4_translate_void_QMatrix4x4_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_x, float param_y)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_x);
+    float arg2 = (float)(param_y);
+    arg0.translate(arg1, arg2);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
+void qt_QMatrix4x4_translate_void_QMatrix4x4_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_x, float param_y, float param_z)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_x);
+    float arg2 = (float)(param_y);
+    float arg3 = (float)(param_z);
+    arg0.translate(arg1, arg2, arg3);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
+}
+
 Pointer qt_QMatrix4x4_transposed_QMatrix4x4_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
     return makeqtype<QMatrix4x4Type>(c,arg0.transposed(),"qt.QMatrix4x4");
+}
+
+void qt_QMatrix4x4_viewport_void_QMatrix4x4_float_float_float_float_float_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_left, float param_bottom, float param_width, float param_height, float param_nearPlane, float param_farPlane)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_left);
+    float arg2 = (float)(param_bottom);
+    float arg3 = (float)(param_width);
+    float arg4 = (float)(param_height);
+    float arg5 = (float)(param_nearPlane);
+    float arg6 = (float)(param_farPlane);
+    arg0.viewport(arg1, arg2, arg3, arg4, arg5, arg6);
+    setqtype<QMatrix4x4Type>(param_this,arg0);
 }
 
 void qt_QMatrix4x4_viewport_void_QMatrix4x4_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
@@ -228,6 +385,14 @@ Pointer qt_QMatrix4x4_operatorMinus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4(Mu::Thr
     return makeqtype<QMatrix4x4Type>(c,arg0.operator-=(arg1),"qt.QMatrix4x4");
 }
 
+Pointer qt_QMatrix4x4_operatorSlash_EQ__QMatrix4x4_QMatrix4x4_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_divisor)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
+    float arg1 = (float)(param_divisor);
+    return makeqtype<QMatrix4x4Type>(c,arg0.operator/=(arg1),"qt.QMatrix4x4");
+}
+
 bool qt_QMatrix4x4_operatorEQ_EQ__bool_QMatrix4x4_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -242,6 +407,11 @@ static NODE_IMPLEMENTATION(_n_QMatrix4x40, Pointer)
     NODE_RETURN(qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
+static NODE_IMPLEMENTATION(_n_QMatrix4x42, Pointer)
+{
+    NODE_RETURN(qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float), NODE_ARG(5, float), NODE_ARG(6, float), NODE_ARG(7, float), NODE_ARG(8, float), NODE_ARG(9, float), NODE_ARG(10, float), NODE_ARG(11, float), NODE_ARG(12, float), NODE_ARG(13, float), NODE_ARG(14, float), NODE_ARG(15, float), NODE_ARG(16, float)));
+}
+
 static NODE_IMPLEMENTATION(_n_QMatrix4x44, Pointer)
 {
     NODE_RETURN(qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4_QTransform(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
@@ -250,6 +420,16 @@ static NODE_IMPLEMENTATION(_n_QMatrix4x44, Pointer)
 static NODE_IMPLEMENTATION(_n_determinant0, double)
 {
     NODE_RETURN(qt_QMatrix4x4_determinant_double_QMatrix4x4(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_fill0, void)
+{
+    qt_QMatrix4x4_fill_void_QMatrix4x4_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float));
+}
+
+static NODE_IMPLEMENTATION(_n_frustum0, void)
+{
+    qt_QMatrix4x4_frustum_void_QMatrix4x4_float_float_float_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float), NODE_ARG(5, float), NODE_ARG(6, float));
 }
 
 static NODE_IMPLEMENTATION(_n_isAffine0, bool)
@@ -287,6 +467,11 @@ static NODE_IMPLEMENTATION(_n_optimize0, void)
     qt_QMatrix4x4_optimize_void_QMatrix4x4(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
 }
 
+static NODE_IMPLEMENTATION(_n_ortho0, void)
+{
+    qt_QMatrix4x4_ortho_void_QMatrix4x4_float_float_float_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float), NODE_ARG(5, float), NODE_ARG(6, float));
+}
+
 static NODE_IMPLEMENTATION(_n_ortho1, void)
 {
     qt_QMatrix4x4_ortho_void_QMatrix4x4_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
@@ -295,6 +480,31 @@ static NODE_IMPLEMENTATION(_n_ortho1, void)
 static NODE_IMPLEMENTATION(_n_ortho2, void)
 {
     qt_QMatrix4x4_ortho_void_QMatrix4x4_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+}
+
+static NODE_IMPLEMENTATION(_n_perspective0, void)
+{
+    qt_QMatrix4x4_perspective_void_QMatrix4x4_float_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float));
+}
+
+static NODE_IMPLEMENTATION(_n_rotate1, void)
+{
+    qt_QMatrix4x4_rotate_void_QMatrix4x4_float_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float));
+}
+
+static NODE_IMPLEMENTATION(_n_scale1, void)
+{
+    qt_QMatrix4x4_scale_void_QMatrix4x4_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float));
+}
+
+static NODE_IMPLEMENTATION(_n_scale2, void)
+{
+    qt_QMatrix4x4_scale_void_QMatrix4x4_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float));
+}
+
+static NODE_IMPLEMENTATION(_n_scale3, void)
+{
+    qt_QMatrix4x4_scale_void_QMatrix4x4_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float));
 }
 
 static NODE_IMPLEMENTATION(_n_setToIdentity0, void)
@@ -307,9 +517,29 @@ static NODE_IMPLEMENTATION(_n_toTransform0, Pointer)
     NODE_RETURN(qt_QMatrix4x4_toTransform_QTransform_QMatrix4x4(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
+static NODE_IMPLEMENTATION(_n_toTransform1, Pointer)
+{
+    NODE_RETURN(qt_QMatrix4x4_toTransform_QTransform_QMatrix4x4_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float)));
+}
+
+static NODE_IMPLEMENTATION(_n_translate1, void)
+{
+    qt_QMatrix4x4_translate_void_QMatrix4x4_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float));
+}
+
+static NODE_IMPLEMENTATION(_n_translate2, void)
+{
+    qt_QMatrix4x4_translate_void_QMatrix4x4_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float));
+}
+
 static NODE_IMPLEMENTATION(_n_transposed0, Pointer)
 {
     NODE_RETURN(qt_QMatrix4x4_transposed_QMatrix4x4_QMatrix4x4(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_viewport0, void)
+{
+    qt_QMatrix4x4_viewport_void_QMatrix4x4_float_float_float_float_float_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float), NODE_ARG(5, float), NODE_ARG(6, float));
 }
 
 static NODE_IMPLEMENTATION(_n_viewport1, void)
@@ -330,6 +560,11 @@ static NODE_IMPLEMENTATION(_n_operatorPlus_EQ_0, Pointer)
 static NODE_IMPLEMENTATION(_n_operatorMinus_EQ_0, Pointer)
 {
     NODE_RETURN(qt_QMatrix4x4_operatorMinus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+}
+
+static NODE_IMPLEMENTATION(_n_operatorSlash_EQ_0, Pointer)
+{
+    NODE_RETURN(qt_QMatrix4x4_operatorSlash_EQ__QMatrix4x4_QMatrix4x4_float(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, float)));
 }
 
 static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
@@ -377,7 +612,7 @@ addSymbols(
     // member functions
     new Function(c, "QMatrix4x4", _n_QMatrix4x40, None, Compiled, qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
     // MISSING: QMatrix4x4 (QMatrix4x4; QMatrix4x4 this, "const float *" values)
-    // MISSING: QMatrix4x4 (QMatrix4x4; QMatrix4x4 this, "float" m11, "float" m12, "float" m13, "float" m14, "float" m21, "float" m22, "float" m23, "float" m24, "float" m31, "float" m32, "float" m33, "float" m34, "float" m41, "float" m42, "float" m43, "float" m44)
+    new Function(c, "QMatrix4x4", _n_QMatrix4x42, None, Compiled, qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float_float, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "m11", "float"), new Param(c, "m12", "float"), new Param(c, "m13", "float"), new Param(c, "m14", "float"), new Param(c, "m21", "float"), new Param(c, "m22", "float"), new Param(c, "m23", "float"), new Param(c, "m24", "float"), new Param(c, "m31", "float"), new Param(c, "m32", "float"), new Param(c, "m33", "float"), new Param(c, "m34", "float"), new Param(c, "m41", "float"), new Param(c, "m42", "float"), new Param(c, "m43", "float"), new Param(c, "m44", "float"), End),
     // MISSING: QMatrix4x4 (QMatrix4x4; QMatrix4x4 this, "const QGenericMatrix<N, M, float> &" matrix)
     new Function(c, "QMatrix4x4", _n_QMatrix4x44, None, Compiled, qt_QMatrix4x4_QMatrix4x4_QMatrix4x4_QMatrix4x4_QTransform, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "transform", "qt.QTransform"), End),
     // MISSING: column ("QVector4D"; QMatrix4x4 this, int index)
@@ -386,8 +621,8 @@ addSymbols(
     // MISSING: data ("float *"; QMatrix4x4 this)
     // MISSING: data ("const float *"; QMatrix4x4 this)
     new Function(c, "determinant", _n_determinant0, None, Compiled, qt_QMatrix4x4_determinant_double_QMatrix4x4, Return, "double", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
-    // MISSING: fill (void; QMatrix4x4 this, "float" value)
-    // MISSING: frustum (void; QMatrix4x4 this, "float" left, "float" right, "float" bottom, "float" top, "float" nearPlane, "float" farPlane)
+    new Function(c, "fill", _n_fill0, None, Compiled, qt_QMatrix4x4_fill_void_QMatrix4x4_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "value", "float"), End),
+    new Function(c, "frustum", _n_frustum0, None, Compiled, qt_QMatrix4x4_frustum_void_QMatrix4x4_float_float_float_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "left", "float"), new Param(c, "right", "float"), new Param(c, "bottom", "float"), new Param(c, "top", "float"), new Param(c, "nearPlane", "float"), new Param(c, "farPlane", "float"), End),
     // MISSING: inverted (QMatrix4x4; QMatrix4x4 this, "bool *" invertible)
     new Function(c, "isAffine", _n_isAffine0, None, Compiled, qt_QMatrix4x4_isAffine_bool_QMatrix4x4, Return, "bool", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
     new Function(c, "isIdentity", _n_isIdentity0, None, Compiled, qt_QMatrix4x4_isIdentity_bool_QMatrix4x4, Return, "bool", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
@@ -401,40 +636,40 @@ addSymbols(
     // MISSING: mapVector ("QVector3D"; QMatrix4x4 this, "const QVector3D &" vector)
     // MISSING: normalMatrix ("QMatrix3x3"; QMatrix4x4 this)
     new Function(c, "optimize", _n_optimize0, None, Compiled, qt_QMatrix4x4_optimize_void_QMatrix4x4, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
-    // MISSING: ortho (void; QMatrix4x4 this, "float" left, "float" right, "float" bottom, "float" top, "float" nearPlane, "float" farPlane)
+    new Function(c, "ortho", _n_ortho0, None, Compiled, qt_QMatrix4x4_ortho_void_QMatrix4x4_float_float_float_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "left", "float"), new Param(c, "right", "float"), new Param(c, "bottom", "float"), new Param(c, "top", "float"), new Param(c, "nearPlane", "float"), new Param(c, "farPlane", "float"), End),
     new Function(c, "ortho", _n_ortho1, None, Compiled, qt_QMatrix4x4_ortho_void_QMatrix4x4_QRect, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "rect", "qt.QRect"), End),
     new Function(c, "ortho", _n_ortho2, None, Compiled, qt_QMatrix4x4_ortho_void_QMatrix4x4_QRectF, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "rect", "qt.QRectF"), End),
-    // MISSING: perspective (void; QMatrix4x4 this, "float" verticalAngle, "float" aspectRatio, "float" nearPlane, "float" farPlane)
-    // MISSING: rotate (void; QMatrix4x4 this, "float" angle, "const QVector3D &" vector)
-    // MISSING: rotate (void; QMatrix4x4 this, "float" angle, "float" x, "float" y, "float" z)
+    new Function(c, "perspective", _n_perspective0, None, Compiled, qt_QMatrix4x4_perspective_void_QMatrix4x4_float_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "verticalAngle", "float"), new Param(c, "aspectRatio", "float"), new Param(c, "nearPlane", "float"), new Param(c, "farPlane", "float"), End),
+    // MISSING: rotate (void; QMatrix4x4 this, float angle, "const QVector3D &" vector)
+    new Function(c, "rotate", _n_rotate1, None, Compiled, qt_QMatrix4x4_rotate_void_QMatrix4x4_float_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "angle", "float"), new Param(c, "x", "float"), new Param(c, "y", "float"), new Param(c, "z", "float"), End),
     // MISSING: rotate (void; QMatrix4x4 this, "const QQuaternion &" quaternion)
     // MISSING: row ("QVector4D"; QMatrix4x4 this, int index)
     // MISSING: scale (void; QMatrix4x4 this, "const QVector3D &" vector)
-    // MISSING: scale (void; QMatrix4x4 this, "float" x, "float" y)
-    // MISSING: scale (void; QMatrix4x4 this, "float" x, "float" y, "float" z)
-    // MISSING: scale (void; QMatrix4x4 this, "float" factor)
+    new Function(c, "scale", _n_scale1, None, Compiled, qt_QMatrix4x4_scale_void_QMatrix4x4_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "x", "float"), new Param(c, "y", "float"), End),
+    new Function(c, "scale", _n_scale2, None, Compiled, qt_QMatrix4x4_scale_void_QMatrix4x4_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "x", "float"), new Param(c, "y", "float"), new Param(c, "z", "float"), End),
+    new Function(c, "scale", _n_scale3, None, Compiled, qt_QMatrix4x4_scale_void_QMatrix4x4_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "factor", "float"), End),
     // MISSING: setColumn (void; QMatrix4x4 this, int index, "const QVector4D &" value)
     // MISSING: setRow (void; QMatrix4x4 this, int index, "const QVector4D &" value)
     new Function(c, "setToIdentity", _n_setToIdentity0, None, Compiled, qt_QMatrix4x4_setToIdentity_void_QMatrix4x4, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
     // MISSING: toGenericMatrix ("QGenericMatrix<N, M, float>"; QMatrix4x4 this)
     new Function(c, "toTransform", _n_toTransform0, None, Compiled, qt_QMatrix4x4_toTransform_QTransform_QMatrix4x4, Return, "qt.QTransform", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
-    // MISSING: toTransform (QTransform; QMatrix4x4 this, "float" distanceToPlane)
+    new Function(c, "toTransform", _n_toTransform1, None, Compiled, qt_QMatrix4x4_toTransform_QTransform_QMatrix4x4_float, Return, "qt.QTransform", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "distanceToPlane", "float"), End),
     // MISSING: translate (void; QMatrix4x4 this, "const QVector3D &" vector)
-    // MISSING: translate (void; QMatrix4x4 this, "float" x, "float" y)
-    // MISSING: translate (void; QMatrix4x4 this, "float" x, "float" y, "float" z)
+    new Function(c, "translate", _n_translate1, None, Compiled, qt_QMatrix4x4_translate_void_QMatrix4x4_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "x", "float"), new Param(c, "y", "float"), End),
+    new Function(c, "translate", _n_translate2, None, Compiled, qt_QMatrix4x4_translate_void_QMatrix4x4_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "x", "float"), new Param(c, "y", "float"), new Param(c, "z", "float"), End),
     new Function(c, "transposed", _n_transposed0, None, Compiled, qt_QMatrix4x4_transposed_QMatrix4x4_QMatrix4x4, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), End),
-    // MISSING: viewport (void; QMatrix4x4 this, "float" left, "float" bottom, "float" width, "float" height, "float" nearPlane, "float" farPlane)
+    new Function(c, "viewport", _n_viewport0, None, Compiled, qt_QMatrix4x4_viewport_void_QMatrix4x4_float_float_float_float_float_float, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "left", "float"), new Param(c, "bottom", "float"), new Param(c, "width", "float"), new Param(c, "height", "float"), new Param(c, "nearPlane", "float"), new Param(c, "farPlane", "float"), End),
     new Function(c, "viewport", _n_viewport1, None, Compiled, qt_QMatrix4x4_viewport_void_QMatrix4x4_QRectF, Return, "void", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "rect", "qt.QRectF"), End),
     // MISSING: QVariant ("QVariant operator"; QMatrix4x4 this)
     // MISSING: = ("QMatrix4x4 & operator*"; QMatrix4x4 this, QMatrix4x4 other)
-    // MISSING: = ("QMatrix4x4 & operator*"; QMatrix4x4 this, "float" factor)
+    // MISSING: = ("QMatrix4x4 & operator*"; QMatrix4x4 this, float factor)
     // static functions
     EndArguments);
 globalScope()->addSymbols(
     new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorBang_EQ__bool_QMatrix4x4_QMatrix4x4, Return, "bool", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
     new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorPlus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
     new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorMinus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
-    // MISSING: /= (QMatrix4x4; QMatrix4x4 this, "float" divisor)
+    new Function(c, "/=", _n_operatorSlash_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorSlash_EQ__QMatrix4x4_QMatrix4x4_float, Return, "qt.QMatrix4x4", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "divisor", "float"), End),
     new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QMatrix4x4_operatorEQ_EQ__bool_QMatrix4x4_QMatrix4x4, Return, "bool", Parameters, new Param(c, "this", "qt.QMatrix4x4"), new Param(c, "other", "qt.QMatrix4x4"), End),
     EndArguments);
 scope()->addSymbols(

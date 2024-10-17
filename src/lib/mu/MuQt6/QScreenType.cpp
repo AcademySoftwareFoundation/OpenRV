@@ -196,6 +196,13 @@ int qt_QScreen_angleBetween_int_QScreen_int_int(Mu::Thread& NODE_THREAD, Pointer
     return arg0->angleBetween(arg1, arg2);
 }
 
+Pointer qt_QScreen_availableGeometry_QRect_QScreen(Mu::Thread& NODE_THREAD, Pointer param_this)
+{
+    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+    QScreen* arg0 = object<QScreen>(param_this);
+    return makeqtype<QRectType>(c,arg0->availableGeometry(),"qt.QRect");
+}
+
 bool qt_QScreen_isLandscape_bool_QScreen_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_o)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -293,6 +300,11 @@ void qt_QScreen_timerEvent_void_QScreen_QTimerEvent(Mu::Thread& NODE_THREAD, Poi
 static NODE_IMPLEMENTATION(_n_angleBetween0, int)
 {
     NODE_RETURN(qt_QScreen_angleBetween_int_QScreen_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
+}
+
+static NODE_IMPLEMENTATION(_n_availableGeometry0, Pointer)
+{
+    NODE_RETURN(qt_QScreen_availableGeometry_QRect_QScreen(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_isLandscape0, bool)
@@ -394,7 +406,7 @@ addSymbols(
     // enums
     // member functions
     new Function(c, "angleBetween", _n_angleBetween0, None, Compiled, qt_QScreen_angleBetween_int_QScreen_int_int, Return, "int", Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "a", "int"), new Param(c, "b", "int"), End),
-    // PROP: availableGeometry (QRect; QScreen this)
+    new Function(c, "availableGeometry", _n_availableGeometry0, None, Compiled, qt_QScreen_availableGeometry_QRect_QScreen, Return, "qt.QRect", Parameters, new Param(c, "this", "qt.QScreen"), End),
     // PROP: availableSize (QSize; QScreen this)
     // PROP: availableVirtualGeometry (QRect; QScreen this)
     // PROP: availableVirtualSize (QSize; QScreen this)
