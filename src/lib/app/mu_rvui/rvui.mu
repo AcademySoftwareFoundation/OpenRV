@@ -4200,7 +4200,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         cmd    = "\"%s\" \"%s\"" % (rv, target);
 
     saveSession(target, true, true);
-    qt.QProcess.startDetached (cmd);
+    qt.QProcess.startDetached (cmd, string[] {""});
 }
 
 \: cloneSyncedRV (void; Event ev)
@@ -4212,7 +4212,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         rv     = system.getenv ("RV_APP_RV"),
         cmd = "\"%s\" -network -networkPort %s -networkConnect 127.0.0.1 %s -flags syncPullFirst" % (rv, myPort+1, myPort);
 
-    qt.QProcess.startDetached (cmd);
+    qt.QProcess.startDetached (cmd, string[] {""});
 }
 
 \: save (void; Event ev)
