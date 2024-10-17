@@ -39,7 +39,6 @@
 #include <MuQt6/QDragMoveEventType.h>
 #include <MuQt6/QMenuType.h>
 #include <MuQt6/QResizeEventType.h>
-#include <MuQt6/QWebEngineHistoryType.h>
 #include <MuQt6/QWheelEventType.h>
 #include <MuQt6/QMouseEventType.h>
 #include <MuQt6/QFocusEventType.h>
@@ -804,13 +803,6 @@ Pointer qt_QWebEngineView_createStandardContextMenu_QMenu_QWebEngineView(Mu::Thr
     return makeinstance<QMenuType>(c, arg0->createStandardContextMenu(), "qt.QMenu");
 }
 
-Pointer qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-    return makeinstance<QWebEngineHistoryType>(c, arg0->history(), "qt.QWebEngineHistory");
-}
-
 void qt_QWebEngineView_load_void_QWebEngineView_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -1181,11 +1173,6 @@ static NODE_IMPLEMENTATION(_n_createStandardContextMenu0, Pointer)
     NODE_RETURN(qt_QWebEngineView_createStandardContextMenu_QMenu_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_history0, Pointer)
-{
-    NODE_RETURN(qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_load0, void)
 {
     qt_QWebEngineView_load_void_QWebEngineView_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
@@ -1439,7 +1426,6 @@ addSymbols(
     new Function(c, "QWebEngineView", _n_QWebEngineView2, None, Compiled, qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWebEnginePage_QWidget, Return, "qt.QWebEngineView", Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "page", "qt.QWebEnginePage"), new Param(c, "parent", "qt.QWidget"), End),
     new Function(c, "createStandardContextMenu", _n_createStandardContextMenu0, None, Compiled, qt_QWebEngineView_createStandardContextMenu_QMenu_QWebEngineView, Return, "qt.QMenu", Parameters, new Param(c, "this", "qt.QWebEngineView"), End),
     // PROP: hasSelection (bool; QWebEngineView this)
-    new Function(c, "history", _n_history0, None, Compiled, qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView, Return, "qt.QWebEngineHistory", Parameters, new Param(c, "this", "qt.QWebEngineView"), End),
     // PROP: icon (QIcon; QWebEngineView this)
     // PROP: iconUrl (QUrl; QWebEngineView this)
     // MISSING: lastContextMenuRequest ("QWebEngineContextMenuRequest *"; QWebEngineView this)

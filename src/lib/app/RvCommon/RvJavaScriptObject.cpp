@@ -8,11 +8,11 @@
 #include <RvCommon/RvJavaScriptObject.h>
 #include <RvCommon/RvDocument.h>
 #include <TwkQtCoreUtil/QtConvert.h>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtWebEngineWidgets/QWebEngineProfile>
-#include <QtWebEngineWidgets/QWebEngineScript>
-#include <QtWebEngineWidgets/QWebEngineScriptCollection>
-#include <QtWebChannel/QWebChannel>
+#include <QWebEnginePage>
+#include <QWebEngineProfile>
+#include <QWebEngineScript>
+#include <QWebEngineScriptCollection>
+#include <QWebChannel>
 
 namespace Rv {
 using namespace std;

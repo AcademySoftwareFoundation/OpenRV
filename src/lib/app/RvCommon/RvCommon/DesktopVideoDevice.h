@@ -13,7 +13,6 @@
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkApp/VideoModule.h>
-#include <QtOpenGL/QGLWidget>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <boost/thread/mutex.hpp>
 

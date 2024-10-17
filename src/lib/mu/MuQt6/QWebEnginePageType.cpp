@@ -39,7 +39,6 @@
 #include <MuQt6/QObjectType.h>
 #include <MuQt6/QEventType.h>
 #include <MuQt6/QWebChannelType.h>
-#include <MuQt6/QWebEngineHistoryType.h>
 #include <MuQt6/QUrlType.h>
 #include <MuQt6/QActionType.h>
 #include <MuQt6/QTimerEventType.h>
@@ -398,13 +397,6 @@ void qt_QWebEnginePage_download_void_QWebEnginePage_QUrl_string(Mu::Thread& NODE
     arg0->download(arg1, arg2);
 }
 
-Pointer qt_QWebEnginePage_history_QWebEngineHistory_QWebEnginePage(Mu::Thread& NODE_THREAD, Pointer param_this)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    QWebEnginePage* arg0 = object<QWebEnginePage>(param_this);
-    return makeinstance<QWebEngineHistoryType>(c, arg0->history(), "qt.QWebEngineHistory");
-}
-
 Pointer qt_QWebEnginePage_inspectedPage_QWebEnginePage_QWebEnginePage(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -642,11 +634,6 @@ static NODE_IMPLEMENTATION(_n_download0, void)
     qt_QWebEnginePage_download_void_QWebEnginePage_QUrl_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
 }
 
-static NODE_IMPLEMENTATION(_n_history0, Pointer)
-{
-    NODE_RETURN(qt_QWebEnginePage_history_QWebEngineHistory_QWebEnginePage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-}
-
 static NODE_IMPLEMENTATION(_n_inspectedPage0, Pointer)
 {
     NODE_RETURN(qt_QWebEnginePage_inspectedPage_QWebEnginePage_QWebEnginePage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
@@ -818,7 +805,6 @@ addSymbols(
     new Function(c, "devToolsPage", _n_devToolsPage0, None, Compiled, qt_QWebEnginePage_devToolsPage_QWebEnginePage_QWebEnginePage, Return, "qt.QWebEnginePage", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),
     new Function(c, "download", _n_download0, None, Compiled, qt_QWebEnginePage_download_void_QWebEnginePage_QUrl_string, Return, "void", Parameters, new Param(c, "this", "qt.QWebEnginePage"), new Param(c, "url", "qt.QUrl"), new Param(c, "filename", "string"), End),
     // PROP: hasSelection (bool; QWebEnginePage this)
-    new Function(c, "history", _n_history0, None, Compiled, qt_QWebEnginePage_history_QWebEngineHistory_QWebEnginePage, Return, "qt.QWebEngineHistory", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),
     // PROP: icon (QIcon; QWebEnginePage this)
     // PROP: iconUrl (QUrl; QWebEnginePage this)
     new Function(c, "inspectedPage", _n_inspectedPage0, None, Compiled, qt_QWebEnginePage_inspectedPage_QWebEnginePage_QWebEnginePage, Return, "qt.QWebEnginePage", Parameters, new Param(c, "this", "qt.QWebEnginePage"), End),

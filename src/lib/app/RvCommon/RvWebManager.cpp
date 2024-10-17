@@ -9,7 +9,7 @@
 #include <IPCore/Session.h>
 #include <QtCore/QUrl>
 #include <QtCore/QDir>
-#include <QtCore/QTextCodec>
+#include <QTextCodec>
 #include <QtCore/QStandardPaths>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>

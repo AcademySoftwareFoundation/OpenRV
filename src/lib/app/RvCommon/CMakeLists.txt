@@ -80,6 +80,13 @@ ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)
 
+
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  # Use Qt6 connections syntax because it generates the wrong QObject::connect for RvConsoleWindow.ui.
+  # TODO_QT: Could remove the connections from the UI XML and add them to RvConsoleWindow.cpp
+  SET(ui_options --connections string)
+ENDIF()
+
 FOREACH(
   ui_source
   ${_ui_sources}
@@ -233,8 +240,10 @@ IF(RV_TARGET_LINUX)
     SET(_rvcommon_qt_components X11Extras)
     SET(_rvcommon_link_libraries Qt::X11Extras)
   ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
-    SET(_rvcommon_qt_components Gui)
-    SET(_rvcommon_link_libraries Qt::GuiPrivate)
+    # TODO_QT: Core5Compat is temporary to fix issue with QTextCodec and other things = faster build to test.
+    #          https://doc.qt.io/qt-6.5/qtcore5compat-module.html
+    SET(_rvcommon_qt_components Gui Core5Compat)
+    SET(_rvcommon_link_libraries Qt::GuiPrivate Qt6::Core5Compat)
   ENDIF()
 
   FIND_PACKAGE(

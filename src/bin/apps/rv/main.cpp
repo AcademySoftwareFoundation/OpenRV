@@ -95,6 +95,7 @@
     #include <QtOpenGL/QGLContext>
 #endif
 
+#include <QTextCodec>
 #include <QtWidgets/QtWidgets>
 #include <QtGui/QtGui>
 #include <RvCommon/RvDocument.h>
