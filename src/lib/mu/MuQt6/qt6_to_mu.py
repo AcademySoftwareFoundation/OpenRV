@@ -912,6 +912,7 @@ exclusionMap = {
     "QProcess::createProcessArgumentsModifier": None,
     "QProcess::setCreateProcessArgumentsModifier": None,
     "QProcess::setChildProcessModifier": None,
+    "QProcess::startDetached": None, # handrolled
     "QMenuBar::defaultAction": None,
     "QMenuBar::setDefaultAction": None,
     "QPlainTextEdit::extraSelections": None,

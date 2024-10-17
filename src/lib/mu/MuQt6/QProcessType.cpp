@@ -1026,6 +1026,31 @@ static NODE_IMPLEMENTATION(_n_systemEnvironment0, Pointer)
 }
 
 
+//
+// Copyright (C) 2024  Autodesk, Inc. All Rights Reserved. 
+// 
+// SPDX-License-Identifier: Apache-2.0 
+//
+
+bool qt_QProcess_startDetached_bool_string_stringBSB_ESB_(Mu::Thread& NODE_THREAD, 
+                                                          Pointer param_command,
+                                                          Pointer param_arguments)
+{
+    // Leave the default value for the 3rd and 4th arguments
+    //    const QString &workingDirectory = QString()
+    //    qint64 *pid = nullptr
+
+    const QString arg0 = qstring(param_command);
+    const QStringList arg1 = qstringlist(param_arguments);
+    return QProcess::startDetached(arg0, arg1);
+}
+
+static NODE_IMPLEMENTATION(_n_startDetached0, bool)
+{
+    NODE_RETURN(qt_QProcess_startDetached_bool_string_stringBSB_ESB_(NODE_THREAD, 
+                                                                     NODE_ARG(0, Pointer),
+                                                                     NODE_ARG(1, Pointer)));
+}
 
 void
 QProcessType::load()
@@ -1120,7 +1145,6 @@ addSymbols(
     new Function(c, "start", _n_start0, None, Compiled, qt_QProcess_start_void_QProcess_string_stringBSB_ESB__int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "program", "string"), new Param(c, "arguments", "string[]"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
     new Function(c, "start", _n_start1, None, Compiled, qt_QProcess_start_void_QProcess_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
     new Function(c, "startCommand", _n_startCommand0, None, Compiled, qt_QProcess_startCommand_void_QProcess_string_int, Return, "void", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "command", "string"), new Param(c, "mode", "int", Value((int)QIODeviceBase::ReadWrite)), End),
-    // MISSING: startDetached (bool; QProcess this, "qint64 *" pid)
     new Function(c, "state", _n_state0, None, Compiled, qt_QProcess_state_int_QProcess, Return, "int", Parameters, new Param(c, "this", "qt.QProcess"), End),
     new Function(c, "waitForFinished", _n_waitForFinished0, None, Compiled, qt_QProcess_waitForFinished_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "msecs", "int", Value((int)30000)), End),
     new Function(c, "waitForStarted", _n_waitForStarted0, None, Compiled, qt_QProcess_waitForStarted_bool_QProcess_int, Return, "bool", Parameters, new Param(c, "this", "qt.QProcess"), new Param(c, "msecs", "int", Value((int)30000)), End),
@@ -1147,7 +1171,6 @@ addSymbols(
     new Function(c, "execute", _n_execute0, None, Compiled, qt_QProcess_execute_int_string_stringBSB_ESB_, Return, "int", Parameters, new Param(c, "program", "string"), new Param(c, "arguments", "string[]"), End),
     new Function(c, "nullDevice", _n_nullDevice0, None, Compiled, qt_QProcess_nullDevice_string, Return, "string", End),
     // MISSING: splitCommand (string[]; "QStringView" command)
-    // MISSING: startDetached (bool; string program, string[] arguments, string workingDirectory, "qint64 *" pid)
     new Function(c, "systemEnvironment", _n_systemEnvironment0, None, Compiled, qt_QProcess_systemEnvironment_stringBSB_ESB_, Return, "string[]", End),
     EndArguments);
 globalScope()->addSymbols(
@@ -1155,6 +1178,31 @@ globalScope()->addSymbols(
 scope()->addSymbols(
     EndArguments);
 
+//
+// Copyright (C) 2024  Autodesk, Inc. All Rights Reserved. 
+// 
+// SPDX-License-Identifier: Apache-2.0 
+//
+
+// MISSING: startDetached (bool; string program, string[] arguments, string workingDirectory, "qint64 *" pid)
+
+addSymbol(
+    new Function(
+        c, 
+        "startDetached", 
+        _n_startDetached0, 
+        None, 
+        Compiled,
+        // qt_QProcess_startDetached_bool_string_stringBSB_ESB_string_int64, 
+        qt_QProcess_startDetached_bool_string_stringBSB_ESB_, 
+        Return, 
+        "bool", 
+        Parameters, 
+        new Param(c, "command", "string"),
+        new Param(c, "arguments", "string[]"),
+        End
+    )
+);
 
     const char** propExclusions = 0;
 
