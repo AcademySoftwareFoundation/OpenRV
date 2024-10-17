@@ -279,6 +279,10 @@ void initUICommands(MuLangContext* context)
                                       new Param(c, "doEncode", "bool", Value(true)), 
                                       End),
 
+                         new Function(c, "pasteTextFromClipboard", pasteTextFromClipboard, None,
+                                      Return, "string",
+                                      End),
+
                          new Function(c, "myNetworkPort", myNetworkPort, None,
                                       Return, "int",
                                       End),
@@ -464,6 +468,11 @@ NODE_DECLARATION(sessionFromUrl, void)
 
 NODE_DECLARATION(putUrlOnClipboard, void)
 {
+}
+
+NODE_DECLARAION(pasteTextFromClipboard, Mu::Pointer)
+{
+    NODE_RETURN(0); // Will represent a string
 }
 
 NODE_DECLARATION(myNetworkPort, int)
