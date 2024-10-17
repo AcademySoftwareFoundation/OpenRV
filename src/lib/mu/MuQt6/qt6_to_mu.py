@@ -1238,7 +1238,7 @@ exclusionMap = {
     "QTextStream::operator>>": None,
     # cannot convert from 'std::chrono::milliseconds' to 'int'
     "QTimer::intervalAsDuration": None,
-    # cannot convert from 'std::chrono::milliseconds' to 'int'
+    # cannot convert from 'std::chrono::milliseconds' to 'int' 
     "QTimer::remainingTimeAsDuration": None,
     "QCursor::bitmap": None,
     "QCursor::mask": None,
@@ -1251,6 +1251,8 @@ exclusionMap = {
     "QWebEnginePage::runJavaScript": None,
     "QWebEnginePage::toHtml": None,
     "QWebEnginePage::toPlainText": None,
+    "QWebEnginePage::history": None,
+    "QWebEngineView::history": None,
     "QWebEngineProfile::setNotificationPresenter": None,
     "QWebEngineProfile::requestIconForIconURL": None,
     "QWebEngineProfile::requestIconForPageURL": None,

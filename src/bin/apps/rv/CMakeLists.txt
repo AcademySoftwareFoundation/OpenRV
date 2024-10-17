@@ -20,9 +20,16 @@ SET(CMAKE_AUTORCC
     ON
 )
 
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+# TODO_QT: Core5Compat is temporary to fix issue with QTextCodec and other things = faster build to test.
+#          https://doc.qt.io/qt-6.5/qtcore5compat-module.html
+SET(_main_qt_components Core5Compat)
+SET(_main_link_libraries Qt6::Core5Compat)
+ENDIF()
+
 FIND_PACKAGE(
   ${RV_QT_PACKAGE_NAME}
-  COMPONENTS Core Gui Widgets OpenGL
+  COMPONENTS Core Gui Widgets OpenGL ${_main_qt_components}
   REQUIRED
 )
 
@@ -105,6 +112,7 @@ TARGET_LINK_LIBRARIES(
           TwkGLF
           arg
           stl_ext
+          ${_main_link_libraries}
 )
 
 IF(RV_TARGET_WINDOWS)

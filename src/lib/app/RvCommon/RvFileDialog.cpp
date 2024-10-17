@@ -29,7 +29,6 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QDirModel>
 
 
 namespace Rv {
@@ -326,7 +325,11 @@ RvFileDialog::RvFileDialog(QWidget* parent,
             this, SLOT(fileTypeChanged(int)));
 
     QCompleter *completer = new QCompleter(this);
-    completer->setModel(new QDirModel(completer));
+
+    QFileSystemModel *fileSystemModel = new QFileSystemModel(completer);
+    // TODO_QT: Is AllEntries fine here?
+    fileSystemModel->setFilter(QDir::AllEntries);
+    completer->setModel(fileSystemModel);
     completer->setCompletionMode(QCompleter::InlineCompletion);
     m_ui.currentPath->setCompleter(completer);
     m_ui.currentPath->setText("");
@@ -455,9 +458,9 @@ RvFileDialog::findMountPoints()
 {
     QFileInfoList list;
 
-    list.push_back(QDir::home().path());
+    list.push_back(QFileInfo(QDir::home().path()));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_DARWIN)
-    list.push_back(QString("/"));
+    list.push_back(QFileInfo(QString("/")));
     m_drives.insert ("/");
 #endif
 
@@ -712,7 +715,7 @@ RvFileDialog::setDirectory(const QString& inpath, bool force)
     }
     else if (m_viewMode == ColumnView)
     {
-        QModelIndex i = m_columnModel->indexOfPath(absoluteDirPath);
+        QModelIndex i = m_columnModel->indexOfPath(QFileInfo(absoluteDirPath));
 
         if (!i.isValid())
         {
@@ -769,7 +772,7 @@ RvFileDialog::setDirectory(const QString& inpath, bool force)
 #ifdef WIN32
             if (aPathNoSlash.endsWith("/")) aPathNoSlash.chop(1);
 #endif
-            m_ui.pathCombo->addItem(iconForFile(aPath), 
+            m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)), 
                                     aPathNoSlash,
                                     aPath);
 
@@ -778,7 +781,7 @@ RvFileDialog::setDirectory(const QString& inpath, bool force)
         else
         {
             DB ("    not at root: '" << aPath.toUtf8().data() << "'");
-            m_ui.pathCombo->addItem(iconForFile(aPath),
+            m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)),
                                     dName,
                                     aPath);
         }
@@ -1225,7 +1228,7 @@ void
 RvFileDialog::columnViewTimeout()
 {
     DB ("columnViewTimeout file " << m_columnViewFile.toUtf8().data());
-    QModelIndex i = m_columnModel->indexOfPath(m_columnViewFile);
+    QModelIndex i = m_columnModel->indexOfPath(QFileInfo(m_columnViewFile));
     if (i.isValid()) m_columnView->setCurrentIndex(i);
 }
 
@@ -1758,7 +1761,7 @@ RvFileDialog::nextButtonTrigger(QAction*)
 void
 RvFileDialog::sortComboChanged(int index)
 {
-    QDir::SortFlags f = 0;
+    QDir::SortFlags f = QDir::Name;
 
     switch (index)
     {
