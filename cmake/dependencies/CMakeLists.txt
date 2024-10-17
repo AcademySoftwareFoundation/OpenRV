@@ -128,7 +128,13 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 MESSAGE(STATUS "Using PNG:          ${RV_DEPS_PNG_VERSION}")
 MESSAGE(STATUS "Using Python3:      ${RV_DEPS_PYTHON3_VERSION}")
-MESSAGE(STATUS "Using PySide2:      ${RV_DEPS_PYSIDE2_VERSION}")
+
+RV_VFX_SET_VARIABLE(
+  _rv_deps_pyside_version
+  CY2023 "Using PySide2:      ${RV_DEPS_PYSIDE_VERSION}"
+  CY2024 "Using PySide6:      ${RV_DEPS_PYSIDE_VERSION}"
+)
+MESSAGE(STATUS "${_rv_deps_pyside_version}")
 
 RV_VFX_SET_VARIABLE(
   _rv_deps_qt_version

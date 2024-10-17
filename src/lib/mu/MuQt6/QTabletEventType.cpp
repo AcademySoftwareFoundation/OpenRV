@@ -165,7 +165,7 @@ addSymbols(
 addSymbols(
     // enums
     // member functions
-    // MISSING: QTabletEvent (QTabletEvent; QTabletEvent this, flags QEvent::Type type, "const QPointingDevice *" dev, QPointF pos, QPointF globalPos, double pressure, "float" xTilt, "float" yTilt, "float" tangentialPressure, double rotation, "float" z, flags Qt::KeyboardModifiers keyState, flags Qt::MouseButton button, flags Qt::MouseButtons buttons)
+    // MISSING: QTabletEvent (QTabletEvent; QTabletEvent this, flags QEvent::Type type, "const QPointingDevice *" dev, QPointF pos, QPointF globalPos, double pressure, float xTilt, float yTilt, float tangentialPressure, double rotation, float z, flags Qt::KeyboardModifiers keyState, flags Qt::MouseButton button, flags Qt::MouseButtons buttons)
     new Function(c, "pressure", _n_pressure0, None, Compiled, qt_QTabletEvent_pressure_double_QTabletEvent, Return, "double", Parameters, new Param(c, "this", "qt.QTabletEvent"), End),
     new Function(c, "rotation", _n_rotation0, None, Compiled, qt_QTabletEvent_rotation_double_QTabletEvent, Return, "double", Parameters, new Param(c, "this", "qt.QTabletEvent"), End),
     new Function(c, "tangentialPressure", _n_tangentialPressure0, None, Compiled, qt_QTabletEvent_tangentialPressure_double_QTabletEvent, Return, "double", Parameters, new Param(c, "this", "qt.QTabletEvent"), End),

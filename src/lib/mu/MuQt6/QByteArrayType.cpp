@@ -669,7 +669,7 @@ addSymbols(
     // MISSING: setNum (QByteArray; QByteArray this, "ulong" n, int base)
     // MISSING: setNum (QByteArray; QByteArray this, "qlonglong" n, int base)
     // MISSING: setNum (QByteArray; QByteArray this, "qulonglong" n, int base)
-    // MISSING: setNum (QByteArray; QByteArray this, "float" n, "char" format, int precision)
+    // MISSING: setNum (QByteArray; QByteArray this, float n, "char" format, int precision)
     // MISSING: setNum (QByteArray; QByteArray this, double n, "char" format, int precision)
     // MISSING: setRawData (QByteArray; QByteArray this, "const char *" data, "qsizetype" size)
     new Function(c, "shrink_to_fit", _n_shrink_to_fit0, None, Compiled, qt_QByteArray_shrink_to_fit_void_QByteArray, Return, "void", Parameters, new Param(c, "this", "qt.QByteArray"), End),
@@ -685,7 +685,7 @@ addSymbols(
     new Function(c, "toBase64", _n_toBase640, None, Compiled, qt_QByteArray_toBase64_QByteArray_QByteArray_int, Return, "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "options", "int", Value((int)QByteArray::Base64Encoding)), End),
     // MISSING: toCFData ("CFDataRef"; QByteArray this)
     // MISSING: toDouble (double; QByteArray this, "bool *" ok)
-    // MISSING: toFloat ("float"; QByteArray this, "bool *" ok)
+    // MISSING: toFloat (float; QByteArray this, "bool *" ok)
     // MISSING: toHex (QByteArray; QByteArray this, "char" separator)
     // MISSING: toInt (int; QByteArray this, "bool *" ok, int base)
     // MISSING: toLong ("long"; QByteArray this, "bool *" ok, int base)
