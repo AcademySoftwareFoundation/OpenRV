@@ -296,11 +296,6 @@ CommandsModule::load()
                             new Param(c, "file", "string"),
                             End),
 
-                new Function(c, "qtMajorVersion", 
-                             CommandsModule::qtMajorVersion, None,
-                             Return, "int",
-                             End),
-
                EndArguments);
 }
 
@@ -1026,15 +1021,6 @@ NODE_IMPLEMENTATION(CommandsModule::sequenceOfFile, Pointer)
     pt->frame = pp.second;
 
     NODE_RETURN(tuple);
-}
-
-NODE_IMPLEMENTATION(CommandsModule::qtMajorVersion, int)
-{
-#if defined( RV_VFX_CY2023 )
-    NODE_RETURN(5);
-#else
-    NODE_RETURN(6);
-#endif
 }
 
 } // MuTwkApp
