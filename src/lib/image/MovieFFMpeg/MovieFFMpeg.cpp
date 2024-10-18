@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <math.h>
 #include <algorithm>
+#include <array>
 #include <stdlib.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
