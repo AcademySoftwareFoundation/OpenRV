@@ -21,11 +21,18 @@ SET(CMAKE_AUTORCC
     ON
 )
 
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  # TODO_QT: Core5Compat is temporary to fix issue with QTextCodec.
+  #          https://doc.qt.io/qt-6.5/qtcore5compat-module.html
+  SET(_rvcommon_core5compat_component Core5Compat)
+  SET(_rvcommon_core5compat_link_libraries Qt6::Core5Compat)
+ENDIF()
+
 #
 # This find_package statement is also required to find QT's build tools like 'uic' required just below. Keep this line before 'qt5_wrap_ui'
 FIND_PACKAGE(
   ${RV_QT_PACKAGE_NAME}
-  COMPONENTS Core Gui OpenGL Widgets ${QT6_QOPENGLWIDGET_COMPONENT}
+  COMPONENTS Core Gui OpenGL Widgets ${QT6_QOPENGLWIDGET_COMPONENT} ${_rvcommon_core5compat_component}
   REQUIRED
 )
 
@@ -188,6 +195,7 @@ TARGET_LINK_LIBRARIES(
          Qt::Widgets
          Qt::OpenGL
          ${QT6_QOPENGLWIDGET_TARGET}
+         ${_rvcommon_core5compat_link_libraries}
   PRIVATE Python::Python
           IPBaseNodes
           ${RV_QT_MU_TARGET}
@@ -240,10 +248,8 @@ IF(RV_TARGET_LINUX)
     SET(_rvcommon_qt_components X11Extras)
     SET(_rvcommon_link_libraries Qt::X11Extras)
   ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
-    # TODO_QT: Core5Compat is temporary to fix issue with QTextCodec and other things = faster build to test.
-    #          https://doc.qt.io/qt-6.5/qtcore5compat-module.html
-    SET(_rvcommon_qt_components Gui Core5Compat)
-    SET(_rvcommon_link_libraries Qt::GuiPrivate Qt6::Core5Compat)
+    SET(_rvcommon_qt_components Gui)
+    SET(_rvcommon_link_libraries Qt::GuiPrivate)
   ENDIF()
 
   FIND_PACKAGE(

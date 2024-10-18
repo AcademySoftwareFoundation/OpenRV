@@ -77,6 +77,46 @@ def prepare() -> None:
     if os.path.exists(TEMP_DIR) is False:
         os.makedirs(TEMP_DIR)
 
+    # PySide6 requires Clang 13+.
+    print("Setting up Clang...")
+    clang_filename_suffix = ""
+
+    system = platform.system()
+    if system == "Darwin":
+        clang_version_search = re.search(
+            "version (\d+)\.(\d+)\.(\d+)",
+            os.popen("clang --version").read(),
+        )
+        clang_version_str = ".".join(clang_version_search.groups())
+        clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
+    elif system == "Linux":
+        clang_filename_suffix = "19.1.0-based-linux-Rhel8.8-gcc10.3-x86_64.7z"
+    elif system == "Windows":
+        clang_filename_suffix = "19.1.0-based-windows-vs2019_64.7z"
+
+    download_url = LIBCLANG_URL_BASE + clang_filename_suffix
+    libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
+    if os.path.exists(libclang_zip) is False:
+        download_file(download_url, libclang_zip)
+    # if we have a failed download, clean it up and redownload.
+    # checking for False since it can return None when archive doesn't have a CRC
+    elif verify_7z_archive(libclang_zip) is False:
+        os.remove(libclang_zip)
+        download_file(download_url, libclang_zip)
+
+    # clean up previous failed extraction
+    libclang_tmp = os.path.join(TEMP_DIR, "libclang-tmp")
+    if os.path.exists(libclang_tmp) is True:
+        shutil.rmtree(libclang_tmp)
+
+    # extract to a temp location and only move if successful
+    libclang_extracted = os.path.join(TEMP_DIR, "libclang")
+    if os.path.exists(libclang_extracted) is False:
+        extract_7z_archive(libclang_zip, libclang_tmp)
+        shutil.move(libclang_tmp, libclang_extracted)
+
+    libclang_install_dir = os.path.join(libclang_extracted, "libclang")
+    
     if OPENSSL_OUTPUT_DIR:
         os.environ["PATH"] = os.path.pathsep.join(
             [
@@ -86,6 +126,9 @@ def prepare() -> None:
         )
 
     print(f"PATH={os.environ['PATH']}")
+
+    os.environ["LLVM_INSTALL_DIR"] = libclang_install_dir
+    os.environ["CLANG_INSTALL_DIR"] = libclang_install_dir
 
     # PySide6 build requires numpy 1.26.3
     install_numpy_args = get_python_interpreter_args(PYTHON_OUTPUT_DIR) + [
