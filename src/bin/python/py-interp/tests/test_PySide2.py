@@ -4,8 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0 
 #
 import unittest
-import PySide2
-from PySide2 import *
+
+try:
+    import PySide2
+    from PySide2 import *
+except ImportError:
+  try:
+    import PySide6
+    from PySide6 import *
+  except ImportError:
+    pass
 
 
 class TestPySide2(unittest.TestCase):
