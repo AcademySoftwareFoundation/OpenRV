@@ -54,12 +54,23 @@ app = None
 
 def fetch_pyside(url):
     def impl(url):
-        from PySide2.QtCore import QEventLoop, QUrl, QCoreApplication
-        from PySide2.QtNetwork import (
-            QNetworkRequest,
-            QNetworkReply,
-            QNetworkAccessManager,
-        )
+        try:
+            from PySide2.QtCore import QEventLoop, QUrl, QCoreApplication
+            from PySide2.QtNetwork import (
+                QNetworkRequest,
+                QNetworkReply,
+                QNetworkAccessManager,
+            )
+        except ImportError:
+        try:
+            from PySide6.QtCore import QEventLoop, QUrl, QCoreApplication
+            from PySide6.QtNetwork import (
+                QNetworkRequest,
+                QNetworkReply,
+                QNetworkAccessManager,
+            )
+        except ImportError:
+            pass
 
         global app
         if app is None:

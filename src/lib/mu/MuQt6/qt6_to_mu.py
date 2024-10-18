@@ -469,6 +469,7 @@ translationMap = {
     "uint": "int",
     "bool": "bool",
     "double": "double",
+    "float": "float",
     "qreal": "double",
     "qint64": "int64",
     "quint32": "int",
@@ -848,7 +849,8 @@ forceEnumOutput = {
 doProps = ["QInputDialog"]
 
 doPropsIfFuncToo = [
-    "primaryScreen"
+    "primaryScreen",
+    "availableGeometry"
 ]
 
 noHFileOutput = []  # ["QObject"]

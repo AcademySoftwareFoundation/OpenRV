@@ -18,6 +18,12 @@ def setup_webview_default_profile():
     default_profile.setHttpUserAgent(user_agent)
 
 
-from PySide2.QtWebEngineWidgets import QWebEngineProfile
+try:
+    from PySide2.QtWebEngineWidgets import QWebEngineProfile
+except ImportError:
+  try:
+    from PySide6.QtWebEngineCore import QWebEngineProfile
+  except ImportError:
+    pass
 
 setup_webview_default_profile()
