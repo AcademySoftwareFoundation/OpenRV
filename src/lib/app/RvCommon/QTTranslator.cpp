@@ -625,9 +625,14 @@ QTTranslator::sendMouseEvent(QEvent* qevent, float activationTime) const
     bool b1 = event->buttons() & Qt::LeftButton;
     bool b2 = event->buttons() & Qt::MiddleButton;
     bool b3 = event->buttons() & Qt::RightButton;
-    
+
+#if defined( RV_VFX_CY2023 )
+    m_x = (m_xscale * event->x()) + m_xoffset;
+    m_y = (m_yscale * (m_widget->height() - event->y())) + m_yoffset;
+#else
     m_x = (m_xscale * event->position().x()) + m_xoffset;
     m_y = (m_yscale * (m_widget->height() - event->position().y())) + m_yoffset;
+#endif
 
     if (type == QEvent::MouseMove && !buttons())
     {
@@ -913,11 +918,19 @@ QTTranslator::sendDNDEvent(QEvent* event) const
 
             for (int i=0; i < seqs.size(); i++)
             {
+#if defined( RV_VFX_CY2023 )
+                DragDropEvent e(ename, m_node, type, DragDropEvent::File, 
+                                seqs[i], 0, 
+                                devent->pos().x(), 
+                                h - devent->pos().y() - 1, 
+                                w, h);
+#else
                 DragDropEvent e(ename, m_node, type, DragDropEvent::File, 
                                 seqs[i], 0, 
                                 devent->position().toPoint().x(), 
                                 h - devent->position().toPoint().y() - 1, 
                                 w, h);
+#endif
 
                 sendEvent(e);
                 if (e.handled) handled = true;
@@ -925,11 +938,19 @@ QTTranslator::sendDNDEvent(QEvent* event) const
 
             for (int i=0; i < nonfiles.size(); i++)
             {
+#if defined( RV_VFX_CY2023 )
+                DragDropEvent e(ename, m_node, type, DragDropEvent::URL, 
+                                nonfiles[i], 0, 
+                                devent->pos().x(), 
+                                h - devent->pos().y() - 1, 
+                                w, h);
+#else
                 DragDropEvent e(ename, m_node, type, DragDropEvent::URL, 
                                 nonfiles[i], 0, 
                                 devent->position().toPoint().x(), 
                                 h - devent->position().toPoint().y() - 1, 
                                 w, h);
+#endif
 
                 sendEvent(e);
                 if (e.handled) handled = true;
@@ -937,11 +958,19 @@ QTTranslator::sendDNDEvent(QEvent* event) const
         }
         else if (devent->mimeData()->hasText())
         {
+#if defined( RV_VFX_CY2023 )
+            DragDropEvent e(ename, m_node, type, DragDropEvent::Text, 
+                            devent->mimeData()->text().toUtf8().constData(), 0, 
+                            devent->pos().x(), 
+                            h - devent->pos().y() - 1, 
+                            w, h);
+#else
             DragDropEvent e(ename, m_node, type, DragDropEvent::Text, 
                             devent->mimeData()->text().toUtf8().constData(), 0, 
                             devent->position().toPoint().x(), 
                             h - devent->position().toPoint().y() - 1, 
                             w, h);
+#endif
 
             sendEvent(e);
             if (e.handled) handled = true;

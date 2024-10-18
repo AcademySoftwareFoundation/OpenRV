@@ -53,6 +53,9 @@ FIND_PACKAGE(
   REQUIRED
 )
 
+SET(QT_MOC_EXECUTABLE "${Qt5Core_MOC_EXECUTABLE}" CACHE STRING "Qt MOC executable")
+SET(QT_UIC_EXECUTABLE "${Qt5Widgets_UIC_EXECUTABLE}" CACHE STRING "Qt UIC executable")
+
 SET(_qt_copy_message
     "Copying Qt into ${RV_STAGE_ROOT_DIR}"
 )
