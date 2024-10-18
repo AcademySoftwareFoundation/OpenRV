@@ -217,6 +217,9 @@ RvSession::RvSession()
 
     if (firstTime)
     {
+        // NOTE_QT: The comment below is not necessary true in Qt6 because the context is not valid until widget shown.
+        //          A custom context could be created I think, but it might required a lot more changes to make it work.
+
         //
         //  Initialize nodes here -- at this point we know that GL has
         //  been initialized which is currently required for node
@@ -226,6 +229,9 @@ RvSession::RvSession()
         IPCore::Application::setOptionValueFromEnvironment("nodePath", "TWK_NODE_PLUGIN_PATH");
         IPCore::Application::setOptionValueFromEnvironment("nodeDefinitionOverride", "TWK_NODE_DEFINITION_OVERRIDE");
         addRvNodeDefinitions(IPCore::Application::instance()->nodeManager());
+
+        // NOTE_QT: This function call ends up in the following code path:
+        //          new Shader::Function -> initGLSLVersion() -> glGetString -> crashes because no context
         IPCore::Application::instance()->loadOptionNodeDefinitions();
         firstTime = false;
     }

@@ -506,6 +506,18 @@ int main(int argc, char *argv[])
     //  Application
     //
 
+    QSurfaceFormat fmt;
+    fmt.setRenderableType(QSurfaceFormat::OpenGL);
+
+    // NOTE_QT: Set to version 2.1 for now.
+    fmt.setMajorVersion(2);
+    fmt.setMinorVersion(1);
+
+    //fmt.setProfile(QSurfaceFormat::CoreProfile);
+    //fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+    QSurfaceFormat::setDefaultFormat(fmt);
+
     QApplication* app = new QApplication(argc, argv);
 
     QTranslator* translator = new QTranslator();

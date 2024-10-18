@@ -15,7 +15,6 @@
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
-#include <RvCommon/InitGL.h>
 //#include <RvCommon/QTFrameBuffer.h>
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
@@ -47,10 +46,14 @@
 #include <stl_ext/string_algo.h>
 
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QDesktopWidget>
+#include <QScreen>
 
 #ifdef PLATFORM_LINUX
+#if defined( RV_VFX_CY2023 )
 #include <QtX11Extras/QX11Info>
+#else
+#include <QtGui/private/qtx11extras_p.h>
+#endif
 #include <X11/Xlib.h>
 #endif
 
@@ -178,25 +181,12 @@ RvDocument::RvDocument()
                               opts.dispAlphaBits,
                               !m_startupResize
                               );
-
-        //
-        //  Make the GL context valid ASAP so we can query it later
-        //
-
-        if (!m_glView->isValid())
-        {
-            delete m_glView;
-            //cout << "ERROR: reverting to known GL state" << endl;
-            //cout << "ERROR: check the rendering preferences" << endl;
-            m_glView = new GLView(this, 0, this);
-            resetGLPrefs = true;
-        }
     }
     else
     {
         RvSession* s = static_cast<RvSession*>(docs.front());
         RvDocument *rvDoc = (RvDocument*)s->opaquePointer();
-        m_glView = new GLView(this, rvDoc->view(), this,
+        m_glView = new GLView(this, rvDoc->view()->context(), this,
                               opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                               opts.vsync != 0 && !m_vsyncDisabled,
                               true, // double buffer
@@ -206,25 +196,15 @@ RvDocument::RvDocument()
                               opts.dispAlphaBits,
                               !m_startupResize
                               );
-
-        if (!m_glView->isValid())
-        {
-            delete m_glView;
-            //cout << "ERROR: reverting to known GL state" << endl;
-            //cout << "ERROR: check the rendering preferences" << endl;
-            m_glView = new GLView(this, rvDoc->view(), this);
-            resetGLPrefs = true;
-        }
     }
-
 
     m_stackedLayout = new QStackedLayout(m_centralWidget);
     m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
     m_stackedLayout->addWidget(m_glView);
-
+    
     setCentralWidget(m_viewContainerWidget);
 
-    //QTFrameBuffer* fb = m_glView->frameBuffer();
+    //QTFrameBuffer* fb = m_glView->frameBuffer(
     m_glView->setFocus(Qt::OtherFocusReason);
     //qApp->installEventFilter(m_glView);
 
@@ -240,59 +220,7 @@ RvDocument::RvDocument()
     m_menuTimer->setInterval(50);
     connect(m_menuTimer, SIGNAL(timeout()), this, SLOT(buildMenu()));
 
-    m_glView->makeCurrent();
-    initializeGLExtensions();
-
-    m_session = new RvSession;
-    //m_session->setFrameBuffer(fb);
-
-#ifdef PLATFORM_DARWIN
-    m_displayLink = new DisplayLink(this);
-    if (m_displayLink) m_session->useExternalVSyncTiming(true);
-#endif
-
-    //RvApp()->addVideoDevice(m_glView->videoDevice());
-    m_session->setControlVideoDevice(m_glView->videoDevice());
-
-    m_session->setRendererType("Composite");
-    m_session->setOpaquePointer( this );
-    m_session->makeActive();
-    m_session->postInitialize();
-    char nm[64]; 
-    sprintf (nm, "session%03d", sessionCount++);
-    m_session->setEventNodeName(nm);
-    setObjectName(QString("rv-") + QString(nm));
-
-    mergeMenu(m_session->menu());
-
-    setAttribute(Qt::WA_DeleteOnClose);
-    setAttribute(Qt::WA_QuitOnClose);
-
-    m_topViewToolBar->setSession(m_session);
-    m_bottomViewToolBar->setSession(m_session);
-
-    // 10.5 looks better without it (no longer has the 100% white top)
-    //setAttribute(Qt::WA_MacBrushedMetal);
-
-    m_session->addNotification(this, IPCore::Session::updateMessage());
-    m_session->addNotification(this, IPCore::Session::updateLoadingMessage());
-    m_session->addNotification(this, IPCore::Session::fullScreenOnMessage());
-    m_session->addNotification(this, IPCore::Session::fullScreenOffMessage());
-    m_session->addNotification(this, IPCore::Session::stereoHardwareOnMessage());
-    m_session->addNotification(this, IPCore::Session::stereoHardwareOffMessage());
-    m_session->addNotification(this, TwkApp::Document::deleteMessage());
-    m_session->addNotification(this, TwkApp::Document::menuChangedMessage());
-    m_session->addNotification(this, TwkApp::Document::activeMessage());
-    m_session->addNotification(this, TwkApp::Document::filenameChangedMessage());
-    m_session->addNotification(this, IPCore::Session::audioUnavailbleMessage());
-    m_session->addNotification(this, IPCore::Session::eventDeviceChangedMessage());
-    m_session->addNotification(this, IPCore::Session::stopPlayMessage());
-
-    m_session->playStartSignal().connect(boost::bind(&RvDocument::playStartSlot, this, std::placeholders::_1));
-    m_session->playStopSignal().connect(boost::bind(&RvDocument::playStopSlot, this, std::placeholders::_1));
-    m_session->physicalVideoDeviceChangedSignal().connect(boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this, std::placeholders::_1));
-
-    if (resetGLPrefs) resetGLStateAndPrefs();
+    //if (resetGLPrefs) resetGLStateAndPrefs();
 
 #ifdef PLATFORM_LINUX
 
@@ -318,6 +246,61 @@ RvDocument::RvDocument()
     {
         Qt::WindowFlags flags = windowFlags();
         setWindowFlags(flags | Qt::FramelessWindowHint);
+    }
+}
+
+void RvDocument::initializeSession()
+{
+    if (!m_session)
+    {
+        m_session = new RvSession;
+        //m_session->setFrameBuffer(fb);
+
+    #ifdef PLATFORM_DARWIN
+        m_displayLink = new DisplayLink(this);
+        if (m_displayLink) m_session->useExternalVSyncTiming(true);
+    #endif
+
+        //RvApp()->addVideoDevice(m_glView->videoDevice());
+        m_session->setControlVideoDevice(m_glView->videoDevice());
+
+        m_session->setRendererType("Composite");
+        m_session->setOpaquePointer( this );
+        m_session->makeActive();
+        m_session->postInitialize();
+        char nm[64]; 
+        sprintf (nm, "session%03d", sessionCount++);
+        m_session->setEventNodeName(nm);
+        setObjectName(QString("rv-") + QString(nm));
+
+        mergeMenu(m_session->menu());
+
+        setAttribute(Qt::WA_DeleteOnClose);
+        setAttribute(Qt::WA_QuitOnClose);
+
+        m_topViewToolBar->setSession(m_session);
+        m_bottomViewToolBar->setSession(m_session);
+
+        // 10.5 looks better without it (no longer has the 100% white top)
+        //setAttribute(Qt::WA_MacBrushedMetal);
+
+        m_session->addNotification(this, IPCore::Session::updateMessage());
+        m_session->addNotification(this, IPCore::Session::updateLoadingMessage());
+        m_session->addNotification(this, IPCore::Session::fullScreenOnMessage());
+        m_session->addNotification(this, IPCore::Session::fullScreenOffMessage());
+        m_session->addNotification(this, IPCore::Session::stereoHardwareOnMessage());
+        m_session->addNotification(this, IPCore::Session::stereoHardwareOffMessage());
+        m_session->addNotification(this, TwkApp::Document::deleteMessage());
+        m_session->addNotification(this, TwkApp::Document::menuChangedMessage());
+        m_session->addNotification(this, TwkApp::Document::activeMessage());
+        m_session->addNotification(this, TwkApp::Document::filenameChangedMessage());
+        m_session->addNotification(this, IPCore::Session::audioUnavailbleMessage());
+        m_session->addNotification(this, IPCore::Session::eventDeviceChangedMessage());
+        m_session->addNotification(this, IPCore::Session::stopPlayMessage());
+
+        m_session->playStartSignal().connect(boost::bind(&RvDocument::playStartSlot, this, std::placeholders::_1));
+        m_session->playStopSignal().connect(boost::bind(&RvDocument::playStopSlot, this, std::placeholders::_1));
+        m_session->physicalVideoDeviceChangedSignal().connect(boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this, std::placeholders::_1));
     }
 }
 
@@ -755,7 +738,7 @@ RvDocument::rebuildGLView(bool stereo,
     Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
     oldGLView->stopProcessingEvents();
 
-    GLView* newGLView = new GLView(this, view(), this,
+    GLView* newGLView = new GLView(this, view()->context(), this,
                                    stereo, vsync, doubleBuffer,
                                    red, green, blue, alpha);
 
@@ -773,7 +756,7 @@ RvDocument::rebuildGLView(bool stereo,
     if (!newGLView->isValid())
     {
         delete newGLView;
-        newGLView = new GLView(this, view(), this);
+        newGLView = new GLView(this, view()->context(), this);
         resetGLPrefs = true;
     }
     
@@ -819,7 +802,8 @@ RvDocument::setStereo(bool b)
 {
     const bool vsync  = m_glView->format().swapInterval() == 1;
     const bool stereo = m_glView->format().stereo();
-    const bool dbl    = m_glView->format().doubleBuffer();
+    bool dbl = false;
+    if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer) dbl = true;
     const int  red    = m_glView->format().redBufferSize();
     const int  green  = m_glView->format().greenBufferSize();
     const int  blue   = m_glView->format().blueBufferSize();
@@ -833,7 +817,8 @@ RvDocument::setVSync(bool b)
     if (m_vsyncDisabled) return;
     const bool vsync = m_glView->format().swapInterval() == 1;
     const bool stereo = m_glView->format().stereo();
-    const bool dbl    = m_glView->format().doubleBuffer();
+    bool dbl = false;
+    if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer) dbl = true;
     const int  red    = m_glView->format().redBufferSize();
     const int  green  = m_glView->format().greenBufferSize();
     const int  blue   = m_glView->format().blueBufferSize();
@@ -861,7 +846,8 @@ RvDocument::setDisplayOutput(DisplayOutputType type)
 {
     const bool vsync = m_glView->format().swapInterval() == 1;
     const bool stereo = m_glView->format().stereo();
-    const bool dbl    = m_glView->format().doubleBuffer();
+    bool dbl = false;
+    if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer) dbl = true;
     int  red    = m_glView->format().redBufferSize();
     int  green  = m_glView->format().greenBufferSize();
     int  blue   = m_glView->format().blueBufferSize();
@@ -896,9 +882,13 @@ RvDocument::view() const
 void
 RvDocument::center()
 {
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    QRect ssize = desktop->availableGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+    QRect ssize = screen->availableGeometry(); 
 
     int sw = ssize.width();
     int sh = ssize.height();
@@ -935,11 +925,15 @@ RvDocument::resizeView(int w, int h)
     //  top of an existing one.
     //
 
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    
-    QRect ssize = desktop->availableGeometry(screen);
-    QRect ts = desktop->screenGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry();
+    QRect ts = screen->geometry();
     float sw = float(ssize.width());
     float sh = float(ssize.height());
 
@@ -1051,12 +1045,16 @@ RvDocument::resizeToFit(bool placement, bool firstTime)
     float w = 0;
     float h = 0;
 
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    
-    QRect ssize = desktop->availableGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry(); 
     DB ("resizeToFit available geom w " << ssize.width() << " h " << ssize.height());
-    QRect ts = desktop->screenGeometry(screen);
+    QRect ts = screen->geometry();
     float sw = float(ssize.width());
     float sh = float(ssize.height());
 
@@ -1262,9 +1260,15 @@ void
 RvDocument::toggleFullscreen(bool firstTime)
 {
     DB ("toggleFullScreen currently " << isFullScreen());
-    QDesktopWidget* desktop = QApplication::desktop();
-    int screen = desktop->screenNumber(this);
-    QRect ssize = desktop->screenGeometry(screen);
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry(); 
+
     int sw = ssize.width();
     int sh = ssize.height();
 
@@ -1277,7 +1281,7 @@ RvDocument::toggleFullscreen(bool firstTime)
 
     if (isFullScreen())
     {
-        ssize = desktop->availableGeometry(screen);
+        ssize = screen->geometry();
         showNormal();
     }
     else

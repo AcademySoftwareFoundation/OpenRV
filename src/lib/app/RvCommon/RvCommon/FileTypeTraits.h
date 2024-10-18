@@ -8,6 +8,7 @@
 #ifndef __RvCommon__FileTypeTraits__h__
 #define __RvCommon__FileTypeTraits__h__
 #include <iostream>
+#include <QLocale>
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>

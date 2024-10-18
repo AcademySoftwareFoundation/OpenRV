@@ -11,7 +11,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <QtWidgets/QWidgetAction>
 #include <QtWidgets/QFrame>
 #include <IPCore/Session.h>

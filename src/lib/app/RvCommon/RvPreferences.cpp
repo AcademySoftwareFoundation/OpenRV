@@ -35,7 +35,6 @@
 #include <ImfThreading.h>
 #include <QtGui/QtGui>
 #include <QtWidgets/QStyleFactory>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 #include <TwkQtCoreUtil/QtConvert.h>
@@ -469,7 +468,9 @@ RvPreferences::update()
 
     m_ui.startupScreenCombo->clear();
     m_ui.startupScreenCombo->addItem("Follow Pointer");
-    for (int i = 0; i < QApplication::desktop()->screenCount(); ++i)
+
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    for (int i = 0; i < screens.size(); i++)
     {
         m_ui.startupScreenCombo->addItem(QString("Screen %1").arg((unsigned int)(i)));
     }
@@ -852,7 +853,7 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
     opts.useCrashReporter = int(settings.value("useCrashReporter", opts.useCrashReporter ? true : false).toBool());
 
     opts.stereoMode = 0;
-    s = settings.value("stereoMode", opts.stereoMode).toString();
+    s = settings.value("stereoMode", QString(opts.stereoMode)).toString();
     if (s == StereoAnaglyph) opts.stereoMode = (char*)StereoAnaglyph;
     if (s == StereoLumAnaglyph) opts.stereoMode = (char*)StereoLumAnaglyph;
     if (s == StereoPair) opts.stereoMode = (char*)StereoPair;
@@ -928,7 +929,7 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
     opts.maxvram = settings.value("vram", opts.maxvram).toDouble();
     opts.maxbits = settings.value("maxBitDepth", opts.maxbits).toInt();
 
-    s = settings.value("resampleMethod", opts.resampleMethod).toString();
+    s = settings.value("resampleMethod", QString(opts.resampleMethod)).toString();
 
     if (s == Area) opts.resampleMethod = (char*)Area;
     else if (s == Linear) opts.resampleMethod = (char*)Linear;
@@ -1019,7 +1020,7 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
     opts.cinMaxAsync = settings.value("MaxInFlight", opts.cinMaxAsync).toInt();
     opts.cinchroma = int(settings.value("usePrimaries", bool(opts.cinchroma)).toBool());
     
-    QString cinpf = settings.value("pixelFormatNew", opts.cinPixel).toString();
+    QString cinpf = settings.value("pixelFormatNew", QString(opts.cinPixel)).toString();
 
     if      (cinpf == RGB8)         opts.cinPixel = (char*)RGB8;
     else if (cinpf == RGBA8)        opts.cinPixel = (char*)RGBA8;
@@ -1039,7 +1040,7 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
     opts.dpxMaxAsync = settings.value("MaxInFlight", opts.dpxMaxAsync).toInt();
     opts.dpxchroma = int(settings.value("usePrimaries", bool(opts.dpxchroma)).toBool());
 
-    QString dpxpf = settings.value("pixelFormatNew", opts.dpxPixel).toString();
+    QString dpxpf = settings.value("pixelFormatNew", QString(opts.dpxPixel)).toString();
 
     if      (dpxpf == RGB8)         opts.dpxPixel = (char*)RGB8;
     else if (dpxpf == RGBA8)        opts.dpxPixel = (char*)RGBA8;
@@ -1222,7 +1223,7 @@ RvPreferences::write()
       case 3: method = (char*)Nearest; break;
     }
 
-    settings.setValue("resampleMethod", method);
+    settings.setValue("resampleMethod", QString(method));
 
     switch (m_ui.imageFilterCombo->currentIndex())
     {
@@ -1231,7 +1232,7 @@ RvPreferences::write()
       case 1: method = (char*)Nearest; break;
     }
 
-    settings.setValue("imageFilter", method);
+    settings.setValue("imageFilter", QString(method));
 
     switch (m_ui.bgPatternCombo->currentIndex())
     {
@@ -1244,7 +1245,7 @@ RvPreferences::write()
       case 5: method = (char*)CrossHatch; break;
     }
 
-    settings.setValue("backgroundPattern", method);
+    settings.setValue("backgroundPattern", QString(method));
 
     settings.endGroup();
 
