@@ -4217,7 +4217,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         rv     = system.getenv ("RV_APP_RV"),
         cmd = "\"%s\" -network -networkPort %s -networkConnect 127.0.0.1 %s -flags syncPullFirst" % (rv, myPort+1, myPort);
 
-    qt.QProcess.startDetached (cmd, string[] {""});
+    // IMPORTANT: SEE src/lib/app/mu_rvui/CMakeLists.txt
+    @MU_QT_QPROCESS_STARTDETACHED@
 }
 
 \: save (void; Event ev)

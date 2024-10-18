@@ -29,6 +29,9 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QMenu>
+#if defined( RV_VFX_CY2023 )
+#include <QtWidgets/QDirModel>
+#endif
 
 
 namespace Rv {
@@ -325,11 +328,14 @@ RvFileDialog::RvFileDialog(QWidget* parent,
             this, SLOT(fileTypeChanged(int)));
 
     QCompleter *completer = new QCompleter(this);
-
+#if defined( RV_VFX_CY2023 )
+    completer->setModel(new QDirModel(completer));
+#else
     QFileSystemModel *fileSystemModel = new QFileSystemModel(completer);
     // TODO_QT: Is AllEntries fine here?
     fileSystemModel->setFilter(QDir::AllEntries);
     completer->setModel(fileSystemModel);
+#endif
     completer->setCompletionMode(QCompleter::InlineCompletion);
     m_ui.currentPath->setCompleter(completer);
     m_ui.currentPath->setText("");
