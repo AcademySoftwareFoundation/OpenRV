@@ -2701,14 +2701,19 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             default: continue;
         }
 
-        AVChannel ch = av_channel_layout_channel_from_index(&layout, i);
-        char chName[64], chDesc[256];
-        if (av_channel_name(chName, sizeof(chName), ch) == 0 &&
-            av_channel_description(chDesc, sizeof(chDesc), ch) == 0)
+        AVChannel avChannel = av_channel_layout_channel_from_index(&layout, i);
+        std::array<char, 64> chName;
+        std::array<char, 256> chDesc;
+
+        // av_channel_name and av_channel_description functions
+        // return amount of bytes needed to hold the output string,
+        // or a negative AVERROR on failure.
+        if (av_channel_name(chName.data(), chName.size(), avChannel) > 0 &&
+            av_channel_description(chDesc.data(), chDesc.size(), avChannel) > 0)
         {
             DBL (DB_AUDIO, "Audio ch " << (chans.size()-1)
-                        << " is: '" << chName
-                        << "-" << chDesc);
+                        << " is: '" << chName.data()
+                        << "-" << chDesc.data());
         }
     }
 
