@@ -77,3 +77,37 @@ SET_PROPERTY(
   CACHE RV_VFX_PLATFORM
   PROPERTY STRINGS ${_RV_VFX_PLATFORM}
 )
+
+#
+# FFmpeg option
+#
+# This option is to control the version of FFmpeg
+# that OpenRV downloads and installs.
+#
+# There will be one version used by default per
+# major release. Any other version will require
+# RV_FFMPEG env var to be set with the desired
+# major version.
+#
+
+# Supported FFmpeg versions.
+SET(RV_FFMPEG_SUPPORTED_OPTIONS 6 7)
+ # Default option
+SET(_RV_FFMPEG "6")
+
+IF(DEFINED RV_FFMPEG)
+  set(_RV_FFMPEG ${RV_FFMPEG})
+  IF(NOT "${_RV_FFMPEG}" IN_LIST RV_FFMPEG_SUPPORTED_OPTIONS)
+    MESSAGE(FATAL_ERROR "RV_FFMPEG=${RV_FFMPEG} is unsupported. Supported values are: ${RV_FFMPEG_SUPPORTED_OPTIONS}")
+  ENDIF()
+ENDIF()
+
+# Overwrite the cache variable
+SET(RV_FFMPEG
+  "${_RV_FFMPEG}"
+  CACHE STRING "Set FFmpeg version for installing external depdendency" FORCE
+)
+SET_PROPERTY(
+  CACHE RV_FFMPEG
+  PROPERTY STRINGS ${_RV_FFMPEG}
+)
