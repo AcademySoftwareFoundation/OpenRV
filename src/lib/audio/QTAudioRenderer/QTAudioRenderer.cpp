@@ -971,12 +971,13 @@ QTAudioOutput::setAudioOutputBufferSize()
     // audio preference "Audio Cache samples" is zero;
     // in which case we calculate what the audioOutput
     // bufferSize should be.
+    
     if (AudioRenderer::defaultParameters().framesPerBuffer == 0)
     {
 #ifdef PLATFORM_DARWIN
         setBufferSize(calcAudioBufferSize(m_format.channelCount(),
                                           m_format.sampleRate(),
-                                          sampleSize(m_audioRenderer.m_format),
+                                          sampleSize(m_format),
                                           bufferSize()));
 #endif
 
@@ -1000,14 +1001,14 @@ QTAudioOutput::setAudioOutputBufferSize()
         {
             setBufferSize(calcAudioBufferSize(m_format.channelCount(),
                                             m_format.sampleRate(),
-                                            sampleSize(m_audioRenderer.m_format),
+                                            sampleSize(m_format),
                                             bufferSize()) / 10);
         }
         else
         {
             setBufferSize(calcAudioBufferSize(m_format.channelCount(),
                                             m_format.sampleRate(),
-                                            sampleSize(m_audioRenderer.m_format),
+                                            sampleSize(m_format),
                                             bufferSize()));
         }
 #endif
@@ -1490,7 +1491,9 @@ bool
     // so we assume its supported... hence we always return true.
     return true;
 #else
+#if defined( RV_VFX_CY2023 )
     const QList<int> channels = device.supportedChannelCounts();
+#endif
 
     if (AudioRenderer::debug)
     {
