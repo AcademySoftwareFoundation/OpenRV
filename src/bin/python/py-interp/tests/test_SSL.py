@@ -62,15 +62,15 @@ def fetch_pyside(url):
                 QNetworkAccessManager,
             )
         except ImportError:
-        try:
-            from PySide6.QtCore import QEventLoop, QUrl, QCoreApplication
-            from PySide6.QtNetwork import (
-                QNetworkRequest,
-                QNetworkReply,
-                QNetworkAccessManager,
-            )
-        except ImportError:
-            pass
+            try:
+                from PySide6.QtCore import QEventLoop, QUrl, QCoreApplication
+                from PySide6.QtNetwork import (
+                    QNetworkRequest,
+                    QNetworkReply,
+                    QNetworkAccessManager,
+                )
+            except ImportError:
+                pass
 
         global app
         if app is None:
