@@ -237,8 +237,36 @@ QTDesktopVideoDevice::colorProfile() const
 
     // Get the context for this screen
     const QList<QScreen*> screens = QGuiApplication::screens();
-    WId id = screens[m_screen]->effectiveWinId();
-    HDC hdc = GetDC (reinterpret_cast<HWND>(id));
+
+    // Ensure the screen index is valid.
+    if (m_screen < 0 || m_screen >= screens.size())
+    {
+        m_colorProfile = ColorProfile();
+        return m_colorProfile;
+    }
+
+    QScreen* targetScreen = screens[m_screen];
+    QWindow* windowOnTargetScreen = nullptr;
+    const QList<QWindow*> windows = QGuiApplication::topLevelWindows();
+
+    // Check all windows to find one on the target screen.
+    for (QWindow* window : windows)
+    {
+        if (window->screen() == targetScreen)
+        {
+            windowOnTargetScreen = window;
+        }
+    }
+
+    if (!windowOnTargetScreen)
+    {
+        // Return empty profile if no window is found on the screen.
+        m_colorProfile = ColorProfile();
+        return m_colorProfile;
+    }
+
+    HWND hwnd = reinterpret_cast<HWND>(windowOnTargetScreen->winId());
+    HDC hdc = GetDC(hwnd);
 
     if (hdc)
     {
@@ -268,7 +296,7 @@ QTDesktopVideoDevice::colorProfile() const
         }
 
         delete path;
-        ReleaseDC (reinterpret_cast<HWND>(id), hdc);
+        ReleaseDC(hwnd, hdc);
     }
     else
     {
