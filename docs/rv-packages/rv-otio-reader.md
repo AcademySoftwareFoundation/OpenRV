@@ -24,6 +24,8 @@ The package also uses a number of files located in `Plugins/SupportFiles/otio_re
 - `clipHook.py`: An example of a hook called before importing a clip.
 - `customTransitionHook.py`: An example of importing a custom transition in OTIO into RV.
 - `effectHook.py`: A helper file for adding and setting RV properties from OTIO.
+- `paint_schema.py`: An example schema for a paint annotation.
+- `point_schema.py`: An example schema for a paint annotation point.
 - `sourcePostExportHook.py`: A hook called after an RVSourceNodeGroup has been exported to a `Clip`. This can be used to add custom effects for other nodes within the same source group. The RVLinearize node is provided as an example.
 - `retimeExportHook.py`: A hook for exporting an RVRetime node to OTIO schemas LinearTimeWarp or FreezeFrame.
 - `timeWarpHook.py`: A hook for importing OTIO's LinearTimeWarp and FreezeFrame schemas.

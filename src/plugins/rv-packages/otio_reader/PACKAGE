@@ -42,6 +42,10 @@ files:
     location: SupportFiles/$PACKAGE
   - file: multiRepPostExportHook.py
     location: SupportFiles/$PACKAGE
+  - file: paint_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: point_schema.py
+    location: SupportFiles/$PACKAGE
 
 description: |
     <p>
@@ -131,6 +135,20 @@ description: |
     <p>
     genericEffectHook.py
     A for handling the Effect schema.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    paint_schema.py
+    An example schema for a paint annotation.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    point_schema.py
+    An example schema for a paint annotation point.
     </p>
     </li>
 
