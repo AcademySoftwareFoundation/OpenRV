@@ -92,7 +92,6 @@
 #else
     #include <TwkGLFFBO/FBOVideoDevice.h>
     #include <IPCore/ImageRenderer.h>
-    #include <QtOpenGL/QGLContext>
 #endif
 
 #include <QTextCodec>

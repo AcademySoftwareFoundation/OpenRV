@@ -22,6 +22,13 @@ TARGET_INCLUDE_DIRECTORIES(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# Need that with Qt6 since the code for this target does not support unicode correctly.
+IF(RV_TARGET_WINDOWS
+   AND RV_VFX_PLATFORM STREQUAL CY2024
+)
+  ADD_DEFINITIONS(-UUNICODE -U_UNICODE)
+ENDIF()
+
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkGLF

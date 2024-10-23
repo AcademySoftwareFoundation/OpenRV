@@ -181,6 +181,12 @@ FBOVideoDevice::FBOVideoDevice(VideoModule* m, int w, int h, bool alpha, int num
     static const char className[] = "fbopbuffer";
     WNDCLASS wc;
 
+    #ifdef UNICODE
+        potato
+    #else
+        int a = 0;
+    #endif
+
     if (!GetClassInfo(hInstance, className, &wc))
     {
         wc.style         = CS_OWNDC;

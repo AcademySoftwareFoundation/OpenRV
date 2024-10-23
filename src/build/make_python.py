@@ -635,6 +635,7 @@ def install() -> None:
         ).check_returncode()
 
         dst_dir = os.path.join(OUTPUT_DIR, "bin")
+        libs_dir = os.path.join(OUTPUT_DIR, "libs")
         os.makedirs(dst_dir, exist_ok=True)
 
         # bin
@@ -664,6 +665,7 @@ def install() -> None:
             python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
 
         shutil.copy(os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib))
+        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib))
         shutil.copy(os.path.join(build_path, python3xx_lib), os.path.join(dst_dir, python3xx_lib))
 
         # Tcl and Tk DLL are not copied by the main.py script in Debug.

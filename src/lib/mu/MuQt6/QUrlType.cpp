@@ -450,14 +450,6 @@ bool qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer para
     return arg0.operator==(arg1);
 }
 
-Pointer qt_QUrl_fromAce_string_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_domain, int param_options)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QByteArray  arg0 = getqtype<QByteArrayType>(param_domain);
-    QUrl::AceProcessingOptions arg1 = (QUrl::AceProcessingOptions)(param_options);
-    return makestring(c,QUrl::fromAce(arg0, arg1));
-}
-
 Pointer qt_QUrl_fromEncoded_QUrl_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_input, int param_parsingMode)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -508,14 +500,6 @@ void qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointe
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QStringList  arg0 = qstringlist(param_list);
     QUrl::setIdnWhitelist(arg0);
-}
-
-Pointer qt_QUrl_toAce_QByteArray_string_int(Mu::Thread& NODE_THREAD, Pointer param_domain, int param_options)
-{
-    MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const QString  arg0 = qstring(param_domain);
-    QUrl::AceProcessingOptions arg1 = (QUrl::AceProcessingOptions)(param_options);
-    return makeqtype<QByteArrayType>(c,QUrl::toAce(arg0, arg1),"qt.QByteArray");
 }
 
 Pointer qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_input, Pointer param_exclude, Pointer param_include)
@@ -761,11 +745,6 @@ static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     NODE_RETURN(qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
-static NODE_IMPLEMENTATION(_n_fromAce0, Pointer)
-{
-    NODE_RETURN(qt_QUrl_fromAce_string_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
-}
-
 static NODE_IMPLEMENTATION(_n_fromEncoded0, Pointer)
 {
     NODE_RETURN(qt_QUrl_fromEncoded_QUrl_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
@@ -799,11 +778,6 @@ static NODE_IMPLEMENTATION(_n_idnWhitelist0, Pointer)
 static NODE_IMPLEMENTATION(_n_setIdnWhitelist0, void)
 {
     qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_(NODE_THREAD, NODE_ARG(0, Pointer));
-}
-
-static NODE_IMPLEMENTATION(_n_toAce0, Pointer)
-{
-    NODE_RETURN(qt_QUrl_toAce_QByteArray_string_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
 }
 
 static NODE_IMPLEMENTATION(_n_toPercentEncoding0, Pointer)
@@ -939,7 +913,6 @@ addSymbols(
     new Function(c, "userInfo", _n_userInfo0, None, Compiled, qt_QUrl_userInfo_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)), End),
     new Function(c, "userName", _n_userName0, None, Compiled, qt_QUrl_userName_string_QUrl_int, Return, "string", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
     // static functions
-    new Function(c, "fromAce", _n_fromAce0, None, Compiled, qt_QUrl_fromAce_string_QByteArray_int, Return, "string", Parameters, new Param(c, "domain", "qt.QByteArray"), new Param(c, "options", "int", Value((int){})), End),
     // MISSING: fromCFURL (QUrl; "CFURLRef" url)
     new Function(c, "fromEncoded", _n_fromEncoded0, None, Compiled, qt_QUrl_fromEncoded_QUrl_QByteArray_int, Return, "qt.QUrl", Parameters, new Param(c, "input", "qt.QByteArray"), new Param(c, "parsingMode", "int", Value((int)QUrl::TolerantMode)), End),
     new Function(c, "fromLocalFile", _n_fromLocalFile0, None, Compiled, qt_QUrl_fromLocalFile_QUrl_string, Return, "qt.QUrl", Parameters, new Param(c, "localFile", "string"), End),
@@ -949,7 +922,6 @@ addSymbols(
     new Function(c, "fromUserInput", _n_fromUserInput0, None, Compiled, qt_QUrl_fromUserInput_QUrl_string_string_int, Return, "qt.QUrl", Parameters, new Param(c, "userInput", "string"), new Param(c, "workingDirectory", "string"), new Param(c, "options", "int", Value((int)QUrl::DefaultResolution)), End),
     new Function(c, "idnWhitelist", _n_idnWhitelist0, None, Compiled, qt_QUrl_idnWhitelist_stringBSB_ESB_, Return, "string[]", End),
     new Function(c, "setIdnWhitelist", _n_setIdnWhitelist0, None, Compiled, qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_, Return, "void", Parameters, new Param(c, "list", "string[]"), End),
-    new Function(c, "toAce", _n_toAce0, None, Compiled, qt_QUrl_toAce_QByteArray_string_int, Return, "qt.QByteArray", Parameters, new Param(c, "domain", "string"), new Param(c, "options", "int", Value((int){})), End),
     new Function(c, "toPercentEncoding", _n_toPercentEncoding0, None, Compiled, qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray, Return, "qt.QByteArray", Parameters, new Param(c, "input", "string"), new Param(c, "exclude", "qt.QByteArray"), new Param(c, "include", "qt.QByteArray"), End),
     new Function(c, "toStringList", _n_toStringList0, None, Compiled, qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int, Return, "string[]", Parameters, new Param(c, "urls", "qt.QUrl[]"), new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
     EndArguments);
