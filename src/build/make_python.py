@@ -124,7 +124,9 @@ def get_python_interpreter_args(python_home: str) -> List[str]:
     python_interpreters = glob.glob(
         os.path.join(python_home, python_name_pattern), recursive=True
     )
-    python_interpreters += glob.glob(os.path.join(python_home, "bin", python_name_pattern))
+    python_interpreters += glob.glob(
+        os.path.join(python_home, "bin", python_name_pattern)
+    )
 
     # sort put python# before python#-config
     python_interpreters = sorted(
@@ -164,7 +166,9 @@ def patch_python_distribution(python_home: str) -> None:
             shutil.move(failed_lib, failed_lib.replace("_failed.so", ".so"))
     if OPENSSL_OUTPUT_DIR:
         if platform.system() == "Darwin":
-            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
+            openssl_libs = glob.glob(
+                os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*")
+            )
             openssl_libs = [l for l in openssl_libs if os.path.islink(l) is False]
 
             python_openssl_libs = []
@@ -196,7 +200,9 @@ def patch_python_distribution(python_home: str) -> None:
                     subprocess.run(install_name_tool_change_args).check_returncode()
 
         elif platform.system() == "Linux":
-            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*"))
+            openssl_libs = glob.glob(
+                os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*")
+            )
 
             for lib_path in openssl_libs:
                 print(f"Copying {lib_path} to the python home")
@@ -297,8 +303,12 @@ def test_python_distribution(python_home: str) -> None:
 
             # Specify the location of the debug python import lib (eg. python39_d.lib)
             python_include_dirs = os.path.join(tmp_python_home, "include")
-            python_lib = os.path.join(tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib")
-            my_env["CMAKE_ARGS"] = f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
+            python_lib = os.path.join(
+                tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib"
+            )
+            my_env["CMAKE_ARGS"] = (
+                f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
+            )
 
             opentimelineio_install_arg = python_interpreter_args + [
                 "-m",
@@ -441,7 +451,6 @@ def configure() -> None:
         if OPENSSL_OUTPUT_DIR:
             configure_args.append(f"--with-openssl={OPENSSL_OUTPUT_DIR}")
 
-
         if VARIANT == "Release":
             configure_args.append("--enable-optimizations")
 
@@ -565,7 +574,6 @@ def build() -> None:
         if OPENSSL_OUTPUT_DIR:
             subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
 
-
         subprocess.run(
             build_args,
             cwd=SOURCE_DIR,
@@ -623,18 +631,16 @@ def install() -> None:
             "--include-tcltk",
             "--include-tests",
             "--include-venv",
-            "--flat-dlls"
+            "--flat-dlls",
         ]
 
         if VARIANT == "Debug":
             install_args.append("--debug")
 
-        subprocess.run(
-            install_args,
-            cwd=SOURCE_DIR
-        ).check_returncode()
+        subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()
 
         dst_dir = os.path.join(OUTPUT_DIR, "bin")
+        libs_dir = os.path.join(OUTPUT_DIR, "libs")
         os.makedirs(dst_dir, exist_ok=True)
 
         # bin
@@ -651,7 +657,7 @@ def install() -> None:
 
         # Move files under root directory into the bin folder.
         for filename in os.listdir(os.path.join(OUTPUT_DIR)):
-            file_path = os.path.join(OUTPUT_DIR, filename)  
+            file_path = os.path.join(OUTPUT_DIR, filename)
             if os.path.isfile(file_path):
                 shutil.move(file_path, os.path.join(dst_dir, filename))
 
@@ -663,8 +669,18 @@ def install() -> None:
             python3_lib = "python3_d.lib"
             python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
 
-        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib))
-        shutil.copy(os.path.join(build_path, python3xx_lib), os.path.join(dst_dir, python3xx_lib))
+        shutil.copy(
+            os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib)
+        )
+        shutil.copy(
+            os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib)
+        )
+        shutil.copy(
+            os.path.join(build_path, python3xx_lib),
+            os.path.join(dst_dir, python3xx_lib),
+        )
+
+        print(os.listdir(libs_dir))
 
         # Tcl and Tk DLL are not copied by the main.py script in Debug.
         # Assuming that Tcl and Tk are not built in debug.
@@ -726,7 +742,13 @@ if __name__ == "__main__":
 
     if platform.system() == "Windows":
         # Major and minor version of Python without dots. E.g. 3.10.3 -> 310
-        parser.add_argument("--python-version", dest="python_version", type=str, required=True, default="")
+        parser.add_argument(
+            "--python-version",
+            dest="python_version",
+            type=str,
+            required=True,
+            default="",
+        )
 
     parser.set_defaults(clean=False, configure=False, build=False, install=False)
 

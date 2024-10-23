@@ -116,7 +116,7 @@ def prepare() -> None:
         shutil.move(libclang_tmp, libclang_extracted)
 
     libclang_install_dir = os.path.join(libclang_extracted, "libclang")
-    
+
     if OPENSSL_OUTPUT_DIR:
         os.environ["PATH"] = os.path.pathsep.join(
             [
@@ -208,9 +208,10 @@ def build() -> None:
         f"--qtpaths={os.path.join(QT_OUTPUT_DIR, 'bin', 'qtpaths' + ('.exe' if platform.system() == 'Windows' else ''))}",
         "--ignore-git",
         "--standalone",
+        "--verbose",
         "--verbose-build",
+        "--log-level=verbose",
         f"--parallel={os.cpu_count() or 1}",
-        "--skip-docs",
     ]
 
     if OPENSSL_OUTPUT_DIR:
@@ -298,9 +299,10 @@ if __name__ == "__main__":
 
     parser.add_argument("--variant", dest="variant", type=str, required=True)
 
-
     # Major and minor version with dots.
-    parser.add_argument("--python-version", dest="python_version", type=str, required=True, default="")
+    parser.add_argument(
+        "--python-version", dest="python_version", type=str, required=True, default=""
+    )
 
     parser.set_defaults(prepare=False, build=False)
 
@@ -314,7 +316,7 @@ if __name__ == "__main__":
     QT_OUTPUT_DIR = args.qt
     VARIANT = args.variant
     PYTHON_VERSION = args.python_version
-    
+
     print(args)
 
     if args.prepare:
