@@ -18,7 +18,7 @@ ADD_EXECUTABLE(
 )
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Core
   REQUIRED
 )
@@ -38,7 +38,7 @@ TARGET_LINK_LIBRARIES(
           RvPackage
           arg
           stl_ext
-          Qt5::Core
+          Qt::Core
 )
 
 IF(RV_TARGET_DARWIN)

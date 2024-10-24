@@ -45,8 +45,14 @@
 #include <MuIO/IOModule.h>
 #include <MuImage/ImageModule.h>
 #include <MuEncoding/EncodingModule.h>
+
+#if defined( RV_VFX_CY2023 )
 #include <MuQt5/qtUtils.h>
 #include <MuQt5/qtModule.h>
+#else
+#include <MuQt6/qtUtils.h>
+#include <MuQt6/qtModule.h>
+#endif
 #endif
 
 #ifndef RUSAGE_SELF

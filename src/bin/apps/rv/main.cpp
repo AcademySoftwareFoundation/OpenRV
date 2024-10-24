@@ -95,11 +95,14 @@
     #include <QtOpenGL/QGLContext>
 #endif
 
+#include <QTextCodec>
 #include <QtWidgets/QtWidgets>
 #include <QtGui/QtGui>
 #include <RvCommon/RvDocument.h>
 
-#include <QtGlobal>
+// TODO_QT: Remove if everything works.
+// Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
+//#include <QtGlobal>
 
 extern const char* rv_linux_dark;
 

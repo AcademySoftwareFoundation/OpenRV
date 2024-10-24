@@ -8,7 +8,7 @@
 #ifndef __rv_qt__TwkQTAction__h__
 #define __rv_qt__TwkQTAction__h__
 #include <QtCore/QtCore>
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <TwkApp/Menu.h>
 #include <TwkApp/Action.h>
 

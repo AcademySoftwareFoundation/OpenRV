@@ -60,18 +60,11 @@ class GLState
 
     struct FixedFunctionPipeline
     {
-        FixedFunctionPipeline(GLState* s) 
-        : state(s), 
-          program(s->activeGLProgram())
-        {
-            glUseProgram(GLuint(0)); 
-        }
-        void setViewport(int x, int y, int w, int h)
-        {
-            glViewport(x, y, w, h);
-        }
+        FixedFunctionPipeline(GLState* s);
 
-        ~FixedFunctionPipeline() { state->useGLProgram(program); }
+        void setViewport(int x, int y, int w, int h);
+
+        ~FixedFunctionPipeline();
 
         GLState* state;
         const GLProgram* program;
