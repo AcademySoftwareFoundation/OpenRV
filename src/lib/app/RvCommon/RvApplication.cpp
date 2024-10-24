@@ -471,7 +471,6 @@ static void
 callRunCreateSession(void* a)
 {
     RvApplication* app = reinterpret_cast<RvApplication*>(a);
-    std::cout << "??? Calling runCreateSession" << std::endl;
     app->runCreateSession();
 }
 

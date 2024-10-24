@@ -70,9 +70,9 @@ GLVideoDevice*
 QTGLVideoDevice::newSharedContextWorkerDevice() const
 {
     // NOTE_QT: QOpenGLWidget does not take a share parameter anymore. Try to share with setShareContext.
-    QOpenGLWidget* w = new QOpenGLWidget(m_view->parentWidget());
-    w->context()->setShareContext(m_view->context());
-    return new QTGLVideoDevice(name() + "-workerContextDevice", w);
+    QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view->parentWidget());
+    openGLWidget->context()->setShareContext(m_view->context());
+    return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
 }
 
 void 

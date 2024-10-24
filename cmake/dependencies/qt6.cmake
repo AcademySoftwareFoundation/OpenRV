@@ -16,17 +16,17 @@ IF(NOT RV_DEPS_QT6_LOCATION
 )
   MESSAGE(
     FATAL_ERROR
-      "Unable to build without a RV_DEPS_QT6_LOCATION. It is required to provide a working Qt 5.15 root path to build. Example: cmake .. -DRV_DEPS_QT6_LOCATION=/Users/rv/Qt/5.15.11/clang_64"
+      "Unable to build without a RV_DEPS_QT6_LOCATION. It is required to provide a working Qt 5.15 root path to build. Example: cmake .. -DRV_DEPS_QT6_LOCATION=/Users/rv/Qt/6.5.3/clang_64"
   )
 ENDIF()
 
-#TODO : I think that the resources folder changed location
+# TODO : I think that the resources folder changed location
 SET(RV_DEPS_QT6_RESOURCES_FOLDER
     "${RV_DEPS_QT6_LOCATION}/resources"
     CACHE STRING "Path to the Qt resources files folder"
 )
 
-#TODO : I think that the translations folder changed location
+# TODO : I think that the translations folder changed location
 SET(RV_DEPS_QT6_TRANSLATIONS_FOLDER
     "${RV_DEPS_QT6_LOCATION}/translations"
     CACHE STRING "Path to the Qt translations files folder"
@@ -49,19 +49,24 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-# Testing if everything is alright.
-# In Qt6, QtWebEngine has been split into Qt6WebEngineCore and Qt6WebEngineWidgets.
+# Testing if everything is alright. In Qt6, QtWebEngine has been split into Qt6WebEngineCore and Qt6WebEngineWidgets.
 FIND_PACKAGE(
   Qt6
   COMPONENTS Core WebEngineCore WebEngineWidgets
   REQUIRED
 )
 
-get_target_property(MOC_EXECUTABLE Qt6::moc IMPORTED_LOCATION)
-get_target_property(UIC_EXECUTABLE Qt6::uic IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(MOC_EXECUTABLE Qt6::moc IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(UIC_EXECUTABLE Qt6::uic IMPORTED_LOCATION)
 
-SET(QT_MOC_EXECUTABLE "${MOC_EXECUTABLE}" CACHE STRING "Qt MOC executable")
-SET(QT_UIC_EXECUTABLE "${UIC_EXECUTABLE}" CACHE STRING "Qt UIC executable")
+SET(QT_MOC_EXECUTABLE
+    "${MOC_EXECUTABLE}"
+    CACHE STRING "Qt MOC executable"
+)
+SET(QT_UIC_EXECUTABLE
+    "${UIC_EXECUTABLE}"
+    CACHE STRING "Qt UIC executable"
+)
 
 SET(_qt_copy_message
     "Copying Qt into ${RV_STAGE_ROOT_DIR}"
@@ -196,14 +201,13 @@ IF(RV_TARGET_WINDOWS)
       ${SRC_DIR}/*.exe
     )
 
-    # Filtering. Some executables are needed for RV to work:
-    # QtWebEngineProcess.exe
+    # Filtering. Some executables are needed for RV to work: QtWebEngineProcess.exe
     FOREACH(
-      _qt_executable 
+      _qt_executable
       ${_qt_executables}
     )
       IF("${_qt_executable}" STREQUAL "QtWebEngineProcess.exe")
-          LIST(REMOVE_ITEM _qt_executables "${_qt_executable}")
+        LIST(REMOVE_ITEM _qt_executables "${_qt_executable}")
       ENDIF()
     ENDFOREACH()
 
@@ -269,10 +273,14 @@ IF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-
-# Qt5: OpenGLWidgets is in component Widgets
-# Qt6: OpenGLWidgets is in component OpenGLWidgets
-SET(QT6_QOPENGLWIDGET_COMPONENT "OpenGLWidgets" CACHE STRING "Qt QOpenGLWidget component name")
-SET(QT6_QOPENGLWIDGET_TARGET "Qt6::OpenGLWidgets" CACHE STRING "Qt QOpenGLWidget target name")
+# Qt5: OpenGLWidgets is in component Widgets Qt6: OpenGLWidgets is in component OpenGLWidgets
+SET(QT6_QOPENGLWIDGET_COMPONENT
+    "OpenGLWidgets"
+    CACHE STRING "Qt QOpenGLWidget component name"
+)
+SET(QT6_QOPENGLWIDGET_TARGET
+    "Qt6::OpenGLWidgets"
+    CACHE STRING "Qt QOpenGLWidget target name"
+)
 
 MESSAGE(STATUS "${_qt_copy_message} -- DONE")

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # *****************************************************************************
-# Copyright 2020 Autodesk, Inc. All rights reserved.
+# Copyright 2024 Autodesk, Inc. All rights reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -215,25 +215,6 @@ def build() -> None:
 
     if OPENSSL_OUTPUT_DIR:
         pyside_build_args.append(f"--openssl={os.path.join(OPENSSL_OUTPUT_DIR, 'bin')}")
-
-    # PySide2 v5.15.2.1 builds with errors on Windows using Visual Studio 2019.
-    # We force Visual Studio 2017 here to make it build without errors.
-    # if platform.system() == "Windows":
-    #     # Add Qt jom to the path to build in parallel
-    #     jom_path = os.path.abspath(
-    #         os.path.join(QT_OUTPUT_DIR, "..", "..", "Tools", "QtCreator", "bin", "jom")
-    #     )
-    #     if os.path.exists(os.path.join(jom_path, "jom.exe")):
-    #         print(f"jom.exe was successfully located at: {jom_path}")
-    #         update_env_path([jom_path])
-    #     else:
-    #         print(f"Could not find jom.exe at the expected location: {jom_path}")
-    #         print(f"Build performance might be impacted")
-
-    #     # Add the debug switch to match build type but only on Windows
-    #     # (on other platforms, PySide2 is built in release)
-    #     if VARIANT == "Debug":
-    #         pyside_build_args.append("--debug")
 
     print(f"Executing {pyside_build_args}")
     subprocess.run(pyside_build_args).check_returncode()

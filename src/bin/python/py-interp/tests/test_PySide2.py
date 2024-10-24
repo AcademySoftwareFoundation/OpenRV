@@ -1,19 +1,17 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import unittest
 
 try:
-    import PySide2
-    from PySide2 import *
+    from PySide2 import QtCore
 except ImportError:
-  try:
-    import PySide6
-    from PySide6 import *
-  except ImportError:
-    pass
+    try:
+        from PySide6 import QtCore
+    except ImportError:
+        pass
 
 
 class TestPySide2(unittest.TestCase):
