@@ -22,6 +22,7 @@ compile_commands.json
 
 **/__pycache__
 **/*.pyc
+**/.python-version
 
 cmake-*/*
 build/*
