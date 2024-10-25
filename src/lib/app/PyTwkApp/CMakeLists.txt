@@ -21,7 +21,7 @@ SET(_sources
 )
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Core
   REQUIRED
 )
@@ -38,7 +38,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Python::Python
-  PRIVATE Mu MuLang MuPy MuTwkApp Qt5::Core TwkPython
+  PRIVATE Mu MuLang MuPy MuTwkApp Qt::Core TwkPython
 )
 
 IF(RV_TARGET_DARWIN)
