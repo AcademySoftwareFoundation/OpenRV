@@ -8,7 +8,7 @@ INCLUDE(cxx_defaults)
 INCLUDE(rv_quote_file)
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Widgets
   REQUIRED
 )

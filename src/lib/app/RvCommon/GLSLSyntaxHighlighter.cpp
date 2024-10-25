@@ -110,7 +110,7 @@ GLSLSyntaxHighlighter::GLSLSyntaxHighlighter(QTextDocument *parent)
     m_commentFormat.setForeground(QColor(127,127,127));
     m_quotationFormat.setForeground(Qt::green);
 
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+[ \t]*(?=\\()");
+    rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+[ \t]*(?=\\()");
     rule.format = m_functionFormat;
     m_highlightingRules.append(rule);
 
@@ -119,7 +119,7 @@ GLSLSyntaxHighlighter::GLSLSyntaxHighlighter(QTextDocument *parent)
         QString pattern = "\\b";
         pattern += *p;
         pattern += "\\b";
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = m_typeFormat;
         m_highlightingRules.append(rule);
     }
@@ -129,7 +129,7 @@ GLSLSyntaxHighlighter::GLSLSyntaxHighlighter(QTextDocument *parent)
         QString pattern = "\\b";
         pattern += *p;
         pattern += "\\b";
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = m_keywordFormat;
         m_highlightingRules.append(rule);
     }
@@ -139,7 +139,7 @@ GLSLSyntaxHighlighter::GLSLSyntaxHighlighter(QTextDocument *parent)
         QString pattern = "\\b";
         pattern += *p;
         pattern += "\\b";
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = m_builtInFormat;
         m_highlightingRules.append(rule);
     }
@@ -149,12 +149,12 @@ GLSLSyntaxHighlighter::GLSLSyntaxHighlighter(QTextDocument *parent)
         QString pattern = "\\b";
         pattern += *p;
         pattern += "\\b";
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = m_builtInFormat;
         m_highlightingRules.append(rule);
     }
 
-    rule.pattern = QRegExp("\\b(?:inputImage|outputImage)\\b");
+    rule.pattern = QRegularExpression("\\b(?:inputImage|outputImage)\\b");
     rule.format = m_imageFormat;
     m_highlightingRules.append(rule);
 
@@ -163,22 +163,22 @@ GLSLSyntaxHighlighter::GLSLSyntaxHighlighter(QTextDocument *parent)
         QString pattern = "#[ \t]*";
         pattern += *p;
         pattern += "\\b";
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = m_preProcessorFormat;
         m_highlightingRules.append(rule);
     }
 
-    rule.pattern = QRegExp("//[^\n]*");
+    rule.pattern = QRegularExpression("//[^\n]*");
     rule.format = m_commentFormat;
     m_highlightingRules.append(rule);
 
     // GLSL doesn't have string literals
-    //rule.pattern = QRegExp("\".*\"");
+    //rule.pattern = QRegularExpression("\".*\"");
     //rule.format = m_quotationFormat;
     //m_highlightingRules.append(rule);
 
-    m_commentStartExpression = QRegExp("/\\*");
-    m_commentEndExpression = QRegExp("\\*/");
+    m_commentStartExpression = QRegularExpression("/\\*");
+    m_commentEndExpression = QRegularExpression("\\*/");
 }
 
 void 
@@ -186,13 +186,11 @@ GLSLSyntaxHighlighter::highlightBlock(const QString &text)
 {
     foreach (const HighlightingRule &rule, m_highlightingRules) 
     {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
-        while (index >= 0) 
+        QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
+        while (matchIterator.hasNext())
         {
-            int length = expression.matchedLength();
-            setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
+            QRegularExpressionMatch match = matchIterator.next();
+            setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
     }
 
@@ -202,12 +200,14 @@ GLSLSyntaxHighlighter::highlightBlock(const QString &text)
 
     if (previousBlockState() != 1)
     {
-        startIndex = m_commentStartExpression.indexIn(text);
+        QRegularExpressionMatch match = m_commentStartExpression.match(text);
+        startIndex = match.capturedStart();
     }
 
     while (startIndex >= 0) 
     {
-        int endIndex = m_commentEndExpression.indexIn(text, startIndex);
+        QRegularExpressionMatch endMatch = m_commentEndExpression.match(text, startIndex);
+        int endIndex = endMatch.capturedStart();
         int commentLength;
 
         if (endIndex == -1) 
@@ -217,12 +217,13 @@ GLSLSyntaxHighlighter::highlightBlock(const QString &text)
         } 
         else 
         {
-            commentLength = endIndex - startIndex
-                            + m_commentEndExpression.matchedLength();
+            commentLength = endIndex - startIndex + endMatch.capturedLength();
         }
 
         setFormat(startIndex, commentLength, m_commentFormat);
-        startIndex = m_commentStartExpression.indexIn(text, startIndex + commentLength);
+
+        QRegularExpressionMatch startMatch = m_commentStartExpression.match(text, startIndex + commentLength);
+        startIndex = startMatch.capturedStart();
     }
 }
 
