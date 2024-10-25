@@ -12,7 +12,7 @@ SET(_target
 )
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Gui
   REQUIRED
 )
@@ -53,7 +53,7 @@ TARGET_LINK_LIBRARIES(
           MuIO
           MuTwkApp
           PyTwkApp
-          Qt5::Gui
+          Qt::Gui
           IPCore
           RvApp
           RvCommon
