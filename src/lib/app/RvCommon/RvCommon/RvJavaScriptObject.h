@@ -8,6 +8,7 @@
 #ifndef __RvCommon__RvJavaScriptObject__h__
 #define __RvCommon__RvJavaScriptObject__h__
 #include <iostream>
+#include <QRegularExpression>
 #include <QtCore/QtCore>
 #include <TwkApp/Event.h>
 #include <TwkApp/EventNode.h>
@@ -90,7 +91,7 @@ class RvJavaScriptObject : public QObject, public TwkApp::EventNode
 
     QWebEnginePage* m_frame;
 
-    QList<QRegExp> m_eventNames;
+    QList<QRegularExpression> m_eventNames;
 };
 
 } // Rv

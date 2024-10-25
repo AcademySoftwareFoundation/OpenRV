@@ -22,7 +22,9 @@
 #include <TwkUtil/File.h>
 
 #include <QByteArray>
-#include <QtGlobal>
+// TODO_QT: Remove if everything works.
+// Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
+// #include <QtGlobal>
 
 #include <fstream>
 #include <sstream>
