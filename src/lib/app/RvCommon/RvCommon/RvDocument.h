@@ -184,6 +184,90 @@ namespace Rv
         DisplayLink* m_displayLink;
     };
 
-} // namespace Rv
+    void setStereo(bool);
+    void setVSync(bool);
+    void setDoubleBuffer(bool);
+    void setDisplayOutput(DisplayOutputType);
+
+    void disconnectActions(const QList<QAction*> &);
+
+    void resetGLStateAndPrefs();
+
+    bool vsyncDisabled() const { return m_vsyncDisabled; }
+
+    bool queryDriverVSync() const;
+    void checkDriverVSync();
+    void warnOnDriverVSync();
+
+    void editSourceNode(const std::string&);
+
+    void physicalVideoDeviceChangedSlot(const TwkApp::VideoDevice*);
+    void playStartSlot(const std::string&);
+    void playStopSlot(const std::string&);
+
+    void initializeSession();
+
+  protected:
+    // Overrides for TwkUtil::Notifier
+    virtual bool receive( Notifier *, Notifier *, MessageId, MessageData * );
+
+    void enableActions(bool, QMenu*);
+
+  private slots:
+    void menuActivated();
+    void aboutToShowMenu();
+    void buildMenu();
+    void watchedFileChanged(const QString&);
+    void frameChanged();
+    void resetSizePolicy();
+    void lazyDeleteGLView();
+
+  private:
+    void purgeMenus();
+    void mergeMenu(const TwkApp::Menu*, bool shortcuts=true);
+    void convert(QMenu*, const TwkApp::Menu*, bool shortcuts);
+
+    void closeEvent(QCloseEvent*);
+    void changeEvent(QEvent*);
+    bool event(QEvent*);
+    void moveEvent(QMoveEvent*);
+
+    void setBuildMenu();
+
+    void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
+
+  private:
+    RvSession*           m_session;
+    QMenu*               m_rvMenu;
+    QMenu*               m_mainPopup;
+    QMenu*               m_userPopup;
+    TwkApp::Menu*        m_userMenu;
+    GLView*              m_glView;
+    GLView*              m_oldGLView;
+    QWidget*             m_viewContainerWidget;
+    RvTopViewToolBar*    m_topViewToolBar;
+    RvBottomViewToolBar* m_bottomViewToolBar;
+    QWidget*             m_centralWidget;
+    QStackedLayout*      m_stackedLayout;
+    int                  m_menuBarHeight;
+    bool                 m_menuBarDisable;
+    bool                 m_menuBarShown;
+    bool                 m_startupResize;
+    bool                 m_aggressiveSizing;
+    int                  m_menuExecuting;
+    QTimer*              m_menuTimer;
+    QTimer*              m_frameChangedTimer;
+    QTimer*              m_resetPolicyTimer;
+    const QAction*       m_lastPopupAction;
+    QFileSystemWatcher*  m_watcher;
+    bool                 m_currentlyClosing;
+    bool                 m_closeEventReceived;
+    bool                 m_vsyncDisabled;
+    RvSourceEditor*      m_sourceEditor;
+    DisplayLink*         m_displayLink;
+};
+
+
+} // Rv
 
 #endif // __rv-qt__RvDocument__h__

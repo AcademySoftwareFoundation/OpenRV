@@ -8,11 +8,11 @@
 #include <RvCommon/RvJavaScriptObject.h>
 #include <RvCommon/RvDocument.h>
 #include <TwkQtCoreUtil/QtConvert.h>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtWebEngineWidgets/QWebEngineProfile>
-#include <QtWebEngineWidgets/QWebEngineScript>
-#include <QtWebEngineWidgets/QWebEngineScriptCollection>
-#include <QtWebChannel/QWebChannel>
+#include <QWebEnginePage>
+#include <QWebEngineProfile>
+#include <QWebEngineScript>
+#include <QWebEngineScriptCollection>
+#include <QWebChannel>
 
 namespace Rv
 {
@@ -29,7 +29,99 @@ namespace Rv
     {
         QFile webChannelJsFile(":/qtwebchannel/qwebchannel.js");
 
-        if (!webChannelJsFile.open(QIODevice::ReadOnly))
+    if (m_frame->webChannel())
+    {
+        m_channel = m_frame->webChannel();
+    }
+    else 
+    {
+        m_channel = new QWebChannel(m_frame);
+    }
+
+    m_channel->registerObject(QStringLiteral("rvsession"), this);
+    m_frame->setWebChannel(m_channel);
+    connect(m_frame, SIGNAL(loadFinished(bool)), this, SLOT(emitReady()));
+
+    listenTo(m_doc->session());
+}
+
+RvJavaScriptObject::~RvJavaScriptObject() {}
+
+void
+RvJavaScriptObject::emitReady()
+{
+    m_frame->runJavaScript("var event = new CustomEvent(\"rvsession-ready\",{}); document.dispatchEvent(event);");
+}
+
+QString
+RvJavaScriptObject::evaluate(const QString& code)
+{
+    string rval = 
+        m_doc->session()->userGenericEvent("remote-eval", 
+                                           UTF8::qconvert(code),
+                                           UTF8::qconvert(m_frame->url().toString()));
+    return UTF8::qconvert(rval.c_str());
+}
+
+QString
+RvJavaScriptObject::pyevaluate(const QString& code)
+{
+    string rval = 
+        m_doc->session()->userGenericEvent("remote-pyeval", 
+                                           UTF8::qconvert(code),
+                                           UTF8::qconvert(m_frame->url().toString()));
+    return UTF8::qconvert(rval.c_str());
+}
+
+void
+RvJavaScriptObject::pyexec(const QString& code)
+{
+    (void) m_doc->session()->userGenericEvent("remote-pyexec", 
+                                              UTF8::qconvert(code),
+                                              UTF8::qconvert(m_frame->url().toString()));
+}
+
+QString 
+RvJavaScriptObject::sendInternalEvent(const QString& eventName,
+                                      const QString& contents,
+                                      const QString& sender)
+{
+    QString s = (sender == "") ? m_frame->url().toString() : sender;
+
+    string rval = 
+        m_doc->session()->userGenericEvent(UTF8::qconvert(eventName),
+                                           UTF8::qconvert(contents),
+                                           UTF8::qconvert(s));
+    return UTF8::qconvert(rval.c_str());
+}
+
+void
+RvJavaScriptObject::bindToRegex(const QString& name)
+{
+    QRegularExpression re(name);
+    if (!m_eventNames.contains(re)) m_eventNames.push_back(re);
+}
+
+void
+RvJavaScriptObject::unbindRegex(const QString& name)
+{
+    m_eventNames.removeOne(QRegularExpression(name));
+}
+
+bool
+RvJavaScriptObject::hasBinding(const QString& name)
+{
+    return m_eventNames.contains(QRegularExpression(name));
+}
+
+EventNode::Result 
+RvJavaScriptObject::receiveEvent(const TwkApp::Event& event)
+{
+    QString name = event.name().c_str();
+
+    for (size_t i = 0; i < m_eventNames.size(); i++)
+    {
+        if (m_eventNames[i].match(name).hasMatch())
         {
             QString msg = QString("Couldn't open qwebchannel.js file: %1")
                               .arg(webChannelJsFile.errorString());

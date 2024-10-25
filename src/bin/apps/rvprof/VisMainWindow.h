@@ -8,9 +8,11 @@
 #ifndef __playbackVis__VisMainWindow__h__
 #define __playbackVis__VisMainWindow__h__
 #include <iostream>
+#include <QFileDialog>
 #include <QtGui/QtGui>
 #include <QtOpenGL/QtOpenGL>
-#include <QtWidgets/QtWidgets>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
 
 #include <TwkMath/Mat44.h>
 #include <TwkMath/Vec3.h>
@@ -91,7 +93,7 @@ typedef std::vector<DataElement> DataVector;
 
 class VisMainWindow;
 
-class GLView : public QGLWidget
+class GLView : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -124,10 +126,10 @@ public:
     void setComputedRefresh(float);
     void setComputedFPS(float);
 
-protected:
-    void initializeGL();
-    void paintGL();
-    void resizeGL(int, int);
+  protected:
+    void initializeGL() override;
+    void paintGL() override;
+    void resizeGL(int, int) override;
     void rebuildIdealFrames();
     int timeToSample(float t);
     int sampleFromMousePosition(float x, float y);

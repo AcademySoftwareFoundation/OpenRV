@@ -8,6 +8,7 @@
 #ifndef __RvCommon__RvJavaScriptObject__h__
 #define __RvCommon__RvJavaScriptObject__h__
 #include <iostream>
+#include <QRegularExpression>
 #include <QtCore/QtCore>
 #include <TwkApp/Event.h>
 #include <TwkApp/EventNode.h>
@@ -84,7 +85,8 @@ namespace Rv
 
         QWebChannel* m_channel;
 
-        QWebEnginePage* m_frame;
+    QList<QRegularExpression> m_eventNames;
+};
 
         QList<QRegExp> m_eventNames;
     };

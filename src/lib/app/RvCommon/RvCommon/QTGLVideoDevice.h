@@ -9,12 +9,26 @@
 #define __RvCommon__QTGLVideoDevice__h__
 #include <iostream>
 #include <TwkGLF/GLVideoDevice.h>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
 #include <QtWidgets/QWidget>
 #include <RvCommon/QTTranslator.h>
 
 namespace Rv
 {
+  public:
+    QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWidget* view);
+    QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
+    virtual ~QTGLVideoDevice();
+    
+    void setWidget(QOpenGLWidget*);
+    QOpenGLWidget* widget() const { return m_view; }
+
+    virtual void makeCurrent() const;
+    const QTTranslator&  translator() const { return *m_translator; }
+    virtual void redraw() const;
+    virtual void redrawImmediately() const;
+
+    void setAbsolutePosition(int x, int y);
 
     //
     //  QTGLVideoDevice
@@ -40,10 +54,16 @@ namespace Rv
 
         const QTTranslator& translator() const { return *m_translator; }
 
-        virtual void redraw() const;
-        virtual void redrawImmediately() const;
+  protected:
+    QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
 
-        void setAbsolutePosition(int x, int y);
+  protected:
+    int             m_x;
+    int             m_y;
+    float           m_refresh;
+    QOpenGLWidget*  m_view;
+    QTTranslator*   m_translator;
+};
 
         //
         //  VideoDevice API
