@@ -1979,10 +1979,6 @@ def parseFunction(func, qtnamespace):
         # Skip any function that has issue with the simple parsing above.
         print("Error parsing function.. skipping: {0}".format(orig_func))
         return None
-    return None
-
-
-##
 ##  NamespaceInfo holds the final parsed info about a Qt Class The
 ##  other results are Enumeration and Enum which are the name of the
 ##  enumeration and each individual name*value pair.
