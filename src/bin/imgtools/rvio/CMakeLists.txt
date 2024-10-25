@@ -18,7 +18,7 @@ ADD_EXECUTABLE(
 )
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Core Gui Widgets
   REQUIRED
 )
@@ -55,19 +55,19 @@ TARGET_LINK_LIBRARIES(
           arg
           stl_ext
           TwkMediaLibrary
-          Qt5::Core
+          Qt::Core
           TwkGLFFBO
 )
 
 IF(RV_TARGET_LINUX)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE Qt5::Gui Qt5::Widgets GLEW::GLEW BDWGC::Gc QTBundle
+    PRIVATE Qt::Gui Qt::Widgets GLEW::GLEW BDWGC::Gc QTBundle
   )
 ELSEIF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE Qt5::Gui Qt5::Widgets glew gc QTBundle
+    PRIVATE Qt::Gui Qt::Widgets glew gc QTBundle
   )
 ELSEIF(RV_TARGET_DARWIN)
   TARGET_LINK_LIBRARIES(

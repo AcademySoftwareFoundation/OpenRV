@@ -27,7 +27,7 @@ ADD_LIBRARY(
 )
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Core Multimedia
   REQUIRED
 )
@@ -41,7 +41,7 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC TwkMath TwkUtil Qt5::Core Qt5::Multimedia
+  PUBLIC TwkMath TwkUtil Qt::Core Qt::Multimedia
   PRIVATE TwkAudio
 )
 

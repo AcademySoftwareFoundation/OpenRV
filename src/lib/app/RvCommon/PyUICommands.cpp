@@ -33,7 +33,7 @@
 #include <PyTwkApp/PyEventType.h>
 #include <PyTwkApp/PyInterface.h>
 #include <QtCore/QtCore>
-#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QWebEnginePage>
 #include <QtWidgets/QFileIconProvider>
 #include <RvCommon/RvJavaScriptObject.h>
 #include <QtGui/QtGui>
