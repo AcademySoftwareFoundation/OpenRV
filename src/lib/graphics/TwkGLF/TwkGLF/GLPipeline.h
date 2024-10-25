@@ -82,7 +82,7 @@ class GLPipeline
 
     //----------------------------------------------------------------------
     // miscellaneous
-    void use() const { glUseProgram(m_program->programId()); }
+    void use() const;
     unsigned int programId() const { return m_program->programId(); }
     const GLProgram* glProgram() const { return m_program; }
 

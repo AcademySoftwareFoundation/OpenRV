@@ -48,7 +48,6 @@
 #include <QtCore/qlogging.h>
 #include <QtCore/QStandardPaths>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QTextEdit>
 
@@ -613,6 +612,13 @@ RvApplication::newSessionFromFiles(const StringVector& files)
 {
     DB ("RvApplication::newSessionFromFiles()");
     Rv::RvDocument *doc = new Rv::RvDocument;
+
+    doc->show();
+
+#ifndef PLATFORM_LINUX
+    doc->raise();
+#endif
+
     //doc->ensurePolished();
     Rv::RvSession* s = doc->session();
 
@@ -639,17 +645,50 @@ RvApplication::newSessionFromFiles(const StringVector& files)
         doc->center();
     }
 
+    QList<QScreen*> screens = QGuiApplication::screens();
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+
+    auto isVirtualDesktop = [&screens, primaryScreen]() -> bool
+    {
+        // Not a virtual desktop if there is only one screen.
+        if (screens.size() <= 1) return false;
+        
+        QRect totalGeometry;
+        for (const auto& screen : screens)
+        {
+            totalGeometry = totalGeometry.united(screen->geometry());
+        }
+
+        return totalGeometry != primaryScreen->geometry();
+    };
+
+    auto getScreenFromPoint = [&screens](const QPoint& point) -> int
+    {
+        for (int i = 0; i < screens.size(); ++i)
+        {
+            if (screens[i]->geometry().contains(point))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
     //
     //  Allow command line placement
     //
 
     if (opts.x != -1 || opts.y != -1)
     {
-        if (opts.screen != -1 && QApplication::desktop()->isVirtualDesktop())
+        if (opts.screen != -1 && isVirtualDesktop())
         {
-            QRect r = QApplication::desktop()->screenGeometry(opts.screen);
-            opts.x += r.x();
-            opts.y += r.y();
+            if (opts.screen < screens.size())
+            {
+                QRect r = screens[opts.screen]->geometry();
+                opts.x += r.x();
+                opts.y += r.y();
+            }
         }
 
         if (opts.width != -1 && opts.height != -1)
@@ -662,23 +701,23 @@ RvApplication::newSessionFromFiles(const StringVector& files)
         }
     }
 
-    int screen = QApplication::desktop()->screenNumber(QCursor::pos());
+    int screen = getScreenFromPoint(QCursor::pos());
     if (opts.screen != -1) screen = opts.screen;
 
     int oldX = doc->pos().x();
     int oldY = doc->pos().y();
 
-    int oldScreen = QApplication::desktop()->screenNumber(QPoint(oldX,oldY));
+    int oldScreen = getScreenFromPoint(QPoint(oldX, oldY));
 
-    if (screen != -1 && QApplication::desktop()->isVirtualDesktop() && screen != oldScreen)
+    if (screen != -1 && isVirtualDesktop() && screen != oldScreen)
     //
     //  The application is going to come up on the wrong screen, so figure out our
     //  our relative position on the current screen, and move to the same relative
     //  position on the correct screen.
     //
     {
-        QRect rnew = QApplication::desktop()->screenGeometry(screen);
-        QRect rold = QApplication::desktop()->screenGeometry(oldScreen);
+        QRect rnew = QGuiApplication::screens().at(screen)->geometry();
+        QRect rold = QGuiApplication::screens().at(oldScreen)->geometry();
 
 	int xoff = oldX - rold.x();
 	int yoff = oldY - rold.y();
@@ -695,12 +734,6 @@ RvApplication::newSessionFromFiles(const StringVector& files)
             doc->setGeometry(opts.x, opts.y, opts.width, opts.height);
         }
     }
-
-    doc->show();
-
-#ifndef PLATFORM_LINUX
-    doc->raise();
-#endif
 
     if (videoModules().empty())
     {
@@ -806,8 +839,8 @@ RvApplication::createNewSessionFromFiles(const StringVector& files)
             m_newTimer->setObjectName("m_newTimer");
             connect(m_newTimer, SIGNAL(timeout()), this, SLOT(runCreateSession()));
         }
-
-        m_newTimer->start(int(1.0 / 192.0 * 1000.0));
+        // TODO_CED TIMER
+        m_newTimer->start(int(1.0 / 50.0 * 1000.0));
     }
 
     m_newSessions.push_back(sv);
@@ -1539,7 +1572,7 @@ RvApplication::setPresentationMode(bool value)
                 {
                     const DesktopVideoDevice* dd = dynamic_cast<const DesktopVideoDevice*>(d);
 
-                    if (dd && dd->qtScreen() == qApp->desktop()->QDesktopWidget::screenNumber(rvDoc))
+                    if (dd && dd->qtScreen() == QApplication::screens().indexOf(QApplication::screenAt(rvDoc->mapToGlobal(QPoint(0, 0)))));
                     {
                         TWK_THROW_EXC_STREAM("Cannot open presentation device for the same screen the controller is on");
                     }
