@@ -25,7 +25,12 @@ compile_commands.json
 **/.python-version
 
 cmake-*/*
+<<<<<<< HEAD
 /*build*/
+=======
+build/*
+_build*/*
+>>>>>>> 5ca3dd8 (Feature - Qt 6 port #1 (#606))
 _install/*
 .venv/*
 
