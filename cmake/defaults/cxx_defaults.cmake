@@ -69,39 +69,13 @@ IF(RV_VFX_PLATFORM STREQUAL CY2024)
       ON
   )
   ADD_COMPILE_DEFINITIONS(RV_VFX_CY2024)
-  SET(RV_QT_PACKAGE_NAME
-      "Qt6"
-  )
-  SET(RV_QT_MU_TARGET
-      "MuQt6"
-  )
+  SET(RV_QT_PACKAGE_NAME "Qt6")
+  SET(RV_QT_MU_TARGET "MuQt6")
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(RV_VFX_CY2023
       ON
   )
   ADD_COMPILE_DEFINITIONS(RV_VFX_CY2023)
-  SET(RV_QT_PACKAGE_NAME
-      "Qt5"
-  )
-  SET(RV_QT_MU_TARGET
-      "MuQt5"
-  )
-ENDIF()
-
-#
-# FFmpeg option
-#
-
-# Add preprocessor variable for use in code and cmake to determine the current version of FFmpeg. Current version must be one of the supported versions, as
-# defined in ffmpeg.cmake.
-IF(RV_FFMPEG STREQUAL 6)
-  SET(RV_FFMPEG_6
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_FFMPEG_6)
-ELSEIF(RV_FFMPEG STREQUAL 7)
-  SET(RV_FFMPEG_7
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_FFMPEG_7)
+  SET(RV_QT_PACKAGE_NAME "Qt5")
+  SET(RV_QT_MU_TARGET "MuQt5")
 ENDIF()

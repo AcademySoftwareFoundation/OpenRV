@@ -354,9 +354,8 @@ namespace TwkQtChat
 
         if (isValid())
         {
-            // cout << "CONNECTION: sending PING" << endl;
-            DB("send: 'PING 1 p'");
-            write("PING 1 p");
+            m_pingTimer.start();
+            m_pongTime.restart();
         }
     }
 
@@ -398,7 +397,95 @@ namespace TwkQtChat
                 break;
         }
 
-#ifdef DB_LEVEL
+    } 
+    while (bytesAvailable() > 0);
+}
+
+void
+Connection::startPingPong()
+{
+    DB ("turning on heartbeat");
+    m_pongTime.restart();
+    m_pingTimer.start();
+    m_pingpong = true;
+}
+
+void
+Connection::stopPingPong()
+{
+    DB ("turning off heartbeat");
+    m_pingTimer.stop();
+    m_pingpong = false;
+}
+
+void
+Connection::pingPongControl (bool ppOn)
+{
+    if (ppOn) startPingPong();
+    else      stopPingPong();
+
+    QString m("PINGPONGCONTROL 1 " + QString((ppOn) ? "1" : "0"));
+    DB ("send: '" << m.toUtf8().data() << "'");
+    write(m.toUtf8().data());
+}
+
+void
+Connection::sendPing()
+{
+    if (!m_pingpong) return;
+
+    if (m_pongTime.elapsed() > PongTimeout) 
+    {
+        cerr << "ERROR: connection aborted because response was too slow" << endl;
+        abort();
+        return;
+    }
+
+    if (isValid())
+    {
+        //cout << "CONNECTION: sending PING" << endl;
+        DB ("send: 'PING 1 p'");
+        write("PING 1 p");
+    }
+}
+
+void
+Connection::sendGreetingMessage()
+{
+    QString greetingString = m_greetingName;
+    if (m_greetingApp != "rv") greetingString += " " + m_greetingApp;
+    QByteArray greeting = greetingString.toUtf8();
+
+    QByteArray data = ((m_greetingApp != "rv") ? "NEWGREETING " : "GREETING ")
+        + QByteArray::number(greeting.size()) 
+        + " " 
+        + greeting;
+
+    DB ("send: '" << data.data() << "'");
+    if (write(data) == data.size()) m_isGreetingMessageSent = true;
+}
+
+int
+Connection::readDataIntoBuffer(int maxSize)
+{
+    if (maxSize > MaxBufferSize) return 0;
+
+    int numBytesBeforeRead = m_buffer.size();
+
+    if (numBytesBeforeRead == MaxBufferSize) 
+    {
+        cerr << "ERROR: connection aborted because data load too big" << endl;
+        abort();
+        return 0;
+    }
+
+    while (bytesAvailable() > 0 && m_buffer.size() < maxSize) 
+    {
+        m_buffer.append(read(1));
+        if (m_buffer.endsWith(SeparatorToken)) break;
+    }
+
+    #ifdef DB_LEVEL
         QByteArray printable;
         for (int i = 0; i < m_buffer.size(); ++i)
         {
@@ -556,4 +643,77 @@ namespace TwkQtChat
         m_buffer.clear();
     }
 
-} // namespace TwkQtChat
+    if (m_numBytesForCurrentDataType <= 0)
+        m_numBytesForCurrentDataType = dataLengthForCurrentDataType();
+
+    if (bytesAvailable() < m_numBytesForCurrentDataType
+        || m_numBytesForCurrentDataType <= 0) 
+    {
+        m_transferTimerId = startTimer(TransferTimeout);
+        return false;
+    }
+
+    return true;
+}
+
+void
+Connection::processData()
+{
+    if (!isValid()) return;
+
+    m_buffer = read(m_numBytesForCurrentDataType);
+    DB ("processData read " << m_buffer.size() << " bytes");
+
+    if (m_buffer.size() != m_numBytesForCurrentDataType) 
+    {
+        cerr << "ERROR: connection aborted because data size mismatch" << endl;
+        abort();
+        return;
+    }
+
+    switch (m_currentDataType) 
+    {
+      case PlainText:
+          DB ("calling newMessage " << m_buffer.data());
+          emit newMessage(m_remoteContactName, QString::fromUtf8(m_buffer));
+          break;
+      case RawData:
+          emit newData(m_remoteContactName, m_dataInterp, m_buffer);
+          break;
+      case Ping:
+          //cout << "CONNECTION: sending PONG" << endl;
+          DB ("send: 'PONG 1 p'");
+          write("PONG 1 p");
+          break;
+      case Pong:
+          //cout << "CONNECTION: received PONG" << endl;
+          m_pongTime.restart();
+          break;
+      case PingPongControl:
+          if (m_buffer.toInt()) startPingPong();
+          else                  stopPingPong();
+          break;
+      default:
+          break;
+    }
+
+    //
+    //  Restart the ping and pong timers. There's no need to check the
+    //  connection status since we just got a message. Obviously the
+    //  connection is still functional. This prevents a lot of useless
+    //  chatter.
+    //
+
+    if (m_pingpong)
+    {
+        m_pingTimer.start();
+        m_pongTime.restart();
+    }
+    m_currentDataType = Undefined;
+    m_numBytesForCurrentDataType = 0;
+    m_buffer.clear();
+}
+
+
+} // TwkQtChat
+

@@ -211,4 +211,10 @@ namespace TwkGLF
         return m_program->uniformLocation(name) != -1;
     }
 
-} // namespace TwkGLF
+void 
+GLPipeline::use() const 
+{ 
+    glUseProgram(m_program->programId()); 
+}
+
+}

@@ -48,7 +48,6 @@
 #include <QtCore/qlogging.h>
 #include <QtCore/QStandardPaths>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QTextEdit>
 
@@ -622,8 +621,184 @@ namespace Rv
 
         Rv::RvDocument* doc = (RvDocument*)s->opaquePointer();
 
-        if (opts.nomb && doc->menuBarShown())
-            doc->toggleMenuBar();
+        for  (int i=0; i < m_newSessions.size(); i++)
+        {
+            StringVector* sv = m_newSessions[i];
+            copy(sv->begin(), sv->end(), back_inserter(all));
+            delete sv;
+        }
+
+        m_newSessions.clear();
+        if (m_newTimer) m_newTimer->stop();
+
+        newSessionFromFiles(all);
+    }
+}
+
+RvDocument*
+RvApplication::rebuildSessionFromFiles(Rv::RvSession *s, const StringVector& files)
+{
+    //
+    //  If we have new files, clear the session.  If we don't have
+    //  new files, don't clear it, since we have have built a
+    //  session "by hand" ie via mu.
+    //
+    //  Code, like the shotgrid module, that want's to clear the
+    //  session with each processed URL, should clear the session
+    //  explicitly.
+    //
+    if (files.size() && s->sources().size()) s->clear();
+
+    Rv::Options& opts = Rv::Options::sharedOptions();
+
+    Rv::RvDocument *doc = (RvDocument *)s->opaquePointer();
+
+    if (opts.nomb && doc->menuBarShown()) doc->toggleMenuBar();
+
+    try
+    {
+        s->readUnorganizedFileList(files, true);
+    }
+    catch (const std::exception& exc)
+    {
+        cerr << "ERROR: " << exc.what() << endl;
+    }
+
+
+    return doc;
+}
+
+RvDocument*
+RvApplication::newSessionFromFiles(const StringVector& files)
+{
+    DB ("RvApplication::newSessionFromFiles()");
+    Rv::RvDocument *doc = new Rv::RvDocument;
+
+    doc->show();
+
+#ifndef PLATFORM_LINUX
+    doc->raise();
+#endif
+
+    //doc->ensurePolished();
+    Rv::RvSession* s = doc->session();
+
+    s->queryAndStoreGLInfo();
+
+    Rv::Options& opts = Rv::Options::sharedOptions();
+
+    DB ("xl "  << opts.xl);
+    doc->setAggressiveSizing (opts.xl);
+    if (opts.nomb && doc->menuBarShown()) doc->toggleMenuBar();
+
+    rebuildSessionFromFiles (s, files);
+
+    //
+    //  Since we stopped giving Qt a style sheet, it doesn't seem to
+    //  account for the menubar and it makes the window too small to
+    //  hold both the menubar and the image.  This "fixes" that.
+    //  In general, the menubar does not seem to report the correct
+    //  size until this point.
+    //
+
+    if (s->userHasSetViewSize())
+    {
+        doc->center();
+    }
+
+    QList<QScreen*> screens = QGuiApplication::screens();
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+
+    auto isVirtualDesktop = [&screens, primaryScreen]() -> bool
+    {
+        // Not a virtual desktop if there is only one screen.
+        if (screens.size() <= 1) return false;
+        
+        QRect totalGeometry;
+        for (const auto& screen : screens)
+        {
+            totalGeometry = totalGeometry.united(screen->geometry());
+        }
+
+        return totalGeometry != primaryScreen->geometry();
+    };
+
+    auto getScreenFromPoint = [&screens](const QPoint& point) -> int
+    {
+        for (int i = 0; i < screens.size(); ++i)
+        {
+            if (screens[i]->geometry().contains(point))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
+    //
+    //  Allow command line placement
+    //
+
+    if (opts.x != -1 || opts.y != -1)
+    {
+        if (opts.screen != -1 && isVirtualDesktop())
+        {
+            if (opts.screen < screens.size())
+            {
+                QRect r = screens[opts.screen]->geometry();
+                opts.x += r.x();
+                opts.y += r.y();
+            }
+        }
+
+        if (opts.width != -1 && opts.height != -1)
+        {
+            doc->setGeometry(opts.x, opts.y, opts.width, opts.height);
+        }
+        else
+        {
+            doc->move(opts.x, opts.y);
+        }
+    }
+
+    int screen = getScreenFromPoint(QCursor::pos());
+    if (opts.screen != -1) screen = opts.screen;
+
+    int oldX = doc->pos().x();
+    int oldY = doc->pos().y();
+
+    int oldScreen = getScreenFromPoint(QPoint(oldX, oldY));
+
+    if (screen != -1 && isVirtualDesktop() && screen != oldScreen)
+    //
+    //  The application is going to come up on the wrong screen, so figure out our
+    //  our relative position on the current screen, and move to the same relative
+    //  position on the correct screen.
+    //
+    {
+        QRect rnew = QGuiApplication::screens().at(screen)->geometry();
+        QRect rold = QGuiApplication::screens().at(oldScreen)->geometry();
+
+	int xoff = oldX - rold.x();
+	int yoff = oldY - rold.y();
+
+        doc->move(rnew.x() + xoff, rnew.y() + yoff);
+    }
+
+    if (opts.fullscreen && !doc->isFullScreen())
+    {
+        doc->toggleFullscreen(true);
+
+        if (opts.width != -1 && opts.height != -1)
+        {
+            doc->setGeometry(opts.x, opts.y, opts.width, opts.height);
+        }
+    }
+
+    if (videoModules().empty())
+    {
+        doc->view()->makeCurrent();
 
         try
         {
@@ -667,10 +842,68 @@ namespace Rv
         {
             doc->center();
         }
+        // TODO_CED TIMER
+        m_newTimer->start(int(1.0 / 50.0 * 1000.0));
+    }
 
-        //
-        //  Allow command line placement
-        //
+    m_newSessions.push_back(sv);
+}
+
+RvApplication::DispatchID
+RvApplication::dispatchToMainThread(DispatchCallback callback)
+{
+    std::lock_guard<DispatchMutex> guard(m_dispatchMutex);
+
+    auto dispatchID = m_nextDispatchID++;
+    m_dispatchMap[dispatchID] = callback;
+
+    QMetaObject::invokeMethod(m_dispatchTimer, "start", Qt::QueuedConnection, Q_ARG(int, 0));
+
+    return dispatchID;
+}
+
+void
+RvApplication::undispatchToMainThread(DispatchID dispatchID, double maxDuration)
+{
+    {
+    std::lock_guard<DispatchMutex> guard(m_dispatchMutex);
+
+    auto iter = m_dispatchMap.find(dispatchID);
+    if (iter != m_dispatchMap.end())
+        m_dispatchMap.erase(iter);
+    }
+
+    TwkUtil::SystemClock clock;
+    auto t0 = clock.now();
+
+    while ( (clock.now() - t0) < maxDuration )
+    {
+        if( ! isDispatchExecuting(dispatchID) )
+            return;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    std::cout << "ERROR: Max undispatch time reached." << std::endl;
+    return;
+}
+
+bool
+RvApplication::isDispatchExecuting(DispatchID dispatchID)
+{
+    std::lock_guard<DispatchMutex> guard(m_dispatchMutex);
+
+    return m_executingMap.find(dispatchID) != m_executingMap.end();
+}
+
+void
+RvApplication::dispatchTimeout()
+{
+    //Fix for error when loading multiple sources with the newly created API call AddsourcesVerbose()
+    //dispatchTimeout() was being called by another thread resulting in a crash.
+    int atomicInt = ++m_dispatchAtomicInt;
+    if(atomicInt == 1){
+        HOP_PROF_FUNC();
 
         if (opts.x != -1 || opts.y != -1)
         {
@@ -1582,8 +1815,29 @@ namespace Rv
             }
 #endif
 
-                string optionArgs = setVideoDeviceStateFromSettings(d);
-                rvDoc->view()->videoDevice()->makeCurrent();
+            string optionArgs = setVideoDeviceStateFromSettings(d);
+            rvDoc->view()->videoDevice()->makeCurrent();
+
+            try
+            {
+                if (!d->isOpen())
+                {
+                    const DesktopVideoDevice* dd = dynamic_cast<const DesktopVideoDevice*>(d);
+
+                    if (dd && dd->qtScreen() == QApplication::screens().indexOf(QApplication::screenAt(rvDoc->mapToGlobal(QPoint(0, 0)))));
+                    {
+                        TWK_THROW_EXC_STREAM("Cannot open presentation device for the same screen the controller is on");
+                    }
+
+                    StringVector vargs;
+                    algorithm::split(vargs, optionArgs, is_any_of(string(" \t\n\r")), token_compress_on);
+                    d->open(vargs);
+                }
+
+#ifdef PLATFORM_DARWIN
+                //cout << "INFO: disabling double buffer in controller" << endl;
+                //rvDoc->setDoubleBuffer(false);
+#endif
 
                 try
                 {

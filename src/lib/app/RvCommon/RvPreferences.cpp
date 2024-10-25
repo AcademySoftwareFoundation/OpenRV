@@ -35,7 +35,6 @@
 #include <ImfThreading.h>
 #include <QtGui/QtGui>
 #include <QtWidgets/QStyleFactory>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 #include <TwkQtCoreUtil/QtConvert.h>
@@ -503,9 +502,144 @@ namespace Rv
         m_ui.useCrashReporterToggle->setCheckState(Qt::Unchecked);
         m_ui.useCrashReporterToggle->setDisabled(true);
 
-        m_ui.startupScreenCombo->clear();
-        m_ui.startupScreenCombo->addItem("Follow Pointer");
-        for (int i = 0; i < QApplication::desktop()->screenCount(); ++i)
+    m_ui.startupScreenCombo->clear();
+    m_ui.startupScreenCombo->addItem("Follow Pointer");
+
+    const QList<QScreen*> screens = QGuiApplication::screens();
+    for (int i = 0; i < screens.size(); i++)
+    {
+        m_ui.startupScreenCombo->addItem(QString("Screen %1").arg((unsigned int)(i)));
+    }
+    m_ui.startupScreenCombo->setCurrentIndex ((opts.screen < m_ui.startupScreenCombo->count()-1) ? opts.screen+1 : 0);
+
+    n = 0;
+    if (opts.stereoMode)
+    {
+        string s = opts.stereoMode;
+        if (s == StereoAnaglyph) n = 1;
+        else if (s == StereoPair) n = 2;
+        else if (s == StereoMirror) n = 3;
+        else if (s == StereoLeft) n = 4;
+        else if (s == StereoRight) n = 5;
+        else if (s == StereoChecker) n = 6;
+        else if (s == StereoScanline) n = 7;
+        else if (s == StereoHardware) n = 8;
+        else if ( s == StereoLumAnaglyph) n = 9;
+    }
+
+    m_ui.stereoModeCombo->setCurrentIndex(n);
+
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+    settings.beginGroup("Caching");
+
+    n = 0;
+    if (opts.useCache) n = 1;
+    if (opts.useLCache) n = 2;
+
+    m_ui.cacheModeCombo->setCurrentIndex(settings.value("cacheMode", n).toInt());
+
+    // Pull the achitecture specific settings... 
+    double max32lram = settings.value("lookAheadCacheSize32New", opts.maxlram).toDouble();
+    double max64lram = settings.value("lookAheadCacheSize64New", opts.maxlram).toDouble();
+    double max32cram = settings.value("regionCacheSize32New",    opts.maxcram).toDouble();
+    double max64cram = settings.value("regionCacheSize64New",    opts.maxcram).toDouble();
+
+    // ...and populate the preference fields
+    //s.setNum(max32lram, 'g', 3); m_ui.lookAheadCacheSize32Edit->setText(s);
+    s.setNum(max64lram, 'g', 3); m_ui.lookAheadCacheSize64Edit->setText(s);
+    //s.setNum(max32cram, 'g', 3); m_ui.regionCacheSize32Edit->setText(s);
+    s.setNum(max64cram, 'g', 3); m_ui.regionCacheSize64Edit->setText(s);
+
+    s.setNum(opts.maxbwait, 'g', 3); m_ui.bufferWaitEdit->setText(s);
+    s.setNum(opts.lookback, 'g', 3); m_ui.lookBehindFracEdit->setText(s);
+
+    m_ui.cacheOutsideRegionToggle->setCheckState(opts.cacheOutsideRegion ? Qt::Checked : Qt::Unchecked);
+
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+    settings.beginGroup("Rendering");
+
+    n = 0;
+    if (opts.maxbits == 16) n = 1;
+    if (opts.maxbits == 8) n = 2;
+
+    m_ui.bitDepthCombo->setCurrentIndex(n);
+    m_ui.allowFloatToggle->setCheckState(opts.nofloat ? Qt::Unchecked : Qt::Checked);
+    m_ui.swapScanlinesToggle->setCheckState(opts.swapScanlines ? Qt::Checked : Qt::Unchecked);
+    m_ui.prefetchToggle->setCheckState(opts.prefetch ? Qt::Checked : Qt::Unchecked);
+    m_ui.newGLSLlutInterpToggle->setCheckState(opts.newGLSLlutInterp ? Qt::Checked : Qt::Unchecked);
+
+    if (ImageRenderer::queryClientStorage())
+    {
+        m_ui.appleClientStorageToggle->setCheckState(opts.useAppleClientStorage ? Qt::Checked : Qt::Unchecked);
+    }
+    else
+    {
+        m_ui.appleClientStorageToggle->setEnabled(false);
+    }
+
+    if (ImageRenderer::queryThreadedUpload())
+    {
+        m_ui.useThreadedUploadToggle->setCheckState(opts.useThreadedUpload ? Qt::Checked : Qt::Unchecked);
+    }
+    else
+    {
+        m_ui.useThreadedUploadToggle->setEnabled(false);
+    }
+
+    n = 0;
+    if (opts.resampleMethod)
+    {
+        // "area" is n=0.
+        if (!strcmp(opts.resampleMethod, "cubic")) n = 1;
+        else if (!strcmp(opts.resampleMethod, "linear")) n = 2;
+        else if (!strcmp(opts.resampleMethod, "nearest")) n = 3;
+    }
+    m_ui.resampleMethodCombo->setCurrentIndex(n);
+
+    if (opts.imageFilter == GL_LINEAR)  m_ui.imageFilterCombo->setCurrentIndex(0);
+    if (opts.imageFilter == GL_NEAREST) m_ui.imageFilterCombo->setCurrentIndex(1);
+
+    n = 0;
+    if (opts.bgpattern)
+    {
+        if (!strcmp(opts.bgpattern, "grey18")) n = 1;
+        else if (!strcmp(opts.bgpattern, "grey50")) n = 2;
+        else if (!strcmp(opts.bgpattern, "white")) n = 3;
+        else if (!strcmp(opts.bgpattern, "checker")) n = 4;
+        else if (!strcmp(opts.bgpattern, "crosshatch")) n = 5;
+    }
+
+    m_ui.bgPatternCombo->setCurrentIndex(n);
+
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+    settings.beginGroup("Audio");
+
+    if (AudioRenderer::audioDisabledAlways())
+    {
+        m_ui.audioModuleCombo->clear();
+        m_ui.audioDeviceCombo->clear();
+        m_ui.audioDeviceLayoutCombo->clear();
+        m_ui.audioDeviceFormatCombo->clear();
+        m_ui.audioDeviceRateCombo->clear();
+        m_ui.audioModuleCombo->addItem("Audio Disabled");
+        m_ui.audioModuleCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
+        m_ui.audioDeviceCombo->setEnabled(false);
+        m_ui.audioDeviceLayoutCombo->setEnabled(false);
+        m_ui.audioDeviceFormatCombo->setEnabled(false);
+        m_ui.audioDeviceRateCombo->setEnabled(false);
+    }
+    else if (!m_ui.audioModuleCombo->count())
+    {
+        const AudioRenderer::ModuleVector& modules = AudioRenderer::modules();
+        size_t current = 0;
+
+        for (size_t i= 0; i < modules.size(); i++)
         {
             m_ui.startupScreenCombo->addItem(
                 QString("Screen %1").arg((unsigned int)(i)));
@@ -936,9 +1070,79 @@ namespace Rv
         QCoreApplication::setOrganizationDomain(INTERNAL_ORGANIZATION_DOMAIN);
         QCoreApplication::setApplicationName(INTERNAL_APPLICATION_NAME);
 
-        QSettings user;
-        user.clear();
-        user.sync();
+void
+RvPreferences::loadSettingsIntoOptions(Options& opts)
+{
+    RV_QSETTINGS;
+
+    loadSettingsIntoOptions (settings, opts);
+}
+
+void
+RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
+{
+    QString s;
+    settings.beginGroup("Controls");
+
+    opts.clickToPlayEnable = int(!settings.value("disableClickToPlay", opts.clickToPlayEnable ? false : true).toBool());
+    opts.scrubEnable       = int(!settings.value("disableScrubInView", opts.scrubEnable ? false : true).toBool());
+
+    settings.endGroup();
+
+    settings.beginGroup("General");
+
+    opts.fontSize1 = settings.value("fontSize1", opts.fontSize1).toInt();
+    opts.fontSize2 = settings.value("fontSize2", opts.fontSize2).toInt();
+
+    opts.playMode         = settings.value("playMode", opts.playMode).toInt();
+    opts.play             = int(settings.value("playOnStartup", opts.play ? true : false).toBool());
+    opts.networkOnStartup = int(settings.value("networkOnStartup", opts.networkOnStartup ? true : false).toBool());
+    opts.stylusAsMouse    = int(settings.value("stylusAsMouse", opts.stylusAsMouse ? true : false).toBool());
+    opts.startupResize    = int(settings.value("startupResize", opts.startupResize ? true : false).toBool());
+    opts.qtdesktop        = int(settings.value("desktopAware", opts.qtdesktop ? true : false).toBool());
+    opts.urlsReuseSession = int(settings.value("urlsReuseSession", opts.urlsReuseSession ? true : false).toBool());
+    opts.fullscreen       = int(settings.value("fullscreenOnStartup", opts.fullscreen ? true : false).toBool());
+    opts.screen           = settings.value("startupScreenPolicy", opts.screen).toInt();
+    opts.nomb             = int(settings.value("noMenuBar", opts.nomb ? true : false).toBool());
+    opts.defaultfps       = settings.value("fps", opts.defaultfps).toDouble();
+    opts.networkHostBuf   = settings.value("networkHost", (opts.networkHost) ? opts.networkHost : "").toString().toUtf8().data();
+    opts.networkHost      = (char *) ((opts.networkHostBuf.empty()) ? 0 : opts.networkHostBuf.c_str());
+    opts.readerThreads    = settings.value("readerThreads", opts.readerThreads).toInt();
+    opts.autoRetime       = int(settings.value("autoRetime", opts.autoRetime ? true : false).toBool());
+    opts.useCrashReporter = int(settings.value("useCrashReporter", opts.useCrashReporter ? true : false).toBool());
+
+    opts.stereoMode = 0;
+    s = settings.value("stereoMode", QString(opts.stereoMode)).toString();
+    if (s == StereoAnaglyph) opts.stereoMode = (char*)StereoAnaglyph;
+    if (s == StereoLumAnaglyph) opts.stereoMode = (char*)StereoLumAnaglyph;
+    if (s == StereoPair) opts.stereoMode = (char*)StereoPair;
+    if (s == StereoMirror) opts.stereoMode = (char*)StereoMirror;
+    if (s == StereoChecker) opts.stereoMode = (char*)StereoChecker;
+    if (s == StereoScanline) opts.stereoMode = (char*)StereoScanline;
+    if (s == StereoHardware) opts.stereoMode = (char*)StereoHardware;
+    if (s == StereoLeft) opts.stereoMode = (char*)StereoLeft;
+    if (s == StereoRight) opts.stereoMode = (char*)StereoRight;
+
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+    settings.beginGroup("Caching");
+    int cacheMode     = settings.value("cacheMode", 2 /*Look-Ahead Cache*/).toInt();
+
+    opts.useCache = false;
+    opts.useLCache = false;
+
+    switch (cacheMode)
+    {
+      default:
+      case 0:
+          break;
+      case 1:
+          opts.useCache = true;
+          break;
+      case 2:
+          opts.useLCache = true;
+          break;
     }
 
     void RvPreferences::loadSettingsIntoOptions(Options& opts)
@@ -1116,9 +1320,7 @@ namespace Rv
         //  in settings file.
         //
 
-        opts.useThreadedUpload =
-            settings.value("useThreadedUpload3", opts.useThreadedUpload)
-                .toBool();
+    s = settings.value("resampleMethod", QString(opts.resampleMethod)).toString();
 
         opts.maxvram = settings.value("vram", opts.maxvram).toDouble();
         opts.maxbits = settings.value("maxBitDepth", opts.maxbits).toInt();
@@ -1225,29 +1427,14 @@ namespace Rv
             settings.value("dispAlphaBits", opts.dispAlphaBits).toInt();
         settings.endGroup();
 
-        //----------------------------------------------------------------------
-        settings.beginGroup("OpenEXR");
-        opts.exrRGBA = settings.value("useRGBA", bool(opts.exrRGBA)).toBool();
-        opts.exrInherit =
-            settings.value("inheritChannels", bool(opts.exrInherit)).toBool();
-        opts.exrPlanar3Chan =
-            settings.value("planar3Channel", bool(opts.exrPlanar3Chan))
-                .toBool();
-        opts.exrNoOneChannel =
-            settings.value("noOneChannel", bool(opts.exrNoOneChannel)).toBool();
-        opts.exrcpus = settings.value("cpus", opts.exrcpus).toInt();
-        opts.exrIOMethod = settings.value("IOmethod", opts.exrIOMethod).toInt();
-        opts.exrIOSize = settings.value("IOsize", opts.exrIOSize).toInt();
-        opts.exrMaxAsync =
-            settings.value("MaxInFlight", opts.exrMaxAsync).toInt();
-        opts.exrReadWindowIsDisplayWindow =
-            settings
-                .value("readWindowIsDisplayWindow",
-                       bool(opts.exrReadWindowIsDisplayWindow))
-                .toBool();
-        opts.exrReadWindow =
-            settings.value("readWindow", opts.exrReadWindow).toInt();
-        settings.endGroup();
+    //----------------------------------------------------------------------
+    settings.beginGroup("Cineon");
+    opts.cinIOMethod = settings.value("IOmethod", opts.cinIOMethod).toInt();
+    opts.cinIOSize = settings.value("IOsize", opts.cinIOSize).toInt();
+    opts.cinMaxAsync = settings.value("MaxInFlight", opts.cinMaxAsync).toInt();
+    opts.cinchroma = int(settings.value("usePrimaries", bool(opts.cinchroma)).toBool());
+    
+    QString cinpf = settings.value("pixelFormatNew", QString(opts.cinPixel)).toString();
 
         //----------------------------------------------------------------------
         settings.beginGroup("JPEG");
@@ -1272,22 +1459,7 @@ namespace Rv
         QString cinpf =
             settings.value("pixelFormatNew", opts.cinPixel).toString();
 
-        if (cinpf == RGB8)
-            opts.cinPixel = (char*)RGB8;
-        else if (cinpf == RGBA8)
-            opts.cinPixel = (char*)RGBA8;
-        else if (cinpf == RGB8_PLANAR)
-            opts.cinPixel = (char*)RGB8_PLANAR;
-        else if (cinpf == RGB10_A2)
-            opts.cinPixel = (char*)RGB10_A2;
-        else if (cinpf == A2_BGR10)
-            opts.cinPixel = (char*)A2_BGR10;
-        else if (cinpf == RGB16)
-            opts.cinPixel = (char*)RGB16;
-        else if (cinpf == RGBA16)
-            opts.cinPixel = (char*)RGBA16;
-        else if (cinpf == RGB16_PLANAR)
-            opts.cinPixel = (char*)RGB16_PLANAR;
+    QString dpxpf = settings.value("pixelFormatNew", QString(opts.dpxPixel)).toString();
 
         settings.endGroup();
 
@@ -1883,6 +2055,264 @@ namespace Rv
     }
 
     //----------------------------------------------------------------------
+
+    settings.beginGroup("Caching");
+    settings.setValue("cacheMode", m_ui.cacheModeCombo->currentIndex());
+
+    // Use the setting from the running architecture as the shared setting for 
+    // backwards compatibility.
+    #ifdef ARCH_IA32
+        settings.setValue("lookAheadCacheSizeNew", m_ui.lookAheadCacheSize32Edit->text().toDouble());
+        settings.setValue("regionCacheSizeNew", m_ui.regionCacheSize32Edit->text().toDouble());
+    #else
+        settings.setValue("lookAheadCacheSizeNew", m_ui.lookAheadCacheSize64Edit->text().toDouble());
+        settings.setValue("regionCacheSizeNew", m_ui.regionCacheSize64Edit->text().toDouble());
+    #endif
+
+    // Set the architecture specific settings
+    //settings.setValue("lookAheadCacheSize32New", m_ui.lookAheadCacheSize32Edit->text().toDouble());
+    settings.setValue("lookAheadCacheSize64New", m_ui.lookAheadCacheSize64Edit->text().toDouble());
+    //settings.setValue("regionCacheSize32New", m_ui.regionCacheSize32Edit->text().toDouble());
+    settings.setValue("regionCacheSize64New", m_ui.regionCacheSize64Edit->text().toDouble());
+
+    settings.setValue("bufferWait", m_ui.bufferWaitEdit->text().toDouble());
+    settings.setValue("lookBehindFraction", m_ui.lookBehindFracEdit->text().toDouble());
+    settings.setValue("cacheOutsideRegion", m_ui.cacheOutsideRegionToggle->checkState() == Qt::Checked);
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("Rendering");
+
+    settings.setValue("nofloat", m_ui.allowFloatToggle->checkState() != Qt::Checked);
+    settings.setValue("swapScanlines", m_ui.swapScanlinesToggle->checkState() == Qt::Checked);
+    settings.setValue("prefetch2", m_ui.prefetchToggle->checkState() == Qt::Checked);
+    settings.setValue("appleClientStorage", m_ui.appleClientStorageToggle->checkState() == Qt::Checked);
+    settings.setValue("newGLSLlutInterp", m_ui.newGLSLlutInterpToggle->checkState() == Qt::Checked);
+
+    //  Don't write the value of the toggle as a setting unless the user was
+    //  actually allowed to change it.
+    //  
+    if (ImageRenderer::queryThreadedUpload())
+    {
+        settings.setValue("useThreadedUpload3", m_ui.useThreadedUploadToggle->checkState() == Qt::Checked);
+    }
+    
+    int n = 32;
+    switch (m_ui.bitDepthCombo->currentIndex())
+    {
+      default:
+      case 0: n = 32; break;
+      case 1: n = 16; break;
+      case 2: n = 8; break;
+    }
+
+    settings.setValue("maxBitDepth", n);
+
+    char* method = 0;
+
+    switch (m_ui.resampleMethodCombo->currentIndex())
+    {
+      default:
+      case 0: method = (char*)Area; break;
+      case 1: method = (char*)Cubic; break;
+      case 2: method = (char*)Linear; break;
+      case 3: method = (char*)Nearest; break;
+    }
+
+    settings.setValue("resampleMethod", QString(method));
+
+    switch (m_ui.imageFilterCombo->currentIndex())
+    {
+      default:
+      case 0: method = (char*)Linear; break;
+      case 1: method = (char*)Nearest; break;
+    }
+
+    settings.setValue("imageFilter", QString(method));
+
+    switch (m_ui.bgPatternCombo->currentIndex())
+    {
+      default:
+      case 0: method = (char*)Solid0; break;
+      case 1: method = (char*)Solid18; break;
+      case 2: method = (char*)Solid50; break;
+      case 3: method = (char*)Solid100; break;
+      case 4: method = (char*)Checker; break;
+      case 5: method = (char*)CrossHatch; break;
+    }
+
+    settings.setValue("backgroundPattern", QString(method));
+
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("Audio");
+    settings.setValue("volume", m_ui.volumeSlider->sliderPosition() / 100.0);
+    settings.setValue("holdDeviceOpen", m_ui.audioHoldOpenToggle->checkState() == Qt::Checked);
+    settings.setValue("hardwareLock", m_ui.audioHardwareLockToggle->checkState() == Qt::Checked);
+    settings.setValue("audioScrub", m_ui.audioScrubAtLaunchToggle->checkState() == Qt::Checked);
+    settings.setValue("audioPreRoll", m_ui.audioPreRollToggle->checkState() == Qt::Checked);
+    settings.setValue("devicePacketSize", m_ui.audioDevicePacketEdit->text().toInt());
+    settings.setValue("cachePacketSizeNew", m_ui.audioCachePacketEdit->text().toInt());
+    settings.setValue("audioMinCache", m_ui.audioCacheMinEdit->text().toDouble());
+    settings.setValue("audioMaxCache", m_ui.audioCacheMaxEdit->text().toDouble());
+    settings.setValue("globalOffset", m_ui.audioGlobalOffsetEdit->text().toDouble());
+    settings.setValue("audioDeviceLatency", m_ui.audioDeviceLatencyEdit->text().toDouble());
+
+    if (!AudioRenderer::audioDisabledAlways() && 
+            m_ui.audioDeviceLayoutCombo->currentText() != "Unavailable" &&
+            m_ui.audioDeviceLayoutCombo->currentText() != "")
+    {
+        settings.setValue("outputRate", m_ui.audioDeviceRateCombo->currentText().toDouble());
+        settings.setValue("outputModule", m_ui.audioModuleCombo->currentText());
+        settings.setValue("outputDevice", m_ui.audioDeviceCombo->currentText());
+
+        // Handle outputPrecision settings
+        int currentIndex = m_ui.audioDeviceFormatCombo->currentIndex();
+        TwkAudio::Format currentFormat;
+
+        if (currentIndex < m_ui.audioDeviceFormatCombo->count())
+        {
+            currentFormat = (TwkAudio::Format) m_ui.audioDeviceFormatCombo->itemData(currentIndex).toInt();
+        }
+
+        int prec;
+        switch (currentFormat)
+        {
+            default:
+            case TwkAudio::Float32Format: prec = 32; break;
+            case TwkAudio::Int24Format: prec = 24; break;
+            case TwkAudio::Int16Format: prec = 16; break;
+            case TwkAudio::Int8Format: prec = 8; break;
+            case TwkAudio::Int32Format: prec = -32 ; break;
+        }
+
+        settings.setValue("outputPrecision", prec);
+
+        // Handle outputLayout settings
+        currentIndex = m_ui.audioDeviceLayoutCombo->currentIndex();
+        TwkAudio::Layout currentChannelLayout;
+
+        if (currentIndex < m_ui.audioDeviceLayoutCombo->count())
+        {
+            currentChannelLayout = (TwkAudio::Layout) m_ui.audioDeviceLayoutCombo->itemData(currentIndex).toInt();
+        }
+        settings.setValue("outputLayout", int(currentChannelLayout));
+    }
+
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("Display");
+    settings.setValue("vsync", m_ui.displayVideoSyncButton->checkState() == Qt::Checked ? 1 : 0);
+
+    int rbits = 0, gbits = 0, bbits = 0, abits = 0;
+
+    switch (m_ui.displayOutputCombo->currentIndex())
+    {
+      default:
+      case 0: abits = bbits = gbits = rbits = 0; break;
+      case 1: abits = bbits = gbits = rbits = 8; break;
+      case 2: bbits = gbits = rbits = 10; abits = 2; break;
+          break;
+    }
+    
+    settings.setValue("dispRedBits", rbits);
+    settings.setValue("dispGreenBits", gbits);
+    settings.setValue("dispBlueBits", bbits);
+    settings.setValue("dispAlphaBits", abits);
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("OpenEXR");
+    settings.setValue("useRGBA", m_ui.exrRGBAToggle->checkState() == Qt::Checked);
+    settings.setValue("inheritChannels", m_ui.exrInheritToggle->checkState() == Qt::Checked);
+    settings.setValue("planar3Channel", m_ui.exrPlanar3ChannelToggle->checkState() == Qt::Checked);
+    settings.setValue("noOneChannel", m_ui.exrNoOneChannelToggle->checkState() == Qt::Checked);
+    settings.setValue("readWindowIsDisplayWindow", m_ui.exrReadWindowIsDisplayWindowToggle->checkState() == Qt::Checked);
+    settings.setValue("cpus", m_ui.exrNumThreadsEdit->text().toInt());
+    settings.setValue("IOmethod", m_ui.exrIOMethodCombo->currentIndex());
+    settings.setValue("readWindow", m_ui.exrReadWindowCombo->currentIndex());
+    settings.setValue("IOsize", m_ui.exrChunkSizeEdit->text().toInt());
+    settings.setValue("MaxInFlight", m_ui.exrMaxInFlightEdit->text().toInt());
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("JPEG");
+    settings.setValue("RGBA", m_ui.jpegRGBAToggle->checkState() == Qt::Checked);
+    settings.setValue("IOmethod", m_ui.jpegIOMethodCombo->currentIndex());
+    settings.setValue("IOsize", m_ui.jpegChunkSizeEdit->text().toInt());
+    settings.setValue("MaxInFlight", m_ui.jpegMaxInFlightEdit->text().toInt());
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("Cineon");
+    settings.setValue("IOmethod", m_ui.cinIOMethodCombo->currentIndex());
+    settings.setValue("IOsize", m_ui.cinChunkSizeEdit->text().toInt());
+    settings.setValue("MaxInFlight", m_ui.cinMaxInFlightEdit->text().toInt());
+    settings.setValue("usePrimaries", m_ui.cinChromaToggle->checkState() == Qt::Checked);
+
+    const char* cinfmt = opts.cinPixel;
+
+    switch (m_ui.cinDisplayPixelCombo->currentIndex())
+    {
+      case 0: cinfmt = RGB8;         break;
+      case 1: cinfmt = RGBA8;        break;
+      case 2: cinfmt = RGB8_PLANAR;  break;
+      case 3: cinfmt = RGB10_A2;     break;
+      case 4: cinfmt = A2_BGR10;     break;
+      case 5: cinfmt = RGB16;        break;
+      case 6: cinfmt = RGBA16;       break;
+      case 7: cinfmt = RGB16_PLANAR; break;
+    }
+
+    settings.setValue("pixelFormatNew", UTF8::qconvert(cinfmt));
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+
+    settings.beginGroup("DPX");
+    settings.setValue("IOmethod", m_ui.dpxIOMethodCombo->currentIndex());
+    settings.setValue("IOsize", m_ui.dpxChunkSizeEdit->text().toInt());
+    settings.setValue("MaxInFlight", m_ui.dpxMaxInFlightEdit->text().toInt());
+    settings.setValue("usePrimaries", m_ui.dpxChromaToggle->checkState() == Qt::Checked);
+
+    const char* dpxfmt = opts.dpxPixel;
+
+    switch (m_ui.dpxDisplayPixelCombo->currentIndex())
+    {
+      case 0: dpxfmt = RGB8;         break;
+      case 1: dpxfmt = RGBA8;        break;
+      case 2: dpxfmt = RGB8_PLANAR;  break;
+      case 3: dpxfmt = RGB10_A2;     break;
+      case 4: dpxfmt = A2_BGR10;     break;
+      case 5: dpxfmt = RGB16;        break;
+      case 6: dpxfmt = RGBA16;       break;
+      case 7: dpxfmt = RGB16_PLANAR; break;
+    }
+
+    settings.setValue("pixelFormatNew", UTF8::qconvert(dpxfmt));
+    settings.endGroup();
+
+    //----------------------------------------------------------------------
+    settings.beginGroup("TGA");
+    settings.setValue("IOmethod", m_ui.tgaIOMethodCombo->currentIndex());
+    settings.setValue("IOsize", m_ui.tgaChunkSizeEdit->text().toInt());
+    settings.setValue("MaxInFlight", m_ui.tgaMaxInFlightEdit->text().toInt());
+    settings.endGroup();
+
+    settings.beginGroup("TIFF");
+    settings.setValue("IOmethod", m_ui.tifIOMethodCombo->currentIndex());
+    settings.setValue("IOsize", m_ui.tifChunkSizeEdit->text().toInt());
+    settings.setValue("MaxInFlight", m_ui.tifMaxInFlightEdit->text().toInt());
+    settings.endGroup();
+
     //
     //  General
     //

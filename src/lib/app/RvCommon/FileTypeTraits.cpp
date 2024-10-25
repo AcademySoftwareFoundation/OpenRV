@@ -11,8 +11,54 @@ namespace Rv
 {
     using namespace std;
 
-    FileTypeTraits::FileTypeTraits()
-        : m_iconMode(SystemIcons)
+FileTypeTraits::~FileTypeTraits()
+{
+}
+
+FileTypeTraits*
+FileTypeTraits::copyTraits() const
+{
+    FileTypeTraits* t = new FileTypeTraits();
+    t->setIconMode(m_iconMode);
+    return t;
+}
+
+QStringList 
+FileTypeTraits::typeDescriptions()
+{
+    QStringList list;
+    list.append("Any File");
+    return list;
+}
+
+bool 
+FileTypeTraits::isKnown(size_t index, const QString&) const
+{
+    return true;
+}
+
+QStringList
+FileTypeTraits::fileAttributes(const QString& file) const
+{
+    QStringList list;
+    QFileInfo info(file);
+
+#if defined( RV_VFX_CY2023 )
+    list << "Created" << info.birthTime().toString(Qt::DefaultLocaleShortDate);
+    list << "Modified" << info.lastModified().toString(Qt::DefaultLocaleShortDate);
+#else
+    // created() is deprecated.
+    // birthTime() function to get the time the file was created.
+    // metadataChangeTime() to get the time its metadata was last changed.
+    // lastModified() to get the time it was last modified.
+    QLocale locale = QLocale::system();
+    list << "Created" << locale.toString(info.birthTime(), QLocale::ShortFormat);
+    list << "Modified" << locale.toString(info.lastModified(), QLocale::ShortFormat);
+#endif
+
+    size_t s = info.size();
+
+    if (s < 1024)
     {
     }
 

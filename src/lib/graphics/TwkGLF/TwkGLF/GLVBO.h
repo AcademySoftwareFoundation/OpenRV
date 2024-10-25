@@ -12,30 +12,25 @@
 #include <TwkGLF/GL.h>
 #include <vector>
 
-namespace TwkGLF
+
+namespace TwkGLF {
+
+//----------------------------------------------------------------------
+//
+//  VBO
+//
+class GLVBO
 {
 
-    //----------------------------------------------------------------------
-    //
-    //  VBO
-    //
-    class GLVBO
-    {
-    public:
-        typedef std::vector<GLVBO*> GLVBOVector;
+    GLVBO();
+    ~GLVBO();
 
-        GLVBO()
-        {
-            glGenBuffers(1, &m_vbo);
-            m_available = true;
-            m_totalBytes = 0;
-        }
+    //size is in bytes
+    void setupData(const GLvoid* data, GLenum type, size_t size);
 
-        ~GLVBO()
-        {
-            if (m_vbo != 0)
-                glDeleteBuffers(1, &m_vbo);
-        }
+    bool isValid() const;
+    
+    const GLuint vbo() const { return m_vbo; }
 
         // size is in bytes
         void setupData(const GLvoid* data, GLenum type, size_t size)

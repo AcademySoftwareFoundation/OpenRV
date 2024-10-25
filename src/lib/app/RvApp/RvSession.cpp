@@ -221,36 +221,8 @@ namespace Rv
         , m_userHasSetViewSize(false)
         , m_conductorSource(nullptr)
     {
-        Options& opts = Options::sharedOptions();
-        m_realtime = (opts.playMode == 2);
-        m_playMode = static_cast<PlayMode>(opts.loopMode);
-
-        if (firstTime)
-        {
-            //
-            //  Initialize nodes here -- at this point we know that GL has
-            //  been initialized which is currently required for node
-            //  initialization.
-            //
-
-            IPCore::Application::setOptionValueFromEnvironment(
-                "nodePath", "TWK_NODE_PLUGIN_PATH");
-            IPCore::Application::setOptionValueFromEnvironment(
-                "nodeDefinitionOverride", "TWK_NODE_DEFINITION_OVERRIDE");
-            addRvNodeDefinitions(
-                IPCore::Application::instance()->nodeManager());
-            IPCore::Application::instance()->loadOptionNodeDefinitions();
-            firstTime = false;
-        }
-
-        m_mediaLoadingSetEmptyConnection =
-            graph().mediaLoadingSetEmptySignal().connect(
-                boost::bind(&RvSession::onGraphMediaSetEmpty, this));
-
-        // register the signal to detecting removing of node in the graphe
-        m_nodeWillRemoveConnection = graph().nodeWillRemoveSignal().connect(
-            boost::bind(&RvSession::onGraphNodeWillRemove, this,
-                        std::placeholders::_1));
+        // NOTE_QT: The comment below is not necessary true in Qt6 because the context is not valid until widget shown.
+        //          A custom context could be created I think, but it might required a lot more changes to make it work.
 
         //
         // register the signal to detect fastAddSourceEnabled in the graphe
@@ -261,7 +233,15 @@ namespace Rv
                     boost::bind(&RvSession::onGraphFastAddSourceChanged, this,
                                 std::placeholders::_1, std::placeholders::_2));
 
-        graph().clear();
+        IPCore::Application::setOptionValueFromEnvironment("nodePath", "TWK_NODE_PLUGIN_PATH");
+        IPCore::Application::setOptionValueFromEnvironment("nodeDefinitionOverride", "TWK_NODE_DEFINITION_OVERRIDE");
+        addRvNodeDefinitions(IPCore::Application::instance()->nodeManager());
+
+        // NOTE_QT: This function call ends up in the following code path:
+        //          new Shader::Function -> initGLSLVersion() -> glGetString -> crashes because no context
+        IPCore::Application::instance()->loadOptionNodeDefinitions();
+        firstTime = false;
+    }
 
         if (getenv("RV_DEBUG_GC"))
             debugGC = true;

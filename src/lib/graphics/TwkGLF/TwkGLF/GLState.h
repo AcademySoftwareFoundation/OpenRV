@@ -39,25 +39,11 @@ namespace TwkGLF
 
     class GLState
     {
-    public:
-        //
-        //  Types
-        //
-        typedef TwkGLF::GLFBO GLFBO;
-        typedef TwkGLF::GLVBO GLVBO;
-        typedef std::map<unsigned int, GLPipeline> PipelineMap;
+        FixedFunctionPipeline(GLState* s);
 
-        //
-        //  FixedFunctionPipeline is intended to be allocated on the
-        //  stack. The constructor will store the current program and
-        //  switch to the GL fixed function pipeline. When destroyed, the
-        //  previous program will be restored:
-        //
-        //  {
-        //      FixedFunctionPipeline FFP(globalState);
-        //      // render some stuff
-        //  }
-        //
+        void setViewport(int x, int y, int w, int h);
+
+        ~FixedFunctionPipeline();
 
         struct FixedFunctionPipeline
         {

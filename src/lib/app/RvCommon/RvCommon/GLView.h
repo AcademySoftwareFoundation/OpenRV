@@ -8,13 +8,21 @@
 #ifndef __rv_qt__GLView__h__
 #define __rv_qt__GLView__h__
 #include <TwkGLF/GL.h>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QSurfaceFormat>
+#include <QOffscreenSurface>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <TwkUtil/Timer.h>
 #include <boost/thread/thread.hpp>
 
-namespace Rv
+namespace Rv {
+class RvDocument;
+class QTFrameBuffer;
+class QTGLVideoDevice;
+
+class GLView : public QOpenGLWidget, protected QOpenGLFunctions
 {
     class RvDocument;
     class QTFrameBuffer;
@@ -24,14 +32,26 @@ namespace Rv
     {
         Q_OBJECT
 
-    public:
-        typedef TwkUtil::Timer Timer;
+    GLView(QWidget* parent, 
+           QOpenGLContext* sharedContext, 
+           RvDocument* doc, 
+           bool stereo=false,
+           bool vsync=true,
+           bool doubleBuffer=true,
+           int red=0,
+           int green=0,
+           int blue=0,
+           int alpha=0,
+           bool noResize=true);
+    ~GLView();
 
-        GLView(QWidget* parent, const QGLWidget* share, RvDocument* doc,
-               bool stereo = false, bool vsync = true, bool doubleBuffer = true,
-               int red = 0, int green = 0, int blue = 0, int alpha = 0,
-               bool noResize = true);
-        ~GLView();
+    static QSurfaceFormat rvGLFormat(bool stereo=false,
+                                     bool vsync=true,
+                                     bool doubleBuffer=true,
+                                     int red=8,
+                                     int green=8,
+                                     int blue=8,
+                                     int alpha=8);
 
         static QGLFormat rvGLFormat(bool stereo = false, bool vsync = true,
                                     bool doubleBuffer = true, int red = 8,
@@ -58,8 +78,31 @@ namespace Rv
 
         void* syncClosure() const { return m_syncThreadData; }
 
-    public slots:
-        void eventProcessingTimeout();
+private:
+    RvDocument*      m_doc;
+    //QTFrameBuffer*   m_frameBuffer;
+    boost::thread    m_swapThread;
+    QTGLVideoDevice* m_videoDevice;
+    unsigned int     m_lastKey;
+    QEvent::Type     m_lastKeyType;
+    Timer            m_activityTimer;
+    Timer            m_renderTimer;
+    QTimer           m_eventProcessingTimer;
+    bool             m_userActive;
+    size_t           m_renderCount;
+    Timer            m_activationTimer;
+    bool             m_firstPaintCompleted;
+    QSize            m_csize;
+    QSize            m_msize;
+    int              m_red;
+    int              m_green;
+    int              m_blue;
+    int              m_alpha;
+    bool             m_postFirstNonEmptyRender;
+    bool             m_stopProcessingEvents;
+    void*            m_syncThreadData;
+    QOpenGLContext* m_sharedContext;
+};
 
     protected:
         void initializeGL();

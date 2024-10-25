@@ -11,24 +11,64 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/sgcHopTools.h>
 
-namespace TwkGLF
-{
-    using namespace std;
+#include <QOpenGLContext>
 
-    GLFBO::GLFBO(size_t width, size_t height, GLenum colorFormat,
-                 size_t numSamples, void* data)
-        : m_width(width)
-        , m_height(height)
-        , m_samples(numSamples == 0 ? 1 : numSamples)
-        , m_colorFormat(colorFormat)
-        , m_data(data)
-        , m_device(0)
-        , m_colorCount(0)
-        , m_state(Renderable)
-        , m_fence(0)
-        , m_pbo(0)
-        , m_totalSizeInBytes(0)
-        , m_mappedBuffer(0)
+namespace TwkGLF {
+using namespace std;
+
+GLFBO::GLFBO(size_t width, 
+         size_t height,
+         GLenum colorFormat,
+         size_t numSamples,
+         void* data)
+    : m_width(width),
+      m_height(height),
+      m_samples(numSamples == 0 ? 1 : numSamples),
+      m_colorFormat(colorFormat),
+      m_data(data),
+      m_device(0),
+      m_colorCount(0),
+      m_state(Renderable),
+      m_fence(0),
+      m_pbo(0),
+      m_totalSizeInBytes(0),
+      m_mappedBuffer(0)
+{
+    // NOTE_QT: My thinking was to use QOpenGLContext::currentContext()->defaultFramebufferObject(), but we get
+    //          a black screen by using it. Do we need more code?
+    glGenFramebuffers(1, &m_id); TWK_GLDEBUG;
+    glBindFramebuffer(GL_FRAMEBUFFER_EXT, m_id); TWK_GLDEBUG;
+}
+
+GLFBO::GLFBO(const GLVideoDevice* d)
+    : m_id(QOpenGLContext::currentContext()->defaultFramebufferObject()),
+      m_width(0),
+      m_height(0),
+      m_samples(0),
+      m_colorFormat(0),
+      m_data(0),
+      m_device(d),
+      m_colorCount(0),
+      m_state(Renderable),
+      m_fence(0),
+      m_pbo(0),
+      m_totalSizeInBytes(0),
+      m_mappedBuffer(0)
+{
+    const TwkApp::VideoDevice::DataFormat& df = d->dataFormatAtIndex(d->currentDataFormat());
+    m_colorFormat = TwkGLF::internalFormatFromDataFormat(df.iformat);    
+    m_defaultTarget = d->capabilities() & TwkApp::VideoDevice::NormalizedCoordinates
+                      ? GL_TEXTURE_2D : GL_TEXTURE_RECTANGLE_ARB;
+    
+    TwkGLF::GLenumPair tformat = TwkGLF::textureFormatFromDataFormat(df.iformat);
+    m_defaultTextureFormat = tformat.first;
+    m_defaultType   = tformat.second;
+    
+}
+
+GLFBO::~GLFBO()
+{
+    if (m_id)
     {
         glGenFramebuffersEXT(1, &m_id);
         TWK_GLDEBUG;

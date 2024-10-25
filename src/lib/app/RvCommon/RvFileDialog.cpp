@@ -26,7 +26,9 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QMenu>
+#if defined( RV_VFX_CY2023 )
 #include <QtWidgets/QDirModel>
+#endif
 
 namespace Rv
 {
@@ -83,6 +85,247 @@ namespace Rv
         m_ui.searchButton->setVisible(false);
         m_ui.contentFrame->setMaximumHeight(0);
 
+    switch (iconMode)
+    {
+      default:
+      case 0:
+          traits->setIconMode(FileTypeTraits::SystemIcons);
+          break;
+      case 1:
+          traits->setIconMode(FileTypeTraits::GenericIcons);
+          break;
+      case 2:
+          traits->setIconMode(FileTypeTraits::NoIcons);
+          break;
+    }
+    setFileTypeTraits(traits);
+
+    if (m_visited.empty())
+    {
+        m_visited = settings.value("visited", QStringList()).toStringList();
+    }
+
+    int vmode = settings.value("viewModeNew", -1).toInt();
+    int smode = settings.value("sortMethod", -1).toInt();
+    bool showHiddenFiles = settings.value("showHiddenFiles", false).toBool();
+
+    m_allowAutoRefresh = settings.value("allowAutoRefresh", false).toBool();
+    m_ui.autoRefreshCheckbox->setCheckState ((m_allowAutoRefresh) ? Qt::Checked : Qt::Unchecked);
+
+    setWindowTitle("Select Files/Directories");
+    setSizeGripEnabled(true);
+    m_reloadTimer = new QTimer(this);
+    m_sidePanelTimer = new QTimer(this);
+    m_columnViewTimer = new QTimer(this);
+    m_reloadTimer->setSingleShot(true);
+    m_sidePanelTimer->setSingleShot(true);
+    m_columnViewTimer->setSingleShot(true);
+    m_columnViewTimer->start(100);
+    m_ui.buttonBox->setStandardButtons(m_role == OpenFileRole ?
+                   (QDialogButtonBox::Open | QDialogButtonBox::Cancel) :
+                   (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
+
+    m_ui.sidePanelList->setSelectionMode(QAbstractItemView::SingleSelection);
+    loadSidePanel();
+
+    while (QWidget* w = m_ui.viewStack->currentWidget()) delete w;
+
+    m_sidePanelPopup = new QMenu(this);
+    QAction* spGo = m_sidePanelPopup->addAction("Go to Location");
+    QAction* spUse = m_sidePanelPopup->addAction("Use Selection");
+    m_sidePanelPopup->addSeparator();
+    QAction* spRemove = m_sidePanelPopup->addAction("Remove Item from Panel");
+    
+    m_configPopup = new QMenu(this);
+    m_cpSystem = m_configPopup->addAction("System Icons");
+    m_cpGeneric = m_configPopup->addAction("Generic Icons");
+    m_cpNone = m_configPopup->addAction("No Icons");
+    m_configPopup->addSeparator();
+    m_cpHidden = m_configPopup->addAction("Show Hidden Files");
+    m_cpSystem->setCheckable(true);
+    m_cpGeneric->setCheckable(true);
+    m_cpNone->setCheckable(true);
+    m_cpHidden->setCheckable(true);
+    m_cpHidden->setChecked(showHiddenFiles);
+    QActionGroup* cpGroup = new QActionGroup(this);
+    cpGroup->addAction(m_cpSystem);
+    cpGroup->addAction(m_cpGeneric);
+    cpGroup->addAction(m_cpNone);
+    m_ui.configButton->setMenu(m_configPopup);
+
+    QIcon backIcon = colorAdjustedIcon(":images/back_32x32.png");
+    QIcon forwardIcon = colorAdjustedIcon(":images/forwd_32x32.png");
+    QIcon configIcon = colorAdjustedIcon(":images/confg_32x32.png");
+
+    m_ui.previousButton->setDefaultAction(new QAction(backIcon, "<", this));
+    m_ui.nextButton->setDefaultAction(new QAction(forwardIcon, ">", this));
+    m_ui.configButton->setIcon(configIcon);
+
+    switch (iconMode)
+    {
+      default:
+      case 0:
+          m_cpSystem->setChecked(true);
+          break;
+      case 1:
+          m_cpGeneric->setChecked(true);
+          break;
+      case 2:
+          m_cpNone->setChecked(true);
+          break;
+    }
+
+    m_columnView = new QColumnView(this);
+    QWidget* preview = new QWidget();
+    m_columnPreview = new QTextEdit();
+    QLayout* layout = new QVBoxLayout();
+    layout->addWidget(m_columnPreview);
+    preview->setLayout(layout);
+    m_columnPreview->setReadOnly(true);
+    QSizePolicy p(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    p.setHeightForWidth(true);
+    m_columnPreview->setSizePolicy(p);
+    preview->setSizePolicy(p);
+    m_columnView->setPreviewWidget(preview);
+
+    m_detailTree = new QTreeView(this);
+    m_detailTree->setExpandsOnDoubleClick(false);
+    m_detailTree->setAlternatingRowColors(true);
+
+    m_detailTree->setDragEnabled(true);
+    m_columnView->setDragEnabled(true);
+
+    QList<int> widths;
+    for (int i=0; i < 25; i++) widths << 175;
+    m_columnView->setColumnWidths(widths);
+
+    m_columnModel = new MediaDirModel(m_fileTraits->copyTraits());
+    m_columnView->setModel(m_columnModel);
+    m_columnView->setSelectionBehavior(QAbstractItemView::SelectItems);
+
+    setFileMode(m_fileMode); 
+
+    m_detailMediaModel = new MediaDirModel(m_fileTraits->copyTraits());
+    m_detailFileModel = new MediaDirModel(m_fileTraits->copyTraits());
+    m_detailTree->setModel(m_detailFileModel);
+
+    m_detailMediaModel->setShowHiddenFiles(showHiddenFiles);
+    m_detailFileModel->setShowHiddenFiles(showHiddenFiles);
+    m_columnModel->setShowHiddenFiles(showHiddenFiles);
+
+    m_ui.viewStack->addWidget(m_columnView);
+    m_ui.viewStack->addWidget(m_detailTree);
+    m_ui.viewStack->setCurrentIndex(0);
+    m_ui.currentPath->installEventFilter(this);
+
+//#ifdef PLATFORM_DARWIN
+    // this is nice, but it makes a mess out of the slider if one becomes visible
+    //m_ui.sidePanelList->setStyleSheet(QString::fromUtf8("background: rgb(235, 240, 248)"));
+//#endif
+    m_ui.sidePanelList->installEventFilter(this);
+
+    connect(spGo, SIGNAL(triggered(bool)), this, SLOT(sidePanelGo(bool)));
+    connect(spRemove, SIGNAL(triggered(bool)), this, SLOT(sidePanelRemove(bool)));
+    connect(spUse, SIGNAL(triggered(bool)), this, SLOT(sidePanelAccept(bool)));
+
+    connect(cpGroup, SIGNAL(triggered(QAction*)), this, SLOT(iconViewChanged(QAction*)));
+    connect(m_cpHidden, SIGNAL(triggered(bool)), this, SLOT(hiddenViewChanged(bool)));
+
+    connect(m_ui.previousButton, SIGNAL(triggered(QAction*)),
+            this, SLOT(prevButtonTrigger(QAction*)));
+
+    connect(m_ui.nextButton, SIGNAL(triggered(QAction*)),
+            this, SLOT(nextButtonTrigger(QAction*)));
+
+    connect(m_ui.sidePanelList->model(),
+            SIGNAL(rowsInserted(const QModelIndex&,int,int)),
+            this, SLOT(sidePanelInserted(const QModelIndex&,int,int)));
+
+    connect(m_ui.sidePanelList,
+            SIGNAL(itemClicked(QListWidgetItem*)),
+            this, SLOT(sidePanelClick(QListWidgetItem*)));
+
+    connect(m_ui.sidePanelList,
+            SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+            this, SLOT(sidePanelDoubleClick(QListWidgetItem*)));
+
+    connect(m_ui.sidePanelList,
+            SIGNAL(customContextMenuRequested(const QPoint&)),
+            this, SLOT(sidePanelPopup(const QPoint&)));
+
+    connect(m_reloadTimer, SIGNAL(timeout()), this, SLOT(reloadTimeout()));
+
+    connect(m_sidePanelTimer, SIGNAL(timeout()), this, SLOT(sidePanelTimeout()));
+
+    connect(m_columnViewTimer, SIGNAL(timeout()), this, SLOT(columnViewTimeout()));
+
+    connect(m_ui.sortCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(sortComboChanged(int)));
+
+    connect(m_ui.viewCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(viewComboChanged(int)));
+
+    connect(m_ui.pathCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(pathComboChanged(int)));
+
+    connect(m_ui.currentPath, SIGNAL(returnPressed()),
+            this, SLOT(inputPathEntry()));
+
+    connect(m_detailTree, SIGNAL(doubleClicked(const QModelIndex&)), 
+            this, SLOT(doubleClickAccept(const QModelIndex&)));
+
+    connect(m_detailTree, SIGNAL(collapsed(const QModelIndex&)), 
+            this, SLOT(resizeColumns(const QModelIndex&)));
+
+    connect(m_detailTree, SIGNAL(expanded(const QModelIndex&)), 
+            this, SLOT(resizeColumns(const QModelIndex&)));
+
+    connect(m_columnView, SIGNAL(doubleClicked(const QModelIndex&)), 
+            this, SLOT(doubleClickAccept(const QModelIndex&)));
+
+    connect(m_columnView->selectionModel(), 
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+            this,
+            SLOT(columnSelectionChanged(const QItemSelection&, const QItemSelection&)));
+
+    connect(m_detailTree->selectionModel(), 
+            SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+            this,
+            SLOT(treeSelectionChanged(const QItemSelection&, const QItemSelection&)));
+
+    connect(m_columnView, SIGNAL(updatePreviewWidget(const QModelIndex&)),
+            this, SLOT(columnUpdatePreview(const QModelIndex&)));
+
+    connect(m_ui.reloadButton, SIGNAL(clicked(bool)),
+            this, SLOT(reload(bool)));
+
+    connect(m_ui.autoRefreshCheckbox, SIGNAL(stateChanged(int)),
+            this, SLOT(autoRefreshChanged(int)));
+
+    connect(m_ui.fileTypeCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(fileTypeChanged(int)));
+
+    QCompleter *completer = new QCompleter(this);
+#if defined( RV_VFX_CY2023 )
+    completer->setModel(new QDirModel(completer));
+#else
+    QFileSystemModel *fileSystemModel = new QFileSystemModel(completer);
+    // TODO_QT: Is AllEntries fine here?
+    fileSystemModel->setFilter(QDir::AllEntries);
+    completer->setModel(fileSystemModel);
+#endif
+    completer->setCompletionMode(QCompleter::InlineCompletion);
+    m_ui.currentPath->setCompleter(completer);
+    m_ui.currentPath->setText("");
+
+    if (vmode != -1) 
+    {
+        m_ui.viewCombo->setCurrentIndex(vmode);
+        
+        //
+        //  Need this because the combo will default to index 0 and thus
+        //  provide no signal. The signal is required to intialize the
+        //  column view.
         //
         //   XXX hide the new folder button for now, since it's always
         //   disabled.
@@ -463,10 +706,40 @@ namespace Rv
     {
         QFileInfoList list;
 
-        list.push_back(QDir::home().path());
+void 
+RvFileDialog::setViewMode(ViewMode v) 
+{ 
+    m_ui.viewCombo->setCurrentIndex(v);
+    m_viewMode = NoViewMode; 
+    viewComboChanged((int)v);
+}
+
+void 
+RvFileDialog::setRole(Role r) 
+{ 
+    m_role = r; 
+    //  XXX this is hidden for now
+    //  m_ui.newFolderButton->setDisabled(m_role == OpenFileRole);
+    m_ui.buttonBox->setStandardButtons(m_role == OpenFileRole ?
+                   (QDialogButtonBox::Open | QDialogButtonBox::Cancel) :
+                   (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
+}
+
+void
+RvFileDialog::setTitleLabel(const QString& text)
+{
+    m_ui.titleLabel->setText(text);
+}
+
+QFileInfoList
+RvFileDialog::findMountPoints()
+{
+    QFileInfoList list;
+
+    list.push_back(QFileInfo(QDir::home().path()));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_DARWIN)
-        list.push_back(QString("/"));
-        m_drives.insert("/");
+    list.push_back(QFileInfo(QString("/")));
+    m_drives.insert ("/");
 #endif
 
 #if defined(PLATFORM_LINUX)
@@ -625,12 +898,74 @@ namespace Rv
 
         if (path == "")
         {
-            RV_QSETTINGS;
-            settings.beginGroup(m_settingsGroup);
-            path = settings.value("lastDir", inpath).toString();
-            settings.endGroup();
-            pathInfo = QFileInfo(path);
-            if (!pathInfo.isDir())
+            m_watcher = new QFileSystemWatcher(this);
+            connect(m_watcher, SIGNAL(directoryChanged(const QString&)),
+                    this, SLOT(watchedDirChanged(const QString&)));
+        }
+
+        if (!m_watcher->directories().empty())
+            m_watcher->removePaths(m_watcher->directories());
+
+        m_watcher->addPath(absoluteDirPath);
+    }
+
+    if (pathInfo.isDir())
+    {
+        if (!absoluteDirPath.endsWith("/")) absoluteDirPath += "/";
+        if (m_dirPrev.empty() || absoluteDirPath != m_dirPrev.back()) 
+        {
+            m_dirPrev.push_back(absoluteDirPath);
+        }
+    }
+    else
+    {
+        dir = QDir (pathInfo.absolutePath(),
+             "", 
+             QDir::Name | QDir::IgnoreCase,
+             m_filters);
+    }
+    DB ("    setting currentPath " << absoluteDirPath.toUtf8().data());
+    m_ui.currentPath->setText(absoluteDirPath);
+    m_ui.currentPath->end(false);
+    m_currentFile = "";
+
+    if (m_viewMode == DetailedFileView || m_viewMode == DetailedMediaView)
+    {
+        MediaDirModel* model = dynamic_cast<MediaDirModel*>(m_detailTree->model());
+        model->setDirectory(dir, m_viewMode == DetailedFileView 
+                            ? MediaDirModel::BasicFileDetails
+                            : MediaDirModel::MediaDetails);
+        
+        for (int i=0; i < 8; i++) m_detailTree->resizeColumnToContents(i);
+    }
+    else if (m_viewMode == ColumnView)
+    {
+        QModelIndex i = m_columnModel->indexOfPath(QFileInfo(absoluteDirPath));
+
+        if (!i.isValid())
+        {
+            //
+            //  On windows, we need to setdir to the root of the
+            //  current file system. For example, C:/ or Y:/ not just
+            //  "/" or some directory. 
+            //
+
+            QDir fd = dir;
+            while (fd.cdUp());
+            m_columnModel->setDirectory(fd, MediaDirModel::NoDetails);
+        }
+
+        //
+        //    This is a hack to get around a Qt bug in the column view (or
+        //    maybe its the scrolled area). The column view will get
+        //    scrolled too far by setCurrentIndex() if its called before
+        //    the dialog box is fully formed.
+        //
+        DB ("    m_columnViewTimer active " << m_columnViewTimer->isActive());
+
+        if (i != m_columnView->currentIndex())
+        {
+            if (m_columnViewTimer->isActive())
             {
                 path = QDir::currentPath();
                 pathInfo = QFileInfo(path);
@@ -676,12 +1011,14 @@ namespace Rv
 
         if (m_allowAutoRefresh)
         {
-            if (!m_watcher)
-            {
-                m_watcher = new QFileSystemWatcher(this);
-                connect(m_watcher, SIGNAL(directoryChanged(const QString&)),
-                        this, SLOT(watchedDirChanged(const QString&)));
-            }
+            QString aPathNoSlash = aPath;
+            DB ("    up to root: '" << aPath.toUtf8().data() << "'");
+#ifdef WIN32
+            if (aPathNoSlash.endsWith("/")) aPathNoSlash.chop(1);
+#endif
+            m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)), 
+                                    aPathNoSlash,
+                                    aPath);
 
             if (!m_watcher->directories().empty())
                 m_watcher->removePaths(m_watcher->directories());
@@ -700,8 +1037,10 @@ namespace Rv
         }
         else
         {
-            dir = QDir(pathInfo.absolutePath(), "",
-                       QDir::Name | QDir::IgnoreCase, m_filters);
+            DB ("    not at root: '" << aPath.toUtf8().data() << "'");
+            m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)),
+                                    dName,
+                                    aPath);
         }
         DB("    setting currentPath " << absoluteDirPath.toUtf8().data());
         m_ui.currentPath->setText(absoluteDirPath);
@@ -1094,8 +1433,29 @@ namespace Rv
             reload(true);
     }
 
-    void RvFileDialog::columnSelectionChanged(const QItemSelection& selected,
-                                              const QItemSelection& deselected)
+    saveSidePanel();
+    QDialog::done(r);
+}
+
+void 
+RvFileDialog::columnViewTimeout()
+{
+    DB ("columnViewTimeout file " << m_columnViewFile.toUtf8().data());
+    QModelIndex i = m_columnModel->indexOfPath(QFileInfo(m_columnViewFile));
+    if (i.isValid()) m_columnView->setCurrentIndex(i);
+}
+
+void
+RvFileDialog::sidePanelTimeout()
+{
+   //
+    //  Delete any older duplicates
+    //
+
+    QListWidget* l = m_ui.sidePanelList;
+    QStringList dropped;
+
+    for (int i=m_sideInsertStart; i <= m_sideInsertEnd; i++)
     {
         DB("columnSelectionChanged() m_building "
            << m_building << " sel " << selected.indexes().size() << " desel "
@@ -1614,12 +1974,101 @@ namespace Rv
             {
                 const QModelIndex& index = selection[i];
 
-                if (index.isValid() && index.column() == 0)
-                {
-                    QString file = model->absoluteFilePath(index);
-                    files.push_back(file);
-                    DB("    file " << file.toUtf8().data());
-                }
+void
+RvFileDialog::prevButtonTrigger(QAction*)
+{
+    if (m_dirPrev.size() > 1)
+    {
+        m_dirNext.push_back(m_dirPrev.back());
+        m_dirPrev.pop_back();
+        QString d = m_dirPrev.back();
+        m_dirPrev.pop_back();
+        setDirectory(d); // m_dirPrev will have d pushed onto it
+    }
+}
+
+void
+RvFileDialog::nextButtonTrigger(QAction*)
+{
+    if (m_dirNext.size() > 0)
+    {
+        QString d = m_dirNext.back();
+        m_dirNext.pop_back();
+        setDirectory(d);
+    }
+}
+
+void
+RvFileDialog::sortComboChanged(int index)
+{
+    QDir::SortFlags f = QDir::Name;
+
+    switch (index)
+    {
+      case 0: f = QDir::Name; break;
+      case 1: f = QDir::Time; break;
+      case 2: f = QDir::Size; break;
+      case 3: f = QDir::Type; break;
+    }
+
+    if (m_viewMode == ColumnView)
+    {
+        m_columnModel->setSortFlags(f);
+        QFileInfo info(m_ui.currentPath->text());
+        QModelIndex i = m_columnModel->indexOfPath(info);
+        if (i.isValid() && !m_columnViewTimer->isActive()) m_columnView->setCurrentIndex(i);
+    }
+    else if (m_viewMode == DetailedMediaView)
+    {
+        m_detailMediaModel->setSortFlags(f);
+    }
+    else if (m_viewMode == DetailedFileView)
+    {
+        m_detailFileModel->setSortFlags(f);
+    }
+
+    RV_QSETTINGS;
+    settings.beginGroup(m_settingsGroup);
+    settings.setValue("sortMethod", index);
+    settings.endGroup();
+}
+
+void
+RvFileDialog::viewComboChanged(int index)
+{
+    DB ("viewComboChanged() index " << index);
+    switch (index)
+    {
+      case 0:
+        if (m_viewMode != ColumnView)
+        {
+            DB ("    switching to ColumnView");
+            m_viewMode = ColumnView;
+            m_ui.viewStack->setCurrentIndex(0);
+            m_columnModel->setDirectory(QDir::root(), MediaDirModel::NoDetails);
+
+            if (!m_dirPrev.empty()) setDirectory (m_dirPrev.back(), true);
+            else setDirectory ("", true);
+
+            /*
+            QFileInfo info(m_ui.currentPath->text());       
+            QModelIndex i = m_columnModel->indexOfPath(info.absoluteFilePath()); 
+            //
+            //    This is a hack to get around a Qt bug in the column view (or
+            //    maybe its the scrolled area). The column view will get
+            //    scrolled too far by setCurrentIndex() if its called before
+            //    the dialog box is fully formed.
+            //
+            if (i != m_columnView->currentIndex())          
+            {                                               
+                if (m_columnViewTimer->isActive())          
+                {                                           
+                    m_columnViewFile = m_ui.currentPath->text();
+                }                                           
+                else if (i.isValid())                                        
+                {                                           
+                    m_columnView->setCurrentIndex(i);       
+                }                                      
             }
         }
         return files;

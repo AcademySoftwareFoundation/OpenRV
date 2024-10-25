@@ -42,11 +42,20 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>
 
+#if defined( RV_VFX_CY2023 )
 #include <MuQt5/QNetworkAccessManagerType.h>
 #include <MuQt5/QTabWidgetType.h>
 #include <MuQt5/QToolBarType.h>
 #include <MuQt5/qtUtils.h>
 #include <MuQt5/QUrlType.h>
+#else
+#include <MuQt6/QNetworkAccessManagerType.h>
+#include <MuQt6/QTabWidgetType.h>
+#include <MuQt6/QToolBarType.h>
+#include <MuQt6/qtUtils.h>
+#include <MuQt6/QUrlType.h>
+#endif
+
 
 #include <TwkQtCoreUtil/QtConvert.h>
 #include <RvApp/Options.h>
@@ -74,12 +83,21 @@
 //  Related to MainWindow UI
 //  May want to move into separate module/library later on
 //----------------------------------------------------------------------
+#if defined( RV_VFX_CY2023 )
 #include <MuQt5/qtModule.h>
 #include <MuQt5/QActionType.h>
 #include <MuQt5/QWidgetType.h>
 #include <MuQt5/QObjectType.h>
 #include <MuQt5/QMainWindowType.h>
 #include <MuQt5/QWebEnginePageType.h>
+#else
+#include <MuQt6/qtModule.h>
+#include <MuQt6/QActionType.h>
+#include <MuQt6/QWidgetType.h>
+#include <MuQt6/QObjectType.h>
+#include <MuQt6/QMainWindowType.h>
+#include <MuQt6/QWebEnginePageType.h>
+#endif
 
 #include <RvCommon/RvJavaScriptObject.h>
 

@@ -15,8 +15,7 @@
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
-#include <RvCommon/InitGL.h>
-// #include <RvCommon/QTFrameBuffer.h>
+//#include <RvCommon/QTFrameBuffer.h>
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvCommon/RvNetworkDialog.h>
@@ -47,10 +46,14 @@
 #include <stl_ext/string_algo.h>
 
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QDesktopWidget>
+#include <QScreen>
 
 #ifdef PLATFORM_LINUX
+#if defined( RV_VFX_CY2023 )
 #include <QtX11Extras/QX11Info>
+#else
+#include <QtGui/private/qtx11extras_p.h>
+#endif
 #include <X11/Xlib.h>
 #endif
 
@@ -90,40 +93,192 @@ namespace Rv
 
     namespace
     {
-        bool workAroundActionLeak = false;
-    };
-
-    RvDocument::RvDocument()
-        : QMainWindow()
-        , TwkUtil::Notifier()
-        , m_rvMenu(0)
-        , m_lastPopupAction(0)
-        , m_menuBarHeight(0)
-        , m_mainPopup(0)
-        , m_menuBarDisable(false)
-        , m_menuBarShown(true)
-        , m_startupResize(false)
-        , m_aggressiveSizing(false)
-        , m_menuTimer(0)
-        , m_menuExecuting(0)
-        , m_userMenu(0)
-        , m_userPopup(0)
-        , m_watcher(0)
-        , m_resetPolicyTimer(0)
-        , m_session(0)
-        , m_currentlyClosing(false)
-        , m_closeEventReceived(false)
-        , m_vsyncDisabled(false)
-        , m_oldGLView(0)
-        , m_glView(0)
-        , m_sourceEditor(0)
-        , m_displayLink(0)
+        m_glView = new GLView(this,
+                              0,
+                              this,
+                              opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                              opts.vsync != 0 && !m_vsyncDisabled,
+                              true,
+                              opts.dispRedBits,
+                              opts.dispGreenBits,
+                              opts.dispBlueBits,
+                              opts.dispAlphaBits,
+                              !m_startupResize
+                              );
+    }
+    else
     {
-        DB("RvDocument constructed");
+        RvSession* s = static_cast<RvSession*>(docs.front());
+        RvDocument *rvDoc = (RvDocument*)s->opaquePointer();
+        m_glView = new GLView(this, rvDoc->view()->context(), this,
+                              opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                              opts.vsync != 0 && !m_vsyncDisabled,
+                              true, // double buffer
+                              opts.dispRedBits,
+                              opts.dispGreenBits,
+                              opts.dispBlueBits,
+                              opts.dispAlphaBits,
+                              !m_startupResize
+                              );
+    }
 
-        if (getenv("RV_WORKAROUND_ACTION_LEAK"))
+    m_stackedLayout = new QStackedLayout(m_centralWidget);
+    m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
+    m_stackedLayout->addWidget(m_glView);
+    
+    setCentralWidget(m_viewContainerWidget);
+
+    //QTFrameBuffer* fb = m_glView->frameBuffer(
+    m_glView->setFocus(Qt::OtherFocusReason);
+    //qApp->installEventFilter(m_glView);
+
+    m_resetPolicyTimer = new QTimer(this);
+    m_resetPolicyTimer->setSingleShot(true);
+    connect(m_resetPolicyTimer, SIGNAL(timeout()), this, SLOT(resetSizePolicy()));
+
+    m_frameChangedTimer = new QTimer(this);
+    m_frameChangedTimer->setSingleShot(true);
+    connect(m_frameChangedTimer, SIGNAL(timeout()), this, SLOT(frameChanged()));
+
+    m_menuTimer = new QTimer(this);
+    m_menuTimer->setInterval(50);
+    connect(m_menuTimer, SIGNAL(timeout()), this, SLOT(buildMenu()));
+
+    //if (resetGLPrefs) resetGLStateAndPrefs();
+
+#ifdef PLATFORM_LINUX
+
+    int op_ret, ev_ret, er_ret;
+
+    bool haveNV = XQueryExtension (QX11Info::display(), 
+                                   "NV-GLX", &op_ret, &ev_ret, &er_ret);
+
+    if (!haveNV)
+    {
+        cerr << endl;
+        cerr << "ERROR:******* NV-GLX Extension Missing ***********" << endl;
+        cerr << "    If you're using an Nvidia card, please install" << endl;
+        cerr << "    the optimized NVIDIA binary driver."            << endl;
+        cerr << "    If you're using an ATI card, please be aware "  << endl;
+        cerr << "    that RV has not been tested with ATI cards."    << endl;
+        cerr << "**************************************************" << endl;
+        cerr << endl;
+    }
+#endif
+
+    if (opts.noBorders)
+    {
+        Qt::WindowFlags flags = windowFlags();
+        setWindowFlags(flags | Qt::FramelessWindowHint);
+    }
+}
+
+void RvDocument::initializeSession()
+{
+    if (!m_session)
+    {
+        m_session = new RvSession;
+        //m_session->setFrameBuffer(fb);
+
+    #ifdef PLATFORM_DARWIN
+        m_displayLink = new DisplayLink(this);
+        if (m_displayLink) m_session->useExternalVSyncTiming(true);
+    #endif
+
+        //RvApp()->addVideoDevice(m_glView->videoDevice());
+        m_session->setControlVideoDevice(m_glView->videoDevice());
+
+        m_session->setRendererType("Composite");
+        m_session->setOpaquePointer( this );
+        m_session->makeActive();
+        m_session->postInitialize();
+        char nm[64]; 
+        sprintf (nm, "session%03d", sessionCount++);
+        m_session->setEventNodeName(nm);
+        setObjectName(QString("rv-") + QString(nm));
+
+        mergeMenu(m_session->menu());
+
+        setAttribute(Qt::WA_DeleteOnClose);
+        setAttribute(Qt::WA_QuitOnClose);
+
+        m_topViewToolBar->setSession(m_session);
+        m_bottomViewToolBar->setSession(m_session);
+
+        // 10.5 looks better without it (no longer has the 100% white top)
+        //setAttribute(Qt::WA_MacBrushedMetal);
+
+        m_session->addNotification(this, IPCore::Session::updateMessage());
+        m_session->addNotification(this, IPCore::Session::updateLoadingMessage());
+        m_session->addNotification(this, IPCore::Session::fullScreenOnMessage());
+        m_session->addNotification(this, IPCore::Session::fullScreenOffMessage());
+        m_session->addNotification(this, IPCore::Session::stereoHardwareOnMessage());
+        m_session->addNotification(this, IPCore::Session::stereoHardwareOffMessage());
+        m_session->addNotification(this, TwkApp::Document::deleteMessage());
+        m_session->addNotification(this, TwkApp::Document::menuChangedMessage());
+        m_session->addNotification(this, TwkApp::Document::activeMessage());
+        m_session->addNotification(this, TwkApp::Document::filenameChangedMessage());
+        m_session->addNotification(this, IPCore::Session::audioUnavailbleMessage());
+        m_session->addNotification(this, IPCore::Session::eventDeviceChangedMessage());
+        m_session->addNotification(this, IPCore::Session::stopPlayMessage());
+
+        m_session->playStartSignal().connect(boost::bind(&RvDocument::playStartSlot, this, std::placeholders::_1));
+        m_session->playStopSignal().connect(boost::bind(&RvDocument::playStopSlot, this, std::placeholders::_1));
+        m_session->physicalVideoDeviceChangedSignal().connect(boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this, std::placeholders::_1));
+    }
+}
+
+RvDocument::~RvDocument()
+{
+    if (IPCore::debugProfile)
+    {
+        Rv::Options& opts = Options::sharedOptions();
+        //RvPreferences* prefs = RvApp()->prefDialog();
+        //prefs->loadSettingsIntoOptions(opts);
+
+        QString dt = QDateTime::currentDateTime().toString("yyMMddhhmmss");
+        QString host = QHostInfo::localHostName();
+        host.replace(".", "_");
+
+        ostringstream out;
+        out << "rv_";
+        out << TWK_DEPLOY_MAJOR_VERSION();
+        out << "_";
+        out << TWK_DEPLOY_MINOR_VERSION();
+        out << "_";
+        out << TWK_DEPLOY_PATCH_LEVEL();
+        out << "_";
+        out << host.toUtf8().constData();
+        out << "_";
+        out << dt.toUtf8().constData();
+        out << ".rvprof";
+
+        ofstream file(UNICODE_C_STR(out.str().c_str()));
+
+        if (file)
         {
-            workAroundActionLeak = true;
+            file << "# RV playback debug data" << endl;
+            file << "# version " << TWK_DEPLOY_MAJOR_VERSION() 
+                 << "." << TWK_DEPLOY_MINOR_VERSION()
+                 << "." << TWK_DEPLOY_PATCH_LEVEL()
+                 << endl;
+            file << "# -------------------------------------------" << endl;
+            file << "# PLATFORM = " << PLATFORM_STRING << endl;
+            file << "# COMPILER = " << COMPILER_STRING << endl;
+            file << "# ARCH = " << ARCH_STRING << endl;
+            file << "# CXXFLAGS = " << CXXFLAGS_STRING << endl;
+            file << "# HEAD = " << GIT_HEAD << endl;
+            file << "# RELEASE = " << RELEASE_DESCRIPTION << endl;
+            file << "# " << endl;
+            file << "# options" << endl;
+
+            opts.output(file);
+
+            file << "# -------------------------------------------" << endl;
+
+            m_session->dumpProfilingToFile(file);
+
+            cout << "INFO: wrote profiling file" << endl;
         }
         else
         {
@@ -683,9 +838,709 @@ namespace Rv
 
         if (box.clickedButton() == b2)
         {
-            RvApp()->prefs();
-            RvApp()->prefDialog()->tabWidget()->setCurrentIndex(2);
-            RvApp()->prefDialog()->raise();
+            IPCore::AudioRenderer::setAudioNever(true);
+        }
+        // else if (box.clickedButton() == b1)
+        // {
+        //     Rv::AudioRenderer::setNoAudio(true);
+        // }
+
+        IPCore::AudioRenderer::reset();
+    }
+
+    return true;
+}
+
+void 
+RvDocument::resetGLStateAndPrefs()
+{
+    QMessageBox box(this);
+    box.setWindowTitle(tr(UI_APPLICATION_NAME ": Invalid Display Configuration"));
+    QString baseText = tr("Display Configuration is Invalid");
+    QString detailedText = tr("The display configuration in the preferences is\n"
+                           "incompatible with this driver and/or graphics hardware.\n"
+                           UI_APPLICATION_NAME " will use the default display configuration to continue.\n"
+#ifdef PLATFORM_LINUX
+                           "You can check available display possibilities\n"
+                           "using the glxinfo command with the -t option from a shell\n"
+                           "or use the driver configuration UI.\n"
+#endif
+                           "You have a choice: reset the preference automatically\n"
+                           "or use the Rendering preferences to change it manually.\n"
+                           );
+
+    box.setText(baseText + "\n\n" + detailedText);
+    box.setWindowModality(Qt::WindowModal);
+    QPushButton* b1 = box.addButton(tr("Reset Automatically"), QMessageBox::RejectRole);
+    QPushButton* b2 = box.addButton(tr("Change Preferences Manually"), QMessageBox::AcceptRole);
+
+#ifdef PLATFORM_LINUX
+    // Show the RV Icon-- otherwise the user has no idea where
+    // this came from if RV isn't up yet.
+    box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
+#else
+    box.setIcon(QMessageBox::Critical);
+#endif
+
+    box.exec();
+
+    if (box.clickedButton() == b2)
+    {
+        RvApp()->prefs();
+        RvApp()->prefDialog()->tabWidget()->setCurrentIndex(2);
+        RvApp()->prefDialog()->raise();
+    }
+    else
+    {
+        Rv::Options& opts = Options::sharedOptions();
+        opts.dispRedBits = 0;
+        opts.dispGreenBits = 0;
+        opts.dispBlueBits = 0;
+        opts.dispAlphaBits = 0;
+
+        {
+            RV_QSETTINGS;
+            settings.beginGroup("Display");
+            settings.setValue("dispRedBits", 0);
+            settings.setValue("dispGreenBits", 0);
+            settings.setValue("dispBlueBits", 0);
+            settings.setValue("dispAlphaBits", 0);
+            settings.endGroup();
+        }
+
+        RvApp()->prefDialog()->update();
+        RvApp()->prefDialog()->write();
+        RvApp()->prefDialog()->raise();
+    }
+}
+
+void
+RvDocument::enableActions(bool b, QMenu* menu)
+{
+    QList<QAction*> actions = menu->actions();
+
+    for (size_t i = 0; i < actions.size(); i++)
+    {
+        QAction* a = actions[i];
+        if (a->menu()) enableActions(b, a->menu());
+
+        a->setEnabled(b);
+    }
+}
+
+void
+RvDocument::lazyDeleteGLView()
+{
+    delete m_oldGLView;
+    m_oldGLView = 0;
+}
+
+void
+RvDocument::resetSizePolicy()
+{
+    m_glView->setMinimumContentSize(64,64);
+    m_glView->setMinimumSize(QSize(64,64));
+    m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred,
+                                        QSizePolicy::Preferred));
+}
+
+void
+RvDocument::setDocumentDisabled(bool b, bool menuBarOnly)
+{
+    //if (!menuBarOnly) setDisabled(b);
+
+    m_menuBarDisable = b;
+
+    QList<QAction*> actions = mb()->actions();
+    for (size_t i = 0; i < actions.size(); i++)
+    {
+        QAction* a = actions[i];
+        if (a->menu()) enableActions(!b, a->menu());
+        a->setEnabled(!b);
+    }
+}
+
+void
+RvDocument::rebuildGLView(bool stereo,
+                          bool vsync,
+                          bool doubleBuffer,
+                          int red,
+                          int green,
+                          int blue,
+                          int alpha)
+{
+    //
+    //  On the mac, we need to carefully replace the content GL widget so
+    //  that Qt doesn't resize the dock widgets and everything
+    //  else. Unforunately, when the content widget was the GLView and we
+    //  put a new one in, we had no core dump. When we do this manually and
+    //  delete the old widget it dumps core. The problem seems to be random
+    //  events which are going to be sent this event processing round.
+    //
+    //  The workaround is to lazily delete the old GLView. I have a feeling
+    //  the main window class does something similar itself which is why
+    //  our code didn't dump core before. At the bottom of this function
+    //  there is a temp timer that fires in 100ms to delete it. Or if this
+    //  function is called again before that time its deleted.
+    //
+
+    lazyDeleteGLView();
+
+    GLView* oldGLView = m_glView;
+    Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
+    oldGLView->stopProcessingEvents();
+
+    GLView* newGLView = new GLView(this, view()->context(), this,
+                                   stereo, vsync, doubleBuffer,
+                                   red, green, blue, alpha);
+
+    newGLView->setContentSize(oldGLView->sizeHint().width(),
+                              oldGLView->sizeHint().height());
+
+    newGLView->setMinimumSize(oldGLView->minimumSizeHint().width(),
+                              oldGLView->minimumSizeHint().height());
+
+    bool resetGLPrefs = false;
+
+    size_t ow = centralWidget()->width();
+    size_t oh = centralWidget()->height();
+
+    if (!newGLView->isValid())
+    {
+        delete newGLView;
+        newGLView = new GLView(this, view()->context(), this);
+        resetGLPrefs = true;
+    }
+    
+    m_stackedLayout->addWidget(newGLView);
+    m_stackedLayout->removeWidget(oldGLView);
+    m_glView = newGLView;
+    m_glView->show();
+    m_glView->setFocus(Qt::OtherFocusReason);
+
+    m_topViewToolBar->setDevice(m_glView->videoDevice());
+
+    bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+    m_session->setEventVideoDevice(0);
+    m_session->setOutputVideoDevice(0);
+    m_session->setControlVideoDevice(m_glView->videoDevice());
+    if (same) m_session->setOutputVideoDevice(m_glView->videoDevice());
+
+    m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
+
+    if (resetGLPrefs) resetGLStateAndPrefs();
+
+    if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
+    {
+        const TwkApp::VideoModule::VideoDevices& devices = m->devices();
+        
+        for (size_t i = 0; i < devices.size(); i++)
+        {
+            if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+            {
+                d->setShareDevice(m_glView->videoDevice());
+            }
+        }
+    }
+
+    m_glView->videoDevice()->translator().setCurrentModifiers(cur);
+    m_oldGLView = oldGLView;
+    m_oldGLView->hide();
+    QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
+}
+
+void
+RvDocument::setStereo(bool b)
+{
+    const bool vsync  = m_glView->format().swapInterval() == 1;
+    const bool stereo = m_glView->format().stereo();
+    bool dbl = false;
+    if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer) dbl = true;
+    const int  red    = m_glView->format().redBufferSize();
+    const int  green  = m_glView->format().greenBufferSize();
+    const int  blue   = m_glView->format().blueBufferSize();
+    const int  alpha  = m_glView->format().alphaBufferSize();
+    if (b != stereo) rebuildGLView(b, vsync, dbl, red, green, blue, alpha);
+}
+
+void
+RvDocument::setVSync(bool b)
+{
+    if (m_vsyncDisabled) return;
+    const bool vsync = m_glView->format().swapInterval() == 1;
+    const bool stereo = m_glView->format().stereo();
+    bool dbl = false;
+    if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer) dbl = true;
+    const int  red    = m_glView->format().redBufferSize();
+    const int  green  = m_glView->format().greenBufferSize();
+    const int  blue   = m_glView->format().blueBufferSize();
+    const int  alpha  = m_glView->format().alphaBufferSize();
+    if (b != vsync) rebuildGLView(stereo, b, dbl, red, green, blue, alpha);
+}
+
+void
+RvDocument::setDoubleBuffer(bool b)
+{
+    bool       vsync  = m_glView->format().swapInterval() == 1;
+    const bool stereo = m_glView->format().stereo();
+    const int  red    = m_glView->format().redBufferSize();
+    const int  green  = m_glView->format().greenBufferSize();
+    const int  blue   = m_glView->format().blueBufferSize();
+    const int  alpha  = m_glView->format().alphaBufferSize();
+
+    if (!b) vsync = false;
+
+    rebuildGLView(stereo, vsync, b, red, green, blue, alpha);
+}
+
+void
+RvDocument::setDisplayOutput(DisplayOutputType type)
+{
+    const bool vsync = m_glView->format().swapInterval() == 1;
+    const bool stereo = m_glView->format().stereo();
+    bool dbl = false;
+    if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer) dbl = true;
+    int  red    = m_glView->format().redBufferSize();
+    int  green  = m_glView->format().greenBufferSize();
+    int  blue   = m_glView->format().blueBufferSize();
+    int  alpha  = m_glView->format().alphaBufferSize();
+
+    switch (type)
+    {
+      default:
+      case OpenGLDefaultFormat:
+          if (red == 0) return;
+          red = 0; blue = 0; green = 0; alpha = 0;
+          break;
+      case OpenGL8888:
+          if (red == 8) return;
+          red = 8; blue = 8; green = 8; alpha = 8;
+          break;
+      case OpenGL1010102:
+          if (red == 10) return;
+          red = 10; green = 10; blue = 10; alpha = 2;
+          break;
+    }
+
+    rebuildGLView(stereo, vsync, dbl, red, green, blue, alpha);
+}
+
+GLView*
+RvDocument::view() const
+{
+    return m_glView;
+}
+
+void
+RvDocument::center()
+{
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+    QRect ssize = screen->availableGeometry(); 
+
+    int sw = ssize.width();
+    int sh = ssize.height();
+
+    int x = ssize.left() + int ((sw - frameGeometry().width()) / 2);
+    int y = ssize.top() + int ((sh - frameGeometry().height()) / 2);
+    DB ("center moving to x " << x << " y " << y);
+    move (x, y);
+}
+
+void
+RvDocument::resizeView(int w, int h)
+{
+    if (!m_session) return;
+
+    //
+    //  Fit the window on to the screen so that all of its pixels are
+    //  visible. If the contents is smaller than the screen, fit the
+    //  window to the content size. If not, fit the window to the
+    //  screen and leave some margin on each side so that the user can
+    //  move the window.
+    //
+
+#ifndef PLATFORM_LINUX
+    const int oversizeMargin = 0;
+#else
+    const int oversizeMargin = 60;
+#endif
+
+    const int overlap = 20;
+
+    //
+    //  Get all top level windows so we can avoid placing this one on
+    //  top of an existing one.
+    //
+
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry();
+    QRect ts = screen->geometry();
+    float sw = float(ssize.width());
+    float sh = float(ssize.height());
+
+    if (h == 0) h = w;
+    if (w == 0) w = h;
+    if (w == 0) { w = 1024; h = 720; }
+
+    m_session->userRenderEvent("layout");
+    IPCore::Session::Margins margins = m_session->controlVideoDevice()->margins();
+    float mw = int(margins.left + margins.right);
+    float mh = int(margins.top + margins.bottom);
+
+    sw -= mw;
+    sh -= mh;
+
+    //
+    //  We'd like to compensate for the frame geometry (wm
+    //  decorations) in our size request, but values returned are
+    //  not reliable on linx.
+    //
+    #ifndef PLATFORM_LINUX
+        int frameW = int (frameGeometry().width()-width());
+        int frameH = int (frameGeometry().height()-height());
+        DB ("resizeView frame w " << frameW << " h " << frameH);
+
+        sw -= frameW;
+        sh -= frameH;
+    #endif
+
+    //
+    //  We'd like to compensate for the menubar height but it does
+    //  not report it's size reliably on linux.  On mac, we don't
+    //  care.
+    //
+    #ifdef PLATFORM_WINDOWS
+        sh -= (menuBarShown()) ? mb()->height() : 0;
+    #endif
+
+    float aspect = float(w) / float(h);
+
+    if (w >= sw - oversizeMargin)
+    {
+        w = int(sw - oversizeMargin);
+        if (!m_aggressiveSizing) h = int (float(w) / aspect);
+    }
+
+    if (h > sh - oversizeMargin)
+    {
+        h = int(sh - oversizeMargin);
+        if (!m_aggressiveSizing) w = int(float(h) * aspect);
+    }
+
+    h += int(mh);
+    w += int(mw);
+
+    m_glView->setContentSize(w, h);
+    m_glView->setMinimumContentSize(w, h);
+    m_glView->updateGeometry();
+
+    const int dh = m_glView->height() - h;
+    const int dw = m_glView->width() - w;
+
+    if (dh || dw)
+    {
+        resize(width() - dw, height() - dh);
+        m_glView->setContentSize(w, h);
+        m_glView->setMinimumContentSize(w, h);
+        m_glView->updateGeometry();
+    }
+
+    m_resetPolicyTimer->start();
+}
+
+void
+RvDocument::resizeToFit(bool placement, bool firstTime)
+{
+    DB ("resizeToFit first " << firstTime);
+    if (!m_session) return;
+
+    //
+    //  Fit the window on to the screen so that all of its pixels are
+    //  visible. If the contents is smaller than the screen, fit the
+    //  window to the content size. If not, fit the window to the
+    //  screen and leave some margin on each side so that the user can
+    //  move the window.
+    //
+
+#ifndef PLATFORM_LINUX
+    const int oversizeMargin = 0;
+#else
+    const int oversizeMargin = 60;
+#endif
+
+    const int overlap = 20;
+
+    //
+    //  Get all top level windows so we can avoid placing this one on
+    //  top of an existing one.
+    //
+
+    const TwkApp::Application::Documents& docs = RvApp()->documents();
+    vector<RvDocument*> windows;
+    
+    for (unsigned int i = 0; i < docs.size(); i++)
+    {
+        windows.push_back(reinterpret_cast<RvDocument*>(docs[i]->opaquePointer()));
+    }
+
+    float w = 0;
+    float h = 0;
+
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry(); 
+    DB ("resizeToFit available geom w " << ssize.width() << " h " << ssize.height());
+    QRect ts = screen->geometry();
+    float sw = float(ssize.width());
+    float sh = float(ssize.height());
+
+    /*
+      if (m_session->graph().viewNode())
+      {
+      DB("resizeToFit using view node");
+      IPNode *n = m_session->graph().viewNode();
+      if (n->inputs().size()) { DB ("resizeToFit selecting input"); n = n->inputs()[0]; }
+        
+      IPNode::ImageStructureInfo info = 
+      n->imageStructureInfo(m_session->graph().contextForFrame(m_session->currentFrame()));
+      w = int(info.width);
+      h = int(info.height);
+      DB ("resizeToFit node " << n->name() << " w " << w << " h " << h << endl);
+      }
+    */
+    if (m_session->rootNode())
+    {
+        DB("resizeToFit using root node");
+        //
+        //  Find source nodes in eval path
+        //
+        IPNode::MetaEvalInfoVector evalInfos;
+        IPNode::MetaEvalClosestByTypeName collector(evalInfos, "RVSourceGroup");
+        m_session->rootNode()->metaEvaluate(m_session->graph().contextForFrame(m_session->currentFrame()), collector);
+        if (evalInfos.size())
+        {
+            IPNode::ImageStructureInfo info = 
+                evalInfos[0].node->imageStructureInfo(m_session->graph().contextForFrame(m_session->currentFrame()));
+            w = int(info.width);
+            h = int(info.height);
+            DB("resizeToFit w " << info.width << " h " << info.height);
+        }
+    }
+    else if (!m_session->isEmpty())
+    {
+        DB("resizeToFit using first source");
+        IPGraph::NodeVector nodes;
+        m_session->graph().findNodesByTypeName(nodes, "RVSourceGroup");
+
+        if (!nodes.empty())
+        {
+            IPNode* node = nodes.front();
+            IPNode::ImageRangeInfo range = nodes.front()->imageRangeInfo();
+            IPNode::ImageStructureInfo info =
+                node->imageStructureInfo(m_session->graph().contextForFrame(range.start));
+            w = int(info.width);
+            h = int(info.height);
+            DB("resizeToFit source info w " << info.width << " h " << info.height);
+        }
+    }
+    if (w <= 0 || h <= 0)
+    {
+        DB ("resizeToFit bad initial dimensions: w " << w << " h " << h);
+        w = 854;
+        h = 480;
+    }
+    DB ("resizeToFit initial w " << w << " h " << h);
+
+    if (h == 0) h = w;
+    if (w == 0) w = h;
+    
+    if (w == 0)
+    {
+        w = 854;
+        h = 480;
+    }
+
+    m_session->userRenderEvent("layout");
+    Session::Margins margins = m_glView->videoDevice()->margins();
+    float mw = int(margins.left + margins.right);
+    float mh = int(margins.top + margins.bottom);
+
+    ensurePolished();
+
+    sw -= mw;
+    sh -= mh;
+   
+    //
+    //  We'd like to compensate for the frame geometry (wm
+    //  decorations) in our size request, but values returned are
+    //  not reliable on linx.
+    //
+#ifndef PLATFORM_LINUX
+    int frameW = int (frameGeometry().width()-width());
+    int frameH = int (frameGeometry().height()-height());
+    DB ("resizeToFit frame w " << frameW << " h " << frameH);
+
+    sw -= frameW;
+    sh -= frameH;
+#endif
+
+    //
+    //  We'd like to compensate for the presence of the top and/or
+    //  bottom toolbars as well.
+    //
+    if (m_topViewToolBar->isVisible())
+    {
+        sh -= m_topViewToolBar->height();
+    }
+    if (m_bottomViewToolBar->isVisible())
+    {
+        sh -= m_bottomViewToolBar->height();
+    }
+
+    //
+    //  We'd like to compensate for the menubar height but it does
+    //  not report it's size reliably on linux.  On mac, we don't
+    //  care.
+    //
+    mb()->ensurePolished();
+    DB ("resizeToFit mb()->height() " << mb()->height());
+#ifdef PLATFORM_WINDOWS
+    sh -= (menuBarShown()) ? mb()->height() : 0;
+    //sh -= (menuBarShown()) ? 26 : 0;
+#endif
+
+    float aspect = float(w) / float(h);
+
+    if (w >= sw - oversizeMargin)
+    {
+        w = sw - oversizeMargin;
+        if (!m_aggressiveSizing) h = w / aspect;
+    }
+
+    if (h > sh - oversizeMargin)
+    {
+        h = sh - oversizeMargin;
+        if (!m_aggressiveSizing) w = h * aspect;
+    }
+
+    h += mh;
+    w += mw;
+
+    DB ("resizeToFit final target w " << w << " h " << h);
+
+    m_glView->setContentSize(int(w), int(h));
+    m_glView->setMinimumContentSize(int(w), int(h));
+    m_glView->updateGeometry();
+
+    DB ("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
+
+    const int dh = m_glView->height() - int(h);
+    const int dw = m_glView->width() - int(w);
+
+    //
+    //  WHY? Dunno
+    //
+
+    DB ("resizeToFit dw " << dw << " dh " << dh);
+    if (!firstTime && (dh || dw))
+        //if ((dh || dw))
+    {
+        resize(width() - dw, height() - dh);
+        m_glView->setContentSize(int(w), int(h));
+        m_glView->setMinimumContentSize(int(w), int(h));
+        m_glView->updateGeometry();
+    }
+    DB ("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
+
+    m_resetPolicyTimer->start();
+    
+    if (placement)
+    {
+        int x = ssize.left() + int ((sw - w) / 2);
+        int y = ssize.top() + int ((sh - h) / 2);
+
+        //
+        //  Keep moving the window until its in a decent spot. This may
+        //  move it to a partially occluded position, but it will not
+        //  cover an existing window's frame. This mimics (kind-of) what
+        //  Cocoa does.
+        //
+
+        for (int i=0; i < windows.size(); i++)
+        {
+            RvDocument* d = windows[i];
+
+            if (d != this)
+            {
+                int dx = d->x() - x;
+                int dy = d->y() - y;
+                
+                if (abs(dx) < overlap || abs(dy) < overlap)
+                {
+                    x += overlap;
+                    y += overlap;
+                    int i = -1; // start over
+                }
+            }
+        }
+
+        x = max (ssize.left(), x);
+        //y = max (frameH, y);
+        y = max (ssize.top(), y);
+        DB ("resizeToFit, moving to " << x << " " << y);
+        move(x, y);
+    }
+}
+
+void
+RvDocument::toggleFullscreen(bool firstTime)
+{
+    DB ("toggleFullScreen currently " << isFullScreen());
+    QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
+    if (!screen)
+    {
+        // Fallback on primary screen.
+        screen = QGuiApplication::primaryScreen();
+    }
+
+    QRect ssize = screen->availableGeometry(); 
+
+    int sw = ssize.width();
+    int sh = ssize.height();
+
+    resetSizePolicy();
+
+    if (m_topViewToolBar)
+    {
+        m_topViewToolBar->setFullscreen(!isFullScreen());
+    }
+
+    if (isFullScreen())
+    {
+        ssize = screen->geometry();
+        showNormal();
+    }
+    else
+    {
+        if (firstTime)
+        {
+            setWindowState(windowState() ^ Qt::WindowFullScreen);
         }
         else
         {
