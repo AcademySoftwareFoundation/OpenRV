@@ -78,7 +78,7 @@ QTTranslator::modifiers(Qt::KeyboardModifiers s) const
 void
 QTTranslator::resetModifiers() const
 {
-    m_modifiers = 0;
+    m_modifiers = Qt::NoModifier;
 }
 
 Qt::MouseButtons
@@ -87,7 +87,7 @@ QTTranslator::qbuttons(unsigned int b) const
     Qt::MouseButtons q = Qt::NoButton;
 
     if (b & 0x1 << 0) q |= Qt::LeftButton;
-    if (b & 0x1 << 1) q |= Qt::MidButton;
+    if (b & 0x1 << 1) q |= Qt::MiddleButton;
     if (b & 0x1 << 2) q |= Qt::RightButton;
     return q;
 }
@@ -572,7 +572,8 @@ QTTranslator::sendMouseWheelEvent(QEvent* qevent) const
                              event->buttons());
 
     n += "wheel";
-    if (event->delta() < 0) n += "down"; else n += "up";
+    // use pixelDelta() or angleDelta() instead of delta() (deprecated)
+    if (event->angleDelta().y() < 0) n += "down"; else n += "up";
 
     PointerEvent e(n, m_node, modifiers(m_modifiers),
                    m_x, m_y,
@@ -622,11 +623,16 @@ QTTranslator::sendMouseEvent(QEvent* qevent, float activationTime) const
     string n;
 
     bool b1 = event->buttons() & Qt::LeftButton;
-    bool b2 = event->buttons() & Qt::MidButton;
+    bool b2 = event->buttons() & Qt::MiddleButton;
     bool b3 = event->buttons() & Qt::RightButton;
 
+#if defined( RV_VFX_CY2023 )
     m_x = (m_xscale * event->x()) + m_xoffset;
     m_y = (m_yscale * (m_widget->height() - event->y())) + m_yoffset;
+#else
+    m_x = (m_xscale * event->position().x()) + m_xoffset;
+    m_y = (m_yscale * (m_widget->height() - event->position().y())) + m_yoffset;
+#endif
 
     if (type == QEvent::MouseMove && !buttons())
     {
@@ -912,11 +918,19 @@ QTTranslator::sendDNDEvent(QEvent* event) const
 
             for (int i=0; i < seqs.size(); i++)
             {
+#if defined( RV_VFX_CY2023 )
                 DragDropEvent e(ename, m_node, type, DragDropEvent::File, 
                                 seqs[i], 0, 
                                 devent->pos().x(), 
                                 h - devent->pos().y() - 1, 
                                 w, h);
+#else
+                DragDropEvent e(ename, m_node, type, DragDropEvent::File, 
+                                seqs[i], 0, 
+                                devent->position().toPoint().x(), 
+                                h - devent->position().toPoint().y() - 1, 
+                                w, h);
+#endif
 
                 sendEvent(e);
                 if (e.handled) handled = true;
@@ -924,11 +938,19 @@ QTTranslator::sendDNDEvent(QEvent* event) const
 
             for (int i=0; i < nonfiles.size(); i++)
             {
+#if defined( RV_VFX_CY2023 )
                 DragDropEvent e(ename, m_node, type, DragDropEvent::URL, 
                                 nonfiles[i], 0, 
                                 devent->pos().x(), 
                                 h - devent->pos().y() - 1, 
                                 w, h);
+#else
+                DragDropEvent e(ename, m_node, type, DragDropEvent::URL, 
+                                nonfiles[i], 0, 
+                                devent->position().toPoint().x(), 
+                                h - devent->position().toPoint().y() - 1, 
+                                w, h);
+#endif
 
                 sendEvent(e);
                 if (e.handled) handled = true;
@@ -936,11 +958,19 @@ QTTranslator::sendDNDEvent(QEvent* event) const
         }
         else if (devent->mimeData()->hasText())
         {
+#if defined( RV_VFX_CY2023 )
             DragDropEvent e(ename, m_node, type, DragDropEvent::Text, 
                             devent->mimeData()->text().toUtf8().constData(), 0, 
                             devent->pos().x(), 
                             h - devent->pos().y() - 1, 
                             w, h);
+#else
+            DragDropEvent e(ename, m_node, type, DragDropEvent::Text, 
+                            devent->mimeData()->text().toUtf8().constData(), 0, 
+                            devent->position().toPoint().x(), 
+                            h - devent->position().toPoint().y() - 1, 
+                            w, h);
+#endif
 
             sendEvent(e);
             if (e.handled) handled = true;
@@ -963,8 +993,13 @@ QTTranslator::sendTabletEvent(QEvent* qevent) const
     double xoff = p.x();
     double yoff = p.y();
 
+#if defined( RV_VFX_CY2023 )
     const double gx        = event->hiResGlobalX() - xoff;
     const double gy        = double(m_widget->height()) - (event->hiResGlobalY() - yoff);
+#else
+    const double gx        = event->globalPosition().x() - xoff;
+    const double gy        = double(m_widget->height()) - (event->globalPosition().y() - yoff);
+#endif
     const double pressure  = event->pressure();
     const double tpressure = event->tangentialPressure();
     const double rot       = event->rotation();
@@ -977,7 +1012,10 @@ QTTranslator::sendTabletEvent(QEvent* qevent) const
 
     string n;
 
-    switch (event->device())
+    // NOTE_QT: There is no equivalent to QTabletEvent::FourDMouse. Might need custom class or use generic mouse type.
+
+#if defined( RV_VFX_CY2023 )
+    switch (event->deviceType())
     {
       case QTabletEvent::NoDevice: 
           device = TabletEvent::NoTableDevice; 
@@ -1025,6 +1063,58 @@ QTTranslator::sendTabletEvent(QEvent* qevent) const
           n += "eraser-";
           break;
     }
+#else
+    switch (event->deviceType())
+    {
+      case QInputDevice::DeviceType::Unknown: 
+          device = TabletEvent::NoTableDevice; 
+          n = "generic-tablet-device-";
+          break;
+      case QInputDevice::DeviceType::Puck: 
+          device = TabletEvent::PuckDevice; 
+          n = "puck-";
+          break;
+      case QInputDevice::DeviceType::Stylus:
+          device = TabletEvent::StylusDevice;
+          n = "stylus-";
+          break;
+      case QInputDevice::DeviceType::Airbrush: 
+          device = TabletEvent::AirBrushDevice;
+          n = "airbrush-";
+          break;
+      // TODO_QT: FourDMouse is not available anymore.
+    //   case QInputDevice::DeviceType::Mouse:
+    //       device = TabletEvent::FourDMouseDevice;
+    //       n = "mouse4D-";
+    //       break;
+      // TODO_QT: RotationStylus is not available anymore.
+    //   case QTabletEvent::RotationStylus: 
+    //       device = TabletEvent::RotationStylusDevice;
+    //       n = "rotating-stylus-";
+    //       break;
+      default:
+          break;
+    }
+
+    switch (event->pointerType())
+    {
+        case QPointingDevice::PointerType::Unknown:
+          kind = TabletEvent::UnknownTabletKind;
+          break;
+      case QPointingDevice::PointerType::Pen: 
+          kind = TabletEvent::PenKind; 
+          n += "pen-";
+          break;
+      case QPointingDevice::PointerType::Cursor:
+          kind = TabletEvent::CursorKind; 
+          n += "cursor-";
+          break;
+      case QPointingDevice::PointerType::Eraser:
+          kind = TabletEvent::EraserKind; 
+          n += "eraser-";
+          break;
+    }
+#endif
 
     bool b1 = m_b1;
     bool b2 = m_b2;
