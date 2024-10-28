@@ -3,6 +3,12 @@
     "schemadefs" : [
         {
             "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Annotation",
+            "execution_scope" : "in process",
+            "filepath" : "annotation_schema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
             "name" : "CDL",
             "execution_scope" : "in process",
             "filepath" : "cdlSchema.py"
