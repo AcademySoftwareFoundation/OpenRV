@@ -18,6 +18,8 @@ modes:
 files:
   - file: manifest.json
     location: SupportFiles/$PACKAGE
+  - file: annotation_schema.py
+    location: SupportFiles/$PACKAGE
   - file: cdlSchema.py
     location: SupportFiles/$PACKAGE
   - file: cdlHook.py
@@ -80,6 +82,13 @@ description: |
     <p>
     manifest.json
     This is used to provide examples schemas and hooks used in the import process.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    annotation_schema.py
+    An example schema of an annotation.
     </p>
     </li>
 
@@ -260,4 +269,3 @@ description: |
     <p>
     For pre- and post- hooks, no return value is expected.
     </p>
-
