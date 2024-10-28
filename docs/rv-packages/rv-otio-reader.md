@@ -17,6 +17,7 @@ The RV package is installed in the usual Python package installation location: `
 The package also uses a number of files located in `Plugins/SupportFiles/otio_reader` and detailed below.
 
 - `manifest.json`: Provides examples of schemas and hooks used in the import process.
+- `annotation_schema.py` An example schema of an annotation.
 - `cdlExportHook.py`: An example of exporting an RVLinearize to a custom CDL effect in OTIO.
 - `cdlHook.py`: An example of importing a custom CDL effect in OTIO into an RVLinearize node.
 - `cdlSchema.py` An example schema of a CDL effect.
