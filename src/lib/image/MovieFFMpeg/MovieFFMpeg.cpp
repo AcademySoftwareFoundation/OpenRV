@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <math.h>
 #include <algorithm>
+#include <array>
 #include <stdlib.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
@@ -1518,12 +1519,12 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
     rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
 
     // If rotation metadata not in metadata, try to get it from side data
-    if (!rotEntry && videoStream->nb_side_data > 0) 
+    if (!rotEntry && videoCodecContext->nb_coded_side_data > 0)
     {
         double rotationFromSideData = 0;
-        for (int i = 0; i < videoStream->nb_side_data; ++i) 
+        for (int i = 0; i < videoCodecContext->nb_coded_side_data; ++i)
         {
-            const AVPacketSideData *sd = &videoStream->side_data[i];
+            const AVPacketSideData *sd = &videoStream->codecpar->coded_side_data[i];
             if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) 
             {
                 rotationFromSideData = av_display_rotation_get((int32_t *)sd->data);
@@ -1535,7 +1536,7 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
         
         // Setting rotation
         char charRotation[5]; // Expecting a number between -360 and 360 (inclusive)
-        sprintf(charRotation, "%lu", rotation);
+        sprintf(charRotation, "%d", rotation);
         if (av_dict_set(
             &videoStream->metadata, "rotate", charRotation, 0) < 0) 
         {
@@ -1989,7 +1990,7 @@ MovieFFMpegReader::initializeAll()
         else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             string tsLang = streamLang(i);
-            int numChans = tsStream->codecpar->channels;
+            int numChans = tsStream->codecpar->ch_layout.nb_channels;
 
             // Keep a sorted set of channel counts for each language
             chLangMap[tsLang].insert(numChans);
@@ -2094,6 +2095,7 @@ MovieFFMpegReader::initializeAll()
                         m_info.views.push_back(trackName.str());
                         ostringstream trk;
                         trk << "Track" << i;
+
                         snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
                     }
                     else
@@ -2115,6 +2117,7 @@ MovieFFMpegReader::initializeAll()
                         m_audioTracks.push_back(track);
                         ostringstream trk;
                         trk << "Track" << i;
+
                         snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
                     }
                     else
@@ -2385,11 +2388,11 @@ MovieFFMpegReader::initializeAudio()
             TWK_THROW_EXC_STREAM("Audio sample rate must match for each track!");
         }
         audioSampleRate = audioCodecContext->sample_rate;
-        if (numChannels != 0 && numChannels != audioCodecContext->channels)
+        if (numChannels != 0 && numChannels != audioCodecContext->ch_layout.nb_channels)
         {
             TWK_THROW_EXC_STREAM("Audio channel count must match for each track!");
         }
-        numChannels = audioCodecContext->channels;
+        numChannels = audioCodecContext->ch_layout.nb_channels;
         track->numChannels = numChannels;
 
         double timebase = av_q2d(audioStream->time_base);
@@ -2413,7 +2416,7 @@ MovieFFMpegReader::initializeAudio()
                     << " timebase: " << timebase);
 
         // Get the input source channels
-        uint64_t layout = audioCodecContext->channel_layout;
+        AVChannelLayout layout = audioCodecContext->ch_layout;
         audioChannels = idAudioChannels(layout, numChannels);
 
         // XXX Assume this thread will never decode audio
@@ -2657,7 +2660,7 @@ MovieFFMpegReader::isImageFormat(const char* format)
 }
 
 ChannelsVector
-MovieFFMpegReader::idAudioChannels(uint64_t layout, int numChannels)
+MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
 {
     uint64_t unmasked;
     ChannelsVector chans;
@@ -2665,7 +2668,7 @@ MovieFFMpegReader::idAudioChannels(uint64_t layout, int numChannels)
     // Layout can have max 64 channels; one bit per channel. See avutil/channel_layout.h
     for (int i = 0; i < 64 && chans.size() < numChannels; i++)
     {
-        unmasked = layout & ((uint64_t) 1 << i);
+        unmasked = layout.u.mask & (1ULL << i);
 
         if (!unmasked) continue;
 
@@ -2699,13 +2702,20 @@ MovieFFMpegReader::idAudioChannels(uint64_t layout, int numChannels)
             default: continue;
         }
 
-        const char *chName, *chDesc;
-        chName = av_get_channel_name(unmasked);
-        chDesc = av_get_channel_description(unmasked);
+        AVChannel avChannel = av_channel_layout_channel_from_index(&layout, i);
+        std::array<char, 64> chName;
+        std::array<char, 256> chDesc;
 
-        DBL (DB_AUDIO, "Audio ch " << (chans.size()-1)
-                    << " is: '" << chName
-                    << "-" << chDesc);
+        // av_channel_name and av_channel_description functions
+        // return amount of bytes needed to hold the output string,
+        // or a negative AVERROR on failure.
+        if (av_channel_name(chName.data(), chName.size(), avChannel) > 0 &&
+            av_channel_description(chDesc.data(), chDesc.size(), avChannel) > 0)
+        {
+            DBL (DB_AUDIO, "Audio ch " << (chans.size()-1)
+                        << " is: '" << chName.data()
+                        << "-" << chDesc.data());
+        }
     }
 
     // If we don't know any of the channels then assume the most common layout
@@ -4079,16 +4089,15 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
     }
     else
     {
-        avStream->time_base.num        = 1;
-        avStream->time_base.den        = m_info.audioSampleRate;
-        avCodecContext->time_base.num  = 1;
-        avCodecContext->time_base.den  = m_info.audioSampleRate;
-        avCodecContext->codec_id       = avCodec->id;
-        avCodecContext->codec_type     = AVMEDIA_TYPE_AUDIO;
-        avCodecContext->sample_rate    = m_info.audioSampleRate;
-        avCodecContext->channels       = m_info.audioChannels.size();
-        avCodecContext->channel_layout =
-            av_get_default_channel_layout(avCodecContext->channels);
+        avStream->time_base.num                 = 1;
+        avStream->time_base.den                 = m_info.audioSampleRate;
+        avCodecContext->time_base.num           = 1;
+        avCodecContext->time_base.den           = m_info.audioSampleRate;
+        avCodecContext->codec_id                = avCodec->id;
+        avCodecContext->codec_type              = AVMEDIA_TYPE_AUDIO;
+        avCodecContext->sample_rate             = m_info.audioSampleRate;
+        avCodecContext->ch_layout.nb_channels   = m_info.audioChannels.size();
+        av_channel_layout_default(&(avCodecContext->ch_layout), avCodecContext->ch_layout.nb_channels);
 
         if (m_parameters.find("sample_fmt") != m_parameters.end())
         {
@@ -4147,7 +4156,7 @@ MovieFFMpegWriter::addTrack(bool isVideo, string codec,
         m_audioFrameSize = (avCodecContext->frame_size) ?
             avCodecContext->frame_size : 2048;
         if (m_audioSamples) av_freep(&m_audioSamples);
-        m_audioSamples = av_malloc(avCodecContext->channels * m_audioFrameSize *
+        m_audioSamples = av_malloc(avCodecContext->ch_layout.nb_channels * m_audioFrameSize *
             av_get_bytes_per_sample(avCodecContext->sample_fmt));
     }
 }
@@ -4553,7 +4562,7 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
     AVStream* audioStream = m_avFormatContext->streams[track->number];
     AVCodecContext* audioCodecContext = track->avCodecContext;
     AVSampleFormat audioFormat = audioCodecContext->sample_fmt;
-    int audioChannels = audioCodecContext->channels;
+    int audioChannels = audioCodecContext->ch_layout.nb_channels;
     int sampleSize = av_get_bytes_per_sample(audioFormat);
     int totalOutputSize = audioBuffer.size() * audioChannels * sampleSize;
     bool planar = av_sample_fmt_is_planar(audioFormat);
@@ -4612,8 +4621,8 @@ MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow, bool lastPass)
 
     track->audioFrame->nb_samples = nsamps;
     track->audioFrame->format = audioFormat;
-    track->audioFrame->channels = audioCodecContext->channels;
-    track->audioFrame->channel_layout = audioCodecContext->channel_layout;
+    track->audioFrame->ch_layout.nb_channels = audioCodecContext->ch_layout.nb_channels;
+    track->audioFrame->ch_layout = audioCodecContext->ch_layout;
     avcodec_fill_audio_frame(track->audioFrame, audioChannels,
         audioFormat, (uint8_t*)m_audioSamples, totalOutputSize, 0);
 

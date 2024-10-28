@@ -343,7 +343,7 @@ jobs:
   
       - name: Install Homebrew dependencies
         run: |
-          brew install --quiet --formula cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+          brew install --quiet --formula cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew icu4c
 
       - name: Set QT_HOME
         if: matrix.arch-type == 'x86_64'
