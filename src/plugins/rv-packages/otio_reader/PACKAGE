@@ -20,6 +20,8 @@ files:
     location: SupportFiles/$PACKAGE
   - file: annotation_schema.py
     location: SupportFiles/$PACKAGE
+  - file: annotation_hook.py
+    location: SupportFiles/$PACKAGE
   - file: cdlSchema.py
     location: SupportFiles/$PACKAGE
   - file: cdlHook.py
