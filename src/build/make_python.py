@@ -34,6 +34,8 @@ VARIANT = ""
 ARCH = ""
 OPENTIMELINEIO_SOURCE_DIR = ""
 
+LIB_DIR = ""
+
 SITECUSTOMIZE_FILE_CONTENT = f'''
 #
 # Copyright (c) {datetime.now().year} Autodesk, Inc. All rights reserved.
@@ -201,12 +203,12 @@ def patch_python_distribution(python_home: str) -> None:
 
         elif platform.system() == "Linux":
             openssl_libs = glob.glob(
-                os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*")
+                os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR, "lib*.so*")
             )
 
             for lib_path in openssl_libs:
                 print(f"Copying {lib_path} to the python home")
-                shutil.copy(lib_path, os.path.join(python_home, "lib"))
+                shutil.copy(lib_path, os.path.join(python_home, LIB_DIR))
 
         elif platform.system() == "Windows":
             openssl_dlls = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
@@ -451,6 +453,12 @@ def configure() -> None:
         if OPENSSL_OUTPUT_DIR:
             configure_args.append(f"--with-openssl={OPENSSL_OUTPUT_DIR}")
 
+            if platform.system() == "Linux":
+                # This option prevent Python to build the _ssl module correctly on Darwin.
+                configure_args.append(
+                    f"--with-openssl-rpath={OPENSSL_OUTPUT_DIR}/{LIB_DIR}"
+                )
+
         if VARIANT == "Release":
             configure_args.append("--enable-optimizations")
 
@@ -495,23 +503,24 @@ def configure() -> None:
 
         LDFLAGS = [f"-L{d}" for d in LD_LIBRARY_PATH]
 
-        configure_args.append(f'CPPFLAGS={" ".join(CPPFLAGS)}')
-        configure_args.append(f'LDFLAGS={" ".join(LDFLAGS)}')
-
-        if platform.system() == "Linux":
-            configure_args.append(f'LD_LIBRARY_PATH={":".join(LD_LIBRARY_PATH)}')
+        if OPENSSL_OUTPUT_DIR:
+            if platform.system() == "Darwin":
+                configure_args.append(
+                    f"LC_RPATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}"
+                )
+                configure_args.append(f'LDFLAGS={" ".join(LDFLAGS)}')
+                configure_args.append(f'CPPFLAGS={" ".join(CPPFLAGS)}')
+                configure_args.append(
+                    f"DYLD_LIBRARY_PATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}"
+                )
+            else:
+                # Linux (NOT Windows was checked before)
+                configure_args.append(f"LDFLAGS=-L{OPENSSL_OUTPUT_DIR}/{LIB_DIR}")
+                configure_args.append(f"CPPFLAGS=-I{OPENSSL_OUTPUT_DIR}/include")
 
         print(f"Executing {configure_args} from {SOURCE_DIR}")
 
-        subprocess_env = {**os.environ}
-        if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
-
-        subprocess.run(
-            configure_args,
-            cwd=SOURCE_DIR,
-            env=subprocess_env,
-        ).check_returncode()
+        subprocess.run(configure_args, cwd=SOURCE_DIR).check_returncode()
 
         makefile_path = os.path.join(SOURCE_DIR, "Makefile")
         old_makefile_path = os.path.join(SOURCE_DIR, "Makefile.old")
@@ -585,7 +594,7 @@ def build() -> None:
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
         if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)
 
         subprocess.run(
             make_args,
@@ -680,8 +689,6 @@ def install() -> None:
             os.path.join(dst_dir, python3xx_lib),
         )
 
-        print(os.listdir(libs_dir))
-
         # Tcl and Tk DLL are not copied by the main.py script in Debug.
         # Assuming that Tcl and Tk are not built in debug.
         # Manually copy the DLL.
@@ -697,7 +704,7 @@ def install() -> None:
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
         if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)
         subprocess.run(
             make_args,
             cwd=SOURCE_DIR,
@@ -732,6 +739,8 @@ if __name__ == "__main__":
     parser.add_argument("--variant", dest="variant", type=str, required=True)
     parser.add_argument("--arch", dest="arch", type=str, required=False, default="")
 
+    parser.add_argument("--vfx_platform", dest="vfx_platform", type=int, required=True)
+
     parser.add_argument(
         "--opentimelineio-source-dir",
         dest="otio_source_dir",
@@ -761,6 +770,17 @@ if __name__ == "__main__":
     VARIANT = args.variant
     ARCH = args.arch
     OPENTIMELINEIO_SOURCE_DIR = args.otio_source_dir
+    VFX_PLATFORM = args.vfx_platform
+
+    if platform.system() == "Darwin":
+        LIB_DIR = "lib"
+    else:
+        # Assuming Linux because that variable is not used for Windows.
+        # TODO: Note: This might not be right on Debian based platform.
+        if VFX_PLATFORM == 2023:
+            LIB_DIR = "lib"
+        elif VFX_PLATFORM == 2024:
+            LIB_DIR = "lib64"
 
     if platform.system() == "Windows":
         PYTHON_VERSION = args.python_version
