@@ -1701,54 +1701,59 @@ namespace IPCore
             m_fullRenderSerialNumber++;
             freeOldTextures();
 
-            if (useThreadedUpload())
+            if (root != NULL)
             {
-                if (uploadRoot == NULL)
+                if (useThreadedUpload())
                 {
-                    uploadRoot = root;
-                }
-                m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
+                    if (uploadRoot == NULL)
+                    {
+                        uploadRoot = root;
+                    }
+                    m_uploadThreadPrefetch =
+                        (root == uploadRoot) ? false : true;
 
-                //
-                // traverse our IPTree, and create gl textures/buffers for all
-                // texture uploads the upload thread will need
-                // the reason for this is we want all the gen/deletion of
-                // textures/buffers to be handled by the main thread
-                //
-                if (m_uploadThreadPrefetch)
+                    //
+                    // traverse our IPTree, and create gl textures/buffers for
+                    // all texture uploads the upload thread will need the
+                    // reason for this is we want all the gen/deletion of
+                    // textures/buffers to be handled by the main thread
+                    //
+                    if (m_uploadThreadPrefetch)
+                    {
+                        //
+                        // Load the textures for the next frame
+                        // in case prefetch didnt fetch the current frame, fetch
+                        // it now. This only happens for the first frame, or
+                        // when the last render was N and this current render
+                        // isn't N+1 (say N+2) in which case the prefetch went
+                        // to a waste. Regardless we want to give prirority to
+                        // make sure everything is uploaded for the current
+                        // frame. This is overhead in most cases though
+                        //
+                        prepareTextureDescriptionsForUpload(root);
+                        prefetch(root);
+                    }
+
+                    prepareTextureDescriptionsForUpload(uploadRoot);
+                    setupUploadThread(uploadRoot);
+                }
+                else
                 {
                     //
-                    // Load the textures for the next frame
-                    // in case prefetch didnt fetch the current frame, fetch it
-                    // now. This only happens for the first frame, or when the
-                    // last render was N and this current render isn't N+1 (say
-                    // N+2) in which case the prefetch went to a waste.
-                    // Regardless we want to give prirority to make sure
-                    // everything is uploaded for the current frame. This is
-                    // overhead in most cases though
+                    // In case prefetch is on, in most cases textures should be
+                    // uploaded for this frame already with the exception of
+                    // first frame, or when the last render was N and this
+                    // current render isn't N+1 (say N+2) in which case the
+                    // prefetch went to a waste. In prefetch most cases this is
+                    // a overhead
                     //
+                    //
+
                     prepareTextureDescriptionsForUpload(root);
                     prefetch(root);
                 }
-
-                prepareTextureDescriptionsForUpload(uploadRoot);
-                setupUploadThread(uploadRoot);
+                HOP_CALL(glFinish();)
             }
-            else
-            {
-                //
-                // In case prefetch is on, in most cases textures should be
-                // uploaded for this frame already with the exception of first
-                // frame, or when the last render was N and this current render
-                // isn't N+1 (say N+2) in which case the prefetch went to a
-                // waste. In prefetch most cases this is a overhead
-                //
-                //
-
-                prepareTextureDescriptionsForUpload(root);
-                prefetch(root);
-            }
-            HOP_CALL(glFinish();)
         }
 
         {
