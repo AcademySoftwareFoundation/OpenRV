@@ -131,9 +131,10 @@ ELSE()
 
   # Ref: https://github.com/openssl/openssl/blob/398011848468c7e8e481b295f7904afc30934217/INSTALL.md?plain=1#L1847-L1858
 
-  IF(RV_TARGET_LINUX)
-    RV_VFX_SET_VARIABLE(_dot_version CY2023 ".1.1" CY2024 ".3")
+  RV_VFX_SET_VARIABLE(_dot_version CY2023 ".1.1" CY2024 ".3")
+  RV_VFX_SET_VARIABLE(_underscore_version CY2023 "1_1" CY2024 "3")
 
+  IF(RV_TARGET_LINUX)
     SET(_crypto_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}${_dot_version}
     )
@@ -144,17 +145,17 @@ ELSE()
   ELSEIF(RV_TARGET_WINDOWS)
     # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64 when OpenSSL is build with MSVC.
     SET(_crypto_lib_name
-        libcrypto-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libcrypto-${_underscore_version}-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_ssl_lib_name
-        libssl-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libssl-${_underscore_version}-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   ELSE()
     SET(_crypto_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}crypto.1.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${_dot_version}${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_ssl_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}ssl.1.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${_dot_version}${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   ENDIF()
 

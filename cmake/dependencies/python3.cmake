@@ -256,22 +256,6 @@ SET(_requirements_install_command
     "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
 )
 
-IF(RV_TARGET_WINDOWS)
-  SET(_patch_python3_11_command
-      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.openssl.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.python.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.get_externals.bat.patch"
-  )
-
-  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python3_11_command}")
-  # Split the command into a semi-colon separated list.
-  SEPARATE_ARGUMENTS(_patch_command)
-  STRING(
-    REGEX
-    REPLACE ";+" ";" _patch_command "${_patch_command}"
-  )
-ENDIF()
-
 EXTERNALPROJECT_ADD(
   ${_python3_target}
   DOWNLOAD_NAME ${_python3_target}_${_python3_version}.zip
@@ -282,7 +266,6 @@ EXTERNALPROJECT_ADD(
   URL ${_python3_download_url}
   URL_MD5 ${_python3_download_hash}
   DEPENDS OpenSSL::Crypto OpenSSL::SSL
-  PATCH_COMMAND "${_patch_command}"
   CONFIGURE_COMMAND ${_python3_make_command} --configure
   BUILD_COMMAND ${_python3_make_command} --build
   INSTALL_COMMAND ${_python3_make_command} --install

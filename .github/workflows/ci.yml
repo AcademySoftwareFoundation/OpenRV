@@ -65,6 +65,7 @@ jobs:
         - /usr/local/share/powershell:/github/home/powershell
         - /usr/local/share/chromium:/github/home/chromium
         - /usr/local/lib/node_modules:/github/home/node_modules
+        - /opt/hostedtoolcache/CodeQL:/github/home/CodeQL
     strategy:
       fail-fast: false
       matrix:
@@ -168,6 +169,7 @@ jobs:
           rm -rf /github/home/powershell || true
           rm -rf /github/home/chromium || true
           rm -rf /github/home/node_modules || true
+          rm -rf /github/home/CodeQL || true
 
       - name: Display disk space
         run: |
@@ -181,6 +183,7 @@ jobs:
           dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd
           dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel
           dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
+          dnf clean all
 
       - name: Install other system dependencies
         if: ${{ matrix.rocky-version == '9' }}

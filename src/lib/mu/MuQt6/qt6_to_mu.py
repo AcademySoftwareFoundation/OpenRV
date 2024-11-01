@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from sgmllib import SGMLParser
 import urllib
@@ -264,7 +264,7 @@ baseHTML = [
     "qwheelevent",
     "qtextbrowser",
     "qsinglepointevent",
-    "qpointerevent"
+    "qpointerevent",
 ]
 
 #
@@ -423,7 +423,7 @@ pointerTypes = set(
         # "QWebEngineHistory",
         "QWindowStateChangeEvent",
         "QSinglePointEvent",
-        "QPointerEvent"
+        "QPointerEvent",
     ]
 )
 # "QTouchEvent",
@@ -530,7 +530,7 @@ repMap = [
 
 
 def repMapFind(x):
-    for (rexp, val) in repMap:
+    for rexp, val in repMap:
         if rexp.match(x):
             return val
     return None
@@ -768,7 +768,7 @@ abstractClasses = [
     re.compile("QAbstract.*"),
     re.compile("QLayout"),
     re.compile("QIODevice"),
-    re.compile("QIODeviceBase")
+    re.compile("QIODeviceBase"),
 ]
 
 
@@ -848,10 +848,7 @@ forceEnumOutput = {
 #
 doProps = ["QInputDialog"]
 
-doPropsIfFuncToo = [
-    "primaryScreen",
-    "availableGeometry"
-]
+doPropsIfFuncToo = ["primaryScreen", "availableGeometry"]
 
 noHFileOutput = []  # ["QObject"]
 
@@ -914,7 +911,7 @@ exclusionMap = {
     "QProcess::createProcessArgumentsModifier": None,
     "QProcess::setCreateProcessArgumentsModifier": None,
     "QProcess::setChildProcessModifier": None,
-    "QProcess::startDetached": None, # handrolled
+    "QProcess::startDetached": None,  # handrolled
     "QMenuBar::defaultAction": None,
     "QMenuBar::setDefaultAction": None,
     "QPlainTextEdit::extraSelections": None,
@@ -1096,52 +1093,133 @@ exclusionMap = {
     ],
     # Issue with std::variant and Types: "const std::variant<Types...>"
     "QVariant::fromStdVariant": None,
-    "QFile::QFile":[
-        ('QFile', '', [('name', 'const std::filesystem::path &', None)], '', False),
-        ('QFile', '', [('name', 'const std::filesystem::path &', None), ('parent', 'QObject *', None)], '', False)
+    "QFile::QFile": [
+        ("QFile", "", [("name", "const std::filesystem::path &", None)], "", False),
+        (
+            "QFile",
+            "",
+            [
+                ("name", "const std::filesystem::path &", None),
+                ("parent", "QObject *", None),
+            ],
+            "",
+            False,
+        ),
     ],
     "QFile::filesystemFileName": None,
     "QFile::filesystemSymLinkTarget": None,
-    "QFile::link":[
-        ('link', '', [('newName', 'const std::filesystem::path &', None)], 'bool', False)
+    "QFile::link": [
+        (
+            "link",
+            "",
+            [("newName", "const std::filesystem::path &", None)],
+            "bool",
+            False,
+        )
     ],
-    "QFile::rename":[
-        ('rename', '', [('newName', 'const std::filesystem::path &', None)], 'bool', False)
+    "QFile::rename": [
+        (
+            "rename",
+            "",
+            [("newName", "const std::filesystem::path &", None)],
+            "bool",
+            False,
+        )
     ],
-    "QFile::setFileName":[
-        ('setFileName', '', [('name', 'const std::filesystem::path &', None)], 'void', False)
+    "QFile::setFileName": [
+        (
+            "setFileName",
+            "",
+            [("name", "const std::filesystem::path &", None)],
+            "void",
+            False,
+        )
     ],
-    "QFile::permissions":[
-        ('permissions', '', [('filename', 'const std::filesystem::path &', None)], 'QFileDevice::Permissions', False)
+    "QFile::permissions": [
+        (
+            "permissions",
+            "",
+            [("filename", "const std::filesystem::path &", None)],
+            "QFileDevice::Permissions",
+            False,
+        )
     ],
-    "QFile::copy":[
-        ('copy', '', [('newName', 'const std::filesystem::path &', None)], 'bool', False)
+    "QFile::copy": [
+        (
+            "copy",
+            "",
+            [("newName", "const std::filesystem::path &", None)],
+            "bool",
+            False,
+        )
     ],
-    "QFile::setPermissions":[
-        ('setPermissions', '', [('permissions', 'QFileDevice::Permissions', None)], 'virtual bool', False),
-        ('setPermissions', '', [('fileName', 'const QString &', None), ('permissions', 'QFileDevice::Permissions', None)], 'bool', False),
-        ('setPermissions', '', [('filename', 'const std::filesystem::path &', None), ('permissionSpec', 'QFileDevice::Permissions', None)], 'bool', False)
+    "QFile::setPermissions": [
+        (
+            "setPermissions",
+            "",
+            [("permissions", "QFileDevice::Permissions", None)],
+            "virtual bool",
+            False,
+        ),
+        (
+            "setPermissions",
+            "",
+            [
+                ("fileName", "const QString &", None),
+                ("permissions", "QFileDevice::Permissions", None),
+            ],
+            "bool",
+            False,
+        ),
+        (
+            "setPermissions",
+            "",
+            [
+                ("filename", "const std::filesystem::path &", None),
+                ("permissionSpec", "QFileDevice::Permissions", None),
+            ],
+            "bool",
+            False,
+        ),
     ],
     # Issue with conversion QString to QString *
     "QFile::moveToTrash": [
         (
-            "moveToTrash", 
-            "", 
-            [("fileName", "const QString &", None), ("pathInTrash", "QString *", "nullptr")], 
-            "bool", 
-            False
+            "moveToTrash",
+            "",
+            [
+                ("fileName", "const QString &", None),
+                ("pathInTrash", "QString *", "nullptr"),
+            ],
+            "bool",
+            False,
         )
     ],
     # QFile has funky semantics which screw things up in QFileInfo
     # so these have to be done manually
     "QFileInfo::QFileInfo": [
-        ('QFileInfo', '', [('file', 'const QFileDevice &', None)], '', False),
-        ('QFileInfo', '', [('dir', 'const QDir &', None), ('file', 'const std::filesystem::path &', None)], '', False),
-        ('QFileInfo', '', [('file', 'const std::filesystem::path &', None)], '', False)
+        ("QFileInfo", "", [("file", "const QFileDevice &", None)], "", False),
+        (
+            "QFileInfo",
+            "",
+            [
+                ("dir", "const QDir &", None),
+                ("file", "const std::filesystem::path &", None),
+            ],
+            "",
+            False,
+        ),
+        ("QFileInfo", "", [("file", "const std::filesystem::path &", None)], "", False),
     ],
     "QFileInfo::setFile": [
-        ('setFile', '', [('file', 'const std::filesystem::path &', None)], 'void', False),
-        ('setFile', '', [('file', 'const QFileDevice &', None)], 'void', False)
+        (
+            "setFile",
+            "",
+            [("file", "const std::filesystem::path &", None)],
+            "void",
+            False,
+        ),
+        ("setFile", "", [("file", "const QFileDevice &", None)], "void", False),
     ],
     "QFileInfo::operator!=": [
         (
@@ -1233,7 +1311,7 @@ exclusionMap = {
     "QTextOption::tabs": None,
     # Syntax error with "const QList<QTextEdit::ExtraSelection>  arg1 = (&)(param_selections);"
     "QTextEdit::setExtraSelections": None,
-    "QTextStream::QTextStream": None, # handrolled
+    "QTextStream::QTextStream": None,  # handrolled
     "QTextStream::setString": None,
     "QTextStream::string": None,
     "QTextStream::readLineInto": None,
@@ -1241,7 +1319,7 @@ exclusionMap = {
     "QTextStream::operator>>": None,
     # cannot convert from 'std::chrono::milliseconds' to 'int'
     "QTimer::intervalAsDuration": None,
-    # cannot convert from 'std::chrono::milliseconds' to 'int' 
+    # cannot convert from 'std::chrono::milliseconds' to 'int'
     "QTimer::remainingTimeAsDuration": None,
     "QCursor::bitmap": None,
     "QCursor::mask": None,
@@ -1262,7 +1340,7 @@ exclusionMap = {
     "QWebEngineView::findText": None,
     "QMenu::setAsDockMenu": None,
     # Trouble with std::initializer_list
-    # syntax error: std::initializer_list<QPair<QString, QString> > arg1 = (>)(param_list);  
+    # syntax error: std::initializer_list<QPair<QString, QString> > arg1 = (>)(param_list);
     "QUrlQuery::QUrlQuery": [
         (
             "QUrlQuery",
@@ -1274,13 +1352,16 @@ exclusionMap = {
             False,
         )
     ],
-    "QQuickItem::itemChange":[
+    "QQuickItem::itemChange": [
         (
-            "itemChange", 
-            "", 
-            [("change", "QQuickItem::ItemChange", None), ("value", "const QQuickItem::ItemChangeData &", None)], 
-            "virtual void", 
-            False
+            "itemChange",
+            "",
+            [
+                ("change", "QQuickItem::ItemChange", None),
+                ("value", "const QQuickItem::ItemChangeData &", None),
+            ],
+            "virtual void",
+            False,
         )
     ],
     # Syntax issue with 'const QVector<QQmlContext::PropertyPair>  arg1 = (&)(param_properties);'
@@ -1337,17 +1418,43 @@ exclusionMap = {
         ),
     ],
     "QDir::QDir": [
-        ('QDir', '', [('path', 'const std::filesystem::path &', None), ('nameFilter', 'const QString &', None), ('sort', 'QDir::SortFlags', 'SortFlags(Name | IgnoreCase)'), ('filters', 'QDir::Filters', 'AllEntries')], '', False),
-        ('QDir', '', [('path', 'const std::filesystem::path &', None)], '', False)
+        (
+            "QDir",
+            "",
+            [
+                ("path", "const std::filesystem::path &", None),
+                ("nameFilter", "const QString &", None),
+                ("sort", "QDir::SortFlags", "SortFlags(Name | IgnoreCase)"),
+                ("filters", "QDir::Filters", "AllEntries"),
+            ],
+            "",
+            False,
+        ),
+        ("QDir", "", [("path", "const std::filesystem::path &", None)], "", False),
     ],
     "QDir::filesystemAbsolutePath": None,
     "QDir::filesystemCanonicalPath": None,
     "QDir::filesystemPath": None,
     "QDir::setPath": [
-        ('setPath', '', [('path', 'const std::filesystem::path &', None)], 'void', False)
+        (
+            "setPath",
+            "",
+            [("path", "const std::filesystem::path &", None)],
+            "void",
+            False,
+        )
     ],
     "QDir::addSearchPath": [
-        ('addSearchPath', '', [('prefix', 'const QString &', None), ('path', 'const std::filesystem::path &', None)], 'void', False)
+        (
+            "addSearchPath",
+            "",
+            [
+                ("prefix", "const QString &", None),
+                ("path", "const std::filesystem::path &", None),
+            ],
+            "void",
+            False,
+        )
     ],
     "QFileInfo::filesystemAbsoluteFilePath": None,
     "QFileInfo::filesystemAbsolutePath": None,
@@ -1358,6 +1465,8 @@ exclusionMap = {
     "QFileInfo::filesystemPath": None,
     "QFileInfo::filesystemReadSymLink": None,
     "QFileInfo::filesystemSymLinkTarget": None,
+    "QUrl::fromAce": None,
+    "QUrl::toAce": None,
 }
 
 customNativeFuncsHeader = {
@@ -1720,32 +1829,33 @@ def parseParameter(param, n):
 
 def parse_cpp_function(function_signature):
     # Updated regular expression to handle operator overloading
-    pattern = r'^((?:template\s+)?(?:virtual\s+)?(?:explicit\s+)?(?:[\w:]+(?:<.*?>)?(?:\s*[\*&])?\s+)+)?\s*(\~?\w+(?:::\w+)*|\w+\s*(?:<.*?>)?::(?:~?\w+|operator\s*\S+)|operator\s*\S+)\s*(\(.*?\))(?:\s*((?:const)?\s*(?:noexcept)?\s*(?:override)?\s*(?:final)?\s*(?:&)?\s*(?:->.*?)?(?:=\s*\w+)?))?$'
-    
+    pattern = r"^((?:template\s+)?(?:virtual\s+)?(?:explicit\s+)?(?:[\w:]+(?:<.*?>)?(?:\s*[\*&])?\s+)+)?\s*(\~?\w+(?:::\w+)*|\w+\s*(?:<.*?>)?::(?:~?\w+|operator\s*\S+)|operator\s*\S+)\s*(\(.*?\))(?:\s*((?:const)?\s*(?:noexcept)?\s*(?:override)?\s*(?:final)?\s*(?:&)?\s*(?:->.*?)?(?:=\s*\w+)?))?$"
+
     match = re.match(pattern, function_signature.strip())
-    
+
     if not match:
         return None, None, None, None
-    
+
     return_type, function_name, parameters, after_parameters = match.groups()
-    
+
     # Clean up the matches
     if return_type:
         return_type = return_type.strip()
     else:
         return_type = ""
-    
+
     function_name = function_name.strip()
-    
+
     # Fix this as this remove () for thing like Qt::WindowsFlag()
     parameters = parameters[1:-1]
-    
+
     if after_parameters:
         after_parameters = after_parameters.strip()
     else:
         after_parameters = ""
-    
+
     return return_type, function_name, parameters, after_parameters
+
 
 def parseFunction(func, qtnamespace):
     orig_func = func
@@ -1769,7 +1879,7 @@ def parseFunction(func, qtnamespace):
     demoted = False
     if len(func) == 0:
         return None
-    
+
     message("Processing function " + func)
     if func[-1] == "@":
         # demote virtual props to not props otherwise we can't create
@@ -1853,18 +1963,24 @@ def parseFunction(func, qtnamespace):
                     params[i] = (p[0] + "_", p[1], p[2])
 
             if nameproto:
-                v = (nameproto[-1], thistype, params, string.join(nameproto[0:-1]), prop)
+                v = (
+                    nameproto[-1],
+                    thistype,
+                    params,
+                    string.join(nameproto[0:-1]),
+                    prop,
+                )
                 if demoted:
                     qtnamespace.demotedProps.append(v)
                     # message("PROP demoted " + str(func))
                 return v
             else:
-                message("WARNING: Nameproto empty for " + func) 
+                message("WARNING: Nameproto empty for " + func)
     except:
         # Skip any function that has issue with the simple parsing above.
         print("Error parsing function.. skipping: {0}".format(orig_func))
         return None
-    
+
     return None
 
 
@@ -2087,8 +2203,8 @@ class MuEnum:
             if e.name != "\n":
                 # TODO: Might not be the right place to do it, but it works.
                 # Remove anything parenthesis and spacing in the name.
-                pattern = r'\([^)]*\)'
-                e.name = re.sub(pattern, '', e.name).strip()
+                pattern = r"\([^)]*\)"
+                e.name = re.sub(pattern, "", e.name).strip()
                 name_without_class_name = e.name.split(muclass.name, 1)[1]
                 # Could use e.name for val, but let's keep the logic similar.
                 val = muclass.name + name_without_class_name
@@ -2160,7 +2276,11 @@ class MuFunction:
         self.purevirtual = "= 0" in qtfunc[1]
 
         print("Processing function {0}".format(qtfunc))
-        print("failed: {0}, isprop: {1}, isprotected: {2}".format(str(self.failed), str(self.isprop), str(self.isprotected)))
+        print(
+            "failed: {0}, isprop: {1}, isprotected: {2}".format(
+                str(self.failed), str(self.isprop), str(self.isprotected)
+            )
+        )
 
         if self.operator:
             self.name = name[8 : len(name)]
@@ -2185,12 +2305,15 @@ class MuFunction:
             else:
                 self.args.append(("this", muclass.name, None))
 
-        for (aname, atype, aval) in args:
+        for aname, atype, aval in args:
             message("Trying to translate (%s, %s) for %s" % (atype, c, name))
             mutype = api.translate(atype, c)
             if mutype == None:
                 self.failed = True
-                message("%s failed because api.translate(%s,%s) return None" % (name, atype, c))
+                message(
+                    "%s failed because api.translate(%s,%s) return None"
+                    % (name, atype, c)
+                )
                 mutype = '"%s"' % atype
             self.args.append((aname, mutype, aval))
 
@@ -2290,7 +2413,7 @@ class MuFunction:
         )
         if self.args:
             out += "Parameters, "
-            for (aname, atype, aval) in self.args:
+            for aname, atype, aval in self.args:
                 atype = conditionType(atype)
                 if self.muclass.muapi.classes.has_key(atype):
                     atype = "qt." + atype
@@ -2328,7 +2451,7 @@ class MuFunction:
         out += "%s(NODE_THREAD" % self.compiled
         if self.args:
             count = 0
-            for (aname, atype, aval) in self.args:
+            for aname, atype, aval in self.args:
                 rep = repMapFind(atype)
                 (repType, instType) = rep
                 if count == 0 and self.ismember:
@@ -2423,7 +2546,7 @@ class MuFunction:
             return "// NO FUNC: CONSTRUCTOR IS PROTECTED: %s" % self.muDeclaration()
         rep = repMapFind(self.rtype)
         out = "%s %s(Mu::Thread& NODE_THREAD" % (rep[0], self.compiled)
-        for (aname, atype, aval) in self.args:
+        for aname, atype, aval in self.args:
             rep = repMapFind(atype)
             out += ", %s param_%s" % (rep[0], aname)
         out += ")\n{\n"
@@ -2672,7 +2795,7 @@ class MuFunction:
     def muDeclaration(self):
         out = "%s (%s; " % (self.name, self.rtype)
         comma = False
-        for (aname, mutype, aval) in self.args:
+        for aname, mutype, aval in self.args:
             if comma:
                 out += ", "
             out += "%s %s" % (mutype, aname)
@@ -2714,7 +2837,10 @@ class MuClass:
             fname = f[0]
             rtype = f[3]
             cppname = qtnamespace.name + "::" + fname
-            message("functions fname = %s, rtype = %s, cppname = %s" % (fname, rtype, cppname))
+            message(
+                "functions fname = %s, rtype = %s, cppname = %s"
+                % (fname, rtype, cppname)
+            )
             exclude = isFunctionExcluded(qtnamespace, f)
             if exclude and verbose:
                 print("EXCLUDED:", str(f))
@@ -2765,7 +2891,10 @@ class MuClass:
             cppname = qtnamespace.name + "::" + fname
             exclude = isFunctionExcluded(qtnamespace, f)
             print(qtnamespace)
-            message("staticfuncs fname = %s, cppname = %s, exclude = %s" % (fname, cppname, str(exclude)))
+            message(
+                "staticfuncs fname = %s, cppname = %s, exclude = %s"
+                % (fname, cppname, str(exclude))
+            )
             if not exclude:
                 self.statics.append(
                     MuFunction(
@@ -3425,7 +3554,7 @@ class MuClass:
             cppout = open("qtGlobals.cpp", "w")
         else:
             cppout = open(name + "Type.cpp", "w")
-        
+
         cppout.writelines(cpplines)
         cppout.close()
 
@@ -3674,7 +3803,7 @@ class QtDocParser(SGMLParser):
         self.qtnamespace.isclass = isclass
 
     def start_span(self, attrs):
-        for (attr, value) in attrs:
+        for attr, value in attrs:
             if value == "small-subtitle":
                 self.modulespan = True
 
@@ -3701,11 +3830,11 @@ class QtDocParser(SGMLParser):
 
     def start_a(self, attrs):
         if self.ininheritedby:
-            for (attr, value) in attrs:
+            for attr, value in attrs:
                 if attr == "href":
                     self.addChildURL(value)
         elif self.infunc:
-            for (attr, value) in attrs:
+            for attr, value in attrs:
                 if attr == "href":
                     self.funcIsProp = value.rfind("-prop") != -1
         self.acount += 1
@@ -3996,7 +4125,7 @@ def recursiveParse(url):
             # if "qwidget.html" in u:
             absPath = os.path.join(os.path.dirname(url), u)
             recursiveParse(absPath)
-    except (IOError):
+    except IOError:
         print("FAILED: (IOError)", url)
     except:
         sys.stdout.flush()
