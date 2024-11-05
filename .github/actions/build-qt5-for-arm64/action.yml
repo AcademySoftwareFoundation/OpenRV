@@ -7,9 +7,6 @@ inputs:
   qt-version-short:
     description: 'Qt version to build major.minor'
     required: true
-  vfx-platform:
-    description: 'VFX Platform'
-    required: true
   python3-version:
     description: 'Python 3 version'
     required: true
@@ -58,17 +55,10 @@ runs:
         shell: bash
 
       - name: Install Homebrew dependencies (OpenSSL 1.1.1)
-        if: steps.arm64-qt.outputs.cache-hit != 'true' && matrix.vfx-platform == 'CY2023'
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
         run: |
           brew install --quiet --formula openssl@1.1
           brew list openssl@1.1
-        shell: bash
-
-      - name: Install Homebrew dependencies (OpenSSL 3.X.X)
-        if: steps.arm64-qt.outputs.cache-hit != 'true' && matrix.vfx-platform == 'CY2024'
-        run: |
-          brew install --quiet --formula openssl@3
-          brew list openssl@3
         shell: bash
 
       # Use Ninja 1.11.1 because Qt need to be patched for Ninja 1.12.1.
@@ -112,17 +102,9 @@ runs:
         shell: bash
 
       - name: Download Qt ${{ inputs.qt-version }} source
-        if: steps.arm64-qt.outputs.cache-hit != 'true' && matrix.vfx-platform == 'CY2023'
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
         run: |
           curl https://www.nic.funet.fi/pub/mirrors/download.qt-project.org/official_releases/qt/${{ inputs.qt-version-short }}/${{ inputs.qt-version }}/single/qt-everywhere-opensource-src-${{ inputs.qt-version }}.tar.xz -o qt.tar.xz
-          tar xf qt.tar.xz
-          mv qt-everywhere-src-${{ inputs.qt-version }} qt-src
-        shell: bash
-
-      - name: Download Qt ${{ inputs.qt-version }} source
-        if: steps.arm64-qt.outputs.cache-hit != 'true' && matrix.vfx-platform == 'CY2024'
-        run: |
-          curl https://www.nic.funet.fi/pub/mirrors/download.qt-project.org/official_releases/qt/${{ inputs.qt-version-short }}/${{ inputs.qt-version }}/single/qt-everywhere-src-${{ inputs.qt-version }}.tar.xz -o qt.tar.xz
           tar xf qt.tar.xz
           mv qt-everywhere-src-${{ inputs.qt-version }} qt-src
         shell: bash
@@ -133,14 +115,8 @@ runs:
           mkdir -p qt-build
         shell: bash
 
-      - name: List OpenSSL folder
-        if: matrix.vfx-platform == 'CY2024'
-        run: |
-          ls -al $(brew --prefix openssl@3)
-        shell: bash
-
       - name: Configure Qt ${{ inputs.qt-version }} for CY2023
-        if: steps.arm64-qt.outputs.cache-hit != 'true' && matrix.vfx-platform == 'CY2023'
+        if: steps.arm64-qt.outputs.cache-hit != 'true'
         run: |
           ../qt-src/configure \
           --prefix="../${{ inputs.qt-output }}" \
@@ -174,45 +150,6 @@ runs:
           -skip qtpurchasing \
           -skip qtlocation \
           -I /opt/homebrew/Cellar/openssl@1.1/1.1.1w/include -L /opt/homebrew/Cellar/openssl@1.1/1.1.1w/lib \
-          -I /opt/homebrew/Cellar/icu4c/74.2/include -L /opt/homebrew/Cellar/icu4c/74.2/lib
-        working-directory: ${{ github.workspace }}/qt-build
-        shell: bash
-
-      - name: Configure Qt ${{ inputs.qt-version }} for CY2024
-        if: steps.arm64-qt.outputs.cache-hit != 'true' && matrix.vfx-platform == 'CY2024'
-        run: |
-          ../qt-src/configure \
-          --prefix="../${{ inputs.qt-output }}" \
-          -no-strip \
-          -no-rpath \
-          -opensource \
-          -plugin-sql-sqlite \
-          -openssl-linked \
-          -verbose \
-          -opengl desktop \
-          -no-warnings-are-errors \
-          -no-libudev \
-          -no-egl \
-          -nomake examples \
-          -nomake tests \
-          -c++std c++14 \
-          -confirm-license \
-          -no-use-gold-linker \
-          -release \
-          -no-sql-mysql \
-          -no-xcb \
-          -qt-libjpeg \
-          -qt-libpng \
-          -bundled-xcb-xinput \
-          -sysconfdir /etc/xdg \
-          -qt-pcre \
-          -qt-harfbuzz \
-          -R . \
-          -icu \
-          -skip qtnetworkauth \
-          -skip qtpurchasing \
-          -skip qtlocation \
-          -I $(brew --prefix openssl@3)/include -L $(brew --prefix openssl@3)/lib \
           -I /opt/homebrew/Cellar/icu4c/74.2/include -L /opt/homebrew/Cellar/icu4c/74.2/lib
         working-directory: ${{ github.workspace }}/qt-build
         shell: bash

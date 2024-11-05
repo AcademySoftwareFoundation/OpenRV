@@ -107,12 +107,23 @@ FOREACH(
   SET(outfile
       ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/ui_${outfile}.h
   )
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${outfile}
-    COMMAND ${QT_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
-    MAIN_DEPENDENCY ${infile}
-    VERBATIM
-  )
+
+  IF(RV_VFX_PLATFORM STREQUAL CY2023)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${Qt5Widgets_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${QT_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ENDIF()
+
   SET_SOURCE_FILES_PROPERTIES(
     ${infile}
     PROPERTIES SKIP_AUTOMOC ON
@@ -147,12 +158,23 @@ FOREACH(
   SET(outfile
       ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_${outfile}.cpp
   )
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${outfile}
-    COMMAND ${QT_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
-    MAIN_DEPENDENCY ${infile}
-    VERBATIM
-  )
+
+  IF(RV_VFX_PLATFORM STREQUAL CY2023)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${Qt5Core_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${QT_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ENDIF()
+
   SET_SOURCE_FILES_PROPERTIES(
     ${infile}
     PROPERTIES SKIP_AUTOMOC ON

@@ -436,6 +436,17 @@ def clean() -> None:
     subprocess.run(git_clean_command, cwd=SOURCE_DIR)
 
 
+def add_path_to_env_var(env, envvar: str, paths: list) -> None:
+    current_value = env.get(envvar, "")
+    for path in paths:
+        p = pathlib.Path(path).resolve()
+        if current_value:
+            current_value = f"{p.__str__()}{os.pathsep}{current_value}"
+        else:
+            current_value = p.__str__()
+    env[envvar] = current_value
+
+
 def configure() -> None:
     """
     Run the configure step of the build. It builds the makefile required to build Python with the path correctly set.
@@ -464,6 +475,7 @@ def configure() -> None:
 
         CPPFLAGS = []
         LD_LIBRARY_PATH = []
+        PKG_CONFIG_PATH = []
 
         if platform.system() == "Darwin":
             readline_prefix_proc = subprocess.run(
@@ -476,6 +488,11 @@ def configure() -> None:
             )
             tcl_prefix_proc.check_returncode()
 
+            python_tk_prefix_proc = subprocess.run(
+                ["brew", "--prefix", "python-tk"], capture_output=True
+            )
+            python_tk_prefix_proc.check_returncode()
+
             xz_prefix_proc = subprocess.run(
                 ["brew", "--prefix", "xz"], capture_output=True
             )
@@ -486,20 +503,45 @@ def configure() -> None:
             )
             sdk_prefix_proc.check_returncode()
 
-            readline_prefix = readline_prefix_proc.stdout.strip().decode("utf-8")
-            tcl_prefix = tcl_prefix_proc.stdout.strip().decode("utf-8")
-            xz_prefix = xz_prefix_proc.stdout.strip().decode("utf-8")
-            sdk_prefix = sdk_prefix_proc.stdout.strip().decode("utf-8")
+            readline_prefix = (
+                pathlib.Path(readline_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            tcl_prefix = (
+                pathlib.Path(tcl_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            xz_prefix = (
+                pathlib.Path(xz_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            sdk_prefix = (
+                pathlib.Path(sdk_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            python_tk_prefix = (
+                pathlib.Path(python_tk_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
 
             CPPFLAGS.append(f'-I{os.path.join(readline_prefix, "include")}')
             CPPFLAGS.append(f'-I{os.path.join(tcl_prefix, "include")}')
             CPPFLAGS.append(f'-I{os.path.join(xz_prefix, "include")}')
             CPPFLAGS.append(f'-I{os.path.join(sdk_prefix, "usr", "include")}')
+            CPPFLAGS.append(f'-I{os.path.join(python_tk_prefix, "include")}')
 
             LD_LIBRARY_PATH.append(os.path.join(readline_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(tcl_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(xz_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(sdk_prefix, "usr", "lib"))
+            LD_LIBRARY_PATH.append(os.path.join(python_tk_prefix, "lib"))
+
+            PKG_CONFIG_PATH.append(os.path.join(tcl_prefix, "lib", "pkgconfig"))
 
         LDFLAGS = [f"-L{d}" for d in LD_LIBRARY_PATH]
 
@@ -518,9 +560,15 @@ def configure() -> None:
                 configure_args.append(f"LDFLAGS=-L{OPENSSL_OUTPUT_DIR}/{LIB_DIR}")
                 configure_args.append(f"CPPFLAGS=-I{OPENSSL_OUTPUT_DIR}/include")
 
+        subprocess_env = {**os.environ}
+        if platform.system() == "Darwin":
+            add_path_to_env_var(subprocess_env, "PKG_CONFIG_PATH", PKG_CONFIG_PATH)
+
         print(f"Executing {configure_args} from {SOURCE_DIR}")
 
-        subprocess.run(configure_args, cwd=SOURCE_DIR).check_returncode()
+        subprocess.run(
+            configure_args, cwd=SOURCE_DIR, env=subprocess_env
+        ).check_returncode()
 
         makefile_path = os.path.join(SOURCE_DIR, "Makefile")
         old_makefile_path = os.path.join(SOURCE_DIR, "Makefile.old")

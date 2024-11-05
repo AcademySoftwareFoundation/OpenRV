@@ -66,6 +66,7 @@ jobs:
         - /usr/local/share/chromium:/github/home/chromium
         - /usr/local/lib/node_modules:/github/home/node_modules
         - /opt/hostedtoolcache/CodeQL:/github/home/CodeQL
+        - /usr/local/share/boost:/github/home/boost
     strategy:
       fail-fast: false
       matrix:
@@ -170,6 +171,7 @@ jobs:
           rm -rf /github/home/chromium || true
           rm -rf /github/home/node_modules || true
           rm -rf /github/home/CodeQL || true
+          rm -rf /github/home/boost || true
 
       - name: Display disk space
         run: |
@@ -308,6 +310,11 @@ jobs:
         run: |
           ctest --test-dir _build -C ${{ matrix.build-type }} --extra-verbose
 
+      - name: Free some spaces for the install steps
+        run: |
+          rm -rf _build/RV_DEPS_*
+          rm -rf _build/_deps
+
       - name: Install OpenRV
         run: |
           cmake --install _build --prefix $(pwd)/_install --config ${{ matrix.build-type }}
@@ -440,20 +447,21 @@ jobs:
           aqtversion: '==3.1.*'
 
       - name: Install Qt ${{ matrix.qt-version }}
-        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2024'
+        if: matrix.vfx-platform == 'CY2024'
         uses: jurplel/install-qt-action@v4
         with:
           version: '${{ matrix.qt-version }}'
           host: 'mac'
           target: 'desktop'
-          arch: 'clang_64'
+          # clang_64 contains both x86_64 and arm64 for Qt 6.
+          arch: 'clang_64' 
           dir: "${{ github.workspace }}/deps"
           install-deps: 'false'
           modules: ${{ env.MACOX_X86_64_QT6_MODULES }}
           archives: ${{ env.MACOX_X86_64_QT6_ARCHIVES }}
           # Caching only save 2 minutes. Keep the cache for longer operations.
           cache: false
-          setup-python: 'false'
+          setup-python: true
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
@@ -468,13 +476,12 @@ jobs:
           cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64/mkspecs/features/toolchain.prf
 
       - name: Build Qt
-        if: matrix.arch-type == 'arm64'
+        if: matrix.arch-type == 'arm64' && matrix.vfx-platform == 'CY2023'
         id: build-qt5-for-arm64
         uses: ./.github/actions/build-qt5-for-arm64
         with:
           qt-version: "${{ matrix.qt-version }}"
           qt-version-short: "${{ matrix.qt-version-short }}"
-          vfx-platform: "${{ matrix.vfx-platform }}"
           python3-version: "3.11.9"
           python2-version: "2.7.18"
           xcode-version: "14.3.1"
@@ -492,22 +499,24 @@ jobs:
   
       - name: Install Homebrew dependencies
         run: |
-          brew install --quiet --formula cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew icu4c
-
+          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew icu4c
+      
       - name: Set QT_HOME
         if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
+        # With aqt, the universal binaries are under clang_64 and not macos folder.
         run: |
           echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64" >> $GITHUB_ENV
-
-      - name: Set QT_HOME
-        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2024'
-        run: |
-          echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/macos" >> $GITHUB_ENV
           
       - name: Set QT_HOME
-        if: matrix.arch-type == 'arm64'
+        if: matrix.arch-type == 'arm64' && matrix.vfx-platform == 'CY2023'
+        # The path for QT_HOME is diferent for arm64 CY2023 because we have to build it in the CI.
         run: |
           echo "QT_HOME=${{ github.workspace }}/deps" >> $GITHUB_ENV
+
+      - name: Set QT_HOME
+        if: matrix.vfx-platform == 'CY2024'
+        run: |
+          echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/macos" >> $GITHUB_ENV
 
       - name: Check if the dependencies changed
         if: matrix.build-type == 'Release'
@@ -549,7 +558,7 @@ jobs:
       - name: Build OpenRV main executable
         run: |
           cmake --build _build --config ${{ matrix.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
-
+      
       - name: Tests
         run: |
           ctest --test-dir _build -C ${{ matrix.build-type }} --extra-verbose
