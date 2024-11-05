@@ -2,10 +2,10 @@ package: OTIO Reader
 author: Contributors to the OpenTimelineIO project
 organization: OpenTimelineIO project
 contact: opentimelineio@pixar.com
-version: 1.1
+version: 1.2
 url: http://opentimeline.io
-rv: 4.0.8
-openrv: 1.0.0
+rv: 2024.2.0
+openrv: 2.1.0
 
 modes: 
   - file: otio_reader_plugin.py
