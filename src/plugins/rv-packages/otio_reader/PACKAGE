@@ -2,10 +2,10 @@ package: OTIO Reader
 author: Contributors to the OpenTimelineIO project
 organization: OpenTimelineIO project
 contact: opentimelineio@pixar.com
-version: 1.1
+version: 1.2
 url: http://opentimeline.io
-rv: 4.0.8
-openrv: 1.0.0
+rv: 2024.2.0
+openrv: 2.1.0
 
 modes: 
   - file: otio_reader_plugin.py
@@ -17,6 +17,10 @@ modes:
   
 files:
   - file: manifest.json
+    location: SupportFiles/$PACKAGE
+  - file: annotation_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: annotation_hook.py
     location: SupportFiles/$PACKAGE
   - file: cdlSchema.py
     location: SupportFiles/$PACKAGE
@@ -39,6 +43,10 @@ files:
   - file: sourcePostExportHook.py
     location: SupportFiles/$PACKAGE
   - file: multiRepPostExportHook.py
+    location: SupportFiles/$PACKAGE
+  - file: paint_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: point_schema.py
     location: SupportFiles/$PACKAGE
 
 description: |
@@ -85,6 +93,13 @@ description: |
 
     <li>
     <p>
+    annotation_schema.py
+    An example schema of an annotation.
+    </p>
+    </li>
+
+    <li>
+    <p>
     cdlHook.py
     An example of importing a custom CDL effect in OTIO into an RVCDL node.
     </p>
@@ -122,6 +137,20 @@ description: |
     <p>
     genericEffectHook.py
     A for handling the Effect schema.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    paint_schema.py
+    An example schema for a paint annotation.
+    </p>
+    </li>
+
+    <li>
+    <p>
+    point_schema.py
+    An example schema for a paint annotation point.
     </p>
     </li>
 
@@ -260,4 +289,3 @@ description: |
     <p>
     For pre- and post- hooks, no return value is expected.
     </p>
-
