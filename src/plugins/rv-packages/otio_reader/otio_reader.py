@@ -60,6 +60,21 @@ class NoNodeFromHook(otio.exceptions.OTIOError):
     pass
 
 
+def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object | None:
+    """
+    Main entry point to expand a given otio string into the current RV session.
+
+    Returns the top level node created that represents this otio
+    timeline.
+    """
+    otio_obj = otio.adapters.read_from_string(otio_string)
+    timeline = otio_obj["otio"]
+
+    context = {"sg_url": host_prefix} if host_prefix else None
+
+    return create_rv_node_from_otio(timeline, context), timeline.global_start_time
+
+
 def read_otio_file(otio_file):
     """
     Main entry point to expand a given otio (or file otio can read)
@@ -525,7 +540,7 @@ def _create_sources(item, context=None):
 def _get_media_path(target_url: str, context: dict | None = None) -> str:
     context = context or {}
 
-    if "sg_url" in context and target_url.startswith("/file_serve/version"):
+    if "sg_url" in context:
         return context.get("sg_url") + target_url
 
     if not os.path.isabs(target_url):
@@ -672,16 +687,11 @@ def _add_source_bounds(media_ref, src, active_src, context=None):
     # width by the inverse of the aspect ratio
     #
     try:
-        # Note: When multiple media representation sources are created, we can only retrieve the media_info of a source if it is the active source
-        # That's because multiple media representation in RV is optimized to only load a source when it gets activated.
-        # If the current source is not the active source, we can't get the media_info so we fall back to the active source's media_info as our best guess.
-        media_info = commands.sourceMediaInfo(active_src)
+        media_info = commands.sourceMediaInfo(src)
         height = media_info["height"]
         aspect_ratio = media_info["width"] / height
     except Exception:
-        logging.exception(
-            "Unable to determine aspect ratio, using default value of 16:9"
-        )
+        logging.exception("Unable to determine aspect ratio, using default value of 16:9")
         aspect_ratio = 1920 / 1080
 
     translate = bounds.center() * global_scale - global_translate

@@ -1,35 +1,106 @@
 {
-  "OTIO_SCHEMA": "PluginManifest.1",
-  "schemadefs": [
-    {
-      "OTIO_SCHEMA": "SchemaDef.1",
-      "name": "Annotation",
-      "execution_scope": "in process",
-      "filepath": "annotation_schema.py"
-    },
-    {
-      "OTIO_SCHEMA": "SchemaDef.1",
-      "name": "CDL",
-      "execution_scope": "in process",
-      "filepath": "cdlSchema.py"
-    },
-    {
-      "OTIO_SCHEMA": "SchemaDef.1",
-      "name": "Compare",
-      "execution_scope": "in process",
-      "filepath": "compare_schema.py"
-    },
-    {
-      "OTIO_SCHEMA": "SchemaDef.1",
-      "name": "Paint",
-      "execution_scope": "in process",
-      "filepath": "paint_schema.py"
-    },
-    {
-      "OTIO_SCHEMA": "SchemaDef.1",
-      "name": "Point",
-      "execution_scope": "in process",
-      "filepath": "point_schema.py"
+    "OTIO_SCHEMA" : "PluginManifest.1",
+    "schemadefs" : [
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Annotation",
+            "execution_scope" : "in process",
+            "filepath" : "annotation_schema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "CDL",
+            "execution_scope" : "in process",
+            "filepath" : "cdlSchema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Paint",
+            "execution_scope" : "in process",
+            "filepath" : "paint_schema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Point",
+            "execution_scope" : "in process",
+            "filepath" : "point_schema.py"
+        }
+    ],
+    "hook_scripts" : [
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "load_annotation",
+            "execution_scope" : "in_process",
+            "filepath" : "annotation_hook.py"
+        },
+        {
+           "OTIO_SCHEMA" : "HookScript.1",
+           "name" : "create_cdl",
+           "execution_scope" : "in_process",
+           "filepath" : "cdlHook.py"
+        }, 
+        {
+           "OTIO_SCHEMA" : "HookScript.1",
+           "name" : "create_effect",
+           "execution_scope" : "in_process",
+           "filepath" : "genericEffectHook.py"
+        }, 
+        {
+           "OTIO_SCHEMA" : "HookScript.1",
+           "name" : "export_cdl",
+           "execution_scope" : "in_process",
+           "filepath" : "cdlExportHook.py"
+        },
+        {
+           "OTIO_SCHEMA" : "HookScript.1",
+           "name" : "create_timewarp",
+           "execution_scope" : "in_process",
+           "filepath" : "timeWarpHook.py"
+        },
+        {
+           "OTIO_SCHEMA" : "HookScript.1",
+           "name" : "export_retime",
+           "execution_scope" : "in_process",
+           "filepath" : "retimeExportHook.py"
+        },
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "clip",
+            "execution_scope" : "in_process",
+            "filepath" : "clipHook.py"
+        },
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "custom_transition",
+            "execution_scope" : "in_process",
+            "filepath" : "customTransitionHook.py"
+        },
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "post_export_source",
+            "execution_scope" : "in_process",
+            "filepath" : "sourcePostExportHook.py"
+        },
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "post_export_multi_rep",
+            "execution_scope" : "in_process",
+            "filepath" : "multiRepPostExportHook.py"
+        }
+
+    ],
+    "hooks" : {
+        "Annotation_to_rv" : ["load_annotation"],
+        "CDL_to_rv" : ["create_cdl"],
+        "Effect_to_rv" : ["create_effect"],
+        "export_RVLinearize" : ["export_cdl"],
+        "FreezeFrame_to_rv": ["create_timewarp"],
+        "LinearTimeWarp_to_rv": ["create_timewarp"],
+        "export_RVRetime": ["export_retime"],
+        "pre_hook_Clip": ["clip"],
+        "post_export_hook_RVSourceGroup": ["post_export_source"],
+        "post_export_hook_RVSwitchGroup": ["post_export_multi_rep"],
+        "CustomTransition_to_rv": ["custom_transition"]
     }
   ],
   "hook_scripts": [

@@ -37,11 +37,11 @@ class Annotation(otio.schema.Effect):
         self.layers = layers
 
     _visible = otio.core.serializable_field(
-        "visible", required_type=bool, doc=("visible: expects either true or false")
+        "visible", required_type=bool, doc=("Visible: expects either true or false")
     )
 
     _layers = otio.core.serializable_field(
-        "layers", required_type=list, doc=("layers: expects a list of annotation types")
+        "layers", required_type=list, doc=("Layers: expects a list of annotation types")
     )
 
     @property
@@ -53,14 +53,7 @@ class Annotation(otio.schema.Effect):
         self._layers = val
 
     def __str__(self) -> str:
-        return (
-            f"Annotation({self.name}, {self.effect_name}, {self.visible}, "
-            f"{self.layers})"
-        )
+        return f"Annotation({self.name}, {self.effect_name}, {self.visible}, {self.layers})"
 
     def __repr__(self) -> str:
-        return (
-            f"otio.schema.Annotation(name={self.name!r}, "
-            f"effect_name={self.effect_name!r}, "
-            f"visible={self.visible!r}, layers={self.layers!r})"
-        )
+        return f"otio.schema.Annotation(name={self.name!r}, effect_name={self.effect_name!r}, visible={self.visible!r}, layers={self.layers!r})"

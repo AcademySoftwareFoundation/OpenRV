@@ -18,7 +18,7 @@ is ready to be used.
 ```python
 Example:
 myObject = otio.schemadef.Paint.Paint(
-    name, points, rgba, type, brush, layer_range, hold, ghost, ghost_before, ghost_after, visible
+    name, points, rgba, type, brush, layer_range, hold, ghost
 )
 """
 
@@ -39,12 +39,9 @@ class Paint(otio.core.SerializableObject):
         rgba: list | None = None,
         type: str = "",
         brush: str = "",
-        layer_range: otio.opentime.TimeRange | None = None,
+        layer_range: dict | None = None,
         hold: bool = False,
         ghost: bool = False,
-        ghost_before: int = 0,
-        ghost_after: int = 0,
-        visible: bool = True,
     ) -> None:
         super().__init__()
         self.name = name
@@ -55,16 +52,13 @@ class Paint(otio.core.SerializableObject):
         self.layer_range = layer_range
         self.hold = hold
         self.ghost = ghost
-        self.ghost_before = ghost_before
-        self.ghost_after = ghost_after
-        self.visible = visible
 
     name = otio.core.serializable_field(
-        "name", required_type=str, doc=("name: expects a string")
+        "name", required_type=str, doc=("Name: expects a string")
     )
 
     _points = otio.core.serializable_field(
-        "points", required_type=list, doc=("points: expects a list of point objects")
+        "points", required_type=list, doc=("Points: expects a list of point objects")
     )
 
     @property
@@ -72,11 +66,11 @@ class Paint(otio.core.SerializableObject):
         return self._points
 
     @points.setter
-    def points(self, val: list):
+    def points(self, val: list) -> None:
         self._points = val
 
     _rgba = otio.core.serializable_field(
-        "rgba", required_type=list, doc=("rgba: expects a list of four floats")
+        "rgba", required_type=list, doc=("RGBA: expects a list of four floats")
     )
 
     @property
@@ -84,21 +78,21 @@ class Paint(otio.core.SerializableObject):
         return self._rgba
 
     @rgba.setter
-    def rgba(self, val: list) -> None:
+    def rgba(self, val: list) -> list:
         self._rgba = val
 
     type = otio.core.serializable_field(
-        "type", required_type=str, doc=("type: expects a string")
+        "type", required_type=str, doc=("Type: expects a string")
     )
 
     brush = otio.core.serializable_field(
-        "brush", required_type=str, doc=("brush: expects a string")
+        "brush", required_type=str, doc=("Brush: expects a string")
     )
 
     _layer_range = otio.core.serializable_field(
         "layer_range",
         required_type=otio.opentime.TimeRange,
-        doc=("layer_range: expects a TimeRange object"),
+        doc=("Layer_range: expects a TimeRange object"),
     )
 
     @property
@@ -106,34 +100,21 @@ class Paint(otio.core.SerializableObject):
         return self._layer_range
 
     @layer_range.setter
-    def layer_range(self, val):
+    def layer_range(self, val) -> otio.opentime.TimeRange:
         self._layer_range = val
 
-    hold = otio.core.serializable_field(
-        "hold", required_type=bool, doc=("hold: expects either true or false")
+    _hold = otio.core.serializable_field(
+        "hold", required_type=bool, doc=("Hold: expects either true or false")
     )
 
-    ghost = otio.core.serializable_field(
-        "ghost", required_type=bool, doc=("ghost: expects either true or false")
-    )
-
-    _ghost_before = otio.core.serializable_field(
-        "ghost_before", required_type=int, doc=("ghost_before: expects an integer")
-    )
-
-    _ghost_after = otio.core.serializable_field(
-        "ghost_after", required_type=int, doc=("ghost_after: expects an integer")
-    )
-
-    visible = otio.core.serializable_field(
-        "visible", required_type=bool, doc=("visible: expects either true or false")
+    _ghost = otio.core.serializable_field(
+        "ghost", required_type=bool, doc=("Ghost: expects either true or false")
     )
 
     def __str__(self) -> str:
         return (
             f"Paint({self.name}, {self.points}, {self.rgba}, {self.type}, "
-            f"{self.brush}, {self.layer_range}, {self.hold}, {self.ghost}, "
-            f"{self.ghost_before}, {self.ghost_after}, {self.visible})"
+            f"{self.brush}, {self.layer_range}, {self.hold}, {self.ghost})"
         )
 
     def __repr__(self) -> str:
@@ -141,6 +122,5 @@ class Paint(otio.core.SerializableObject):
             f"otio.schema.Paint(name={self.name!r}, points={self.points!r}, "
             f"rgba={self.rgba!r}, type={self.type!r}, brush={self.brush!r}, "
             f"layer_range={self.layer_range!r}, hold={self.hold!r}, "
-            f"ghost={self.ghost!r}, ghost_before={self.ghost_before!r}, "
-            f"ghost_after={self.ghost_after!r}, visible={self.visible!r})"
+            f"ghost={self.ghost!r})"
         )
