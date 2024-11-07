@@ -29,6 +29,7 @@
 # such that we can use this both interactively as well as standalone
 #
 
+import logging
 from rv import commands
 from rv import extra_commands
 
@@ -57,6 +58,21 @@ class NoMappingForOtioTypeError(otio.exceptions.OTIOError):
 
 class NoNodeFromHook(otio.exceptions.OTIOError):
     pass
+
+
+def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object | None:
+    """
+    Main entry point to expand a given otio string into the current RV session.
+
+    Returns the top level node created that represents this otio
+    timeline.
+    """
+    otio_obj = otio.adapters.read_from_string(otio_string)
+    timeline = otio_obj["otio"]
+
+    context = {"sg_url": host_prefix} if host_prefix else None
+
+    return create_rv_node_from_otio(timeline, context), timeline.global_start_time
 
 
 def read_otio_file(otio_file):
@@ -276,12 +292,12 @@ def _create_track(in_seq, context=None):
     return new_seq
 
 
-def _get_global_transform(tl):
+def _get_global_transform(tl) -> dict:
     # since there's no global scale in otio, calculate the minimum box size
     # that can contain all clips
     def find_display_bounds(tl):
         display_bounds = None
-        for clip in tl.clip_if():
+        for clip in tl.find_clips():
             try:
                 bounds = clip.media_reference.available_image_bounds
                 if bounds:
@@ -491,8 +507,11 @@ def _create_sources(item, context=None):
     return source_group, active_source
 
 
-def _get_media_path(target_url, context=None):
+def _get_media_path(target_url: str, context: dict | None = None) -> str:
     context = context or {}
+
+    if "sg_url" in context:
+        return context.get("sg_url") + target_url
 
     if not os.path.isabs(target_url):
         # if this is a relative file path, assume relative to the otio file
@@ -635,9 +654,13 @@ def _add_source_bounds(media_ref, src, context=None):
     # A width of 1.0 in RV means draw to the aspect ratio, so scale the
     # width by the inverse of the aspect ratio
     #
-    media_info = commands.sourceMediaInfo(src)
-    height = media_info["height"]
-    aspect_ratio = 1.0 if height == 0 else media_info["width"] / height
+    try:
+        media_info = commands.sourceMediaInfo(src)
+        height = media_info["height"]
+        aspect_ratio = media_info["width"] / height
+    except Exception:
+        logging.exception("Unable to determine aspect ratio, using default value of 16:9")
+        aspect_ratio = 1920 / 1080
 
     translate = bounds.center() * global_scale - global_translate
     scale = (bounds.max - bounds.min) * global_scale

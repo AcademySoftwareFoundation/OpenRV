@@ -980,19 +980,21 @@ Locate the input in the eval path at frame starting at node and return its ui na
 }
 
 documentation: """
-Returns an array of all annotated frames relative to the view node. The array
-is not sorted and some frames may appear more than once.
+Returns an array of all annotated frames relative to the node passed to the function.
+If there is no node, the view node is used instead. The array is not sorted and some
+frames may appear more than once.
 """;
 
-\: findAnnotatedFrames (int[];)
+\: findAnnotatedFrames (int[]; string node = nil)
 {
     string[] tempProps;
     let seqb = sequenceBoundaries();
     let testFrames = if seqb.empty() then int[](frameStart()) else seqb;
+    if (node eq nil) node = viewNode();
 
     for_each (f; testFrames)
     {
-        for_each (info; metaEvaluate(f, viewNode()))
+        for_each (info; metaEvaluate(f, node))
         {
             let {name, nodeType, eframe} = info;
 
