@@ -29,6 +29,7 @@
 # such that we can use this both interactively as well as standalone
 #
 
+import logging
 from rv import commands
 from rv import extra_commands
 
@@ -653,9 +654,13 @@ def _add_source_bounds(media_ref, src, context=None):
     # A width of 1.0 in RV means draw to the aspect ratio, so scale the
     # width by the inverse of the aspect ratio
     #
-    media_info = commands.sourceMediaInfo(src)
-    height = media_info["height"]
-    aspect_ratio = 1.0 if height == 0 else media_info["width"] / height
+    try:
+        media_info = commands.sourceMediaInfo(src)
+        height = media_info["height"]
+        aspect_ratio = media_info["width"] / height
+    except Exception:
+        logging.exception("Unable to determine aspect ratio, using default value of 16:9")
+        aspect_ratio = 1920 / 1080
 
     translate = bounds.center() * global_scale - global_translate
     scale = (bounds.max - bounds.min) * global_scale
