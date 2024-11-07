@@ -3,12 +3,36 @@
     "schemadefs" : [
         {
             "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Annotation",
+            "execution_scope" : "in process",
+            "filepath" : "annotation_schema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
             "name" : "CDL",
             "execution_scope" : "in process",
             "filepath" : "cdlSchema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Paint",
+            "execution_scope" : "in process",
+            "filepath" : "paint_schema.py"
+        },
+        {
+            "OTIO_SCHEMA" : "SchemaDef.1",
+            "name" : "Point",
+            "execution_scope" : "in process",
+            "filepath" : "point_schema.py"
         }
     ],
     "hook_scripts" : [
+        {
+            "OTIO_SCHEMA" : "HookScript.1",
+            "name" : "load_annotation",
+            "execution_scope" : "in_process",
+            "filepath" : "annotation_hook.py"
+        },
         {
            "OTIO_SCHEMA" : "HookScript.1",
            "name" : "create_cdl",
@@ -66,6 +90,7 @@
 
     ],
     "hooks" : {
+        "Annotation_to_rv" : ["load_annotation"],
         "CDL_to_rv" : ["create_cdl"],
         "Effect_to_rv" : ["create_effect"],
         "export_RVLinearize" : ["export_cdl"],
