@@ -24,7 +24,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <array>
-#include <string_view>
+#include <stdlib.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
 #include <string>
@@ -1759,12 +1759,60 @@ namespace TwkMovie
             }
             else
             {
-                m_info.proxy.attribute<string>("Rotation") = charRotation;
+                unsigned char *profile = NULL;
+                uint32_t size = 0;
+                mp4v2Utils::getPROFValues(fileHandle, streamIndex, profile, size);
+
+                track->fb.setICCprofile((void*)profile, size);
+                track->fb.setTransferFunction(TwkFB::ColorSpace::ICCProfile());
+                track->fb.setPrimaryColorSpace(TwkFB::ColorSpace::ICCProfile());
+            }
+        }
+        mp4v2Utils::closeFile(fileHandle);
+    }
+
+    return foundIndividualValues;
+}
+
+FrameBuffer::Orientation
+MovieFFMpegReader::snagOrientation(VideoTrack* track)
+{
+    AVStream* videoStream = m_avFormatContext->streams[track->number];
+    AVCodecContext* videoCodecContext = track->avCodecContext;
+    AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
+    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
+    bool yuvPlanar = (!(desc->flags & AV_PIX_FMT_FLAG_ALPHA) &&
+                       (desc->flags & AV_PIX_FMT_FLAG_PLANAR) &&
+                      !(desc->flags & AV_PIX_FMT_FLAG_RGB));
+
+    int rotation = 0;
+    AVDictionaryEntry *rotEntry;
+
+    // Trying to get rotation from metadata
+    rotEntry = av_dict_get(videoStream->metadata, "rotate", NULL, 0);
+    rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
+
+    // If rotation metadata not in metadata, try to get it from side data
+    if (!rotEntry && videoCodecContext->nb_coded_side_data > 0)
+    {
+        double rotationFromSideData = 0;
+        for (int i = 0; i < videoCodecContext->nb_coded_side_data; ++i)
+        {
+            const AVPacketSideData *sd = &videoStream->codecpar->coded_side_data[i];
+            if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) 
+            {
+                rotationFromSideData = av_display_rotation_get((int32_t *)sd->data);
             }
         }
 
-        bool rotate = false;
-        switch (rotation)
+        // Getting rid of negative rotation metadata
+        rotation = rotationFromSideData < 0 ? lround(rotationFromSideData) + 360 : lround(rotationFromSideData);
+        
+        // Setting rotation
+        char charRotation[5]; // Expecting a number between -360 and 360 (inclusive)
+        sprintf(charRotation, "%d", rotation);
+        if (av_dict_set(
+            &videoStream->metadata, "rotate", charRotation, 0) < 0) 
         {
         case 270:
         case -90:
@@ -2164,9 +2212,8 @@ namespace TwkMovie
         bool foundStreams = false;
         if (m_avFormatContext->nb_streams == 0)
         {
-            findStreamInfo();
-            foundStreams = true;
-        }
+            string tsLang = streamLang(i);
+            int numChans = tsStream->codecpar->ch_layout.nb_channels;
 
         //
         // These series of checks are an attempt to cover for bad or missing
@@ -2315,8 +2362,7 @@ namespace TwkMovie
                         ostringstream trk;
                         trk << "Track" << i;
 
-                        snagMetadata(tsStream->metadata, trk.str(),
-                                     &m_info.proxy);
+                        snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
                     }
                     else
                     {
@@ -2338,8 +2384,7 @@ namespace TwkMovie
                         ostringstream trk;
                         trk << "Track" << i;
 
-                        snagMetadata(tsStream->metadata, trk.str(),
-                                     &m_info.proxy);
+                        snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
                     }
                     else
                     {
@@ -2605,24 +2650,15 @@ namespace TwkMovie
         ChannelsVector audioChannels;
         for (int i = m_audioTracks.size() - 1; i >= 0; i--)
         {
-            AudioTrack* track = m_audioTracks[i];
-            AVStream* audioStream = m_avFormatContext->streams[track->number];
-            AVCodecContext* audioCodecContext = track->avCodecContext;
-            if (audioSampleRate != 0
-                && audioSampleRate != audioCodecContext->sample_rate)
-            {
-                TWK_THROW_EXC_STREAM(
-                    "Audio sample rate must match for each track!");
-            }
-            audioSampleRate = audioCodecContext->sample_rate;
-            if (numChannels != 0
-                && numChannels != audioCodecContext->ch_layout.nb_channels)
-            {
-                TWK_THROW_EXC_STREAM(
-                    "Audio channel count must match for each track!");
-            }
-            numChannels = audioCodecContext->ch_layout.nb_channels;
-            track->numChannels = numChannels;
+            TWK_THROW_EXC_STREAM("Audio sample rate must match for each track!");
+        }
+        audioSampleRate = audioCodecContext->sample_rate;
+        if (numChannels != 0 && numChannels != audioCodecContext->ch_layout.nb_channels)
+        {
+            TWK_THROW_EXC_STREAM("Audio channel count must match for each track!");
+        }
+        numChannels = audioCodecContext->ch_layout.nb_channels;
+        track->numChannels = numChannels;
 
             double timebase = av_q2d(audioStream->time_base);
             int64_t duration = audioStream->duration;
@@ -2646,9 +2682,9 @@ namespace TwkMovie
                     << " channels: " << numChannels
                     << " timebase: " << timebase);
 
-            // Get the input source channels
-            AVChannelLayout layout = audioCodecContext->ch_layout;
-            audioChannels = idAudioChannels(layout, numChannels);
+        // Get the input source channels
+        AVChannelLayout layout = audioCodecContext->ch_layout;
+        audioChannels = idAudioChannels(layout, numChannels);
 
             // XXX Assume this thread will never decode audio
             avcodec_free_context(&audioCodecContext);
@@ -2857,7 +2893,61 @@ namespace TwkMovie
                 }
             }
         }
-        if (timeDuration == 0)
+    }
+    if (timeDuration == 0)
+    {
+        if (audioLength > 0) timeDuration = audioLength;
+        else timeDuration = formatTimeDur;
+    }
+    if (timeDuration <= 0)
+    {
+        TWK_THROW_EXC_STREAM("Could not determine playback timing: " << m_filename);
+    }
+    if (frames == 0)
+    {
+        frames = timeDuration * m_io->defaultFPS();
+        rate.num = m_io->defaultFPS();
+        rate.den = 1.0f;
+    }
+    if (frames <= 0)
+    {
+        TWK_THROW_EXC_STREAM("Unable to locate frames: " << m_filename);
+    }
+
+    //
+    // Set the MovieInfo based on the calculated frame rate
+    //
+
+    m_info.start = getFirstFrame(rate);
+    m_info.end = m_info.start + frames - 1;
+    m_info.inc = 1;
+    m_info.fps = floor(av_q2d(rate) * FPS_PRECISION_LIMIT)/ FPS_PRECISION_LIMIT;
+}
+
+bool
+MovieFFMpegReader::isImageFormat(const char* format)
+{
+    if(!std::strcmp(format, "png_pipe") || !std::strcmp(format, "jpeg_pipe"))
+    {
+        return true;
+    }
+    return false;
+}
+
+ChannelsVector
+MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
+{
+    uint64_t unmasked;
+    ChannelsVector chans;
+
+    // Layout can have max 64 channels; one bit per channel. See avutil/channel_layout.h
+    for (int i = 0; i < 64 && chans.size() < numChannels; i++)
+    {
+        unmasked = layout.u.mask & (1ULL << i);
+
+        if (!unmasked) continue;
+
+        switch (unmasked)
         {
             if (audioLength > 0)
                 timeDuration = audioLength;
@@ -2880,15 +2970,20 @@ namespace TwkMovie
             TWK_THROW_EXC_STREAM("Unable to locate frames: " << m_filename);
         }
 
-        //
-        // Set the MovieInfo based on the calculated frame rate
-        //
+        AVChannel avChannel = av_channel_layout_channel_from_index(&layout, i);
+        std::array<char, 64> chName;
+        std::array<char, 256> chDesc;
 
-        m_info.start = getFirstFrame(rate);
-        m_info.end = m_info.start + frames - 1;
-        m_info.inc = 1;
-        m_info.fps =
-            floor(av_q2d(rate) * FPS_PRECISION_LIMIT) / FPS_PRECISION_LIMIT;
+        // av_channel_name and av_channel_description functions
+        // return amount of bytes needed to hold the output string,
+        // or a negative AVERROR on failure.
+        if (av_channel_name(chName.data(), chName.size(), avChannel) > 0 &&
+            av_channel_description(chDesc.data(), chDesc.size(), avChannel) > 0)
+        {
+            DBL (DB_AUDIO, "Audio ch " << (chans.size()-1)
+                        << " is: '" << chName.data()
+                        << "-" << chDesc.data());
+        }
     }
 
     bool MovieFFMpegReader::isImageFormat(const char* format)
@@ -4512,8 +4607,74 @@ namespace TwkMovie
             //  matrix except jpeg, or RGB pixel formats
             //
 
-            if (codec == "jpegls" || codec == "ljpeg" || codec == "mjpeg"
-                || codec == "mjpegb" || codec == "v210")
+        if (codec == "jpegls" || codec == "ljpeg" || codec == "mjpeg" ||
+            codec == "mjpegb" || codec == "v210")
+        {
+            avCodecContext->colorspace  = AVCOL_SPC_SMPTE170M;        // 6
+        }
+        else
+        {
+            const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(avCodecContext->pix_fmt);
+            bool isRGB = (desc && (desc->flags & AV_PIX_FMT_FLAG_RGB));
+
+            if (isRGB) avCodecContext->colorspace  = AVCOL_SPC_RGB;   // 0
+            else       avCodecContext->colorspace  = AVCOL_SPC_BT709; // 1
+        }
+
+        avCodecContext->sample_aspect_ratio =
+            av_d2q(m_request.pixelAspect, INT_MAX);
+
+        AVPixelFormat requestFormat = (m_canControlRequest) ?
+            getBestAVFormat(avCodecContext->pix_fmt) : RV_OUTPUT_FFMPEG_FMT;
+        const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(requestFormat);
+        int bitSize = desc->comp[0].depth - desc->comp[0].shift;
+        bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
+
+        // XXX might need to set avCodecContext->bits_per_raw_sample to match
+        // something appropriate for the pix_fmt
+
+        m_info.pixelAspect  = m_request.pixelAspect;
+        m_info.orientation  = FrameBuffer::TOPLEFT;
+        m_info.numChannels  = (hasAlpha) ? 4 : 3;
+        m_info.dataType     = (bitSize > 8) ?
+            FrameBuffer::USHORT : FrameBuffer::UCHAR;
+
+        // Backwards compatibility for quality setting
+        if (codec == "mjpeg")
+        {
+            avCodecContext->flags |= AV_CODEC_FLAG_QSCALE;
+            avCodecContext->global_quality =
+                pow(100000, 1.0 - m_request.quality);
+        }
+
+        VideoTrack* track = new VideoTrack;
+        track->number = avStream->id;
+        track->avCodecContext = avCodecContext;
+        m_videoTracks.push_back(track);
+
+        // Set the reel name if provided
+        if (m_reelName != "")
+        {
+            av_dict_set(&avStream->metadata, "reel_name", m_reelName.c_str(), 0);
+        }
+    }
+    else
+    {
+        avStream->time_base.num                 = 1;
+        avStream->time_base.den                 = m_info.audioSampleRate;
+        avCodecContext->time_base.num           = 1;
+        avCodecContext->time_base.den           = m_info.audioSampleRate;
+        avCodecContext->codec_id                = avCodec->id;
+        avCodecContext->codec_type              = AVMEDIA_TYPE_AUDIO;
+        avCodecContext->sample_rate             = m_info.audioSampleRate;
+        avCodecContext->ch_layout.nb_channels   = m_info.audioChannels.size();
+        av_channel_layout_default(&(avCodecContext->ch_layout), avCodecContext->ch_layout.nb_channels);
+
+        if (m_parameters.find("sample_fmt") != m_parameters.end())
+        {
+            avCodecContext->sample_fmt = av_get_sample_fmt(
+                m_parameters["sample_fmt"].c_str());
+            if (removeAppliedCodecParametersFromTheList)
             {
                 avCodecContext->colorspace = AVCOL_SPC_SMPTE170M; // 6
             }
@@ -4581,7 +4742,144 @@ namespace TwkMovie
             av_channel_layout_default(&(avCodecContext->ch_layout),
                                       avCodecContext->ch_layout.nb_channels);
 
-            if (m_parameters.find("sample_fmt") != m_parameters.end())
+        AudioTrack* track = new AudioTrack;
+        track->number = avStream->id;
+        track->avCodecContext = avCodecContext;
+        m_audioTracks.push_back(track);
+
+        // Step back a frame for AAC pre-roll
+        if (codec == "aac") track->audioFrame->pts = -2048;
+    }
+
+    // Some formats want stream headers to be separate.
+    if (m_avFormatContext->oformat->flags & AVFMT_GLOBALHEADER)
+    {
+        avCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    }
+
+    // Enable experimental compliance if the codec supports it
+    if (avCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL)
+    {
+        avCodecContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+    }
+
+    // Set any relevant codec options
+    applyCodecParameters(avCodecContext, removeAppliedCodecParametersFromTheList);
+
+    int ret = avcodec_open2(avCodecContext, avCodec, NULL);
+    if (ret < 0)
+    {
+        TWK_THROW_EXC_STREAM("Could not open codec: " << avErr2Str(ret));
+    }
+
+    // Copy codec parameters from AVCodecContext to AVStream.
+    if (avcodec_parameters_from_context(avStream->codecpar, avCodecContext) < 0) {
+        TWK_THROW_EXC_STREAM("Failed to copy codec parameters from context to stream");
+    }
+
+    // Post codec open initializations
+    if (isVideo) initVideoTrack(avStream);
+    else
+    {
+        // If there is no preferred sample size in this codec then use 2048
+        m_audioFrameSize = (avCodecContext->frame_size) ?
+            avCodecContext->frame_size : 2048;
+        if (m_audioSamples) av_freep(&m_audioSamples);
+        m_audioSamples = av_malloc(avCodecContext->ch_layout.nb_channels * m_audioFrameSize *
+            av_get_bytes_per_sample(avCodecContext->sample_fmt));
+    }
+}
+
+void
+MovieFFMpegWriter::applyCodecParameters(AVCodecContext* avCodecContext,
+    bool removeAppliedCodecParametersFromTheList /*=true*/)
+{
+    //
+    // Find and apply parameters for AVCodecContext (*cc:) and AVCodec (*c:).
+    // Keep track of what we applied to remove from further processing.
+    //
+
+    vector<string> applied;
+    for (map<string, string>::iterator left = m_parameters.begin();
+            left != m_parameters.end(); left++)
+    {
+        string name  = left->first;
+        string value = left->second;
+
+        void* avObj         = NULL;
+        const AVOption* opt = NULL;
+        if (name.substr(1,3) == "cc:")
+        {
+            avObj = (void*)avCodecContext;
+            string sub = name.substr(4);
+            opt = av_opt_find(avObj, sub.c_str(), NULL, 0, 0);
+        }
+        else if (name.substr(1,2) == "c:")
+        {
+            avObj = avCodecContext->priv_data;
+            string sub = name.substr(3);
+            opt = av_opt_find(avObj, sub.c_str(), NULL, 0, 0);
+        }
+        if (opt != NULL && avObj != NULL)
+        {
+            DBL (DB_WRITE, "Found option: " << opt->name
+                        << " for name: " << name
+                        << " value: " << value);
+
+            if (setOption(opt, avObj, value))
+                applied.push_back(left->first);
+        }
+    }
+
+    //
+    // Remove what we applied because we will report what was unmatched later
+    //
+    if (removeAppliedCodecParametersFromTheList)
+    {
+        for (vector<string>::iterator erase = applied.begin();
+                erase != applied.end(); erase++)
+        {
+            m_parameters.erase(*erase);
+        }
+    }
+}
+
+void
+MovieFFMpegWriter::applyFormatParameters()
+{
+    //
+    // Keep track of if we set the comment and copyright, because we have
+    // default values for these fields if they are not set explicitly by the
+    // user.
+    //
+
+    bool comment = false;
+    bool copyright = false;
+    for (int i = 0; i < m_request.parameters.size(); i++)
+    {
+        const string& name  = m_request.parameters[i].first;
+        const string& value = m_request.parameters[i].second;
+
+        DBL (DB_WRITE, "parameter name: " << name << " value: " << value);
+
+        //
+        // Handle tweak specific parameter options
+        //
+
+        if (name.substr(0,7)  == "output/"   ||
+            name.substr(0,8)  == "duration"  ||
+            name.substr(0,9)  == "timescale" ||
+            name.substr(0,17) == "libx264autoresize") continue;
+
+        //
+        // If the timecode string has no ":" in it then it treat it as a frame
+        // number.
+        //
+
+        if (name == "timecode")
+        {
+            string tcval = value.c_str();
+            if (value.find(":") == string::npos)
             {
                 avCodecContext->sample_fmt =
                     av_get_sample_fmt(m_parameters["sample_fmt"].c_str());
@@ -5068,8 +5366,31 @@ namespace TwkMovie
         }
     }
 
-    bool MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow,
-                                      bool lastPass)
+    AudioTrack* track = m_audioTracks[0];
+    AVStream* audioStream = m_avFormatContext->streams[track->number];
+    AVCodecContext* audioCodecContext = track->avCodecContext;
+    AVSampleFormat audioFormat = audioCodecContext->sample_fmt;
+    int audioChannels = audioCodecContext->ch_layout.nb_channels;
+    int sampleSize = av_get_bytes_per_sample(audioFormat);
+    int totalOutputSize = audioBuffer.size() * audioChannels * sampleSize;
+    bool planar = av_sample_fmt_is_planar(audioFormat);
+
+    DBL (DB_WRITE, "nsamps: " << nsamps
+                << " planar: " << planar
+                << " bufSize: " << audioBuffer.size()
+                << " audioChannels: " << audioChannels
+                << " bufChannels: " << audioBuffer.numChannels()
+                << " audioSampleRate: " << m_info.audioSampleRate
+                << " bufRate: " << audioBuffer.rate()
+                << " audioLength: " << audioLength
+                << " bufLength: " << audioBuffer.duration()
+                << " bufTotalSize: " << audioBuffer.sizeInBytes()
+                << " totalOutputSize: " << totalOutputSize
+                << " m_lastAudioTime: " << m_lastAudioTime
+                << " bufStart: " << audioBuffer.startTime()
+                << " overflow: " << overflow);
+
+    switch (audioFormat)
     {
         //
         //  Compute the start and end samples for this audio
@@ -5157,6 +5478,60 @@ namespace TwkMovie
         case AV_SAMPLE_FMT_NONE:
         default:
             TWK_THROW_EXC_STREAM("Unsupported audio format.");
+    }
+
+    //
+    // It is critical to set the number of samples in the audio AVFrame before
+    // calling fill frame and encode.
+    //
+
+    track->audioFrame->nb_samples = nsamps;
+    track->audioFrame->format = audioFormat;
+    track->audioFrame->ch_layout.nb_channels = audioCodecContext->ch_layout.nb_channels;
+    track->audioFrame->ch_layout = audioCodecContext->ch_layout;
+    avcodec_fill_audio_frame(track->audioFrame, audioChannels,
+        audioFormat, (uint8_t*)m_audioSamples, totalOutputSize, 0);
+
+    //
+    // Make sure the frame has a valid pts to seed the packet.
+    //
+
+    if (track->audioFrame->pts == AV_NOPTS_VALUE)
+    {
+        track->audioFrame->pts = track->lastEncodedAudio;
+    }
+    track->lastEncodedAudio = track->audioFrame->pts + track->audioFrame->nb_samples;
+
+    encodeAudio(audioCodecContext, track->audioFrame, track->audioPacket, 
+                audioStream, &nsamps, track->lastDecodedAudio);
+    if (lastPass)
+    {
+        // It is important to call encodeAudio (above) to make sure that all frames as been sent
+        // to the encoder before entering draining mode by passing NULL.
+        // Send a NULL frame to enter draining mode.
+        encodeAudio(audioCodecContext, NULL, track->audioPacket, 
+                    audioStream, NULL, track->lastDecodedAudio);
+        // Returned value as no value at this point.
+    }
+
+    return audioFinished;
+}
+
+void 
+MovieFFMpegWriter::encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, 
+                               AVStream* stream, int lastEncVideo)
+{
+    int ret = avcodec_send_frame(ctx, frame);
+    if (ret < 0)
+    {
+        TWK_THROW_EXC_STREAM("Error encoding video frame: " << avErr2Str(ret));
+    }
+
+    while (ret >= 0)
+    {
+        ret = avcodec_receive_packet(ctx, pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            return;
         }
 
         //

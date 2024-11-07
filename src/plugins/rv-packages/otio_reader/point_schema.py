@@ -32,7 +32,10 @@ class Point(otio.core.SerializableObject):
     _name = "Point"
 
     def __init__(
-        self, width: float | None = None, x: float | None = None, y: float | None = None
+        self, 
+        width: float | None = None,
+        x: float | None = None,
+        y: float | None = None
     ) -> None:
         super().__init__()
         self.width = width
@@ -40,7 +43,7 @@ class Point(otio.core.SerializableObject):
         self.y = y
 
     width = otio.core.serializable_field(
-        "width", required_type=float, doc=("width: expects a float")
+        "width", required_type=float, doc=("Width: expect a float")
     )
 
     x = otio.core.serializable_field(
@@ -52,9 +55,10 @@ class Point(otio.core.SerializableObject):
     )
 
     def __str__(self) -> str:
-        return f"Point({self.width}, {self.x}, {self.y})"
+        return f"Point{self.width}, {self.x}, {self.y}"
 
     def __repr__(self) -> str:
         return (
-            f"otio.schema.Point(width={self.width!r}, x={self.x!r}, " f"y={self.y!r})"
+            f"otio.schema.Point(width={self.width!r}, x={self.x!r}, "
+            f"y={self.y!r})"
         )
