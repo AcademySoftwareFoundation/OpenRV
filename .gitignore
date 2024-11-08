@@ -25,8 +25,7 @@ compile_commands.json
 **/.python-version
 
 cmake-*/*
-build/*
-_build*/*
+/*build*/
 _install/*
 .venv/*
 

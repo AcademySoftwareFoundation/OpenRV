@@ -634,14 +634,8 @@ namespace IPCore
     // e.g. propagateMediaChange() might occurs before those two.
     if( m_workItemID )
     {
-      // We make a copy of workItemID because it can be clear
-      // before the lamda is finished.
-      // It is used by the graph to indicate the start and end loading
-      // of a graph.
-      int workItemID = m_workItemID;
       addDispatchJob( Application::instance()->dispatchToMainThread(
-          [this, sharedMedia, proxySharedMedia,
-           workItemID]( Application::DispatchID dispatchID )
+          [this, sharedMedia, proxySharedMedia]( Application::DispatchID dispatchID )
           {
             {
               LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
@@ -2756,13 +2750,54 @@ namespace IPCore
       }
 
       mov = openProxyMovie( errMsg.str(), 0.0, filename, defaultFPS );
-      setMediaActive( false );
 
       ostringstream str;
       str << name() << ";;" << file << ";;" << mediaRepName();
-      TwkApp::GenericStringEvent event( "source-media-unavailable", graph(),
-                                        str.str() );
-      graph()->sendEvent( event );
+      TwkApp::GenericStringEvent event( "source-media-unavailable", graph(), str.str() );
+
+      // The following instructions can only be executed on the main thread.
+      // Dispatch to main thread only when using async loading.
+      if (!m_workItemID)
+      {
+        // We are not using async loading: we can safely execute the following instructions
+        setMediaActive( false );
+        graph()->sendEvent( event );
+      }
+      else
+      {
+        // We are using async loading: Dispatch to main thread
+        addDispatchJob( Application::instance()->dispatchToMainThread(
+            [this, event]( Application::DispatchID dispatchID )
+            {
+              {
+                LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
+
+                bool isCanceled =
+                    ( m_dispatchIDCancelRequestedSet.count( dispatchID ) >= 1 );
+                if( isCanceled )
+                {
+                  m_dispatchIDCancelRequestedSet.erase( dispatchID );
+                  return;
+                }
+              }
+
+              setMediaActive( false );
+              graph()->sendEvent( event );
+
+              {
+                LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
+                bool isCanceled =
+                    ( m_dispatchIDCancelRequestedSet.count( dispatchID ) >= 1 );
+                if( isCanceled )
+                {
+                  m_dispatchIDCancelRequestedSet.erase( dispatchID );
+                  return;
+                }
+              }
+
+              removeDispatchJob( dispatchID );
+            } ) );
+      }
     }
 
     SharedMediaPointer sharedMedia(
