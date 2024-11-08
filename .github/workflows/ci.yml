@@ -498,9 +498,12 @@ jobs:
           python3 -m pip install --user --upgrade -r requirements.txt
   
       - name: Install Homebrew dependencies
+        # icu4c is needed for Qt UIC executable / AUTOUIC.
+        # Might be to find another way to install icu4c if the icu4c recipe disappear.
         run: |
-          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew icu4c
-      
+          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+          brew install --formula icu4c@74
+
       - name: Set QT_HOME
         if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
         # With aqt, the universal binaries are under clang_64 and not macos folder.
