@@ -89,10 +89,18 @@ def hook_function(
             global_width = 2 / 15  # 0.133333...
 
             for point in layer.points:
-                commands.insertFloatProperty(
-                    points_property,
-                    [point.x * global_scale.x, point.y * global_scale.y],
-                )
-                commands.insertFloatProperty(
-                    width_property, [point.width * global_width]
-                )
+                points = commands.getFloatProperty(points_property)
+                if (
+                    len(points) > 1
+                    and points[-1] == point.y * global_scale.y
+                    and points[-2] == point.x * global_scale.x
+                ):
+                    pass
+                else:
+                    commands.insertFloatProperty(
+                        points_property,
+                        [point.x * global_scale.x, point.y * global_scale.y],
+                    )
+                    commands.insertFloatProperty(
+                        width_property, [point.width * global_width]
+                    )
