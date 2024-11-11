@@ -90,9 +90,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 #else
-#include <TwkGLFFBO/FBOVideoDevice.h>
-#include <IPCore/ImageRenderer.h>
-#include <QtOpenGL/QGLContext>
+    #include <TwkGLFFBO/FBOVideoDevice.h>
+    #include <IPCore/ImageRenderer.h>
 #endif
 
 #include <QTextCodec>

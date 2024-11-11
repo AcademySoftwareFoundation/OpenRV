@@ -76,14 +76,14 @@ namespace TwkApp
 #endif
 
 #ifdef PLATFORM_WINDOWS
-        m_homeSupport = getenv("APPDATA");
+    m_homeSupport = QString(getenv("APPDATA"));
 
-        if (!m_homeSupport.cd("RV"))
-        {
-            m_homeSupport = getenv("APPDATA");
-            m_homeSupport.mkpath("RV");
-            m_homeSupport.cd("RV");
-        }
+    if (!m_homeSupport.cd("RV"))
+    {
+        m_homeSupport = QString(getenv("APPDATA"));
+        m_homeSupport.mkpath("RV");
+        m_homeSupport.cd("RV");
+    }
 #endif
 
         m_pyhome = m_root;

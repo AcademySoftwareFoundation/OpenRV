@@ -185,7 +185,26 @@ namespace TwkGLF
         static const char className[] = "fbopbuffer";
         WNDCLASS wc;
 
-        if (!GetClassInfo(hInstance, className, &wc))
+    #ifdef UNICODE
+        potato
+    #else
+        int a = 0;
+    #endif
+
+    if (!GetClassInfo(hInstance, className, &wc))
+    {
+        wc.style         = CS_OWNDC;
+        wc.lpfnWndProc   = DefWindowProc;
+        wc.cbClsExtra    = 0;
+        wc.cbWndExtra    = 0;
+        wc.hInstance     = hInstance;
+        wc.hIcon         = LoadIcon( NULL, IDI_APPLICATION );
+        wc.hCursor       = LoadCursor( NULL, IDC_ARROW );
+        wc.hbrBackground = NULL;
+        wc.lpszMenuName  = NULL;
+        wc.lpszClassName = className;
+
+        if (!RegisterClass(&wc))
         {
             wc.style = CS_OWNDC;
             wc.lpfnWndProc = DefWindowProc;
