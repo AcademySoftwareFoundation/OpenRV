@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-
 SET(_python3_target
     "RV_DEPS_PYTHON3"
 )
