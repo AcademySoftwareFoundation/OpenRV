@@ -53,11 +53,17 @@ FIND_PACKAGE(
   REQUIRED
 )
 
-get_target_property(MOC_EXECUTABLE Qt5::moc IMPORTED_LOCATION)
-get_target_property(UIC_EXECUTABLE Qt5::uic IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(MOC_EXECUTABLE Qt5::moc IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(UIC_EXECUTABLE Qt5::uic IMPORTED_LOCATION)
 
-SET(QT_MOC_EXECUTABLE "${MOC_EXECUTABLE}" CACHE STRING "Qt MOC executable")
-SET(QT_UIC_EXECUTABLE "${UIC_EXECUTABLE}" CACHE STRING "Qt UIC executable")
+SET(QT_MOC_EXECUTABLE
+    "${MOC_EXECUTABLE}"
+    CACHE STRING "Qt MOC executable"
+)
+SET(QT_UIC_EXECUTABLE
+    "${UIC_EXECUTABLE}"
+    CACHE STRING "Qt UIC executable"
+)
 
 SET(_qt_copy_message
     "Copying Qt into ${RV_STAGE_ROOT_DIR}"
@@ -192,14 +198,13 @@ IF(RV_TARGET_WINDOWS)
       ${SRC_DIR}/*.exe
     )
 
-    # Filtering. Some executables are needed for RV to work:
-    # QtWebEngineProcess.exe
+    # Filtering. Some executables are needed for RV to work: QtWebEngineProcess.exe
     FOREACH(
-      _qt_executable 
+      _qt_executable
       ${_qt_executables}
     )
       IF("${_qt_executable}" STREQUAL "QtWebEngineProcess.exe")
-          LIST(REMOVE_ITEM _qt_executables "${_qt_executable}")
+        LIST(REMOVE_ITEM _qt_executables "${_qt_executable}")
       ENDIF()
     ENDFOREACH()
 

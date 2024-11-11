@@ -80,7 +80,8 @@ int main(int argc, char** argv)
     //
     // On windows: force -i
     //
-    wchar_t* w_nargv[] = {Py_DecodeLocale(argv[0], nullptr), L"-i", L'\0'};
+    wchar_t arg2[] = L"-i";
+    wchar_t* w_nargv[] = {Py_DecodeLocale(argv[0], nullptr), arg2, nullptr};
 
     if (argc == 1)
         return Py_Main(2, w_nargv);

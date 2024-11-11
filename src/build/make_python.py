@@ -34,6 +34,8 @@ VARIANT = ""
 ARCH = ""
 OPENTIMELINEIO_SOURCE_DIR = ""
 
+LIB_DIR = ""
+
 SITECUSTOMIZE_FILE_CONTENT = f'''
 #
 # Copyright (c) {datetime.now().year} Autodesk, Inc. All rights reserved.
@@ -124,7 +126,9 @@ def get_python_interpreter_args(python_home: str) -> List[str]:
     python_interpreters = glob.glob(
         os.path.join(python_home, python_name_pattern), recursive=True
     )
-    python_interpreters += glob.glob(os.path.join(python_home, "bin", python_name_pattern))
+    python_interpreters += glob.glob(
+        os.path.join(python_home, "bin", python_name_pattern)
+    )
 
     # sort put python# before python#-config
     python_interpreters = sorted(
@@ -164,7 +168,9 @@ def patch_python_distribution(python_home: str) -> None:
             shutil.move(failed_lib, failed_lib.replace("_failed.so", ".so"))
     if OPENSSL_OUTPUT_DIR:
         if platform.system() == "Darwin":
-            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
+            openssl_libs = glob.glob(
+                os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*")
+            )
             openssl_libs = [l for l in openssl_libs if os.path.islink(l) is False]
 
             python_openssl_libs = []
@@ -196,11 +202,13 @@ def patch_python_distribution(python_home: str) -> None:
                     subprocess.run(install_name_tool_change_args).check_returncode()
 
         elif platform.system() == "Linux":
-            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.so*"))
+            openssl_libs = glob.glob(
+                os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR, "lib*.so*")
+            )
 
             for lib_path in openssl_libs:
                 print(f"Copying {lib_path} to the python home")
-                shutil.copy(lib_path, os.path.join(python_home, "lib"))
+                shutil.copy(lib_path, os.path.join(python_home, LIB_DIR))
 
         elif platform.system() == "Windows":
             openssl_dlls = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
@@ -297,8 +305,12 @@ def test_python_distribution(python_home: str) -> None:
 
             # Specify the location of the debug python import lib (eg. python39_d.lib)
             python_include_dirs = os.path.join(tmp_python_home, "include")
-            python_lib = os.path.join(tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib")
-            my_env["CMAKE_ARGS"] = f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
+            python_lib = os.path.join(
+                tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib"
+            )
+            my_env["CMAKE_ARGS"] = (
+                f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
+            )
 
             opentimelineio_install_arg = python_interpreter_args + [
                 "-m",
@@ -424,6 +436,17 @@ def clean() -> None:
     subprocess.run(git_clean_command, cwd=SOURCE_DIR)
 
 
+def add_path_to_env_var(env, envvar: str, paths: list) -> None:
+    current_value = env.get(envvar, "")
+    for path in paths:
+        p = pathlib.Path(path).resolve()
+        if current_value:
+            current_value = f"{p.__str__()}{os.pathsep}{current_value}"
+        else:
+            current_value = p.__str__()
+    env[envvar] = current_value
+
+
 def configure() -> None:
     """
     Run the configure step of the build. It builds the makefile required to build Python with the path correctly set.
@@ -441,12 +464,18 @@ def configure() -> None:
         if OPENSSL_OUTPUT_DIR:
             configure_args.append(f"--with-openssl={OPENSSL_OUTPUT_DIR}")
 
+            if platform.system() == "Linux":
+                # This option prevent Python to build the _ssl module correctly on Darwin.
+                configure_args.append(
+                    f"--with-openssl-rpath={OPENSSL_OUTPUT_DIR}/{LIB_DIR}"
+                )
 
         if VARIANT == "Release":
             configure_args.append("--enable-optimizations")
 
         CPPFLAGS = []
         LD_LIBRARY_PATH = []
+        PKG_CONFIG_PATH = []
 
         if platform.system() == "Darwin":
             readline_prefix_proc = subprocess.run(
@@ -459,6 +488,11 @@ def configure() -> None:
             )
             tcl_prefix_proc.check_returncode()
 
+            python_tk_prefix_proc = subprocess.run(
+                ["brew", "--prefix", "python-tk"], capture_output=True
+            )
+            python_tk_prefix_proc.check_returncode()
+
             xz_prefix_proc = subprocess.run(
                 ["brew", "--prefix", "xz"], capture_output=True
             )
@@ -469,39 +503,71 @@ def configure() -> None:
             )
             sdk_prefix_proc.check_returncode()
 
-            readline_prefix = readline_prefix_proc.stdout.strip().decode("utf-8")
-            tcl_prefix = tcl_prefix_proc.stdout.strip().decode("utf-8")
-            xz_prefix = xz_prefix_proc.stdout.strip().decode("utf-8")
-            sdk_prefix = sdk_prefix_proc.stdout.strip().decode("utf-8")
+            readline_prefix = (
+                pathlib.Path(readline_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            tcl_prefix = (
+                pathlib.Path(tcl_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            xz_prefix = (
+                pathlib.Path(xz_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            sdk_prefix = (
+                pathlib.Path(sdk_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
+            python_tk_prefix = (
+                pathlib.Path(python_tk_prefix_proc.stdout.strip().decode("utf-8"))
+                .resolve()
+                .__str__()
+            )
 
             CPPFLAGS.append(f'-I{os.path.join(readline_prefix, "include")}')
             CPPFLAGS.append(f'-I{os.path.join(tcl_prefix, "include")}')
             CPPFLAGS.append(f'-I{os.path.join(xz_prefix, "include")}')
             CPPFLAGS.append(f'-I{os.path.join(sdk_prefix, "usr", "include")}')
+            CPPFLAGS.append(f'-I{os.path.join(python_tk_prefix, "include")}')
 
             LD_LIBRARY_PATH.append(os.path.join(readline_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(tcl_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(xz_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(sdk_prefix, "usr", "lib"))
+            LD_LIBRARY_PATH.append(os.path.join(python_tk_prefix, "lib"))
+
+            PKG_CONFIG_PATH.append(os.path.join(tcl_prefix, "lib", "pkgconfig"))
 
         LDFLAGS = [f"-L{d}" for d in LD_LIBRARY_PATH]
 
-        configure_args.append(f'CPPFLAGS={" ".join(CPPFLAGS)}')
-        configure_args.append(f'LDFLAGS={" ".join(LDFLAGS)}')
+        if OPENSSL_OUTPUT_DIR:
+            if platform.system() == "Darwin":
+                configure_args.append(
+                    f"LC_RPATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}"
+                )
+                configure_args.append(f'LDFLAGS={" ".join(LDFLAGS)}')
+                configure_args.append(f'CPPFLAGS={" ".join(CPPFLAGS)}')
+                configure_args.append(
+                    f"DYLD_LIBRARY_PATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}"
+                )
+            else:
+                # Linux (NOT Windows was checked before)
+                configure_args.append(f"LDFLAGS=-L{OPENSSL_OUTPUT_DIR}/{LIB_DIR}")
+                configure_args.append(f"CPPFLAGS=-I{OPENSSL_OUTPUT_DIR}/include")
 
-        if platform.system() == "Linux":
-            configure_args.append(f'LD_LIBRARY_PATH={":".join(LD_LIBRARY_PATH)}')
+        subprocess_env = {**os.environ}
+        if platform.system() == "Darwin":
+            add_path_to_env_var(subprocess_env, "PKG_CONFIG_PATH", PKG_CONFIG_PATH)
 
         print(f"Executing {configure_args} from {SOURCE_DIR}")
 
-        subprocess_env = {**os.environ}
-        if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
-
         subprocess.run(
-            configure_args,
-            cwd=SOURCE_DIR,
-            env=subprocess_env,
+            configure_args, cwd=SOURCE_DIR, env=subprocess_env
         ).check_returncode()
 
         makefile_path = os.path.join(SOURCE_DIR, "Makefile")
@@ -565,7 +631,6 @@ def build() -> None:
         if OPENSSL_OUTPUT_DIR:
             subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
 
-
         subprocess.run(
             build_args,
             cwd=SOURCE_DIR,
@@ -577,7 +642,7 @@ def build() -> None:
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
         if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)
 
         subprocess.run(
             make_args,
@@ -609,15 +674,34 @@ def install() -> None:
         dst_dir = os.path.join(OUTPUT_DIR, "lib")
         shutil.copytree(src_dir, dst_dir)
 
-        # libs - required by pyside2
-        dst_dir = os.path.join(OUTPUT_DIR, "libs")
-        os.mkdir(dst_dir)
-        python_libs = glob.glob(
-            os.path.join(SOURCE_DIR, "PCBuild", "amd64", "python*.lib")
-        )
-        if python_libs:
-            for python_lib in python_libs:
-                shutil.copy(python_lib, dst_dir)
+        install_args = [
+            python_executable,
+            os.path.join(SOURCE_DIR, "PC", "layout", "main.py"),
+            "-vv",
+            "--source",
+            SOURCE_DIR,
+            "--build",
+            build_path,
+            "--copy",
+            OUTPUT_DIR,
+            "--temp",
+            os.path.join(parent, "temp"),
+            "--include-dev",
+            "--include-symbols",
+            "--include-tcltk",
+            "--include-tests",
+            "--include-venv",
+            "--flat-dlls",
+        ]
+
+        if VARIANT == "Debug":
+            install_args.append("--debug")
+
+        subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()
+
+        dst_dir = os.path.join(OUTPUT_DIR, "bin")
+        libs_dir = os.path.join(OUTPUT_DIR, "libs")
+        os.makedirs(dst_dir, exist_ok=True)
 
         # bin
         src_dir = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
@@ -632,13 +716,47 @@ def install() -> None:
         dst_file = os.path.join(dst_dir, "python3.exe")
         shutil.copyfile(src_file, dst_file)
 
+        # Move files under root directory into the bin folder.
+        for filename in os.listdir(os.path.join(OUTPUT_DIR)):
+            file_path = os.path.join(OUTPUT_DIR, filename)
+            if os.path.isfile(file_path):
+                shutil.move(file_path, os.path.join(dst_dir, filename))
+
+        # Manually move python3.lib because the script provided do not copy it.
+        python3_lib = "python3.lib"
+        python3xx_lib = f"python{PYTHON_VERSION}.lib"
+
+        if VARIANT == "Debug":
+            python3_lib = "python3_d.lib"
+            python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
+
+        shutil.copy(
+            os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib)
+        )
+        shutil.copy(
+            os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib)
+        )
+        shutil.copy(
+            os.path.join(build_path, python3xx_lib),
+            os.path.join(dst_dir, python3xx_lib),
+        )
+
+        # Tcl and Tk DLL are not copied by the main.py script in Debug.
+        # Assuming that Tcl and Tk are not built in debug.
+        # Manually copy the DLL.
+        if VARIANT == "Debug":
+            tcl_dll = os.path.join(build_path, "tcl86t.dll")
+            tk_dll = os.path.join(build_path, "tk86t.dll")
+            shutil.copyfile(tcl_dll, os.path.join(dst_dir, "tcl86t.dll"))
+            shutil.copyfile(tk_dll, os.path.join(dst_dir, "tk86t.dll"))
+
     else:
         make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
         if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)
         subprocess.run(
             make_args,
             cwd=SOURCE_DIR,
@@ -673,6 +791,8 @@ if __name__ == "__main__":
     parser.add_argument("--variant", dest="variant", type=str, required=True)
     parser.add_argument("--arch", dest="arch", type=str, required=False, default="")
 
+    parser.add_argument("--vfx_platform", dest="vfx_platform", type=int, required=True)
+
     parser.add_argument(
         "--opentimelineio-source-dir",
         dest="otio_source_dir",
@@ -683,7 +803,13 @@ if __name__ == "__main__":
 
     if platform.system() == "Windows":
         # Major and minor version of Python without dots. E.g. 3.10.3 -> 310
-        parser.add_argument("--python-version", dest="python_version", type=str, required=True, default="")
+        parser.add_argument(
+            "--python-version",
+            dest="python_version",
+            type=str,
+            required=True,
+            default="",
+        )
 
     parser.set_defaults(clean=False, configure=False, build=False, install=False)
 
@@ -696,6 +822,17 @@ if __name__ == "__main__":
     VARIANT = args.variant
     ARCH = args.arch
     OPENTIMELINEIO_SOURCE_DIR = args.otio_source_dir
+    VFX_PLATFORM = args.vfx_platform
+
+    if platform.system() == "Darwin":
+        LIB_DIR = "lib"
+    else:
+        # Assuming Linux because that variable is not used for Windows.
+        # TODO: Note: This might not be right on Debian based platform.
+        if VFX_PLATFORM == 2023:
+            LIB_DIR = "lib"
+        elif VFX_PLATFORM == 2024:
+            LIB_DIR = "lib64"
 
     if platform.system() == "Windows":
         PYTHON_VERSION = args.python_version

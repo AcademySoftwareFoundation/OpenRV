@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-
 SET(_python3_target
     "RV_DEPS_PYTHON3"
 )
@@ -13,11 +12,7 @@ SET(_opentimelineio_target
     "RV_DEPS_OPENTIMELINEIO"
 )
 
-RV_VFX_SET_VARIABLE(
-  _pyside_target
-  CY2023 "RV_DEPS_PYSIDE2"
-  CY2024 "RV_DEPS_PYSIDE6"
-)
+RV_VFX_SET_VARIABLE(_pyside_target CY2023 "RV_DEPS_PYSIDE2" CY2024 "RV_DEPS_PYSIDE6")
 
 SET(PYTHON_VERSION_MAJOR
     3
@@ -42,11 +37,7 @@ SET(_opentimelineio_version
     "0.16.0"
 )
 
-RV_VFX_SET_VARIABLE(
-  _pyside_version
-  CY2023 "5.15.10"
-  CY2024 "6.5.3"
-)
+RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.10" CY2024 "6.5.3")
 
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
@@ -62,15 +53,13 @@ SET(_opentimelineio_git_tag
 
 RV_VFX_SET_VARIABLE(
   _pyside_archive_url
-  CY2023 "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside_version}-src/pyside-setup-opensource-src-${_pyside_version}.zip"
-  CY2024 "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside_version}-src/pyside-setup-everywhere-src-${_pyside_version}.zip"
+  CY2023
+  "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside_version}-src/pyside-setup-opensource-src-${_pyside_version}.zip"
+  CY2024
+  "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside_version}-src/pyside-setup-everywhere-src-${_pyside_version}.zip"
 )
 
-RV_VFX_SET_VARIABLE(
-  _pyside_download_hash
-  CY2023 "87841aaced763b6b52e9b549e31a493f"
-  CY2024 "515d3249c6e743219ff0d7dd25b8c8d8"
-)
+RV_VFX_SET_VARIABLE(_pyside_download_hash CY2023 "87841aaced763b6b52e9b549e31a493f" CY2024 "515d3249c6e743219ff0d7dd25b8c8d8")
 
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/install
@@ -118,6 +107,11 @@ LIST(APPEND _python3_make_command "--output-dir")
 LIST(APPEND _python3_make_command ${_install_dir})
 LIST(APPEND _python3_make_command "--temp-dir")
 LIST(APPEND _python3_make_command ${_build_dir})
+
+LIST(APPEND _python3_make_command "--vfx_platform")
+RV_VFX_SET_VARIABLE(_vfx_platform_ CY2023 "2023" CY2024 "2024")
+LIST(APPEND _python3_make_command ${_vfx_platform_})
+
 IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _python3_make_command "--openssl-dir")
   LIST(APPEND _python3_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
@@ -129,10 +123,7 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
 
-
-# TODO_QT: Maybe we could use something like NOT CY2023
-#          since after 2023, it is Qt6
-# TODO_QT: Below code could be simplified, but for now it is faster to test.
+# TODO_QT: Maybe we could use something like NOT CY2023 since after 2023, it is Qt6 TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_pyside_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
@@ -163,10 +154,10 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   LIST(APPEND _pyside_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   SET(_pyside_make_command_script
-    "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
+      "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
   )
   SET(_pyside_make_command
-    python3 "${_pyside_make_command_script}"
+      python3 "${_pyside_make_command_script}"
   )
 
   LIST(APPEND _pyside_make_command "--variant")
@@ -265,22 +256,6 @@ SET(_requirements_install_command
     "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
 )
 
-IF(RV_TARGET_WINDOWS)
-  SET(_patch_python3_11_command
-      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.openssl.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.python.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.get_externals.bat.patch"
-  )
-
-  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python3_11_command}")
-  # Split the command into a semi-colon separated list.
-  SEPARATE_ARGUMENTS(_patch_command)
-  STRING(
-    REGEX
-    REPLACE ";+" ";" _patch_command "${_patch_command}"
-  )
-ENDIF()
-
 EXTERNALPROJECT_ADD(
   ${_python3_target}
   DOWNLOAD_NAME ${_python3_target}_${_python3_version}.zip
@@ -291,7 +266,6 @@ EXTERNALPROJECT_ADD(
   URL ${_python3_download_url}
   URL_MD5 ${_python3_download_hash}
   DEPENDS OpenSSL::Crypto OpenSSL::SSL
-  PATCH_COMMAND "${_patch_command}"
   CONFIGURE_COMMAND ${_python3_make_command} --configure
   BUILD_COMMAND ${_python3_make_command} --build
   INSTALL_COMMAND ${_python3_make_command} --install
@@ -330,10 +304,7 @@ SET(${_pyside_target}-build-flag
     ${_install_dir}/${_pyside_target}-build-flag
 )
 
-
-# TODO_QT: Maybe we could use something like NOT CY2023
-#          since after 2023, it is Qt6
-# TODO_QT: Below code could be simplified, but for now it is faster to test.
+# TODO_QT: Maybe we could use something like NOT CY2023 since after 2023, it is Qt6 TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide2 using ${_pyside_make_command_script}"
@@ -347,7 +318,9 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
     USES_TERMINAL
   )
 
-  SET(_build_flag_depends ${${_pyside_target}-build-flag})
+  SET(_build_flag_depends
+      ${${_pyside_target}-build-flag}
+  )
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide6 using ${_pyside_make_command_script}"
@@ -358,7 +331,9 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
     USES_TERMINAL
   )
 
-  SET(_build_flag_depends ${${_pyside_target}-build-flag})
+  SET(_build_flag_depends
+      ${${_pyside_target}-build-flag}
+  )
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)

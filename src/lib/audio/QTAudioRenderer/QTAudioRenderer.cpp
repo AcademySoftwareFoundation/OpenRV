@@ -1253,7 +1253,18 @@ QTAudioOutput::setAudioOutputBufferSize()
         // This is a temporary mechanism that will unblock our clients
         // without introducing an RV preference that would have polluted the RV
         // preferences unnecessarily.
+
+#if defined( RV_VFX_CY2023 )
         const bool audioDeviceIsWASAPI = m_device.realm() == "wasapi";
+#else
+        // Device id may contain backend information (e.g. wasapi or waveout for WinMM).
+        const QString deviceId = QString::fromUtf8(m_device.id());
+        // Description may contain useful information.
+        const QString deviceName = m_device.description();
+        const bool audioDeviceIsWASAPI = deviceId.contains("wasapi", Qt::CaseInsensitive) ||
+                                         deviceName.contains("wasapi", Qt::CaseInsensitive);
+#endif
+
         if (audioDeviceIsWASAPI && evApplyWasapiFix.getValue())
         {
             setBufferSize(calcAudioBufferSize(m_format.channelCount(),
