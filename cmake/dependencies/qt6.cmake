@@ -16,7 +16,7 @@ IF(NOT RV_DEPS_QT6_LOCATION
 )
   MESSAGE(
     FATAL_ERROR
-      "Unable to build without a RV_DEPS_QT6_LOCATION. It is required to provide a working Qt 5.15 root path to build. Example: cmake .. -DRV_DEPS_QT6_LOCATION=/Users/rv/Qt/6.5.3/clang_64"
+      "Unable to build without a RV_DEPS_QT6_LOCATION. It is required to provide a working Qt 5.15 root path to build. Example: cmake .. -DRV_DEPS_QT6_LOCATION=/Users/rv/Qt/5.15.11/clang_64"
   )
 ENDIF()
 
