@@ -23,6 +23,7 @@ SOURCE_DIR = ""
 OUTPUT_DIR = ""
 ARCH = ""
 PERL_ROOT = ""
+LIB_DIR = ""
 
 
 def get_openssl_args(root) -> List[str]:
@@ -134,10 +135,16 @@ def test_openssl_distribution() -> None:
 
         openssl_bin = get_openssl_args(tmp_openssl_dir)
 
+        subprocess_env = os.environ.copy()
+        subprocess_env.update(
+            {"LD_LIBRARY_PATH": os.path.join(tmp_openssl_dir, LIB_DIR)}
+        )
+
         print(f"Executing {openssl_bin}")
         subprocess.run(
             openssl_bin,
             input=b"exit\n",
+            env=subprocess_env,
         ).check_returncode()
     finally:
         print(f"Moving {tmp_openssl_dir} to {OUTPUT_DIR}")
@@ -238,6 +245,8 @@ if __name__ == "__main__":
         "--perlroot", dest="perlroot", type=str, required=False, default=""
     )
 
+    parser.add_argument("--vfx_platform", dest="vfx_platform", type=int, required=True)
+
     parser.set_defaults(clean=False, configure=False, build=False, install=False)
 
     args = parser.parse_args()
@@ -247,6 +256,17 @@ if __name__ == "__main__":
     OUTPUT_DIR = args.output
     ARCH = args.arch
     PERL_ROOT = args.perlroot
+    VFX_PLATFORM = args.vfx_platform
+
+    if platform.system() == "Darwin":
+        LIB_DIR = "lib"
+    else:
+        # Assuming Linux because that variable is not used for Windows.
+        # TODO: Note: This might not be right on Debian based platform.
+        if VFX_PLATFORM == 2023:
+            LIB_DIR = "lib"
+        elif VFX_PLATFORM == 2024:
+            LIB_DIR = "lib64"
 
     if args.clean:
         clean()
