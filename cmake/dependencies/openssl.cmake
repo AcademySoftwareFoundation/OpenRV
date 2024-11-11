@@ -8,7 +8,11 @@ SET(_target
     "RV_DEPS_OPENSSL"
 )
 
-IF(RV_TARGET_IS_RHEL8)
+IF(RV_TARGET_IS_RHEL8
+   AND RV_VFX_PLATFORM STREQUAL CY2023
+)
+  # VFX2023: Rocky Linux 8
+
   FIND_PACKAGE(OpenSSL 1.1.1 REQUIRED)
 
   SET(RV_DEPS_OPENSSL_VERSION
@@ -25,6 +29,8 @@ IF(RV_TARGET_IS_RHEL8)
   MESSAGE(STATUS "_lib_dir ${_lib_dir}")
 
 ELSE()
+  # VFX2023: Rocky Linux 9, Windows and MacOS VFX2024: Rocky Linux 8/9, Windows and MacOS
+
   SET(RV_DEPS_WIN_PERL_ROOT
       ""
       CACHE STRING "Path to Windows perl root"
@@ -34,10 +40,9 @@ ELSE()
       "RV_DEPS_OPENSSL"
   )
 
-  SET(_version
-      "1.1.1u"
-  )
-  string(REPLACE "." "_" _version_underscored ${_version})
+  RV_VFX_SET_VARIABLE(_version CY2023 "1.1.1u" CY2024 "3.4.0")
+
+  STRING(REPLACE "." "_" _version_underscored ${_version})
 
   IF(RV_TARGET_WINDOWS
      AND (NOT RV_DEPS_WIN_PERL_ROOT
@@ -61,19 +66,25 @@ ELSE()
   SET(_build_dir
       ${RV_DEPS_BASE_DIR}/${_target}/build
   )
-  SET(_lib_dir
-      ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib
-  )
+
+  IF(RHEL_VERBOSE)
+    RV_VFX_SET_VARIABLE(_lib_dir CY2023 "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib" CY2024 "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib64")
+  ELSE()
+    SET(_lib_dir
+        ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib
+    )
+  ENDIF()
+
   SET(_bin_dir
       ${RV_DEPS_OPENSSL_INSTALL_DIR}/bin
   )
 
-  SET(_download_url
-      "https://github.com/openssl/openssl/releases/download/OpenSSL_${_version_underscored}/openssl-${_version}.tar.gz"
+  RV_VFX_SET_VARIABLE(
+    _download_url CY2023 "https://github.com/openssl/openssl/releases/download/OpenSSL_${_version_underscored}/openssl-${_version}.tar.gz" CY2024
+    "https://github.com/openssl/openssl/releases/download/openssl-${_version}/openssl-${_version}.tar.gz"
   )
-  SET(_download_hash
-      "72f7ba7395f0f0652783ba1089aa0dcc"
-  )
+
+  RV_VFX_SET_VARIABLE(_download_hash CY2023 "72f7ba7395f0f0652783ba1089aa0dcc" CY2024 "34733f7be2d60ecd8bd9ddb796e182af")
 
   SET(_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_openssl.py"
@@ -86,59 +97,65 @@ ELSE()
   LIST(APPEND _make_command ${_source_dir})
   LIST(APPEND _make_command "--output-dir")
   LIST(APPEND _make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
+
+  LIST(APPEND _make_command "--vfx_platform")
+  RV_VFX_SET_VARIABLE(_vfx_platform_ CY2023 "2023" CY2024 "2024")
+  LIST(APPEND _make_command ${_vfx_platform_})
+
   IF(RV_TARGET_WINDOWS)
     LIST(APPEND _make_command "--perlroot")
     LIST(APPEND _make_command ${RV_DEPS_WIN_PERL_ROOT})
   ENDIF()
 
   IF(APPLE)
-    # This is needed because if Rosetta is used to compile for x86_64 from ARM64,
-    # openssl build system detects it as "linux-x86_64" and it causes issues.
+    # This is needed because if Rosetta is used to compile for x86_64 from ARM64, openssl build system detects it as "linux-x86_64" and it causes issues.
 
     IF(RV_TARGET_APPLE_X86_64)
-      SET(__openssl_arch__ x86_64)
+      SET(__openssl_arch__
+          x86_64
+      )
     ELSEIF(RV_TARGET_APPLE_ARM64)
-      SET(__openssl_arch__ arm64)
+      SET(__openssl_arch__
+          arm64
+      )
     ENDIF()
 
     LIST(APPEND _make_command --arch=-${__openssl_arch__})
   ENDIF()
-  
-  # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1`
-  # and `libssl.so.1.1`.
 
-  # On Windows build with MSVC or using MingW, shared libraries are named
-  # `libcrypto-1_1.dll` and `libssl-1_1.dll` for 32-bit Windows,
-  # `libcrypto-1_1-x64.dll` and `libssl-1_1-x64.dll` for 64-bit x86_64 Windows,
-  # and `libcrypto-1_1-ia64.dll` and `libssl-1_1-ia64.dll` for IA64 Windows.
-  # With MSVC, the import libraries are named `libcrypto.lib` and `libssl.lib`,
-  # while with MingW, they are named `libcrypto.dll.a` and `libssl.dll.a`.
+  # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1` and `libssl.so.1.1`.
+
+  # On Windows build with MSVC or using MingW, shared libraries are named `libcrypto-1_1.dll` and `libssl-1_1.dll` for 32-bit Windows, `libcrypto-1_1-x64.dll`
+  # and `libssl-1_1-x64.dll` for 64-bit x86_64 Windows, and `libcrypto-1_1-ia64.dll` and `libssl-1_1-ia64.dll` for IA64 Windows. With MSVC, the import libraries
+  # are named `libcrypto.lib` and `libssl.lib`, while with MingW, they are named `libcrypto.dll.a` and `libssl.dll.a`.
 
   # Ref: https://github.com/openssl/openssl/blob/398011848468c7e8e481b295f7904afc30934217/INSTALL.md?plain=1#L1847-L1858
 
+  RV_VFX_SET_VARIABLE(_dot_version CY2023 ".1.1" CY2024 ".3")
+  RV_VFX_SET_VARIABLE(_underscore_version CY2023 "1_1" CY2024 "3")
+
   IF(RV_TARGET_LINUX)
     SET(_crypto_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
+        ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}${_dot_version}
     )
 
     SET(_ssl_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}.1.1
+        ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}${_dot_version}
     )
   ELSEIF(RV_TARGET_WINDOWS)
-    # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64
-    # when OpenSSL is build with MSVC.
+    # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64 when OpenSSL is build with MSVC.
     SET(_crypto_lib_name
-      libcrypto-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libcrypto-${_underscore_version}-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_ssl_lib_name
-      libssl-1_1-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
+        libssl-${_underscore_version}-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   ELSE()
     SET(_crypto_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}crypto.1.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${_dot_version}${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
     SET(_ssl_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}ssl.1.1${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${_dot_version}${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   ENDIF()
 
