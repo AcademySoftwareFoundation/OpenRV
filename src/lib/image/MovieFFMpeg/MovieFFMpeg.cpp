@@ -1331,9 +1331,8 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
     // offset by the given positive value.
     //
 
-    m_formatStartFrame = max(int64_t(0), int64_t(0.49 + av_q2d(rate) *
-        double(m_avFormatContext->start_time) / double(AV_TIME_BASE)));
-    int64_t firstFrame = max(int64_t(m_formatStartFrame), int64_t(1));
+    int64_t firstFrame = std::max(static_cast<int64_t>(0), static_cast<int64_t>(0.49 + av_q2d(rate) *
+        static_cast<double>(m_avFormatContext->start_time) / static_cast<double>(AV_TIME_BASE)));
 
     for (int i = 0; i < m_avFormatContext->nb_streams; i++)
     {
