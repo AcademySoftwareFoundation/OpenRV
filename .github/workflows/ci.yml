@@ -272,7 +272,6 @@ jobs:
           sudo rm -rf /Applications/Xcode_15.3.app
           sudo rm -rf /Applications/Xcode_15.2.app
           sudo rm -rf /Applications/Xcode_15.1.app
-          sudo rm -rf /Applications/Xcode_15.0.1.app
           sudo rm -rf /Users/runner/Library/Android
 
       - name: Display disk space
@@ -328,7 +327,7 @@ jobs:
           qt-version: "5.15.15"
           python3-version: "3.11.9"
           python2-version: "2.7.18"
-          xcode-version: "14.3.1"
+          xcode-version: "15.0"
           qt-output: "deps"
 
       - name: Activate Python ${{ matrix.python-version }} if Qt was taken from cache
@@ -343,7 +342,8 @@ jobs:
   
       - name: Install Homebrew dependencies
         run: |
-          brew install --quiet --formula cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew icu4c
+          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+          brew install --formula icu4c@76
 
       - name: Set QT_HOME
         if: matrix.arch-type == 'x86_64'
