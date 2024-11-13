@@ -77,9 +77,13 @@ If you need to, RV can load sources asynchronously, also known as progressive so
 
 **Use one of these methods to enable asynchronous source loading:**
 
-- Set `setProgressiveSourceLoading = true`
 - With the command line argument: `-progressiveSourceLoading 1`
 - With the environment variable: `RV_PROGRESSIVE_SOURCE_LOADING`
+- Execute the following command in an RV Python package:
+```python
+from rv import commands as rvc
+rvc.setProgressiveSourceLoading(True)
+```
 
 > Note: `setProgressiveSourceLoading` affects the behaviour of the following scripting commands:
 >
