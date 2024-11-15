@@ -3593,6 +3593,10 @@ RvPreferences::videoFormatChanged(int v)
         settings.setValue("videoFormat", v);
         settings.endGroup();
 
+        // The user has set a new video format which overrides the video format
+        // specified on the command line if any
+        Rv::Options::sharedOptions().presentFormat=nullptr;
+
         updateVideoDataFormat(d);
         updateVideoSync(d);
         updateVideoSyncSource(d);
@@ -3650,6 +3654,10 @@ RvPreferences::videoDataFormatChanged(int v)
         settings.beginGroup(QString::fromUtf8(str.str().c_str()));
         settings.setValue("dataFormat", v);
         settings.endGroup();
+
+        // The user has set a new video data format which overrides the video 
+        // data format specified on the command line if any
+        Rv::Options::sharedOptions().presentData=nullptr;
 
         updateVideoSync(d);
         updateVideoSyncSource(d);
@@ -3711,6 +3719,9 @@ RvPreferences::videoAudioCheckBoxChanged(int v)
         settings.beginGroup(QString::fromUtf8(str.str().c_str()));
         settings.setValue("useAsAudioDevice", checked);
         settings.endGroup();
+
+        // This user action overrides the presentAudio command line option if any
+        Rv::Options::sharedOptions().presentAudio=-1;
     }
 }
 
