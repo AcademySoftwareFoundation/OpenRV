@@ -61,7 +61,7 @@ jobs:
             build-type: "Release"
             qt-version: "5.15.2"
             cmake-version: "3.29.8"
-            python-version: "3.11.8"
+            python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
@@ -71,7 +71,7 @@ jobs:
             build-type: "Release"
             qt-version: "5.15.2"
             cmake-version: "3.29.8"
-            python-version: "3.11.8"
+            python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "crb"
           - os: "ubuntu-latest"
@@ -81,7 +81,7 @@ jobs:
             build-type: "Debug"
             qt-version: "5.15.2"
             cmake-version: "3.29.8"
-            python-version: "3.11.8"
+            python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
@@ -91,7 +91,7 @@ jobs:
             build-type: "Debug"
             qt-version: "5.15.2"
             cmake-version: "3.29.8"
-            python-version: "3.11.8"
+            python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "crb"
     steps:
@@ -236,25 +236,13 @@ jobs:
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "5.15.2"
-            python-version: "3.11"
-            vfx-platform: "CY2023"
-          - os: "macos-14"
-            arch-type: "arm64"
-            build-type: "Release"
-            qt-version: "5.15.15"
-            python-version: "3.11"
+            python-version: "3.10"
             vfx-platform: "CY2023"
           - os: "macos-13"
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "5.15.2"
-            python-version: "3.11"
-            vfx-platform: "CY2023"
-          - os: "macos-14"
-            arch-type: "arm64"
-            build-type: "Debug"
-            qt-version: "5.15.15"
-            python-version: "3.11"
+            python-version: "3.10"
             vfx-platform: "CY2023"
     steps:
       - name: Check if it is a schedule job
@@ -320,19 +308,7 @@ jobs:
           unzip file.zip
           cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64/mkspecs/features/toolchain.prf
 
-      - name: Build Qt
-        if: matrix.arch-type == 'arm64'
-        id: build-qt5-for-arm64
-        uses: ./.github/actions/build-qt5-for-arm64
-        with:
-          qt-version: "5.15.15"
-          python3-version: "3.11.9"
-          python2-version: "2.7.18"
-          xcode-version: "14.3.1"
-          qt-output: "deps"
-
-      - name: Activate Python ${{ matrix.python-version }} if Qt was taken from cache
-        if: steps.build-qt5-for-arm64.outputs.qt-cache-hit == 'true'
+      - name: Activate Python ${{ matrix.python-version }}
         uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
         with:
           python-version: '${{ matrix.python-version }}'
@@ -417,7 +393,7 @@ jobs:
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "5.15.2"
-            python-version: "3.11"
+            python-version: "3.10"
             cmake-version: "3.29.8"
             vfx-platform: "CY2023"
             msvc-component: "14.40.17.10.x86.x64"
@@ -426,7 +402,7 @@ jobs:
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "5.15.2"
-            python-version: "3.11"
+            python-version: "3.10"
             cmake-version: "3.29.8"
             vfx-platform: "CY2023"
             msvc-component: "14.40.17.10.x86.x64"
