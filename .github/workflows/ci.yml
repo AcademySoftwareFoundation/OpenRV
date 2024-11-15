@@ -2,20 +2,11 @@ name: OpenRV
 
 on:
   push:
-    # Skip jobs when only those files are changed.
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - 'Notice.txt'
-      - 'rvcmds.sh'
+    branches:
+      # This will run when PR is merged or direct pushes to main.
+      - main
 
-  pull_request:
-    # Skip jobs when only those files are changed.
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - 'Notice.txt'
-      - 'rvcmds.sh'
+  pull_request: # This handles PR creation and subsequent commits.
 
   schedule:
     # Midnight build every day
