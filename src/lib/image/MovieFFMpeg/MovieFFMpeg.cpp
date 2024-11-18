@@ -52,7 +52,10 @@ extern "C" {
 //#include <libavcodec/ass_split.h>
 }
 
-static ENVVAR_BOOL( evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false );
+namespace {
+    ENVVAR_BOOL( evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false );
+    ENVVAR_BOOL(evStartFrameAtOne, "RV_START_FRAME_AT_ONE", false);
+}
 
 namespace TwkMovie {
 
@@ -1330,9 +1333,13 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
     // format start time, then we have to assume that the source's start is
     // offset by the given positive value.
     //
-
+    
     int64_t firstFrame = std::max(static_cast<int64_t>(0), static_cast<int64_t>(0.49 + av_q2d(rate) *
         static_cast<double>(m_avFormatContext->start_time) / static_cast<double>(AV_TIME_BASE)));
+    if (evStartFrameAtOne.getValue())
+    {
+        firstFrame = max(int64_t(m_formatStartFrame), int64_t(1));
+    }
 
     for (int i = 0; i < m_avFormatContext->nb_streams; i++)
     {
