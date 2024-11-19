@@ -44,6 +44,7 @@ TARGET_LINK_LIBRARIES(
           stl_ext
           Boost::headers
           yaml_cpp
+          Qt5::Core
 )
 
 IF(RV_TARGET_DARWIN)
