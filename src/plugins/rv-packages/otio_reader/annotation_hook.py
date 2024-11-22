@@ -12,17 +12,20 @@ import opentimelineio as otio
 from rv import commands, extra_commands
 
 
-def hook_function(in_timeline, argument_map=None) -> None:
+def hook_function(
+    in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None
+) -> None:
+    """A hook for the annotation schema"""
     for layer in in_timeline.layers:
         if layer.name == "Paint":
-            if type(layer.layer_range) is otio._opentime.TimeRange:
-                range = layer.layer_range
+            if isinstance(layer.layer_range, otio._opentime.TimeRange):
+                time_range = layer.layer_range
             else:
-                range = otio.opentime.TimeRange(
+                time_range = otio.opentime.TimeRange(
                     layer.layer_range["start_time"], layer.layer_range["duration"]
                 )
 
-            relative_time = range.end_time_inclusive()
+            relative_time = time_range.end_time_inclusive()
             frame = relative_time.to_frames()
 
             source_node = argument_map.get("source_group")
@@ -41,7 +44,7 @@ def hook_function(in_timeline, argument_map=None) -> None:
             effectHook.add_rv_effect_props(
                 pen_component,
                 {
-                    "color": [float(x) for x in layer.rgba],
+                    "color": list(map(float, layer.rgba)),
                     "brush": layer.brush,
                     "debug": 1,
                     "join": 3,
@@ -89,13 +92,11 @@ def hook_function(in_timeline, argument_map=None) -> None:
 
             for point in layer.points:
                 points = commands.getFloatProperty(points_property)
-                if (
+                if not (
                     len(points) > 1
-                    and points[-1] == point.y * global_scale.y
-                    and points[-2] == point.x * global_scale.x
+                    or points[-1] == point.y * global_scale.y
+                    or points[-2] == point.x * global_scale.x
                 ):
-                    pass
-                else:
                     commands.insertFloatProperty(
                         points_property,
                         [point.x * global_scale.x, point.y * global_scale.y],
