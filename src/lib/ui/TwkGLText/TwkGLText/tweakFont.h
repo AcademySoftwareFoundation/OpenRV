@@ -5,12 +5,9 @@
 // 
 //******************************************************************************
 
-#ifndef __TWEAKFONT_H__
-#define __TWEAKFONT_H__
+#pragma once
 
 // Nedian Medium
 
 extern const unsigned char tweakFont[];
 const unsigned int tweakFontSize = 62376;
-
-#endif    // End #ifdef __TWEAKFONT_H__
