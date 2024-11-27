@@ -1693,7 +1693,7 @@ RvDocument::buildMenu()
 void
 RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
 {
-    purgeMenus();
+    //purgeMenus();
 
     if (!menu) 
     {
@@ -1742,11 +1742,23 @@ RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
     for (int i=0; i < menu->items().size(); i++)
     {
         const TwkApp::Menu::Item* item = menu->items()[i];
-
-        if (item->subMenu())
+        
+        if (item->subMenu())    
         {
             QString title = utf8(item->title());
 
+            // Overwrite the existing menu if it is already present in the QMenuBar.
+            for (QAction* action : mb()->actions())
+            {
+                QMenu* menu = action->menu();
+                if (menu && menu->title() ==  title)
+                {
+
+                    mb()->removeAction(menu->menuAction());
+                }
+            }
+            
+            QMenuBar* bar = mb();
             QMenu* menu = mb()->addMenu(title);
             //  rt.go();
             connect(menu, SIGNAL(aboutToShow()), this, SLOT(aboutToShowMenu()));
