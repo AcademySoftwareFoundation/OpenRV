@@ -463,7 +463,7 @@ jobs:
         # icu4c is needed for Qt UIC executable / AUTOUIC.
         # Might be to find another way to install icu4c if the icu4c recipe disappear.
         run: |
-          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
           brew install --formula icu4c@74
 
       - name: Set QT_HOME
