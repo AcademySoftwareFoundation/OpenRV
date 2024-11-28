@@ -33,17 +33,15 @@ IF(RV_FFMPEG_7)
   )
 ELSEIF(RV_FFMPEG_6)
   SET(_version
-      "n6.1.1"
+      "n6.1.2"
   )
 
   SET(_download_hash
-      "6dfc27fcb6da6f653c6ec025c2cd9b00"
+      "953b858e5be3ab66232bdbb90e42f50d"
   )
 ELSE()
-  # This shouldn't happen, but it could if there are changes the acceptable
-  # versions of FFmpeg in ffmpeg.cmake and this section is not
-  # updated accordingly.
-  message( FATAL_ERROR "The requested version of FFmpeg is not supported." )
+  # This shouldn't happen, but it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
+  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
 ENDIF()
 
 SET(_download_url
@@ -80,7 +78,6 @@ ELSE()
       ${_install_dir}/lib
   )
 ENDIF()
-
 
 IF(RV_FFMPEG_7)
   IF(RV_TARGET_DARWIN)
@@ -183,10 +180,8 @@ ELSEIF(RV_FFMPEG_6)
     )
   ENDIF()
 ELSE()
-  # This shouldn't happen. But it could if there are changes the acceptable
-  # versions of FFmpeg in ffmpeg.cmake and this section is not
-  # updated accordingly.
-  message( FATAL_ERROR "The requested version of FFmpeg is not supported." )
+  # This shouldn't happen. But it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
+  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
 ENDIF()
 
 SET(_ffmpeg_libs

@@ -4950,13 +4950,203 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
 
         RV_QSETTINGS;
         settings.beginGroup(QString::fromUtf8(str.str().c_str()));
-        settings.setValue("fixedLatency", xl);
-        settings.setValue("frameLatency", fl);
+        settings.setValue("videoFormat", v);
+        settings.endGroup();
+
+        // The user has set a new video format which overrides the video format
+        // specified on the command line if any
+        Rv::Options::sharedOptions().presentFormat=nullptr;
+
+        updateVideoDataFormat(d);
+        updateVideoSync(d);
+        updateVideoSyncSource(d);
+        updateVideoProfiles(d);
+    }
+}
+
+void 
+RvPreferences::video4KTransportChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        d->setVideo4KTransport(v);
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("video4KTransport", v);
+        settings.endGroup();
+
+        updateVideoProfiles(d);
+    }
+}
+
+void 
+RvPreferences::videoAudioFormatChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        d->setAudioFormat(v);
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("audioFormat", v);
         settings.endGroup();
     }
 
     void RvPreferences::fontChanged()
     {
+        d->setDataFormat(v);
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("dataFormat", v);
+        settings.endGroup();
+
+        // The user has set a new video data format which overrides the video 
+        // data format specified on the command line if any
+        Rv::Options::sharedOptions().presentData=nullptr;
+
+        updateVideoSync(d);
+        updateVideoSyncSource(d);
+        updateVideoProfiles(d);
+    }
+}
+
+void 
+RvPreferences::syncMethodChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        d->setSyncMode(v);
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("syncMode", v);
+        settings.endGroup();
+
+        updateVideoSyncSource(d);
+    }
+}
+
+void 
+RvPreferences::syncSourceChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        d->setSyncSource(v);
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("syncSource", v);
+        settings.endGroup();
+    }
+}
+
+void 
+RvPreferences::videoAudioCheckBoxChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        bool checked = v == Qt::Checked;
+
+        m_ui.useVideoLatencyCheckBox->setEnabled(!checked);
+        m_ui.configureVideoLatencyButton->setEnabled(!checked);
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("useAsAudioDevice", checked);
+        settings.endGroup();
+
+        // This user action overrides the presentAudio command line option if any
+        Rv::Options::sharedOptions().presentAudio=-1;
+    }
+}
+
+void 
+RvPreferences::videoSwapStereoEyesChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        bool checked = v == Qt::Checked;
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("swapStereoEyes", checked);
+        settings.endGroup();
+
+        d->setSwapStereoEyes(checked);
+    }
+}
+
+void 
+RvPreferences::videoUseLatencyCheckBoxChanged(int v)
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        bool checked = v == Qt::Checked;
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("useLatencyForAudio", checked);
+        settings.endGroup();
+    }
+}
+
+void 
+RvPreferences::videoAdditionalOptionsChanged()
+{
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
+
+        QString s = m_ui.additionalOptionsEdit->toPlainText();
+
+        RV_QSETTINGS;
+        settings.beginGroup(QString::fromUtf8(str.str().c_str()));
+        settings.setValue("additionalOptions", s);
+        settings.endGroup();
+    }
+}
+
+void
+RvPreferences::presentationCheckBoxChanged(int state)
+{
+    if (m_lockPresentCheck) return;
+
+    if (VideoDevice* d = currentVideoDevice())
+    {
+        const VideoModule* m = d->module();
+        ostringstream str;
+        str << m->name() << "/" << d->name();
         Options& opts = Options::sharedOptions();
         bool mustUpdateCSS = false;
 
