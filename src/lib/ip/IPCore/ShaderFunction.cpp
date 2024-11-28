@@ -1346,6 +1346,7 @@ Function::hashAuxNames()
     static regex funcDefRE(" ?\\w+ (\\w+) ?\\([^\\{]+\\{\\}$");
     static regex varRE("const .*?(\\w+) ?=");
     static regex varArrayRE("const .*?(\\w+)\\[\\w+] ?= ?\\w+\\[\\w+].*$");
+    static regex uniformSamplerRE("uniform sampler\\wD (\\w+).*$");
 
     for (size_t i = 0; i < lines.size(); i++)
     {
@@ -1354,7 +1355,8 @@ Function::hashAuxNames()
 
         if (regex_search(line, sm, funcDefRE) ||
             regex_search(line, sm, varRE) ||
-            regex_search(line, sm, varArrayRE))
+            regex_search(line, sm, varArrayRE) ||
+            regex_search(line, sm, uniformSamplerRE) )
         {
             if (sm[1] != m_name)
             {

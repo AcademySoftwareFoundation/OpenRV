@@ -484,7 +484,7 @@ def configure() -> None:
             readline_prefix_proc.check_returncode()
 
             tcl_prefix_proc = subprocess.run(
-                ["brew", "--prefix", "tcl-tk"], capture_output=True
+                ["brew", "--prefix", "tcl-tk@8"], capture_output=True
             )
             tcl_prefix_proc.check_returncode()
 
