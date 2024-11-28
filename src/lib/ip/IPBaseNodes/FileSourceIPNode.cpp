@@ -457,7 +457,54 @@ namespace IPCore
 
         if (!sharedMedia->movies.empty())
         {
-            for (size_t q = 0; q < info.views.size(); q++)
+          const FBInfo::ViewInfo& vinfo = info.viewInfos[vi];
+          const string& vname = vinfo.name;
+
+          if( m_viewNameSet.count( vname ) == 0 )
+          {
+            m_allViews.push_back( vname );
+            m_viewNameSet.insert( vname );
+          }
+        }
+      }
+    }
+
+    setHasVideo( hasVideo );
+    setHasAudio( evIgnoreAudio.getValue() ? false : hasAudio );
+    updateStereoViews( m_allViews, m_eyeViews );
+
+    if( hasAudio )
+    {
+      AudioConfiguration config( m_adevRate, m_adevLayout, m_adevSamples );
+      audioConfigure( config );
+    }
+
+    if( defaultOverrideFPS != 0 )
+    {
+      m_fps->front() = defaultOverrideFPS;
+    }
+  }
+
+  void FileSourceIPNode::addMedia( const SharedMediaPointer& sharedMedia,
+                                   const SharedMediaPointer& proxySharedMedia )
+  {
+    HOP_PROF_FUNC();
+
+    if( m_jobsCancelling )
+    {
+      // we are on the middle of a job cancellation
+      return;
+    }
+
+    // Dispatch to main thread only when using async loading.
+    // In sync mode, we do not want to dispatch the events, because that
+    // would postpones their execution and may lead to wrong behavior.
+    // e.g. propagateMediaChange() might occurs before those two.
+    if( m_workItemID )
+    {
+      addDispatchJob( Application::instance()->dispatchToMainThread(
+          [this, sharedMedia, proxySharedMedia]( Application::DispatchID dispatchID )
+          {
             {
                 const string& vname = info.views[q];
                 sharedMedia->views.insert(vname);
@@ -2994,7 +3041,73 @@ namespace IPCore
         if (cacheItemString == "")
             return false;
 
-        if (Component* c = component(cacheItemString))
+      mov = openProxyMovie( errMsg.str(), 0.0, filename, defaultFPS );
+
+      ostringstream str;
+      str << name() << ";;" << file << ";;" << mediaRepName();
+      TwkApp::GenericStringEvent event( "source-media-unavailable", graph(), str.str() );
+
+      // The following instructions can only be executed on the main thread.
+      // Dispatch to main thread only when using async loading.
+      if (!m_workItemID)
+      {
+        // We are not using async loading: we can safely execute the following instructions
+        setMediaActive( false );
+        graph()->sendEvent( event );
+      }
+      else
+      {
+        // We are using async loading: Dispatch to main thread
+        addDispatchJob( Application::instance()->dispatchToMainThread(
+            [this, event]( Application::DispatchID dispatchID )
+            {
+              {
+                LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
+
+                bool isCanceled =
+                    ( m_dispatchIDCancelRequestedSet.count( dispatchID ) >= 1 );
+                if( isCanceled )
+                {
+                  m_dispatchIDCancelRequestedSet.erase( dispatchID );
+                  return;
+                }
+              }
+
+              setMediaActive( false );
+              graph()->sendEvent( event );
+
+              {
+                LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
+                bool isCanceled =
+                    ( m_dispatchIDCancelRequestedSet.count( dispatchID ) >= 1 );
+                if( isCanceled )
+                {
+                  m_dispatchIDCancelRequestedSet.erase( dispatchID );
+                  return;
+                }
+              }
+
+              removeDispatchJob( dispatchID );
+            } ) );
+      }
+    }
+
+    SharedMediaPointer sharedMedia(
+        newSharedMedia( mov, true /*hasValidRange*/ ) );
+    addMedia( sharedMedia, proxySharedMedia );
+  }
+
+  string FileSourceIPNode::cacheHash( const string& filename,
+                                      const string& prefix )
+  {
+    string hashString;
+
+    const bool filepathIsURL = TwkUtil::pathIsURL( filename );
+    if( !filepathIsURL )
+    {
+      if(TwkUtil::fileExists(filename.c_str()))
+      {
+        try
         {
             const Components& innercomps = c->components();
 
