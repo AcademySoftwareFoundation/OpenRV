@@ -1,0 +1,20 @@
+---
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  google-explicit-constructor,
+  misc-*,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+FormatStyle: 'file'
+...
