@@ -1693,7 +1693,9 @@ RvDocument::buildMenu()
 void
 RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
 {
+#if defined( RV_VFX_CY2023 )
     purgeMenus();
+#endif
 
     if (!menu) 
     {
@@ -1711,7 +1713,11 @@ RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
 
 
 #if !defined(PLATFORM_DARWIN)
+#if defined( RV_VFX_CY2023 )
     if (!m_rvMenu || !workAroundActionLeak)
+#else
+    if (!m_rvMenu)
+#endif
     {
         m_rvMenu = mb()->addMenu(UI_APPLICATION_NAME);
         m_rvMenu->addAction(RvApp()->aboutAction());
@@ -1742,10 +1748,23 @@ RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
     for (int i=0; i < menu->items().size(); i++)
     {
         const TwkApp::Menu::Item* item = menu->items()[i];
-
-        if (item->subMenu())
+        
+        if (item->subMenu())    
         {
             QString title = utf8(item->title());
+
+#if defined( RV_VFX_CY2024 )
+            // Overwrite the existing menu if it is already present in the QMenuBar.
+            for (QAction* action : mb()->actions())
+            {
+                QMenu* menu = action->menu();
+                if (menu && menu->title() ==  title)
+                {
+
+                    mb()->removeAction(menu->menuAction());
+                }
+            }
+#endif       
 
             QMenu* menu = mb()->addMenu(title);
             //  rt.go();
