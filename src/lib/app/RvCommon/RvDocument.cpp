@@ -2549,7 +2549,14 @@ RvDocument::toggleFullscreen(bool firstTime)
         }
     }
 
-    void RvDocument::disconnectActions(const QList<QAction*>& actions)
+void
+RvDocument::mergeMenu(const TwkApp::Menu* menu, bool shortcuts)
+{
+#if defined( RV_VFX_CY2023 )
+    purgeMenus();
+#endif
+
+    if (!menu) 
     {
         for (int i = 0; i < actions.size(); ++i)
         {
@@ -2647,20 +2654,68 @@ RvDocument::toggleFullscreen(bool firstTime)
             shortcuts = false;
 
 #if !defined(PLATFORM_DARWIN)
-        if (!m_rvMenu || !workAroundActionLeak)
+#if defined( RV_VFX_CY2023 )
+    if (!m_rvMenu || !workAroundActionLeak)
+#else
+    if (!m_rvMenu)
+#endif
+    {
+        m_rvMenu = mb()->addMenu(UI_APPLICATION_NAME);
+        m_rvMenu->addAction(RvApp()->aboutAction());
+        m_rvMenu->addSeparator();
+        m_rvMenu->addAction(RvApp()->prefAction());
+        m_rvMenu->addSeparator();
+        if (RvApp()->networkAction()) m_rvMenu->addAction(RvApp()->networkAction());
+        m_rvMenu->addSeparator();
+        m_rvMenu->addAction(RvApp()->quitAction());
+        m_rvMenu->menuAction()->font().setBold(true);
+        m_rvMenu->setObjectName(UI_APPLICATION_NAME " Menu");
+    }
+#endif
+
+
+    if (m_mainPopup) m_mainPopup->clear();
+    else m_mainPopup = new QMenu(this);
+
+    m_mainPopup->setObjectName("Main Popup");
+
+#ifdef PLATFORM_DARWIN
+    QFont f = m_mainPopup->font();
+    f.setPointSize(12);
+    m_mainPopup->setFont(f);
+#endif
+
+    //  rt.init();
+    for (int i=0; i < menu->items().size(); i++)
+    {
+        const TwkApp::Menu::Item* item = menu->items()[i];
+        
+        if (item->subMenu())    
         {
-            m_rvMenu = mb()->addMenu(UI_APPLICATION_NAME);
-            m_rvMenu->addAction(RvApp()->aboutAction());
-            m_rvMenu->addSeparator();
-            m_rvMenu->addAction(RvApp()->prefAction());
-            m_rvMenu->addSeparator();
-            if (RvApp()->networkAction())
-                m_rvMenu->addAction(RvApp()->networkAction());
-            m_rvMenu->addSeparator();
-            m_rvMenu->addAction(RvApp()->quitAction());
-            m_rvMenu->menuAction()->font().setBold(true);
-            m_rvMenu->setObjectName(UI_APPLICATION_NAME " Menu");
-        }
+            QString title = utf8(item->title());
+
+#if defined( RV_VFX_CY2024 )
+            // Overwrite the existing menu if it is already present in the QMenuBar.
+            for (QAction* action : mb()->actions())
+            {
+                QMenu* menu = action->menu();
+                if (menu && menu->title() ==  title)
+                {
+
+                    mb()->removeAction(menu->menuAction());
+                }
+            }
+#endif       
+
+            QMenu* menu = mb()->addMenu(title);
+            //  rt.go();
+            connect(menu, SIGNAL(aboutToShow()), this, SLOT(aboutToShowMenu()));
+            //  rt.stop();
+            convert(menu, item->subMenu(), shortcuts);
+
+            QMenu* pmenu = m_mainPopup->addMenu(title);
+#ifdef PLATFORM_DARWIN
+            pmenu->setFont(f);
 #endif
 
         if (m_mainPopup)
