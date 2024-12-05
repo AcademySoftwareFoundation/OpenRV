@@ -57,6 +57,22 @@ Some of the RV build scripts requires extra python packages. They can be install
 python3 -m pip install -r requirements.txt
 ```
 
+## Install CMake
+
+You need CMake version 3.27+ to build RV. The dnf-installable version is not quite recent enough, you'll need to build and install CMake from source.
+
+```bash
+wget https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3.tar.gz
+tar -zxvf cmake-3.30.3.tar.gz
+cd cmake-3.30.3
+./bootstrap --parallel=32  # 32 or whatever your machine allows
+make -j 32  # 32 or whatever your machine allows
+sudo make install
+
+cmake --version  # confirm the version of your newly installed version of CMake
+cmake version3.30.3
+```
+
 ## Install Qt
 
 Download the last version of Qt 5.15.x that you can get using the online installer on the [Qt page](https://www.qt.io/download-open-source). During Qt Setup's Select Components phase, check the "Archive" box on the right side of the window then click on "Filter" to see Qt 5.15.x options. Logs, Android, iOS and WebAssembly are not required to build OpenRV. Make sure to note the destination of the Qt install, as you will have to set the `QT_HOME` environment variable to this location's build dir.
