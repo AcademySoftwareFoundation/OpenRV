@@ -6,6 +6,7 @@
 # *****************************************************************************
 
 
+import logging
 import effectHook
 import opentimelineio as otio
 from rv import commands, extra_commands
@@ -59,12 +60,19 @@ def hook_function(in_timeline, argument_map=None) -> None:
 
             global_scale = argument_map.get("global_scale")
             if global_scale is None:
-                first_source_node = commands.sourcesAtFrame(0)[0]
-                media_info = commands.sourceMediaInfo(first_source_node)
-                height = media_info["height"]
-                aspect_ratio = media_info["width"] / height
-                scale = aspect_ratio / 16
-                global_scale = otio.schema.V2d(scale, scale)
+                try:
+                    first_source_node = commands.sourcesAtFrame(0)[0]
+                    media_info = commands.sourceMediaInfo(first_source_node)
+                    height = media_info["height"]
+                    aspect_ratio = media_info["width"] / height
+                except Exception:
+                    logging.exception(
+                        "Unable to determine aspect ratio, using default value of 16:9"
+                    )
+                    aspect_ratio = 1920 / 1080
+                finally:
+                    scale = aspect_ratio / 16
+                    global_scale = otio.schema.V2d(scale, scale)
 
             points_property = f"{pen_component}.points"
             width_property = f"{pen_component}.width"
