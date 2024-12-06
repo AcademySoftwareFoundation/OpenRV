@@ -216,6 +216,12 @@ def build() -> None:
     if OPENSSL_OUTPUT_DIR:
         pyside_build_args.append(f"--openssl={os.path.join(OPENSSL_OUTPUT_DIR, 'bin')}")
 
+    if platform.system() == "Windows":
+        # Add the debug switch to match build type but only on Windows
+        # (on other platforms, PySide6 is built in release)
+        if VARIANT == "Debug":
+            pyside_build_args.append("--debug")
+
     print(f"Executing {pyside_build_args}")
     subprocess.run(pyside_build_args).check_returncode()
 
