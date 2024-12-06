@@ -48,7 +48,7 @@ python3 -m pip install -r requirements.txt
 
 ## Install CMake
 
-You need CMake version 3.24+ to build RV. The yum-installable version is not quite recent enough, you'll to build and install CMake from sources.
+You need CMake version 3.24+ to build RV. The yum-installable version is not quite recent enough, you'll need to build and install CMake from source.
 
 ```bash
 wget https://github.com/Kitware/CMake/releases/download/v3.24.0/cmake-3.24.0.tar.gz
