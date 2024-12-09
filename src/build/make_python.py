@@ -651,7 +651,75 @@ def build() -> None:
         ).check_returncode()
 
 
-def install() -> None:
+def install_python_vfx2023() -> None:
+    """
+    Run the install step of the build. It puts all the files inside of the output directory and make them ready to be
+    packaged.
+    """
+
+    if os.path.exists(OUTPUT_DIR):
+        shutil.rmtree(OUTPUT_DIR)
+
+    if platform.system() == "Windows":
+        # include
+        src_dir = os.path.join(SOURCE_DIR, "Include")
+        dst_dir = os.path.join(OUTPUT_DIR, "include")
+        shutil.copytree(src_dir, dst_dir)
+        src_file = os.path.join(SOURCE_DIR, "PC", "pyconfig.h")
+        dst_file = os.path.join(dst_dir, "pyconfig.h")
+        shutil.copyfile(src_file, dst_file)
+
+        # lib
+        src_dir = os.path.join(SOURCE_DIR, "Lib")
+        dst_dir = os.path.join(OUTPUT_DIR, "lib")
+        shutil.copytree(src_dir, dst_dir)
+
+        # libs - required by pyside2
+        dst_dir = os.path.join(OUTPUT_DIR, "libs")
+        os.mkdir(dst_dir)
+        python_libs = glob.glob(
+            os.path.join(SOURCE_DIR, "PCBuild", "amd64", "python*.lib")
+        )
+        if python_libs:
+            for python_lib in python_libs:
+                shutil.copy(python_lib, dst_dir)
+
+        # bin
+        src_dir = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
+        dst_dir = os.path.join(OUTPUT_DIR, "bin")
+        shutil.copytree(src_dir, dst_dir)
+        # Create a python3.exe file to mimic Mac+Linux
+        if VARIANT == "Debug":
+            src_python_exe = "python_d.exe"
+        else:
+            src_python_exe = "python.exe"
+        src_file = os.path.join(src_dir, src_python_exe)
+        dst_file = os.path.join(dst_dir, "python3.exe")
+        shutil.copyfile(src_file, dst_file)
+
+    else:
+        make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]
+
+        print(f"Executing {make_args} from {SOURCE_DIR}")
+        subprocess_env = {**os.environ}
+        if OPENSSL_OUTPUT_DIR:
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
+        subprocess.run(
+            make_args,
+            cwd=SOURCE_DIR,
+            env=subprocess_env,
+        ).check_returncode()
+
+    # Create the 'python' symlink
+    if platform.system() != "Windows":
+        python3_path = os.path.realpath(os.path.join(OUTPUT_DIR, "bin", "python3"))
+        python_path = os.path.join(os.path.dirname(python3_path), "python")
+        os.symlink(os.path.basename(python3_path), python_path)
+
+    patch_python_distribution(OUTPUT_DIR)
+    test_python_distribution(OUTPUT_DIR)
+
+def install_python_vfx2024() -> None:
     """
     Run the install step of the build. It puts all the files inside of the output directory and make them ready to be
     packaged.
@@ -683,24 +751,28 @@ def install() -> None:
             OUTPUT_DIR,
             "--temp",
             os.path.join(parent, "temp"),
+            "--preset-default",
             "--include-dev",
             "--include-symbols",
             "--include-tcltk",
             "--include-tests",
             "--include-venv",
-            "--flat-dlls",
         ]
 
         if VARIANT == "Debug":
             install_args.append("--debug")
 
-        subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()
+        print(f"Executing {install_args}")
 
-        dst_dir = os.path.join(OUTPUT_DIR, "bin")
-        libs_dir = os.path.join(OUTPUT_DIR, "libs")
-        os.makedirs(dst_dir, exist_ok=True)
+        subprocess.run(
+            install_args,
+            cwd=SOURCE_DIR
+        ).check_returncode()
 
         # bin
+        libs_dir = os.path.join(OUTPUT_DIR, "libs")
+        dst_dir = os.path.join(OUTPUT_DIR, "bin")
+
         # Create a python3.exe file to mimic Mac+Linux
         if VARIANT == "Debug":
             src_python_exe = "python_d.exe"
@@ -710,11 +782,13 @@ def install() -> None:
         src_file = os.path.join(OUTPUT_DIR, src_python_exe)
         dst_file = os.path.join(dst_dir, "python3.exe")
         print(f"Copy {src_file} to {dst_file}")
+
+        os.makedirs(dst_dir, exist_ok=True)
         shutil.copyfile(src_file, dst_file)
 
         # Move files under root directory into the bin folder.
         for filename in os.listdir(os.path.join(OUTPUT_DIR)):
-            file_path = os.path.join(OUTPUT_DIR, filename)
+            file_path = os.path.join(OUTPUT_DIR, filename)  
             if os.path.isfile(file_path):
                 shutil.move(file_path, os.path.join(dst_dir, filename))
 
@@ -726,16 +800,9 @@ def install() -> None:
             python3_lib = "python3_d.lib"
             python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
 
-        shutil.copy(
-            os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib)
-        )
-        shutil.copy(
-            os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib)
-        )
-        shutil.copy(
-            os.path.join(build_path, python3xx_lib),
-            os.path.join(dst_dir, python3xx_lib),
-        )
+        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib))
+        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib))
+        shutil.copy(os.path.join(build_path, python3xx_lib), os.path.join(dst_dir, python3xx_lib))
 
         # Tcl and Tk DLL are not copied by the main.py script in Debug.
         # Assuming that Tcl and Tk are not built in debug.
@@ -752,7 +819,7 @@ def install() -> None:
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
         if OPENSSL_OUTPUT_DIR:
-            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)
+            subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
         subprocess.run(
             make_args,
             cwd=SOURCE_DIR,
@@ -767,7 +834,6 @@ def install() -> None:
 
     patch_python_distribution(OUTPUT_DIR)
     test_python_distribution(OUTPUT_DIR)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -843,4 +909,9 @@ if __name__ == "__main__":
         build()
 
     if args.install:
-        install()
+        # The install functions has a lot of similiarity but I think it is better to have two differents 
+        # functions because it will be easier to drop the support for a VFX platform.
+        if VFX_PLATFORM == 2023:
+            install_python_vfx2023()
+        elif VFX_PLATFORM == 2024:
+            install_python_vfx2024()
