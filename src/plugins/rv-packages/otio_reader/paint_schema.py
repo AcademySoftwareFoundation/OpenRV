@@ -54,11 +54,11 @@ class Paint(otio.core.SerializableObject):
         self.ghost = ghost
 
     name = otio.core.serializable_field(
-        "name", required_type=str, doc=("Name: expects a string")
+        "name", required_type=str, doc=("name: expects a string")
     )
 
     _points = otio.core.serializable_field(
-        "points", required_type=list, doc=("Points: expects a list of point objects")
+        "points", required_type=list, doc=("points: expects a list of point objects")
     )
 
     @property
@@ -66,11 +66,11 @@ class Paint(otio.core.SerializableObject):
         return self._points
 
     @points.setter
-    def points(self, val: list) -> None:
+    def points(self, val: list):
         self._points = val
 
     _rgba = otio.core.serializable_field(
-        "rgba", required_type=list, doc=("RGBA: expects a list of four floats")
+        "rgba", required_type=list, doc=("rgba: expects a list of four floats")
     )
 
     @property
@@ -78,21 +78,21 @@ class Paint(otio.core.SerializableObject):
         return self._rgba
 
     @rgba.setter
-    def rgba(self, val: list) -> list:
+    def rgba(self, val: list) -> None:
         self._rgba = val
 
     type = otio.core.serializable_field(
-        "type", required_type=str, doc=("Type: expects a string")
+        "type", required_type=str, doc=("type: expects a string")
     )
 
     brush = otio.core.serializable_field(
-        "brush", required_type=str, doc=("Brush: expects a string")
+        "brush", required_type=str, doc=("brush: expects a string")
     )
 
     _layer_range = otio.core.serializable_field(
         "layer_range",
         required_type=otio.opentime.TimeRange,
-        doc=("Layer_range: expects a TimeRange object"),
+        doc=("layer_range: expects a TimeRange object"),
     )
 
     @property
@@ -100,15 +100,15 @@ class Paint(otio.core.SerializableObject):
         return self._layer_range
 
     @layer_range.setter
-    def layer_range(self, val) -> otio.opentime.TimeRange:
+    def layer_range(self, val):
         self._layer_range = val
 
     _hold = otio.core.serializable_field(
-        "hold", required_type=bool, doc=("Hold: expects either true or false")
+        "hold", required_type=bool, doc=("hold: expects either true or false")
     )
 
     _ghost = otio.core.serializable_field(
-        "ghost", required_type=bool, doc=("Ghost: expects either true or false")
+        "ghost", required_type=bool, doc=("ghost: expects either true or false")
     )
 
     def __str__(self) -> str:
