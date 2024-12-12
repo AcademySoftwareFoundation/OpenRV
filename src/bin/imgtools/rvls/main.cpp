@@ -19,6 +19,8 @@
 #include <IOproxy/IOproxy.h>
 #include <ImfThreading.h>
 #include <MovieFB/MovieFB.h>
+#include <MuTwkApp/MuInterface.h>
+#include <PyTwkApp/PyInterface.h>
 #include <TwkFB/TwkFBThreadPool.h>
 #include <MovieProcedural/MovieProcedural.h>
 #include <MovieProxy/MovieProxy.h>
@@ -675,6 +677,17 @@ int utf8Main(int argc, char** argv)
 
     TwkMovie::GenericIO::addPlugin(new MovieFBIO());
     TwkMovie::GenericIO::addPlugin(new MovieProceduralIO());
+
+    try
+    {
+        TwkApp::initMu(nullptr);
+        TwkApp::initPython();
+    }
+    catch (const std::exception &e)
+    {
+        cerr << "ERROR: during initialization: " << e.what() << '\n';
+        exit(-1);
+    }
 
     if (showFormats)
     {
