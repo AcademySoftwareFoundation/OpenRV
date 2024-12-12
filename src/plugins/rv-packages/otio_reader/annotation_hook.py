@@ -60,6 +60,9 @@ def hook_function(in_timeline, argument_map=None) -> None:
 
             global_scale = argument_map.get("global_scale")
             if global_scale is None:
+                logging.warning(
+                    "Unable to get the global scale, using the aspect ratio of the first media file"
+                )
                 try:
                     first_source_node = commands.sourcesAtFrame(0)[0]
                     media_info = commands.sourceMediaInfo(first_source_node)
