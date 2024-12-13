@@ -85,6 +85,7 @@ FILE(MAKE_DIRECTORY ${_include_dir})
 
 LIST(APPEND _configure_options "-Denable_parallel_mark=ON")
 LIST(APPEND _configure_options "-Denable_cplusplus=ON")
+LIST(APPEND _configure_options "-Denable_large_config=yes")
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND _configure_options "-DCMAKE_USE_WIN32_THREADS_INIT=1")
 ELSE()
