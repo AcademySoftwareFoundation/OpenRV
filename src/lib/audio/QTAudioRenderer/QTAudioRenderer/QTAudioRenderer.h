@@ -260,6 +260,10 @@ class QTAudioRenderer : public IPCore::AudioRenderer
     TwkAudio::Format convertToTwkAudioFormat(SampleFormat fmtType) const;
 #endif
 
+#if defined( RV_VFX_CY2024 )
+    QAudioFormat::SampleFormat convertToQtAudioFormat(TwkAudio::Format fmtType) const;
+#endif   
+
     void setSampleSizeAndType(Layout twkLayout,
                               Format twkFormat,
                               QAudioFormat &qformat) const;

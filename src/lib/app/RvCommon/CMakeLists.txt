@@ -91,6 +91,14 @@ ENDIF()
 FILE(GLOB _ui_sources ui/*.ui)
 
 IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  FILE(GLOB _ui_sources_extra ui/RvPreferences/Qt6/RvPreferences.ui)
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
+  FILE(GLOB _ui_sources_extra ui/RvPreferences/Qt5/RvPreferences.ui)
+ENDIF()
+
+LIST(APPEND _ui_sources ${_ui_sources_extra})
+
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
   # Use Qt6 connections syntax because it generates the wrong QObject::connect for RvConsoleWindow.ui. TODO_QT: Could remove the connections from the UI XML and
   # add them to RvConsoleWindow.cpp
   SET(ui_options
