@@ -48,8 +48,8 @@ def hook_function(
                     "brush": layer.brush,
                     "debug": 1,
                     "join": 3,
-                    "cap": 2,
-                    "splat": 1,
+                    "cap": 1,
+                    "splat": 0,
                     "mode": 0 if layer.type == "COLOR" else 1,
                 },
             )
@@ -91,16 +91,10 @@ def hook_function(
             global_width = 2 / 15  # 0.133333...
 
             for point in layer.points:
-                points = commands.getFloatProperty(points_property)
-                if not (
-                    len(points) > 1
-                    or points[-1] == point.y * global_scale.y
-                    or points[-2] == point.x * global_scale.x
-                ):
-                    commands.insertFloatProperty(
-                        points_property,
-                        [point.x * global_scale.x, point.y * global_scale.y],
-                    )
-                    commands.insertFloatProperty(
-                        width_property, [point.width * global_width]
-                    )
+                commands.insertFloatProperty(
+                    points_property,
+                    [point.x * global_scale.x, point.y * global_scale.y],
+                )
+                commands.insertFloatProperty(
+                    width_property, [point.width * global_width]
+                )
