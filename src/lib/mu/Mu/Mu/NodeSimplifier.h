@@ -4,41 +4,41 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/NodeVisitor.h>
 
-namespace Mu {
-class NodeAssembler;
-class Context;
-class Function;
-
-//
-//  class NodeSimplifier
-//
-//  Takes a node tree expression and applies various heuristics to do
-//  symbolic simplification.
-//
-
-class NodeSimplifier : protected NodeVisitor
+namespace Mu
 {
-public:
-    explicit NodeSimplifier(NodeAssembler*);
+    class NodeAssembler;
+    class Context;
+    class Function;
 
     //
-    //  This is the main entry point
+    //  class NodeSimplifier
+    //
+    //  Takes a node tree expression and applies various heuristics to do
+    //  symbolic simplification.
     //
 
-    Node* operator() (Node*);
+    class NodeSimplifier : protected NodeVisitor
+    {
+    public:
+        explicit NodeSimplifier(NodeAssembler*);
 
-protected:
-    virtual void    preOrderVisit(Node*,int depth);
+        //
+        //  This is the main entry point
+        //
 
-private:
-    NodeAssembler*  _as;
-    Context*        _context;
-    
-};
+        Node* operator()(Node*);
+
+    protected:
+        virtual void preOrderVisit(Node*, int depth);
+
+    private:
+        NodeAssembler* _as;
+        Context* _context;
+    };
 
 } // namespace Mu
 

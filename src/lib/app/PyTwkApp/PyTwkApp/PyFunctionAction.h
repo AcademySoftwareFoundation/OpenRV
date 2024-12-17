@@ -1,9 +1,9 @@
 //******************************************************************************
 // Copyright (c) 2011 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __PyTwkApp__PyFunctionAction__h__
 #define __PyTwkApp__PyFunctionAction__h__
@@ -13,30 +13,27 @@
 
 namespace TwkApp
 {
-  //
-  //  An action which holds a function object and executes on demand.
-  //
+    //
+    //  An action which holds a function object and executes on demand.
+    //
 
-  class PyFunctionAction : public Action
-  {
-   public:
-    PyFunctionAction( PyObject* );
-    PyFunctionAction( PyObject*, const std::string& docstring );
-    virtual ~PyFunctionAction();
-    virtual void execute( Document*, const Event& ) const;
-    virtual Action* copy() const;
-    virtual bool error() const;
-
-    PyObject* fobj() const
+    class PyFunctionAction : public Action
     {
-      return m_func;
-    }
+    public:
+        PyFunctionAction(PyObject*);
+        PyFunctionAction(PyObject*, const std::string& docstring);
+        virtual ~PyFunctionAction();
+        virtual void execute(Document*, const Event&) const;
+        virtual Action* copy() const;
+        virtual bool error() const;
 
-   private:
-    PyObject* m_func;
-    mutable bool m_exception;
-  };
+        PyObject* fobj() const { return m_func; }
 
-}  // namespace TwkApp
+    private:
+        PyObject* m_func;
+        mutable bool m_exception;
+    };
 
-#endif  // __PyTwkApp__PyFunctionAction__h__
+} // namespace TwkApp
+
+#endif // __PyTwkApp__PyFunctionAction__h__

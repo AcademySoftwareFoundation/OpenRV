@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include "RVMath/LogC.h"
 
@@ -11,14 +11,16 @@
 
 namespace RVMath
 {
-    LogC::LogC(const Param& param, float asa):
-        m_Param(param),
-        m_ExposureGain(0.0f)
+    LogC::LogC(const Param& param, float asa)
+        : m_Param(param)
+        , m_ExposureGain(0.0f)
     {
         m_LinSlope = 1 / (param.cutPoint * log(10.0f));
         m_LinOffset = log10(param.cutPoint) - m_LinSlope * param.cutPoint;
-        if (asa != 0.0f) setAsa(asa);
-        else setAsa(param.nominalSpeed);
+        if (asa != 0.0f)
+            setAsa(asa);
+        else
+            setAsa(param.nominalSpeed);
     }
 
     bool LogC::setAsa(float asa)
@@ -36,22 +38,28 @@ namespace RVMath
 
         m_ExposureGain = gain;
         m_GraySignal = m_Param.midGraySignal / m_ExposureGain;
-        m_EncodingGain = (log(m_ExposureGain)/log(2.0f) * (0.89f - 1.0f) / 3.0f + 1.0f) * m_Param.encodingGain;
+        m_EncodingGain =
+            (log(m_ExposureGain) / log(2.0f) * (0.89f - 1.0f) / 3.0f + 1.0f)
+            * m_Param.encodingGain;
         m_EncodingOffset = m_Param.encodingOffset;
         for (int ioff = 0; ioff < 3; ++ioff)
         {
-            m_BlackOffset = ((m_Param.encodingBlack - m_EncodingOffset) / m_EncodingGain - m_LinOffset) / m_LinSlope;
-            m_EncodingOffset = m_Param.encodingOffset - log10(1 + m_BlackOffset) * m_EncodingGain;
+            m_BlackOffset =
+                ((m_Param.encodingBlack - m_EncodingOffset) / m_EncodingGain
+                 - m_LinOffset)
+                / m_LinSlope;
+            m_EncodingOffset = m_Param.encodingOffset
+                               - log10(1 + m_BlackOffset) * m_EncodingGain;
         }
         m_MaxValue = unconstrainedValue(1.0);
-        return(true);
+        return (true);
     }
 
     float LogC::unconstrainedValue(float x) const
     {
-        float xr = (x - m_Param.blackSignal ) / m_GraySignal + m_BlackOffset;
+        float xr = (x - m_Param.blackSignal) / m_GraySignal + m_BlackOffset;
         float y = 0.0f;
-        if(xr > m_Param.cutPoint)
+        if (xr > m_Param.cutPoint)
         {
             y = log10(xr);
         }
@@ -67,11 +75,11 @@ namespace RVMath
     {
         float y = unconstrainedValue(x);
         const float yceil = 0.8f;
-        if(y < 0.0f)
+        if (y < 0.0f)
         {
             y = 0.0f;
         }
-        else if(y > yceil && m_MaxValue > 1.0f)
+        else if (y > yceil && m_MaxValue > 1.0f)
         {
             float w[4];
             hermite(y, yceil, m_MaxValue, w);
@@ -81,4 +89,4 @@ namespace RVMath
         }
         return y;
     }
-}
+} // namespace RVMath

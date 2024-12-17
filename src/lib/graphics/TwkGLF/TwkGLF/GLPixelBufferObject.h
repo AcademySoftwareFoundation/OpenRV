@@ -11,46 +11,51 @@
 
 #include <TwkGLF/GL.h>
 
-namespace TwkGLF {
-
-//==============================================================================
-class GLPixelBufferObject
+namespace TwkGLF
 {
-public:
-   enum PackDir { TO_GPU, FROM_GPU };
-public:
-   GLPixelBufferObject(
-      PackDir dir, unsigned int num_bytes, unsigned int alignment = 1
-   );
-   virtual ~GLPixelBufferObject();
 
-   void bind();
-   void unbind();
+    //==============================================================================
+    class GLPixelBufferObject
+    {
+    public:
+        enum PackDir
+        {
+            TO_GPU,
+            FROM_GPU
+        };
 
-   void* map();
-   void unmap();
+    public:
+        GLPixelBufferObject(PackDir dir, unsigned int num_bytes,
+                            unsigned int alignment = 1);
+        virtual ~GLPixelBufferObject();
 
-   void resize(unsigned int num_bytes);
-   void release();   
+        void bind();
+        void unbind();
 
-   unsigned int getSize() const;
-   void* getMappedPtr();
-   unsigned int getOffset() const;
+        void* map();
+        void unmap();
 
-   void copyBufferData( void * data, unsigned size );
+        void resize(unsigned int num_bytes);
+        void release();
 
-   bool isValid() const;
-   GLuint getId() const;
+        unsigned int getSize() const;
+        void* getMappedPtr();
+        unsigned int getOffset() const;
 
-   PackDir getPackDir() const;
-   
-private:
-   class BufferObject* _bufferObject;
-};
+        void copyBufferData(void* data, unsigned size);
 
-extern const char MEM_DEV_PBO_TO_GPU[];
-extern const char MEM_DEV_PBO_FROM_GPU[];
+        bool isValid() const;
+        GLuint getId() const;
 
-} // TwkGLF
+        PackDir getPackDir() const;
+
+    private:
+        class BufferObject* _bufferObject;
+    };
+
+    extern const char MEM_DEV_PBO_TO_GPU[];
+    extern const char MEM_DEV_PBO_FROM_GPU[];
+
+} // namespace TwkGLF
 
 #endif // __TwkGLF__GLPixelBufferObject__h__

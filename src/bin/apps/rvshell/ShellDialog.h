@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2008 Tweak Software. 
+//  Copyright (c) 2008 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __rvshell__ShellDialog__h__
 #define __rvshell__ShellDialog__h__
@@ -11,16 +11,19 @@
 #include "ui_ShellDialog.h"
 #include <TwkQtChat/Client.h>
 
-class ShellDialog : public QMainWindow, private Ui::ShellDialog
+class ShellDialog
+    : public QMainWindow
+    , private Ui::ShellDialog
 {
     Q_OBJECT
 
 public:
-    ShellDialog(QWidget *parent = 0);
+    ShellDialog(QWidget* parent = 0);
+
     TwkQtChat::Client* client() const { return m_client; }
 
 public slots:
-    void appendMessage(const QString &from, const QString &message);
+    void appendMessage(const QString& from, const QString& message);
 
 private slots:
     void go();
@@ -39,15 +42,15 @@ private slots:
     void sendImage();
 
 private:
-    TwkQtChat::Client*   m_client;
-    QTextTableFormat     m_tableFormat;
-    QGraphicsScene*      m_scene;
-    QPixmap              m_pixmap;
+    TwkQtChat::Client* m_client;
+    QTextTableFormat m_tableFormat;
+    QGraphicsScene* m_scene;
+    QPixmap m_pixmap;
     QGraphicsPixmapItem* m_pixmapItem;
-    QString              m_contact;
-    QString              m_mediaName;
-    unsigned char*       m_imageData;
-    bool                 m_stop;
+    QString m_contact;
+    QString m_mediaName;
+    unsigned char* m_imageData;
+    bool m_stop;
 };
 
 #endif // __rvshell__ShellDialog__h__

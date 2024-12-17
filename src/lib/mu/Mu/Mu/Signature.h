@@ -4,78 +4,96 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/config.h>
 #include <Mu/HashTable.h>
 #include <Mu/Type.h>
 #include <vector>
 
-namespace Mu {
-class Signature;
-class Context;
-
-//----------------------------------------------------------------------
-//
-//  class Signature
-//
-//  This class is produced after functions are resolved.
-//
-
-class Signature /*: public Type*/
+namespace Mu
 {
-  public:
-    MU_GC_STUBBORN_NEW_DELETE
+    class Signature;
+    class Context;
 
+    //----------------------------------------------------------------------
     //
-    //  Types
+    //  class Signature
     //
-
-    typedef Symbol::SymbolRefList Types;
-    typedef Symbol::SymbolRef SymbolRef;
-
-    //
-    //  Constructor / Destructor
+    //  This class is produced after functions are resolved.
     //
 
-    Signature() : _resolved(false), _typesIn(false) {}
-    // Signature(const char*);
-    ~Signature();
+    class Signature /*: public Type*/
+    {
+    public:
+        MU_GC_STUBBORN_NEW_DELETE
 
-    bool operator==(const Signature& other) const;
+        //
+        //  Types
+        //
 
-    size_t size() const { return _types.size(); }
+        typedef Symbol::SymbolRefList Types;
+        typedef Symbol::SymbolRef SymbolRef;
 
-    void push_back(const Type* t);
-    void push_back(Name);
+        //
+        //  Constructor / Destructor
+        //
 
-    const Types& types() const { return _types; }
+        Signature()
+            : _resolved(false)
+            , _typesIn(false)
+        {
+        }
 
-    SymbolRef& operator[] (size_t i) { return _types[i]; }
-    const SymbolRef& operator[] (size_t i) const { return _types[i]; }
+        // Signature(const char*);
+        ~Signature();
 
-    bool resolved() const { return _resolved; }
-    void resolve(const Context*) const; 
+        bool operator==(const Signature& other) const;
 
-    String functionTypeName() const;
+        size_t size() const { return _types.size(); }
 
-    const Type* argType(size_t i) const { return _types[i+1].symbolOfType<Type>(); }
-    const Type* returnType() const { return _types[0].symbolOfType<Type>(); }
+        void push_back(const Type* t);
+        void push_back(Name);
 
-  private:
-    mutable Types       _types;
-    mutable bool        _resolved : 1;
-    bool                _typesIn  : 1;
-};
+        const Types& types() const { return _types; }
 
-struct SignatureTraits
-{
-    static bool equals(const Signature *a, const Signature *b) 
-        { return *a == *b; }
-    static unsigned long hash(const Signature*);
-};
+        SymbolRef& operator[](size_t i) { return _types[i]; }
 
-typedef HashTable<Signature*,SignatureTraits> SignatureHashTable;
+        const SymbolRef& operator[](size_t i) const { return _types[i]; }
+
+        bool resolved() const { return _resolved; }
+
+        void resolve(const Context*) const;
+
+        String functionTypeName() const;
+
+        const Type* argType(size_t i) const
+        {
+            return _types[i + 1].symbolOfType<Type>();
+        }
+
+        const Type* returnType() const
+        {
+            return _types[0].symbolOfType<Type>();
+        }
+
+    private:
+        mutable Types _types;
+        mutable bool _resolved : 1;
+        bool _typesIn : 1;
+    };
+
+    struct SignatureTraits
+    {
+        static bool equals(const Signature* a, const Signature* b)
+        {
+            return *a == *b;
+        }
+
+        static unsigned long hash(const Signature*);
+    };
+
+    typedef HashTable<Signature*, SignatureTraits> SignatureHashTable;
 
 } // namespace Mu
 

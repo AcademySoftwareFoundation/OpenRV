@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001-2003 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #ifndef __COURIER_H__
@@ -15,4 +15,4 @@
 extern const unsigned char courierFont[];
 const unsigned int courierFontSize = 297660;
 
-#endif    // End #ifdef __COURIER_H__
+#endif // End #ifdef __COURIER_H__

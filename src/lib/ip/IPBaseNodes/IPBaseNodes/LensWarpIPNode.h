@@ -1,91 +1,88 @@
 //******************************************************************************
 //  Copyright (c) 2013 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //******************************************************************************
 #ifndef __IPBaseNodes__LensWarpIPNode__h__
 #define __IPBaseNodes__LensWarpIPNode__h__
 #include <iostream>
 #include <IPCore/IPNode.h>
 
-namespace IPCore {
-
-//
-//  LensWarpIPNode
-//
-//  Handles both warp and unwarp cases. Also handles pixel aspect
-//  ratio.
-//
-
-class LensWarpIPNode : public IPNode
+namespace IPCore
 {
-  public:
-    LensWarpIPNode(const std::string &name,
-                   const NodeDefinition* def,
-                   IPGraph* graph,
-                   GroupIPNode* group = 0);
 
-    virtual ~LensWarpIPNode();
-    virtual IPImage* evaluate(const Context&);
-    virtual ImageStructureInfo imageStructureInfo(const Context&) const;
-    virtual void readCompleted(const std::string&, unsigned int);
-    virtual void propertyChanged(const Property*);
+    //
+    //  LensWarpIPNode
+    //
+    //  Handles both warp and unwarp cases. Also handles pixel aspect
+    //  ratio.
+    //
 
-    float pixelAspect() const;
-    bool active() const;
+    class LensWarpIPNode : public IPNode
+    {
+    public:
+        LensWarpIPNode(const std::string& name, const NodeDefinition* def,
+                       IPGraph* graph, GroupIPNode* group = 0);
 
-  private:
-    IntProperty*   m_activeProperty;
+        virtual ~LensWarpIPNode();
+        virtual IPImage* evaluate(const Context&);
+        virtual ImageStructureInfo imageStructureInfo(const Context&) const;
+        virtual void readCompleted(const std::string&, unsigned int);
+        virtual void propertyChanged(const Property*);
 
-    FloatProperty* m_pixelAspect;
+        float pixelAspect() const;
+        bool active() const;
 
-    StringProperty* m_model;
+    private:
+        IntProperty* m_activeProperty;
 
-    // Radial distortion coefficients
-    FloatProperty* m_k1;
-    FloatProperty* m_k2;
-    FloatProperty* m_k3;
-    FloatProperty* m_d;
-    // Tangential distortion coefficients
-    FloatProperty* m_p1;
-    FloatProperty* m_p2;
-    // Distortion center and offset
-    Vec2fProperty* m_center;
-    Vec2fProperty* m_offset;
-    // Focallength in x and y
-    FloatProperty* m_fx;
-    FloatProperty* m_fy;
-    // Crop Ratio in x and y
-    FloatProperty* m_cropRatioX;
-    FloatProperty* m_cropRatioY;
+        FloatProperty* m_pixelAspect;
 
-    // 3de4 anamorphic params
-    FloatProperty* m_cx02;
-    FloatProperty* m_cy02;
-    FloatProperty* m_cx22;
-    FloatProperty* m_cy22;
+        StringProperty* m_model;
 
-    FloatProperty* m_cx04;
-    FloatProperty* m_cy04;
-    FloatProperty* m_cx24;
-    FloatProperty* m_cy24;
-    FloatProperty* m_cx44;
-    FloatProperty* m_cy44;
+        // Radial distortion coefficients
+        FloatProperty* m_k1;
+        FloatProperty* m_k2;
+        FloatProperty* m_k3;
+        FloatProperty* m_d;
+        // Tangential distortion coefficients
+        FloatProperty* m_p1;
+        FloatProperty* m_p2;
+        // Distortion center and offset
+        Vec2fProperty* m_center;
+        Vec2fProperty* m_offset;
+        // Focallength in x and y
+        FloatProperty* m_fx;
+        FloatProperty* m_fy;
+        // Crop Ratio in x and y
+        FloatProperty* m_cropRatioX;
+        FloatProperty* m_cropRatioY;
 
-    FloatProperty* m_cx06;
-    FloatProperty* m_cy06;
-    FloatProperty* m_cx26;
-    FloatProperty* m_cy26;
-    FloatProperty* m_cx46;
-    FloatProperty* m_cy46;
-    FloatProperty* m_cx66;
-    FloatProperty* m_cy66;
+        // 3de4 anamorphic params
+        FloatProperty* m_cx02;
+        FloatProperty* m_cy02;
+        FloatProperty* m_cx22;
+        FloatProperty* m_cy22;
 
-};
+        FloatProperty* m_cx04;
+        FloatProperty* m_cy04;
+        FloatProperty* m_cx24;
+        FloatProperty* m_cy24;
+        FloatProperty* m_cx44;
+        FloatProperty* m_cy44;
 
+        FloatProperty* m_cx06;
+        FloatProperty* m_cy06;
+        FloatProperty* m_cx26;
+        FloatProperty* m_cy26;
+        FloatProperty* m_cx46;
+        FloatProperty* m_cy46;
+        FloatProperty* m_cx66;
+        FloatProperty* m_cy66;
+    };
 
-} // IPCore
+} // namespace IPCore
 
 #endif // __IPBaseNodes__LensWarpIPNode__h__

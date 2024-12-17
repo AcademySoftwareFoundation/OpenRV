@@ -4,101 +4,101 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Node.h>
 #include <Mu/PrimitiveObject.h>
 #include <Mu/PrimitiveType.h>
 #include <iosfwd>
 
-namespace Mu {
-
-//
-//  class BoolType
-//
-//  Boolean type. Includes most of the flow control constructs as
-//  well. 
-//
-
-class BoolType : public Mu::PrimitiveType
+namespace Mu
 {
-  public:
-    BoolType(Context*);
-    ~BoolType();
 
     //
-    //	Type API
+    //  class BoolType
+    //
+    //  Boolean type. Includes most of the flow control constructs as
+    //  well.
     //
 
-    virtual Mu::PrimitiveObject* newObject() const;
-    virtual Mu::Value nodeEval(const Mu::Node*, Mu::Thread&) const;
-    virtual void nodeEval(void*, const Mu::Node*, Mu::Thread&) const;
+    class BoolType : public Mu::PrimitiveType
+    {
+    public:
+        BoolType(Context*);
+        ~BoolType();
 
-    //
-    //	Output the symbol name
-    //	Output the appropriate Value in human readable form
-    //
+        //
+        //	Type API
+        //
 
-    virtual void outputValue(std::ostream&, const Mu::Value&, bool full=false) const;
-    virtual void outputValueRecursive(std::ostream&, 
-                                      const Mu::ValuePointer,
-                                      ValueOutputState&) const;
+        virtual Mu::PrimitiveObject* newObject() const;
+        virtual Mu::Value nodeEval(const Mu::Node*, Mu::Thread&) const;
+        virtual void nodeEval(void*, const Mu::Node*, Mu::Thread&) const;
 
-    //
-    //	Load function is called when the symbol is added to the
-    //	context.
-    //
+        //
+        //	Output the symbol name
+        //	Output the appropriate Value in human readable form
+        //
 
-    virtual void load();
+        virtual void outputValue(std::ostream&, const Mu::Value&,
+                                 bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const Mu::ValuePointer,
+                                          ValueOutputState&) const;
 
-    //
-    //	Casts
-    //
+        //
+        //	Load function is called when the symbol is added to the
+        //	context.
+        //
 
-    static NODE_DECLARATION(defaultBool,bool);
-    static NODE_DECLARATION(dereference,bool);
+        virtual void load();
 
-    //
-    //	Operators
-    //
+        //
+        //	Casts
+        //
 
-    static NODE_DECLARATION(assign,Mu::Pointer);
-    static NODE_DECLARATION(logicalNot,bool);
-    static NODE_DECLARATION(logicalAnd,bool);
-    static NODE_DECLARATION(logicalOr,bool);
-    static NODE_DECLARATION(conditionalExpr,bool);
+        static NODE_DECLARATION(defaultBool, bool);
+        static NODE_DECLARATION(dereference, bool);
 
-    static NODE_DECLARATION(eq, bool);
-    static NODE_DECLARATION(neq, bool);
+        //
+        //	Operators
+        //
 
-    //
-    //	Language Constructs
-    //
+        static NODE_DECLARATION(assign, Mu::Pointer);
+        static NODE_DECLARATION(logicalNot, bool);
+        static NODE_DECLARATION(logicalAnd, bool);
+        static NODE_DECLARATION(logicalOr, bool);
+        static NODE_DECLARATION(conditionalExpr, bool);
 
-    static NODE_DECLARATION(__if,void);
-    static NODE_DECLARATION(__if_else,void);
-    static NODE_DECLARATION(__for,void);
-    static NODE_DECLARATION(__repeat,void);
-    static NODE_DECLARATION(__for_each_fixed_array,void);
-    static NODE_DECLARATION(__for_each_dynamic_array,void);
-    static NODE_DECLARATION(__for_each_list,void);
-    static NODE_DECLARATION(__for_index_dynamic_array,void);
-    static NODE_DECLARATION(__for_index_fixed1_array,void);
-    static NODE_DECLARATION(__for_index_fixed2_array,void);
-    static NODE_DECLARATION(__for_index_fixed3_array,void);
-    static NODE_DECLARATION(__while,void);
-    static NODE_DECLARATION(__do_while,void);
+        static NODE_DECLARATION(eq, bool);
+        static NODE_DECLARATION(neq, bool);
 
-    static NODE_DECLARATION(__break,void);
-    static NODE_DECLARATION(__continue,void);
+        //
+        //	Language Constructs
+        //
 
-    //
-    //	Functions
-    //
+        static NODE_DECLARATION(__if, void);
+        static NODE_DECLARATION(__if_else, void);
+        static NODE_DECLARATION(__for, void);
+        static NODE_DECLARATION(__repeat, void);
+        static NODE_DECLARATION(__for_each_fixed_array, void);
+        static NODE_DECLARATION(__for_each_dynamic_array, void);
+        static NODE_DECLARATION(__for_each_list, void);
+        static NODE_DECLARATION(__for_index_dynamic_array, void);
+        static NODE_DECLARATION(__for_index_fixed1_array, void);
+        static NODE_DECLARATION(__for_index_fixed2_array, void);
+        static NODE_DECLARATION(__for_index_fixed3_array, void);
+        static NODE_DECLARATION(__while, void);
+        static NODE_DECLARATION(__do_while, void);
 
-    static NODE_DECLARATION(assertion,void);
+        static NODE_DECLARATION(__break, void);
+        static NODE_DECLARATION(__continue, void);
 
-};
+        //
+        //	Functions
+        //
+
+        static NODE_DECLARATION(assertion, void);
+    };
 
 } // namespace Mu
 

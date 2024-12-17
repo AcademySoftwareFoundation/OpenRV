@@ -17,29 +17,27 @@
 using namespace Gto;
 using namespace std;
 
-
-const char *stripNamePrefix( const std::string &name, const char *prefix )
+const char* stripNamePrefix(const std::string& name, const char* prefix)
 {
-    if( ! prefix )
+    if (!prefix)
     {
         return name.c_str();
     }
-    if( name.substr( 0, strlen( prefix ) ) == prefix )
+    if (name.substr(0, strlen(prefix)) == prefix)
     {
         return &(name[strlen(prefix)]);
     }
     return name.c_str();
 }
 
-void
-propertyMerge(Component *out, Component *in)
+void propertyMerge(Component* out, Component* in)
 {
-    for (size_t i=0; i < in->properties.size(); i++)
+    for (size_t i = 0; i < in->properties.size(); i++)
     {
-        Property *p = in->properties[i];
+        Property* p = in->properties[i];
         bool found = false;
 
-        for (size_t q=0; q < out->properties.size(); q++)
+        for (size_t q = 0; q < out->properties.size(); q++)
         {
             if (out->properties[q]->name == p->name)
             {
@@ -57,15 +55,14 @@ propertyMerge(Component *out, Component *in)
     }
 }
 
-void
-componentMerge(Components& out, Components& in)
+void componentMerge(Components& out, Components& in)
 {
-    for (size_t i=0; i < in.size(); i++)
+    for (size_t i = 0; i < in.size(); i++)
     {
-        Component *c = in[i];
+        Component* c = in[i];
         bool found = false;
 
-        for (size_t q=0; q < out.size(); q++)
+        for (size_t q = 0; q < out.size(); q++)
         {
             if (out[q]->name == c->name)
             {
@@ -85,21 +82,21 @@ componentMerge(Components& out, Components& in)
     }
 }
 
-void
-objectMerge(RawDataBase *out, RawDataBase *in, const char *stripPrefix)
+void objectMerge(RawDataBase* out, RawDataBase* in, const char* stripPrefix)
 {
-    if( stripPrefix )
+    if (stripPrefix)
     {
-        for (size_t i=0; i < in->objects.size(); i++)
+        for (size_t i = 0; i < in->objects.size(); i++)
         {
-            Object *o = in->objects[i];
+            Object* o = in->objects[i];
             bool found = false;
 
-            std::string mungedNameIn( stripNamePrefix( o->name, stripPrefix ) );
+            std::string mungedNameIn(stripNamePrefix(o->name, stripPrefix));
 
-            for (size_t q=0; q < out->objects.size(); q++)
+            for (size_t q = 0; q < out->objects.size(); q++)
             {
-                std::string mungedNameOut( stripNamePrefix( out->objects[q]->name, stripPrefix ) );
+                std::string mungedNameOut(
+                    stripNamePrefix(out->objects[q]->name, stripPrefix));
                 if (mungedNameOut == mungedNameIn)
                 {
                     found = true;
@@ -119,12 +116,12 @@ objectMerge(RawDataBase *out, RawDataBase *in, const char *stripPrefix)
     }
     else
     {
-        for (size_t i=0; i < in->objects.size(); i++)
+        for (size_t i = 0; i < in->objects.size(); i++)
         {
-            Object *o = in->objects[i];
+            Object* o = in->objects[i];
             bool found = false;
 
-            for (size_t q=0; q < out->objects.size(); q++)
+            for (size_t q = 0; q < out->objects.size(); q++)
             {
                 if (out->objects[q]->name == o->name)
                 {
@@ -153,20 +150,20 @@ void usage()
          << "-nc            force uncompressed GTO" << endl
          << "-sp PREFIX     strip prefix" << endl
          << endl;
-    
+
     exit(-1);
 }
 
-int utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
     vector<string> inputFiles;
-    char *outFile = NULL;
+    char* outFile = NULL;
     RawDataBase outObjects;
-    char *stripPrefix = NULL;
+    char* stripPrefix = NULL;
     int text = 0;
     int nocompress = 0;
 
-    for (int i=1; i < argc; i++)
+    for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "-o"))
         {
@@ -211,7 +208,7 @@ int utf8Main(int argc, char *argv[])
         usage();
     }
 
-    for (size_t i=0; i < inputFiles.size(); i++)
+    for (size_t i = 0; i < inputFiles.size(); i++)
     {
         RawDataBaseReader reader;
         cout << "Reading input file " << inputFiles[i] << "..." << endl;
@@ -224,20 +221,21 @@ int utf8Main(int argc, char *argv[])
         }
         else
         {
-            RawDataBase *inObjects = reader.dataBase();
+            RawDataBase* inObjects = reader.dataBase();
             objectMerge(&outObjects, inObjects, stripPrefix);
         }
     }
 
     RawDataBaseWriter writer;
     Writer::FileType type = Writer::CompressedGTO;
-    if (nocompress) type = Writer::BinaryGTO;
-    if (text) type = Writer::TextGTO;
+    if (nocompress)
+        type = Writer::BinaryGTO;
+    if (text)
+        type = Writer::TextGTO;
 
     if (!writer.write(outFile, outObjects, type))
     {
-        cerr << "ERROR: unable to write file " << outFile
-             << endl;
+        cerr << "ERROR: unable to write file " << outFile << endl;
         exit(-1);
     }
     else

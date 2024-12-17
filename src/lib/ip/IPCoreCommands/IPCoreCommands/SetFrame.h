@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2014 Tweak Software. 
+//  Copyright (c) 2014 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __IPCoreCommands__SetFrame__h__
 #define __IPCoreCommands__SetFrame__h__
@@ -11,43 +11,44 @@
 #include <IPCore/Session.h>
 #include <iostream>
 
-namespace IPCore {
-namespace Commands {
-
-//
-//  SetFrame
-//
-//  Set the current frame. 
-//
-
-class SetFrameInfo : public TwkApp::CommandInfo
+namespace IPCore
 {
-  public:
-    typedef TwkApp::Command Command;
+    namespace Commands
+    {
 
-    SetFrameInfo(const std::string& name, TwkApp::CommandInfo::UndoType type);
-    virtual ~SetFrameInfo();
-    virtual Command* newCommand() const;
-};
+        //
+        //  SetFrame
+        //
+        //  Set the current frame.
+        //
 
+        class SetFrameInfo : public TwkApp::CommandInfo
+        {
+        public:
+            typedef TwkApp::Command Command;
 
-class SetFrame : public TwkApp::Command
-{
-  public:
-    SetFrame(const SetFrameInfo*);
-    virtual ~SetFrame();
+            SetFrameInfo(const std::string& name,
+                         TwkApp::CommandInfo::UndoType type);
+            virtual ~SetFrameInfo();
+            virtual Command* newCommand() const;
+        };
 
-    void setArgs(IPCore::Session* session, int frame);
+        class SetFrame : public TwkApp::Command
+        {
+        public:
+            SetFrame(const SetFrameInfo*);
+            virtual ~SetFrame();
 
-    virtual void doit();
+            void setArgs(IPCore::Session* session, int frame);
 
-  private:
-    Session* m_session;
-    int      m_frame;
-};
+            virtual void doit();
 
+        private:
+            Session* m_session;
+            int m_frame;
+        };
 
-} // Commands
-} // IPCore
+    } // namespace Commands
+} // namespace IPCore
 
 #endif // __IPCoreCommands__SetFrame__h__

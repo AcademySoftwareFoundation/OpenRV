@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #ifndef __base__RVMath__LogC
@@ -9,15 +9,17 @@
 
 class Param;
 
-namespace RVMath {
+namespace RVMath
+{
 
-    struct Param {
+    struct Param
+    {
         float cutPoint;
         float nominalSpeed;
 
         float midGraySignal;
         float blackSignal;
-        
+
         float encodingBlack;
         float encodingOffset;
         float encodingGain;
@@ -25,39 +27,43 @@ namespace RVMath {
 
     class LogC
     {
-        public:
-            explicit LogC(const Param& param, float asa);
+    public:
+        explicit LogC(const Param& param, float asa);
 
-            float value(float x) const;
+        float value(float x) const;
 
-            float getExposureGain() { return m_ExposureGain; }
-            float getEncodingGain() { return m_EncodingGain; }
-            float getEncodingOffset() { return m_EncodingOffset; }
+        float getExposureGain() { return m_ExposureGain; }
 
-            float getLinearSlope() { return m_LinSlope; }
-            float getLinearOffset() { return m_LinOffset; }
+        float getEncodingGain() { return m_EncodingGain; }
 
-            float getBlackOffset() { return m_BlackOffset; }
-            float getGraySignal() { return m_GraySignal; }
+        float getEncodingOffset() { return m_EncodingOffset; }
 
-        private:
-            bool setAsa(float asa);
-            float unconstrainedValue(float x) const;
+        float getLinearSlope() { return m_LinSlope; }
 
-            float m_ExposureGain;
-            float m_EncodingGain;
-            float m_EncodingOffset;
+        float getLinearOffset() { return m_LinOffset; }
 
-            float m_LinSlope;
-            float m_LinOffset;
+        float getBlackOffset() { return m_BlackOffset; }
 
-            float m_BlackOffset;
-            float m_GraySignal;
+        float getGraySignal() { return m_GraySignal; }
 
-            float m_MaxValue;
+    private:
+        bool setAsa(float asa);
+        float unconstrainedValue(float x) const;
 
-            Param m_Param;
+        float m_ExposureGain;
+        float m_EncodingGain;
+        float m_EncodingOffset;
+
+        float m_LinSlope;
+        float m_LinOffset;
+
+        float m_BlackOffset;
+        float m_GraySignal;
+
+        float m_MaxValue;
+
+        Param m_Param;
     };
-}
+} // namespace RVMath
 
 #endif

@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2012 Tweak Software. 
+//  Copyright (c) 2012 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #include <TwkUtil/ProcessInfo.h>
 
@@ -13,23 +13,17 @@
 #include <unistd.h>
 #endif
 
-namespace TwkUtil {
+namespace TwkUtil
+{
 
 #ifdef PLATFORM_WINDOWS
 
-size_t processID()
-{
-    return size_t(GetCurrentProcessId());
-}
+    size_t processID() { return size_t(GetCurrentProcessId()); }
 
 #else
 
-size_t processID()
-{
-    return size_t(getpid());
-}
+    size_t processID() { return size_t(getpid()); }
 
 #endif
 
-
-} // TwkUtil
+} // namespace TwkUtil

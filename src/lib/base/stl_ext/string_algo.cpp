@@ -1,141 +1,130 @@
 //
 // Copyright (c) 2010, Jim Hourihan
 // All rights reserved.
-// 
-// SPDX-License-Identifier: Apache-2.0 
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <stl_ext/string_algo.h>
 #include <sstream>
 
-namespace stl_ext {
-using namespace std;
-
-void
-tokenize(vector<string> &tokens, 
-	 const string& str, 
-	 const string& delimiters)
+namespace stl_ext
 {
-    string::size_type lastPos = str.find_first_not_of(delimiters, 0);
-    string::size_type pos     = str.find_first_of(delimiters, lastPos);
+    using namespace std;
 
-    while (pos != string::npos || lastPos != string::npos)
+    void tokenize(vector<string>& tokens, const string& str,
+                  const string& delimiters)
     {
-        tokens.push_back(str.substr(lastPos, pos - lastPos));
-        lastPos = str.find_first_not_of(delimiters, pos);
-        pos = str.find_first_of(delimiters, lastPos);
-    }
-}
+        string::size_type lastPos = str.find_first_not_of(delimiters, 0);
+        string::size_type pos = str.find_first_of(delimiters, lastPos);
 
-string 
-wrap(const string& s, 
-     char wrapchar, 
-     const string& breakString,
-     string::size_type col)
-{
-    if (s.size() < col) return s;
-
-    ostringstream str;
-
-    for (string::size_type a = 0, b = 0, c = 0;;)
-    {
-        b = s.find_first_of(wrapchar, a);
-
-        if (b == string::npos)
+        while (pos != string::npos || lastPos != string::npos)
         {
-            for (string::size_type i = a; i < s.size(); i++, c++) str << s[i];
-            break;
+            tokens.push_back(str.substr(lastPos, pos - lastPos));
+            lastPos = str.find_first_not_of(delimiters, pos);
+            pos = str.find_first_of(delimiters, lastPos);
         }
-        else
+    }
+
+    string wrap(const string& s, char wrapchar, const string& breakString,
+                string::size_type col)
+    {
+        if (s.size() < col)
+            return s;
+
+        ostringstream str;
+
+        for (string::size_type a = 0, b = 0, c = 0;;)
         {
-            for (string::size_type i = a; i < b; i++, c++) str << s[i];
-            a = s.find_first_not_of(wrapchar, b);
-            str << wrapchar;
+            b = s.find_first_of(wrapchar, a);
+
+            if (b == string::npos)
+            {
+                for (string::size_type i = a; i < s.size(); i++, c++)
+                    str << s[i];
+                break;
+            }
+            else
+            {
+                for (string::size_type i = a; i < b; i++, c++)
+                    str << s[i];
+                a = s.find_first_not_of(wrapchar, b);
+                str << wrapchar;
+            }
+
+            if (c >= col)
+            {
+                str << breakString;
+                c = 0;
+            }
         }
 
-        if (c >= col) 
+        return str.str();
+    }
+
+    string dirname(string path)
+    {
+        size_t lastSlash = path.rfind("/");
+        if (lastSlash == path.npos)
         {
-            str << breakString;
-            c = 0;
+            return string(".");
         }
-    } 
 
-    return str.str();
-}
-
-
-
-string 
-dirname( string path )
-{
-    size_t lastSlash = path.rfind( "/" );
-    if( lastSlash == path.npos )
-    {
-        return string(".");
+        return path.substr(0, lastSlash);
     }
 
-    return path.substr( 0, lastSlash );
-}
-
-
-string 
-basename( string path )
-{
-    size_t lastSlash = path.rfind( "/" );
-    if( lastSlash == path.npos )
+    string basename(string path)
     {
-        return path;
+        size_t lastSlash = path.rfind("/");
+        if (lastSlash == path.npos)
+        {
+            return path;
+        }
+
+        return path.substr(lastSlash + 1, path.size());
     }
 
-    return path.substr( lastSlash + 1, path.size() );
-}
-
-
-string 
-prefix( string path )
-{
-    string filename( basename( path ) );
-    if( filename.find( "." ) == filename.npos )
+    string prefix(string path)
     {
-        return filename;
+        string filename(basename(path));
+        if (filename.find(".") == filename.npos)
+        {
+            return filename;
+        }
+        return filename.substr(0, filename.find("."));
     }
-    return filename.substr( 0, filename.find( "." ) );
-}
 
-
-string 
-extension( string path )
-{
-    string filename( basename( path ) );
-    if( filename.find( "." ) == filename.npos )
+    string extension(string path)
     {
-        return string("");
+        string filename(basename(path));
+        if (filename.find(".") == filename.npos)
+        {
+            return string("");
+        }
+        return filename.substr(filename.rfind(".") + 1, filename.size());
     }
-    return filename.substr( filename.rfind(".") + 1, filename.size() );
-}
 
+    unsigned long hash(const std::string& s)
+    {
+        //
+        //	Taken from the ELF format hash function
+        //
 
-unsigned long 
-hash(const std::string &s)
-{
+        unsigned long h = 0, g;
+
+        for (int i = 0; i < s.size(); i++)
+        {
+            h = (h << 4) + s[i];
+            if ((g = h & 0xf0000000))
+                h ^= g >> 24;
+            h &= ~g;
+        }
+
+        return h;
+    }
+
     //
-    //	Taken from the ELF format hash function
+    //  Claimed to be fast
     //
-
-    unsigned long h=0,g;
-    
-    for (int i=0; i<s.size(); i++)
-    {
-	h = (h << 4) + s[i];
-	if ( (g = h & 0xf0000000) ) h ^= g >> 24;
-	h &= ~g;
-    }
-    
-    return h;
-}
-
-//
-//  Claimed to be fast
-//
 
 #if 0
 unsigned int 

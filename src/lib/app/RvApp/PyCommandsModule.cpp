@@ -1,9 +1,9 @@
 //
 //  Copyright (c) 2011 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #include <RvApp/PyCommandsModule.h>
 
@@ -15,20 +15,19 @@
 #include <PyTwkApp/PyEventType.h>
 #include <TwkApp/Event.h>
 
-namespace Rv {
+namespace Rv
+{
     using namespace std;
     using namespace TwkApp;
     using namespace IPCore;
 
-    static PyObject*
-        badArgument()
+    static PyObject* badArgument()
     {
         PyErr_SetString(PyExc_Exception, "Bad argument");
         return NULL;
     }
 
-    static PyObject *
-        data(PyObject *self, PyObject* args)
+    static PyObject* data(PyObject* self, PyObject* args)
     {
         RvSession* s = RvSession::currentRvSession();
 
@@ -43,23 +42,23 @@ namespace Rv {
         }
     }
 
-    static PyObject *
-        insertCreatePixelBlock(PyObject *self, PyObject* args)
+    static PyObject* insertCreatePixelBlock(PyObject* self, PyObject* args)
     {
         RvSession* s = RvSession::currentRvSession();
         PyEventObject* event;
 
-        if (!PyArg_ParseTuple(args, "O!", TwkApp::pyEventType(),&event)) return NULL;
+        if (!PyArg_ParseTuple(args, "O!", TwkApp::pyEventType(), &event))
+            return NULL;
 
         if (const PixelBlockTransferEvent* pe =
-            dynamic_cast<const PixelBlockTransferEvent*>(event->event))
+                dynamic_cast<const PixelBlockTransferEvent*>(event->event))
         {
             const RvGraph::Sources& sources = s->rvgraph().imageSources();
 
-            for (size_t i=0; i < sources.size(); i++)
+            for (size_t i = 0; i < sources.size(); i++)
             {
                 if (ImageSourceIPNode* node =
-                    dynamic_cast<ImageSourceIPNode*>(sources[i]))
+                        dynamic_cast<ImageSourceIPNode*>(sources[i]))
                 {
                     size_t index = node->mediaIndex(pe->media());
 
@@ -67,12 +66,10 @@ namespace Rv {
                     {
                         try
                         {
-                            node->insertPixels(pe->view(),
-                                pe->layer(),
-                                pe->frame(),
-                                pe->x(), pe->y(), pe->width(), pe->height(),
-                                pe->pixels(),
-                                pe->size());
+                            node->insertPixels(pe->view(), pe->layer(),
+                                               pe->frame(), pe->x(), pe->y(),
+                                               pe->width(), pe->height(),
+                                               pe->pixels(), pe->size());
                         }
                         catch (PixelBlockSizeMismatchExc& exc)
                         {
@@ -97,25 +94,15 @@ namespace Rv {
         return Py_None;
     }
 
-    static PyMethodDef localmethods[] ={
+    static PyMethodDef localmethods[] = {
 
-        { "data",
-        data,
-        METH_NOARGS,
-        "return session data object." },
+        {"data", data, METH_NOARGS, "return session data object."},
 
-        { "insertCreatePixelBlock",
-        insertCreatePixelBlock,
-        METH_VARARGS,
-        "insert block of pixels into image source." },
+        {"insertCreatePixelBlock", insertCreatePixelBlock, METH_VARARGS,
+         "insert block of pixels into image source."},
 
-        { NULL }
-    };
+        {NULL}};
 
-    void*
-        pyRvAppCommands()
-    {
-        return (void*)localmethods;
-    }
+    void* pyRvAppCommands() { return (void*)localmethods; }
 
-} // Rv
+} // namespace Rv

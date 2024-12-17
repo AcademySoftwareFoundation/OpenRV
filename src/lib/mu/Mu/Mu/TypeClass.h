@@ -4,17 +4,17 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Symbol.h>
 
-namespace Mu {
-
-class TypeClass : public Symbol
+namespace Mu
 {
-public:
-};
 
+    class TypeClass : public Symbol
+    {
+    public:
+    };
 
 } // namespace Mu
 

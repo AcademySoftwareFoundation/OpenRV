@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #include "../../utf8Main.h"
@@ -28,19 +28,20 @@ fields:\n\
 \n\
 ";
 
-int utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
     VisMainWindow mainWindow;
 
     if (argc == 2)
     {
-	if (0 == strcmp(argv[1], "-help"))
-	{
-	    cerr << usage;
-	    exit (-1);
-	}
-        else mainWindow.readFile(argv[1]);
+        if (0 == strcmp(argv[1], "-help"))
+        {
+            cerr << usage;
+            exit(-1);
+        }
+        else
+            mainWindow.readFile(argv[1]);
     }
 
     mainWindow.show();

@@ -4,8 +4,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <mu_test/BaseType.h>
 #include <Mu/Node.h>
 #include <Mu/ClassInstance.h>
@@ -16,33 +16,34 @@
 #include <iosfwd>
 #include <string>
 
-namespace Mu {
-
-//
-//  class CClassType
-//
-//  
-//
-
-class CClassType : public Class
+namespace Mu
 {
-  public:
-    CClassType(Context* c, Class *super);
-    ~CClassType();
 
-    struct Layout : public BaseType::Layout
+    //
+    //  class CClassType
+    //
+    //
+    //
+
+    class CClassType : public Class
     {
-        ClassInstance* parent;
-        DynamicArray*  children;
+    public:
+        CClassType(Context* c, Class* super);
+        ~CClassType();
+
+        struct Layout : public BaseType::Layout
+        {
+            ClassInstance* parent;
+            DynamicArray* children;
+        };
+
+        virtual void load();
+
+        static NODE_DECLARATION(construct, Pointer);
+        static NODE_DECLARATION(print, void);
+        static NODE_DECLARATION(baz, Pointer);
+        static NODE_DECLARATION(bar, Pointer);
     };
-
-    virtual void load();
-
-    static NODE_DECLARATION(construct, Pointer);
-    static NODE_DECLARATION(print, void);
-    static NODE_DECLARATION(baz, Pointer);
-    static NODE_DECLARATION(bar, Pointer);
-};
 
 } // namespace Mu
 

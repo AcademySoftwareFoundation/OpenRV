@@ -4,31 +4,30 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Interface.h>
 
-namespace Mu {
-
-//
-//  class ObjectInterface
-//
-//  The "universal" interface. Anything can be cast to "object". The
-//  interface gives access to general characteristics of any
-//  non-primitive type object.
-//
-
-class ObjectInterface : public Interface
+namespace Mu
 {
-  public:
-    ObjectInterface(Context*);
-    virtual ~ObjectInterface();
 
-    virtual void load();
-    static NODE_DECLARATION(identity, Pointer);
-};
+    //
+    //  class ObjectInterface
+    //
+    //  The "universal" interface. Anything can be cast to "object". The
+    //  interface gives access to general characteristics of any
+    //  non-primitive type object.
+    //
 
+    class ObjectInterface : public Interface
+    {
+    public:
+        ObjectInterface(Context*);
+        virtual ~ObjectInterface();
 
+        virtual void load();
+        static NODE_DECLARATION(identity, Pointer);
+    };
 
 } // namespace Mu
 

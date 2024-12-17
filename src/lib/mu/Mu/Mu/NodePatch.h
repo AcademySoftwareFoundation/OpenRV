@@ -4,59 +4,63 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/NodeVisitor.h>
 #include <Mu/NodeAssembler.h>
 #include <vector>
 
-namespace Mu {
-class UnresolvedCall;
-class RootSymbol;
-
-//
-//  A NodeVisitor that patches previously unknown functions, fills in
-//  stubs, etc. Used for back-patching during parsing primarily.
-//
-
-class NodePatch : public NodeVisitor
+namespace Mu
 {
-  public:
-    //
-    //  Types
-    //
-
-    typedef NodeAssembler::NodeList NodeList;
-    typedef STLVector<const Symbol*>::Type SymbolStack;
+    class UnresolvedCall;
+    class RootSymbol;
 
     //
-    //  NodePatch API
+    //  A NodeVisitor that patches previously unknown functions, fills in
+    //  stubs, etc. Used for back-patching during parsing primarily.
     //
-    
-    explicit NodePatch(NodeAssembler*, Function*);
-    ~NodePatch();
 
-    Node* patch();
+    class NodePatch : public NodeVisitor
+    {
+    public:
+        //
+        //  Types
+        //
 
-    Function* function() const { return _function; }
-    bool method() const { return _method; }
-    NodeAssembler& as() { return *_as; }
-    Node* parent() { return nodeParent(); }
-    size_t index() const { return nodeIndex(); }
+        typedef NodeAssembler::NodeList NodeList;
+        typedef STLVector<const Symbol*>::Type SymbolStack;
 
-  protected:
-    virtual void    preOrderVisit(Node*,int depth);
-    virtual void    postOrderVisit(Node*,int depth);
-    virtual void    childVisit(Node*,Node*,size_t);
+        //
+        //  NodePatch API
+        //
 
-  private:
-    Function*       _function;
-    NodeAssembler*  _as;
-    Name            _this;
-    Node**          _slot;
-    bool            _method;
-};
+        explicit NodePatch(NodeAssembler*, Function*);
+        ~NodePatch();
 
+        Node* patch();
+
+        Function* function() const { return _function; }
+
+        bool method() const { return _method; }
+
+        NodeAssembler& as() { return *_as; }
+
+        Node* parent() { return nodeParent(); }
+
+        size_t index() const { return nodeIndex(); }
+
+    protected:
+        virtual void preOrderVisit(Node*, int depth);
+        virtual void postOrderVisit(Node*, int depth);
+        virtual void childVisit(Node*, Node*, size_t);
+
+    private:
+        Function* _function;
+        NodeAssembler* _as;
+        Name _this;
+        Node** _slot;
+        bool _method;
+    };
 
 } // namespace Mu
 

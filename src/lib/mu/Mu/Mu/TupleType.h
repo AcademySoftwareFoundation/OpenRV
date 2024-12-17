@@ -4,36 +4,38 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <vector>
 #include <Mu/Type.h>
 #include <Mu/Class.h>
 #include <Mu/ClassInstance.h>
 #include <Mu/MachineRep.h>
 
-namespace Mu {
-class Thread;
-
-class TupleType : public Class
+namespace Mu
 {
-  public:
-    typedef STLVector<const Type*>::Type Types;
+    class Thread;
 
-    TupleType(Context* context, const char *name, const Types& fieldTypes);
-    ~TupleType();
+    class TupleType : public Class
+    {
+    public:
+        typedef STLVector<const Type*>::Type Types;
 
-    virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
-    virtual void load();
+        TupleType(Context* context, const char* name, const Types& fieldTypes);
+        ~TupleType();
 
-    const Types& tupleFieldTypes() const { return _types; }
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
+                                          ValueOutputState&) const;
+        virtual void load();
 
-    static NODE_DECLARATION(defaultConstructor, Pointer);
-    static NODE_DECLARATION(aggregateConstructor, Pointer);
+        const Types& tupleFieldTypes() const { return _types; }
 
-  private:
-    Types       _types;
-};
+        static NODE_DECLARATION(defaultConstructor, Pointer);
+        static NODE_DECLARATION(aggregateConstructor, Pointer);
+
+    private:
+        Types _types;
+    };
 
 } // namespace Mu
 

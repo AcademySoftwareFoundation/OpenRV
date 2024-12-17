@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2003 Tweak Inc. 
+// Copyright (c) 2003 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __MuTwkApp__MenuItem__h__
 #define __MuTwkApp__MenuItem__h__
@@ -14,50 +14,51 @@
 #include <Mu/FunctionObject.h>
 #include <vector>
 
-namespace TwkApp {
-using namespace Mu;
-
-//
-//  MenuItem is the base of class hierarchy for UI. 
-//
-
-class MenuItem : public Class
+namespace TwkApp
 {
-public:
+    using namespace Mu;
+
     //
-    //  ClassInstance Structure
+    //  MenuItem is the base of class hierarchy for UI.
     //
 
-    struct Struct
+    class MenuItem : public Class
     {
-        StringType::String* label;
-        FunctionObject*     actionCB;
-        StringType::String* key;
-        FunctionObject*     stateCB;
-        DynamicArray*       subMenu;
+    public:
+        //
+        //  ClassInstance Structure
+        //
+
+        struct Struct
+        {
+            StringType::String* label;
+            FunctionObject* actionCB;
+            StringType::String* key;
+            FunctionObject* stateCB;
+            DynamicArray* subMenu;
+        };
+
+        //
+        //  Constructors
+        //
+
+        MenuItem(Context* c, const char* name, Class* super = 0);
+        ~MenuItem();
+
+        //
+        //	Symbol API
+        //
+
+        virtual void load();
+
+        //
+        //	Constant
+        //
+
+        static NODE_DECLARATION(construct, Pointer);
+        static NODE_DECLARATION(construct2, Pointer);
     };
 
-    //
-    //  Constructors
-    //
-
-    MenuItem(Context* c, const char* name, Class *super=0);
-    ~MenuItem();
-
-    //
-    //	Symbol API
-    //
-
-    virtual void load();
-
-    //
-    //	Constant
-    //
-
-    static NODE_DECLARATION(construct, Pointer);
-    static NODE_DECLARATION(construct2, Pointer);
-};
-
-} // TwkApp
+} // namespace TwkApp
 
 #endif // __MuTwkApp__MenuItem__h__

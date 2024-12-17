@@ -1,9 +1,9 @@
 //*****************************************************************************
 // Copyright (c) 2001 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //*****************************************************************************
 
 #ifndef __ZFile__ZFileReader__h__
@@ -13,126 +13,126 @@
 #include <iostream>
 #include <string>
 
-namespace ZFile {
-
-//
-// class Reader
-//
-// Reads a Pixar zfile as output by prman.  If the file was
-// written on a machine with a different byte-order, the Reader
-// will automatically byte-swap all values.
-//
-
-class Reader
+namespace ZFile
 {
-public:
-    Reader();
-    ~Reader();
 
     //
-    // Open a file and read the header values.  This
-    // must be called before anything else.  Returns
-    // false if there was an error reading the file.
+    // class Reader
+    //
+    // Reads a Pixar zfile as output by prman.  If the file was
+    // written on a machine with a different byte-order, the Reader
+    // will automatically byte-swap all values.
     //
 
-    bool        setInputFile( const char *fileName );
+    class Reader
+    {
+    public:
+        Reader();
+        ~Reader();
 
-    //
-    // Generic input
-    //
+        //
+        // Open a file and read the header values.  This
+        // must be called before anything else.  Returns
+        // false if there was an error reading the file.
+        //
 
-    bool        setInputStream( std::istream&, const char *name = NULL);
+        bool setInputFile(const char* fileName);
 
-    //
-    // This returns non-zero if there was an error in
-    // setInputFile() or setInputStream()
-    //
+        //
+        // Generic input
+        //
 
-    int         error() const { return m_error; }
+        bool setInputStream(std::istream&, const char* name = NULL);
 
-    //
-    // Manually close the file if opened with setInputFile().  The
-    // file is automatically closed when the Reader is destroyed.
-    //
+        //
+        // This returns non-zero if there was an error in
+        // setInputFile() or setInputStream()
+        //
 
-    void        closeFile();
+        int error() const { return m_error; }
 
-    //
-    // Has anything been read?
-    //
+        //
+        // Manually close the file if opened with setInputFile().  The
+        // file is automatically closed when the Reader is destroyed.
+        //
 
-    bool        isEmpty() const { return m_empty; }
+        void closeFile();
 
-    //
-    // Did the file require byte-swapping
-    //
+        //
+        // Has anything been read?
+        //
 
-    bool        isSwapped() const { return m_swapped; }
+        bool isEmpty() const { return m_empty; }
 
-    //
-    // Access the Header data
-    //
+        //
+        // Did the file require byte-swapping
+        //
 
-    const Header& header() const { return m_header; }
+        bool isSwapped() const { return m_swapped; }
 
-    //
-    // This function will cause data to be cached locally in the
-    // reader.
-    //
+        //
+        // Access the Header data
+        //
 
-    float       depthAt( uint16 x, uint16 y ) const;
+        const Header& header() const { return m_header; }
 
-    //
-    //  All the data
-    //
+        //
+        // This function will cause data to be cached locally in the
+        // reader.
+        //
 
-    const float* data() const { return m_data; }
+        float depthAt(uint16 x, uint16 y) const;
 
+        //
+        //  All the data
+        //
 
-private:
-    //
-    // Read depth values for all pixels into the float array
-    // pointed to by "data".
-    //
+        const float* data() const { return m_data; }
 
-    void        readDepths( float *data );
+    private:
+        //
+        // Read depth values for all pixels into the float array
+        // pointed to by "data".
+        //
 
-    //
-    // Read depth values for "num" number of pixels into
-    // the float array pointed to by "data".
-    //
+        void readDepths(float* data);
 
-    void        readDepths( float *data, int num );
+        //
+        // Read depth values for "num" number of pixels into
+        // the float array pointed to by "data".
+        //
 
-    //
-    // Read depth values for "stripHeight" number of scanlines
-    // into the float array pointed to by "data".
-    //
+        void readDepths(float* data, int num);
 
-    void        readStrip( float *data, int stripHeight );
+        //
+        // Read depth values for "stripHeight" number of scanlines
+        // into the float array pointed to by "data".
+        //
 
-private:
-    Header          m_header;
-    std::string     m_inName;
-    std::istream*   m_in;
-    float*          m_data;
-    bool            m_needsClosing;
-    bool            m_swapped;
-    bool            m_empty;
-    int             m_error;
-};
+        void readStrip(float* data, int stripHeight);
 
-inline float
-Reader::depthAt( uint16 x, uint16 y ) const
-{
-    if (x >= m_header.imageWidth) x = m_header.imageWidth - 1;
-    if (y >= m_header.imageHeight) y = m_header.imageHeight - 1;
-    // note: you don't have to check for negative since the type is unsigned
-    //assert( x < m_header.imageWidth && y < m_header.imageHeight );
-    return m_data[y * m_header.imageWidth + x];
-}
+    private:
+        Header m_header;
+        std::string m_inName;
+        std::istream* m_in;
+        float* m_data;
+        bool m_needsClosing;
+        bool m_swapped;
+        bool m_empty;
+        int m_error;
+    };
 
+    inline float Reader::depthAt(uint16 x, uint16 y) const
+    {
+        if (x >= m_header.imageWidth)
+            x = m_header.imageWidth - 1;
+        if (y >= m_header.imageHeight)
+            y = m_header.imageHeight - 1;
+        // note: you don't have to check for negative since the type is unsigned
+        // assert( x < m_header.imageWidth && y < m_header.imageHeight );
+        return m_data[y * m_header.imageWidth + x];
+    }
 
-} // ZFile
+} // namespace ZFile
 
 #endif // __ZFile__ZFileReader__h__

@@ -4,46 +4,46 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Symbol.h>
 
-namespace Mu {
-class Context;
-class ParameterVariable;
-
-//
-//  class ParameterModifier
-//  
-//  Used as a keyword much like a TypeModifier is. Sets attributes of
-//  a ParameterVariable.
-//
-
-class ParameterModifier : public Symbol
+namespace Mu
 {
-  public:
-    ParameterModifier(Context* context, const char *name);
-    virtual ~ParameterModifier();
+    class Context;
+    class ParameterVariable;
 
     //
-    //	Symbol API
+    //  class ParameterModifier
     //
-    
-    virtual void outputNode(std::ostream&,const Node*) const;
-
-    //
-    //	Output the symbol
+    //  Used as a keyword much like a TypeModifier is. Sets attributes of
+    //  a ParameterVariable.
     //
 
-    virtual void output(std::ostream&) const;
+    class ParameterModifier : public Symbol
+    {
+    public:
+        ParameterModifier(Context* context, const char* name);
+        virtual ~ParameterModifier();
 
-    //
-    //  ParameterModifier APi
-    //
+        //
+        //	Symbol API
+        //
 
-    virtual void modify(ParameterVariable*) const = 0;
-};
+        virtual void outputNode(std::ostream&, const Node*) const;
 
+        //
+        //	Output the symbol
+        //
+
+        virtual void output(std::ostream&) const;
+
+        //
+        //  ParameterModifier APi
+        //
+
+        virtual void modify(ParameterVariable*) const = 0;
+    };
 
 } // namespace Mu
 

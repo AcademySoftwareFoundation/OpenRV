@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2006 Tweak Inc. 
+// Copyright (c) 2006 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __TwkGLText__GLT__h__
 #define __TwkGLText__GLT__h__
@@ -14,7 +14,7 @@
 #include <map>
 
 #ifndef FTGL_FONT_TYPE
-//#define FTGL_FONT_TYPE FTGLPixmapFont
+// #define FTGL_FONT_TYPE FTGLPixmapFont
 #define FTGL_FONT_TYPE FTTextureFont
 #endif
 
@@ -30,11 +30,11 @@
 //  A Face is a font+size
 //
 
-typedef FTGL_FONT_TYPE                          GLTFace;
-typedef std::pair<std::string, size_t>          GLTFaceDescription;
+typedef FTGL_FONT_TYPE GLTFace;
+typedef std::pair<std::string, size_t> GLTFaceDescription;
 typedef std::pair<GLTFaceDescription, GLTFace*> GLTState;
-typedef std::vector<GLTState>                   GLTStateStack;
-typedef std::map<GLTFaceDescription, GLTFace*>  GLTFaceCache;
+typedef std::vector<GLTState> GLTStateStack;
+typedef std::map<GLTFaceDescription, GLTFace*> GLTFaceCache;
 
 //
 //  glt is a state machine much like GL itself
@@ -65,23 +65,13 @@ void gltMultipleLineRender(float x, float y, const std::string& text);
 //  Measuring strings and the current face
 //
 
-void gltBounds(const std::string& text,
-               float& xmin,
-               float& xmax,
-               float& ymin,
+void gltBounds(const std::string& text, float& xmin, float& xmax, float& ymin,
                float& ymax);
 
-void gltMultipleLineBounds(const std::string& text,
-                           float& xmin,
-                           float& xmax,
-                           float& ymin,
-                           float& ymax);
-
+void gltMultipleLineBounds(const std::string& text, float& xmin, float& xmax,
+                           float& ymin, float& ymax);
 
 float gltAscenderHeight();
 float gltDescenderHeight();
 
-
-
 #endif // __TwkGLText__GLT__h__
-

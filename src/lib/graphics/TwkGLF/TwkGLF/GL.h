@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2002 Tweak Inc. 
+// Copyright (c) 2002 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __TwkGLF__GL__h__
 #define __TwkGLF__GL__h__
@@ -66,6 +66,7 @@
 #endif
 
 #include <iostream>
+
 //----------------------------------------------------------------------
 //
 //  These are RAII structs to make sure GL state is properly handled
@@ -75,44 +76,41 @@
 struct GLPushAttrib
 {
     GLPushAttrib(GLenum e) { glPushAttrib(e); }
+
     ~GLPushAttrib() { glPopAttrib(); }
 };
 
 struct GLPushClientAttrib
 {
     GLPushClientAttrib(GLenum e) { glPushClientAttrib(e); }
+
     ~GLPushClientAttrib() { glPopClientAttrib(); }
 };
 
 struct GLPushMatrix
 {
     GLPushMatrix() { glPushMatrix(); }
-    ~GLPushMatrix()  { glPopMatrix(); }
+
+    ~GLPushMatrix() { glPopMatrix(); }
 };
 
 //----------------------------------------------------------------------
 //
-//  DEBUG macro 
+//  DEBUG macro
 //
 
 #ifdef NDEBUG
 #define TWK_GLDEBUG ;
 #else
-//#define TWK_ABORT abort()
-#define TWK_ABORT 
-#define TWK_GLDEBUG                             \
-    if (GLuint err = glGetError())              \
-    {                                           \
-        std::cerr << "GL_ERROR: in "            \
-             << __FILE__                        \
-             << ", function "                   \
-             << __FUNCTION__                    \
-             << ", line "                       \
-             << __LINE__                        \
-             << ": "                            \
-             << TwkGLF::errorString(err)        \
-             << std::endl;                      \
-        TWK_ABORT;                              \
+// #define TWK_ABORT abort()
+#define TWK_ABORT
+#define TWK_GLDEBUG                                                \
+    if (GLuint err = glGetError())                                 \
+    {                                                              \
+        std::cerr << "GL_ERROR: in " << __FILE__ << ", function "  \
+                  << __FUNCTION__ << ", line " << __LINE__ << ": " \
+                  << TwkGLF::errorString(err) << std::endl;        \
+        TWK_ABORT;                                                 \
     }
 #endif
 
@@ -133,11 +131,11 @@ struct GLPushMatrix
 
 //----------------------------------------------------------------------
 
-namespace TwkGLF {
-std::string errorString(GLenum errorCode);
-std::string safeGLGetString(GLenum name);
-}
-
+namespace TwkGLF
+{
+    std::string errorString(GLenum errorCode);
+    std::string safeGLGetString(GLenum name);
+} // namespace TwkGLF
 
 //
 //  These functions have C++ linkage -- so its not necessary to put
@@ -147,16 +145,10 @@ std::string safeGLGetString(GLenum name);
 //
 // COLOR
 //
-inline void glColor( const TwkMath::Vec3f &c ) 
-{ 
-    glColor3fv( ( GLfloat * )( &c ) ); 
-}
+inline void glColor(const TwkMath::Vec3f& c) { glColor3fv((GLfloat*)(&c)); }
 
 //
-inline void glColor( const TwkMath::Vec4f &c )
-{ 
-    glColor4fv( ( GLfloat * )( &c ) ); 
-}
+inline void glColor(const TwkMath::Vec4f& c) { glColor4fv((GLfloat*)(&c)); }
 
 #if 0
 //
@@ -180,33 +172,27 @@ inline void glSecondardColor( const TwkMath::Vec4f &c )
 //
 // NORMAL
 //
-inline void glNormal( const TwkMath::Vec3f &n ) 
-{ 
-    glNormal3fv( ( GLfloat * )( &n ) ); 
-}
+inline void glNormal(const TwkMath::Vec3f& n) { glNormal3fv((GLfloat*)(&n)); }
 
 //
 // TEX COORD
 //
-inline void glTexCoord( const GLfloat f )
-{ 
-    glTexCoord1f( f );     
-}
+inline void glTexCoord(const GLfloat f) { glTexCoord1f(f); }
 
 //
-inline void glTexCoord( const TwkMath::Vec2f &t )
-{ 
-    glTexCoord2fv( ( GLfloat * )( &t ) ); 
+inline void glTexCoord(const TwkMath::Vec2f& t)
+{
+    glTexCoord2fv((GLfloat*)(&t));
 }
 
-inline void glTexCoord( const TwkMath::Vec3f &t ) 
-{ 
-    glTexCoord3fv( ( GLfloat * )( &t ) ); 
+inline void glTexCoord(const TwkMath::Vec3f& t)
+{
+    glTexCoord3fv((GLfloat*)(&t));
 }
 
-inline void glTexCoord( const TwkMath::Vec4f &t )
-{ 
-    glTexCoord4fv( ( GLfloat * )( &t ) ); 
+inline void glTexCoord(const TwkMath::Vec4f& t)
+{
+    glTexCoord4fv((GLfloat*)(&t));
 }
 
 //
@@ -214,106 +200,95 @@ inline void glTexCoord( const TwkMath::Vec4f &t )
 //
 #if GL_ARB_multitexture
 //
-inline void glMultiTexCoord( GLenum unit, GLfloat f ) 
-{ 
-    glMultiTexCoord1fARB( unit, f );     
+inline void glMultiTexCoord(GLenum unit, GLfloat f)
+{
+    glMultiTexCoord1fARB(unit, f);
 }
 
-inline void glMultiTexCoord( GLenum unit, const TwkMath::Vec2f &t ) 
-{ 
-    glMultiTexCoord2fvARB( unit, ( GLfloat * )( &t ) ); 
+inline void glMultiTexCoord(GLenum unit, const TwkMath::Vec2f& t)
+{
+    glMultiTexCoord2fvARB(unit, (GLfloat*)(&t));
 }
 
-inline void glMultiTexCoord( GLenum unit, const TwkMath::Vec3f &t ) 
-{ 
-    glMultiTexCoord3fvARB( unit, ( GLfloat * )( &t ) ); 
+inline void glMultiTexCoord(GLenum unit, const TwkMath::Vec3f& t)
+{
+    glMultiTexCoord3fvARB(unit, (GLfloat*)(&t));
 }
 
-inline void glMultiTexCoord( GLenum unit, const TwkMath::Vec4f &t ) 
-{ 
-    glMultiTexCoord4fvARB( unit, ( GLfloat * )( &t ) ); 
+inline void glMultiTexCoord(GLenum unit, const TwkMath::Vec4f& t)
+{
+    glMultiTexCoord4fvARB(unit, (GLfloat*)(&t));
 }
 #endif
 
 //
 // VERTEX
 //
-inline void glVertex( const TwkMath::Vec2f &v )
-{ 
-    glVertex2fv( ( GLfloat * )( &v ) ); 
-}
+inline void glVertex(const TwkMath::Vec2f& v) { glVertex2fv((GLfloat*)(&v)); }
 
-inline void glVertex( const TwkMath::Vec3f &v ) 
-{ 
-    glVertex3fv( ( GLfloat * )( &v ) ); 
-}
+inline void glVertex(const TwkMath::Vec3f& v) { glVertex3fv((GLfloat*)(&v)); }
 
-inline void glVertex( const TwkMath::Vec4f &v ) 
-{ 
-    glVertex4fv( ( GLfloat * )( &v ) ); 
-}
+inline void glVertex(const TwkMath::Vec4f& v) { glVertex4fv((GLfloat*)(&v)); }
 
 //
 // MATERIAL
 //
-inline void glMaterial( GLenum face, GLenum pname, GLint i )
-{ 
-    glMateriali( face, pname, i ); 
+inline void glMaterial(GLenum face, GLenum pname, GLint i)
+{
+    glMateriali(face, pname, i);
 }
 
-inline void glMaterial( GLenum face, GLenum pname, GLfloat f )
-{ 
-    glMaterialf( face, pname, f ); 
+inline void glMaterial(GLenum face, GLenum pname, GLfloat f)
+{
+    glMaterialf(face, pname, f);
 }
 
-inline void glMaterial( GLenum face, GLenum pname, const TwkMath::Vec4f &v )
-{ 
-    glMaterialfv( face, pname, ( GLfloat * )( &v ) ); 
+inline void glMaterial(GLenum face, GLenum pname, const TwkMath::Vec4f& v)
+{
+    glMaterialfv(face, pname, (GLfloat*)(&v));
 }
 
 //
 // LIGHT
 //
-inline void glLight( GLenum light, GLenum pname, GLint i )
-{ 
-    glLighti( light, pname, i ); 
-} 
-
-inline void glLight( GLenum light, GLenum pname, GLfloat f )
+inline void glLight(GLenum light, GLenum pname, GLint i)
 {
-    glLightf( light, pname, f ); 
-} 
+    glLighti(light, pname, i);
+}
 
-inline void glLight( GLenum light, GLenum pname, const TwkMath::Vec4f &v )
-{ 
-    glLightfv( light, pname, ( GLfloat * )( &v ) ); 
-} 
+inline void glLight(GLenum light, GLenum pname, GLfloat f)
+{
+    glLightf(light, pname, f);
+}
 
-inline void glLight( GLenum light, GLenum pname, const TwkMath::Vec3f &v, 
-                     float wa = 1.0f )
-{   
-    TwkMath::Vec4f v4( v[0], v[1], v[2], wa ); 
-    glLightfv( light, pname, ( GLfloat * )( &v4 ) ); 
-} 
+inline void glLight(GLenum light, GLenum pname, const TwkMath::Vec4f& v)
+{
+    glLightfv(light, pname, (GLfloat*)(&v));
+}
+
+inline void glLight(GLenum light, GLenum pname, const TwkMath::Vec3f& v,
+                    float wa = 1.0f)
+{
+    TwkMath::Vec4f v4(v[0], v[1], v[2], wa);
+    glLightfv(light, pname, (GLfloat*)(&v4));
+}
 
 //
 // MATRIX
 //
-inline TwkMath::Mat44f getMatrix( GLenum matrix ) 
+inline TwkMath::Mat44f getMatrix(GLenum matrix)
 {
     GLfloat m[16];
-    glGetFloatv( matrix, m );
+    glGetFloatv(matrix, m);
 
     // Unfortunately, open GL stores matrices in COLUMN-major
     // format, whereas we store them in the much more sane ROW-major
     // format.
-    return TwkMath::Mat44f( m[0], m[4], m[8],  m[12],
-                            m[1], m[5], m[9],  m[13],
-                            m[2], m[6], m[10], m[14],
-                            m[3], m[7], m[11], m[15] );
+    return TwkMath::Mat44f(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13],
+                           m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
 }
 
-inline void glLoadMatrix( const TwkMath::Mat44f &m ) 
+inline void glLoadMatrix(const TwkMath::Mat44f& m)
 {
     GLfloat mv[16];
 
@@ -337,10 +312,10 @@ inline void glLoadMatrix( const TwkMath::Mat44f &m )
     mv[14] = m[2][3];
     mv[15] = m[3][3];
 
-    glLoadMatrixf( mv );	
+    glLoadMatrixf(mv);
 }
 
-inline void glMultMatrix( const TwkMath::Mat44f &m )
+inline void glMultMatrix(const TwkMath::Mat44f& m)
 {
     GLfloat mv[16];
 
@@ -364,7 +339,7 @@ inline void glMultMatrix( const TwkMath::Mat44f &m )
     mv[14] = m[2][3];
     mv[15] = m[3][3];
 
-    glMultMatrixf( mv );	
+    glMultMatrixf(mv);
 }
 
 //
@@ -380,43 +355,44 @@ inline void glRotate( const TwkMath::Qtnf &r )
 }
 #endif
 
-inline void glTranslate( const TwkMath::Vec3f &t )
+inline void glTranslate(const TwkMath::Vec3f& t)
 {
-    glTranslatef( t[0], t[1], t[2] ); 
+    glTranslatef(t[0], t[1], t[2]);
 }
 
-inline void glScale( const TwkMath::Vec3f &s ) 
-{ 
-    glScalef( s[0], s[1], s[2] ); 
-}
+inline void glScale(const TwkMath::Vec3f& s) { glScalef(s[0], s[1], s[2]); }
 
-inline void setUniformGLMatrix(GLuint p, const unsigned int loc, GLfloat* mat, bool transpose = true)
+inline void setUniformGLMatrix(GLuint p, const unsigned int loc, GLfloat* mat,
+                               bool transpose = true)
 {
-    glUniformMatrix4fv(loc, 1, transpose, mat); TWK_GLDEBUG;
+    glUniformMatrix4fv(loc, 1, transpose, mat);
+    TWK_GLDEBUG;
 }
 
 inline void getUniformGLMatrix(GLuint p, const unsigned int loc, GLfloat* mat)
 {
-    glGetUniformfv(p, loc, mat); TWK_GLDEBUG;
+    glGetUniformfv(p, loc, mat);
+    TWK_GLDEBUG;
 }
 
-inline bool setUniformGLFloat(GLuint p, const unsigned int loc, size_t no, GLfloat* data)
+inline bool setUniformGLFloat(GLuint p, const unsigned int loc, size_t no,
+                              GLfloat* data)
 {
-    switch(no)
+    switch (no)
     {
-      case 1:
+    case 1:
         glUniform1fv(loc, 1, data);
         break;
-      case 2:
+    case 2:
         glUniform2fv(loc, 1, data);
         break;
-      case 3:
+    case 3:
         glUniform3fv(loc, 1, data);
         break;
-      case 4:
+    case 4:
         glUniform4fv(loc, 1, data);
         break;
-      default:
+    default:
         return false;
         break;
     }
@@ -426,26 +402,28 @@ inline bool setUniformGLFloat(GLuint p, const unsigned int loc, size_t no, GLflo
 
 inline void getUniformGLFloat(GLuint p, const unsigned int loc, GLfloat* data)
 {
-    glGetUniformfv(p, loc, data); TWK_GLDEBUG;
+    glGetUniformfv(p, loc, data);
+    TWK_GLDEBUG;
 }
 
-inline bool setUniformGLInt(GLuint p, const unsigned int loc, size_t no, GLint* data)
+inline bool setUniformGLInt(GLuint p, const unsigned int loc, size_t no,
+                            GLint* data)
 {
-    switch(no)
+    switch (no)
     {
-      case 1:
+    case 1:
         glUniform1iv(loc, 1, data);
         break;
-      case 2:
+    case 2:
         glUniform2iv(loc, 1, data);
         break;
-      case 3:
+    case 3:
         glUniform3iv(loc, 1, data);
         break;
-      case 4:
+    case 4:
         glUniform4iv(loc, 1, data);
         break;
-      default:
+    default:
         return false;
         break;
     }
@@ -455,55 +433,69 @@ inline bool setUniformGLInt(GLuint p, const unsigned int loc, size_t no, GLint* 
 
 inline void getUniformGLInt(GLuint p, const unsigned int loc, GLint* data)
 {
-    glGetUniformiv(p, loc, data); TWK_GLDEBUG;
+    glGetUniformiv(p, loc, data);
+    TWK_GLDEBUG;
 }
 
-void glDrawBox(const TwkMath::Box3f &bbox);
+void glDrawBox(const TwkMath::Box3f& bbox);
 
-void glJitterFrustum(GLdouble left, GLdouble right, 
-                     GLdouble bottom, GLdouble top, 
-                     GLdouble near, GLdouble far, 
-                     GLdouble pixdx, GLdouble pixdy, 
-                     GLdouble eyedx, GLdouble eyedy, 
+void glJitterFrustum(GLdouble left, GLdouble right, GLdouble bottom,
+                     GLdouble top, GLdouble near, GLdouble far, GLdouble pixdx,
+                     GLdouble pixdy, GLdouble eyedx, GLdouble eyedy,
                      GLdouble focus);
 
-void glJitterPerspective(GLdouble fovy, GLdouble aspect, 
-                         GLdouble near, GLdouble far, 
-                         GLdouble pixdx, GLdouble pixdy, 
-                         GLdouble eyedx, GLdouble eyedy, 
-                         GLdouble focus);
+void glJitterPerspective(GLdouble fovy, GLdouble aspect, GLdouble near,
+                         GLdouble far, GLdouble pixdx, GLdouble pixdy,
+                         GLdouble eyedx, GLdouble eyedy, GLdouble focus);
 
 bool glSupportsExtension(const char*);
 
 #if !defined(TWK_USE_GLEW) && defined(WIN32)
-#define TWK_INIT_GL_EXTENSIONS \
-    glMultiTexCoord1fARB         = (PFNGLMULTITEXCOORD1FARBPROC)  wglGetProcAddress("glMultiTexCoord1fARB");                \
-    glMultiTexCoord2fvARB        = (PFNGLMULTITEXCOORD2FVARBPROC) wglGetProcAddress("glMultiTexCoord2fvARB");               \
-    glMultiTexCoord3fvARB        = (PFNGLMULTITEXCOORD3FVARBPROC) wglGetProcAddress("glMultiTexCoord3fvARB");               \
-    glMultiTexCoord4fvARB        = (PFNGLMULTITEXCOORD4FVARBPROC) wglGetProcAddress("glMultiTexCoord4fvARB");               \
-    glVertexAttrib2fvNV          = (PFNGLMULTITEXCOORD2FVARBPROC) wglGetProcAddress("glVertexAttrib2fvNV");                 \
-    glVertexAttrib3fvNV          = (PFNGLMULTITEXCOORD3FVARBPROC) wglGetProcAddress("glVertexAttrib3fvNV");                 \
-    glVertexAttrib4fvNV          = (PFNGLMULTITEXCOORD4FVARBPROC) wglGetProcAddress("glVertexAttrib4fvNV");                 \
-    glGetProgramivARB            = (PFNGLGETPROGRAMIVARBPROC) wglGetProcAddress("glGetProgramivARB");                       \
-    glActiveTextureARB           = (PFNGLACTIVETEXTUREARBPROC) wglGetProcAddress("glActiveTextureARB");                     \
-    glMultiTexCoord2f            = (PFNGLMULTITEXCOORD2FPROC)   wglGetProcAddress("glMultiTexCoord2f");                     \
-    glDeleteBuffers              = (PFNGLDELETEBUFFERSPROC)     wglGetProcAddress("glDeleteBuffers");                       \
-    glBufferData                 = (PFNGLBUFFERDATAPROC)        wglGetProcAddress("glBufferData");                          \
-    glBindBuffer                 = (PFNGLBINDBUFFERPROC)        wglGetProcAddress("glBindBuffer");                          \
-    glGenBuffers                 = (PFNGLGENBUFFERSPROC)        wglGetProcAddress("glGenBuffers");                          \
-    glUnmapBuffer                = (PFNGLUNMAPBUFFERPROC)       wglGetProcAddress("glUnmapBuffer");                         \
-    glMapBuffer                  = (PFNGLMAPBUFFERPROC)         wglGetProcAddress("glMapBuffer");                           \
-    glTexImage3D                 = (PFNGLTEXIMAGE3DPROC)        wglGetProcAddress("glTexImage3D");                          \
-    glDeleteProgramsARB          = (PFNGLDELETEPROGRAMSARBPROC) wglGetProcAddress("glDeleteProgramsARB");                   \
-    glProgramStringARB           = (PFNGLPROGRAMSTRINGARBPROC)  wglGetProcAddress("glProgramStringARB");                    \
-    glBindProgramARB             = (PFNGLBINDPROGRAMARBPROC)    wglGetProcAddress("glBindProgramARB");                      \
-    glGenProgramsARB             = (PFNGLGENPROGRAMSARBPROC)    wglGetProcAddress("glGenProgramsARB");                      \
-    glProgramLocalParameter4fARB = (PFNGLPROGRAMLOCALPARAMETER4FARBPROC) wglGetProcAddress("glProgramLocalParameter4fARB"); \
-    glColorTable                 = (PFNGLCOLORTABLEPROC) wglGetProcAddress("glColorTable");                                 \
-    glBlendEquation              = (PFNGLBLENDEQUATIONEXTPROC) wglGetProcAddress("glBlendEquation")
+#define TWK_INIT_GL_EXTENSIONS                                                \
+    glMultiTexCoord1fARB = (PFNGLMULTITEXCOORD1FARBPROC)wglGetProcAddress(    \
+        "glMultiTexCoord1fARB");                                              \
+    glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress(  \
+        "glMultiTexCoord2fvARB");                                             \
+    glMultiTexCoord3fvARB = (PFNGLMULTITEXCOORD3FVARBPROC)wglGetProcAddress(  \
+        "glMultiTexCoord3fvARB");                                             \
+    glMultiTexCoord4fvARB = (PFNGLMULTITEXCOORD4FVARBPROC)wglGetProcAddress(  \
+        "glMultiTexCoord4fvARB");                                             \
+    glVertexAttrib2fvNV = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress(    \
+        "glVertexAttrib2fvNV");                                               \
+    glVertexAttrib3fvNV = (PFNGLMULTITEXCOORD3FVARBPROC)wglGetProcAddress(    \
+        "glVertexAttrib3fvNV");                                               \
+    glVertexAttrib4fvNV = (PFNGLMULTITEXCOORD4FVARBPROC)wglGetProcAddress(    \
+        "glVertexAttrib4fvNV");                                               \
+    glGetProgramivARB =                                                       \
+        (PFNGLGETPROGRAMIVARBPROC)wglGetProcAddress("glGetProgramivARB");     \
+    glActiveTextureARB =                                                      \
+        (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");   \
+    glMultiTexCoord2f =                                                       \
+        (PFNGLMULTITEXCOORD2FPROC)wglGetProcAddress("glMultiTexCoord2f");     \
+    glDeleteBuffers =                                                         \
+        (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");         \
+    glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");    \
+    glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");    \
+    glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");    \
+    glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)wglGetProcAddress("glUnmapBuffer"); \
+    glMapBuffer = (PFNGLMAPBUFFERPROC)wglGetProcAddress("glMapBuffer");       \
+    glTexImage3D = (PFNGLTEXIMAGE3DPROC)wglGetProcAddress("glTexImage3D");    \
+    glDeleteProgramsARB =                                                     \
+        (PFNGLDELETEPROGRAMSARBPROC)wglGetProcAddress("glDeleteProgramsARB"); \
+    glProgramStringARB =                                                      \
+        (PFNGLPROGRAMSTRINGARBPROC)wglGetProcAddress("glProgramStringARB");   \
+    glBindProgramARB =                                                        \
+        (PFNGLBINDPROGRAMARBPROC)wglGetProcAddress("glBindProgramARB");       \
+    glGenProgramsARB =                                                        \
+        (PFNGLGENPROGRAMSARBPROC)wglGetProcAddress("glGenProgramsARB");       \
+    glProgramLocalParameter4fARB =                                            \
+        (PFNGLPROGRAMLOCALPARAMETER4FARBPROC)wglGetProcAddress(               \
+            "glProgramLocalParameter4fARB");                                  \
+    glColorTable = (PFNGLCOLORTABLEPROC)wglGetProcAddress("glColorTable");    \
+    glBlendEquation =                                                         \
+        (PFNGLBLENDEQUATIONEXTPROC)wglGetProcAddress("glBlendEquation")
 #else
 #define TWK_INIT_GL_EXTENSIONS
 #endif
 
 #endif // __TwkGLF__GL__h__
-

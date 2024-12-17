@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <mu_test/AClassType.h>
 #include <Mu/BaseFunctions.h>
@@ -24,140 +24,128 @@
 #include <iostream>
 #include <sstream>
 
-namespace Mu {
-using namespace std;
-using namespace Mu;
-
-//----------------------------------------------------------------------
-
-
-AClassType::AClassType(Context* c, Class *super) : Class(c, "a_class", super)
+namespace Mu
 {
-}
+    using namespace std;
+    using namespace Mu;
 
-AClassType::~AClassType() {}
+    //----------------------------------------------------------------------
 
+    AClassType::AClassType(Context* c, Class* super)
+        : Class(c, "a_class", super)
+    {
+    }
 
-void
-AClassType::load()
-{
-    USING_MU_FUNCTION_SYMBOLS;
+    AClassType::~AClassType() {}
 
-    Symbol *s = scope();
-    MuLangContext* context = (MuLangContext*)globalModule()->context();
-    Context* c = context;
+    void AClassType::load()
+    {
+        USING_MU_FUNCTION_SYMBOLS;
 
-    String tname = s->name();
-    tname += ".";
-    tname += "a_class";
+        Symbol* s = scope();
+        MuLangContext* context = (MuLangContext*)globalModule()->context();
+        Context* c = context;
 
-    String rname = tname + "&";
+        String tname = s->name();
+        tname += ".";
+        tname += "a_class";
 
-    const char* tn = tname.c_str();
-    const char* rn = rname.c_str();
-		  
-    s->addSymbols( new ReferenceType(c, "a_class&", this), 
+        String rname = tname + "&";
 
-		   new Function(c, "a_class", AClassType::construct, None,
-				Return, tn, 
-                                Args, "string",
-                                End),
+        const char* tn = tname.c_str();
+        const char* rn = rname.c_str();
 
-		   new Function(c, "a_class", BaseFunctions::dereference, Cast,
-				Return, tn,
-				Args, rn, End),
+        s->addSymbols(new ReferenceType(c, "a_class&", this),
 
-		   EndArguments);
+                      new Function(c, "a_class", AClassType::construct, None,
+                                   Return, tn, Args, "string", End),
 
-    globalScope()->addSymbols(
+                      new Function(c, "a_class", BaseFunctions::dereference,
+                                   Cast, Return, tn, Args, rn, End),
 
-		   new Function(c, "print", AClassType::print, None,
-				Return, "void", 
-				Args, tn, End),
+                      EndArguments);
 
-		   new Function(c, "=", BaseFunctions::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
+        globalScope()->addSymbols(
+
+            new Function(c, "print", AClassType::print, None, Return, "void",
+                         Args, tn, End),
+
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
+                         rn, tn, End),
+
+            EndArguments);
+
+        typedef ParameterVariable Param;
+
+        addSymbols(new MemberVariable(c, "value", "int"),
+
+                   new MemberFunction(c, "foo", AClassType::foo, None, Return,
+                                      "string", Args, tn, End),
+
+                   new MemberFunction(c, "bar", AClassType::bar, None, Return,
+                                      "string", Args, tn, End),
 
                    EndArguments);
-
-    typedef ParameterVariable Param;
-
-    addSymbols( new MemberVariable(c, "value", "int"),
-
-                new MemberFunction(c, "foo", AClassType::foo, None,
-                                   Return, "string",
-                                   Args, tn,
-                                   End),
-
-                new MemberFunction(c, "bar", AClassType::bar, None,
-                                   Return, "string",
-                                   Args, tn,
-                                   End),
-
-		EndArguments );
-
-}
-
-NODE_IMPLEMENTATION(AClassType::construct, Pointer)
-{
-    StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
-    if (!name) throw NilArgumentException();
-
-    Process *p = NODE_THREAD.process();
-    const Class *c = static_cast<const AClassType*>(NODE_THIS.type());
-    ClassInstance *o = ClassInstance::allocate(c);
-
-    Layout *x = reinterpret_cast<Layout*>(o->structure());
-    x->name = name;
-
-    NODE_RETURN(Pointer(o));
-}
-
-NODE_IMPLEMENTATION(AClassType::print, void)
-{
-    ClassInstance *i = NODE_ARG_OBJECT(0, ClassInstance);
-    i->type()->outputValue(cout, Value(i));
-}
-
-NODE_IMPLEMENTATION(AClassType::foo, Pointer)
-{
-    ClassInstance *i = NODE_ARG_OBJECT(0, ClassInstance);
-    Layout *x = reinterpret_cast<Layout*>(i->structure());
-    Process *p = NODE_THREAD.process();
-    MuLangContext* c = static_cast<MuLangContext*>(p->context());
-
-    ostringstream str;
-
-    if (x->name)
-    {
-        str << x->name->c_str();
-        str << "->";
     }
 
-    str << "a_class.foo";
-    NODE_RETURN(c->stringType()->allocate(str));
-}
-
-NODE_IMPLEMENTATION(AClassType::bar, Pointer)
-{
-    ClassInstance *i = NODE_ARG_OBJECT(0, ClassInstance);
-    Layout *x = reinterpret_cast<Layout*>(i->structure());
-    Process *p = NODE_THREAD.process();
-    MuLangContext* c = static_cast<MuLangContext*>(p->context());
-
-    ostringstream str;
-
-    if (x->name)
+    NODE_IMPLEMENTATION(AClassType::construct, Pointer)
     {
-        str << x->name->c_str();
-        str << "->";
+        StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
+        if (!name)
+            throw NilArgumentException();
+
+        Process* p = NODE_THREAD.process();
+        const Class* c = static_cast<const AClassType*>(NODE_THIS.type());
+        ClassInstance* o = ClassInstance::allocate(c);
+
+        Layout* x = reinterpret_cast<Layout*>(o->structure());
+        x->name = name;
+
+        NODE_RETURN(Pointer(o));
     }
 
-    str << "a_class.bar";
-    NODE_RETURN(c->stringType()->allocate(str));
-}
+    NODE_IMPLEMENTATION(AClassType::print, void)
+    {
+        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);
+        i->type()->outputValue(cout, Value(i));
+    }
 
+    NODE_IMPLEMENTATION(AClassType::foo, Pointer)
+    {
+        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);
+        Layout* x = reinterpret_cast<Layout*>(i->structure());
+        Process* p = NODE_THREAD.process();
+        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+
+        ostringstream str;
+
+        if (x->name)
+        {
+            str << x->name->c_str();
+            str << "->";
+        }
+
+        str << "a_class.foo";
+        NODE_RETURN(c->stringType()->allocate(str));
+    }
+
+    NODE_IMPLEMENTATION(AClassType::bar, Pointer)
+    {
+        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);
+        Layout* x = reinterpret_cast<Layout*>(i->structure());
+        Process* p = NODE_THREAD.process();
+        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+
+        ostringstream str;
+
+        if (x->name)
+        {
+            str << x->name->c_str();
+            str << "->";
+        }
+
+        str << "a_class.bar";
+        NODE_RETURN(c->stringType()->allocate(str));
+    }
 
 } // namespace Mu
-

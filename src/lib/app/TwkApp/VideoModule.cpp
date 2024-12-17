@@ -1,67 +1,40 @@
 //
-//  Copyright (c) 2011 Tweak Software. 
+//  Copyright (c) 2011 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #include <TwkApp/VideoModule.h>
 
-namespace TwkApp {
-using namespace std;
-
-VideoModule::VideoModule(NativeDisplayPtr)
+namespace TwkApp
 {
-}
+    using namespace std;
 
-VideoModule::~VideoModule()
-{
-}
+    VideoModule::VideoModule(NativeDisplayPtr) {}
 
-std::string 
-VideoModule::name() const
-{
-    return "UNNAMED";
-}
+    VideoModule::~VideoModule() {}
 
-string
-VideoModule::SDKIdentifier() const
-{
-    return "";
-}
+    std::string VideoModule::name() const { return "UNNAMED"; }
 
-string
-VideoModule::SDKInfo() const
-{
-    return "";
-}
+    string VideoModule::SDKIdentifier() const { return ""; }
 
-void
-VideoModule::open()
-{
-}
+    string VideoModule::SDKInfo() const { return ""; }
 
-void
-VideoModule::close()
-{
-}
+    void VideoModule::open() {}
 
-bool
-VideoModule::isOpen() const
-{
-    return false;
-}
+    void VideoModule::close() {}
 
-const VideoModule::VideoDevices&
-VideoModule::devices() const
-{
-    return m_devices;
-}
+    bool VideoModule::isOpen() const { return false; }
 
-VideoDevice* 
-VideoModule::deviceFromPosition(int x, int y) const
-{
-    return 0;
-}
+    const VideoModule::VideoDevices& VideoModule::devices() const
+    {
+        return m_devices;
+    }
 
-} // TwkApp
+    VideoDevice* VideoModule::deviceFromPosition(int x, int y) const
+    {
+        return 0;
+    }
+
+} // namespace TwkApp

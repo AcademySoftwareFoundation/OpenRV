@@ -11,32 +11,34 @@
 
 #include <TwkGLF/GLPixelBufferObject.h>
 
-namespace TwkGLF {
-
-void InitPBOPools();
-void UninitPBOPools();
-
-class GLPixelBufferObjectFromPool
+namespace TwkGLF
 {
-public:
-   GLPixelBufferObjectFromPool( GLPixelBufferObject::PackDir dir, unsigned int num_bytes );
-   ~GLPixelBufferObjectFromPool();
 
-   void bind();
-   void unbind();
-   
-   void* map();
-   void* getMappedPtr();
-   void unmap();
+    void InitPBOPools();
+    void UninitPBOPools();
 
-   unsigned int getSize() const;
-   void copyBufferData( void * data, unsigned size );
-   GLPixelBufferObject::PackDir getPackDir() const;
+    class GLPixelBufferObjectFromPool
+    {
+    public:
+        GLPixelBufferObjectFromPool(GLPixelBufferObject::PackDir dir,
+                                    unsigned int num_bytes);
+        ~GLPixelBufferObjectFromPool();
 
-private:
-  class PBOWrap * _pPBOWrap;
-};
+        void bind();
+        void unbind();
 
-} // TwkGLF
+        void* map();
+        void* getMappedPtr();
+        void unmap();
+
+        unsigned int getSize() const;
+        void copyBufferData(void* data, unsigned size);
+        GLPixelBufferObject::PackDir getPackDir() const;
+
+    private:
+        class PBOWrap* _pPBOWrap;
+    };
+
+} // namespace TwkGLF
 
 #endif // __TwkGLF__GLPixelBufferObjectPool__h__

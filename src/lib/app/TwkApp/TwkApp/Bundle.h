@@ -1,231 +1,237 @@
 //******************************************************************************
-// Copyright (c) 2007 Tweak Inc. 
+// Copyright (c) 2007 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __TwkApp__Bundle__h__
 #define __TwkApp__Bundle__h__
 #include <string>
 #include <vector>
 
-namespace TwkApp {
-
-//
-//  class Bundle
-//
-//  This is an interface to Application files outside of the binary.
-//  An instance of this must be passed to the Application class. This
-//  is usually instantiated as either a DarwinBundle, UnixBundle, or 
-//  WindowsBundle depending on the OS.
-//
-//  For our purposes, search paths to plugins, or paths to files are
-//  placed in environment variables. These are then searched by
-//  individual components (like image plugins for example) that know
-//  where and how to look for what they want.
-//
-
-class Bundle
+namespace TwkApp
 {
-public:
+
     //
-    //  These could change to wstring or ustring
+    //  class Bundle
+    //
+    //  This is an interface to Application files outside of the binary.
+    //  An instance of this must be passed to the Application class. This
+    //  is usually instantiated as either a DarwinBundle, UnixBundle, or
+    //  WindowsBundle depending on the OS.
+    //
+    //  For our purposes, search paths to plugins, or paths to files are
+    //  placed in environment variables. These are then searched by
+    //  individual components (like image plugins for example) that know
+    //  where and how to look for what they want.
     //
 
-    typedef std::string       Path;
-    typedef std::string       FileName;
-    typedef std::string       CacheItemName;
-    typedef std::string       DirName;
-    typedef std::string       EnvVar;
-    typedef std::vector<Path> PathVector;
-    typedef unsigned char     Byte;
-    typedef std::string       FileAccessPermission;
-    typedef void*             AccessObject;
-
-    class CacheArena
+    class Bundle
     {
-      public:
-        CacheArena(const std::string& name)
-            : m_name(name) {}
-        virtual ~CacheArena();
+    public:
+        //
+        //  These could change to wstring or ustring
+        //
 
-        const std::string& name() const { return m_name; }
-        
-      private:
-        std::string m_name;
-    };
+        typedef std::string Path;
+        typedef std::string FileName;
+        typedef std::string CacheItemName;
+        typedef std::string DirName;
+        typedef std::string EnvVar;
+        typedef std::vector<Path> PathVector;
+        typedef unsigned char Byte;
+        typedef std::string FileAccessPermission;
+        typedef void* AccessObject;
 
-    //
-    //  
-    //
+        class CacheArena
+        {
+        public:
+            CacheArena(const std::string& name)
+                : m_name(name)
+            {
+            }
 
-    Bundle(const std::string& appName,
-           size_t major_version,
-           size_t minor_version,
-           size_t revision_number,
-           bool sandboxed = false,
-           bool inheritedSandbox = false);
+            virtual ~CacheArena();
 
-    virtual ~Bundle();
+            const std::string& name() const { return m_name; }
 
-    static Bundle* mainBundle() { return m_mainBundle; }
+        private:
+            std::string m_name;
+        };
 
-    const std::string& applicationName() const { return m_applicationName; }
+        //
+        //
+        //
 
-    bool isSandboxed() const { return m_sandboxed; }
-    bool isInheritedSandbox() const { return m_inheritedSandbox; }
+        Bundle(const std::string& appName, size_t major_version,
+               size_t minor_version, size_t revision_number,
+               bool sandboxed = false, bool inheritedSandbox = false);
 
-    //
-    //  Application root. This is not where the binary lives: its the
-    //  topmost directory that holds the whole app.
-    //
+        virtual ~Bundle();
 
-    virtual Path top() = 0;
+        static Bundle* mainBundle() { return m_mainBundle; }
 
-    //
-    // 
-    
-    const std::string& majorVersionDir() const { return m_majorVersionDir; }
-    const std::string& versionDir() const { return m_versionDir; }
+        const std::string& applicationName() const { return m_applicationName; }
 
-    //
-    //  Find a particular binary, or application
-    //
+        bool isSandboxed() const { return m_sandboxed; }
 
-    virtual Path executableFile(const FileName& name) = 0;
-    virtual Path application(const FileName& name) = 0;
+        bool isInheritedSandbox() const { return m_inheritedSandbox; }
 
-    //
-    //  The user support root path (~/Library/Application Support/APP)
-    //
+        //
+        //  Application root. This is not where the binary lives: its the
+        //  topmost directory that holds the whole app.
+        //
 
-    virtual PathVector supportPath() = 0;
+        virtual Path top() = 0;
 
-    //
-    //  Looks for: 
-    //      rcenv
-    //      .rcfileName in home dir 
-    //      rcfileName in bundle
-    //
-    //  type is the extension, so .rvrc.mu which could be overriden by
-    //  RV_INIT env var would look like:
-    //
-    //      rcfile("rvrc", "mu", "RV_INIT")
-    //  
+        //
+        //
 
-    virtual Path rcfile(const FileName& rcfileName,
-                        const FileName& type,
-                        const EnvVar& rcenv) = 0;
+        const std::string& majorVersionDir() const { return m_majorVersionDir; }
 
-    //
-    //  Find a seach path for types of plugins, or scripts. The app
-    //  versions will find the path associated with the application
-    //  directory only.
-    //
+        const std::string& versionDir() const { return m_versionDir; }
 
-    virtual PathVector pluginPath(const DirName& pluginType) = 0;
-    virtual PathVector scriptPath(const DirName& scriptType) = 0;
-    virtual Path       appPluginPath(const DirName& pluginType) = 0;
-    virtual Path       appScriptPath(const DirName& pluginType) = 0;
-    virtual Path       userPluginPath(const DirName& pluginType) = 0;
-    virtual Path       userCacheDir() = 0;
+        //
+        //  Find a particular binary, or application
+        //
 
-    //
-    //  For example: resource("rv_manual", "pdf");
-    //
+        virtual Path executableFile(const FileName& name) = 0;
+        virtual Path application(const FileName& name) = 0;
 
-    virtual Path resource(const FileName& name, const FileName& type) = 0;
-    
-    //
-    //  Find all the license files in the usual system locations
-    //
+        //
+        //  The user support root path (~/Library/Application Support/APP)
+        //
 
-    virtual PathVector licenseFiles(const FileName& licFileName,
+        virtual PathVector supportPath() = 0;
+
+        //
+        //  Looks for:
+        //      rcenv
+        //      .rcfileName in home dir
+        //      rcfileName in bundle
+        //
+        //  type is the extension, so .rvrc.mu which could be overriden by
+        //  RV_INIT env var would look like:
+        //
+        //      rcfile("rvrc", "mu", "RV_INIT")
+        //
+
+        virtual Path rcfile(const FileName& rcfileName, const FileName& type,
+                            const EnvVar& rcenv) = 0;
+
+        //
+        //  Find a seach path for types of plugins, or scripts. The app
+        //  versions will find the path associated with the application
+        //  directory only.
+        //
+
+        virtual PathVector pluginPath(const DirName& pluginType) = 0;
+        virtual PathVector scriptPath(const DirName& scriptType) = 0;
+        virtual Path appPluginPath(const DirName& pluginType) = 0;
+        virtual Path appScriptPath(const DirName& pluginType) = 0;
+        virtual Path userPluginPath(const DirName& pluginType) = 0;
+        virtual Path userCacheDir() = 0;
+
+        //
+        //  For example: resource("rv_manual", "pdf");
+        //
+
+        virtual Path resource(const FileName& name, const FileName& type) = 0;
+
+        //
+        //  Find all the license files in the usual system locations
+        //
+
+        virtual PathVector licenseFiles(const FileName& licFileName,
+                                        const FileName& type) = 0;
+
+        //
+        //  Location of default license (may not exist)
+        //
+
+        virtual Path defaultLicense(const FileName& licFileName,
                                     const FileName& type) = 0;
 
-    //
-    //  Location of default license (may not exist)
-    //
+        //
+        //  Get/Set environment variables
+        //  The version that takes a vector creates a path value
+        //  if force is false, and the env var exists, it will not be touched.
+        //
 
-    virtual Path defaultLicense(const FileName& licFileName,
-                                const FileName& type) = 0;
+        virtual std::string getEnvVar(const EnvVar& name,
+                                      const std::string& defaultValue = "");
 
-    //
-    //  Get/Set environment variables
-    //  The version that takes a vector creates a path value
-    //  if force is false, and the env var exists, it will not be touched.
-    //
+        virtual void setEnvVar(const EnvVar& name, const Path& value,
+                               bool force = false) = 0;
 
-    virtual std::string getEnvVar(const EnvVar& name,
-                                  const std::string& defaultValue = "");
+        virtual void addPathToEnvVar(const EnvVar& name,
+                                     const PathVector& value) = 0;
 
-    virtual void setEnvVar(const EnvVar& name, 
-                           const Path& value, 
-                           bool force=false) = 0;
+        //
+        //  User directories. These don't necessarily exist.
+        //
 
-    virtual void addPathToEnvVar(const EnvVar& name, 
-                                 const PathVector& value) = 0;
+        virtual Path userHome();
+        virtual Path userMovies();
+        virtual Path userMusic();
+        virtual Path userPictures();
 
-    //
-    //  User directories. These don't necessarily exist.
-    //
+        //
+        //  Crash Log
+        //
 
-    virtual Path userHome();
-    virtual Path userMovies();
-    virtual Path userMusic();
-    virtual Path userPictures();
+        virtual FileName crashLogFile() = 0;
+        virtual Path crashLogDirectory() = 0;
 
-    //
-    //  Crash Log
-    //
+        //
+        //  Cache File Management
+        //
+        //  This API manages cache files which are allowed to be removed
+        //  at any time.
+        //
+        //  userCacheDir()  is the location of the main cache dir.
+        //  rescanCache()   will update internal cache lookups (cache cache)
+        //  cacheItemPath() will return a path to the item name IFF it
+        //                  already exists in the cache. If not it returns
+        //                  a blank path
+        //
+        //  addCacheItem()  will cause a stat on the file unless you give it
+        //                  the size in bytes of the cache item you
+        //                  created
+        //
 
-    virtual FileName crashLogFile() = 0;
-    virtual Path crashLogDirectory() = 0;
+        virtual void rescanCache(const std::string& cacheName);
+        virtual bool hasCacheItem(const std::string& cacheName,
+                                  const CacheItemName&);
+        virtual Path cacheItemPath(const std::string& cacheName,
+                                   const CacheItemName&);
+        virtual void addCacheItem(const std::string& cacheName,
+                                  const CacheItemName&, size_t size = 0);
 
-    //
-    //  Cache File Management
-    //
-    //  This API manages cache files which are allowed to be removed
-    //  at any time.
-    //
-    //  userCacheDir()  is the location of the main cache dir. 
-    //  rescanCache()   will update internal cache lookups (cache cache)
-    //  cacheItemPath() will return a path to the item name IFF it
-    //                  already exists in the cache. If not it returns
-    //                  a blank path
-    //
-    //  addCacheItem()  will cause a stat on the file unless you give it
-    //                  the size in bytes of the cache item you
-    //                  created
-    //  
+        //
+        //  Security API for external filesystem resources
+        //  This is chiefly here to support sandboxing
+        //
 
-    virtual void rescanCache(const std::string& cacheName);
-    virtual bool hasCacheItem(const std::string& cacheName, const CacheItemName&);
-    virtual Path cacheItemPath(const std::string& cacheName, const CacheItemName&);
-    virtual void addCacheItem(const std::string& cacheName, const CacheItemName&, size_t size=0);
+        virtual FileAccessPermission
+        permissionForFileAccess(const Path&, bool readonly) const;
+        virtual AccessObject
+        beginFileAccessWithPermission(const FileAccessPermission&) const;
+        virtual void endFileAccessWithPermission(AccessObject) const;
 
-    //
-    //  Security API for external filesystem resources
-    //  This is chiefly here to support sandboxing
-    //
+    private:
+        std::string m_applicationName;
+        size_t m_majorVersion;
+        size_t m_minorVersion;
+        size_t m_revisionNumber;
+        std::string m_majorVersionDir;
+        std::string m_versionDir;
+        bool m_sandboxed;
+        bool m_inheritedSandbox;
+        static Bundle* m_mainBundle;
+    };
 
-    virtual FileAccessPermission permissionForFileAccess(const Path&, bool readonly) const;
-    virtual AccessObject beginFileAccessWithPermission(const FileAccessPermission&) const;
-    virtual void endFileAccessWithPermission(AccessObject) const;
-    
-  private:
-    std::string    m_applicationName;
-    size_t         m_majorVersion;
-    size_t         m_minorVersion;
-    size_t         m_revisionNumber;
-    std::string    m_majorVersionDir;
-    std::string    m_versionDir;
-    bool           m_sandboxed;
-    bool           m_inheritedSandbox;
-    static Bundle* m_mainBundle;
-};
-
-} // TwkApp
+} // namespace TwkApp
 
 #endif // __TwkApp__Bundle__h__

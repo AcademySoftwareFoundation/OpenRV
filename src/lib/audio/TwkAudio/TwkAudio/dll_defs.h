@@ -1,7 +1,7 @@
 //*****************************************************************************/
 // Copyright (c) 2022 Autodesk, Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
 //
 //*****************************************************************************/
@@ -15,6 +15,5 @@
 #define TWKAUDIO_EXPORT __declspec(dllimport)
 #endif
 #else
-#define TWKAUDIO_EXPORT 
+#define TWKAUDIO_EXPORT
 #endif
-

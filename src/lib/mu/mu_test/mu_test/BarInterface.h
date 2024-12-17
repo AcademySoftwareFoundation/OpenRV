@@ -4,25 +4,24 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Interface.h>
 
-namespace Mu {
-
-class BarInterface : public Interface
+namespace Mu
 {
-  public:
-    BarInterface(Context*);
-    virtual ~BarInterface();
 
-    virtual void load();
+    class BarInterface : public Interface
+    {
+    public:
+        BarInterface(Context*);
+        virtual ~BarInterface();
 
-    static NODE_DECLARATION(bar, Pointer);
-    static NODE_DECLARATION(foo, Pointer);
-};
+        virtual void load();
 
-
+        static NODE_DECLARATION(bar, Pointer);
+        static NODE_DECLARATION(foo, Pointer);
+    };
 
 } // namespace Mu
 

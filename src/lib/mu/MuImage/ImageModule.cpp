@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <MuImage/ImageModule.h>
 #include <MuImage/ImageType.h>
@@ -19,101 +19,86 @@
 #include <sstream>
 #include <stdlib.h>
 
-namespace Mu {
-using namespace std;
-
-typedef ImageType::ImageStruct ImageStruct;
-
-ImageModule::ImageModule(Context* c, const char *name)
-    : Module(c, name)
+namespace Mu
 {
-}
+    using namespace std;
 
-Module*
-ImageModule::init(const char *name, Context *context)
-{
-    Module *m = new ImageModule(context, name);
-    MuLangContext *c = static_cast<MuLangContext*>(context);
-    Symbol *s = c->globalScope();
-    s->addSymbol(m);
-    return m;
-}
+    typedef ImageType::ImageStruct ImageStruct;
 
-ImageModule::~ImageModule()
-{
-}
+    ImageModule::ImageModule(Context* c, const char* name)
+        : Module(c, name)
+    {
+    }
 
-static ClassInstance* 
-makeImage(MuLangContext* c, const Class* imageType, int w, int h)
-{
-    DynamicArrayType* dataType = 
-        static_cast<DynamicArrayType*>(c->arrayType(c->vec4fType(), 1, 0));
-    ClassInstance* o = ClassInstance::allocate(imageType);
-    ImageStruct* im = o->data<ImageStruct>();
+    Module* ImageModule::init(const char* name, Context* context)
+    {
+        Module* m = new ImageModule(context, name);
+        MuLangContext* c = static_cast<MuLangContext*>(context);
+        Symbol* s = c->globalScope();
+        s->addSymbol(m);
+        return m;
+    }
 
-    im->data = new DynamicArray(dataType, 1);
-    im->data->resize(w * h);
-    im->width = w;
-    im->height = h;
-    im->name = 0;
+    ImageModule::~ImageModule() {}
 
-    return o;
-}
+    static ClassInstance* makeImage(MuLangContext* c, const Class* imageType,
+                                    int w, int h)
+    {
+        DynamicArrayType* dataType =
+            static_cast<DynamicArrayType*>(c->arrayType(c->vec4fType(), 1, 0));
+        ClassInstance* o = ClassInstance::allocate(imageType);
+        ImageStruct* im = o->data<ImageStruct>();
 
-static NODE_IMPLEMENTATION(resize, Pointer)
-{
-    MuLangContext* context = static_cast<MuLangContext*>(NODE_THREAD.context());
-    const Class*   c       = static_cast<const ImageType*>(NODE_THIS.type());
-    ClassInstance* inObj   = NODE_ARG_OBJECT(0, ClassInstance);
-    int            width   = NODE_ARG(1, int);
-    int            height  = NODE_ARG(2, int);
-    ClassInstance* outObj  = makeImage(context, c, width, height);
-    ImageStruct*   inIm    = inObj->data<ImageStruct>();
-    ImageStruct*   outIm   = outObj->data<ImageStruct>();
+        im->data = new DynamicArray(dataType, 1);
+        im->data->resize(w * h);
+        im->width = w;
+        im->height = h;
+        im->name = 0;
 
-    CvMat inMat;
-    CvMat outMat;
+        return o;
+    }
 
-    cvInitMatHeader(&inMat,
-                    inIm->height,
-                    inIm->width,
-                    CV_32FC(4),
-                    inIm->data->data<float>(),
-                    0);
+    static NODE_IMPLEMENTATION(resize, Pointer)
+    {
+        MuLangContext* context =
+            static_cast<MuLangContext*>(NODE_THREAD.context());
+        const Class* c = static_cast<const ImageType*>(NODE_THIS.type());
+        ClassInstance* inObj = NODE_ARG_OBJECT(0, ClassInstance);
+        int width = NODE_ARG(1, int);
+        int height = NODE_ARG(2, int);
+        ClassInstance* outObj = makeImage(context, c, width, height);
+        ImageStruct* inIm = inObj->data<ImageStruct>();
+        ImageStruct* outIm = outObj->data<ImageStruct>();
 
-    cvInitMatHeader(&outMat,
-                    outIm->height,
-                    outIm->width,
-                    CV_32FC(4),
-                    outIm->data->data<float>(),
-                    0);
+        CvMat inMat;
+        CvMat outMat;
 
-    cvResize(&inMat, &outMat, CV_INTER_AREA);
+        cvInitMatHeader(&inMat, inIm->height, inIm->width, CV_32FC(4),
+                        inIm->data->data<float>(), 0);
 
-    NODE_RETURN(outObj);
-}
+        cvInitMatHeader(&outMat, outIm->height, outIm->width, CV_32FC(4),
+                        outIm->data->data<float>(), 0);
 
-void
-ImageModule::load()
-{
-    USING_MU_FUNCTION_SYMBOLS
+        cvResize(&inMat, &outMat, CV_INTER_AREA);
 
-    MuLangContext* c = (MuLangContext*)globalModule()->context();
+        NODE_RETURN(outObj);
+    }
 
-    addSymbols( new ImageType(c),  
-                new PixelsType(c),
+    void ImageModule::load()
+    {
+        USING_MU_FUNCTION_SYMBOLS
 
-                new Function(c, "resize", resize, None,
-                             Return, "image.image",
-                             Parameters,
-                             new Param(c, "img", "image.image"),
-                             new Param(c, "newWidth", "int"),
-                             new Param(c, "newHeight", "int"),
-                             End),
+        MuLangContext* c = (MuLangContext*)globalModule()->context();
 
-		EndArguments );
+        addSymbols(new ImageType(c), new PixelsType(c),
 
-}
+                   new Function(c, "resize", resize, None, Return,
+                                "image.image", Parameters,
+                                new Param(c, "img", "image.image"),
+                                new Param(c, "newWidth", "int"),
+                                new Param(c, "newHeight", "int"), End),
 
+                   EndArguments);
+    }
 
 } // namespace Mu

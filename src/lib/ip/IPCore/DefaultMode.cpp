@@ -1,9 +1,9 @@
 //******************************************************************************
 // Copyright (c) 2002 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <IPCore/DefaultMode.h>
@@ -11,30 +11,26 @@
 #include <TwkApp/SelectionType.h>
 #include <TwkApp/EventTable.h>
 
-namespace IPCore {
-using namespace TwkApp;
-
-DefaultMode::DefaultMode(TwkApp::Document* doc) 
-    : TwkApp::MajorMode("default", doc), m_menu(0)
+namespace IPCore
 {
-    EventTable* global = new EventTable("global");
-    addEventTable(global);
+    using namespace TwkApp;
 
-    //
-    //	Create menu
-    //
+    DefaultMode::DefaultMode(TwkApp::Document* doc)
+        : TwkApp::MajorMode("default", doc)
+        , m_menu(0)
+    {
+        EventTable* global = new EventTable("global");
+        addEventTable(global);
 
-    m_menu = new Menu("Main");
-}
+        //
+        //	Create menu
+        //
 
-DefaultMode::~DefaultMode()
-{
-}
+        m_menu = new Menu("Main");
+    }
 
-TwkApp::Menu*
-DefaultMode::menu()
-{
-    return m_menu;
-}
+    DefaultMode::~DefaultMode() {}
 
-} // Rv
+    TwkApp::Menu* DefaultMode::menu() { return m_menu; }
+
+} // namespace IPCore

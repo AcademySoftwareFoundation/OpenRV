@@ -10,21 +10,22 @@
 #define SGC_HOP_TOOLS_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifdef HOP_ENABLED
 // Macro to add code only when HOP is enabled (eg.: HOP_CALL( glFinish(); ) )
-#define HOP_CALL( x ) x
+#define HOP_CALL(x) x
 #else
-#define HOP_CALL( x )
+#define HOP_CALL(x)
 #endif
 
-// Function to enable HOP before calling the function pointer.
-// This can be useful to add some HOP traces in C code.
-void HOP_PROF_FUNCTION_PTR( const char* functionName,
-                            void(* functionPtr)( void**, void* ),
-                            void** params, void* ret );
+    // Function to enable HOP before calling the function pointer.
+    // This can be useful to add some HOP traces in C code.
+    void HOP_PROF_FUNCTION_PTR(const char* functionName,
+                               void (*functionPtr)(void**, void*),
+                               void** params, void* ret);
 
 #ifdef __cplusplus
 }

@@ -4,22 +4,21 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Interface.h>
 
-namespace Mu {
-
-class SequenceInterface : public Interface
+namespace Mu
 {
-  public:
-    SequenceInterface(Context* c);
-    virtual ~SequenceInterface();
 
-    virtual void load();
-};
+    class SequenceInterface : public Interface
+    {
+    public:
+        SequenceInterface(Context* c);
+        virtual ~SequenceInterface();
 
-
+        virtual void load();
+    };
 
 } // namespace Mu
 
