@@ -15,21 +15,21 @@
 namespace TwkUtil
 {
 
-  class TWKUTIL_EXPORT FileLogger
-  {
-   public:
-    FileLogger();
-    ~FileLogger();
+    class TWKUTIL_EXPORT FileLogger
+    {
+    public:
+        FileLogger();
+        ~FileLogger();
 
-    void logToFile( spdlog::level::level_enum lineLevel,
-                    const std::string& line );
+        void logToFile(spdlog::level::level_enum lineLevel,
+                       const std::string& line);
 
-   private:
-    spdlog::logger* m_logger;
+    private:
+        spdlog::logger* m_logger;
 
-    void setLogLevel( const std::string& level );
-  };
+        void setLogLevel(const std::string& level);
+    };
 
-}  // namespace TwkUtil
+} // namespace TwkUtil
 
 #endif

@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <mu_test/SequenceInterface.h>
 #include <Mu/BaseFunctions.h>
@@ -11,80 +11,68 @@
 #include <Mu/MemberFunction.h>
 #include <Mu/ReferenceType.h>
 
-namespace Mu {
-
-using namespace std;
-
-SequenceInterface::SequenceInterface(Context* c) : Interface(c, "sequence")
+namespace Mu
 {
-}
 
-SequenceInterface::~SequenceInterface()
-{
-}
+    using namespace std;
 
-void
-SequenceInterface::load()
-{
-    Function::ArgKeyword Return   = Function::Return;
-    Function::ArgKeyword Args     = Function::Args;
-    Function::ArgKeyword Optional = Function::Optional;
-    Function::ArgKeyword End      = Function::End;
+    SequenceInterface::SequenceInterface(Context* c)
+        : Interface(c, "sequence")
+    {
+    }
 
-    Function::Attributes None   = Function::None;
-    Function::Attributes CommOp = Function::Mapped |
-				  Function::Commutative |
-				  Function::Operator |
-				  Function::NoSideEffects;
-    Function::Attributes Op     = Function::Mapped |
-				  Function::Operator |
-				  Function::NoSideEffects;
-    Function::Attributes Mapped = Function::Mapped | Function::NoSideEffects;
-    Function::Attributes Cast   = Mapped | Function::Cast;
-    Function::Attributes Lossy  = Cast | Function::Lossy;
-    Function::Attributes AsOp   = Function::MemberOperator | Function::Operator;
+    SequenceInterface::~SequenceInterface() {}
 
-    Symbol *s = scope();
-    Context* c = context();
+    void SequenceInterface::load()
+    {
+        Function::ArgKeyword Return = Function::Return;
+        Function::ArgKeyword Args = Function::Args;
+        Function::ArgKeyword Optional = Function::Optional;
+        Function::ArgKeyword End = Function::End;
 
-    const char* tn = "test.sequence";
-    const char* rn = "test.sequence&";
+        Function::Attributes None = Function::None;
+        Function::Attributes CommOp = Function::Mapped | Function::Commutative
+                                      | Function::Operator
+                                      | Function::NoSideEffects;
+        Function::Attributes Op =
+            Function::Mapped | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Mapped =
+            Function::Mapped | Function::NoSideEffects;
+        Function::Attributes Cast = Mapped | Function::Cast;
+        Function::Attributes Lossy = Cast | Function::Lossy;
+        Function::Attributes AsOp =
+            Function::MemberOperator | Function::Operator;
 
-    s->addSymbols(new ReferenceType(c, "sequence&", this), 
-                  
-                  new Function(c, "sequence", BaseFunctions::dereference, Cast,
-                               Return, tn,
-                               Args, rn, End),
+        Symbol* s = scope();
+        Context* c = context();
 
-                  EndArguments);
+        const char* tn = "test.sequence";
+        const char* rn = "test.sequence&";
 
-    addSymbols( new MemberFunction(c, "clear", NodeFunc(0), None,
-                                   Return, "void", 
-                                   Args, tn,
-                                   End),
+        s->addSymbols(new ReferenceType(c, "sequence&", this),
 
-                new MemberFunction(c, "push_back", NodeFunc(0), None,
-                                   Return, "int", 
-                                   Args, tn, "int",
-                                   End),
+                      new Function(c, "sequence", BaseFunctions::dereference,
+                                   Cast, Return, tn, Args, rn, End),
 
-                new MemberFunction(c, "pop_back", NodeFunc(0), None,
-                                   Return, "int", 
-                                   Args, tn,
-                                   End),
+                      EndArguments);
 
-                EndArguments);
+        addSymbols(new MemberFunction(c, "clear", NodeFunc(0), None, Return,
+                                      "void", Args, tn, End),
 
-    globalScope()->addSymbols(
+                   new MemberFunction(c, "push_back", NodeFunc(0), None, Return,
+                                      "int", Args, tn, "int", End),
 
-		   new Function(c, "=", BaseFunctions::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
+                   new MemberFunction(c, "pop_back", NodeFunc(0), None, Return,
+                                      "int", Args, tn, End),
 
-                   EndArguments );
+                   EndArguments);
 
-}
+        globalScope()->addSymbols(
 
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
+                         rn, tn, End),
 
+            EndArguments);
+    }
 
-} // Mu
+} // namespace Mu

@@ -4,46 +4,46 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Symbol.h>
 #include <Mu/Type.h>
 
-namespace Mu {
-class Context;
-
-//
-//  class TypeModifier
-//  
-//  Usually transforms one type into another type. Used for things
-//  like "varying" or "const".
-//
-
-class TypeModifier : public Symbol
+namespace Mu
 {
-  public:
-    TypeModifier(Context* context, const char *name);
-    virtual ~TypeModifier();
+    class Context;
 
     //
-    //	Symbol API
+    //  class TypeModifier
     //
-    
-    virtual void outputNode(std::ostream&,const Node*) const;
-
-    //
-    //	Output the symbol
+    //  Usually transforms one type into another type. Used for things
+    //  like "varying" or "const".
     //
 
-    virtual void output(std::ostream&) const;
+    class TypeModifier : public Symbol
+    {
+    public:
+        TypeModifier(Context* context, const char* name);
+        virtual ~TypeModifier();
 
-    //
-    //	Typemodifier API
-    //
+        //
+        //	Symbol API
+        //
 
-    virtual const Type* transform(const Type*, Context*) const;
-};
+        virtual void outputNode(std::ostream&, const Node*) const;
 
+        //
+        //	Output the symbol
+        //
+
+        virtual void output(std::ostream&) const;
+
+        //
+        //	Typemodifier API
+        //
+
+        virtual const Type* transform(const Type*, Context*) const;
+    };
 
 } // namespace Mu
 

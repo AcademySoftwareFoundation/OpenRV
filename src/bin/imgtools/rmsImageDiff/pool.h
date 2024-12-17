@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __rv__pool__h__
 #define __rv__pool__h__

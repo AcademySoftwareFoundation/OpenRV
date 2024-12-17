@@ -1,5 +1,5 @@
 //******************************************************************************
-// Copyright (c) 2002 Tweak Inc. 
+// Copyright (c) 2002 Tweak Inc.
 // All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0’
@@ -27,9 +27,9 @@
 using namespace Gto;
 using namespace std;
 
-bool verbose    = false;
-bool glob       = true;
-bool text       = false;
+bool verbose = false;
+bool glob = true;
+bool text = false;
 bool nocompress = false;
 
 regex_t excludeRegex;
@@ -37,42 +37,42 @@ regex_t includeRegex;
 
 struct FullProperty
 {
-    string      name;
-    string      interp;
-    Object*     object;
-    Component*  component;
+    string name;
+    string interp;
+    Object* object;
+    Component* component;
     Components* componentList;
-    Property*   property;
+    Property* property;
 };
 
 typedef vector<FullProperty> FullProperties;
 
 struct Empty_p
 {
-    bool operator() (Object* o) { return o->components.empty(); }
+    bool operator()(Object* o) { return o->components.empty(); }
 };
 
 void gatherComponent(Object* o, Components& components, FullProperties& all)
 {
-    for (size_t j=0; j < components.size(); j++)
+    for (size_t j = 0; j < components.size(); j++)
     {
         Component* c = components[j];
 
-        for (size_t q=0; q < c->properties.size(); q++)
+        for (size_t q = 0; q < c->properties.size(); q++)
         {
             Property* p = c->properties[q];
 
             ostringstream fullname;
             fullname << o->name << "." << p->fullName;
-        
+
             FullProperty fp;
-            fp.name          = fullname.str();
-            fp.object        = o;
-            fp.component     = c;
+            fp.name = fullname.str();
+            fp.object = o;
+            fp.component = c;
             fp.componentList = &components;
-            fp.property      = p;
-            fp.interp        = p->interp;
-            
+            fp.property = p;
+            fp.interp = p->interp;
+
             all.push_back(fp);
         }
 
@@ -82,21 +82,19 @@ void gatherComponent(Object* o, Components& components, FullProperties& all)
 
 void gather(RawDataBase* db, FullProperties& all)
 {
-    for (size_t i=0; i < db->objects.size(); i++)
+    for (size_t i = 0; i < db->objects.size(); i++)
     {
         Object* o = db->objects[i];
         gatherComponent(o, o->components, all);
     }
 }
 
-void filter(RawDataBase* db,
-            FullProperties& properties, 
-            const char *include, 
-            const char *exclude)
+void filter(RawDataBase* db, FullProperties& properties, const char* include,
+            const char* exclude)
 {
-    for (size_t i=0; i < properties.size(); i++)
+    for (size_t i = 0; i < properties.size(); i++)
     {
-        const FullProperty &fp = properties[i];
+        const FullProperty& fp = properties[i];
         bool imatch = false;
         bool ematch = false;
 
@@ -115,11 +113,11 @@ void filter(RawDataBase* db,
 
             if (verbose && matched)
             {
-                cout << "gtomerge: include pattern matched "
-                     << fp.name << endl;
+                cout << "gtomerge: include pattern matched " << fp.name << endl;
             }
 
-            if (matched) imatch = true;
+            if (matched)
+                imatch = true;
         }
 
         if (exclude)
@@ -137,42 +135,38 @@ void filter(RawDataBase* db,
 
             if (verbose && matched)
             {
-                cout << "gtomerge: exclude pattern matched "
-                     << fp.name << endl;
+                cout << "gtomerge: exclude pattern matched " << fp.name << endl;
             }
 
-            if (matched) ematch = true;
+            if (matched)
+                ematch = true;
         }
 
         if (include && imatch && exclude && ematch)
         {
-            cout << "gtomerge: including " << fp.name 
-                 << " despite matching include and exclude pattern"
-                 << endl;
+            cout << "gtomerge: including " << fp.name
+                 << " despite matching include and exclude pattern" << endl;
         }
-        else if ((include && !exclude && !imatch) || 
-                 (!include && exclude && ematch) ||
-                 (include && !imatch && exclude && ematch))
+        else if ((include && !exclude && !imatch)
+                 || (!include && exclude && ematch)
+                 || (include && !imatch && exclude && ematch))
         {
-            Object *o = fp.object;
-            Component *c = fp.component;
-            Property *p = fp.property;
+            Object* o = fp.object;
+            Component* c = fp.component;
+            Property* p = fp.property;
 
-            c->properties.erase( find(c->properties.begin(), 
-                                      c->properties.end(), 
-                                      p) );
+            c->properties.erase(
+                find(c->properties.begin(), c->properties.end(), p));
 
             if (c->properties.empty())
             {
-                fp.componentList->erase( find(fp.componentList->begin(),
-                                              fp.componentList->end(),
-                                              c) );
+                fp.componentList->erase(find(fp.componentList->begin(),
+                                             fp.componentList->end(), c));
 
                 if (fp.object->components.empty())
                 {
-                    db->objects.erase( find(db->objects.begin(),
-                                            db->objects.end(),
-                                            o) );
+                    db->objects.erase(
+                        find(db->objects.begin(), db->objects.end(), o));
                 }
             }
         }
@@ -184,16 +178,14 @@ void filter(RawDataBase* db,
 
     size_t n = db->objects.size();
 
-    db->objects.erase(remove_if(db->objects.begin(),
-                                db->objects.end(),
-                                Empty_p()),
-                      db->objects.end());
+    db->objects.erase(
+        remove_if(db->objects.begin(), db->objects.end(), Empty_p()),
+        db->objects.end());
 
     if (verbose && n != db->objects.size())
     {
         cout << "gtofilter: removed " << (n - db->objects.size())
-             << " empty objects from input"
-             << endl;
+             << " empty objects from input" << endl;
     }
 }
 
@@ -209,35 +201,38 @@ void usage()
          << "-ee/--exclude regex    exclusion regex\n"
          << "-v                     verbose\n"
          << endl;
-    
+
     exit(-1);
 }
-            
-int utf8Main(int argc, char *argv[])
-{
-    char *inFile = 0;
-    char *outFile = 0;
-    char *includeExpr = 0;
-    char *excludeExpr = 0;
 
-    for (int i=1; i < argc; i++)
+int utf8Main(int argc, char* argv[])
+{
+    char* inFile = 0;
+    char* outFile = 0;
+    char* includeExpr = 0;
+    char* excludeExpr = 0;
+
+    for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "-o"))
         {
             i++;
-            if (i >= argc) usage();
+            if (i >= argc)
+                usage();
             outFile = argv[i];
         }
         else if (!strcmp(argv[i], "-ie") || !strcmp(argv[i], "--include"))
         {
             i++;
-            if (i >= argc) usage();
+            if (i >= argc)
+                usage();
             includeExpr = argv[i];
         }
         else if (!strcmp(argv[i], "-ee") || !strcmp(argv[i], "--exclude"))
         {
             i++;
-            if (i >= argc) usage();
+            if (i >= argc)
+                usage();
             excludeExpr = argv[i];
         }
         else if (!strcmp(argv[i], "-v"))
@@ -266,14 +261,15 @@ int utf8Main(int argc, char *argv[])
         }
         else
         {
-            if (inFile) usage();
+            if (inFile)
+                usage();
             inFile = argv[i];
         }
     }
 
     if (!inFile || !outFile)
     {
-	cout << "no infile or outfile specified.\n" << flush;
+        cout << "no infile or outfile specified.\n" << flush;
         cout << endl;
         usage();
     }
@@ -308,12 +304,11 @@ int utf8Main(int argc, char *argv[])
 
     if (!reader.open(inFile))
     {
-        cerr << "ERROR: unable to read file " << inFile
-             << endl;
+        cerr << "ERROR: unable to read file " << inFile << endl;
         exit(-1);
     }
 
-    RawDataBase *db = reader.dataBase();
+    RawDataBase* db = reader.dataBase();
     FullProperties allProperties;
     gather(db, allProperties);
     filter(db, allProperties, includeExpr, excludeExpr);
@@ -326,18 +321,19 @@ int utf8Main(int argc, char *argv[])
 
     RawDataBaseWriter writer;
     Writer::FileType type = Writer::CompressedGTO;
-    if (nocompress) type = Writer::BinaryGTO;
-    if (text) type = Writer::TextGTO;
+    if (nocompress)
+        type = Writer::BinaryGTO;
+    if (text)
+        type = Writer::TextGTO;
 
     if (!writer.write(outFile, *db, type))
     {
-	cerr << "ERROR: unable to write file " << outFile
-	     << endl;
-	exit(-1);
+        cerr << "ERROR: unable to write file " << outFile << endl;
+        exit(-1);
     }
     else
     {
-	cout << "Wrote file " << outFile << endl;
+        cout << "Wrote file " << outFile << endl;
     }
 
     return 0;

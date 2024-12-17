@@ -2,147 +2,136 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <Mu/Unresolved.h>
 #include <Mu/Module.h>
 #include <Mu/Context.h>
 #include <Mu/MachineRep.h>
 
-namespace Mu {
-using namespace std;
-
-UnresolvedSymbol::UnresolvedSymbol(Context* context, const char* n) 
-    : Symbol(context, n) 
+namespace Mu
 {
-    _datanode = true;
-}
+    using namespace std;
 
-UnresolvedSymbol::~UnresolvedSymbol() {}
+    UnresolvedSymbol::UnresolvedSymbol(Context* context, const char* n)
+        : Symbol(context, n)
+    {
+        _datanode = true;
+    }
 
-const Type*
-UnresolvedSymbol::nodeReturnType(const Node*) const
-{
-    const Context* c = globalModule()->context();
-    return c->unresolvedType();
-}
+    UnresolvedSymbol::~UnresolvedSymbol() {}
 
-UnresolvedType::UnresolvedType(Context* context) 
-    : Type(context, "type*", VoidRep::rep())
-{
-    _isUnresolvedType = 1;
-}
+    const Type* UnresolvedSymbol::nodeReturnType(const Node*) const
+    {
+        const Context* c = globalModule()->context();
+        return c->unresolvedType();
+    }
 
-Object*
-UnresolvedType::newObject() const 
-{ 
-    return 0; 
-}
+    UnresolvedType::UnresolvedType(Context* context)
+        : Type(context, "type*", VoidRep::rep())
+    {
+        _isUnresolvedType = 1;
+    }
 
-void 
-UnresolvedType::outputValue(std::ostream& o, Value& value) const
-{
-    o << "unresolved value?";
-}
+    Object* UnresolvedType::newObject() const { return 0; }
 
-Value
-UnresolvedType::nodeEval(const Node* n, Thread &t) const
-{
-    //
-    //  An exception *should* be thrown by whatever function is called
-    //  here.
-    //
+    void UnresolvedType::outputValue(std::ostream& o, Value& value) const
+    {
+        o << "unresolved value?";
+    }
 
-    (*n->func()._voidFunc)(*n, t);
-    return Value(); 
-}
+    Value UnresolvedType::nodeEval(const Node* n, Thread& t) const
+    {
+        //
+        //  An exception *should* be thrown by whatever function is called
+        //  here.
+        //
 
-void
-UnresolvedType::nodeEval(void*, const Node*,Thread &t) const
-{
-    return;
-}
+        (*n->func()._voidFunc)(*n, t);
+        return Value();
+    }
 
+    void UnresolvedType::nodeEval(void*, const Node*, Thread& t) const
+    {
+        return;
+    }
 
-UnresolvedCall::UnresolvedCall(Context* context) 
-    : UnresolvedSymbol(context, "call*") 
-{
-}
+    UnresolvedCall::UnresolvedCall(Context* context)
+        : UnresolvedSymbol(context, "call*")
+    {
+    }
 
-UnresolvedCall::~UnresolvedCall() {}
+    UnresolvedCall::~UnresolvedCall() {}
 
-UnresolvedCast::UnresolvedCast(Context* context) 
-    : UnresolvedSymbol(context, "cast*") 
-{
-}
+    UnresolvedCast::UnresolvedCast(Context* context)
+        : UnresolvedSymbol(context, "cast*")
+    {
+    }
 
-UnresolvedCast::~UnresolvedCast() {}
+    UnresolvedCast::~UnresolvedCast() {}
 
-UnresolvedConstructor::UnresolvedConstructor(Context* context) 
-    : UnresolvedSymbol(context, "constructor*") 
-{
-}
+    UnresolvedConstructor::UnresolvedConstructor(Context* context)
+        : UnresolvedSymbol(context, "constructor*")
+    {
+    }
 
-UnresolvedConstructor::~UnresolvedConstructor() {}
+    UnresolvedConstructor::~UnresolvedConstructor() {}
 
+    UnresolvedReference::UnresolvedReference(Context* context)
+        : UnresolvedSymbol(context, "ref*")
+    {
+    }
 
-UnresolvedReference::UnresolvedReference(Context* context) 
-    : UnresolvedSymbol(context, "ref*") 
-{
-}
+    UnresolvedReference::~UnresolvedReference() {}
 
-UnresolvedReference::~UnresolvedReference() {}
+    UnresolvedDereference::UnresolvedDereference(Context* context)
+        : UnresolvedSymbol(context, "deref*")
+    {
+    }
 
-UnresolvedDereference::UnresolvedDereference(Context* context) 
-    : UnresolvedSymbol(context, "deref*") 
-{
-}
+    UnresolvedDereference::~UnresolvedDereference() {}
 
-UnresolvedDereference::~UnresolvedDereference() {}
+    UnresolvedMemberReference::UnresolvedMemberReference(Context* context)
+        : UnresolvedSymbol(context, "member_ref*")
+    {
+    }
 
-UnresolvedMemberReference::UnresolvedMemberReference(Context* context) 
-    : UnresolvedSymbol(context, "member_ref*") 
-{
-}
+    UnresolvedMemberReference::~UnresolvedMemberReference() {}
 
-UnresolvedMemberReference::~UnresolvedMemberReference() {}
+    UnresolvedMemberCall::UnresolvedMemberCall(Context* context)
+        : UnresolvedSymbol(context, "member_call*")
+    {
+    }
 
-UnresolvedMemberCall::UnresolvedMemberCall(Context* context) 
-    : UnresolvedSymbol(context, "member_call*") 
-{
-}
+    UnresolvedMemberCall::~UnresolvedMemberCall() {}
 
-UnresolvedMemberCall::~UnresolvedMemberCall() {}
+    UnresolvedStackReference::UnresolvedStackReference(Context* context)
+        : UnresolvedSymbol(context, "stack_ref*")
+    {
+    }
 
-UnresolvedStackReference::UnresolvedStackReference(Context* context) 
-    : UnresolvedSymbol(context, "stack_ref*") 
-{
-}
+    UnresolvedStackReference::~UnresolvedStackReference() {}
 
-UnresolvedStackReference::~UnresolvedStackReference() {}
+    UnresolvedStackDereference::UnresolvedStackDereference(Context* context)
+        : UnresolvedSymbol(context, "stack_deref*")
+    {
+    }
 
+    UnresolvedStackDereference::~UnresolvedStackDereference() {}
 
-UnresolvedStackDereference::UnresolvedStackDereference(Context* context) 
-    : UnresolvedSymbol(context, "stack_deref*") 
-{
-}
+    UnresolvedDeclaration::UnresolvedDeclaration(Context* context)
+        : UnresolvedSymbol(context, "declaration*")
+    {
+    }
 
-UnresolvedStackDereference::~UnresolvedStackDereference() {}
+    UnresolvedDeclaration::~UnresolvedDeclaration() {}
 
-UnresolvedDeclaration::UnresolvedDeclaration(Context* context) 
-    : UnresolvedSymbol(context, "declaration*") 
-{
-}
+    UnresolvedAssignment::UnresolvedAssignment(Context* context)
+        : UnresolvedSymbol(context, "assign*")
+    {
+    }
 
-UnresolvedDeclaration::~UnresolvedDeclaration() {}
-
-UnresolvedAssignment::UnresolvedAssignment(Context* context) 
-    : UnresolvedSymbol(context, "assign*") 
-{
-}
-
-UnresolvedAssignment::~UnresolvedAssignment() {}
-
+    UnresolvedAssignment::~UnresolvedAssignment() {}
 
 } // namespace Mu

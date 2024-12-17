@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2007 Tweak Inc. 
+// Copyright (c) 2007 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <IOproxy/IOproxy.h>
@@ -26,163 +26,175 @@
 #define SO_EXTENSION ".so"
 #endif
 
-namespace TwkFB {
-
-using namespace std;
-using namespace TwkUtil;
-using namespace Gto;
-using namespace std;
-
-static vector<string> 
-getPluginFileList(const string& pathVar)
+namespace TwkFB
 {
-    string pluginPath;
 
-    if (getenv(pathVar.c_str()))
+    using namespace std;
+    using namespace TwkUtil;
+    using namespace Gto;
+    using namespace std;
+
+    static vector<string> getPluginFileList(const string& pathVar)
     {
-#ifdef PLATFORM_DARWIN
-        string pluginDir = getenv(pathVar.c_str());
-        string resourceDir = pluginDir + "/../../Resources";
-        pluginPath =  resourceDir + ":" + pluginDir;
-#else
-        pluginPath = getenv(pathVar.c_str());
-#endif
-    }
-    else
-    {
-        pluginPath = "/usr/local/lib:/usr/lib:/lib";
-    }
+        string pluginPath;
 
-    return findInPath("^formats.gto$", pluginPath);
-}
-
-static bool loadedProxies = false;
-
-void 
-loadProxyPlugins(const std::string& envVar)
-{
-    if (!loadedProxies)
-    {
-        vector<string> pluginFiles = getPluginFileList(envVar);
-        if (pluginFiles.empty()) return;
-
-        for (int i = 0; i < pluginFiles.size(); i++)
+        if (getenv(pathVar.c_str()))
         {
-            RawDataBaseReader reader;
-
-            if (reader.open(pluginFiles[i].c_str()))
-            {
-                RawDataBase* db = reader.dataBase();
-                
-                for (size_t q = 0; q < db->objects.size(); q++)
-                {
-                    const Object* o = db->objects[q];
-                    string fname = dirname(pluginFiles[i]);
 #ifdef PLATFORM_DARWIN
-                    // If the gto file is in the Resources dir
-                    // then change the fname of the plugin
-                    // to look in the PlugIns subdir dir.
-                    // This is because for code signed pkg like
-                    // Crank, the gto has to live outside
-                    // of PlugIns dir in the Resources dir.
-                    if (basename(fname) == "Resources")
-                    {
-                        fname += "/../PlugIns/ImageFormats"; 
-                    }
+            string pluginDir = getenv(pathVar.c_str());
+            string resourceDir = pluginDir + "/../../Resources";
+            pluginPath = resourceDir + ":" + pluginDir;
+#else
+            pluginPath = getenv(pathVar.c_str());
 #endif
-                    if (fname[fname.size()-1] != '/') fname += "/";
-                    fname += o->name;
-                    fname += SO_EXTENSION;
+        }
+        else
+        {
+            pluginPath = "/usr/local/lib:/usr/lib:/lib";
+        }
 
-                    string identifier;
-                    string sortKey;
+        return findInPath("^formats.gto$", pluginPath);
+    }
 
-                    for (size_t j = 0; j < o->components.size(); j++)
+    static bool loadedProxies = false;
+
+    void loadProxyPlugins(const std::string& envVar)
+    {
+        if (!loadedProxies)
+        {
+            vector<string> pluginFiles = getPluginFileList(envVar);
+            if (pluginFiles.empty())
+                return;
+
+            for (int i = 0; i < pluginFiles.size(); i++)
+            {
+                RawDataBaseReader reader;
+
+                if (reader.open(pluginFiles[i].c_str()))
+                {
+                    RawDataBase* db = reader.dataBase();
+
+                    for (size_t q = 0; q < db->objects.size(); q++)
                     {
-                        const Component* c = o->components[j];
-                        string name = c->name;
-
-                        if (name == ":info")
+                        const Object* o = db->objects[q];
+                        string fname = dirname(pluginFiles[i]);
+#ifdef PLATFORM_DARWIN
+                        // If the gto file is in the Resources dir
+                        // then change the fname of the plugin
+                        // to look in the PlugIns subdir dir.
+                        // This is because for code signed pkg like
+                        // Crank, the gto has to live outside
+                        // of PlugIns dir in the Resources dir.
+                        if (basename(fname) == "Resources")
                         {
+                            fname += "/../PlugIns/ImageFormats";
+                        }
+#endif
+                        if (fname[fname.size() - 1] != '/')
+                            fname += "/";
+                        fname += o->name;
+                        fname += SO_EXTENSION;
+
+                        string identifier;
+                        string sortKey;
+
+                        for (size_t j = 0; j < o->components.size(); j++)
+                        {
+                            const Component* c = o->components[j];
+                            string name = c->name;
+
+                            if (name == ":info")
+                            {
+                                for (size_t x = 0; x < c->properties.size();
+                                     x++)
+                                {
+                                    const Property* p = c->properties[x];
+
+                                    if (p->name == "identifier")
+                                        identifier = (p->stringData)[0];
+                                    else if (p->name == "sortkey")
+                                        sortKey = (p->stringData)[0];
+                                }
+                            }
+                        }
+
+                        ProxyFBIO* io =
+                            new ProxyFBIO(identifier, sortKey, fname);
+
+                        for (size_t j = 0; j < o->components.size(); j++)
+                        {
+                            const Component* c = o->components[j];
+
+                            string name = c->name;
+
+                            if (name == ":info")
+                                continue;
+
+                            string desc;
+                            unsigned int caps;
+                            FrameBufferIO::StringPairVector codecs;
+                            FrameBufferIO::StringPairVector encodeParams;
+                            FrameBufferIO::StringPairVector decodeParams;
+
                             for (size_t x = 0; x < c->properties.size(); x++)
                             {
                                 const Property* p = c->properties[x];
-                                
-                                if (p->name == "identifier") identifier = (p->stringData)[0];
-                                else if (p->name == "sortkey") sortKey = (p->stringData)[0];
-                            }
-                        }
-                    }
 
-                    ProxyFBIO* io = new ProxyFBIO(identifier, sortKey, fname);
-
-                    for (size_t j = 0; j < o->components.size(); j++)
-                    {
-                        const Component* c = o->components[j];
-
-                        string name = c->name;
-
-                        if (name == ":info") continue;
-
-                        string desc;
-                        unsigned int caps;
-                        FrameBufferIO::StringPairVector codecs;
-                        FrameBufferIO::StringPairVector encodeParams;
-                        FrameBufferIO::StringPairVector decodeParams;
-
-                        for (size_t x = 0; x < c->properties.size(); x++)
-                        {
-                            const Property* p = c->properties[x];
-
-                            if (p->name == "description")
-                            {
-                                desc = (p->stringData)[0];
-                            }
-                            else if (p->name == "capabilities")
-                            {
-                                caps = (p->int32Data)[0];
-                            }
-                            else if (p->name == "codecs")
-                            {
-                                for (int i=0; i < p->size * p->dims.x; i+=2)
+                                if (p->name == "description")
                                 {
-                                    codecs.push_back(make_pair((p->stringData)[i],
-                                                               (p->stringData)[i+1]));
+                                    desc = (p->stringData)[0];
+                                }
+                                else if (p->name == "capabilities")
+                                {
+                                    caps = (p->int32Data)[0];
+                                }
+                                else if (p->name == "codecs")
+                                {
+                                    for (int i = 0; i < p->size * p->dims.x;
+                                         i += 2)
+                                    {
+                                        codecs.push_back(
+                                            make_pair((p->stringData)[i],
+                                                      (p->stringData)[i + 1]));
+                                    }
+                                }
+                                else if (p->name == "encodeParams")
+                                {
+                                    for (int i = 0; i < p->size * p->dims.x;
+                                         i += 2)
+                                    {
+                                        encodeParams.push_back(
+                                            make_pair((p->stringData)[i],
+                                                      (p->stringData)[i + 1]));
+                                    }
+                                }
+                                else if (p->name == "decodeParams")
+                                {
+                                    for (int i = 0; i < p->size * p->dims.x;
+                                         i += 2)
+                                    {
+                                        decodeParams.push_back(
+                                            make_pair((p->stringData)[i],
+                                                      (p->stringData)[i + 1]));
+                                    }
                                 }
                             }
-                            else if (p->name == "encodeParams")
-                            {
-                                for (int i=0; i < p->size * p->dims.x; i+=2)
-                                {
-                                    encodeParams.push_back(make_pair((p->stringData)[i],
-                                                                     (p->stringData)[i+1]));
-                                }
-                            }
-                            else if (p->name == "decodeParams")
-                            {
-                                for (int i=0; i < p->size * p->dims.x; i+=2)
-                                {
-                                    decodeParams.push_back(make_pair((p->stringData)[i],
-                                                                     (p->stringData)[i+1]));
-                                }
-                            }
+
+                            io->add(name, desc, caps, codecs, decodeParams,
+                                    encodeParams);
                         }
 
-                        io->add(name, desc, caps, codecs, decodeParams, encodeParams);
+                        GenericIO::addPlugin(io);
                     }
-
-                    GenericIO::addPlugin(io);
+                }
+                else
+                {
+                    continue;
                 }
             }
-            else
-            {
-                continue;
-            }
+
+            loadedProxies = true;
         }
-
-        loadedProxies = true;
     }
-}
 
-
-} // TwkFB
+} // namespace TwkFB

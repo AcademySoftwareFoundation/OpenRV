@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <MuLang/NameType.h>
 #include <MuLang/StringType.h>
@@ -14,121 +14,111 @@
 #include <Mu/Thread.h>
 #include <MuLang/MuLangContext.h>
 
-namespace Mu {
-using namespace std;
-
-NameType::NameType(Context* c) : PrimitiveType(c, "name", PointerRep::rep())
+namespace Mu
 {
-}
+    using namespace std;
 
-NameType::~NameType() {}
+    NameType::NameType(Context* c)
+        : PrimitiveType(c, "name", PointerRep::rep())
+    {
+    }
 
-PrimitiveObject*
-NameType::newObject() const
-{
-    return new PrimitiveObject(this);
-}
+    NameType::~NameType() {}
 
-Value 
-NameType::nodeEval(const Node *n, Thread &thread) const
-{
-    return Value((*n->func()._PointerFunc)(*n,thread));
-}
+    PrimitiveObject* NameType::newObject() const
+    {
+        return new PrimitiveObject(this);
+    }
 
-void
-NameType::nodeEval(void*, const Node *n, Thread &thread) const
-{
-    (*n->func()._PointerFunc)(*n,thread);
-}
+    Value NameType::nodeEval(const Node* n, Thread& thread) const
+    {
+        return Value((*n->func()._PointerFunc)(*n, thread));
+    }
 
-void 
-NameType::outputValue(ostream &o, const Value &value, bool full) const
-{
-    String s = Name(Name::Ref(value._Pointer)).c_str();
-    StringType::outputQuotedString(o, s);
-}
+    void NameType::nodeEval(void*, const Node* n, Thread& thread) const
+    {
+        (*n->func()._PointerFunc)(*n, thread);
+    }
 
-void
-NameType::outputValueRecursive(std::ostream& o,
-                               const ValuePointer p,
-                               ValueOutputState&) const
-{
-    Name::Ref* ref = reinterpret_cast<Name::Ref*>(p);
-    String s = Name(*ref).c_str();
-    StringType::outputQuotedString(o, s);
-}
+    void NameType::outputValue(ostream& o, const Value& value, bool full) const
+    {
+        String s = Name(Name::Ref(value._Pointer)).c_str();
+        StringType::outputQuotedString(o, s);
+    }
 
-void
-NameType::load()
-{
-    USING_MU_FUNCTION_SYMBOLS;
+    void NameType::outputValueRecursive(std::ostream& o, const ValuePointer p,
+                                        ValueOutputState&) const
+    {
+        Name::Ref* ref = reinterpret_cast<Name::Ref*>(p);
+        String s = Name(*ref).c_str();
+        StringType::outputQuotedString(o, s);
+    }
 
-    //
-    //  All of the Int functions are inlined in Native.h
-    //  So here the NativeInlined attribute is set in
-    //  for all function attributes.
-    //
+    void NameType::load()
+    {
+        USING_MU_FUNCTION_SYMBOLS;
 
-    Mapped  |= NativeInlined;
-    CommOp  |= NativeInlined;
-    Op      |= NativeInlined;
-    AsOp    |= NativeInlined;
-    Lossy   |= NativeInlined;
-    Cast    |= NativeInlined;
+        //
+        //  All of the Int functions are inlined in Native.h
+        //  So here the NativeInlined attribute is set in
+        //  for all function attributes.
+        //
 
-    Symbol *s = scope();
+        Mapped |= NativeInlined;
+        CommOp |= NativeInlined;
+        Op |= NativeInlined;
+        AsOp |= NativeInlined;
+        Lossy |= NativeInlined;
+        Cast |= NativeInlined;
 
-    String tname = fullyQualifiedName();
-    String rname = tname + "&";
+        Symbol* s = scope();
 
-    const char* tn = tname.c_str();
-    const char* rn = rname.c_str();
+        String tname = fullyQualifiedName();
+        String rname = tname + "&";
 
-    Context* c = context();
+        const char* tn = tname.c_str();
+        const char* rn = rname.c_str();
 
-    s->addSymbols( new ReferenceType(c, "name&", this),
+        Context* c = context();
 
-		   new Function(c, "name", NameType::dereference, Cast,
-				Return, tn,
-				Args, rn, End),
+        s->addSymbols(new ReferenceType(c, "name&", this),
 
-		   EndArguments );
+                      new Function(c, "name", NameType::dereference, Cast,
+                                   Return, tn, Args, rn, End),
 
-    globalScope()->addSymbols (
-                                              
-		   new Function(c, "=", NameType::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
-                   
-		   new Function(c, "string", NameType::to_string, Cast,
-				Return, "string", 
-				Args, tn, End),
+                      EndArguments);
 
-		   EndArguments );
+        globalScope()->addSymbols(
 
-}
+            new Function(c, "=", NameType::assign, AsOp, Return, rn, Args, rn,
+                         tn, End),
 
-NODE_IMPLEMENTATION(NameType::dereference, Pointer)
-{
-    Name::Ref* ip = reinterpret_cast<Name::Ref*>(NODE_ARG(0, Pointer));
-    NODE_RETURN(Pointer(*ip));
-}
+            new Function(c, "string", NameType::to_string, Cast, Return,
+                         "string", Args, tn, End),
 
-NODE_IMPLEMENTATION(NameType::assign, Pointer)
-{
-    Name::Ref* ip = reinterpret_cast<Name::Ref*>(NODE_ARG(0, Pointer));
-    *ip = NODE_ARG(1, Name::Ref);				 
-    NODE_RETURN(Pointer(ip));				
-}
+            EndArguments);
+    }
 
-NODE_IMPLEMENTATION(NameType::to_string, Pointer)
-{
-    Process *p = NODE_THREAD.process();
-    MuLangContext *c = static_cast<MuLangContext*>(p->context());
-    Name name(NODE_ARG(0, Name::Ref));
+    NODE_IMPLEMENTATION(NameType::dereference, Pointer)
+    {
+        Name::Ref* ip = reinterpret_cast<Name::Ref*>(NODE_ARG(0, Pointer));
+        NODE_RETURN(Pointer(*ip));
+    }
 
-    NODE_RETURN(c->stringType()->allocate(name));
-}
+    NODE_IMPLEMENTATION(NameType::assign, Pointer)
+    {
+        Name::Ref* ip = reinterpret_cast<Name::Ref*>(NODE_ARG(0, Pointer));
+        *ip = NODE_ARG(1, Name::Ref);
+        NODE_RETURN(Pointer(ip));
+    }
+
+    NODE_IMPLEMENTATION(NameType::to_string, Pointer)
+    {
+        Process* p = NODE_THREAD.process();
+        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+        Name name(NODE_ARG(0, Name::Ref));
+
+        NODE_RETURN(c->stringType()->allocate(name));
+    }
 
 } // namespace Mu
-

@@ -1,131 +1,137 @@
 //******************************************************************************
-// Copyright (c) 2001 Tweak Inc. 
+// Copyright (c) 2001 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __ZFile__ZFileSampler__h__
 #define __ZFile__ZFileSampler__h__
 #include <ZFile/ZFileReader.h>
 
-namespace ZFile {
-
-//
-//  class Sampler
-//
-//  Looks up a value in a ZFile file. You supply the ZFile reader
-//  object. This was shamelessly copied from the Dpz::Sampler class.
-//
-
-class Sampler
+namespace ZFile
 {
-public:
-    Sampler(const Reader& r) : m_reader(&r) {}
-    Sampler(const Reader* r) : m_reader(r) {}
 
     //
-    //	Returns the depth value for a given NDC value in the
-    //	ZFile. This is the raw depth value.
+    //  class Sampler
+    //
+    //  Looks up a value in a ZFile file. You supply the ZFile reader
+    //  object. This was shamelessly copied from the Dpz::Sampler class.
     //
 
-    float		depthAtNDC(float x, float y) const;
+    class Sampler
+    {
+    public:
+        Sampler(const Reader& r)
+            : m_reader(&r)
+        {
+        }
 
-    //
-    //  Return the depth at a pixel
-    //
+        Sampler(const Reader* r)
+            : m_reader(r)
+        {
+        }
 
-    float               depthAtPixel(uint16 x, uint16 y) const 
-                        { return m_reader->depthAt(x,y); }
+        //
+        //	Returns the depth value for a given NDC value in the
+        //	ZFile. This is the raw depth value.
+        //
 
-    //
-    //	Returns depth for a given world value in the ZFile. This is
-    //	the depth straight from the ZFile. For relative depth use the
-    //	relativeDepthAtWorldPoint() function.
-    //
+        float depthAtNDC(float x, float y) const;
 
-    float		depthAtWorldPoint(float x, float y, float z) const;
+        //
+        //  Return the depth at a pixel
+        //
 
-    //
-    //	Returns the depth value of the world point (not the depth that
-    //	stored in the file, the depth of the point if it were stored in the
-    //	file.)
-    //
+        float depthAtPixel(uint16 x, uint16 y) const
+        {
+            return m_reader->depthAt(x, y);
+        }
 
-    float		depthOfWorldPoint(float x, float y, float z) const;
+        //
+        //	Returns depth for a given world value in the ZFile. This is
+        //	the depth straight from the ZFile. For relative depth use the
+        //	relativeDepthAtWorldPoint() function.
+        //
 
-    //
-    //	Returns the relative depth for a given point in world space,
-    //	this is a signed value which indicates the depth of the input
-    //	point relative to the ZFile value. The depth will negative
-    //	*outside* of the shadowed volume (between the volume and the
-    //	light).
-    //
+        float depthAtWorldPoint(float x, float y, float z) const;
 
-    float		relativeDepthAtWorldPoint(float x, 
-						  float y, 
-						  float z) const;
+        //
+        //	Returns the depth value of the world point (not the depth that
+        //	stored in the file, the depth of the point if it were stored in
+        // the 	file.)
+        //
 
-    //
-    //  Access to the reader
-    //
+        float depthOfWorldPoint(float x, float y, float z) const;
 
-    const Reader*       reader() const { return m_reader; }
+        //
+        //	Returns the relative depth for a given point in world space,
+        //	this is a signed value which indicates the depth of the input
+        //	point relative to the ZFile value. The depth will negative
+        //	*outside* of the shadowed volume (between the volume and the
+        //	light).
+        //
 
-protected:
-    Sampler() {}
-    void		matrixMultiply(const float*,
-				       float&,float&,float&) const;
+        float relativeDepthAtWorldPoint(float x, float y, float z) const;
 
-private:
-    const Reader*	m_reader; 
-};
+        //
+        //  Access to the reader
+        //
 
-//----------------------------------------------------------------------
+        const Reader* reader() const { return m_reader; }
 
-inline void
-Sampler::matrixMultiply(const float *M, float &x, float &y, float &z) const
-{
-    float nx = x * M[0] + y * M[4] + z * M[8]  + M[12];
-    float ny = x * M[1] + y * M[5] + z * M[9]  + M[13];
-    float nz = x * M[2] + y * M[6] + z * M[10] + M[14];
-    float w  = x * M[3] + y * M[7] + z * M[11] + M[15];
+    protected:
+        Sampler() {}
 
-    x = nx / w;
-    y = ny / w;
-    z = nz / w;
-}
+        void matrixMultiply(const float*, float&, float&, float&) const;
 
-inline float
-Sampler::depthAtNDC(float x, float y) const
-{
-    // uint16 px = uint16( float(m_reader->header().imageWidth) * x + 0.5f );
-    // uint16 py = uint16( float(m_reader->header().imageHeight) * y + 0.5f );
-    uint16 px = uint16( float( m_reader->header().imageWidth - 1 ) * x );
-    uint16 py = uint16( float( m_reader->header().imageHeight - 1 ) * y );
-    return m_reader->depthAt( px, py );
-}
+    private:
+        const Reader* m_reader;
+    };
 
-inline float
-Sampler::depthAtWorldPoint(float x, float y, float z) const
-{
-    matrixMultiply(m_reader->header().worldToScreen,x,y,z);
-    return depthAtNDC( (1.0f + x) / 2.0f, (1.0f - y) / 2.0f );
-}
+    //----------------------------------------------------------------------
 
-inline float
-Sampler::depthOfWorldPoint(float x, float y, float z) const
-{
-    matrixMultiply(m_reader->header().worldToCamera,x,y,z);
-    return z;
-}
+    inline void Sampler::matrixMultiply(const float* M, float& x, float& y,
+                                        float& z) const
+    {
+        float nx = x * M[0] + y * M[4] + z * M[8] + M[12];
+        float ny = x * M[1] + y * M[5] + z * M[9] + M[13];
+        float nz = x * M[2] + y * M[6] + z * M[10] + M[14];
+        float w = x * M[3] + y * M[7] + z * M[11] + M[15];
 
-inline float
-Sampler::relativeDepthAtWorldPoint(float x, float y, float z) const
-{
-    return depthOfWorldPoint(x,y,z) - depthAtWorldPoint(x,y,z);
-}
+        x = nx / w;
+        y = ny / w;
+        z = nz / w;
+    }
 
-} // ZFile
+    inline float Sampler::depthAtNDC(float x, float y) const
+    {
+        // uint16 px = uint16( float(m_reader->header().imageWidth) * x + 0.5f
+        // ); uint16 py = uint16( float(m_reader->header().imageHeight) * y +
+        // 0.5f );
+        uint16 px = uint16(float(m_reader->header().imageWidth - 1) * x);
+        uint16 py = uint16(float(m_reader->header().imageHeight - 1) * y);
+        return m_reader->depthAt(px, py);
+    }
+
+    inline float Sampler::depthAtWorldPoint(float x, float y, float z) const
+    {
+        matrixMultiply(m_reader->header().worldToScreen, x, y, z);
+        return depthAtNDC((1.0f + x) / 2.0f, (1.0f - y) / 2.0f);
+    }
+
+    inline float Sampler::depthOfWorldPoint(float x, float y, float z) const
+    {
+        matrixMultiply(m_reader->header().worldToCamera, x, y, z);
+        return z;
+    }
+
+    inline float Sampler::relativeDepthAtWorldPoint(float x, float y,
+                                                    float z) const
+    {
+        return depthOfWorldPoint(x, y, z) - depthAtWorldPoint(x, y, z);
+    }
+
+} // namespace ZFile
 
 #endif // __ZFile__ZFileSampler__h__

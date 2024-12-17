@@ -11,67 +11,50 @@
 namespace TwkMediaLibrary
 {
 
-  class PyMediaLibrary;
+    class PyMediaLibrary;
 
-  std::string nameFromPyNodeType( PyNodeType t )
-  {
-    switch( t )
+    std::string nameFromPyNodeType(PyNodeType t)
     {
-      default:
-      case PyNoType:
-        return "PyNoType";
-      case PyMediaType:
-        return "PyMediaType";
-      case PyRootType:
-        return "PyRootType";
+        switch (t)
+        {
+        default:
+        case PyNoType:
+            return "PyNoType";
+        case PyMediaType:
+            return "PyMediaType";
+        case PyRootType:
+            return "PyRootType";
+        }
+
+        return "";
     }
 
-    return "";
-  }
+    PyNode::PyNode(Library* lib, PyNode* parent, std::string name,
+                   PyNodeType type)
+        : Node(lib)
+        , m_type(type)
+        , m_name(std::move(name))
+        , m_parent(parent)
+    {
+        if (m_parent)
+            m_parent->addChild(this);
+    }
 
-  PyNode::PyNode( Library* lib, PyNode* parent, std::string name,
-                  PyNodeType type )
-      : Node( lib ),
-        m_type( type ),
-        m_name( std::move( name ) ),
-        m_parent( parent )
-  {
-    if( m_parent ) m_parent->addChild( this );
-  }
+    void PyNode::addChild(PyNode* child) { m_children.push_back(child); }
 
-  void PyNode::addChild( PyNode* child )
-  {
-    m_children.push_back( child );
-  }
+    std::string PyNode::typeName() const { return nameFromPyNodeType(m_type); }
 
-  std::string PyNode::typeName() const
-  {
-    return nameFromPyNodeType( m_type );
-  }
+    std::string PyNode::name() const { return m_name; }
 
-  std::string PyNode::name() const
-  {
-    return m_name;
-  }
+    const Node* PyNode::parent() const { return m_parent; }
 
-  const Node* PyNode::parent() const
-  {
-    return m_parent;
-  }
+    size_t PyNode::numChildren() const { return m_children.size(); }
 
-  size_t PyNode::numChildren() const
-  {
-    return m_children.size();
-  }
+    const Node* PyNode::child(size_t index) const
+    {
+        return index < m_children.size() ? m_children[index] : nullptr;
+    }
 
-  const Node* PyNode::child( size_t index ) const
-  {
-    return index < m_children.size() ? m_children[index] : nullptr;
-  }
+    void PyNode::setName(const std::string& n) { m_name = n; }
 
-  void PyNode::setName( const std::string& n )
-  {
-    m_name = n;
-  }
-
-}  // namespace TwkMediaLibrary
+} // namespace TwkMediaLibrary

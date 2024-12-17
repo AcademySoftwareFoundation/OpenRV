@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2009 Tweak Software. 
+//  Copyright (c) 2009 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __TwkPaint__Paint__h__
 #define __TwkPaint__Paint__h__
@@ -20,23 +20,24 @@
 //  library. (e.g TwkGLPaint).
 //
 
-namespace TwkPaint {
+namespace TwkPaint
+{
 
-typedef float                 BasePrecision;
+    typedef float BasePrecision;
 
-typedef BasePrecision              Scalar;
-typedef TwkMath::Vec2<Scalar>      Vec;
-typedef TwkMath::Vec3<Scalar>      Vec3;
-typedef TwkMath::Vec3<size_t>      IndexTriangle;
-typedef Vec                        Point;
-typedef TwkMath::Col4f             Color;
-typedef std::vector<Point>         PointArray;
-typedef std::vector<Vec>           VecArray;
-typedef std::vector<Scalar>        ScalarArray;
-typedef std::vector<Color>         ColorArray;
-typedef std::vector<size_t>        IndexArray;
-typedef std::vector<IndexTriangle> IndexTriangleArray;
+    typedef BasePrecision Scalar;
+    typedef TwkMath::Vec2<Scalar> Vec;
+    typedef TwkMath::Vec3<Scalar> Vec3;
+    typedef TwkMath::Vec3<size_t> IndexTriangle;
+    typedef Vec Point;
+    typedef TwkMath::Col4f Color;
+    typedef std::vector<Point> PointArray;
+    typedef std::vector<Vec> VecArray;
+    typedef std::vector<Scalar> ScalarArray;
+    typedef std::vector<Color> ColorArray;
+    typedef std::vector<size_t> IndexArray;
+    typedef std::vector<IndexTriangle> IndexTriangleArray;
 
-} // TwkPaint
+} // namespace TwkPaint
 
 #endif // __TwkPaint__Paint__h__

@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2008 Tweak Software. 
+//  Copyright (c) 2008 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __TwkQtChat__Client__h__
 #define __TwkQtChat__Client__h__
@@ -14,170 +14,169 @@
 #include <QtCore/QSettings>
 #include <TwkQtChat/Server.h>
 
-namespace TwkQtChat {
-class Connection;
-class DataServer;
-class DataConnection;
-
-class Client : public QObject
+namespace TwkQtChat
 {
-    Q_OBJECT
+    class Connection;
+    class DataServer;
+    class DataConnection;
 
- public:
-    typedef QMultiHash<QHostAddress, Connection*> ConnectionMap;
+    class Client : public QObject
+    {
+        Q_OBJECT
 
-    Client(const QString& contactName, const QString& contactApp="rv", 
-            int port=45124, bool pingpong=true, ConnectionFactory f=0);
-    ~Client();
+    public:
+        typedef QMultiHash<QHostAddress, Connection*> ConnectionMap;
 
-    ///
-    /// Reject a connection (usually called by newConnection() signal
-    /// receiver()).
-    ///
+        Client(const QString& contactName, const QString& contactApp = "rv",
+               int port = 45124, bool pingpong = true, ConnectionFactory f = 0);
+        ~Client();
 
-    void rejectConnection(Connection*);
+        ///
+        /// Reject a connection (usually called by newConnection() signal
+        /// receiver()).
+        ///
 
-    ///
-    ///  Send message to a particular connected contact. The contact
-    ///  name should match the actual contact name (not the expected
-    ///  one).
+        void rejectConnection(Connection*);
 
-    void sendMessage(const QString& contact, const QString &message);
+        ///
+        ///  Send message to a particular connected contact. The contact
+        ///  name should match the actual contact name (not the expected
+        ///  one).
 
-    ///
-    /// Send binary data to connected contact. The interp string
-    /// should tell the other end how to deal with it.
-    ///
+        void sendMessage(const QString& contact, const QString& message);
 
-    void sendData(const QString& contact, 
-                  const QString& interp,
-                  const QByteArray& data);
+        ///
+        /// Send binary data to connected contact. The interp string
+        /// should tell the other end how to deal with it.
+        ///
 
-    ///
-    /// Send message to all connected contacts
-    ///
+        void sendData(const QString& contact, const QString& interp,
+                      const QByteArray& data);
 
-    void broadcastMessage(const QString &message);
+        ///
+        /// Send message to all connected contacts
+        ///
 
-    ///
-    /// Formats a message as an event message and sends to particular
-    /// connected contacts.
-    ///
+        void broadcastMessage(const QString& message);
 
-    void sendEvent(const QString& contact, 
-                   const QString& event,
-                   const QString& target,
-                   const QString& message,
-                   bool rsvp=false);
+        ///
+        /// Formats a message as an event message and sends to particular
+        /// connected contacts.
+        ///
 
-    ///
-    /// Formats a message as an event message and sends to all
-    /// connected contacts.
-    /// 
+        void sendEvent(const QString& contact, const QString& event,
+                       const QString& target, const QString& message,
+                       bool rsvp = false);
 
-    void broadcastEvent(const QString& event, 
-                        const QString& target,
-                        const QString& message,
-                        bool rsvp=false);
+        ///
+        /// Formats a message as an event message and sends to all
+        /// connected contacts.
+        ///
 
-    ///
-    /// The local contact name (the name of this client)
-    ///
+        void broadcastEvent(const QString& event, const QString& target,
+                            const QString& message, bool rsvp = false);
 
-    QString& contactName() { return m_contactName; }
+        ///
+        /// The local contact name (the name of this client)
+        ///
 
-    ///
-    /// identifierName() is contactName() + "@" + machine name
-    ///
+        QString& contactName() { return m_contactName; }
 
-    QString identifierName() const;
+        ///
+        /// identifierName() is contactName() + "@" + machine name
+        ///
 
-    ///
-    /// Create specific connection to a contact at a machine. If the
-    /// actual contact on the machine differs from the expected passed
-    /// in name a new contact will be formed.
-    ///
+        QString identifierName() const;
 
-    void connectTo(const QString& name, const QString& host, int port=45124);
-    void connectTo(const QString& name, const QHostAddress& ip, int port=45124);
+        ///
+        /// Create specific connection to a contact at a machine. If the
+        /// actual contact on the machine differs from the expected passed
+        /// in name a new contact will be formed.
+        ///
 
-    ///
-    /// Test for existing connection to machine
-    ///
+        void connectTo(const QString& name, const QString& host,
+                       int port = 45124);
+        void connectTo(const QString& name, const QHostAddress& ip,
+                       int port = 45124);
 
-    bool hasConnection(const QHostAddress& senderIp, int senderPort = -1) const;
+        ///
+        /// Test for existing connection to machine
+        ///
 
-    ///
-    /// Disconnect from existing connection
-    ///
+        bool hasConnection(const QHostAddress& senderIp,
+                           int senderPort = -1) const;
 
-    void disconnectFrom(const QString& contact);
+        ///
+        /// Disconnect from existing connection
+        ///
 
-    ///
-    /// Return if a connection of a contact is incoming
-    ///
-    bool isIncoming(const QString& contact);
+        void disconnectFrom(const QString& contact);
 
-    ///
-    /// Wait for a message from contact. Returns true if it received
-    /// one and false if it timed out.
-    ///
-     
-    bool waitForMessage(const QString& contact);
+        ///
+        /// Return if a connection of a contact is incoming
+        ///
+        bool isIncoming(const QString& contact);
 
-    ///
-    /// Wait for send to occur or timeout. The function returns true
-    /// if a send occured. Use this if you't return to an event loop
-    /// and you want to make sure a previously sent data/message goes
-    /// out immediately.
-    ///
+        ///
+        /// Wait for a message from contact. Returns true if it received
+        /// one and false if it timed out.
+        ///
 
-    bool waitForSend(const QString& contact);
+        bool waitForMessage(const QString& contact);
 
-    ///
-    /// Send a polite disconnect request message (so that the remote
-    /// contact knows you didn't crash).
-    ///
+        ///
+        /// Wait for send to occur or timeout. The function returns true
+        /// if a send occured. Use this if you't return to an event loop
+        /// and you want to make sure a previously sent data/message goes
+        /// out immediately.
+        ///
 
-    void signOff(const QString& contact);
+        bool waitForSend(const QString& contact);
 
-    bool online();
-    int serverPort() { return (m_server) ? m_server->serverPort() : 0; }
+        ///
+        /// Send a polite disconnect request message (so that the remote
+        /// contact knows you didn't crash).
+        ///
 
-  signals:
-    void newMessage(const QString &from, const QString &message);
-    void newData(const QString& from, const QString& interp, const QByteArray& data);
-    void newContact(const QString &contact);
-    void contactLeft(const QString &contact);
-    void requestConnection(TwkQtChat::Connection*);
-    void connectionFailed(QAbstractSocket::SocketError);
-    void contactError(const QString& contact,
-                      const QString& host,
-                      const QString& error);
+        void signOff(const QString& contact);
 
-  private slots:
-    void newConnection(Connection *connection);
-    void connectionError(QAbstractSocket::SocketError socketError);
-    void disconnected();
-    void readyForUse();
-    void requestGreeting();
+        bool online();
 
-  private:
-    void removeConnection(Connection *connection);
-    Connection* connectionByName(const QString&) const;
+        int serverPort() { return (m_server) ? m_server->serverPort() : 0; }
 
-  private:
-    QString        m_contactName;
-    QString        m_contactApp;
-    Server*        m_server;
-    ConnectionMap  m_connectionMap;
-    DataServer*    m_dataServer;
-    bool           m_pingpong;
+    signals:
+        void newMessage(const QString& from, const QString& message);
+        void newData(const QString& from, const QString& interp,
+                     const QByteArray& data);
+        void newContact(const QString& contact);
+        void contactLeft(const QString& contact);
+        void requestConnection(TwkQtChat::Connection*);
+        void connectionFailed(QAbstractSocket::SocketError);
+        void contactError(const QString& contact, const QString& host,
+                          const QString& error);
 
-    ConnectionFactory m_connectionFactory;
-};
+    private slots:
+        void newConnection(Connection* connection);
+        void connectionError(QAbstractSocket::SocketError socketError);
+        void disconnected();
+        void readyForUse();
+        void requestGreeting();
 
-} // TwkQtChat
+    private:
+        void removeConnection(Connection* connection);
+        Connection* connectionByName(const QString&) const;
+
+    private:
+        QString m_contactName;
+        QString m_contactApp;
+        Server* m_server;
+        ConnectionMap m_connectionMap;
+        DataServer* m_dataServer;
+        bool m_pingpong;
+
+        ConnectionFactory m_connectionFactory;
+    };
+
+} // namespace TwkQtChat
 
 #endif // __TwkQtChat__Client__h__
-

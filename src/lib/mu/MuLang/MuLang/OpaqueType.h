@@ -3,58 +3,58 @@
 //
 // Copyright (c) 2010, Jim Hourihan
 // All rights reserved.
-// 
-// SPDX-License-Identifier: Apache-2.0 
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <Mu/Node.h>
 #include <Mu/PrimitiveObject.h>
 #include <Mu/PrimitiveType.h>
 #include <iosfwd>
 
-namespace Mu {
-
-//
-//  class OpaqueType
-//
-//  Used to pass around a C++ void*
-//
-
-class OpaqueType : public PrimitiveType
+namespace Mu
 {
-  public:
-    OpaqueType(Context* c, const char*);
-    ~OpaqueType();
 
     //
-    //	Type API
+    //  class OpaqueType
+    //
+    //  Used to pass around a C++ void*
     //
 
-    virtual PrimitiveObject* newObject() const;
-    virtual Value nodeEval(const Node*, Thread&) const;
-    virtual void nodeEval(void*, const Node*, Thread&) const;
+    class OpaqueType : public PrimitiveType
+    {
+    public:
+        OpaqueType(Context* c, const char*);
+        ~OpaqueType();
 
-    //
-    //	Output the symbol name
-    //	Output the appropriate Value in human readable form
-    //
+        //
+        //	Type API
+        //
 
-    virtual void outputValue(std::ostream&, const Value&, bool full=false) const;
-    virtual void outputValueRecursive(std::ostream&,
-                                      const ValuePointer,
-                                      ValueOutputState&) const;
+        virtual PrimitiveObject* newObject() const;
+        virtual Value nodeEval(const Node*, Thread&) const;
+        virtual void nodeEval(void*, const Node*, Thread&) const;
 
-    //
-    //	Load function is called when the symbol is added to the
-    //	context.
-    //
+        //
+        //	Output the symbol name
+        //	Output the appropriate Value in human readable form
+        //
 
-    virtual void load();
+        virtual void outputValue(std::ostream&, const Value&,
+                                 bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
+                                          ValueOutputState&) const;
 
-    static NODE_DECLARATION(dereference,Pointer);
-    static NODE_DECLARATION(conditionalExpr,Pointer);
-    static NODE_DECLARATION(assign,Pointer);
-};
+        //
+        //	Load function is called when the symbol is added to the
+        //	context.
+        //
 
+        virtual void load();
+
+        static NODE_DECLARATION(dereference, Pointer);
+        static NODE_DECLARATION(conditionalExpr, Pointer);
+        static NODE_DECLARATION(assign, Pointer);
+    };
 
 } // namespace Mu
 

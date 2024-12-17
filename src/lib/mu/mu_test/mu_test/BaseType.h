@@ -4,8 +4,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Node.h>
 #include <Mu/ClassInstance.h>
 #include <Mu/Class.h>
@@ -15,32 +15,33 @@
 #include <iosfwd>
 #include <string>
 
-namespace Mu {
-
-//
-//  class BaseType
-//
-//  
-//
-
-class BaseType : public Class
+namespace Mu
 {
-  public:
-    BaseType(Context* c, Class *super=0);
-    ~BaseType();
 
-    struct Layout
+    //
+    //  class BaseType
+    //
+    //
+    //
+
+    class BaseType : public Class
     {
-        ClassInstance*      next;
-        const StringType::String* name;
+    public:
+        BaseType(Context* c, Class* super = 0);
+        ~BaseType();
+
+        struct Layout
+        {
+            ClassInstance* next;
+            const StringType::String* name;
+        };
+
+        virtual void load();
+
+        static NODE_DECLARATION(construct, Pointer);
+        static NODE_DECLARATION(print, void);
+        static NODE_DECLARATION(foo, Pointer);
     };
-
-    virtual void load();
-
-    static NODE_DECLARATION(construct, Pointer);
-    static NODE_DECLARATION(print, void);
-    static NODE_DECLARATION(foo, Pointer);
-};
 
 } // namespace Mu
 

@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <MovieFFMpeg/MovieFFMpeg.h>
 
@@ -59,80 +59,86 @@ static const char* disallowedCodecsArray[] = {
 #if !defined(__FFMPEG_ENABLE_NON_FREE_DECODER_svq3)
     "svq3",
 #endif
-    0 };
+    0};
 
-extern "C" {
+extern "C"
+{
 
 #ifdef PLATFORM_WINDOWS
-__declspec(dllexport) TwkMovie::MovieIO* create();
-__declspec(dllexport) void destroy(TwkMovie::MovieFFMpegIO*);
-__declspec(dllexport) bool codecIsAllowed(std::string, bool);
+    __declspec(dllexport) TwkMovie::MovieIO* create();
+    __declspec(dllexport) void destroy(TwkMovie::MovieFFMpegIO*);
+    __declspec(dllexport) bool codecIsAllowed(std::string, bool);
 #endif
 
-static bool
-codecIsAllowed(std::string name, bool forRead=true)
-{
-    for (const char** p = disallowedCodecsArray; *p; p++)
+    static bool codecIsAllowed(std::string name, bool forRead = true)
     {
-        if (*p == name)
+        for (const char** p = disallowedCodecsArray; *p; p++)
         {
-            return false;
+            if (*p == name)
+            {
+                return false;
+            }
         }
-    }
-    return true;
-};
+        return true;
+    };
 
-TwkMovie::MovieIO*
-create()
-{
-    int bruteForce     = 0;
-    int codecThreads   = 0;
-    double defaultFPS  = 24.0;
-    string language    = "eng";
-    if (const char* args = getenv("MOVIEFFMPEG_ARGS"))
+    TwkMovie::MovieIO* create()
     {
-        try
+        int bruteForce = 0;
+        int codecThreads = 0;
+        double defaultFPS = 24.0;
+        string language = "eng";
+        if (const char* args = getenv("MOVIEFFMPEG_ARGS"))
         {
-            vector<string> buffer;
-            split(buffer, args, is_any_of(" "), token_compress_on);
+            try
+            {
+                vector<string> buffer;
+                split(buffer, args, is_any_of(" "), token_compress_on);
 
-            vector<const char*> newargs(buffer.size()+1);
+                vector<const char*> newargs(buffer.size() + 1);
 
-            newargs[0] = "";
-            for (size_t i = 0; i < buffer.size(); i++) newargs[i+1] = buffer[i].c_str();
+                newargs[0] = "";
+                for (size_t i = 0; i < buffer.size(); i++)
+                    newargs[i + 1] = buffer[i].c_str();
 
-            const char** argv = &newargs.front();
-            int argc = newargs.size();
+                const char** argv = &newargs.front();
+                int argc = newargs.size();
 
-            options_description desc("");
-            desc.add_options()
-                ("bruteForce",     value<int>(&bruteForce)->    default_value(bruteForce),     "Attempt to load any file extension")
-                ("codecThreads",   value<int>(&codecThreads)->  default_value(codecThreads),   "Thread count to pass to ffmpeg on codec open")
-                ("language",       value<string>(&language)->   default_value(language),       "Language for audio and subtitles (default: eng)")
-                ("defaultFPS",     value<double>(&defaultFPS)-> default_value(defaultFPS),     "For cases where there is no way to determine FPS");
+                options_description desc("");
+                desc.add_options()(
+                    "bruteForce",
+                    value<int>(&bruteForce)->default_value(bruteForce),
+                    "Attempt to load any file extension")(
+                    "codecThreads",
+                    value<int>(&codecThreads)->default_value(codecThreads),
+                    "Thread count to pass to ffmpeg on codec open")(
+                    "language",
+                    value<string>(&language)->default_value(language),
+                    "Language for audio and subtitles (default: eng)")(
+                    "defaultFPS",
+                    value<double>(&defaultFPS)->default_value(defaultFPS),
+                    "For cases where there is no way to determine FPS");
 
-            variables_map vm;
-            store(parse_command_line(argc, argv, desc), vm);
-            notify(vm);
+                variables_map vm;
+                store(parse_command_line(argc, argv, desc), vm);
+                notify(vm);
+            }
+            catch (std::exception& e)
+            {
+                cout << "ERROR: MOVIEFFMPEG_ARGS: " << e.what() << endl;
+                cout << "ERROR: MOVIEFFMPEG_ARGS = \"" << args << "\"" << endl;
+            }
+            catch (...)
+            {
+                cout << "ERROR: bad MOVIEFFMPEG_ARGS = \"" << args << "\""
+                     << endl;
+            }
         }
-        catch (std::exception& e)
-        {
-            cout << "ERROR: MOVIEFFMPEG_ARGS: " << e.what() << endl;
-            cout << "ERROR: MOVIEFFMPEG_ARGS = \"" << args << "\"" << endl;
-        }
-        catch (...)
-        {
-            cout << "ERROR: bad MOVIEFFMPEG_ARGS = \"" << args << "\"" << endl;
-        }
+
+        return new TwkMovie::MovieFFMpegIO(codecIsAllowed, bruteForce,
+                                           codecThreads, language, defaultFPS);
     }
 
-    return new TwkMovie::MovieFFMpegIO(codecIsAllowed, bruteForce, codecThreads, language, defaultFPS);
-}
-
-void
-destroy(TwkMovie::MovieFFMpegIO* plug)
-{
-    delete plug;
-}
+    void destroy(TwkMovie::MovieFFMpegIO* plug) { delete plug; }
 
 } // extern  "C"

@@ -9,31 +9,31 @@
 extern "C"
 {
 #ifdef PLATFORM_WINDOWS
-  __declspec( dllexport ) TwkApp::VideoModule* output_module_create(
-      float output_plugin_version, int output_module_index );
-  __declspec( dllexport ) void output_module_destroy( TwkApp::VideoModule* );
+    __declspec(dllexport) TwkApp::VideoModule*
+    output_module_create(float output_plugin_version, int output_module_index);
+    __declspec(dllexport) void output_module_destroy(TwkApp::VideoModule*);
 #endif
 
-  TwkApp::VideoModule* output_module_create( float output_plugin_version,
-                                             int output_module_index )
-  {
-    try
+    TwkApp::VideoModule* output_module_create(float output_plugin_version,
+                                              int output_module_index)
     {
-      if( output_module_index == 0 )
-      {
-        return new BlackMagicDevices::BlackMagicModule( 0 );
-      }
+        try
+        {
+            if (output_module_index == 0)
+            {
+                return new BlackMagicDevices::BlackMagicModule(0);
+            }
+        }
+        catch (...)
+        {
+        }
+
+        return nullptr;
     }
-    catch( ... )
+
+    void output_module_destroy(TwkApp::VideoModule* output_module)
     {
+        delete output_module;
     }
 
-    return nullptr;
-  }
-
-  void output_module_destroy( TwkApp::VideoModule* output_module )
-  {
-    delete output_module;
-  }
-
-}  // extern  "C"
+} // extern  "C"

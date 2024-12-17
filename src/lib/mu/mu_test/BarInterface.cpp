@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <mu_test/BarInterface.h>
 #include <Mu/BaseFunctions.h>
@@ -15,93 +15,82 @@
 #include <Mu/Thread.h>
 #include <MuLang/StringType.h>
 
-namespace Mu {
-
-using namespace std;
-
-BarInterface::BarInterface(Context* c) : Interface(c, "bar_interface")
+namespace Mu
 {
-}
 
-BarInterface::~BarInterface()
-{
-}
+    using namespace std;
 
-void
-BarInterface::load()
-{
-    Function::ArgKeyword Return   = Function::Return;
-    Function::ArgKeyword Args     = Function::Args;
-    Function::ArgKeyword Optional = Function::Optional;
-    Function::ArgKeyword End      = Function::End;
+    BarInterface::BarInterface(Context* c)
+        : Interface(c, "bar_interface")
+    {
+    }
 
-    Function::Attributes None   = Function::None;
-    Function::Attributes CommOp = Function::Mapped |
-				  Function::Commutative |
-				  Function::Operator |
-				  Function::NoSideEffects;
-    Function::Attributes Op     = Function::Mapped |
-				  Function::Operator |
-				  Function::NoSideEffects;
-    Function::Attributes Mapped = Function::Mapped | Function::NoSideEffects;
-    Function::Attributes Cast   = Mapped | Function::Cast;
-    Function::Attributes Lossy  = Cast | Function::Lossy;
-    Function::Attributes AsOp   = Function::MemberOperator | Function::Operator;
+    BarInterface::~BarInterface() {}
 
-    Symbol *s = scope();
-    Context* c = context();
+    void BarInterface::load()
+    {
+        Function::ArgKeyword Return = Function::Return;
+        Function::ArgKeyword Args = Function::Args;
+        Function::ArgKeyword Optional = Function::Optional;
+        Function::ArgKeyword End = Function::End;
 
-    const char* tn = "test.bar_interface";
-    const char* rn = "test.bar_interface&";
+        Function::Attributes None = Function::None;
+        Function::Attributes CommOp = Function::Mapped | Function::Commutative
+                                      | Function::Operator
+                                      | Function::NoSideEffects;
+        Function::Attributes Op =
+            Function::Mapped | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Mapped =
+            Function::Mapped | Function::NoSideEffects;
+        Function::Attributes Cast = Mapped | Function::Cast;
+        Function::Attributes Lossy = Cast | Function::Lossy;
+        Function::Attributes AsOp =
+            Function::MemberOperator | Function::Operator;
 
-    s->addSymbols(new ReferenceType(c, "bar_interface&", this), 
-                  
-                  new Function(c, "bar_interface", BaseFunctions::dereference, 
-                               Cast,
-                               Return, tn,
-                               Args, rn, End),
+        Symbol* s = scope();
+        Context* c = context();
 
-                  EndArguments);
+        const char* tn = "test.bar_interface";
+        const char* rn = "test.bar_interface&";
 
-    addSymbols( new MemberFunction(c, "bar", BarInterface::bar, None,
-                                   Return, "string", 
-                                   Args, tn,
-                                   End),
+        s->addSymbols(new ReferenceType(c, "bar_interface&", this),
 
-                new MemberFunction(c, "foo", BarInterface::foo, None,
-                                   Return, "string",
-                                   Args, tn,
-                                   End),
+                      new Function(c, "bar_interface",
+                                   BaseFunctions::dereference, Cast, Return, tn,
+                                   Args, rn, End),
 
-                EndArguments);
+                      EndArguments);
 
-    globalScope()->addSymbols(
+        addSymbols(new MemberFunction(c, "bar", BarInterface::bar, None, Return,
+                                      "string", Args, tn, End),
 
-		   new Function(c, "=", BaseFunctions::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
+                   new MemberFunction(c, "foo", BarInterface::foo, None, Return,
+                                      "string", Args, tn, End),
 
-                   EndArguments );
+                   EndArguments);
 
-}
+        globalScope()->addSymbols(
 
-NODE_IMPLEMENTATION(BarInterface::bar, Pointer)
-{
-    ClassInstance *i = NODE_ARG_OBJECT(0, ClassInstance);
-    Process *p = NODE_THREAD.process();
-    const StringType *c = static_cast<const StringType*>(NODE_THIS.type());
-    NODE_RETURN(c->allocate("bar_interface.bar (default implementation)"));
-}
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
+                         rn, tn, End),
 
+            EndArguments);
+    }
 
-NODE_IMPLEMENTATION(BarInterface::foo, Pointer)
-{
-    ClassInstance *i = NODE_ARG_OBJECT(0, ClassInstance);
-    Process *p = NODE_THREAD.process();
-    const StringType *c = static_cast<const StringType*>(NODE_THIS.type());
-    NODE_RETURN(c->allocate("bar_interface.foo (default implementation)"));
-}
+    NODE_IMPLEMENTATION(BarInterface::bar, Pointer)
+    {
+        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);
+        Process* p = NODE_THREAD.process();
+        const StringType* c = static_cast<const StringType*>(NODE_THIS.type());
+        NODE_RETURN(c->allocate("bar_interface.bar (default implementation)"));
+    }
 
+    NODE_IMPLEMENTATION(BarInterface::foo, Pointer)
+    {
+        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);
+        Process* p = NODE_THREAD.process();
+        const StringType* c = static_cast<const StringType*>(NODE_THIS.type());
+        NODE_RETURN(c->allocate("bar_interface.foo (default implementation)"));
+    }
 
-
-} // Mu
+} // namespace Mu

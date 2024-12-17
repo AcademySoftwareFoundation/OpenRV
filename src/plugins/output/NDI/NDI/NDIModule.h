@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2024  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #pragma once
@@ -10,10 +10,11 @@
 
 #include <string>
 
-namespace NDI {
-
-class NDIModule : public TwkApp::VideoModule
+namespace NDI
 {
+
+    class NDIModule : public TwkApp::VideoModule
+    {
     public:
         NDIModule();
         virtual ~NDIModule() final;
@@ -25,9 +26,8 @@ class NDIModule : public TwkApp::VideoModule
         void close() override;
         [[nodiscard]] bool isOpen() const override;
 
-   private:
-        bool m_NDIlib_initialized{ false };
-};
+    private:
+        bool m_NDIlib_initialized{false};
+    };
 
-} // NDI
-
+} // namespace NDI

@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
@@ -24,22 +24,26 @@ TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable")
 
 TEST_CASE("test creating RendererParameters instance")
 {
-    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params =
+        AudioRenderer::defaultParameters();
 }
 
 TEST_CASE("test setting default parameters")
 {
-    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params =
+        AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
 }
 
-TEST_CASE("test setting default parameters, initiazing & reset (with audio disabled)")
+TEST_CASE(
+    "test setting default parameters, initiazing & reset (with audio disabled)")
 {
-    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params =
+        AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
     // With 'setAudioNever' true the 'reset' method is
-    // short-cirtuited, does very little and no module is loaded.    
+    // short-cirtuited, does very little and no module is loaded.
     AudioRenderer::setAudioNever(true);
     AudioRenderer::setNoAudio(true);
     AudioRenderer::reset();
@@ -47,25 +51,28 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio disab
 
 TEST_CASE("test setting default parameters & initiazing")
 {
-    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params =
+        AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
 
     AudioRenderer::outputParameters(params);
 }
 
-TEST_CASE("test setting default parameters, initiazing & reset (with audio enabled)")
+TEST_CASE(
+    "test setting default parameters, initiazing & reset (with audio enabled)")
 {
-    vector<string> files = { "TEST SESSION"};
+    vector<string> files = {"TEST SESSION"};
     Application app = Application();
     Application::instance()->createNewSessionFromFiles(files);
 
-    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params =
+        AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
 
     // The reset method is the one ultimately calling the 'loadModule' method.
-    // which is the one that dlopen shared library. 
+    // which is the one that dlopen shared library.
     // We need the 'setAudioNever' false otherwise the 'reset' method
     // is short-cirtuited and no module is loaded.
     AudioRenderer::setAudioNever(false);
@@ -80,63 +87,70 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
 
     bool audioAvailable = true;
     // On Linux, this typically outputs
-    // INFO: Found module = 'ALSA (Pre-1.0.14)' 
-    // INFO: Found module = 'ALSA (Safe)' 
+    // INFO: Found module = 'ALSA (Pre-1.0.14)'
+    // INFO: Found module = 'ALSA (Safe)'
     // INFO: Found module = 'Per-Frame'
-    for(auto module : modules)
+    for (auto module : modules)
     {
-        cout << endl << "INFO: Found module = '" << module.name.c_str() << "' " << endl;
+        cout << endl
+             << "INFO: Found module = '" << module.name.c_str() << "' " << endl;
 
         CHECK(module.name.size() > 0);
-        cout << "INFO: ... Trying out the '" << module.name.c_str() << "' audio module" << endl;
+        cout << "INFO: ... Trying out the '" << module.name.c_str()
+             << "' audio module" << endl;
 
-        AudioRenderer::setModule(module.name);     
+        AudioRenderer::setModule(module.name);
 
         auto renderer = AudioRenderer::renderer();
 
         // On CI it is reasonable not to have any audio hardware at all
-        if(!renderer)
+        if (!renderer)
         {
-          audioAvailable &= false;
-          CHECK(AudioRenderer::audioDisabled());
+            audioAvailable &= false;
+            CHECK(AudioRenderer::audioDisabled());
 
-          continue;
+            continue;
         }
 
         auto state = renderer->deviceState();
-        cout << "INFO: ... state.device = '" << state.device.c_str() << "'" << endl;
+        cout << "INFO: ... state.device = '" << state.device.c_str() << "'"
+             << endl;
         cout << "INFO: ... state.rate = '" << state.rate << "'" << endl;
         cout << "INFO: ... state.latency = '" << state.latency << "'" << endl;
-        cout << "INFO: ... state.framesPerBuffer = '" << state.framesPerBuffer << "'" << endl;
+        cout << "INFO: ... state.framesPerBuffer = '" << state.framesPerBuffer
+             << "'" << endl;
 
         CHECK_FALSE(renderer->isPlaying());
         cout << "INFO: ... Trying out play() ..." << endl;
         renderer->play();
         CHECK(renderer->isPlaying());
         CHECK(renderer->isOK());
-        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'"
+             << endl;
 
         cout << "INFO: ... Trying out stop() ..." << endl;
         renderer->stop();
         CHECK_FALSE(renderer->isPlaying());
         CHECK(renderer->isOK());
-        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'"
+             << endl;
 
         cout << "INFO: ... Trying out shutdown() ..." << endl;
         renderer->shutdown();
         CHECK(renderer->isOK());
-        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'"
+             << endl;
     }
 
     if (!audioAvailable)
     {
-      CHECK(AudioRenderer::audioDisabledAlways());
+        CHECK(AudioRenderer::audioDisabledAlways());
     }
 }
 
 TEST_CASE("test simple app, start, stop (with audio enabled)")
 {
-    vector<string> files = { "TEST SESSION"};
+    vector<string> files = {"TEST SESSION"};
     Application app = Application();
 
     // First session gets 'session0' auto-name
@@ -148,13 +162,13 @@ TEST_CASE("test simple app, start, stop (with audio enabled)")
     auto graph = new Rv::RvGraph(nodeMgr);
     REQUIRE(graph);
     auto session = new Session(graph);
-    
+
     // Now create a default session and expect to find it.
     CHECK_EQ(session, app.session("session0"));
-    app.startPlay(session);    
+    app.startPlay(session);
     app.stopAll();
 
-    delete session;  // also, deletes m_graph
+    delete session; // also, deletes m_graph
     // Shouldn't be able to find that session now
     CHECK(!app.session("session0"));
 }
@@ -165,14 +179,16 @@ TEST_CASE("test simple app, start, stop (with audio enabled)")
 using namespace std::this_thread;     // sleep_for
 using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
 
-TEST_CASE("test setting default parameters, initiazing & reset (with audio enabled)")
+TEST_CASE(
+    "test setting default parameters, initiazing & reset (with audio enabled)")
 {
     const string testMedia = "bogus_media.bog";
     cout << "INFO: Creating test application ... " << endl;
     Application app = Application();
 
     cout << "INFO: Setting up audio renderer ... " << endl;
-    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params =
+        AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
     AudioRenderer::setAudioNever(false);
@@ -193,17 +209,17 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
     // As-is, without any Audio IPNode setup,
     // we know we won't have audio enabled in this test :-(
     CHECK(!session->hasAudio());
-    
+
     session->setFileName(testMedia);
     CHECK_EQ(session->fileName(), testMedia);
     CHECK_EQ(session->filePath(), testMedia);
-        
+
     cout << "INFO: Starting playback ... " << endl;
     app.startPlay(session);
 
     session->audioVarLock();
-    session->setAudioLoopDuration(100);  // arbitrary
-    session->setAudioLoopCount(5); // arbitrary
+    session->setAudioLoopDuration(100); // arbitrary
+    session->setAudioLoopCount(5);      // arbitrary
     session->audioVarUnLock();
     session->playAudio();
 
@@ -211,14 +227,16 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
     auto renderer = AudioRenderer::renderer();
 
     // On CI it is reasonable not to have any audio hardware at all
-    if(renderer)
+    if (renderer)
     {
         REQUIRE(renderer);
-        while(sleepCount>0)
+        while (sleepCount > 0)
         {
-            cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'" << endl;
+            cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'"
+                 << endl;
             CHECK(renderer->isOK());
-            cout << "INFO: ... renderer->isPlaying() = '" << renderer->isPlaying() << "'" << endl;
+            cout << "INFO: ... renderer->isPlaying() = '"
+                 << renderer->isPlaying() << "'" << endl;
             // Again, as-is, the test won't have audio :-(
             CHECK(!renderer->isPlaying());
             sleep_for(100ms);
@@ -230,16 +248,16 @@ TEST_CASE("test setting default parameters, initiazing & reset (with audio enabl
     app.stopAll();
 
     // On CI it is reasonable not to have any audio hardware at all
-    if(renderer)
+    if (renderer)
     {
-        cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'" << endl;
-        cout << "INFO: ... renderer->isPlaying() = '" << renderer->isPlaying() << "'" << endl;
+        cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'"
+             << endl;
+        cout << "INFO: ... renderer->isPlaying() = '" << renderer->isPlaying()
+             << "'" << endl;
     }
 
     cout << "INFO: Cleanup up ..." << endl;
-    delete session;  // also, deletes m_graph
+    delete session; // also, deletes m_graph
     // Shouldn't be able to find that session now
     CHECK(!app.session("session0"));
 }
-
-

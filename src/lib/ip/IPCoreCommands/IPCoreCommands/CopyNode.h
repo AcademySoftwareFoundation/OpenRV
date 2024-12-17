@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2014 Tweak Software. 
+//  Copyright (c) 2014 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __IPCoreCommands__CopyNode__h__
 #define __IPCoreCommands__CopyNode__h__
@@ -12,41 +12,42 @@
 #include <iostream>
 #include <IPCoreCommands/NewNode.h>
 
-namespace IPCore {
-namespace Commands {
-
-//
-//  CopyNode
-//
-//  Calls NewNode command then copies the props
-//
-
-class CopyNodeInfo : public TwkApp::CommandInfo
+namespace IPCore
 {
-  public:
-    typedef TwkApp::Command Command;
+    namespace Commands
+    {
 
-    CopyNodeInfo();
-    virtual ~CopyNodeInfo();
-    virtual Command* newCommand() const;
-};
+        //
+        //  CopyNode
+        //
+        //  Calls NewNode command then copies the props
+        //
 
-class CopyNode : public NewNode
-{
-  public:
-    CopyNode(const CopyNodeInfo*);
-    virtual ~CopyNode();
+        class CopyNodeInfo : public TwkApp::CommandInfo
+        {
+        public:
+            typedef TwkApp::Command Command;
 
-    void setArgs(IPGraph* graph, IPNode* node, const std::string& name);
+            CopyNodeInfo();
+            virtual ~CopyNodeInfo();
+            virtual Command* newCommand() const;
+        };
 
-    virtual void doit();
+        class CopyNode : public NewNode
+        {
+        public:
+            CopyNode(const CopyNodeInfo*);
+            virtual ~CopyNode();
 
-  private:
-    IPNode* m_copyNode;
-};
+            void setArgs(IPGraph* graph, IPNode* node, const std::string& name);
 
+            virtual void doit();
 
-} // Commands
-} // IPCore
+        private:
+            IPNode* m_copyNode;
+        };
+
+    } // namespace Commands
+} // namespace IPCore
 
 #endif // __IPCoreCommands__CopyNode__h__

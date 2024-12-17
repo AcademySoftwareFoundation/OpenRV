@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/FunctionAction.h>
@@ -17,101 +17,92 @@
 #include <iostream>
 #include <sstream>
 
-namespace TwkApp {
-using namespace std;
-
-MuFuncAction::MuFuncAction(Mu::FunctionObject* obj)
-    : Action()
+namespace TwkApp
 {
-    m_exception = false;
-    m_func = obj;
-    m_func->retainExternal();
-}
+    using namespace std;
 
-MuFuncAction::MuFuncAction(Mu::FunctionObject* obj, const string& doc)
-    : Action(doc)
-{
-    m_func = obj;
-    m_exception = false;
-    m_func->retainExternal();
-}
-
-MuFuncAction::~MuFuncAction()
-{
-    m_func->releaseExternal();
-}
-
-void
-MuFuncAction::execute(Document* d, const Event& event) const
-{
-    HOP_PROF_FUNC();
-
-    const EventType* etype = static_cast<const EventType*>
-        (m_func->function()->argType(0));
-    Mu::Process* p = muProcess();
-
-    EventType::EventInstance* e = 
-        new EventType::EventInstance(etype);
-    e->event = &event;
-    event.handled = true;   // the user can call reject()
-    e->document = d;
-
-    Mu::Function::ArgumentVector args(1);
-    args.back() = Mu::Value(e);
-    
-    Mu::FunctionObject* preservedFunc = m_func;
-    ostringstream preservedFuncName;
-    m_func->function()->output(preservedFuncName);
-
-    muAppThread()->call(m_func->function(), args, false);
-
-    if (muAppThread()->uncaughtException() && !m_exception)
+    MuFuncAction::MuFuncAction(Mu::FunctionObject* obj)
+        : Action()
     {
-        cerr << "ERROR: event = "
-             << event.name()
-             << endl;
+        m_exception = false;
+        m_func = obj;
+        m_func->retainExternal();
+    }
 
-        if (m_func != preservedFunc || !m_func || !(m_func->function()))
+    MuFuncAction::MuFuncAction(Mu::FunctionObject* obj, const string& doc)
+        : Action(doc)
+    {
+        m_func = obj;
+        m_exception = false;
+        m_func->retainExternal();
+    }
+
+    MuFuncAction::~MuFuncAction() { m_func->releaseExternal(); }
+
+    void MuFuncAction::execute(Document* d, const Event& event) const
+    {
+        HOP_PROF_FUNC();
+
+        const EventType* etype =
+            static_cast<const EventType*>(m_func->function()->argType(0));
+        Mu::Process* p = muProcess();
+
+        EventType::EventInstance* e = new EventType::EventInstance(etype);
+        e->event = &event;
+        event.handled = true; // the user can call reject()
+        e->document = d;
+
+        Mu::Function::ArgumentVector args(1);
+        args.back() = Mu::Value(e);
+
+        Mu::FunctionObject* preservedFunc = m_func;
+        ostringstream preservedFuncName;
+        m_func->function()->output(preservedFuncName);
+
+        muAppThread()->call(m_func->function(), args, false);
+
+        if (muAppThread()->uncaughtException() && !m_exception)
         {
-            cerr << "ERROR: event handler function object corrupted!" << endl;
-        }
+            cerr << "ERROR: event = " << event.name() << endl;
 
-        cerr << "ERROR: function = " << preservedFuncName.str() << endl;
-
-        if (const Mu::Object* o = muAppThread()->exception())
-        {
-            cerr << "ERROR: Exception Value: ";
-            o->type()->outputValue(cerr, (Mu::ValuePointer)&o);
-            cerr << endl;
-
-            if (o->type() == muContext()->exceptionType() &&
-                muContext()->debugging())
+            if (m_func != preservedFunc || !m_func || !(m_func->function()))
             {
-                const Mu::ExceptionType::Exception* exc =
-                    static_cast<const Mu::ExceptionType::Exception*>(o);
-
-                cerr << "Backtrace:" << endl << exc->backtraceAsString() << endl;
+                cerr << "ERROR: event handler function object corrupted!"
+                     << endl;
             }
+
+            cerr << "ERROR: function = " << preservedFuncName.str() << endl;
+
+            if (const Mu::Object* o = muAppThread()->exception())
+            {
+                cerr << "ERROR: Exception Value: ";
+                o->type()->outputValue(cerr, (Mu::ValuePointer)&o);
+                cerr << endl;
+
+                if (o->type() == muContext()->exceptionType()
+                    && muContext()->debugging())
+                {
+                    const Mu::ExceptionType::Exception* exc =
+                        static_cast<const Mu::ExceptionType::Exception*>(o);
+
+                    cerr << "Backtrace:" << endl
+                         << exc->backtraceAsString() << endl;
+                }
+            }
+
+            m_exception = true;
         }
-
-        m_exception = true;
+        else
+        {
+            // m_exception = false;
+        }
     }
-    else
+
+    bool MuFuncAction::error() const { return m_exception; }
+
+    Action* MuFuncAction::copy() const
     {
-        //m_exception = false;
+        return new MuFuncAction(m_func, docString());
     }
-}
 
-bool
-MuFuncAction::error() const
-{
-    return m_exception;
-}
-
-Action* 
-MuFuncAction::copy() const
-{
-    return new MuFuncAction(m_func, docString());
-}
-
-} // TwkApp
+} // namespace TwkApp

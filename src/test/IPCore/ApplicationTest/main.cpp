@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
@@ -24,7 +24,7 @@ TEST_CASE("test creating IPCore::Application instance")
 
 TEST_CASE("test creating test session")
 {
-    vector<string> files = { "TEST SESSION"};
+    vector<string> files = {"TEST SESSION"};
     Application app = Application();
     Application::instance()->createNewSessionFromFiles(files);
 }
@@ -55,7 +55,7 @@ TEST_CASE("test get session by name")
     CHECK(app.session(testSessionName));
 
     cout << "INFO: Cleanup up ..." << endl;
-    delete session;  // also, deletes m_graph
+    delete session; // also, deletes m_graph
     // Shouldn't be able to find that session now
     CHECK(!app.session(testSessionName));
 }
@@ -63,7 +63,7 @@ TEST_CASE("test get session by name")
 TEST_CASE("test creating session with node graph")
 {
     const string testSessionName = "test session";
-    
+
     cout << "INFO: Creating test application ... " << endl;
     Application app = Application();
 
@@ -78,7 +78,7 @@ TEST_CASE("test creating session with node graph")
     REQUIRE(session);
 
     cout << "INFO: Cleanup up ..." << endl;
-    delete session;  // also, deletes m_graph
+    delete session; // also, deletes m_graph
     // Shouldn't be able to find that session now
     CHECK(!app.session(testSessionName));
 }

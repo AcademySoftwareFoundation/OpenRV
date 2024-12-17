@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #include <IPBaseNodes/ColorLinearToSRGBIPNode.h>
 #include <IPCore/Exception.h>
@@ -17,34 +17,33 @@
 #include <iostream>
 #include <stl_ext/string_algo.h>
 
-namespace IPCore {
-using namespace std;
-using namespace TwkContainer;
-using namespace TwkMath;
-
-
-ColorLinearToSRGBIPNode::ColorLinearToSRGBIPNode(const std::string& name,
-                                                 const NodeDefinition* def,
-                                                 IPGraph* graph,
-                                                 GroupIPNode* group): IPNode(name, def, graph, group)
+namespace IPCore
 {
-    setMaxInputs(1);
-}
+    using namespace std;
+    using namespace TwkContainer;
+    using namespace TwkMath;
 
-ColorLinearToSRGBIPNode::~ColorLinearToSRGBIPNode()
-{
-}
-    
-IPImage*
-ColorLinearToSRGBIPNode::evaluate(const Context& context)
-{
+    ColorLinearToSRGBIPNode::ColorLinearToSRGBIPNode(const std::string& name,
+                                                     const NodeDefinition* def,
+                                                     IPGraph* graph,
+                                                     GroupIPNode* group)
+        : IPNode(name, def, graph, group)
+    {
+        setMaxInputs(1);
+    }
 
-    int frame = context.frame;
-    IPImage* head = IPNode::evaluate(context);
-    if (!head) return IPImage::newNoImage(this, "No Input");
-    
-    head->shaderExpr = Shader::newColorLinearToSRGB(head->shaderExpr);
-    return head;
-}
-    
-}
+    ColorLinearToSRGBIPNode::~ColorLinearToSRGBIPNode() {}
+
+    IPImage* ColorLinearToSRGBIPNode::evaluate(const Context& context)
+    {
+
+        int frame = context.frame;
+        IPImage* head = IPNode::evaluate(context);
+        if (!head)
+            return IPImage::newNoImage(this, "No Input");
+
+        head->shaderExpr = Shader::newColorLinearToSRGB(head->shaderExpr);
+        return head;
+    }
+
+} // namespace IPCore

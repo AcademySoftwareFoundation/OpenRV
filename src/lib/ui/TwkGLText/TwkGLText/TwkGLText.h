@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001-2002 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #ifndef __TWKGRAPHTEXT_H__
@@ -15,7 +15,6 @@
 #include <TwkMath/Box.h>
 #include <string>
 #include <map>
-
 
 //
 //  This is a static class that is useful for drawing text into an
@@ -34,56 +33,60 @@
 //  context.
 //
 
-namespace TwkGLText { 
-
-typedef void* Context;
-
-class GLtext
+namespace TwkGLText
 {
-public:
-    TWK_EXC_DECLARE( Exception, TwkExc::Exception, "glText::Exception: " );
 
-    static Context newContext();
-    static Context getContext();
-    static void setContext(Context);
-    static void deleteContext(Context);
+    typedef void* Context;
 
-    static void clear();
+    class GLtext
+    {
+    public:
+        TWK_EXC_DECLARE(Exception, TwkExc::Exception, "glText::Exception: ");
 
-    static void init();
-    static void init( const char *fontName );
-    static void init( const unsigned char *fontData, int fontDataSize );
+        static Context newContext();
+        static Context getContext();
+        static void setContext(Context);
+        static void deleteContext(Context);
 
-    static void writeAt( float x, float y, const char *text );
-    static void writeAt( const TwkMath::Vec2f &pos, const char *text );
+        static void clear();
 
-    static void writeAt( float x, float y, std::string text );
-    static void writeAt( const TwkMath::Vec2f &pos, std::string text );
+        static void init();
+        static void init(const char* fontName);
+        static void init(const unsigned char* fontData, int fontDataSize);
 
-    // Pay attention to newlines, returns # of lines written
-    static int writeAtNL( float x, float y, const char *text, float mult = 1.0f );
-    static int writeAtNL( const TwkMath::Vec2f &pos, const char *text, float mult = 1.0f );
+        static void writeAt(float x, float y, const char* text);
+        static void writeAt(const TwkMath::Vec2f& pos, const char* text);
 
-    static int writeAtNL( float x, float y, std::string text, float mult = 1.0f );
-    static int writeAtNL( const TwkMath::Vec2f &pos, std::string text, float mult = 1.0f );
+        static void writeAt(float x, float y, std::string text);
+        static void writeAt(const TwkMath::Vec2f& pos, std::string text);
 
-    static void size( int s );
-    static int size();
-    static TwkMath::Box2f bounds( const char *text );
-    static TwkMath::Box2f bounds( std::string text );
+        // Pay attention to newlines, returns # of lines written
+        static int writeAtNL(float x, float y, const char* text,
+                             float mult = 1.0f);
+        static int writeAtNL(const TwkMath::Vec2f& pos, const char* text,
+                             float mult = 1.0f);
 
-    static TwkMath::Box2f boundsNL( const char *text, float mult = 1.0f );
-    static TwkMath::Box2f boundsNL( std::string text, float mult = 1.0f );
+        static int writeAtNL(float x, float y, std::string text,
+                             float mult = 1.0f);
+        static int writeAtNL(const TwkMath::Vec2f& pos, std::string text,
+                             float mult = 1.0f);
 
-    static void color( float r, float g, float b, float a = 1.0f );
-    static void color( TwkMath::Col3f &c );
-    static void color( TwkMath::Col4f &c );
+        static void size(int s);
+        static int size();
+        static TwkMath::Box2f bounds(const char* text);
+        static TwkMath::Box2f bounds(std::string text);
 
-    static float globalAscenderHeight();
-    static float globalDescenderHeight();
-};
+        static TwkMath::Box2f boundsNL(const char* text, float mult = 1.0f);
+        static TwkMath::Box2f boundsNL(std::string text, float mult = 1.0f);
 
-}  //  End namespace TwkGraphUI { 
+        static void color(float r, float g, float b, float a = 1.0f);
+        static void color(TwkMath::Col3f& c);
+        static void color(TwkMath::Col4f& c);
 
+        static float globalAscenderHeight();
+        static float globalDescenderHeight();
+    };
 
-#endif    // End #ifdef __TWKGRAPHTEXT_H__
+} // namespace TwkGLText
+
+#endif // End #ifdef __TWKGRAPHTEXT_H__

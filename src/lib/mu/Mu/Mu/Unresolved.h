@@ -4,115 +4,116 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Symbol.h>
 #include <Mu/Type.h>
 
-namespace Mu {
-
-class UnresolvedSymbol : public Symbol
+namespace Mu
 {
-public:
-    UnresolvedSymbol(Context* context, const char*);
-    virtual ~UnresolvedSymbol();
-    virtual const Type* nodeReturnType(const Node*) const;
-};
 
-class UnresolvedType : public Type
-{
-  public:
-    UnresolvedType(Context* context);
+    class UnresolvedSymbol : public Symbol
+    {
+    public:
+        UnresolvedSymbol(Context* context, const char*);
+        virtual ~UnresolvedSymbol();
+        virtual const Type* nodeReturnType(const Node*) const;
+    };
 
-    virtual Object* newObject() const;
-    virtual Value   nodeEval(const Node*,Thread &t) const;
-    virtual void    nodeEval(void*, const Node*,Thread &t) const;
-    virtual void    outputValue(std::ostream&,Value&) const;
-};
+    class UnresolvedType : public Type
+    {
+    public:
+        UnresolvedType(Context* context);
 
-class UnresolvedCall : public UnresolvedSymbol
-{
-public:
-    UnresolvedCall(Context*);
-    virtual ~UnresolvedCall();
-};
+        virtual Object* newObject() const;
+        virtual Value nodeEval(const Node*, Thread& t) const;
+        virtual void nodeEval(void*, const Node*, Thread& t) const;
+        virtual void outputValue(std::ostream&, Value&) const;
+    };
 
-class UnresolvedCast : public UnresolvedSymbol
-{
-public:
-    UnresolvedCast(Context*);
-    virtual ~UnresolvedCast();
-};
+    class UnresolvedCall : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedCall(Context*);
+        virtual ~UnresolvedCall();
+    };
 
-class UnresolvedConstructor : public UnresolvedSymbol
-{
-public:
-    UnresolvedConstructor(Context*);
-    virtual ~UnresolvedConstructor();
-};
+    class UnresolvedCast : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedCast(Context*);
+        virtual ~UnresolvedCast();
+    };
 
-class UnresolvedReference : public UnresolvedSymbol
-{
-public:
-    UnresolvedReference(Context*);
-    virtual ~UnresolvedReference();
-};
+    class UnresolvedConstructor : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedConstructor(Context*);
+        virtual ~UnresolvedConstructor();
+    };
 
-class UnresolvedDereference : public UnresolvedSymbol
-{
-public:
-    UnresolvedDereference(Context*);
-    virtual ~UnresolvedDereference();
-};
+    class UnresolvedReference : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedReference(Context*);
+        virtual ~UnresolvedReference();
+    };
 
-class UnresolvedMemberReference : public UnresolvedSymbol
-{
-public:
-    UnresolvedMemberReference(Context*);
-    virtual ~UnresolvedMemberReference();
-};
+    class UnresolvedDereference : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedDereference(Context*);
+        virtual ~UnresolvedDereference();
+    };
 
-class UnresolvedMemberCall : public UnresolvedSymbol
-{
-public:
-    UnresolvedMemberCall(Context*);
-    virtual ~UnresolvedMemberCall();
-};
+    class UnresolvedMemberReference : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedMemberReference(Context*);
+        virtual ~UnresolvedMemberReference();
+    };
 
-class UnresolvedStackReference : public UnresolvedSymbol
-{
-public:
-    UnresolvedStackReference(Context*);
-    virtual ~UnresolvedStackReference();
-};
+    class UnresolvedMemberCall : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedMemberCall(Context*);
+        virtual ~UnresolvedMemberCall();
+    };
 
-class UnresolvedStackDereference : public UnresolvedSymbol
-{
-public:
-    UnresolvedStackDereference(Context*);
-    virtual ~UnresolvedStackDereference();
-};
+    class UnresolvedStackReference : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedStackReference(Context*);
+        virtual ~UnresolvedStackReference();
+    };
 
-class UnresolvedDeclaration : public UnresolvedSymbol
-{
-public:
-    UnresolvedDeclaration(Context*);
-    virtual ~UnresolvedDeclaration();
-};
+    class UnresolvedStackDereference : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedStackDereference(Context*);
+        virtual ~UnresolvedStackDereference();
+    };
 
-class UnresolvedStackDeclaration : public UnresolvedDeclaration
-{
-public:
-    UnresolvedStackDeclaration(Context*);
-    virtual ~UnresolvedStackDeclaration();
-};
+    class UnresolvedDeclaration : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedDeclaration(Context*);
+        virtual ~UnresolvedDeclaration();
+    };
 
-class UnresolvedAssignment : public UnresolvedSymbol
-{
-public:
-    UnresolvedAssignment(Context*);
-    virtual ~UnresolvedAssignment();
-};
+    class UnresolvedStackDeclaration : public UnresolvedDeclaration
+    {
+    public:
+        UnresolvedStackDeclaration(Context*);
+        virtual ~UnresolvedStackDeclaration();
+    };
+
+    class UnresolvedAssignment : public UnresolvedSymbol
+    {
+    public:
+        UnresolvedAssignment(Context*);
+        virtual ~UnresolvedAssignment();
+    };
 
 } // namespace Mu
 

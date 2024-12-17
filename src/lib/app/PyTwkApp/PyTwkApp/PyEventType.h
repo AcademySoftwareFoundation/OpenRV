@@ -1,9 +1,9 @@
 //
 //  Copyright (c) 2011 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __PyTwkApp__PyEventType__h__
 #define __PyTwkApp__PyEventType__h__
@@ -12,25 +12,24 @@
 
 namespace TwkApp
 {
-  class Event;
-  class Document;
+    class Event;
+    class Document;
 
-  typedef struct
-  {
-    PyObject_HEAD
-    const Event* event;
-    const Document* document;
-  } PyEventObject;
+    typedef struct
+    {
+        PyObject_HEAD const Event* event;
+        const Document* document;
+    } PyEventObject;
 
-  PyTypeObject* pyEventType();
+    PyTypeObject* pyEventType();
 
-  void initPyEventType();
+    void initPyEventType();
 
-  //
-  // Create a new event object. The new object has 1 ref on it
-  //
-  PyObject* PyEventFromEvent( const Event*, const Document* );
+    //
+    // Create a new event object. The new object has 1 ref on it
+    //
+    PyObject* PyEventFromEvent(const Event*, const Document*);
 
-}  // namespace TwkApp
+} // namespace TwkApp
 
-#endif  // __PyTwkApp__PyEventType__h__
+#endif // __PyTwkApp__PyEventType__h__

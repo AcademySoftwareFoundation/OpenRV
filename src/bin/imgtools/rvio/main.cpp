@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001-2005 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #include "../../utf8Main.h"
 
@@ -110,7 +110,7 @@
 
 // RVIO third party optional customization
 #if defined(RVIO_THIRD_PARTY_CUSTOMIZATION)
-    extern void rvioThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
+extern void rvioThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
 #endif
 
 typedef TwkContainer::StringProperty StringProperty;
@@ -133,36 +133,24 @@ struct Illuminant
 };
 
 Illuminant standardIlluminants[] = {
-    {"A",   0.44757f, 0.40745f },
-    {"B",   0.34842f, 0.35161f},
-    {"C",   0.31006f, 0.31616f},
-    {"D50",  0.34567f, 0.35850f},
-    {"D55",  0.33242f, 0.34743f},
-    {"D65",  0.31271f, 0.32902f},
-    {"D65REC709",  0.3127f, 0.3290f},
-    {"D75",  0.29902f, 0.31485f},
-    {"E",   1.0f/3.0f, 1.0f/3.0f},
-    {"F1",  0.31310f, 0.33727f},
-    {"F2",  0.37208f, 0.37529f},
-    {"F3",  0.40910f, 0.39430f},
-    {"F4",  0.44018f, 0.40329f},
-    {"F5",  0.31379f, 0.34531f},
-    {"F6",  0.37790f, 0.38835f},
-    {"F7",  0.31292f, 0.32933f},
-    {"F8",  0.34588f, 0.35875f},
-    {"F9",  0.37417f, 0.37281f},
-    {"F10",  0.34609f, 0.35986f},
-    {"F11",  0.38052f, 0.37713f},
-    {"F12",  0.43695f, 0.40441f},
-    {NULL, 0, 0}
-};
+    {"A", 0.44757f, 0.40745f},       {"B", 0.34842f, 0.35161f},
+    {"C", 0.31006f, 0.31616f},       {"D50", 0.34567f, 0.35850f},
+    {"D55", 0.33242f, 0.34743f},     {"D65", 0.31271f, 0.32902f},
+    {"D65REC709", 0.3127f, 0.3290f}, {"D75", 0.29902f, 0.31485f},
+    {"E", 1.0f / 3.0f, 1.0f / 3.0f}, {"F1", 0.31310f, 0.33727f},
+    {"F2", 0.37208f, 0.37529f},      {"F3", 0.40910f, 0.39430f},
+    {"F4", 0.44018f, 0.40329f},      {"F5", 0.31379f, 0.34531f},
+    {"F6", 0.37790f, 0.38835f},      {"F7", 0.31292f, 0.32933f},
+    {"F8", 0.34588f, 0.35875f},      {"F9", 0.37417f, 0.37281f},
+    {"F10", 0.34609f, 0.35986f},     {"F11", 0.38052f, 0.37713f},
+    {"F12", 0.43695f, 0.40441f},     {NULL, 0, 0}};
 
-int parseInFiles(int argc, char *argv[])
+int parseInFiles(int argc, char* argv[])
 {
     //  cerr << "Application::parseInFiles " << argc << " files" << endl;
     Rv::Options& opts = Rv::Options::sharedOptions();
 
-    for (int i=0; i<argc; i++)
+    for (int i = 0; i < argc; i++)
     {
         string newS = IPCore::Application::mapFromVar(argv[i]);
 
@@ -172,7 +160,7 @@ int parseInFiles(int argc, char *argv[])
     return 0;
 }
 
-bool findillum(const char* name, float &x, float &y)
+bool findillum(const char* name, float& x, float& y)
 {
     for (Illuminant* i = standardIlluminants; i->name; i++)
     {
@@ -187,89 +175,89 @@ bool findillum(const char* name, float &x, float &y)
     return false;
 }
 
-char* filename       = 0;
-int   showFormats    = 0;
-char* outputFile     = 0;
-char* licarg         = 0;
-int   lqt_decoder    = 0;
-int   showVersion    = 0;
-float filegamma      = 1.0;
-float ingamma        = 1.0;
-float outgamma       = 1.0;
-float exposure       = 0.0;
-float scale          = 1.0;
-int   iomethod       = -1;
-int   iosize         = 61440;
-int   resizex        = 0;
-int   resizey        = 0;
-int   loglin         = 0;
-int   loglinc        = 0;
-int   redloglin      = 0;
-int   redlogfilmlin  = 0;
-int   linlog         = 0;
-int   verbose        = 0;
-int   reallyverbose  = 0;
-int   outbits        = 0;
-int   processFloat   = 0;
-char* outtype        = 0;
-int   ysamples       = 0;
-int   rysamples      = 0;
-int   bysamples      = 0;
-int   usamples       = 0;
-int   vsamples       = 0;
-int   asamples       = 0;
-int   xsize          = 0;
-int   ysize          = 0;
-int   flipImage      = 0;
-int   flopImage      = 0;
-int   strictlicense  = 0;
-char* compressor     = (char*)"";
-char* codec          = (char*)"";
-char* audioCodec     = (char*)"";
-float quality        = 0.9f;
-char* paRatio        = (char*)"1:1";
-float pixelAspect    = 1.0;
-int   paNumerator    = 1;
-int   paDenominator  = 1;
-char* timerange      = 0;
-int   stretch        = 0;
-char* comment        = (char*)"";
-char* copyright      = (char*)"";
-char* initscript     = 0;
-int   err2out        = 0;
-int   inpremult      = 0;
-int   inunpremult    = 0;
-int   outpremult     = 0;
-int   outunpremult   = 0;
-float audioRate      = 0;
-int   audioChannels  = 0;
-char* outStereo      = (char*)"";
-float outfps         = 0;
-int   nosession      = 0;
-int   outhalf        = 0;
-int   out8           = 0;
-int   leaderFrames   = 1;
-int   outrgb         = 0;
-char* dlut           = 0;
-int   insrgb         = 0;
-int   in709          = 0;
-int   outsrgb        = 0;
-int   out709         = 0;
-int   outaces        = 0;
-int   outlogc        = 0;
-int   outlogcEI      = 0;
-int   outredlog      = 0;
-int   outredlogfilm  = 0;
-float white0         = -999;
-float white1         = -999;
-char* illumName      = (char*)"";
-int   outadaptive    = 0;
-int   tio            = 0;
-int   threads        = 1;
-int   wthreads       = -1;
-int   noprerender    = 0;
+char* filename = 0;
+int showFormats = 0;
+char* outputFile = 0;
+char* licarg = 0;
+int lqt_decoder = 0;
+int showVersion = 0;
+float filegamma = 1.0;
+float ingamma = 1.0;
+float outgamma = 1.0;
+float exposure = 0.0;
+float scale = 1.0;
+int iomethod = -1;
+int iosize = 61440;
+int resizex = 0;
+int resizey = 0;
+int loglin = 0;
+int loglinc = 0;
+int redloglin = 0;
+int redlogfilmlin = 0;
+int linlog = 0;
+int verbose = 0;
+int reallyverbose = 0;
+int outbits = 0;
+int processFloat = 0;
+char* outtype = 0;
+int ysamples = 0;
+int rysamples = 0;
+int bysamples = 0;
+int usamples = 0;
+int vsamples = 0;
+int asamples = 0;
+int xsize = 0;
+int ysize = 0;
+int flipImage = 0;
+int flopImage = 0;
+int strictlicense = 0;
+char* compressor = (char*)"";
+char* codec = (char*)"";
+char* audioCodec = (char*)"";
+float quality = 0.9f;
+char* paRatio = (char*)"1:1";
+float pixelAspect = 1.0;
+int paNumerator = 1;
+int paDenominator = 1;
+char* timerange = 0;
+int stretch = 0;
+char* comment = (char*)"";
+char* copyright = (char*)"";
+char* initscript = 0;
+int err2out = 0;
+int inpremult = 0;
+int inunpremult = 0;
+int outpremult = 0;
+int outunpremult = 0;
+float audioRate = 0;
+int audioChannels = 0;
+char* outStereo = (char*)"";
+float outfps = 0;
+int nosession = 0;
+int outhalf = 0;
+int out8 = 0;
+int leaderFrames = 1;
+int outrgb = 0;
+char* dlut = 0;
+int insrgb = 0;
+int in709 = 0;
+int outsrgb = 0;
+int out709 = 0;
+int outaces = 0;
+int outlogc = 0;
+int outlogcEI = 0;
+int outredlog = 0;
+int outredlogfilm = 0;
+float white0 = -999;
+float white1 = -999;
+char* illumName = (char*)"";
+int outadaptive = 0;
+int tio = 0;
+int threads = 1;
+int wthreads = -1;
+int noprerender = 0;
 char* resampleMethod = (char*)"area";
-char* view           = 0;
+char* view = 0;
 
 static void control_c_handler(int sig)
 {
@@ -277,95 +265,92 @@ static void control_c_handler(int sig)
     exit(1);
 }
 
-
-vector<string>          inputFiles;
-vector<string>          inchmap;
-vector<string>          outchmap;
-vector<vector<string> > leaderArgs;
-vector<vector<string> > tailArgs;
-vector<vector<string> > overlayArgs;
-vector<string>          writerArgs;
-float                   timerwait = 1.0 / 192;
+vector<string> inputFiles;
+vector<string> inchmap;
+vector<string> outchmap;
+vector<vector<string>> leaderArgs;
+vector<vector<string>> tailArgs;
+vector<vector<string>> overlayArgs;
+vector<string> writerArgs;
+float timerwait = 1.0 / 192;
 deque<TwkUtil::StringPair> outparams;
 
-
 #ifndef WIN32
-extern "C" {
-int GC_pthread_create(pthread_t *new_thread,
-                      const pthread_attr_t *attr,
-                      void *(*start_routine)(void *), void *arg);
+extern "C"
+{
+    int GC_pthread_create(pthread_t* new_thread, const pthread_attr_t* attr,
+                          void* (*start_routine)(void*), void* arg);
 #ifdef PLATFORM_DARWIN
-int GC_pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
+    int GC_pthread_sigmask(int how, const sigset_t* set, sigset_t* oset);
 #endif
-int GC_pthread_join(pthread_t thread, void **retval);
-int GC_pthread_detach(pthread_t thread);
+    int GC_pthread_join(pthread_t thread, void** retval);
+    int GC_pthread_detach(pthread_t thread);
 }
 #endif
 
-void
-parseParam (string s)
+void parseParam(string s)
 {
     string::size_type pos = s.find("=");
 
     if (pos != string::npos)
     {
-        outparams.push_back(TwkUtil::StringPair(s.substr(0, pos),
-                                                s.substr(pos+1, string::npos)));
+        outparams.push_back(TwkUtil::StringPair(
+            s.substr(0, pos), s.substr(pos + 1, string::npos)));
     }
 }
 
-int
-parseOutParams(int argc, char *argv[])
+int parseOutParams(int argc, char* argv[])
 {
-    for (int i=0; i<argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        parseParam (argv[i]);
+        parseParam(argv[i]);
     }
 
     return 0;
 }
 
-int
-parseInChannels(int argc, char* argv[])
+int parseInChannels(int argc, char* argv[])
 {
-    for (int i=0; i<argc; i++) inchmap.push_back(argv[i]);
+    for (int i = 0; i < argc; i++)
+        inchmap.push_back(argv[i]);
     return 0;
 }
 
-int
-parseOutChannels(int argc, char* argv[])
+int parseOutChannels(int argc, char* argv[])
 {
-    for (int i=0; i<argc; i++) outchmap.push_back(argv[i]);
+    for (int i = 0; i < argc; i++)
+        outchmap.push_back(argv[i]);
     return 0;
 }
 
-int
-parseLeader(int argc, char* argv[])
+int parseLeader(int argc, char* argv[])
 {
     vector<string> args;
-    for (int i=0; i<argc; i++) args.push_back(argv[i]);
+    for (int i = 0; i < argc; i++)
+        args.push_back(argv[i]);
     leaderArgs.push_back(args);
     return 0;
 }
 
-int
-parseOverlay(int argc, char* argv[])
+int parseOverlay(int argc, char* argv[])
 {
     vector<string> args;
-    for (int i=0; i<argc; i++) args.push_back(argv[i]);
+    for (int i = 0; i < argc; i++)
+        args.push_back(argv[i]);
     overlayArgs.push_back(args);
     return 0;
 }
 
-int parseOutStereo (int argc, char* argv[])
+int parseOutStereo(int argc, char* argv[])
 {
-    if (argc == 0) outStereo = (char *) "separate";
-    else           outStereo = argv[0];
+    if (argc == 0)
+        outStereo = (char*)"separate";
+    else
+        outStereo = argv[0];
     return 0;
 }
 
-void
-threadedMovieInit()
+void threadedMovieInit()
 {
 #ifdef WIN32
     struct GC_stack_base sb;
@@ -377,11 +362,10 @@ threadedMovieInit()
 #endif
 }
 
-TwkMovie::Movie*
-makeLeaderMovie(MovieWriter::WriteRequest& writeRequest,
-                TwkMovie::Movie* omov,
-                Mu::MuLangContext* context,
-                Mu::Process* process)
+TwkMovie::Movie* makeLeaderMovie(MovieWriter::WriteRequest& writeRequest,
+                                 TwkMovie::Movie* omov,
+                                 Mu::MuLangContext* context,
+                                 Mu::Process* process)
 {
     TwkMovie::Movie* lmov = 0;
 
@@ -394,17 +378,16 @@ makeLeaderMovie(MovieWriter::WriteRequest& writeRequest,
         ostringstream str;
         str << "solid,red=0,green=0,blue=0,alpha=1,depth=8f"
             << ",width=" << omov->info().width
-            << ",height=" << omov->info().height
-            << ",fps=" << omov->info().fps;
+            << ",height=" << omov->info().height << ",fps=" << omov->info().fps;
 
-        int ff = writeRequest.frames.empty() ? omov->info().start : writeRequest.frames.front();
+        int ff = writeRequest.frames.empty() ? omov->info().start
+                                             : writeRequest.frames.front();
         int fs = ff - leaderFrames;
-        str << ",start=" << fs << ",end=" << (fs+leaderFrames-1);
+        str << ",start=" << fs << ",end=" << (fs + leaderFrames - 1);
 
         if (omov->hasAudio())
         {
-            str << ",audio=sine,amp=0,rate="
-                << omov->info().audioSampleRate;
+            str << ",audio=sine,amp=0,rate=" << omov->info().audioSampleRate;
         }
 
         str << ".movieproc";
@@ -424,13 +407,14 @@ makeLeaderMovie(MovieWriter::WriteRequest& writeRequest,
 
         TwkMovie::MovieInfo info;
 
-        info.width           = xs;
-        info.height          = ys;
-        info.uncropWidth     = xs;
-        info.uncropHeight    = ys;
-        info.numChannels     = 4;
-        info.audioSampleRate = omov->hasAudio() ? omov->info().audioSampleRate : 0;
-        info.audioChannels   = omov->info().audioChannels;
+        info.width = xs;
+        info.height = ys;
+        info.uncropWidth = xs;
+        info.uncropHeight = ys;
+        info.numChannels = 4;
+        info.audioSampleRate =
+            omov->hasAudio() ? omov->info().audioSampleRate : 0;
+        info.audioChannels = omov->info().audioChannels;
 
         mp->open(session, info, info.audioChannels, audioRate);
         lmov = mp;
@@ -446,10 +430,9 @@ makeLeaderMovie(MovieWriter::WriteRequest& writeRequest,
     return lmov;
 }
 
-TwkMovie::Movie*
-makeOverlayMovie(TwkMovie::Movie* in,
-                 Mu::MuLangContext* context,
-                 Mu::Process* process)
+TwkMovie::Movie* makeOverlayMovie(TwkMovie::Movie* in,
+                                  Mu::MuLangContext* context,
+                                  Mu::Process* process)
 {
     if (!overlayArgs.empty())
     {
@@ -464,8 +447,7 @@ makeOverlayMovie(TwkMovie::Movie* in,
     return in;
 }
 
-MovieRV*
-makeInputMovie()
+MovieRV* makeInputMovie()
 {
     Rv::Options& opts = Rv::Options::sharedOptions();
 
@@ -478,10 +460,10 @@ makeInputMovie()
     Rv::RvSession* session = new Rv::RvSession();
     session->setBatchMode(true);
 
-    if (inputFiles.size() == 1 &&
-        extension(inputFiles.front()) == "rv")
+    if (inputFiles.size() == 1 && extension(inputFiles.front()) == "rv")
     {
-        session->read(inputFiles.front().c_str(), IPCore::Session::ReadRequest());
+        session->read(inputFiles.front().c_str(),
+                      IPCore::Session::ReadRequest());
     }
     else
     {
@@ -502,7 +484,8 @@ makeInputMovie()
     if (*outStereo && strcmp(outStereo, "separate"))
     {
         vector<StringProperty*> props;
-        session->findPropertyOfType<StringProperty>(props, "#RVDisplayStereo.stereo.type");
+        session->findPropertyOfType<StringProperty>(
+            props, "#RVDisplayStereo.stereo.type");
         props.front()->front() = outStereo;
     }
 
@@ -519,8 +502,10 @@ makeInputMovie()
         ys = resizey;
 
         float aspect = float(size[0]) / float(size[1]);
-        if (!ys) ys = int(xs / aspect + 0.49f);
-        else if (!xs) xs = int(ys * aspect + 0.49f);
+        if (!ys)
+            ys = int(xs / aspect + 0.49f);
+        else if (!xs)
+            xs = int(ys * aspect + 0.49f);
     }
 
     if (xs == 0 || ys == 0)
@@ -533,14 +518,13 @@ makeInputMovie()
     ys = int(float(ys) * scale + 0.49f);
 
     TwkMovie::MovieInfo info;
-    info.width           = xs;
-    info.height          = ys;
-    info.uncropWidth     = xs;
-    info.uncropHeight    = ys;
-    info.numChannels     = 4;
+    info.width = xs;
+    info.height = ys;
+    info.uncropWidth = xs;
+    info.uncropHeight = ys;
+    info.numChannels = 4;
     info.audioSampleRate = audioRate;
-    info.audioChannels   = layoutChannels(channelLayouts(audioChannels).front());
-
+    info.audioChannels = layoutChannels(channelLayouts(audioChannels).front());
 
     if (view && !session->setViewNode(view))
     {
@@ -555,15 +539,23 @@ makeInputMovie()
     session->setSessionStateFromNode(session->graph().viewNode());
     rvmov->open(session, info, info.audioChannels, audioRate);
 
-    if (loglin) Rv::setLogLinOnAll(session->graph(), true, 1);
-    if (loglinc) Rv::setLogLinOnAll(session->graph(), true, 3);
-    if (redloglin) Rv::setLogLinOnAll(session->graph(), true, 6);
-    if (redlogfilmlin) Rv::setLogLinOnAll(session->graph(), true, 7);
-    if (insrgb) Rv::setSRGBLinOnAll(session->graph(), true);
-    if (in709) Rv::setRec709LinOnAll(session->graph(), true);
+    if (loglin)
+        Rv::setLogLinOnAll(session->graph(), true, 1);
+    if (loglinc)
+        Rv::setLogLinOnAll(session->graph(), true, 3);
+    if (redloglin)
+        Rv::setLogLinOnAll(session->graph(), true, 6);
+    if (redlogfilmlin)
+        Rv::setLogLinOnAll(session->graph(), true, 7);
+    if (insrgb)
+        Rv::setSRGBLinOnAll(session->graph(), true);
+    if (in709)
+        Rv::setRec709LinOnAll(session->graph(), true);
 
-    if (ingamma != 1.0) Rv::setGammaOnAll(session->graph(), ingamma);
-    if (filegamma != 1.0) Rv::setFileGammaOnAll(session->graph(), filegamma);
+    if (ingamma != 1.0)
+        Rv::setGammaOnAll(session->graph(), ingamma);
+    if (filegamma != 1.0)
+        Rv::setFileGammaOnAll(session->graph(), filegamma);
 
     if (exposure != 0.0)
     {
@@ -573,12 +565,14 @@ makeInputMovie()
 
     if (flipImage || flopImage)
     {
-        Rv::setFlipFlopOnAll(session->graph(), flipImage, true, flopImage, true);
+        Rv::setFlipFlopOnAll(session->graph(), flipImage, true, flopImage,
+                             true);
         flipImage = 0;
         flopImage = 0;
     }
 
-    if (!inchmap.empty()) Rv::setChannelMapOnAll(session->graph(), inchmap);
+    if (!inchmap.empty())
+        Rv::setChannelMapOnAll(session->graph(), inchmap);
     Rv::fitAllInputs(session->graph(), xs, ys);
 
     if (dlut)
@@ -623,10 +617,9 @@ makeInputMovie()
     return rvmov;
 }
 
-TwkMovie::Movie*
-makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
-                   TwkMovie::Movie* omov,
-                   TwkMovie::Movie* lmov)
+TwkMovie::Movie* makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
+                                    TwkMovie::Movie* omov,
+                                    TwkMovie::Movie* lmov)
 {
     //
     //  Reformatter for the content
@@ -639,8 +632,7 @@ makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
     {
         if (!findillum(illumName, white0, white1))
         {
-            cerr << "ERROR: " << illumName
-                 << " is not a standard illuminant"
+            cerr << "ERROR: " << illumName << " is not a standard illuminant"
                  << endl;
             exit(-1);
         }
@@ -657,12 +649,16 @@ makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
     rmov->setOutputLogCEI(outlogcEI);
     rmov->setOutputRedLog(outredlog);
     rmov->setOutputRedLogFilm(outredlogfilm);
-    if (white0 != -999 && white1 != -999) rmov->setOutputWhite(white0, white1);
+    if (white0 != -999 && white1 != -999)
+        rmov->setOutputWhite(white0, white1);
     rmov->setFlip(flipImage);
     rmov->setFlop(flopImage);
-    if (outpremult) rmov->setOutputPremultiply();
-    if (outunpremult) rmov->setOutputUnpremultiply();
-    if (!outchmap.empty()) rmov->setChannelMap(outchmap);
+    if (outpremult)
+        rmov->setOutputPremultiply();
+    if (outunpremult)
+        rmov->setOutputUnpremultiply();
+    if (!outchmap.empty())
+        rmov->setChannelMap(outchmap);
 
     if (rlmov)
     {
@@ -670,11 +666,14 @@ makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
         rlmov->setOutputLogSpace(linlog);
         rlmov->setOutputRedLog(outredlog);
         rlmov->setOutputRedLogFilm(outredlogfilm);
-        if (!outchmap.empty()) rlmov->setChannelMap(outchmap);
+        if (!outchmap.empty())
+            rlmov->setChannelMap(outchmap);
         rlmov->setFlip(flipImage);
         rlmov->setFlop(flopImage);
-        if (outpremult) rlmov->setOutputPremultiply();
-        if (outunpremult) rlmov->setOutputUnpremultiply();
+        if (outpremult)
+            rlmov->setOutputPremultiply();
+        if (outunpremult)
+            rlmov->setOutputUnpremultiply();
     }
 
     if (ysamples)
@@ -701,24 +700,29 @@ makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
 
     if (outtype && outbits)
     {
-        bool fp = !strcmp(outtype, "float") ||
-            !strcmp(outtype, "half") ||
-            !strcmp(outtype, "double");
+        bool fp = !strcmp(outtype, "float") || !strcmp(outtype, "half")
+                  || !strcmp(outtype, "double");
 
         if (outbits <= 8)
         {
             rmov->setOutputFormat(FrameBuffer::UCHAR);
-            if (rlmov) rlmov->setOutputFormat(FrameBuffer::UCHAR);
+            if (rlmov)
+                rlmov->setOutputFormat(FrameBuffer::UCHAR);
         }
         else if (outbits <= 16)
         {
             rmov->setOutputFormat(fp ? FrameBuffer::HALF : FrameBuffer::USHORT);
-            if (rlmov) rlmov->setOutputFormat(fp ? FrameBuffer::HALF : FrameBuffer::USHORT);
+            if (rlmov)
+                rlmov->setOutputFormat(fp ? FrameBuffer::HALF
+                                          : FrameBuffer::USHORT);
         }
         else
         {
-            rmov->setOutputFormat(fp ? FrameBuffer::FLOAT : FrameBuffer::USHORT);
-            if (rlmov) rlmov->setOutputFormat(fp ? FrameBuffer::FLOAT : FrameBuffer::USHORT);
+            rmov->setOutputFormat(fp ? FrameBuffer::FLOAT
+                                     : FrameBuffer::USHORT);
+            if (rlmov)
+                rlmov->setOutputFormat(fp ? FrameBuffer::FLOAT
+                                          : FrameBuffer::USHORT);
         }
     }
 
@@ -733,11 +737,11 @@ makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
     {
         int len = lmov->info().end - lmov->info().start + 1;
         int fs = lmov->info().start;
-        int f0 = writeRequest.frames.empty() ? omov->info().start : writeRequest.frames.front();
-        int f1 = writeRequest.frames.empty() ? omov->info().end : writeRequest.frames.back();
-        LeaderFooterMovie* smov = new LeaderFooterMovie(omov, f0, f1,
-                                                        lmov,
-                                                        0);
+        int f0 = writeRequest.frames.empty() ? omov->info().start
+                                             : writeRequest.frames.front();
+        int f1 = writeRequest.frames.empty() ? omov->info().end
+                                             : writeRequest.frames.back();
+        LeaderFooterMovie* smov = new LeaderFooterMovie(omov, f0, f1, lmov, 0);
         omov = smov;
 
         FrameList lframes;
@@ -749,18 +753,15 @@ makeFormattedMovie(MovieWriter::WriteRequest& writeRequest,
         if (!writeRequest.frames.empty())
         {
             writeRequest.frames.insert(writeRequest.frames.begin(),
-                                       lframes.begin(),
-                                       lframes.end());
+                                       lframes.begin(), lframes.end());
         }
     }
 
     return omov;
 }
 
-TwkMovie::Movie*
-makeMovieTree(MovieWriter::WriteRequest& writeRequest,
-              Mu::MuLangContext* context,
-              Mu::Process* process)
+TwkMovie::Movie* makeMovieTree(MovieWriter::WriteRequest& writeRequest,
+                               Mu::MuLangContext* context, Mu::Process* process)
 {
     MovieRV* reader = makeInputMovie();
 
@@ -789,7 +790,7 @@ makeMovieTree(MovieWriter::WriteRequest& writeRequest,
         // largest.
         //
 
-        for (int i=min(fs,fe); i <= max(fs,fe); i+=abs(inc))
+        for (int i = min(fs, fe); i <= max(fs, fe); i += abs(inc))
         {
             writeRequest.frames.push_back(i);
         }
@@ -799,40 +800,38 @@ makeMovieTree(MovieWriter::WriteRequest& writeRequest,
     //  Add any overlays, etc
     //
 
-    TwkMovie::Movie* omov   = makeOverlayMovie(reader, context, process);
-    TwkMovie::Movie* lmov   = makeLeaderMovie(writeRequest, omov, context, process);
+    TwkMovie::Movie* omov = makeOverlayMovie(reader, context, process);
+    TwkMovie::Movie* lmov =
+        makeLeaderMovie(writeRequest, omov, context, process);
     TwkMovie::Movie* outmov = makeFormattedMovie(writeRequest, omov, lmov);
-    //TwkMovie::Movie* outmov = makeFormattedMovie(writeRequest, reader, 0);
+    // TwkMovie::Movie* outmov = makeFormattedMovie(writeRequest, reader, 0);
 
     return outmov;
 }
 
-string
-str(float f)
+string str(float f)
 {
     ostringstream str;
     str << f;
     return str.str();
 }
 
-string
-str(int i)
+string str(int i)
 {
     ostringstream str;
     str << i;
     return str.str();
 }
 
-void
-addParam(const string& name, const string& val)
+void addParam(const string& name, const string& val)
 {
     outparams.push_front(StringPair(name, val));
 }
 
-void
-addDefaultParams()
+void addDefaultParams()
 {
-    if (outfps != 0.0) addParam("output/fps", str(outfps));
+    if (outfps != 0.0)
+        addParam("output/fps", str(outfps));
 
     if (outgamma != 1.0)
     {
@@ -840,12 +839,17 @@ addDefaultParams()
         addParam("output/transfer", TwkFB::ColorSpace::Gamma());
     }
 
-    if (outsrgb) addParam("output/transfer", TwkFB::ColorSpace::sRGB());
-    if (out709) addParam("output/transfer", TwkFB::ColorSpace::Rec709());
+    if (outsrgb)
+        addParam("output/transfer", TwkFB::ColorSpace::sRGB());
+    if (out709)
+        addParam("output/transfer", TwkFB::ColorSpace::Rec709());
     if (outlogc)
     {
-        if (outlogcEI == 0) addParam("output/transfer", TwkFB::ColorSpace::ArriLogC());
-        else addParam("output/transfer", TwkFB::ColorSpace::ArriLogC() + " EI=" + str(outlogcEI));
+        if (outlogcEI == 0)
+            addParam("output/transfer", TwkFB::ColorSpace::ArriLogC());
+        else
+            addParam("output/transfer",
+                     TwkFB::ColorSpace::ArriLogC() + " EI=" + str(outlogcEI));
     }
 
     if (outaces)
@@ -854,7 +858,8 @@ addDefaultParams()
         addParam("output/transfer", TwkFB::ColorSpace::Linear());
         addParam("output/primaries", TwkFB::ColorSpace::ACES());
         // NOTE: these go rX,rY,gX,gY,bX,bY,wX,wY
-        addParam("output/chromaticities", "0.73470,0.26530,0.0,1.0,0.00010,-0.07700,0.32168,0.33767");
+        addParam("output/chromaticities",
+                 "0.73470,0.26530,0.0,1.0,0.00010,-0.07700,0.32168,0.33767");
         addParam("output/neutral", "0.32168,0.33767");
     }
 
@@ -874,8 +879,10 @@ addDefaultParams()
         addParam("output/transfer", TwkFB::ColorSpace::RedLogFilm());
     }
 
-    if (outpremult) addParam("output/alpha", "PREMULT");
-    else if (outunpremult) addParam("output/alpha", "UNPREMULT");
+    if (outpremult)
+        addParam("output/alpha", "PREMULT");
+    else if (outunpremult)
+        addParam("output/alpha", "UNPREMULT");
 
     if (paNumerator)
     {
@@ -888,8 +895,7 @@ addDefaultParams()
     }
 }
 
-bool
-parsePA()
+bool parsePA()
 {
     string pa = paRatio;
 
@@ -905,12 +911,16 @@ parsePA()
         for (size_t i = 0; i < pa.size(); i++)
         {
             char c = pa[i];
-            if (c != ':' && c != '.' && (c < '0' || c > '9')) return false;
-            if (c == '.') dots++;
-            if (c == ':') colons++;
+            if (c != ':' && c != '.' && (c < '0' || c > '9'))
+                return false;
+            if (c == '.')
+                dots++;
+            if (c == ':')
+                colons++;
         }
 
-        if (dots != 0 && colons != 0) return false;
+        if (dots != 0 && colons != 0)
+            return false;
 
         //
         //  pull it apart if needed
@@ -920,7 +930,7 @@ parsePA()
         {
             string::size_type i = pa.find(':');
             paNumerator = atoi(pa.substr(0, i).c_str());
-            paDenominator = atoi(pa.substr(i+1, pa.size() - i).c_str());
+            paDenominator = atoi(pa.substr(i + 1, pa.size() - i).c_str());
         }
         else
         {
@@ -933,13 +943,12 @@ parsePA()
     return true;
 }
 
-void
-writeSession(string outfile)
+void writeSession(string outfile)
 {
     if (!(overlayArgs.empty() && leaderArgs.empty()))
     {
-        cerr << "WARNING: \"-overlay\" and \"-leader\" " <<
-            "ignored when outputting session" << endl;
+        cerr << "WARNING: \"-overlay\" and \"-leader\" "
+             << "ignored when outputting session" << endl;
     }
 
     MovieRV* reader = makeInputMovie();
@@ -969,8 +978,7 @@ void setEnvVar(const string& var, const string& val)
 
 //----------------------------------------------------------------------
 
-int
-utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
     setEnvVar("LANG", "C");
     setEnvVar("LC_ALL", "C");
@@ -983,46 +991,51 @@ utf8Main(int argc, char *argv[])
     //
 
 #ifdef RVIO_HW
-    TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
+    TwkGLF::FBOVideoDevice* dummyDev =
+        new TwkGLF::FBOVideoDevice(0, 10, 10, false);
 #else
-    TwkGLF::OSMesaVideoDevice* dummyDev = new TwkGLF::OSMesaVideoDevice(0, 10, 10, true);
+    TwkGLF::OSMesaVideoDevice* dummyDev =
+        new TwkGLF::OSMesaVideoDevice(0, 10, 10, true);
     FrameBuffer* dummyFB = new FrameBuffer(10, 10, 4, FrameBuffer::FLOAT);
     dummyDev->makeCurrent(dummyFB);
 #endif
     IPCore::ImageRenderer::queryGL();
-    const char* glVersion =(const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+    const char* glVersion =
+        (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
     IPCore::Shader::Function::useShadingLanguageVersion(glVersion);
 
-    #ifndef PLATFORM_WINDOWS
-        //
-        //  Check the per-process limit on open file descriptors and
-        //  reset the soft limit to the hard limit.
-        //
-        struct rlimit rlim;
-        getrlimit (RLIMIT_NOFILE, &rlim);
-        rlim.rlim_cur = rlim.rlim_max;
-        setrlimit (RLIMIT_NOFILE, &rlim);
-    #endif
+#ifndef PLATFORM_WINDOWS
+    //
+    //  Check the per-process limit on open file descriptors and
+    //  reset the soft limit to the hard limit.
+    //
+    struct rlimit rlim;
+    getrlimit(RLIMIT_NOFILE, &rlim);
+    rlim.rlim_cur = rlim.rlim_max;
+    setrlimit(RLIMIT_NOFILE, &rlim);
+#endif
 
 #ifdef PTW32_STATIC_LIB
     pthread_win32_process_attach_np();
     pthread_win32_process_attach_np();
 #endif
 
-
 #ifdef PLATFORM_DARWIN
     QCoreApplication qapp(argc, argv);
-    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
+    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION,
+                                REVISION_NUMBER);
 #endif
 
 #ifdef PLATFORM_LINUX
     QCoreApplication qapp(argc, argv);
-    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
+    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION,
+                            REVISION_NUMBER);
 #endif
 
 #ifdef PLATFORM_WINDOWS
     QApplication qapp(argc, argv);
-    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
+    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION,
+                            REVISION_NUMBER);
 #endif
 
     Rv::Options& opts = Rv::Options::sharedOptions();
@@ -1033,8 +1046,9 @@ utf8Main(int argc, char *argv[])
     Imf::staticInitialize();
     IPCore::Application::cacheEnvVars();
 
-    TwkFB::GenericIO::init(); // Initialize TwkFB::GenericIO plugins statics
-    TwkMovie::GenericIO::init(); // Initialize TwkMovie::GenericIO plugins statics
+    TwkFB::GenericIO::init();    // Initialize TwkFB::GenericIO plugins statics
+    TwkMovie::GenericIO::init(); // Initialize TwkMovie::GenericIO plugins
+                                 // statics
 
     IPCore::AudioRenderer::setNoAudio(true);
 
@@ -1046,11 +1060,8 @@ utf8Main(int argc, char *argv[])
     //  Call the deploy functions
     //
 
-    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION,
-                               MINOR_VERSION,
-                               REVISION_NUMBER,
-                               argc, argv,
-                               RELEASE_DESCRIPTION,
+    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER,
+                               argc, argv, RELEASE_DESCRIPTION,
                                "HEAD=" GIT_HEAD);
 
     //
@@ -1059,27 +1070,27 @@ utf8Main(int argc, char *argv[])
 
     int sleepTime = 0;
 
-    opts.exrInherit        = 0;
-    opts.exrNoOneChannel   = 0;
+    opts.exrInherit = 0;
+    opts.exrNoOneChannel = 0;
     opts.exrReadWindowIsDisplayWindow = 0;
-    opts.exrReadWindow     = 1; // DisplayWindow
-    opts.dpxPixel          = (char*)"A2_BGR10";
-    opts.cinPixel          = (char*)"A2_BGR10";
+    opts.exrReadWindow = 1; // DisplayWindow
+    opts.dpxPixel = (char*)"A2_BGR10";
+    opts.cinPixel = (char*)"A2_BGR10";
 
 #ifdef PLATFORM_WINDOWS
-    opts.exrIOMethod       = 2;
-    opts.dpxIOMethod       = 2;
-    opts.cinIOMethod       = 2;
-    opts.tgaIOMethod       = 2;
-    opts.jpegIOMethod      = 2;
-    opts.tiffIOMethod      = 2;
+    opts.exrIOMethod = 2;
+    opts.dpxIOMethod = 2;
+    opts.cinIOMethod = 2;
+    opts.tgaIOMethod = 2;
+    opts.jpegIOMethod = 2;
+    opts.tiffIOMethod = 2;
 #else
-    opts.exrIOMethod       = 2;
-    opts.dpxIOMethod       = 2;
-    opts.cinIOMethod       = 2;
-    opts.tgaIOMethod       = 2;
-    opts.jpegIOMethod      = 2;
-    opts.tiffIOMethod      = 2;
+    opts.exrIOMethod = 2;
+    opts.dpxIOMethod = 2;
+    opts.cinIOMethod = 2;
+    opts.tgaIOMethod = 2;
+    opts.jpegIOMethod = 2;
+    opts.tiffIOMethod = 2;
 #endif
 
     //
@@ -1099,181 +1110,329 @@ utf8Main(int argc, char *argv[])
     //  Parse cmd line args
     //
 
-    if (arg_parse
-        (argc, argv,
-         "", "\nUsage: RVIO (hardware version) movie and image sequence conversion and creation",
-         "", "",
-         "", "  Make Movie:           rvio in.#.tif -o out.mov",
-         "", "  Convert Image:        rvio in.tif -o out.jpg",
-         "", "  Convert Image Seq.:   rvio in.#.tif -o out.#.jpg",
-         "", "  Movie With Audio:     rvio [ in.#.tif in.wav ] -o out.mov",
-         "", "  Movie With LUT:       rvio [ -llut log2film.csp in.#.dpx ] -o out.mov",
-         "", "  Rip Movie Range #1:   rvio in.mov -t 1000-1200 -o out.mov",
-         "", "  Rip Movie Range #2:   rvio in.mov -t 1000-1200 -o out.#.jpg",
-         "", "  Rip Movie Audio:      rvio in.mov -o out.wav",
-         "", "  Conform Image:        rvio in.tif -outres 512 512 -o out.tif",
-         "", "  Resize Image:         rvio in.#.tif -scale 0.25 -o out.#.jpg",
-         "", "  Resize/Stretch:       rvio in.#.tif -resize 640 480 -o out.#.jpg",
-         "", "  Resize Keep Aspect:   rvio in.#.tif -resize 1920 0 -o out.#.jpg",
-         "", "  Resize Keep Aspt #2:  rvio in.#.tif -resize 0 1080 -o out.#.jpg",
-         "", "  Sequence:             rvio cut1.#.tif cut2.mov cut3.1-100#.dpx -o out.mov",
-         "", "  Per-Source Arg:       rvio [ -pa 2.0 -fps 30 cut1.#.dpx ] cut2.mov -o out.mov",
-         "", "  Stereo Movie File:    rvio [ left.mov right.mov ] -outstereo separate -o out.mov",
-         "", "  Stereo Anaglyph:      rvio [ left.mov right.mov ] -outstereo anaglyph -o out.mov",
-         "", "  Log Cin/DPX to Movie: rvio -inlog -outsrgb in.#.cin -o out.mov",
-         "", "  Output Log Cin/DPX:   rvio -outlog in.#.exr -o out.#.dpx",
-         "", "  OpenEXR 16 Bit Out:   rvio in.#.dpx -outhalf -o out.#.exr",
-         "", "  OpenEXR to 8 Bit:     rvio in.#.exr -out8 -o out.#.tif",
-         "", "  OpenEXR B44 4:2:0:    rvio in.#.exr -outhalf -yryby 1 2 2 -codec B44 -o out.#.exr",
-         "", "  OpenEXR B44A 4:2:0:   rvio in.#.exr -outhalf -yrybya 1 2 2 1 -codec B44A -o out.#.exr",
-         "", "  OpenEXR DWAA 4:2:0:   rvio in.#.exr -outhalf -yryby 1 2 2 -quality 45 -codec DWAA -o out.#.exr",
-         "", "  OpenEXR DWAB 4:2:0:   rvio in.#.exr -outhalf -yrybya 1 2 2 1 -quality 45 -codec DWAB -o out.#.exr",
-         "", "  ACES from PD DPX:     rvio in.#.dpx -inlog -outhalf -outaces out.#.aces",
-         "", "  ACES from JPEG:       rvio in.#.jpg -insrgb -outhalf -outaces out.#.aces",
-         "", "  Chng White to D75:    rvio in.#.exr -outillum D75 -outhalf -o out.#.exr",
-         "", "  Chng White to D75 #2: rvio in.#.exr -outwhite 0.29902 0.31485 -outhalf -o out.#.exr",
-         "", "  TIFF 32 Bit Float:    rvio in.#.tif -outformat 32 float -o out.#.tif",
-         "", "  Anamorphic Unsqueeze: rvio [ -pa 2.0 in_2k_full_ap.#.dpx ] -outres 2048 1556/2 -o out_2k.mov",
-         "", "  Camera JPEG to EXR:   rvio -insrgb IMG1234.jpg -o out.exr",
-         "", "  Letterbox HD in 1.33: rvio [ -uncrop 1920 1444 0 182 in1080.#.dpx ] -outres 640 480 -o out.mov",
-         "", "  Crop 2.35 of Full Ap: rvio [ -crop 0 342 2047 1213 inFullAp.#.dpx ] -o out.mov",
-         "", "  Multiple CPUs:        rvio -v -rthreads 3 in.#.dpx -o out.mov",
-         "", "  Test Throughput:      rvio -v in.#.dpx -o out.null",
-         "", "",
-         "", "Advanced EXR/ACES Header Attributes Usage:",
-         "", "  Multiple -outparam values can be used.",
-         "", "  Type names: f, i, s, sv        -- float, int, string, string vector [N values]",
-         "", "              v2i, v2f, v3i, v3f -- 2D and 3D int and float vectors [2 or 3 values required]",
-         "", "              b2i, b2f           -- 2D box float and int [4 values required]",
-         "", "              c                  -- chromaticities [8 values required]",
-         "", "  Passthrough syntax:   -outparams passthrough=REGEX",
-         "", "  Attr creation syntax: -outparams NAME:TYPE=VALUE0[,VALUE1,...]\"",
-         "", "  EXIF attrs:           rvio exif.jpg -insrgb -o out.exr -outparams \"passthrough=.*EXIF.*\"",
-         "", "  Create float attr:    rvio in.exr -o out.exr -outparams pi:f=3.14",
-         "", "  Create v2i attr:      rvio in.exr -o out.exr -outparams myV2iAttr:v2i=1,2",
-         "", "  Create string attr:   rvio in.exr -o out.exr -outparams \"myAttr:s=HELLO WORLD\"",
-         "", "  Chromaticies (XYZ):   rvio XYZ.tiff -o out.exr -outparams chromaticities:c=1,0,0,1,0,0,.333333,.3333333",
-         "", "  No Color Adaptation:  rvio in.exr -o out.aces -outaces -outillum D65REC709",
-         "", "",
-         "", "Example Leader/Overlay Usage:",
-         "", "          simpleslate: side-text Field1=Value1 Field2=Value2 ...",
-         "", "          watermark: text opacity",
-         "", "          frameburn: opacity grey font-point-size",
-         "", "          bug: file.tif opacity height",
-         "", "          matte: aspect-ratio opacity",
-         "", "",
-         "", "  Movie w/Slate:        rvio in.#.jpg -o out.mov -leader simpleslate \"FilmCo\" \\",
-         "", "                             \"Artist=Jane Q. Artiste\" \"Shot=S01\" \"Show=BlockBuster\" \\",
-         "", "                             \"Comments=You said it was too blue so I made it red\"",
-         "", "  Movie w/Watermark:    rvio in.#.jpg -o out.mov -overlay watermark \"FilmCo Eyes Only\" .25",
-         "", "  Movie w/Frame Burn:   rvio in.#.jpg -o out.mov -overlay frameburn .4 1.0 30.0",
-         "", "  Movie w/Bug:          rvio in.#.jpg -o out.mov -overlay bug logo.tif 0.4 128 15 100",
-         "", "  Movie w/Matte:        rvio in.#.jpg -o out.mov -overlay matte 2.35 0.8",
-         "", "  Multiple:             rvio ... -leader ... -overlay ... -overlay ...",
-         "", "",
-         RV_ARG_SEQUENCE_HELP,
-         "", "",
-         RV_ARG_SOURCE_OPTIONS(opts),
-         "", "",
-         "", "Global arguments",
-         "", "",
-         "", ARG_SUBR(parseInFiles), "Input sequence patterns, images, movies, or directories ",
-         "-o %S", &outputFile, "Output sequence or image",
-         "-t %S", &timerange, "Output time range (default=input time range)",
-         "-tio", ARG_FLAG(&tio), "Output time range from view's in/out points",
-         "-v", ARG_FLAG(&verbose), "Verbose messages",
-         "-vv", ARG_FLAG(&reallyverbose), "Really Verbose messages",
-         "-q", ARG_FLAG(&processFloat), "Best quality color conversions (not necessary, slower)",
-         "-ns", ARG_FLAG(&opts.nukeSequence), "Nuke-style sequences (deprecated and ignored -- no longer needed)",
-         "-noRanges", ARG_FLAG(&opts.noRanges), "No separate frame ranges (i.e. 1-10 will be considered a file)", \
-         "-rthreads %d", &threads, "Number of reader/render threads (default=1)",
-         "-wthreads %d", &wthreads, "Number of writer threads (limited support for this)",
-         "-view %S", &view, "View to render (default=defaultSequence or current view in RV file)",
-         "-noSequence", ARG_FLAG(&opts.noSequence), "Don't contract files into sequences", \
-         "-formats", ARG_FLAG(&showFormats), "Show all supported image and movie formats",
-         "-leader", ARG_SUBR(parseLeader), "Insert leader/slate (can use multiple time)",
-         "-leaderframes %d", &leaderFrames, "Number of leader frames (default=1)",
-         "-overlay", ARG_SUBR(parseOverlay), "Visual overlay(s) (can use multiple times)",
-         "-inlog", ARG_FLAG(&loglin), "Convert input to linear space via Cineon Log->Lin",
-         "-inredlog", ARG_FLAG(&redloglin), "Convert input to linear space via Red Log->Lin",
-         "-inredlogfilm", ARG_FLAG(&redlogfilmlin), "Convert input to linear space via Red Log Film->Lin",
-         "-insrgb", ARG_FLAG(&insrgb), "Convert input to linear space from sRGB space",
-         "-in709", ARG_FLAG(&in709), "Convert input to linear space from Rec-709 space",
-         "-ingamma %f", &ingamma, "Convert input using gamma correction",
-         "-filegamma %f", &filegamma, "Convert input using gamma correction to linear space",
-         "-inchannelmap", ARG_SUBR(parseInChannels), "map input channels",
-         "-inpremult", ARG_FLAG(&inpremult), "premultiply alpha and color",
-         "-inunpremult", ARG_FLAG(&inunpremult), "un-premultiply alpha and color",
-         "-exposure %f", &exposure, "Apply relative exposure change (in stops)",
-         "-scale %f", &scale, "Scale input image geometry",
-         "-resize %d [%d]", &resizex, &resizey, "Resize input image geometry to exact size on input",
-//       "-resampleMethod %S", &resampleMethod, "Resampling method (area, linear, cubic, nearest, default=%s)", resampleMethod,
-         "-dlut %S", &dlut, "Apply display LUT",
-         "-flip", ARG_FLAG(&flipImage), "Flip image (flip vertical) (keep orientation flags the same)",
-         "-flop", ARG_FLAG(&flopImage), "Flop image (flip horizontal) (keep orientation flags the same)",
-         "-yryby %d %d %d", &ysamples, &rysamples, &bysamples, "Y RY BY sub-sampled planar output",
-         "-yrybya %d %d %d %d", &ysamples, &rysamples, &bysamples, &asamples, "Y RY BY A sub-sampled planar output",
-         "-yuv %d %d %d", &ysamples, &usamples, &vsamples, "Y U V sub-sampled planar output",
-         "-outparams", ARG_SUBR(&parseOutParams), "Codec specific output parameters",               \
-         "-outchannelmap", ARG_SUBR(parseOutChannels), "map output channels",
-         "-outrgb", ARG_FLAG(&outrgb), "same as -outchannelmap R G B",
-         "-outpremult", ARG_FLAG(&outpremult), "premultiply alpha and color",
-         "-outunpremult", ARG_FLAG(&outunpremult), "un-premultiply alpha and color",
-         "-outlog", ARG_FLAG(&linlog), "Convert output to log space via Cineon Lin->Log",
-         "-outsrgb", ARG_FLAG(&outsrgb), "Convert output to sRGB ColorSpace",
-         "-out709", ARG_FLAG(&out709), "Convert output to Rec-709 ColorSpace",
-         "-outredlog", ARG_FLAG(&outredlog), "Convert output to Red Log ColorSpace",
-         "-outredlogfilm", ARG_FLAG(&outredlogfilm), "Convert output to Red Log Film ColorSpace",
-         "-outgamma %f", &outgamma, "Apply gamma to output",
-         "-outstereo", ARG_SUBR(&parseOutStereo), "Output stereo (checker, scanline, anaglyph, left, right, pair, mirror, hsqueezed, vsqueezed, default=separate)",
-         "-outformat %d %S", &outbits, &outtype, "Output bits and format (e.g. 16 float -or- 8 int)",
-         "-outhalf", ARG_FLAG(&outhalf), "Same as -outformat 16 float",
-         "-out8", ARG_FLAG(&out8), "Same as -outformat 8 int",
-         "-outres %d %d", &xsize, &ysize, "Output resolution",
-         "-outfps %f", &outfps, "Output FPS",
-         "-outaces", ARG_FLAG(&outaces), "Output ACES gamut (converts pixels to ACES)",
-         "-outwhite %f %f", &white0, &white1, "Output white CIE 1931 chromaticity x, y",
-         "-outillum %S", &illumName, "Output standard illuminant name (A-C, D50, D55, D65, D65REC709, D75 E, F[1-12])",
-         "-codec %S", &codec, "Output codec (varies with file format)",
-         "-audiocodec %S", &audioCodec, "Output audio codec (varies with file format)",
-         "-audiorate %f", &audioRate, "Output audio sample rate (default 48000)",
-         "-audiochannels %d", &audioChannels, "Output audio channels (default 2)",
-         "-quality %f", &quality, "Output codec quality 0.0 -> 1.0 (100000 for DWAA/DWAB) (varies w/format and codec default=%g)", quality,
-         "-outpa %S", &paRatio, "Output pixel aspect ratio (e.g. 1.33 or 16:9, etc. metadata only) default=%s", paRatio,
-         "-comment %S", &comment, "Ouput comment (movie files, default=\"%s\")", comment,
-         "-copyright %S", &copyright, "Ouput copyright (movie files, default=\"%s\")", copyright,
-         "-lic %S", &licarg, "Use specific license file (this param is simply ignored for Open RV as it is not required)",
-         "-debug", ARG_SUBR(&Rv::parseDebugKeyWords), "Debug category",               \
-         "-version", ARG_FLAG(&showVersion), "Show RVIO version number",
-         "-iomethod %d [%d]", &iomethod, &iosize, "I/O Method (overrides all) (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", iomethod, iosize,  \
-         "-exrcpus %d", &opts.exrcpus, "EXR thread count (default=%d)", opts.exrcpus, \
-         "-exrRGBA", ARG_FLAG(&opts.exrRGBA), "EXR Always read as RGBA (default=false)", \
-         "-exrInherit", ARG_FLAG(&opts.exrInherit), "EXR guess channel inheritance (default=false)", \
-         "-exrNoOneChannel", ARG_FLAG(&opts.exrNoOneChannel), "EXR never use one channel planar images (default=false)", \
-         "-exrIOMethod %d [%d]", &opts.exrIOMethod, &opts.exrIOSize, "EXR I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", opts.exrIOMethod, opts.exrIOSize, \
-         "-exrReadWindowIsDisplayWindow", ARG_FLAG(&opts.exrReadWindowIsDisplayWindow), "EXR read window is display window (default=false)", \
-         "-exrReadWindow %d", &opts.exrReadWindow, "EXR Read Window Method (0=Data, 1=Display, 2=Union, 3=Data inside Display, default=%d)", opts.exrReadWindow, \
-         "-jpegRGBA", ARG_FLAG(&opts.jpegRGBA), "Make JPEG four channel RGBA on read (default=no, use RGB or YUV)", \
-         "-jpegIOMethod %d [%d]", &opts.jpegIOMethod, &opts.jpegIOSize, "JPEG I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", opts.exrIOMethod, opts.exrIOSize, \
-         "-cinpixel %S", &opts.cinPixel, "Cineon pixel storage (default=%s)", opts.cinPixel, \
-         "-cinchroma", ARG_FLAG(&opts.cinchroma), "Use Cineon chromaticity values (for default reader only)", \
-         "-cinIOMethod %d [%d]", &opts.cinIOMethod, &opts.cinIOSize, "Cineon I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", opts.cinIOMethod, opts.cinIOSize, \
-         "-dpxpixel %S", &opts.dpxPixel, "DPX pixel storage (default=%s)", opts.dpxPixel, \
-         "-dpxchroma", ARG_FLAG(&opts.dpxchroma), "Use DPX chromaticity values (for default reader only)", \
-         "-dpxIOMethod %d [%d]", &opts.dpxIOMethod, &opts.dpxIOSize, "DPX I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", opts.dpxIOMethod, opts.dpxIOSize,  \
-         "-tgaIOMethod %d [%d]", &opts.tgaIOMethod, &opts.tgaIOSize, "TARGA I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", opts.tgaIOMethod, opts.tgaIOSize,  \
-         "-tiffIOMethod %d [%d]", &opts.tiffIOMethod, &opts.tiffIOSize, "TIFF I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and optional chunk size (default=%d)", opts.tgaIOMethod, opts.tgaIOSize,  \
-         "-init %S", &initscript, "Override init script",
-         "-err-to-out", ARG_FLAG(&err2out), "Output errors to standard output (instead of standard error)",
-         "-strictlicense", ARG_FLAG(&strictlicense), "Exit rather than consume an RV license if no rvio licenses are available (this param is simply ignored for Open RV as it is not required)",
-         //"-noprerender", ARG_FLAG(&noprerender), "Turn off prerendering optimization",
-         "-flags", ARG_SUBR(&Rv::parseMuFlags), "Arbitrary flags (flag, or 'name=value') for Mu",
+    if (arg_parse(
+            argc, argv, "",
+            "\nUsage: RVIO (hardware version) movie and image sequence "
+            "conversion and creation",
+            "", "", "", "  Make Movie:           rvio in.#.tif -o out.mov", "",
+            "  Convert Image:        rvio in.tif -o out.jpg", "",
+            "  Convert Image Seq.:   rvio in.#.tif -o out.#.jpg", "",
+            "  Movie With Audio:     rvio [ in.#.tif in.wav ] -o out.mov", "",
+            "  Movie With LUT:       rvio [ -llut log2film.csp in.#.dpx ] -o "
+            "out.mov",
+            "", "  Rip Movie Range #1:   rvio in.mov -t 1000-1200 -o out.mov",
+            "", "  Rip Movie Range #2:   rvio in.mov -t 1000-1200 -o out.#.jpg",
+            "", "  Rip Movie Audio:      rvio in.mov -o out.wav", "",
+            "  Conform Image:        rvio in.tif -outres 512 512 -o out.tif",
+            "",
+            "  Resize Image:         rvio in.#.tif -scale 0.25 -o out.#.jpg",
+            "",
+            "  Resize/Stretch:       rvio in.#.tif -resize 640 480 -o "
+            "out.#.jpg",
+            "",
+            "  Resize Keep Aspect:   rvio in.#.tif -resize 1920 0 -o out.#.jpg",
+            "",
+            "  Resize Keep Aspt #2:  rvio in.#.tif -resize 0 1080 -o out.#.jpg",
+            "",
+            "  Sequence:             rvio cut1.#.tif cut2.mov cut3.1-100#.dpx "
+            "-o out.mov",
+            "",
+            "  Per-Source Arg:       rvio [ -pa 2.0 -fps 30 cut1.#.dpx ] "
+            "cut2.mov -o out.mov",
+            "",
+            "  Stereo Movie File:    rvio [ left.mov right.mov ] -outstereo "
+            "separate -o out.mov",
+            "",
+            "  Stereo Anaglyph:      rvio [ left.mov right.mov ] -outstereo "
+            "anaglyph -o out.mov",
+            "",
+            "  Log Cin/DPX to Movie: rvio -inlog -outsrgb in.#.cin -o out.mov",
+            "", "  Output Log Cin/DPX:   rvio -outlog in.#.exr -o out.#.dpx",
+            "", "  OpenEXR 16 Bit Out:   rvio in.#.dpx -outhalf -o out.#.exr",
+            "", "  OpenEXR to 8 Bit:     rvio in.#.exr -out8 -o out.#.tif", "",
+            "  OpenEXR B44 4:2:0:    rvio in.#.exr -outhalf -yryby 1 2 2 "
+            "-codec B44 -o out.#.exr",
+            "",
+            "  OpenEXR B44A 4:2:0:   rvio in.#.exr -outhalf -yrybya 1 2 2 1 "
+            "-codec B44A -o out.#.exr",
+            "",
+            "  OpenEXR DWAA 4:2:0:   rvio in.#.exr -outhalf -yryby 1 2 2 "
+            "-quality 45 -codec DWAA -o out.#.exr",
+            "",
+            "  OpenEXR DWAB 4:2:0:   rvio in.#.exr -outhalf -yrybya 1 2 2 1 "
+            "-quality 45 -codec DWAB -o out.#.exr",
+            "",
+            "  ACES from PD DPX:     rvio in.#.dpx -inlog -outhalf -outaces "
+            "out.#.aces",
+            "",
+            "  ACES from JPEG:       rvio in.#.jpg -insrgb -outhalf -outaces "
+            "out.#.aces",
+            "",
+            "  Chng White to D75:    rvio in.#.exr -outillum D75 -outhalf -o "
+            "out.#.exr",
+            "",
+            "  Chng White to D75 #2: rvio in.#.exr -outwhite 0.29902 0.31485 "
+            "-outhalf -o out.#.exr",
+            "",
+            "  TIFF 32 Bit Float:    rvio in.#.tif -outformat 32 float -o "
+            "out.#.tif",
+            "",
+            "  Anamorphic Unsqueeze: rvio [ -pa 2.0 in_2k_full_ap.#.dpx ] "
+            "-outres 2048 1556/2 -o out_2k.mov",
+            "", "  Camera JPEG to EXR:   rvio -insrgb IMG1234.jpg -o out.exr",
+            "",
+            "  Letterbox HD in 1.33: rvio [ -uncrop 1920 1444 0 182 "
+            "in1080.#.dpx ] -outres 640 480 -o out.mov",
+            "",
+            "  Crop 2.35 of Full Ap: rvio [ -crop 0 342 2047 1213 "
+            "inFullAp.#.dpx ] -o out.mov",
+            "",
+            "  Multiple CPUs:        rvio -v -rthreads 3 in.#.dpx -o out.mov",
+            "", "  Test Throughput:      rvio -v in.#.dpx -o out.null", "", "",
+            "", "Advanced EXR/ACES Header Attributes Usage:", "",
+            "  Multiple -outparam values can be used.", "",
+            "  Type names: f, i, s, sv        -- float, int, string, string "
+            "vector [N values]",
+            "",
+            "              v2i, v2f, v3i, v3f -- 2D and 3D int and float "
+            "vectors [2 or 3 values required]",
+            "",
+            "              b2i, b2f           -- 2D box float and int [4 "
+            "values required]",
+            "",
+            "              c                  -- chromaticities [8 values "
+            "required]",
+            "", "  Passthrough syntax:   -outparams passthrough=REGEX", "",
+            "  Attr creation syntax: -outparams "
+            "NAME:TYPE=VALUE0[,VALUE1,...]\"",
+            "",
+            "  EXIF attrs:           rvio exif.jpg -insrgb -o out.exr "
+            "-outparams \"passthrough=.*EXIF.*\"",
+            "",
+            "  Create float attr:    rvio in.exr -o out.exr -outparams "
+            "pi:f=3.14",
+            "",
+            "  Create v2i attr:      rvio in.exr -o out.exr -outparams "
+            "myV2iAttr:v2i=1,2",
+            "",
+            "  Create string attr:   rvio in.exr -o out.exr -outparams "
+            "\"myAttr:s=HELLO WORLD\"",
+            "",
+            "  Chromaticies (XYZ):   rvio XYZ.tiff -o out.exr -outparams "
+            "chromaticities:c=1,0,0,1,0,0,.333333,.3333333",
+            "",
+            "  No Color Adaptation:  rvio in.exr -o out.aces -outaces "
+            "-outillum D65REC709",
+            "", "", "", "Example Leader/Overlay Usage:", "",
+            "          simpleslate: side-text Field1=Value1 Field2=Value2 ...",
+            "", "          watermark: text opacity", "",
+            "          frameburn: opacity grey font-point-size", "",
+            "          bug: file.tif opacity height", "",
+            "          matte: aspect-ratio opacity", "", "", "",
+            "  Movie w/Slate:        rvio in.#.jpg -o out.mov -leader "
+            "simpleslate \"FilmCo\" \\",
+            "",
+            "                             \"Artist=Jane Q. Artiste\" "
+            "\"Shot=S01\" \"Show=BlockBuster\" \\",
+            "",
+            "                             \"Comments=You said it was too blue "
+            "so I made it red\"",
+            "",
+            "  Movie w/Watermark:    rvio in.#.jpg -o out.mov -overlay "
+            "watermark \"FilmCo Eyes Only\" .25",
+            "",
+            "  Movie w/Frame Burn:   rvio in.#.jpg -o out.mov -overlay "
+            "frameburn .4 1.0 30.0",
+            "",
+            "  Movie w/Bug:          rvio in.#.jpg -o out.mov -overlay bug "
+            "logo.tif 0.4 128 15 100",
+            "",
+            "  Movie w/Matte:        rvio in.#.jpg -o out.mov -overlay matte "
+            "2.35 0.8",
+            "",
+            "  Multiple:             rvio ... -leader ... -overlay ... "
+            "-overlay ...",
+            "", "", RV_ARG_SEQUENCE_HELP, "", "", RV_ARG_SOURCE_OPTIONS(opts),
+            "", "", "", "Global arguments", "", "", "", ARG_SUBR(parseInFiles),
+            "Input sequence patterns, images, movies, or directories ", "-o %S",
+            &outputFile, "Output sequence or image", "-t %S", &timerange,
+            "Output time range (default=input time range)", "-tio",
+            ARG_FLAG(&tio), "Output time range from view's in/out points", "-v",
+            ARG_FLAG(&verbose), "Verbose messages", "-vv",
+            ARG_FLAG(&reallyverbose), "Really Verbose messages", "-q",
+            ARG_FLAG(&processFloat),
+            "Best quality color conversions (not necessary, slower)", "-ns",
+            ARG_FLAG(&opts.nukeSequence),
+            "Nuke-style sequences (deprecated and ignored -- no longer needed)",
+            "-noRanges", ARG_FLAG(&opts.noRanges),
+            "No separate frame ranges (i.e. 1-10 will be considered a file)",
+            "-rthreads %d", &threads,
+            "Number of reader/render threads (default=1)", "-wthreads %d",
+            &wthreads, "Number of writer threads (limited support for this)",
+            "-view %S", &view,
+            "View to render (default=defaultSequence or current view in RV "
+            "file)",
+            "-noSequence", ARG_FLAG(&opts.noSequence),
+            "Don't contract files into sequences", "-formats",
+            ARG_FLAG(&showFormats),
+            "Show all supported image and movie formats", "-leader",
+            ARG_SUBR(parseLeader),
+            "Insert leader/slate (can use multiple time)", "-leaderframes %d",
+            &leaderFrames, "Number of leader frames (default=1)", "-overlay",
+            ARG_SUBR(parseOverlay),
+            "Visual overlay(s) (can use multiple times)", "-inlog",
+            ARG_FLAG(&loglin),
+            "Convert input to linear space via Cineon Log->Lin", "-inredlog",
+            ARG_FLAG(&redloglin),
+            "Convert input to linear space via Red Log->Lin", "-inredlogfilm",
+            ARG_FLAG(&redlogfilmlin),
+            "Convert input to linear space via Red Log Film->Lin", "-insrgb",
+            ARG_FLAG(&insrgb), "Convert input to linear space from sRGB space",
+            "-in709", ARG_FLAG(&in709),
+            "Convert input to linear space from Rec-709 space", "-ingamma %f",
+            &ingamma, "Convert input using gamma correction", "-filegamma %f",
+            &filegamma, "Convert input using gamma correction to linear space",
+            "-inchannelmap", ARG_SUBR(parseInChannels), "map input channels",
+            "-inpremult", ARG_FLAG(&inpremult), "premultiply alpha and color",
+            "-inunpremult", ARG_FLAG(&inunpremult),
+            "un-premultiply alpha and color", "-exposure %f", &exposure,
+            "Apply relative exposure change (in stops)", "-scale %f", &scale,
+            "Scale input image geometry", "-resize %d [%d]", &resizex, &resizey,
+            "Resize input image geometry to exact size on input",
+            //       "-resampleMethod %S", &resampleMethod, "Resampling method
+            //       (area, linear, cubic, nearest, default=%s)",
+            //       resampleMethod,
+            "-dlut %S", &dlut, "Apply display LUT", "-flip",
+            ARG_FLAG(&flipImage),
+            "Flip image (flip vertical) (keep orientation flags the same)",
+            "-flop", ARG_FLAG(&flopImage),
+            "Flop image (flip horizontal) (keep orientation flags the same)",
+            "-yryby %d %d %d", &ysamples, &rysamples, &bysamples,
+            "Y RY BY sub-sampled planar output", "-yrybya %d %d %d %d",
+            &ysamples, &rysamples, &bysamples, &asamples,
+            "Y RY BY A sub-sampled planar output", "-yuv %d %d %d", &ysamples,
+            &usamples, &vsamples, "Y U V sub-sampled planar output",
+            "-outparams", ARG_SUBR(&parseOutParams),
+            "Codec specific output parameters", "-outchannelmap",
+            ARG_SUBR(parseOutChannels), "map output channels", "-outrgb",
+            ARG_FLAG(&outrgb), "same as -outchannelmap R G B", "-outpremult",
+            ARG_FLAG(&outpremult), "premultiply alpha and color",
+            "-outunpremult", ARG_FLAG(&outunpremult),
+            "un-premultiply alpha and color", "-outlog", ARG_FLAG(&linlog),
+            "Convert output to log space via Cineon Lin->Log", "-outsrgb",
+            ARG_FLAG(&outsrgb), "Convert output to sRGB ColorSpace", "-out709",
+            ARG_FLAG(&out709), "Convert output to Rec-709 ColorSpace",
+            "-outredlog", ARG_FLAG(&outredlog),
+            "Convert output to Red Log ColorSpace", "-outredlogfilm",
+            ARG_FLAG(&outredlogfilm),
+            "Convert output to Red Log Film ColorSpace", "-outgamma %f",
+            &outgamma, "Apply gamma to output", "-outstereo",
+            ARG_SUBR(&parseOutStereo),
+            "Output stereo (checker, scanline, anaglyph, left, right, pair, "
+            "mirror, hsqueezed, vsqueezed, default=separate)",
+            "-outformat %d %S", &outbits, &outtype,
+            "Output bits and format (e.g. 16 float -or- 8 int)", "-outhalf",
+            ARG_FLAG(&outhalf), "Same as -outformat 16 float", "-out8",
+            ARG_FLAG(&out8), "Same as -outformat 8 int", "-outres %d %d",
+            &xsize, &ysize, "Output resolution", "-outfps %f", &outfps,
+            "Output FPS", "-outaces", ARG_FLAG(&outaces),
+            "Output ACES gamut (converts pixels to ACES)", "-outwhite %f %f",
+            &white0, &white1, "Output white CIE 1931 chromaticity x, y",
+            "-outillum %S", &illumName,
+            "Output standard illuminant name (A-C, D50, D55, D65, D65REC709, "
+            "D75 E, F[1-12])",
+            "-codec %S", &codec, "Output codec (varies with file format)",
+            "-audiocodec %S", &audioCodec,
+            "Output audio codec (varies with file format)", "-audiorate %f",
+            &audioRate, "Output audio sample rate (default 48000)",
+            "-audiochannels %d", &audioChannels,
+            "Output audio channels (default 2)", "-quality %f", &quality,
+            "Output codec quality 0.0 -> 1.0 (100000 for DWAA/DWAB) (varies "
+            "w/format and codec default=%g)",
+            quality, "-outpa %S", &paRatio,
+            "Output pixel aspect ratio (e.g. 1.33 or 16:9, etc. metadata only) "
+            "default=%s",
+            paRatio, "-comment %S", &comment,
+            "Ouput comment (movie files, default=\"%s\")", comment,
+            "-copyright %S", &copyright,
+            "Ouput copyright (movie files, default=\"%s\")", copyright,
+            "-lic %S", &licarg,
+            "Use specific license file (this param is simply ignored for Open "
+            "RV as it is not required)",
+            "-debug", ARG_SUBR(&Rv::parseDebugKeyWords), "Debug category",
+            "-version", ARG_FLAG(&showVersion), "Show RVIO version number",
+            "-iomethod %d [%d]", &iomethod, &iosize,
+            "I/O Method (overrides all) (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            iomethod, iosize, "-exrcpus %d", &opts.exrcpus,
+            "EXR thread count (default=%d)", opts.exrcpus, "-exrRGBA",
+            ARG_FLAG(&opts.exrRGBA), "EXR Always read as RGBA (default=false)",
+            "-exrInherit", ARG_FLAG(&opts.exrInherit),
+            "EXR guess channel inheritance (default=false)", "-exrNoOneChannel",
+            ARG_FLAG(&opts.exrNoOneChannel),
+            "EXR never use one channel planar images (default=false)",
+            "-exrIOMethod %d [%d]", &opts.exrIOMethod, &opts.exrIOSize,
+            "EXR I/O Method (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            opts.exrIOMethod, opts.exrIOSize, "-exrReadWindowIsDisplayWindow",
+            ARG_FLAG(&opts.exrReadWindowIsDisplayWindow),
+            "EXR read window is display window (default=false)",
+            "-exrReadWindow %d", &opts.exrReadWindow,
+            "EXR Read Window Method (0=Data, 1=Display, 2=Union, 3=Data inside "
+            "Display, default=%d)",
+            opts.exrReadWindow, "-jpegRGBA", ARG_FLAG(&opts.jpegRGBA),
+            "Make JPEG four channel RGBA on read (default=no, use RGB or YUV)",
+            "-jpegIOMethod %d [%d]", &opts.jpegIOMethod, &opts.jpegIOSize,
+            "JPEG I/O Method (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            opts.exrIOMethod, opts.exrIOSize, "-cinpixel %S", &opts.cinPixel,
+            "Cineon pixel storage (default=%s)", opts.cinPixel, "-cinchroma",
+            ARG_FLAG(&opts.cinchroma),
+            "Use Cineon chromaticity values (for default reader only)",
+            "-cinIOMethod %d [%d]", &opts.cinIOMethod, &opts.cinIOSize,
+            "Cineon I/O Method (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            opts.cinIOMethod, opts.cinIOSize, "-dpxpixel %S", &opts.dpxPixel,
+            "DPX pixel storage (default=%s)", opts.dpxPixel, "-dpxchroma",
+            ARG_FLAG(&opts.dpxchroma),
+            "Use DPX chromaticity values (for default reader only)",
+            "-dpxIOMethod %d [%d]", &opts.dpxIOMethod, &opts.dpxIOSize,
+            "DPX I/O Method (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            opts.dpxIOMethod, opts.dpxIOSize, "-tgaIOMethod %d [%d]",
+            &opts.tgaIOMethod, &opts.tgaIOSize,
+            "TARGA I/O Method (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            opts.tgaIOMethod, opts.tgaIOSize, "-tiffIOMethod %d [%d]",
+            &opts.tiffIOMethod, &opts.tiffIOSize,
+            "TIFF I/O Method (0=standard, 1=buffered, 2=unbuffered, "
+            "3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=%d) and "
+            "optional chunk size (default=%d)",
+            opts.tgaIOMethod, opts.tgaIOSize, "-init %S", &initscript,
+            "Override init script", "-err-to-out", ARG_FLAG(&err2out),
+            "Output errors to standard output (instead of standard error)",
+            "-strictlicense", ARG_FLAG(&strictlicense),
+            "Exit rather than consume an RV license if no rvio licenses are "
+            "available (this param is simply ignored for Open RV as it is not "
+            "required)",
+            //"-noprerender", ARG_FLAG(&noprerender), "Turn off prerendering
+            // optimization",
+            "-flags", ARG_SUBR(&Rv::parseMuFlags),
+            "Arbitrary flags (flag, or 'name=value') for Mu",
 #if defined(PLATFORM_WINDOWS) && !defined(NDEBUG)
-         "-sleep %d", &sleepTime, "Sleep (in seconds) before starting to allow attaching debugger",
+            "-sleep %d", &sleepTime,
+            "Sleep (in seconds) before starting to allow attaching debugger",
 #endif
-         NULL) < 0)
+            NULL)
+        < 0)
     {
-       exit(-1);
+        exit(-1);
     }
 
     TwkMovie::MovieWriter::setReallyVerbose(reallyverbose);
@@ -1283,7 +1442,8 @@ utf8Main(int argc, char *argv[])
     //  of reader threads.
     //
 
-    if (wthreads == -1) wthreads = threads;
+    if (wthreads == -1)
+        wthreads = threads;
 
     opts.delaySessionLoading = 0;
 
@@ -1304,18 +1464,18 @@ utf8Main(int argc, char *argv[])
         //  iomethod overrides all specific iomethods for backwards compat
         //
 
-        opts.exrIOMethod  = iomethod;
-        opts.dpxIOMethod  = iomethod;
-        opts.cinIOMethod  = iomethod;
-        opts.tgaIOMethod  = iomethod;
+        opts.exrIOMethod = iomethod;
+        opts.dpxIOMethod = iomethod;
+        opts.cinIOMethod = iomethod;
+        opts.tgaIOMethod = iomethod;
         opts.jpegIOMethod = iomethod;
         opts.tiffIOMethod = iomethod;
-        opts.exrIOSize    = iosize;
-        opts.dpxIOSize    = iosize;
-        opts.cinIOSize    = iosize;
-        opts.tgaIOSize    = iosize;
-        opts.jpegIOSize   = iosize;
-        opts.tiffIOSize   = iosize;
+        opts.exrIOSize = iosize;
+        opts.dpxIOSize = iosize;
+        opts.cinIOSize = iosize;
+        opts.tgaIOSize = iosize;
+        opts.jpegIOSize = iosize;
+        opts.tiffIOSize = iosize;
     }
 
     opts.exportIOEnvVars();
@@ -1351,12 +1511,13 @@ utf8Main(int argc, char *argv[])
 
     addDefaultParams();
 
-    if (const char *envParams = getenv("RVIO_OUTPARAMS"))
+    if (const char* envParams = getenv("RVIO_OUTPARAMS"))
     {
         string s(envParams);
         vector<string> params;
         stl_ext::tokenize(params, s, " ");
-        for (int i = 0; i < params.size(); ++i) parseParam(params[i]);
+        for (int i = 0; i < params.size(); ++i)
+            parseParam(params[i]);
     }
 
     if (!opts.initializeAfterParsing(0))
@@ -1374,20 +1535,29 @@ utf8Main(int argc, char *argv[])
 
     nosession = 0;
 
-    if (err2out) cerr.rdbuf(cout.rdbuf());
+    if (err2out)
+        cerr.rdbuf(cout.rdbuf());
 
     if (showVersion)
     {
-        cout << MAJOR_VERSION << "."
-             << MINOR_VERSION << "."
-             << REVISION_NUMBER << endl;
+        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER
+             << endl;
 
         exit(0);
     }
 
-    if (outhalf) { outbits = 16; outtype = (char*)"float"; }
-    if (out8)    { outbits = 8;  outtype = (char*)"int"; }
-    if (reallyverbose) verbose = 1;
+    if (outhalf)
+    {
+        outbits = 16;
+        outtype = (char*)"float";
+    }
+    if (out8)
+    {
+        outbits = 8;
+        outtype = (char*)"int";
+    }
+    if (reallyverbose)
+        verbose = 1;
 
     if (outrgb)
     {
@@ -1415,12 +1585,13 @@ utf8Main(int argc, char *argv[])
     //  Get CPU info and tell the EXR library to use them all
     //
 
-
-    if (opts.exrcpus > 1) Imf::setGlobalThreadCount(opts.exrcpus);
+    if (opts.exrcpus > 1)
+        Imf::setGlobalThreadCount(opts.exrcpus);
 
     string initPath = bundle.rcfile("rviorc", "mu", "RVIO_INIT");
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
-    if (initscript) initPath = initscript;
+    if (initscript)
+        initPath = initscript;
 
     // RVIO third party optional customization
 #if defined(RVIO_THIRD_PARTY_CUSTOMIZATION)
@@ -1434,7 +1605,8 @@ utf8Main(int argc, char *argv[])
     }
     catch (...)
     {
-        cerr << "WARNING: a problem occured while loading image plugins." << endl;
+        cerr << "WARNING: a problem occured while loading image plugins."
+             << endl;
         cerr << "         some plugins may not have been loaded." << endl;
     }
 
@@ -1462,10 +1634,10 @@ utf8Main(int argc, char *argv[])
         RVIO::initUICommands(TwkApp::muContext());
         Rv::initCommands(TwkApp::muContext());
     }
-    catch (const exception &e)
+    catch (const exception& e)
     {
         cerr << "ERROR: during initialization: " << e.what() << endl;
-        exit( -1 );
+        exit(-1);
     }
 
 #ifndef PLATFORM_WINDOWS
@@ -1502,7 +1674,7 @@ utf8Main(int argc, char *argv[])
     //
 
     Mu::MuLangContext* context = TwkApp::muContext();
-    Mu::Process*       process = TwkApp::muProcess();
+    Mu::Process* process = TwkApp::muProcess();
 
     TwkUtil::setThreadName("RVIO Main");
 
@@ -1522,23 +1694,22 @@ utf8Main(int argc, char *argv[])
         FrameBufferIO::ReadRequest readRequest;
         MovieWriter::WriteRequest writeRequest;
 
-        writeRequest.threads        = wthreads;
-        writeRequest.fps            = outfps;
-        writeRequest.compression    = codec;
-        writeRequest.codec          = codec;
-        writeRequest.audioCodec     = audioCodec;
-        writeRequest.quality        = quality;
-        writeRequest.pixelAspect    = pixelAspect;
-        writeRequest.verbose        = verbose;
-        writeRequest.audioChannels  = audioChannels;
-        writeRequest.audioRate      = audioRate;
-        writeRequest.stereo         = !strcmp(outStereo, "separate");
-        writeRequest.comments       = comment;
-        writeRequest.copyright      = copyright;
-        writeRequest.args           = writerArgs;
+        writeRequest.threads = wthreads;
+        writeRequest.fps = outfps;
+        writeRequest.compression = codec;
+        writeRequest.codec = codec;
+        writeRequest.audioCodec = audioCodec;
+        writeRequest.quality = quality;
+        writeRequest.pixelAspect = pixelAspect;
+        writeRequest.verbose = verbose;
+        writeRequest.audioChannels = audioChannels;
+        writeRequest.audioRate = audioRate;
+        writeRequest.stereo = !strcmp(outStereo, "separate");
+        writeRequest.comments = comment;
+        writeRequest.copyright = copyright;
+        writeRequest.args = writerArgs;
 
-        copy(outparams.begin(),
-             outparams.end(),
+        copy(outparams.begin(), outparams.end(),
              back_inserter(writeRequest.parameters));
 
         if (timerange)
@@ -1548,10 +1719,8 @@ utf8Main(int argc, char *argv[])
 
             if (writeRequest.frames.empty())
             {
-                cerr << "ERROR: timerange \""
-                     << timerange
-                     << "\" expands to nothing"
-                     << endl;
+                cerr << "ERROR: timerange \"" << timerange
+                     << "\" expands to nothing" << endl;
 
                 exit(-1);
             }
@@ -1578,28 +1747,28 @@ utf8Main(int argc, char *argv[])
 #ifdef WIN32
         GC_INIT();
         GC_allow_register_threads();
-        outmov = new ThreadedMovie(inputMovies, outFrames, 8, 0, threadedMovieInit);
+        outmov =
+            new ThreadedMovie(inputMovies, outFrames, 8, 0, threadedMovieInit);
 #else
         ThreadedMovie::ThreadAPI threadAPI;
         threadAPI.create = GC_pthread_create;
-        threadAPI.join   = GC_pthread_join;
+        threadAPI.join = GC_pthread_join;
         threadAPI.detach = GC_pthread_detach;
-        outmov = new ThreadedMovie(inputMovies, outFrames, 8, &threadAPI, threadedMovieInit);
+        outmov = new ThreadedMovie(inputMovies, outFrames, 8, &threadAPI,
+                                   threadedMovieInit);
 #endif
 #endif
 
-        //assert(inputMovies.size() == 1);
-        //outmov = inputMovies.front();
+        // assert(inputMovies.size() == 1);
+        // outmov = inputMovies.front();
 
         //
         //   On windows, we need to do this *after* the threaded movie
         //   has been created. Not sure why.
         //
 
-        TwkApp::initWithFile(TwkApp::muContext(),
-                             TwkApp::muProcess(),
-                             TwkApp::muModuleList(),
-                             initPath.c_str());
+        TwkApp::initWithFile(TwkApp::muContext(), TwkApp::muProcess(),
+                             TwkApp::muModuleList(), initPath.c_str());
 
         //
         //  Since the sessions we're created earlier (before we
@@ -1611,17 +1780,20 @@ utf8Main(int argc, char *argv[])
         //
         for (int i = 0; i < IPCore::App()->documents().size(); ++i)
         {
-            if (Rv::RvSession *s = dynamic_cast<Rv::RvSession*> (IPCore::App()->documents()[i]))
+            if (Rv::RvSession* s =
+                    dynamic_cast<Rv::RvSession*>(IPCore::App()->documents()[i]))
             {
                 s->postInitialize();
                 //
-                //  We show the user no cache stats, so don't bother to compute them.
+                //  We show the user no cache stats, so don't bother to compute
+                //  them.
                 //
                 s->graph().cache().setCacheStatsDisabled(true);
             }
         }
 
-        MovieWriter* writer = TwkMovie::GenericIO::movieWriter(pathConform(outfile));
+        MovieWriter* writer =
+            TwkMovie::GenericIO::movieWriter(pathConform(outfile));
 
         if (!writer)
         {
@@ -1649,7 +1821,8 @@ utf8Main(int argc, char *argv[])
 
             if (writeRequest.compression != "")
             {
-                cout << "INFO: output compressor " << writeRequest.compression << endl;
+                cout << "INFO: output compressor " << writeRequest.compression
+                     << endl;
             }
 
             if (writeRequest.codec != "")
@@ -1664,10 +1837,8 @@ utf8Main(int argc, char *argv[])
 
             if (writeRequest.timeRangeOverride && timerange)
             {
-                cout << "INFO: override time range " << timerange
-                     << ", (" << writeRequest.frames.size()
-                     << " frames)"
-                     << endl;
+                cout << "INFO: override time range " << timerange << ", ("
+                     << writeRequest.frames.size() << " frames)" << endl;
             }
 
             if (writeRequest.keepPlanar && reallyverbose)
@@ -1680,7 +1851,8 @@ utf8Main(int argc, char *argv[])
         //  Tell the writer to do its business
         //
 
-        if (!writer->write(outmov, outfile, writeRequest)) exit (-2);
+        if (!writer->write(outmov, outfile, writeRequest))
+            exit(-2);
 
         // clean up any frame buffers we allocated writing the movie
         //
@@ -1708,9 +1880,8 @@ utf8Main(int argc, char *argv[])
 #endif
 
     TwkMovie::GenericIO::shutdown(); // Shutdown TwkMovie::GenericIO plugins
-    TwkFB::GenericIO::shutdown(); // Shutdown TwkFB::GenericIO plugins
+    TwkFB::GenericIO::shutdown();    // Shutdown TwkFB::GenericIO plugins
 
     TwkFB::ThreadPool::shutdown();
     return 0;
 }
-

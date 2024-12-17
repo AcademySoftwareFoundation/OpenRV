@@ -19,17 +19,17 @@
 
 namespace TwkMediaLibrary
 {
-  class PyMediaNode;
+    class PyMediaNode;
 
-  using MediaNodeVector = std::vector<PyMediaNode*>;
+    using MediaNodeVector = std::vector<PyMediaNode*>;
 
-  class PyRootNode : public PyNode
-  {
-   public:
-    PyRootNode( Library* lib );
-    virtual ~PyRootNode();
+    class PyRootNode : public PyNode
+    {
+    public:
+        PyRootNode(Library* lib);
+        virtual ~PyRootNode();
 
-    bool isLibraryMediaURL( const URL& ) const;
-    MediaNodeVector mediaNodesForURL( const URL& ) const;
-  };
-}  // namespace TwkMediaLibrary
+        bool isLibraryMediaURL(const URL&) const;
+        MediaNodeVector mediaNodesForURL(const URL&) const;
+    };
+} // namespace TwkMediaLibrary

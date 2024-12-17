@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2007 Tweak Inc. 
+// Copyright (c) 2007 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __rv_qt__GLView__h__
 #define __rv_qt__GLView__h__
@@ -14,93 +14,84 @@
 #include <TwkUtil/Timer.h>
 #include <boost/thread/thread.hpp>
 
-namespace Rv {
-class RvDocument;
-class QTFrameBuffer;
-class QTGLVideoDevice;
-
-class GLView : public QGLWidget
+namespace Rv
 {
-    Q_OBJECT
+    class RvDocument;
+    class QTFrameBuffer;
+    class QTGLVideoDevice;
 
-public:
-    typedef TwkUtil::Timer Timer;
+    class GLView : public QGLWidget
+    {
+        Q_OBJECT
 
-    GLView(QWidget* parent, 
-           const QGLWidget* share, 
-           RvDocument* doc, 
-           bool stereo=false,
-           bool vsync=true,
-           bool doubleBuffer=true,
-           int red=0,
-           int green=0,
-           int blue=0,
-           int alpha=0,
-           bool noResize=true);
-    ~GLView();
+    public:
+        typedef TwkUtil::Timer Timer;
 
-    static QGLFormat rvGLFormat(bool stereo=false,
-                                bool vsync=true,
-                                bool doubleBuffer=true,
-                                int red=8,
-                                int green=8,
-                                int blue=8,
-                                int alpha=8);
+        GLView(QWidget* parent, const QGLWidget* share, RvDocument* doc,
+               bool stereo = false, bool vsync = true, bool doubleBuffer = true,
+               int red = 0, int green = 0, int blue = 0, int alpha = 0,
+               bool noResize = true);
+        ~GLView();
 
-    void absolutePosition(int& x, int& y) const;
+        static QGLFormat rvGLFormat(bool stereo = false, bool vsync = true,
+                                    bool doubleBuffer = true, int red = 8,
+                                    int green = 8, int blue = 8, int alpha = 8);
 
-    //QTFrameBuffer* frameBuffer() const { return m_frameBuffer; }
-    QTGLVideoDevice* videoDevice() const { return m_videoDevice; }
+        void absolutePosition(int& x, int& y) const;
 
-    void stopProcessingEvents();
+        // QTFrameBuffer* frameBuffer() const { return m_frameBuffer; }
+        QTGLVideoDevice* videoDevice() const { return m_videoDevice; }
 
-    virtual bool event(QEvent*);
-    virtual bool eventFilter(QObject *object, QEvent *event);
+        void stopProcessingEvents();
 
-    bool firstPaintCompleted() const { return m_firstPaintCompleted; };
+        virtual bool event(QEvent*);
+        virtual bool eventFilter(QObject* object, QEvent* event);
 
-    void setContentSize(int w, int h) { m_csize = QSize(w,h); }
-    void setMinimumContentSize(int w, int h) { m_msize = QSize(w,h); }
+        bool firstPaintCompleted() const { return m_firstPaintCompleted; };
 
-    virtual QSize sizeHint() const;
-    virtual QSize minimumSizeHint() const;
+        void setContentSize(int w, int h) { m_csize = QSize(w, h); }
 
-    void* syncClosure() const { return m_syncThreadData; }
+        void setMinimumContentSize(int w, int h) { m_msize = QSize(w, h); }
 
-public slots:
-    void eventProcessingTimeout();
+        virtual QSize sizeHint() const;
+        virtual QSize minimumSizeHint() const;
 
-protected:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void swapBuffersNoSync();
+        void* syncClosure() const { return m_syncThreadData; }
 
-private:
-    RvDocument*      m_doc;
-    //QTFrameBuffer*   m_frameBuffer;
-    boost::thread    m_swapThread;
-    QTGLVideoDevice* m_videoDevice;
-    unsigned int     m_lastKey;
-    QEvent::Type     m_lastKeyType;
-    Timer            m_activityTimer;
-    Timer            m_renderTimer;
-    QTimer           m_eventProcessingTimer;
-    bool             m_userActive;
-    size_t           m_renderCount;
-    Timer            m_activationTimer;
-    bool             m_firstPaintCompleted;
-    QSize            m_csize;
-    QSize            m_msize;
-    int              m_red;
-    int              m_green;
-    int              m_blue;
-    int              m_alpha;
-    bool             m_postFirstNonEmptyRender;
-    bool             m_stopProcessingEvents;
-    void*            m_syncThreadData;
-};
+    public slots:
+        void eventProcessingTimeout();
 
-} // Rv
+    protected:
+        void initializeGL();
+        void resizeGL(int w, int h);
+        void paintGL();
+        void swapBuffersNoSync();
+
+    private:
+        RvDocument* m_doc;
+        // QTFrameBuffer*   m_frameBuffer;
+        boost::thread m_swapThread;
+        QTGLVideoDevice* m_videoDevice;
+        unsigned int m_lastKey;
+        QEvent::Type m_lastKeyType;
+        Timer m_activityTimer;
+        Timer m_renderTimer;
+        QTimer m_eventProcessingTimer;
+        bool m_userActive;
+        size_t m_renderCount;
+        Timer m_activationTimer;
+        bool m_firstPaintCompleted;
+        QSize m_csize;
+        QSize m_msize;
+        int m_red;
+        int m_green;
+        int m_blue;
+        int m_alpha;
+        bool m_postFirstNonEmptyRender;
+        bool m_stopProcessingEvents;
+        void* m_syncThreadData;
+    };
+
+} // namespace Rv
 
 #endif // __rv-qt__GLView__h__

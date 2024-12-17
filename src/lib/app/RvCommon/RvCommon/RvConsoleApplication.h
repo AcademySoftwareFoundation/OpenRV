@@ -13,13 +13,13 @@
 
 namespace Rv
 {
-  class RvConsoleApplication : public IPCore::Application
-  {
-   public:
-    RvConsoleApplication();
-    virtual ~RvConsoleApplication() = default;
-    
-   private:
-    TwkMediaLibrary::PyMediaLibrary m_pyLibrary;
-  };
-}  // namespace Rv
+    class RvConsoleApplication : public IPCore::Application
+    {
+    public:
+        RvConsoleApplication();
+        virtual ~RvConsoleApplication() = default;
+
+    private:
+        TwkMediaLibrary::PyMediaLibrary m_pyLibrary;
+    };
+} // namespace Rv

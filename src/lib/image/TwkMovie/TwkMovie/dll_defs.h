@@ -1,7 +1,7 @@
 //*****************************************************************************/
 // Copyright (c) 2022 Autodesk, Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
 //
 //*****************************************************************************/
@@ -15,6 +15,5 @@
 #define TWKMOVIE_EXPORT __declspec(dllimport)
 #endif
 #else
-#define TWKMOVIE_EXPORT 
+#define TWKMOVIE_EXPORT
 #endif
-

@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #ifndef _H_RGBE
 #define _H_RGBE
@@ -16,5 +16,3 @@
 #include <stdio.h>
 
 #endif /* _H_RGBE */
-
-

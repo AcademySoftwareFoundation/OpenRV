@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001-2005 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #ifndef __DEVAUDIORENDERER_H__
@@ -13,65 +13,66 @@
 #include <IPCore/AudioRenderer.h>
 #include <OSSDriver/OSSDriver.h>
 
-namespace IPCore {
-
-class DevAudioRenderer : public AudioRenderer
+namespace IPCore
 {
-public:
-    DevAudioRenderer();
-    ~DevAudioRenderer();
 
-    //
-    //  play() will return almost immediately -- a worker thread will
-    //  be released and start playing.
-    //
+    class DevAudioRenderer : public AudioRenderer
+    {
+    public:
+        DevAudioRenderer();
+        ~DevAudioRenderer();
 
-    virtual void play();
+        //
+        //  play() will return almost immediately -- a worker thread will
+        //  be released and start playing.
+        //
 
-    //
-    //  isPlaying() is only true after the first samples have been
-    //  retrieved.
-    //
+        virtual void play();
 
-    virtual bool isPlaying() const;
+        //
+        //  isPlaying() is only true after the first samples have been
+        //  retrieved.
+        //
 
-    //
-    //  stop() will cause the worker thread to wait until play.
-    //
+        virtual bool isPlaying() const;
 
-    virtual void stop();
+        //
+        //  stop() will cause the worker thread to wait until play.
+        //
 
-    //
-    //  Calculated as samples that have played
-    //
+        virtual void stop();
 
-    virtual double elapsed();
+        //
+        //  Calculated as samples that have played
+        //
 
-    //
-    //  Skip to a specified time
-    //
+        virtual double elapsed();
 
-    virtual void setTime(double);
-    
-    void playerThread();
+        //
+        //  Skip to a specified time
+        //
 
-private:
-    void playAudioChunk();
+        virtual void setTime(double);
 
-private:
-    bool                       m_isPlaying;
-    stl_ext::thread_group      m_threads;
-    const TwkMovie::MovieInfo* m_movInfo;
-    unsigned int               m_startSample;
-    unsigned int               m_beginSample;
-    bool                       m_firstTime;
-    bool                       m_running;
-    float                      m_deviceRate;
-    unsigned int               m_sampleShift;
-    double                     m_elapsedSincePlay;
-    OSSDriver*                 m_audioDev;
-};
+        void playerThread();
 
-} // Rv
+    private:
+        void playAudioChunk();
 
-#endif    // End #ifdef __DEVAUDIORENDERER_H__
+    private:
+        bool m_isPlaying;
+        stl_ext::thread_group m_threads;
+        const TwkMovie::MovieInfo* m_movInfo;
+        unsigned int m_startSample;
+        unsigned int m_beginSample;
+        bool m_firstTime;
+        bool m_running;
+        float m_deviceRate;
+        unsigned int m_sampleShift;
+        double m_elapsedSincePlay;
+        OSSDriver* m_audioDev;
+    };
+
+} // namespace IPCore
+
+#endif // End #ifdef __DEVAUDIORENDERER_H__

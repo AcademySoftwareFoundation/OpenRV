@@ -4,25 +4,25 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Symbol.h>
 
-namespace Mu {
-
-//
-//  class Namespace
-//
-//  A symbol that provides a scope
-//
-
-class Namespace : public Symbol
+namespace Mu
 {
-  public:
-    Namespace(Context* context, const char *name);
-    virtual ~Namespace();
-};
 
+    //
+    //  class Namespace
+    //
+    //  A symbol that provides a scope
+    //
+
+    class Namespace : public Symbol
+    {
+    public:
+        Namespace(Context* context, const char* name);
+        virtual ~Namespace();
+    };
 
 } // namespace Mu
 
