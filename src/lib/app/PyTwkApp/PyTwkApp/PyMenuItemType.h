@@ -1,9 +1,9 @@
 //
 //  Copyright (c) 2011 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __PyTwkApp__PyMenuItem__h__
 #define __PyTwkApp__PyMenuItem__h__
@@ -11,22 +11,22 @@
 
 namespace TwkApp
 {
-  class Event;
-  class Document;
+    class Event;
+    class Document;
 
-  typedef struct
-  {
-    PyObject_HEAD PyObject* label;
-    PyObject* actionHook;
-    PyObject* key;
-    PyObject* stateHook;
-    PyObject* subMenu;
-  } PyMenuItemObject;
+    typedef struct
+    {
+        PyObject_HEAD PyObject* label;
+        PyObject* actionHook;
+        PyObject* key;
+        PyObject* stateHook;
+        PyObject* subMenu;
+    } PyMenuItemObject;
 
-  PyTypeObject* pyMenuItemType();
+    PyTypeObject* pyMenuItemType();
 
-  void initPyMenuItemType();
+    void initPyMenuItemType();
 
-}  // namespace TwkApp
+} // namespace TwkApp
 
-#endif  // __PyTwkApp__PyMenuItem__h__
+#endif // __PyTwkApp__PyMenuItem__h__

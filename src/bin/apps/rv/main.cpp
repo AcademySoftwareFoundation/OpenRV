@@ -1,27 +1,27 @@
 //******************************************************************************
 // Copyright (c) 2001-2005 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifdef _MSC_VER
-    //
-    //  We are targetting at least XP, (IE no windows95, etc).
-    //
-    #define WINVER 0x0501
-    #define _WIN32_WINNT 0x0501
-    #include <winsock2.h>
-    #include <windows.h>
-    #include <winnt.h>
-    #include <wincon.h>
-    #include <pthread.h>
-    //
-    //  NOTE: win_pthreads, which supplies implement.h, seems
-    //  targetted at an earlier version of windows (pre-XP).  If you
-    //  include implement.h here, it won't compile.  But as far as I
-    //  can tell, it's not needed, so just leave it out.
-    //
-    //  #include <implement.h>
+//
+//  We are targetting at least XP, (IE no windows95, etc).
+//
+#define WINVER 0x0501
+#define _WIN32_WINNT 0x0501
+#include <winsock2.h>
+#include <windows.h>
+#include <winnt.h>
+#include <wincon.h>
+#include <pthread.h>
+//
+//  NOTE: win_pthreads, which supplies implement.h, seems
+//  targetted at an earlier version of windows (pre-XP).  If you
+//  include implement.h here, it won't compile.  But as far as I
+//  can tell, it's not needed, so just leave it out.
+//
+//  #include <implement.h>
 #endif
 
 #ifdef PLATFORM_LINUX
@@ -86,13 +86,13 @@
 #include <vector>
 
 #ifndef PLATFORM_WINDOWS
-    #include <sys/resource.h>
-    #include <sys/time.h>
-    #include <unistd.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <unistd.h>
 #else
-    #include <TwkGLFFBO/FBOVideoDevice.h>
-    #include <IPCore/ImageRenderer.h>
-    #include <QtOpenGL/QGLContext>
+#include <TwkGLFFBO/FBOVideoDevice.h>
+#include <IPCore/ImageRenderer.h>
+#include <QtOpenGL/QGLContext>
 #endif
 
 #include <QtWidgets/QtWidgets>
@@ -105,7 +105,7 @@ extern const char* rv_linux_dark;
 
 // RV third party optional customization
 #if defined(RV_THIRD_PARTY_CUSTOMIZATION)
-    extern void rvThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
+extern void rvThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
 #endif
 
 //
@@ -115,10 +115,10 @@ extern const char* rv_linux_dark;
 
 #if MAJOR_VERSION == 99
 #if NDEBUG
-//#error ********* NO VERSION INFORMATION ***********
+// #error ********* NO VERSION INFORMATION ***********
 #else
 #ifndef _MSC_VER
-#warning ********* NO VERSION INFORMATION ***********
+#warning********* NO VERSION INFORMATION ***********
 #endif
 #endif
 #endif
@@ -182,17 +182,17 @@ string scarfFile(const string& fileName)
     return buffer.str();
 }
 
-#define EXECUTABLE_SHORT_NAME      "rv"
+#define EXECUTABLE_SHORT_NAME "rv"
 #define EXECUTABLE_SHORT_NAME_CAPS "RV"
 
-TwkApp::QTBundle bundle(EXECUTABLE_SHORT_NAME, MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
+TwkApp::QTBundle bundle(EXECUTABLE_SHORT_NAME, MAJOR_VERSION, MINOR_VERSION,
+                        REVISION_NUMBER);
 
 #ifdef PLATFORM_LINUX
 extern "C" int XInitThreads();
 #endif
 
-int
-utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
 #ifdef PLATFORM_LINUX
     XInitThreads();
@@ -212,44 +212,46 @@ utf8Main(int argc, char *argv[])
     const char* pythonPath = getenv("PYTHONPATH");
     const char* pythonHome = getenv("PYTHONHOME");
 
-    if (pythonPath) pythonPath = strdup(pythonPath);
-    if (pythonHome) pythonHome = strdup(pythonHome);
+    if (pythonPath)
+        pythonPath = strdup(pythonPath);
+    if (pythonHome)
+        pythonHome = strdup(pythonHome);
 
-    #ifndef PLATFORM_WINDOWS
-        //
-        //  Check the per-process limit on open file descriptors and
-        //  reset the soft limit to the hard limit.
-        //
-        struct rlimit rlim;
-        getrlimit (RLIMIT_NOFILE, &rlim);
-        rlim.rlim_cur = rlim.rlim_max;
-        setrlimit (RLIMIT_NOFILE, &rlim);
-        getrlimit (RLIMIT_NOFILE, &rlim);
-        if (rlim.rlim_cur < rlim.rlim_max)
-        {
-            cerr << "WARNING: unable to increase open file limit above " << rlim.rlim_cur << endl;
-        }
-    #else
-        _setmaxstdio(2048);
-    #endif
+#ifndef PLATFORM_WINDOWS
+    //
+    //  Check the per-process limit on open file descriptors and
+    //  reset the soft limit to the hard limit.
+    //
+    struct rlimit rlim;
+    getrlimit(RLIMIT_NOFILE, &rlim);
+    rlim.rlim_cur = rlim.rlim_max;
+    setrlimit(RLIMIT_NOFILE, &rlim);
+    getrlimit(RLIMIT_NOFILE, &rlim);
+    if (rlim.rlim_cur < rlim.rlim_max)
+    {
+        cerr << "WARNING: unable to increase open file limit above "
+             << rlim.rlim_cur << endl;
+    }
+#else
+    _setmaxstdio(2048);
+#endif
 
-    #ifdef PLATFORM_WINDOWS
-        //
-        //  RV is a "GUI" app, so by default we get no output in the
-        //  console, so "rv.exe -help" doesn't work, etc.  Here we
-        //  reattach to the starting console, so we do get that
-        //  output.
-        //
-        HANDLE hand = GetStdHandle(STD_OUTPUT_HANDLE);
+#ifdef PLATFORM_WINDOWS
+    //
+    //  RV is a "GUI" app, so by default we get no output in the
+    //  console, so "rv.exe -help" doesn't work, etc.  Here we
+    //  reattach to the starting console, so we do get that
+    //  output.
+    //
+    HANDLE hand = GetStdHandle(STD_OUTPUT_HANDLE);
 
-        if (    (hand == INVALID_HANDLE_VALUE ||
-                GetFileType(hand) == FILE_TYPE_UNKNOWN) &&
-                AttachConsole(ATTACH_PARENT_PROCESS))
-        {
-            freopen("CON", "w", stdout);
-            freopen("CON", "w", stderr);
-        }
-    #endif
+    if ((hand == INVALID_HANDLE_VALUE || GetFileType(hand) == FILE_TYPE_UNKNOWN)
+        && AttachConsole(ATTACH_PARENT_PROCESS))
+    {
+        freopen("CON", "w", stdout);
+        freopen("CON", "w", stderr);
+    }
+#endif
 
     //
     //  Check for a valid HOME. If we are on Windows and HOME is not set then
@@ -257,22 +259,24 @@ utf8Main(int argc, char *argv[])
     //
     if (!getenv("HOME"))
     {
-        #ifdef PLATFORM_WINDOWS
-            if (getenv("HOMEDRIVE") && getenv("HOMEPATH"))
-            {
-                string home = string(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
-                setEnvVar("HOME", home.c_str());
-                cout << "INFO: Using '" << home << "' for $HOME." << endl;
-            }
-            else
-        #endif
-            {
-                cerr << "ERROR: $HOME is not set in the environment and is required." << endl;
-                exit(-1);
-            }
+#ifdef PLATFORM_WINDOWS
+        if (getenv("HOMEDRIVE") && getenv("HOMEPATH"))
+        {
+            string home = string(getenv("HOMEDRIVE")) + getenv("HOMEPATH");
+            setEnvVar("HOME", home.c_str());
+            cout << "INFO: Using '" << home << "' for $HOME." << endl;
+        }
+        else
+#endif
+        {
+            cerr
+                << "ERROR: $HOME is not set in the environment and is required."
+                << endl;
+            exit(-1);
+        }
     }
 
-    if(getenv("LANG"))
+    if (getenv("LANG"))
     {
         std::string originalLocale = getenv("LANG");
         setEnvVar("ORIGINALLOCAL", originalLocale.c_str());
@@ -287,13 +291,15 @@ utf8Main(int argc, char *argv[])
     TwkFB::ThreadPool::initialize();
 
     // Qt 5.12.1 specific
-    // Disable Qt Quick hardware rendering because QwebEngineView conflicts with QGLWidget
-    setEnvVar( "QT_QUICK_BACKEND", "software");
+    // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
+    // QGLWidget
+    setEnvVar("QT_QUICK_BACKEND", "software");
 
 #if defined(PLATFORM_LINUX)
     // Work around for Wacom Tablet issue on linux
-    // Note: This is a Qt 5.12.4 regression (https://bugreports.qt.io/browse/QTBUG-77826)
-    setEnvVar( "QT_XCB_TABLET_LEGACY_COORDINATES", "1");
+    // Note: This is a Qt 5.12.4 regression
+    // (https://bugreports.qt.io/browse/QTBUG-77826)
+    setEnvVar("QT_XCB_TABLET_LEGACY_COORDINATES", "1");
 #endif
 
     // Prevent crash at startup when multithreaded upload is enabled
@@ -305,9 +311,10 @@ utf8Main(int argc, char *argv[])
     string altPrefsPath;
     for (size_t i = 0; i < argc; i++)
     {
-        if (i < argc-1 && !strcmp(argv[i], "-prefsPath")) altPrefsPath = argv[i+1];
+        if (i < argc - 1 && !strcmp(argv[i], "-prefsPath"))
+            altPrefsPath = argv[i + 1];
     }
-    Rv::RvApplication::initializeQSettings (altPrefsPath);
+    Rv::RvApplication::initializeQSettings(altPrefsPath);
 
     bool noPrefs = false;
     bool resetPrefs = false;
@@ -317,44 +324,50 @@ utf8Main(int argc, char *argv[])
     //  Expand any rvlink urls in argv
     //
 
-    vector<char *> newArgv;
+    vector<char*> newArgv;
 
     for (int i = 0; i < argc; ++i)
     {
-        if (0 == strncmp ("rvlink://", argv[i], 9))
+        if (0 == strncmp("rvlink://", argv[i], 9))
         {
-            Rv::RvApplication::parseURL (argv[i], newArgv);
+            Rv::RvApplication::parseURL(argv[i], newArgv);
         }
-        else newArgv.push_back (argv[i]);
+        else
+            newArgv.push_back(argv[i]);
     }
     argv = &(newArgv[0]);
     argc = newArgv.size();
 
     for (size_t i = 0; i < argc; i++)
     {
-        if      (!strcmp(argv[i], "-noPrefs")) noPrefs = true;
-        else if (!strcmp(argv[i], "-resetPrefs")) resetPrefs = true;
+        if (!strcmp(argv[i], "-noPrefs"))
+            noPrefs = true;
+        else if (!strcmp(argv[i], "-resetPrefs"))
+            resetPrefs = true;
     }
     for (size_t i = 0; i < argc; i++)
     {
         if (!strcmp(argv[i], "-bakeURL"))
         {
-            string url = Rv::RvApplication::bakeCommandLineURL (argc, argv);
+            string url = Rv::RvApplication::bakeCommandLineURL(argc, argv);
             cerr << "Baked URL: " << url << endl;
             exit(0);
         }
         if (!strcmp(argv[i], "-encodeURL"))
         {
-            string url = Rv::RvApplication::encodeCommandLineURL (argc, argv);
+            string url = Rv::RvApplication::encodeCommandLineURL(argc, argv);
             cerr << "Encoded URL: " << url << endl;
             exit(0);
         }
     }
 
     Rv::Options& opts = Rv::Options::sharedOptions();
-    if (resetPrefs) Rv::RvPreferences::resetPreferencesFile();
-    if (!noPrefs) Rv::RvPreferences::loadSettingsIntoOptions(opts);
-    else          Rv::PackageManager::setIgnorePrefs(true);
+    if (resetPrefs)
+        Rv::RvPreferences::resetPreferencesFile();
+    if (!noPrefs)
+        Rv::RvPreferences::loadSettingsIntoOptions(opts);
+    else
+        Rv::PackageManager::setIgnorePrefs(true);
     Rv::Options::manglePerSourceArgs(argv, argc);
     Rv::Options prefOpts = opts;
 
@@ -366,17 +379,15 @@ utf8Main(int argc, char *argv[])
     //  Call the deploy functions
     //
 
-    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION,
-                               MINOR_VERSION,
-                               REVISION_NUMBER,
-                               argc, argv,
-                               RELEASE_DESCRIPTION,
+    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER,
+                               argc, argv, RELEASE_DESCRIPTION,
                                "HEAD=" GIT_HEAD);
 
     Imf::staticInitialize();
 
-    TwkFB::GenericIO::init(); // Initialize TwkFB::GenericIO plugins statics
-    TwkMovie::GenericIO::init(); // Initialize TwkMovie::GenericIO plugins statics
+    TwkFB::GenericIO::init();    // Initialize TwkFB::GenericIO plugins statics
+    TwkMovie::GenericIO::init(); // Initialize TwkMovie::GenericIO plugins
+                                 // statics
 
     IPCore::Application::cacheEnvVars();
 
@@ -397,29 +408,31 @@ utf8Main(int argc, char *argv[])
     //  Parse cmd line args
     //
 
-    int   strictlicense  = 0;
-    char *prefsPath = 0;
+    int strictlicense = 0;
+    char* prefsPath = 0;
     int sleepTime = 0;
 
-    if (arg_parse
-        (argc, argv,
-         "", "",
-         RV_ARG_EXAMPLES,
-         "", "",
-         RV_ARG_SEQUENCE_HELP,
-         "", "",
-         RV_ARG_SOURCE_OPTIONS(opts),
-         "", "",
-         "", ARG_SUBR(Rv::RvApplication::parseInFiles), "Input sequence patterns, images, movies, or directories ",
-         RV_ARG_PARSE_OPTIONS(opts),
-         "-strictlicense", ARG_FLAG(&strictlicense), "Exit rather than consume an RV license if no rvsolo licenses are available",
-         "-prefsPath %S", &prefsPath, "Alternate path to preferences directory",
+    if (arg_parse(
+            argc, argv, "", "", RV_ARG_EXAMPLES, "", "", RV_ARG_SEQUENCE_HELP,
+            "", "", RV_ARG_SOURCE_OPTIONS(opts), "", "", "",
+            ARG_SUBR(Rv::RvApplication::parseInFiles),
+            "Input sequence patterns, images, movies, or directories ",
+            RV_ARG_PARSE_OPTIONS(opts), "-strictlicense",
+            ARG_FLAG(&strictlicense),
+            "Exit rather than consume an RV license if no rvsolo licenses are "
+            "available",
+            "-prefsPath %S", &prefsPath,
+            "Alternate path to preferences directory",
 #if defined(PLATFORM_LINUX)
-         "-scheduler %S", &opts.schedulePolicy, "Thread scheduling policy (may require root)",
-         "-priorities %d %d", &opts.displayPriority, &opts.audioPriority, "Set display and audio thread priorities (may require root)",
+            "-scheduler %S", &opts.schedulePolicy,
+            "Thread scheduling policy (may require root)", "-priorities %d %d",
+            &opts.displayPriority, &opts.audioPriority,
+            "Set display and audio thread priorities (may require root)",
 #endif
-         "-sleep %d", &sleepTime, "Sleep (in seconds) before starting to allow attaching debugger",
-         NULL) < 0)
+            "-sleep %d", &sleepTime,
+            "Sleep (in seconds) before starting to allow attaching debugger",
+            NULL)
+        < 0)
     {
         exit(-1);
     }
@@ -429,18 +442,21 @@ utf8Main(int argc, char *argv[])
     //  a traditional X11 geometry flag, which it's not, so prevent
     //  this by switching it to "geometri" if it's in argv.
     //
-    for (int i = 0; i < argc; ++i) if (strcmp(argv[i], "-geometry") == 0) argv[i][8] = 'i';
+    for (int i = 0; i < argc; ++i)
+        if (strcmp(argv[i], "-geometry") == 0)
+            argv[i][8] = 'i';
 
     if (sleepTime > 0)
     {
         cout << "INFO: sleeping " << sleepTime << " seconds" << endl;
-        std::this_thread::sleep_for( std::chrono::seconds( sleepTime ) );
+        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
         cout << "INFO: continuing after sleep" << endl;
     }
 
     if (opts.showVersion)
     {
-        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER << endl;
+        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER
+             << endl;
         exit(0);
     }
 
@@ -464,8 +480,10 @@ utf8Main(int argc, char *argv[])
 
         unsigned int policy = SCHED_OTHER;
 
-        if (!strcmp(opts.schedulePolicy, "SCHED_RR")) policy = SCHED_RR;
-        else if (!strcmp(opts.schedulePolicy, "SCHED_FIFO")) policy = SCHED_FIFO;
+        if (!strcmp(opts.schedulePolicy, "SCHED_RR"))
+            policy = SCHED_RR;
+        else if (!strcmp(opts.schedulePolicy, "SCHED_FIFO"))
+            policy = SCHED_FIFO;
 
         if (policy != SCHED_OTHER)
         {
@@ -488,7 +506,6 @@ utf8Main(int argc, char *argv[])
 #endif
     }
 
-
     //
     //  Banners
     //
@@ -508,8 +525,8 @@ utf8Main(int argc, char *argv[])
     else
     {
         Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1
-                                  ? (TwkUtil::SystemInfo::numCPUs()-1)
-                                  : 1);
+                                      ? (TwkUtil::SystemInfo::numCPUs() - 1)
+                                      : 1);
     }
 
     //
@@ -517,10 +534,10 @@ utf8Main(int argc, char *argv[])
     //
 
     // Required by the Live Review RV plugin React component's scroll bars
-    std::vector<char*> arguments( argv, argv + argc );
+    std::vector<char*> arguments(argv, argv + argc);
     static char enableOverlayScrollbar[] = "--enable-features=OverlayScrollbar";
-    arguments.emplace_back( enableOverlayScrollbar );
-    argc = static_cast<int>( arguments.size() );
+    arguments.emplace_back(enableOverlayScrollbar);
+    argc = static_cast<int>(arguments.size());
     argv = &arguments[0];
 
     //
@@ -531,7 +548,9 @@ utf8Main(int argc, char *argv[])
 
     QTranslator* translator = new QTranslator();
     QLocale locale = QLocale(getenv("ORIGINALLOCAL"));
-    if (translator->load(locale, QLatin1String("i18n"), "_",QLatin1String(":/translations"))) {
+    if (translator->load(locale, QLatin1String("i18n"), "_",
+                         QLatin1String(":/translations")))
+    {
         app->installTranslator(translator);
     }
 
@@ -543,7 +562,7 @@ utf8Main(int argc, char *argv[])
 
     Rv::RvApplication* rvapp = new Rv::RvApplication(argc, argv);
 
-    rvapp->setExecutableNameCaps ("RV");
+    rvapp->setExecutableNameCaps("RV");
 
     app->installEventFilter(rvapp);
     app->setQuitOnLastWindowClosed(true);
@@ -562,7 +581,8 @@ utf8Main(int argc, char *argv[])
 
     if (bundle.top() == "")
     {
-        cerr << "ERROR: can't locate RV home directory (is it installed in root?)"
+        cerr << "ERROR: can't locate RV home directory (is it installed in "
+                "root?)"
              << endl;
 
         exit(-1);
@@ -571,21 +591,30 @@ utf8Main(int argc, char *argv[])
     bundle.setEnvVar("RV_PYTHONPATH_EXTERNAL", (pythonPath) ? pythonPath : "");
     bundle.setEnvVar("RV_PYTHONHOME_EXTERNAL", (pythonHome) ? pythonHome : "");
 
-    if (getenv("RV_APP_RVIO")) bundle.setEnvVar("RV_APP_RVIO_SET_BY_USER", "true");
-    else                       bundle.setEnvVar("RV_APP_RVIO", bundle.executableFile("rvio"));
+    if (getenv("RV_APP_RVIO"))
+        bundle.setEnvVar("RV_APP_RVIO_SET_BY_USER", "true");
+    else
+        bundle.setEnvVar("RV_APP_RVIO", bundle.executableFile("rvio"));
 
     bundle.setEnvVar("RV_APP_RV_SHORT_NAME", EXECUTABLE_SHORT_NAME);
     bundle.setEnvVar("RV_APP_RV", bundle.executableFile(EXECUTABLE_SHORT_NAME));
     bundle.setEnvVar("RV_APP_MANUAL", bundle.resource("rv_manual", "pdf"));
-    bundle.setEnvVar("RV_APP_MANUAL_HTML", bundle.resource("rv_manual", "html"));
-    bundle.setEnvVar("RV_APP_SDI_MANUAL", bundle.resource("rvsdi_manual", "pdf"));
-    bundle.setEnvVar("RV_APP_SDI_MANUAL_HTML", bundle.resource("rvsdi_manual", "html"));
-    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL", bundle.resource("rv_reference", "pdf"));
-    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL_HTML", bundle.resource("rv_reference", "html"));
+    bundle.setEnvVar("RV_APP_MANUAL_HTML",
+                     bundle.resource("rv_manual", "html"));
+    bundle.setEnvVar("RV_APP_SDI_MANUAL",
+                     bundle.resource("rvsdi_manual", "pdf"));
+    bundle.setEnvVar("RV_APP_SDI_MANUAL_HTML",
+                     bundle.resource("rvsdi_manual", "html"));
+    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL",
+                     bundle.resource("rv_reference", "pdf"));
+    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL_HTML",
+                     bundle.resource("rv_reference", "html"));
     bundle.setEnvVar("RV_APP_MU_MANUAL", bundle.resource("mu", "pdf"));
     bundle.setEnvVar("RV_APP_GTO_REFERENCE", bundle.resource("gto", "pdf"));
-    bundle.setEnvVar("RV_APP_RELEASE_NOTES", bundle.resource("rv_release_notes", "html"));
-    bundle.setEnvVar("RV_APP_LICENSES_NOTES", bundle.resource("rv_client_licenses", "html"));
+    bundle.setEnvVar("RV_APP_RELEASE_NOTES",
+                     bundle.resource("rv_release_notes", "html"));
+    bundle.setEnvVar("RV_APP_LICENSES_NOTES",
+                     bundle.resource("rv_client_licenses", "html"));
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
 
     //
@@ -597,7 +626,8 @@ utf8Main(int argc, char *argv[])
     bundle.setEnvVar("RV_APP_INIT", muInitFile.c_str());
     bundle.setEnvVar("RV_APP_PYINIT", pyInitFile.c_str());
 
-    if (opts.initscript) muInitFile = opts.initscript;
+    if (opts.initscript)
+        muInitFile = opts.initscript;
 
     // RV third party optional customization
 #if defined(RV_THIRD_PARTY_CUSTOMIZATION)
@@ -615,7 +645,6 @@ utf8Main(int argc, char *argv[])
         cerr << "         some plugins may not have been loaded." << endl;
     }
 
-
     TwkMovie::GenericIO::addPlugin(new MovieFBIO());
     TwkMovie::GenericIO::addPlugin(new MovieProceduralIO());
 
@@ -625,21 +654,24 @@ utf8Main(int argc, char *argv[])
 
     TwkFB::GenericIO::compileExtensionSet(predicateFileExtensions());
 
-    #ifdef PLATFORM_WINDOWS
-	DWORD targetClass = HIGH_PRIORITY_CLASS;
-	if (getenv("RV_REALTIME_PRIORITY_CLASS")) targetClass = REALTIME_PRIORITY_CLASS;
-	DWORD proClass1 = GetPriorityClass (GetCurrentProcess());
-	if (0 == SetPriorityClass (GetCurrentProcess(), targetClass))
-	{
-	    cerr << "ERROR: SetPriorityClass failed, error " << GetLastError() << endl;
-	}
-	DWORD proClass2 = GetPriorityClass (GetCurrentProcess());
-	if (proClass2 != targetClass)
-	{
-	    cerr << "WARNING: failed to set Priority Class, class " << hex << showbase <<
-		    int(proClass1) << " -> " << int(proClass2) << noshowbase << dec << endl;
-	}
-    #endif
+#ifdef PLATFORM_WINDOWS
+    DWORD targetClass = HIGH_PRIORITY_CLASS;
+    if (getenv("RV_REALTIME_PRIORITY_CLASS"))
+        targetClass = REALTIME_PRIORITY_CLASS;
+    DWORD proClass1 = GetPriorityClass(GetCurrentProcess());
+    if (0 == SetPriorityClass(GetCurrentProcess(), targetClass))
+    {
+        cerr << "ERROR: SetPriorityClass failed, error " << GetLastError()
+             << endl;
+    }
+    DWORD proClass2 = GetPriorityClass(GetCurrentProcess());
+    if (proClass2 != targetClass)
+    {
+        cerr << "WARNING: failed to set Priority Class, class " << hex
+             << showbase << int(proClass1) << " -> " << int(proClass2)
+             << noshowbase << dec << endl;
+    }
+#endif
 
     //
     //  QT starts here
@@ -650,10 +682,11 @@ utf8Main(int argc, char *argv[])
     pthread_win32_process_attach_np();
 #endif
 
-    //Rv::dumpApplicationPalette();
+    // Rv::dumpApplicationPalette();
     Rv::initializeDefaultPalette();
 
-    if (!getenv("RV_DARK")) bundle.setEnvVar("RV_DARK", "", true);
+    if (!getenv("RV_DARK"))
+        bundle.setEnvVar("RV_DARK", "", true);
 
     QString csstext;
 
@@ -665,9 +698,9 @@ utf8Main(int argc, char *argv[])
     else
     {
         csstext = QString(rv_linux_dark)
-                        .arg(opts.fontSize1)
-                        .arg(opts.fontSize2)
-                        .arg(opts.fontSize2-1);
+                      .arg(opts.fontSize1)
+                      .arg(opts.fontSize2)
+                      .arg(opts.fontSize2 - 1);
     }
 
     if (!opts.qtstyle || !strcmp(opts.qtstyle, "RV"))
@@ -695,18 +728,17 @@ utf8Main(int argc, char *argv[])
             exit(-1);
         }
 
-        TwkApp::initWithFile(TwkApp::muContext(),
-                             TwkApp::muProcess(),
-                             TwkApp::muModuleList(),
-                             muInitFile.c_str());
+        TwkApp::initWithFile(TwkApp::muContext(), TwkApp::muProcess(),
+                             TwkApp::muModuleList(), muInitFile.c_str());
 
-        TwkApp::pyInitWithFile(pyInitFile.c_str(), Rv::pyRvAppCommands(), Rv::pyUICommands());
+        TwkApp::pyInitWithFile(pyInitFile.c_str(), Rv::pyRvAppCommands(),
+                               Rv::pyUICommands());
     }
-    catch (const exception &e)
+    catch (const exception& e)
     {
         cerr << "ERROR: during initialization: " << e.what() << endl;
         rvapp->console()->processLastTextBuffer();
-        exit( -1 );
+        exit(-1);
     }
 
     //
@@ -715,12 +747,14 @@ utf8Main(int argc, char *argv[])
     //  that point.
     //
 
-    #ifdef PLATFORM_WINDOWS
-    TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
+#ifdef PLATFORM_WINDOWS
+    TwkGLF::FBOVideoDevice* dummyDev =
+        new TwkGLF::FBOVideoDevice(0, 10, 10, false);
     IPCore::ImageRenderer::queryGL();
-    const char* glVersion =(const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+    const char* glVersion =
+        (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
     IPCore::Shader::Function::useShadingLanguageVersion(glVersion);
-    #endif
+#endif
 
     //
     //  Organize the input file list
@@ -760,10 +794,9 @@ utf8Main(int argc, char *argv[])
             cerr << exc;
             exit(-1);
         }
-        catch (const exception &e)
+        catch (const exception& e)
         {
-            cerr << "ERROR: Unhandled exception during execution: "
-                 << e.what()
+            cerr << "ERROR: Unhandled exception during execution: " << e.what()
                  << endl;
 
             exit(-1);
@@ -782,7 +815,7 @@ utf8Main(int argc, char *argv[])
 
     TwkFB::ThreadPool::shutdown();
     TwkMovie::GenericIO::shutdown(); // Shutdown TwkMovie::GenericIO plugins
-    TwkFB::GenericIO::shutdown(); // Shutdown TwkFB::GenericIO plugins
+    TwkFB::GenericIO::shutdown();    // Shutdown TwkFB::GenericIO plugins
 
     TwkGLF::UninitPBOPools();
 

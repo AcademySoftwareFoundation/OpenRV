@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <MuTwkApp/MenuState.h>
@@ -15,72 +15,70 @@
 #include <MuTwkApp/MuInterface.h>
 #include <iostream>
 
-namespace TwkApp {
-using namespace std;
-
-MuStateFunc::MuStateFunc(Mu::FunctionObject* obj) : m_func(obj), m_exception(false)
+namespace TwkApp
 {
-    m_func->retainExternal();
-}
+    using namespace std;
 
-MuStateFunc::~MuStateFunc()
-{
-    m_func->releaseExternal();
-    m_func = 0;
-}
-
-int 
-MuStateFunc::state()
-{
-    assert(m_func);
-    Mu::Process* p = muProcess();
-    Mu::Function::ArgumentVector args;
-    const Mu::Function* F = m_func->function();
-    Value v = muAppThread()->call(F, args, false);
-
-    if (muAppThread()->uncaughtException() && !m_exception)
+    MuStateFunc::MuStateFunc(Mu::FunctionObject* obj)
+        : m_func(obj)
+        , m_exception(false)
     {
-        cerr << "ERROR: while evaluating function: ";
-        Value v(m_func);
-        m_func->type()->outputValue(cerr, v);
-        cerr << endl;
+        m_func->retainExternal();
+    }
 
-        if (const Mu::Object* e = muAppThread()->exception())
+    MuStateFunc::~MuStateFunc()
+    {
+        m_func->releaseExternal();
+        m_func = 0;
+    }
+
+    int MuStateFunc::state()
+    {
+        assert(m_func);
+        Mu::Process* p = muProcess();
+        Mu::Function::ArgumentVector args;
+        const Mu::Function* F = m_func->function();
+        Value v = muAppThread()->call(F, args, false);
+
+        if (muAppThread()->uncaughtException() && !m_exception)
         {
-            cerr << "ERROR: Exception Value: ";
-            e->type()->outputValue(cerr, (ValuePointer)&e);
+            cerr << "ERROR: while evaluating function: ";
+            Value v(m_func);
+            m_func->type()->outputValue(cerr, v);
             cerr << endl;
 
-            if (e->type() == muContext()->exceptionType() &&
-                muContext()->debugging())
+            if (const Mu::Object* e = muAppThread()->exception())
             {
-                const Mu::ExceptionType::Exception* exc =
-                    static_cast<const Mu::ExceptionType::Exception*>(e);
+                cerr << "ERROR: Exception Value: ";
+                e->type()->outputValue(cerr, (ValuePointer)&e);
+                cerr << endl;
 
-                cerr << "Backtrace:" << endl << exc->backtraceAsString() << endl;
+                if (e->type() == muContext()->exceptionType()
+                    && muContext()->debugging())
+                {
+                    const Mu::ExceptionType::Exception* exc =
+                        static_cast<const Mu::ExceptionType::Exception*>(e);
+
+                    cerr << "Backtrace:" << endl
+                         << exc->backtraceAsString() << endl;
+                }
             }
+
+            m_exception = true;
+        }
+        else
+        {
+            // m_exception = false;
         }
 
-        m_exception = true;
+        return v._int;
     }
-    else
+
+    bool MuStateFunc::error() const { return m_exception; }
+
+    Menu::StateFunc* MuStateFunc::copy() const
     {
-        //m_exception = false;
+        return new MuStateFunc(m_func);
     }
 
-    return v._int;
-}
-
-bool 
-MuStateFunc::error() const
-{
-    return m_exception; 
-}
-
-Menu::StateFunc* 
-MuStateFunc::copy() const
-{
-    return new MuStateFunc(m_func);
-}
-
-} // TwkApp
+} // namespace TwkApp

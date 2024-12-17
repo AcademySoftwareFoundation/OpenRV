@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2013 Tweak Software. 
+//  Copyright (c) 2013 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __RvCommon__RvProfileManager__h__
 #define __RvCommon__RvProfileManager__h__
@@ -13,43 +13,45 @@
 #include <QtCore/QItemSelection>
 #include <iostream>
 
-namespace IPCore {
-class Profile;
+namespace IPCore
+{
+    class Profile;
 }
 
-namespace Rv {
-
-class RvProfileManager : public QDialog
+namespace Rv
 {
-    Q_OBJECT
 
-  public:
-    typedef QPair<QString,QString> QStringPair;
-    typedef std::vector<IPCore::Profile*> ProfileVector;
+    class RvProfileManager : public QDialog
+    {
+        Q_OBJECT
 
-    RvProfileManager(QObject*);
-    virtual ~RvProfileManager();
+    public:
+        typedef QPair<QString, QString> QStringPair;
+        typedef std::vector<IPCore::Profile*> ProfileVector;
 
-    void loadModel();
+        RvProfileManager(QObject*);
+        virtual ~RvProfileManager();
 
-  public slots:
-    void addProfile();
-    void deleteProfile();
-    void selectionChanged(const QItemSelection&,const QItemSelection&);
-    void applyProfile();
+        void loadModel();
 
-  private:
-    void clear();
-    IPCore::Profile* currentProfile();
+    public slots:
+        void addProfile();
+        void deleteProfile();
+        void selectionChanged(const QItemSelection&, const QItemSelection&);
+        void applyProfile();
 
-  private:
-    Ui::RvProfileManager     m_ui;
-    Ui::CreateProfileDialog  m_createDialogUI;
-    QDialog*                 m_createDialog;
-    QStandardItemModel*      m_model;
-    ProfileVector            m_profiles;
-};
+    private:
+        void clear();
+        IPCore::Profile* currentProfile();
 
-} // Rv
+    private:
+        Ui::RvProfileManager m_ui;
+        Ui::CreateProfileDialog m_createDialogUI;
+        QDialog* m_createDialog;
+        QStandardItemModel* m_model;
+        ProfileVector m_profiles;
+    };
+
+} // namespace Rv
 
 #endif // __RvCommon__RvProfileManager__h__

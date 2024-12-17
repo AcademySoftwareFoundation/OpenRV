@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #ifndef __MULANG_H__
 #define __MULANG_H__
@@ -27,4 +27,4 @@
 #include <MuLang/RegexType.h>
 #include <MuLang/StringType.h>
 
-#endif    // End #ifdef __MULANG_H__
+#endif // End #ifdef __MULANG_H__
