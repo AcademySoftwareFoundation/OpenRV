@@ -80,6 +80,17 @@ namespace AJADevices
 
       deviceIndex++;
     }
+
+#ifdef PLATFORM_WINDOWS
+    GLenum error = glewInit(nullptr);
+    if (error != GLEW_OK)
+    {
+        std::string message = "AJA: GLEW initialization failed: ";
+        throw std::runtime_error(
+            message + reinterpret_cast<const char*>(glewGetErrorString(error))
+        );
+    }
+#endif
   }
 
   void AJAModule::close()
