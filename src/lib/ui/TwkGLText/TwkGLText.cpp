@@ -32,6 +32,7 @@
 #include <iostream>
 #include <stl_ext/string_algo.h>
 #include <TwkGLText/defaultFont.h>
+#include <TwkGLText/noto.h>
 #include <iterator>
 #include <pthread.h>
 
@@ -147,7 +148,7 @@ Context GLtext::newContext()
     }
 
     if ((*ctx->fonts[ctx->fontName]).size() <= ctx->size) (*ctx->fonts[ctx->fontName]).resize(ctx->size+1);
-    if (!(*ctx->fonts[ctx->fontName])[ctx->size]) (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(default_font, 67548);
+    if (!(*ctx->fonts[ctx->fontName])[ctx->size]) (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(notoFont, notoFontSize);
     (*ctx->fonts[ctx->fontName])[ctx->size]->FaceSize(ctx->size);
     ctx->initialized = true;
 
@@ -194,7 +195,7 @@ void GLtext::init()
             (*ctx->fonts[ctx->fontName]).resize(ctx->size+1);
         }
         if (!(*ctx->fonts[ctx->fontName])[ctx->size]) {
-            (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(default_font, 67548);
+            (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(notoFont, notoFontSize);
             (*ctx->fonts[ctx->fontName])[ctx->size]->FaceSize(ctx->size);
         }
         ctx->initialized = true;
