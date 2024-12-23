@@ -622,6 +622,25 @@ class: AnnotateMinorMode : MinorMode
         populateAnnotationList();
     }
 
+    method: pasteTextFromClipboard (void; Event event)
+    {
+        // Getting text directly from the users clipboard
+        let text = commands.pasteTextFromClipboard();
+
+        if (text == "") {
+            print("WARNING: Clipboard is empty");
+
+        } else {
+            _textPlacementMode = true;
+            _textBuffer.pop_back();
+
+            for (int i = 0; i < text.size(); i++)
+                _textBuffer.push_back(text[i]);
+
+            setText(_textBuffer);
+        }
+    }
+
     //----------------------------------------------------------------------
 
     method: pointerLocation ((string, Point); Event event)
@@ -2152,6 +2171,7 @@ class: AnnotateMinorMode : MinorMode
                           ("key-down--alt--backspace", backwardsKillWord, ""),
                           ("key-down--shift--backspace", backwardsKillWord, ""),
                           ("key-down--control--backspace", backwardsKillWord, ""),
+                          ("key-down--meta--v", pasteTextFromClipboard, ""), // Paste from clipboard
                           ("key-down--meta--a", killLine, ""),
                           ("key-down--alt--a", killLine, ""),
                           ("key-down--space", insertChar, ""),
