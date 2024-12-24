@@ -458,6 +458,8 @@ Options::Options()
     presentFormat = (char*)"";
     presentData = (char*)"";
 
+    addSourceToDefaultView = true;
+
 #ifdef PLATFORM_DARWIN
     fontSize1 = 13;
     fontSize2 = 10;
@@ -493,6 +495,7 @@ Options::parseSourceArgs(const Files& inputFiles)
             inSource = true;
             sources.resize(sources.size() + 1);
             sources.back().singleSource = true;
+            sources.back().addSourceToDefaultView = true;
 
             SourceArgs& a = sources.back();
 
