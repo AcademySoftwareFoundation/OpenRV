@@ -30,6 +30,10 @@ files:
     location: SupportFiles/$PACKAGE
   - file: clipHook.py
     location: SupportFiles/$PACKAGE
+  - file: compare_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: compare_hook.py
+    location: SupportFiles/$PACKAGE
   - file: effectHook.py
     location: SupportFiles/$PACKAGE
   - file: genericEffectHook.py
