@@ -1001,7 +1001,7 @@ QTAudioOutput::setAudioOutputBufferSize()
         const bool audioDeviceIsWASAPI = m_device.realm() == "wasapi";
 #else
         // Device id may contain backend information (e.g. wasapi or waveout for WinMM).
-        const QString deviceId = QString::fromUtf8(m_device.description());
+        const QString deviceId = m_device.description();
         // Description may contain useful information.
         const QString deviceName = m_device.description();
         const bool audioDeviceIsWASAPI = deviceId.contains("wasapi", Qt::CaseInsensitive) ||

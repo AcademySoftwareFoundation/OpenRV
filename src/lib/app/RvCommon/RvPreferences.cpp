@@ -165,8 +165,8 @@ RvPreferences::RvPreferences(QWidget* parent)
     connect(m_ui.audioDeviceRateWidget, SIGNAL(activated(int)),
             this, SLOT(audioRateChanged(int)));
 #else
-    connect(m_ui.audioDeviceRateWidget, SIGNAL(valueChanged(int)),
-            this, SLOT(audioRateChanged(int)));
+    connect(m_ui.audioDeviceRateWidget, SIGNAL(editingFinished()),
+            this, SLOT(audioRateChanged()));
 #endif
     m_ui.audioDeviceRateWidget->installEventFilter(scrollEventEater);
 
@@ -2579,7 +2579,11 @@ RvPreferences::audioFormatChanged(int index)
 
 
 void
+#if defined( RV_VFX_CY2023 )
 RvPreferences::audioRateChanged(int index)
+#else
+RvPreferences::audioRateChanged()
+#endif
 {
     if (AudioRenderer::audioDisabledAlways()) return;
 #if defined( RV_VFX_CY2023 )
