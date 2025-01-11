@@ -30,10 +30,17 @@ SET(_download_hash
 )
 
 IF(RV_TARGET_WINDOWS)
-  RV_MAKE_STANDARD_LIB_NAME("openjph" "" "SHARED" "")
+  RV_MAKE_STANDARD_LIB_NAME("openjph.0.18" "0.18.2" "SHARED" "d")
+  SET(_libname
+        "openjph.0.18.lib"
+    )
+    SET(_implibpath
+        ${_lib_dir}/${_libname}
+    )
 ELSE()
-  RV_MAKE_STANDARD_LIB_NAME("openjph" "0.18.2" "SHARED" "")
+  RV_MAKE_STANDARD_LIB_NAME("openjph" "0.18.2" "SHARED" "d")
 ENDIF()
+ MESSAGE("****OPENJPH RV_MAKE_STANDARD_LIB_NAME IMPLIB _implibpath:${_implibpath} _implibname:${_implibname} _libname:${_libname} _libpath:${_libpath}")
 
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
@@ -69,24 +76,32 @@ RV_COPY_LIB_BIN_FOLDERS()
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
 ADD_LIBRARY(OpenJph::OpenJph SHARED IMPORTED GLOBAL)
+
 ADD_DEPENDENCIES(OpenJph::OpenJph ${_target})
 
-SET_PROPERTY(
-  TARGET OpenJph::OpenJph
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-
-IF(RV_TARGET_WINDOWS)
+IF(NOT RV_TARGET_WINDOWS)
   SET_PROPERTY(
     TARGET OpenJph::OpenJph
-    PROPERTY IMPORTED_IMPLIB ${_bin_dir}/${_implibname}
+    PROPERTY IMPORTED_LOCATION ${_libpath}
+  )
+  SET_PROPERTY(
+    TARGET OpenJph::OpenJph
+    PROPERTY IMPORTED_SONAME ${_libname}
+  )
+ELSE()
+  MESSAGE("****OPENJPH IMPORTEDLOCATION ${_implibpath} IMPLIB ${_implibpath} ${_libname} ${_libpath}")
+  # An import library (.lib) file is often used to resolve references to 
+  # functions and variables in a DLL, enabling the linker to generate code 
+  # for loading the DLL and calling its functions at runtime.
+  SET_PROPERTY(
+    TARGET OpenJph::OpenJph
+    PROPERTY IMPORTED_LOCATION "${_libpath}"
+  )
+  SET_PROPERTY(
+    TARGET OpenJph::OpenJph
+    PROPERTY IMPORTED_IMPLIB ${_implibpath}
   )
 ENDIF()
-
-SET_PROPERTY(
-  TARGET OpenJph::OpenJph
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
 
 # It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 SET(_openjph_include_dir

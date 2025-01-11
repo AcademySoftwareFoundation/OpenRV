@@ -26,7 +26,6 @@
 #include <openjph/ojph_file.h>
 #include <openjph/ojph_codestream.h>
 #include <openjph/ojph_params.h>
-#include <openjph/ojph_message.h>
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #endif

@@ -26,7 +26,7 @@ SET_TARGET_PROPERTIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PRIVATE IOhtj2k Boost::program_options
+  PRIVATE IOhtj2k
 )
 
 RV_STAGE(TYPE "IMAGE_FORMAT" TARGET ${_target})
