@@ -7,84 +7,79 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_AJA" "16.2" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_AJA" "17.1.0" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-SET(_patch
-    "bugfix5"
-)
+STRING(REPLACE "." "_" _version_with_underscore ${_version})
 
 SET(_download_url
-    "https://github.com/aja-video/ntv2/archive/refs/tags/v${_version}-${_patch}.zip"
+    "https://github.com/aja-video/libajantv2/archive/refs/tags/ntv2_${_version_with_underscore}.zip"
 )
 
 SET(_download_hash
-    "5ec7f3f7ecfc322ca9307203155a4481"
+    "b9d189f77e18dbdff7c39a339b1a5dd4"
 )
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-SET(_include_dir
-    ${_install_dir}/include
-)
-
-IF(RV_TARGET_LINUX)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
-
-SET(_make_command
-    make
-)
-SET(_configure_command
-    cmake
-)
-
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
-  )
-
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
-  )
-  SET(_configure_command
-      ${_darwin_x86_64} ${_configure_command}
-  )
-ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
-  )
+  RV_MAKE_STANDARD_LIB_NAME(ajantv2_vs143_MT "" "SHARED" "d")
+ELSE()
+  RV_MAKE_STANDARD_LIB_NAME(ajantv2 "" "SHARED" "d")
 ENDIF()
 
-IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  SET(AJA_DEBUG_POSTFIX
-      "d"
-  )
-ENDIF()
-
-SET(_aja_ntv2_libname
-    ${CMAKE_STATIC_LIBRARY_PREFIX}ajantv2${AJA_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
-)
-
-SET(_aja_ntv2_lib
-    ${_lib_dir}/${_aja_ntv2_libname}
-)
 SET(_aja_ntv2_include_dir
-    ${_include_dir}/ajalibraries/ajantv2/includes
+    ${_include_dir}/libajantv2/ajantv2/includes
 )
 SET(_aja_include_dir
-    ${_include_dir}/ajalibraries
+    ${_include_dir}/libajantv2
 )
+
+IF(RHEL_VERBOSE)
+SET(_mbedtls_lib_dir
+    ${_build_dir}/ajantv2/mbedtls-install/lib64
+)
+ELSE()
+SET(_mbedtls_lib_dir
+    ${_build_dir}/ajantv2/mbedtls-install/lib
+)
+ENDIF()
+
+SET(_mbedtls_lib ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedtls${CMAKE_STATIC_LIBRARY_SUFFIX})
+SET(_mbedx509_lib ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedx509${CMAKE_STATIC_LIBRARY_SUFFIX})
+SET(_mbedcrypto_lib ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedcrypto${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+LIST(APPEND _byproducts ${_mbedtls_lib} ${_mbedx509_lib} ${_mbedcrypto_lib})
+
+# There is an issue with the recent AJA SDK : the OS specific header files are no longer copied to _aja_ntv2_include_dir Adding custom paths here to work around
+# this issue
+IF(RV_TARGET_LINUX)
+  SET(_aja_ntv2_os_specific_include_dir
+      ${_include_dir}/libajantv2/ajantv2/src/lin
+  )
+ELSEIF(RV_TARGET_DARWIN)
+  SET(_aja_ntv2_os_specific_include_dir
+      ${_include_dir}/libajantv2/ajantv2/src/mac
+  )
+ELSEIF(RV_TARGET_WINDOWS)
+  SET(_aja_ntv2_os_specific_include_dir
+      ${_include_dir}/libajantv2/ajantv2/src/win
+  )
+ENDIF()
+
+LIST(APPEND
+  _configure_options
+  "-DAJANTV2_DISABLE_DEMOS=ON"
+  "-DAJANTV2_DISABLE_TOOLS=ON"
+  "-DAJANTV2_DISABLE_TESTS=ON"
+  "-DAJANTV2_BUILD_SHARED=ON"
+)
+
+# In Debug, the MSVC runtime library needs to be set to MultiThreadedDebug. Otherwise, it will be set to MultiThreaded.
+IF(RV_TARGET_WINDOWS AND CMAKE_BUILD_TYPE MATCHES "^Debug$")
+  LIST(APPEND
+  _configure_options
+  "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug"
+  )
+ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -93,34 +88,46 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  SOURCE_DIR ${_source_dir}
+  BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} -G Ninja -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DAJA_BUILD_APPS=OFF ${RV_DEPS_BASE_DIR}/${_target}/src
-  # Not using _cmake_build_command and _cmake_install_command since the build dir need to change.
-  BUILD_COMMAND ${CMAKE_COMMAND} --build ${RV_DEPS_BASE_DIR}/${_target}/src --config ${CMAKE_BUILD_TYPE} -j${_cpu_count}
-  INSTALL_COMMAND ${CMAKE_COMMAND} --install ${RV_DEPS_BASE_DIR}/${_target}/src --prefix ${_install_dir} --config ${CMAKE_BUILD_TYPE}
-  BUILD_IN_SOURCE TRUE
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+  BUILD_COMMAND ${_cmake_build_command}
+  INSTALL_COMMAND ${_cmake_install_command} && ${CMAKE_COMMAND} -E copy_directory ${_mbedtls_lib_dir} ${_lib_dir}
+  BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_aja_ntv2_lib}
+  BUILD_BYPRODUCTS ${_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(aja::ntv2 STATIC IMPORTED GLOBAL)
+RV_COPY_LIB_BIN_FOLDERS()
+
+ADD_LIBRARY(aja::ntv2 SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(aja::ntv2 ${_target})
 SET_PROPERTY(
   TARGET aja::ntv2
-  PROPERTY IMPORTED_LOCATION ${_aja_ntv2_lib}
+  PROPERTY IMPORTED_LOCATION ${_libpath}
 )
 SET_PROPERTY(
   TARGET aja::ntv2
-  PROPERTY IMPORTED_SONAME ${_aja_ntv2_libname}
+  PROPERTY IMPORTED_SONAME ${_libname}
 )
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET aja::ntv2
+    PROPERTY IMPORTED_IMPLIB ${_implibpath}
+  )
+ENDIF()
 
-FILE(MAKE_DIRECTORY ${_aja_include_dir} ${_aja_ntv2_include_dir})
+FILE(MAKE_DIRECTORY ${_aja_include_dir} ${_aja_ntv2_include_dir} ${_aja_ntv2_os_specific_include_dir})
 TARGET_INCLUDE_DIRECTORIES(
   aja::ntv2
-  INTERFACE ${_aja_include_dir} ${_aja_ntv2_include_dir}
+  INTERFACE ${_aja_include_dir} ${_aja_ntv2_include_dir} ${_aja_ntv2_os_specific_include_dir}
+)
+
+TARGET_LINK_LIBRARIES(
+  aja::ntv2 INTERFACE
+  ${_mbedtls_lib} ${_mbedx509_lib} ${_mbedcrypto_lib}
 )
 
 IF(RV_TARGET_DARWIN)
@@ -139,34 +146,6 @@ SET(RV_DEPS_AJA_COMPILE_OPTIONS
 )
 
 LIST(APPEND RV_DEPS_LIST aja::ntv2)
-
-IF(RV_TARGET_WINDOWS)
-  FILE(MAKE_DIRECTORY ${_install_dir}/lib)
-  FILE(MAKE_DIRECTORY ${_install_dir}/bin)
-
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_aja_ntv2_libname}
-  )
-ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_aja_ntv2_libname}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_aja_ntv2_libname}
-  )
-ENDIF()
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 

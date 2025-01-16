@@ -28,26 +28,19 @@ namespace AJADevices
       SimpleMode
     };
 
-    AJAModule( NativeDisplayPtr, unsigned int app4CC, OperationMode );
-    virtual ~AJAModule();
+    AJAModule( NativeDisplayPtr, unsigned int appID, OperationMode );
+    ~AJAModule() override;
 
-    virtual std::string name() const;
-    virtual std::string SDKIdentifier() const;
-    virtual std::string SDKInfo() const;
-    virtual void open();
-    virtual void close();
-    virtual bool isOpen() const;
-
-    void* deviceScan() const
-    {
-      return m_devicescan;
-    }
+    [[nodiscard]] std::string name() const override;
+    [[nodiscard]] std::string SDKIdentifier() const override;
+    [[nodiscard]] std::string SDKInfo() const override;
+    void open() override;
+    void close() override;
+    [[nodiscard]] bool isOpen() const override;
 
    private:
-    void* m_devicescan{ nullptr };
     OperationMode m_mode{ OperationMode::ProMode };
     unsigned int m_appID{ 0 };
   };
 
 }  // namespace AJADevices
-

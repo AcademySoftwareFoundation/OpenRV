@@ -596,84 +596,41 @@ def install() -> None:
         shutil.rmtree(OUTPUT_DIR)
 
     if platform.system() == "Windows":
-        build_path = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
-        parent = os.path.dirname(SOURCE_DIR)
+        # include
+        src_dir = os.path.join(SOURCE_DIR, "Include")
+        dst_dir = os.path.join(OUTPUT_DIR, "include")
+        shutil.copytree(src_dir, dst_dir)
+        src_file = os.path.join(SOURCE_DIR, "PC", "pyconfig.h")
+        dst_file = os.path.join(dst_dir, "pyconfig.h")
+        shutil.copyfile(src_file, dst_file)
 
-        # Using the python that OpenRV built to execute the script because it seems
-        # like it need to be the same dot release. (e.g. run the script with 3.11 to install a 3.11)
-        python_executable = "python"
-        if VARIANT == "Debug":
-            python_executable = "python_d"
-        python_executable = os.path.join(build_path, python_executable)
+        # lib
+        src_dir = os.path.join(SOURCE_DIR, "Lib")
+        dst_dir = os.path.join(OUTPUT_DIR, "lib")
+        shutil.copytree(src_dir, dst_dir)
 
-        install_args = [
-            python_executable,
-            os.path.join(SOURCE_DIR, "PC", "layout", "main.py"),
-            "-vv",
-            "--source",
-            SOURCE_DIR,
-            "--build",
-            build_path,
-            "--copy",
-            OUTPUT_DIR,
-            "--temp",
-            os.path.join(parent, "temp"),
-            "--include-dev",
-            "--include-symbols",
-            "--include-tcltk",
-            "--include-tests",
-            "--include-venv",
-            "--flat-dlls"
-        ]
-
-        if VARIANT == "Debug":
-            install_args.append("--debug")
-
-        subprocess.run(
-            install_args,
-            cwd=SOURCE_DIR
-        ).check_returncode()
-
-        dst_dir = os.path.join(OUTPUT_DIR, "bin")
-        os.makedirs(dst_dir, exist_ok=True)
+        # libs - required by pyside2
+        dst_dir = os.path.join(OUTPUT_DIR, "libs")
+        os.mkdir(dst_dir)
+        python_libs = glob.glob(
+            os.path.join(SOURCE_DIR, "PCBuild", "amd64", "python*.lib")
+        )
+        if python_libs:
+            for python_lib in python_libs:
+                shutil.copy(python_lib, dst_dir)
 
         # bin
+        src_dir = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
+        dst_dir = os.path.join(OUTPUT_DIR, "bin")
+        shutil.copytree(src_dir, dst_dir)
         # Create a python3.exe file to mimic Mac+Linux
         if VARIANT == "Debug":
             src_python_exe = "python_d.exe"
         else:
             src_python_exe = "python.exe"
-
-        src_file = os.path.join(OUTPUT_DIR, src_python_exe)
+        src_file = os.path.join(src_dir, src_python_exe)
         dst_file = os.path.join(dst_dir, "python3.exe")
-        print(f"Copy {src_file} to {dst_file}")
         shutil.copyfile(src_file, dst_file)
-
-        # Move files under root directory into the bin folder.
-        for filename in os.listdir(os.path.join(OUTPUT_DIR)):
-            file_path = os.path.join(OUTPUT_DIR, filename)  
-            if os.path.isfile(file_path):
-                shutil.move(file_path, os.path.join(dst_dir, filename))
-
-        # Manually move python3.lib because the script provided do not copy it.
-        python3_lib = "python3.lib"
-        python3xx_lib = f"python{PYTHON_VERSION}.lib"
-
-        if VARIANT == "Debug":
-            python3_lib = "python3_d.lib"
-            python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
-
-        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib))
-        shutil.copy(os.path.join(build_path, python3xx_lib), os.path.join(dst_dir, python3xx_lib))
-
-        # Tcl and Tk DLL are not copied by the main.py script in Debug.
-        # Assuming that Tcl and Tk are not built in debug.
-        # Manually copy the DLL.
-        if VARIANT == "Debug":
-            tcl_dll = os.path.join(build_path, "tcl86t.dll")
-            tk_dll = os.path.join(build_path, "tk86t.dll")
-            shutil.copyfile(tcl_dll, os.path.join(dst_dir, "tcl86t.dll"))
-            shutil.copyfile(tk_dll, os.path.join(dst_dir, "tk86t.dll"))
 
     else:
         make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]

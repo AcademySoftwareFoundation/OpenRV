@@ -22,9 +22,9 @@ compile_commands.json
 
 **/__pycache__
 **/*.pyc
+**/.python-version
 
 cmake-*/*
-build/*
-_build/*
+/*build*/
 _install/*
 .venv/*

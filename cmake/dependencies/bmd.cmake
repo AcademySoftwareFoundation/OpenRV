@@ -59,6 +59,16 @@ EXTERNALPROJECT_ADD(
   INSTALL_COMMAND ""
 )
 
+# Generate the DeckLinkAPI.h file from DeckLinkAPI.idl provided with the DeckLink SDK
+IF(RV_TARGET_WINDOWS)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} post_install_step
+    COMMAND midl.exe ARGS /header DeckLinkAPI.h /iid DeckLinkAPIDispatch.cpp DeckLinkAPI.idl
+    WORKING_DIRECTORY ${_include_dir}
+    DEPENDEES install
+  )
+ENDIF()
+
 ADD_LIBRARY(BlackmagicDeckLinkSDK INTERFACE)
 ADD_DEPENDENCIES(BlackmagicDeckLinkSDK ${_target})
 TARGET_INCLUDE_DIRECTORIES(

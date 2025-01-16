@@ -10,6 +10,7 @@
 
 #ifdef PLATFORM_DARWIN
 #include <DarwinBundle/DarwinBundle.h>
+#include <QtCore/QtCore>
 #else
 #include <QTBundle/QTBundle.h>
 #endif
@@ -18,6 +19,8 @@
 #include <IOproxy/IOproxy.h>
 #include <ImfThreading.h>
 #include <MovieFB/MovieFB.h>
+#include <MuTwkApp/MuInterface.h>
+#include <PyTwkApp/PyInterface.h>
 #include <TwkFB/TwkFBThreadPool.h>
 #include <MovieProcedural/MovieProcedural.h>
 #include <MovieProxy/MovieProxy.h>
@@ -577,11 +580,11 @@ vector<string> readSession(string path)
 int utf8Main(int argc, char** argv)
 {
     TwkFB::ThreadPool::initialize();
+    const QCoreApplication qapp(argc, argv);
 
 #ifdef PLATFORM_DARWIN
     TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #else
-    QCoreApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
     (void) bundle.top();
 #endif
@@ -674,6 +677,17 @@ int utf8Main(int argc, char** argv)
 
     TwkMovie::GenericIO::addPlugin(new MovieFBIO());
     TwkMovie::GenericIO::addPlugin(new MovieProceduralIO());
+
+    try
+    {
+        TwkApp::initMu(nullptr);
+        TwkApp::initPython();
+    }
+    catch (const std::exception &e)
+    {
+        cerr << "ERROR: during initialization: " << e.what() << '\n';
+        exit(-1);
+    }
 
     if (showFormats)
     {

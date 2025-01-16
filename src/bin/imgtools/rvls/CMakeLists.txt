@@ -30,6 +30,7 @@ FIND_PACKAGE(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
+  PUBLIC MuTwkApp
   PRIVATE IOproxy
           OpenEXR::OpenEXR
           MovieFB
@@ -44,6 +45,8 @@ TARGET_LINK_LIBRARIES(
           stl_ext
           Boost::headers
           yaml_cpp
+          Qt5::Core
+          PyTwkApp
 )
 
 IF(RV_TARGET_DARWIN)

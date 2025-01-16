@@ -634,14 +634,8 @@ namespace IPCore
     // e.g. propagateMediaChange() might occurs before those two.
     if( m_workItemID )
     {
-      // We make a copy of workItemID because it can be clear
-      // before the lamda is finished.
-      // It is used by the graph to indicate the start and end loading
-      // of a graph.
-      int workItemID = m_workItemID;
       addDispatchJob( Application::instance()->dispatchToMainThread(
-          [this, sharedMedia, proxySharedMedia,
-           workItemID]( Application::DispatchID dispatchID )
+          [this, sharedMedia, proxySharedMedia]( Application::DispatchID dispatchID )
           {
             {
               LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
@@ -2606,6 +2600,8 @@ namespace IPCore
       }
       else
       {
+        filename = lookupFilenameInMediaLibrary( filename );
+
         openMovieTask( filename, SharedMediaPointer() );
       }
     }
@@ -2614,6 +2610,17 @@ namespace IPCore
     {
       if( !media.empty() )
       {
+        // Lookup the filenames in the media library, save associated HTTP header and cookies
+        // if any, and return the actual filename to be used for opening the movie in case of 
+        // redirection.
+        // Note: This needs to be done in the main thread, NOT in the worker thread
+        // because the media library is python based and thus should only be executed 
+        // in the main thread.
+        for( size_t i = 0; i < media.size(); i++ )
+        {
+          media[i] = lookupFilenameInMediaLibrary( media[i] );
+        }
+
         // Then add a work item to load the actual media movies.
         m_workItemID = graph()->addWorkItem(
             [this, sharedMedias, media]()
@@ -2645,9 +2652,132 @@ namespace IPCore
     //  graph using this thread (which is usually some worker thread
     //  in IPGraph).
     //
-    Bundle* bundle = Bundle::mainBundle();
 
-    string file = filename;
+    Movie* mov = 0;
+    bool failed = false;
+    ostringstream errMsg;
+
+    try
+    {
+      mov = openMovie( filename );
+    }
+    catch( std::exception& exc )
+    {
+      failed = true;
+      errMsg << "Open of '" << filename << "' failed: " << exc.what();
+
+      cerr << "ERROR: " << errMsg.str() << endl;
+    }
+    catch( ... )
+    {
+      failed = true;
+    }
+
+    if( !mov || failed )
+    {
+      if( errMsg.tellp() == std::streampos( 0 ) )
+      {
+        errMsg << "Could not locate \"" << filename
+               << "\". Relocate source to fix.";
+      }
+
+      mov = openProxyMovie( errMsg.str(), 0.0, filename, defaultFPS );
+
+      ostringstream str;
+      str << name() << ";;" << filename << ";;" << mediaRepName();
+      TwkApp::GenericStringEvent event( "source-media-unavailable", graph(), str.str() );
+
+      // The following instructions can only be executed on the main thread.
+      // Dispatch to main thread only when using async loading.
+      if (!m_workItemID)
+      {
+        // We are not using async loading: we can safely execute the following instructions
+        setMediaActive( false );
+        graph()->sendEvent( event );
+      }
+      else
+      {
+        // We are using async loading: Dispatch to main thread
+        addDispatchJob( Application::instance()->dispatchToMainThread(
+            [this, event]( Application::DispatchID dispatchID )
+            {
+              {
+                LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
+
+                bool isCanceled =
+                    ( m_dispatchIDCancelRequestedSet.count( dispatchID ) >= 1 );
+                if( isCanceled )
+                {
+                  m_dispatchIDCancelRequestedSet.erase( dispatchID );
+                  return;
+                }
+              }
+
+              setMediaActive( false );
+              graph()->sendEvent( event );
+
+              {
+                LockGuard dispatchGuard( m_dispatchIDCancelRequestedMutex );
+                bool isCanceled =
+                    ( m_dispatchIDCancelRequestedSet.count( dispatchID ) >= 1 );
+                if( isCanceled )
+                {
+                  m_dispatchIDCancelRequestedSet.erase( dispatchID );
+                  return;
+                }
+              }
+
+              removeDispatchJob( dispatchID );
+            } ) );
+      }
+    }
+
+    SharedMediaPointer sharedMedia(
+        newSharedMedia( mov, true /*hasValidRange*/ ) );
+    addMedia( sharedMedia, proxySharedMedia );
+  }
+
+  string FileSourceIPNode::cacheHash( const string& filename,
+                                      const string& prefix )
+  {
+    string hashString;
+
+    const bool filepathIsURL = TwkUtil::pathIsURL( filename );
+    if( !filepathIsURL )
+    {
+      if(TwkUtil::fileExists(filename.c_str()))
+      {
+        try
+        {
+          boost::filesystem::path p( UNICODE_STR( filename ) );
+          const auto size = boost::filesystem::file_size( p );
+
+          //
+          //  should this function be hashing the first 256 bytes or so of
+          //  the file to be safe?
+          //
+
+          ostringstream name;
+          boost::hash<string> string_hash;
+          name << filename << "::" << size;
+          ostringstream fullHash;
+          fullHash << prefix << hex << string_hash( name.str() ) << dec;
+          hashString = fullHash.str();
+        }
+        catch( ... )
+        {
+          // nothing
+        }
+      }
+    }
+
+    return hashString;
+  }
+
+  string FileSourceIPNode::lookupFilenameInMediaLibrary( const string& filename )
+  {
+    string file(filename);
+
     if( TwkMediaLibrary::isLibraryURL( file ) )
     {
       //
@@ -2655,11 +2785,12 @@ namespace IPCore
       //  into a local file URL and then a path
       //
 
-      string local = TwkMediaLibrary::libraryURLtoMediaURL( file );
-      local.erase( 0, 7 );  // assuming "file://" not good
-      file = local;
+      file = TwkMediaLibrary::libraryURLtoMediaURL( file );
+      file.erase( 0, 7 );  // assuming "file://" not good
+      return file;
     }
-    else if( TwkMediaLibrary::isLibraryMediaURL( file ) )
+
+    if( TwkMediaLibrary::isLibraryMediaURL( file ) )
     {
       //
       //  URL is a media URL tracked by one of the libraries. Find its
@@ -2727,84 +2858,7 @@ namespace IPCore
       }
     }
 
-    Movie* mov = 0;
-    bool failed = false;
-    ostringstream errMsg;
-
-    try
-    {
-      mov = openMovie( file );
-    }
-    catch( std::exception& exc )
-    {
-      failed = true;
-      errMsg << "Open of '" << file << "' failed: " << exc.what();
-
-      cerr << "ERROR: " << errMsg.str() << endl;
-    }
-    catch( ... )
-    {
-      failed = true;
-    }
-
-    if( !mov || failed )
-    {
-      if( errMsg.tellp() == std::streampos( 0 ) )
-      {
-        errMsg << "Could not locate \"" << file
-               << "\". Relocate source to fix.";
-      }
-
-      mov = openProxyMovie( errMsg.str(), 0.0, filename, defaultFPS );
-      setMediaActive( false );
-
-      ostringstream str;
-      str << name() << ";;" << file << ";;" << mediaRepName();
-      TwkApp::GenericStringEvent event( "source-media-unavailable", graph(),
-                                        str.str() );
-      graph()->sendEvent( event );
-    }
-
-    SharedMediaPointer sharedMedia(
-        newSharedMedia( mov, true /*hasValidRange*/ ) );
-    addMedia( sharedMedia, proxySharedMedia );
-  }
-
-  string FileSourceIPNode::cacheHash( const string& filename,
-                                      const string& prefix )
-  {
-    string hashString;
-
-    const bool filepathIsURL = TwkUtil::pathIsURL( filename );
-    if( !filepathIsURL )
-    {
-      if(TwkUtil::fileExists(filename.c_str()))
-      {
-        try
-        {
-          boost::filesystem::path p( UNICODE_STR( filename ) );
-          const auto size = boost::filesystem::file_size( p );
-
-          //
-          //  should this function be hashing the first 256 bytes or so of
-          //  the file to be safe?
-          //
-
-          ostringstream name;
-          boost::hash<string> string_hash;
-          name << filename << "::" << size;
-          ostringstream fullHash;
-          fullHash << prefix << hex << string_hash( name.str() ) << dec;
-          hashString = fullHash.str();
-        }
-        catch( ... )
-        {
-          // nothing
-        }
-      }
-    }
-
-    return hashString;
+    return file;
   }
 
   bool FileSourceIPNode::findCachedMediaMetaData( const string& filename,
