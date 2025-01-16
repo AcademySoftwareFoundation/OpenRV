@@ -1347,12 +1347,12 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
     {
         AVStream *tsStream = m_avFormatContext->streams[i];
 
-        AVRational rate = {tsStream->time_base.den,
+        AVRational tcRate = {tsStream->time_base.den,
                            tsStream->time_base.num};
 
         if (isMOVformat(m_avFormatContext))
         {
-            rate = tsStream->avg_frame_rate;
+            tcRate = tsStream->avg_frame_rate;
         }
 
         AVDictionaryEntry *tcrEntry;
