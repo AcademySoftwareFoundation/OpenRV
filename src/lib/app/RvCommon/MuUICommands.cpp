@@ -491,6 +491,10 @@ void initUICommands()
                                       new Param(c, "doEncode", "bool", Value(true)),
                                       End),
 
+                         new Function(c, "pasteTextFromClipboard", pasteTextFromClipboard, None,
+                                      Return, "string",
+                                      End),
+
                          new Function(c, "myNetworkPort", myNetworkPort, None,
                                       Return, "int",
                                       End),
@@ -2038,6 +2042,12 @@ NODE_IMPLEMENTATION(sessionFromUrl, void)
     RvApp()->sessionFromUrl(url->c_str());
 }
 
+NODE_IMPLEMENTATION(pasteTextFromClipboard, Pointer) {
+    const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
+    std::string s = RvApp()->pasteTextFromClipboard(); // Getting text from the clipboard
+    Mu::Pointer p = stype->allocate(s.c_str());
+    NODE_RETURN(p);
+}
 
 NODE_IMPLEMENTATION(putUrlOnClipboard, void)
 {
@@ -2050,25 +2060,6 @@ NODE_IMPLEMENTATION(putUrlOnClipboard, void)
     RvApp()->putUrlOnClipboard(url->c_str(),
                                title->c_str(),
                                doEncode);
-
-    /*
-    NO WORKY
-
-    QUrl qurl;
-    qurl.setScheme("rvlink");
-    qurl.setUrl (url->c_str(), QUrl::TolerantMode);
-    cerr << "made QUrl from '" << url->c_str() << "', valid " << qurl.isValid() << endl;
-    QList<QUrl> qlist;
-    qlist.append (qurl);
-
-    //  XXX memory leak, but a tiny one.
-    QMimeData *qmd = new QMimeData();
-
-    qmd->setUrls(qlist);
-    qmd->setText(url->c_str());
-
-    QApplication::clipboard()->setMimeData(qmd);
-    */
 }
 
 NODE_IMPLEMENTATION(myNetworkPort, int)
