@@ -144,6 +144,7 @@ namespace IPCore
         IntProperty* m_outputSize;
         IntProperty* m_interactiveSize;
         StringProperty* m_inputsBlendingModes;
+        FloatProperty* m_inputsOpacities;
         IntProperty* m_supportReversedOrderBlending;
 
         /// this signal is called before all state change
