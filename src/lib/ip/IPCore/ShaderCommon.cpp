@@ -115,6 +115,7 @@ extern const char* StereoScanline_glsl;
 extern const char* StereoChecker_glsl;
 extern const char* StereoAnaglyph_glsl;
 extern const char* StereoLumAnaglyph_glsl;
+extern const char* Opacity_glsl;
 extern const char* Over2_glsl;
 extern const char* Over3_glsl;
 extern const char* Over4_glsl;
@@ -314,6 +315,7 @@ namespace IPCore
         static Function* Shader_StereoChecker = 0;
         static Function* Shader_StereoAnaglyph = 0;
         static Function* Shader_StereoLumAnaglyph = 0;
+        static Function* Shader_Opacity = 0;
         static Function* Shader_Over = 0;
         static Function* Shader_Add = 0;
         static Function* Shader_Difference = 0;
@@ -2585,6 +2587,17 @@ namespace IPCore
             }
 
             return Shader_LensWarp3DE4AnamorphicDegree6;
+        }
+
+        Function* Opacity()
+        {
+            if (Shader_Opacity == nullptr)
+            {
+                Shader_Opacity = new Shader::Function("Opacity", Opacity_glsl,
+                                                      Shader::Function::Color);
+            }
+
+            return Shader_Opacity;
         }
 
         //--
@@ -5621,6 +5634,20 @@ namespace IPCore
             args[i] = new BoundSpecial(F->parameters()[i]);
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
+            i++;
+
+            return new Expression(F, args, image);
+        }
+
+        Expression* newOpacity(const IPImage* image, Expression* expr,
+                               const float opacity)
+        {
+            const Function* F = Opacity();
+            ArgumentVector args(F->parameters().size());
+            size_t i = 0;
+            args[i] = new BoundExpression(F->parameters()[i], expr);
+            i++;
+            args[i] = new BoundFloat(F->parameters()[i], opacity);
             i++;
 
             return new Expression(F, args, image);

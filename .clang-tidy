@@ -13,6 +13,7 @@ Checks: >
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
+  -readability-uppercase-literal-suffix,
 WarningsAsErrors: ''
 FormatStyle: 'file'
 ...
