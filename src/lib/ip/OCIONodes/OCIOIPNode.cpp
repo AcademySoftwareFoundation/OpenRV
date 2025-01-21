@@ -82,8 +82,7 @@ OCIOIPNode::OCIOIPNode(const string& name,
                        IPGraph* graph,
                        GroupIPNode* group)
     : IPNode(name, def, graph, group),
-      m_useRawConfig(false),
-      m_lock(QMutex::Recursive)
+      m_useRawConfig(false
 {
     Property::Info* info = new Property::Info();
     info->setPersistent(false);
@@ -291,11 +290,11 @@ OCIO::MatrixTransformRcPtr OCIOIPNode::createMatrixTransformXYZToRec709() const
     return matrix_xyz_to_rec709;
 }
 
+// Note: Ensure that the m_lock mutex is locked prior to calling this function
 OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformXYZToRec709()
 {
     if (!m_matrix_xyz_to_rec709)
     {
-        QMutexLocker lock(&this->m_lock);
         if (!m_matrix_xyz_to_rec709)
         {
             m_matrix_xyz_to_rec709 = createMatrixTransformXYZToRec709();
@@ -305,11 +304,11 @@ OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformXYZToRec709()
     return m_matrix_xyz_to_rec709;
 }
 
+// Note: Ensure that the m_lock mutex is locked prior to calling this function
 OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformRec709ToXYZ()
 {
     if (!m_matrix_rec709_to_xyz)
     {
-        QMutexLocker lock(&this->m_lock);
         if (!m_matrix_rec709_to_xyz)
         {
             m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
