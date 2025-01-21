@@ -1258,7 +1258,7 @@ QTAudioOutput::setAudioOutputBufferSize()
         const bool audioDeviceIsWASAPI = m_device.realm() == "wasapi";
 #else
         // Device id may contain backend information (e.g. wasapi or waveout for WinMM).
-        const QString deviceId = QString::fromUtf8(m_device.id());
+        const QString deviceId = m_device.description();
         // Description may contain useful information.
         const QString deviceName = m_device.description();
         const bool audioDeviceIsWASAPI = deviceId.contains("wasapi", Qt::CaseInsensitive) ||
@@ -1761,7 +1761,8 @@ QTAudioRenderer::convertToTwkAudioFormat(SampleFormat fmtType) const
         return TwkAudio::UnknownFormat;
     }
 #else
-    switch (fmtType) {
+    switch (fmtType) 
+    {
         case QAudioFormat::UInt8:
             // skip for now
             break;
@@ -1778,6 +1779,41 @@ QTAudioRenderer::convertToTwkAudioFormat(SampleFormat fmtType) const
 
     return TwkAudio::UnknownFormat;
 }
+
+#if defined( RV_VFX_CY2024 )
+QAudioFormat::SampleFormat 
+QTAudioRenderer::convertToQtAudioFormat(TwkAudio::Format fmtType) const
+{
+    switch (fmtType)
+    {
+        case TwkAudio::Format::Float32Format:
+            return QAudioFormat::Float;
+            break;
+        case TwkAudio::Format::Int32Format:
+            return QAudioFormat::Int32;
+            break;
+        case TwkAudio::Format::Int24Format:
+            // skip for now
+            break;
+        case TwkAudio::Format::Int16Format:
+            return QAudioFormat::Int16;
+            break;
+        case TwkAudio::Format::Int8Format:
+            // skip for now
+            break;
+        case TwkAudio::Format::UInt32_SMPTE272M_20Format:   // 20 bit NVidia ANC output
+            // skip for now
+            break;
+        case TwkAudio::Format::UInt32_SMPTE299M_24Format:   // 24 bit NVidia ANC output
+            // skip for now
+            break;
+        case TwkAudio::Format::UnknownFormat:
+            break;
+    }
+
+    return QAudioFormat::Unknown;
+}
+#endif
 
 void
 QTAudioRenderer::availableLayouts(const Device &d, LayoutsVector &layouts)
@@ -1799,13 +1835,23 @@ QTAudioRenderer::availableLayouts(const Device &d, LayoutsVector &layouts)
     }
 #else
     QAudioFormat testFormat;
+    // Set valid value to the parameters that we are not testing.
+    testFormat.setSampleRate(AudioRenderer::defaultParameters().rate);
+    testFormat.setSampleFormat(convertToQtAudioFormat(AudioRenderer::defaultParameters().format));
+
     for (int channelCount = device.minimumChannelCount(); channelCount <= device.maximumChannelCount(); ++channelCount)
     {
         testFormat.setChannelCount(channelCount);
         if (device.isFormatSupported(testFormat))
         {
             LayoutsVector l = TwkAudio::channelLayouts(channelCount);
-            for (int i = 0; i < l.size(); i++) layouts.push_back(l[i]);
+            for (int i = 0; i < l.size(); i++) 
+            {
+                if (l[i] != TwkAudio::UnknownLayout)
+                {
+                    layouts.push_back(l[i]);
+                }
+            }
         }
     }
 #endif
@@ -2023,18 +2069,16 @@ QTAudioRenderer::availableRates(const Device &d, Format format, RateVector &audi
         if (device.isFormatSupported(f)) audiorates.push_back(rates[i]);
     }
 #else
-    // Qt6: doesn't provide a list of supported sample rates.
-    // Qt6: Instead, we'll check a range of commong sample rates.
-    // TODO_QT: Better way?
-    std::vector<int> commonRates = { 8000, 11025, 1600, 22050, 3200, 44100, 4800, 88200, 96000, 192000 };
-    for (int rate : commonRates)
-    {
-        if (rate >= device.minimumSampleRate() && rate <= device.maximumSampleRate())
-        {
-            f.setSampleRate(rate);
-            if (device.isFormatSupported(f)) audiorates.push_back(rate);
-        }
-    }
+
+    // Floating point exception are trowned when the sample rate is under TWEAK_AUDIO_MIN_SAMPLE_RATE and
+    // above TWEAK_AUDIO_MAX_SAMPLE_RATE even if Qt returns value outside of those contants for the device.
+    int deviceMin = device.minimumSampleRate();
+    int deviceMax = device.maximumSampleRate();
+    if (deviceMin < TWEAK_AUDIO_MIN_SAMPLE_RATE) deviceMin = TWEAK_AUDIO_MIN_SAMPLE_RATE;
+    if (deviceMax > TWEAK_AUDIO_MAX_SAMPLE_RATE) deviceMax = TWEAK_AUDIO_MAX_SAMPLE_RATE;
+
+    audiorates.push_back(deviceMin);
+    audiorates.push_back(deviceMax);
 #endif
 }
 
@@ -2101,12 +2145,9 @@ bool
 void
 QTAudioRenderer::initDeviceList()
 {
+#if defined( RV_VFX_CY2023 )
     if (m_deviceList.empty())
-    { 
-        // TODO_QT: This could be removed since it is for CentOS 6.5 bug and RV does not support it anymore.
-        //          Should we check on Rocky linux if that is still the case?
-        //          The whole point of the function seems to workaround that specific bug.
-
+    {
         //
         //  This appears to be a bug with Linux (on centos6.5).
         //  Basically the size returned by availbleDevices() is different
@@ -2121,20 +2162,16 @@ QTAudioRenderer::initDeviceList()
         do
         {
             prev_noOfDevices = noOfDevices;
-#if defined( RV_VFX_CY2023 )
             noOfDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput).size();
-#else
-            noOfDevices = QMediaDevices::audioOutputs().size();
-#endif
             --noOfAttempts;
         } while (prev_noOfDevices != noOfDevices && noOfAttempts);
 
-#if defined( RV_VFX_CY2023 )
         m_deviceList << QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
-#else
-        m_deviceList << QMediaDevices::audioOutputs();
-#endif
     }
+#else
+    m_deviceList << QMediaDevices::audioOutputs();
+#endif
+}
 
     void QTAudioRenderer::initDeviceList()
     {
@@ -2246,7 +2283,7 @@ QTAudioRenderer::initDeviceList()
 #if defined( RV_VFX_CY2023 )
             deviceName+="_"+device.realm().toStdString(); 
 #else
-            deviceName+="_"+device.id().toStdString(); 
+            deviceName+="_"+device.description().toStdString(); 
 #endif
         } 
 
@@ -2335,7 +2372,64 @@ QTAudioRenderer::initDeviceList()
         {
             if (m_outputDevices[i].isDefaultDevice)
             {
-                if (m_deviceList[i].deviceName() == defaultInfo.deviceName())
+                defaultDeviceIndex = i;
+                break;
+            }
+        }
+
+        const Device &defaultDevice = m_outputDevices[defaultDeviceIndex];
+
+        if (!defaultDevice.isDefaultDevice)
+        {
+            if (m_parameters.device == "Default")
+            {
+                cout << "ERROR: audio default device is NOT available." << endl;
+            }
+            else
+            {
+                // The device that was picked and registered in the preferences
+                // might no longer be available because its unplugged.
+                cout << "WARNING: audio device '" << m_parameters.device <<
+                        "' is unavailable: Using default." << endl;
+                m_parameters.device = "Default";
+                m_parameters.layout = TwkAudio::Stereo_2;
+                init();
+                return;
+            }
+        }
+
+        DeviceState state;
+
+        state.framesPerBuffer = m_parameters.framesPerBuffer;
+        state.format = m_parameters.format;
+        state.layout = defaultDevice.layout;
+        state.device = defaultDevice.name;
+        state.rate = defaultDevice.defaultRate;
+        state.latency = m_parameters.latency;
+
+        // Find the best matching sample rate for the
+        // select device.
+        if (m_parameters.rate != 0.0)
+        {
+            state.rate = m_parameters.rate;
+        }
+        else
+        {
+            m_parameters.rate = state.rate;
+        }
+
+        RateVector rates;
+
+        availableRates(defaultDevice, state.format, rates);
+
+        if (!rates.empty())
+        {
+
+#if defined( RV_VFX_CY2023 )
+            double nearRate = rates[0];
+            for (size_t i = 1; i < rates.size(); i++)
+            {
+                if (fabs(rates[i] - state.rate) < fabs(nearRate - state.rate))
                 {
                     validDevice = true;
                     break;
@@ -2344,6 +2438,22 @@ QTAudioRenderer::initDeviceList()
 
             state.rate = nearRate;
             m_parameters.rate = state.rate;
+#else
+            // Check if the value is within the lower and upper boundaries sets in the rates vector.
+            int minVal = rates.front();
+            int maxVal = rates.back();
+
+            if (minVal == maxVal || state.rate < minVal) 
+            {
+                state.rate = minVal;
+            }
+            else if (state.rate > maxVal) 
+            {
+                state.rate = maxVal;
+            }
+
+            m_parameters.rate = state.rate;
+#endif
         }
 
         //

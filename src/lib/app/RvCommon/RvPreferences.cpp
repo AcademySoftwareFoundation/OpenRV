@@ -170,9 +170,14 @@ namespace Rv
                 SLOT(audioDeviceChanged(int)));
         m_ui.audioDeviceCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.audioDeviceRateCombo, SIGNAL(activated(int)), this,
-                SLOT(audioRateChanged(int)));
-        m_ui.audioDeviceRateCombo->installEventFilter(scrollEventEater);
+#if defined( RV_VFX_CY2023 )
+    connect(m_ui.audioDeviceRateWidget, SIGNAL(activated(int)),
+            this, SLOT(audioRateChanged(int)));
+#else
+    connect(m_ui.audioDeviceRateWidget, SIGNAL(editingFinished()),
+            this, SLOT(audioRateChanged()));
+#endif
+    m_ui.audioDeviceRateWidget->installEventFilter(scrollEventEater);
 
         connect(m_ui.audioDeviceFormatCombo, SIGNAL(activated(int)), this,
                 SLOT(audioFormatChanged(int)));
@@ -626,13 +631,13 @@ namespace Rv
         m_ui.audioDeviceCombo->clear();
         m_ui.audioDeviceLayoutCombo->clear();
         m_ui.audioDeviceFormatCombo->clear();
-        m_ui.audioDeviceRateCombo->clear();
+        m_ui.audioDeviceRateWidget->clear();
         m_ui.audioModuleCombo->addItem("Audio Disabled");
         m_ui.audioModuleCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
         m_ui.audioDeviceCombo->setEnabled(false);
         m_ui.audioDeviceLayoutCombo->setEnabled(false);
         m_ui.audioDeviceFormatCombo->setEnabled(false);
-        m_ui.audioDeviceRateCombo->setEnabled(false);
+        m_ui.audioDeviceRateWidget->setEnabled(false);
     }
     else if (!m_ui.audioModuleCombo->count())
     {
@@ -2165,7 +2170,11 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
             m_ui.audioDeviceLayoutCombo->currentText() != "Unavailable" &&
             m_ui.audioDeviceLayoutCombo->currentText() != "")
     {
-        settings.setValue("outputRate", m_ui.audioDeviceRateCombo->currentText().toDouble());
+#if defined( RV_VFX_CY2023 )
+        settings.setValue("outputRate", m_ui.audioDeviceRateWidget->currentText().toDouble());
+#else   
+        settings.setValue("outputRate", (double) 1.0 * m_ui.audioDeviceRateWidget->value());
+#endif
         settings.setValue("outputModule", m_ui.audioModuleCombo->currentText());
         settings.setValue("outputDevice", m_ui.audioDeviceCombo->currentText());
 
@@ -3040,12 +3049,105 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
         return true;
     }
 
-    bool
-    RvPreferences::initAudioRatesMenu(AudioRenderer::RendererParameters& params,
-                                      const AudioRenderer::RateVector& rates,
-                                      const size_t& currentRate)
+    return true;
+}
+
+
+bool 
+RvPreferences::initAudioLayoutMenu(AudioRenderer::RendererParameters &params,
+                                   const AudioRenderer::LayoutsVector &layouts,
+                                   const AudioRenderer::Layout &currentLayout)
+{
+    m_ui.audioDeviceLayoutCombo->clear();
+
+    if (layouts.empty()) 
     {
-        m_ui.audioDeviceRateCombo->clear();
+        m_ui.audioDeviceLayoutCombo->addItem("Unavailable");
+        m_ui.audioDeviceLayoutCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
+        m_ui.audioDeviceLayoutCombo->setCurrentIndex(0);
+        m_ui.audioDeviceLayoutCombo->setEnabled(false);
+        return false;
+    }
+    else
+    {
+        int current = 0;
+        for (size_t i = 0; i < layouts.size(); i++)
+        {
+            m_ui.audioDeviceLayoutCombo->addItem(QString::fromUtf8(TwkAudio::layoutString(layouts[i]).c_str()), 
+                                                 layouts[i]);
+            if (layouts[i] == currentLayout) current = i;
+        }
+
+        m_ui.audioDeviceLayoutCombo->setEnabled(true);
+        m_ui.audioDeviceLayoutCombo->setCurrentIndex(current);
+        params.layout = layouts[current];
+    }
+
+    return true;
+}
+
+
+bool 
+RvPreferences::initAudioFormatMenu(AudioRenderer::RendererParameters &params,
+                                   const AudioRenderer::FormatVector &formats,
+                                   const AudioRenderer::Format &currentFormat)
+{
+    m_ui.audioDeviceFormatCombo->clear();
+
+    if (formats.empty()) 
+    {
+        m_ui.audioDeviceFormatCombo->addItem("Unavailable");
+        m_ui.audioDeviceFormatCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
+        m_ui.audioDeviceFormatCombo->setCurrentIndex(0);
+        m_ui.audioDeviceFormatCombo->setEnabled(false);
+        return false;
+    }
+    else
+    {
+        int current = 0;
+        for (size_t i = 0; i < formats.size(); i++)
+        {
+            m_ui.audioDeviceFormatCombo->addItem(QString::fromUtf8(TwkAudio::formatString(formats[i]).c_str()), 
+                                                 formats[i]);
+            if (formats[i] == currentFormat) current = i;
+        }
+
+        m_ui.audioDeviceFormatCombo->setEnabled(true);
+        m_ui.audioDeviceFormatCombo->setCurrentIndex(current);
+        params.format = formats[current];
+    }
+
+    return true;
+}
+
+bool 
+RvPreferences::initAudioRatesMenu(AudioRenderer::RendererParameters &params,
+                                   const AudioRenderer::RateVector &rates,
+                                   const size_t &currentRate)
+{
+    m_ui.audioDeviceRateWidget->clear();
+
+    if (rates.empty())
+    {
+        m_ui.audioDeviceRateWidget->clear();
+#if defined( RV_VFX_CY2023 )
+        m_ui.audioDeviceRateWidget->addItem("Unavailable");
+        m_ui.audioDeviceRateWidget->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
+        m_ui.audioDeviceRateWidget->setCurrentIndex(0);
+#else
+        m_ui.audioDeviceRateWidget->setValue((int)currentRate);
+#endif
+        m_ui.audioDeviceRateWidget->setEnabled(false);
+        return false;
+    }
+    else 
+    {
+#if defined( RV_VFX_CY2023 )
+        int current = 0;
+        for (size_t i = 0; i < rates.size(); i++)
+        {
+            QString s = QString("%1").arg((unsigned int)(rates[i]));
+            m_ui.audioDeviceRateWidget->addItem(s, (unsigned int)rates[i]);
 
         if (rates.empty())
         {
@@ -3074,7 +3176,14 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
             params.rate = rates[current];
         }
 
-        return true;
+        m_ui.audioDeviceRateWidget->setEnabled(true);
+        m_ui.audioDeviceRateWidget->setCurrentIndex(current);
+        params.rate = rates[current];
+#else
+        m_ui.audioDeviceRateWidget->setEnabled(true);
+        m_ui.audioDeviceRateWidget->setValue((int)currentRate);
+        params.rate = currentRate;
+#endif
     }
 
     void RvPreferences::audioModuleChanged(int index)
@@ -3189,7 +3298,14 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
                     (hasStereoLayout ? TwkAudio::Stereo_2 : layouts.front());
             }
         }
-        d.layout = currentLayout;
+        renderer->availableRates(d, currentFormat, rates);
+    }
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+
+    IPCore::App()->resumeAll();
 
         renderer->availableFormats(d, formats);
 
@@ -3209,7 +3325,14 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
             }
             renderer->availableRates(d, currentFormat, rates);
         }
-        IPCore::App()->resumeAll();
+        renderer->availableRates(d, currentFormat, rates);
+    }
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+
+    IPCore::App()->resumeAll();
 
         // Create the channel layout choice list
         initMenusOK =
@@ -3246,8 +3369,178 @@ RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
 
             if (deviceChoice != params.device)
             {
-                params.device = deviceChoice;
-                AudioRenderer::setDefaultParameters(params);
+                // Implies currentFormat isnt a valid choice
+                // for this device.
+                currentFormat = formats.front();
+            }
+        }
+        renderer->availableRates(d, currentFormat, rates);
+    }
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+
+    IPCore::App()->resumeAll();
+
+    // Create format choice list
+    bool initMenusOK = initAudioFormatMenu(params, formats, currentFormat);
+
+    // Create rates choice list
+    initMenusOK = initMenusOK && initAudioRatesMenu(params, rates, currentRate);
+
+    if (initMenusOK)
+    {
+        AudioRenderer::setDefaultParameters(params);
+        AudioRenderer::reset();
+    }
+}
+
+
+void
+RvPreferences::audioFormatChanged(int index)
+{
+    if (AudioRenderer::audioDisabledAlways()) return;
+
+    bool hasChanged = true;
+
+    if ( (index != -1) && (index < m_ui.audioDeviceFormatCombo->count()) )
+    {
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+
+        TwkAudio::Format formatChoice = (TwkAudio::Format) m_ui.audioDeviceFormatCombo->itemData(index).toInt();
+
+        if (formatChoice != params.format)
+        {
+            params.format = formatChoice;
+            AudioRenderer::setDefaultParameters(params);
+
+        }
+        else
+        {
+            hasChanged = false;
+        }
+    }
+
+    AudioRenderer* renderer = 0;
+    try { renderer = AudioRenderer::renderer(); }
+    catch(...) { /* cerr << "renderer() threw" << endl; */ }
+
+    if (!renderer || !hasChanged) return;
+
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+
+    string deviceName = params.device;
+    int deviceIndex = renderer->findDeviceByName(deviceName);
+    if (deviceIndex == -1) deviceIndex = renderer->findDefaultDevice();
+    const AudioRenderer::Device& d = renderer->outputDevices()[deviceIndex];    
+
+    AudioRenderer::Format currentFormat = AudioRenderer::defaultParameters().format;
+    size_t currentRate = size_t(AudioRenderer::defaultParameters().rate);
+
+    AudioRenderer::RateVector rates;
+
+    IPCore::App()->stopAll();
+    renderer->shutdown();
+    renderer->availableRates(d, currentFormat, rates);
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+    IPCore::App()->resumeAll();
+
+    // Create rates choice list
+    bool initMenusOK = initAudioRatesMenu(params, rates, currentRate);
+
+    if (initMenusOK)
+    {
+        AudioRenderer::setDefaultParameters(params);
+        AudioRenderer::reset();
+    }
+}
+
+
+void
+#if defined( RV_VFX_CY2023 )
+RvPreferences::audioRateChanged(int index)
+#else
+RvPreferences::audioRateChanged()
+#endif
+{
+    if (AudioRenderer::audioDisabledAlways()) return;
+#if defined( RV_VFX_CY2023 )
+    size_t rate = m_ui.audioDeviceRateWidget->currentText().toInt();
+#else
+    size_t rate = m_ui.audioDeviceRateWidget->value();
+#endif
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    params.rate = rate;
+    AudioRenderer::setDefaultParameters(params);
+    AudioRenderer::reset();
+}
+
+void
+RvPreferences::audioHoldOpenChanged(int state)
+{
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    params.holdOpen = state == Qt::Checked;
+    AudioRenderer::setDefaultParameters(params);
+    AudioRenderer::reset();
+}
+
+void
+RvPreferences::audioVideoSyncChanged(int state)
+{
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    params.hardwareLock = state == Qt::Checked;
+    AudioRenderer::setDefaultParameters(params);
+    AudioRenderer::reset();
+}
+
+void
+RvPreferences::audioPreRollChanged(int state)
+{
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    params.preRoll = state == Qt::Checked;
+    AudioRenderer::setDefaultParameters(params);
+    AudioRenderer::reset();
+}
+
+
+void
+RvPreferences::audioDevicePacketChanged()
+{
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+    params.framesPerBuffer = m_ui.audioDevicePacketEdit->text().toInt();
+    AudioRenderer::setDefaultParameters(params);
+    AudioRenderer::reset();
+}
+
+void
+RvPreferences::audioCachePacketChanged()
+{
+}
+
+//----------------------------------------------------------------------
+//
+//  PACKAGE management
+//
+
+void 
+RvPreferences::clickedPackage(QModelIndex index)
+{
+    if (index.column() == 0)
+    {
+        QStandardItem* pitem = m_packageModel->itemFromIndex(index);
+        Package& package = m_packages[pitem->data().toInt()];
+
+        if (!pitem->isEnabled()) return;
+
+        if (package.compatible)
+        {
+            if (package.installed)
+            {
+                uninstallPackage(package);
             }
             else
             {
