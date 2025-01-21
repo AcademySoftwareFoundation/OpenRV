@@ -161,9 +161,14 @@ RvPreferences::RvPreferences(QWidget* parent)
             this, SLOT(audioDeviceChanged(int)));
     m_ui.audioDeviceCombo->installEventFilter(scrollEventEater);
 
-    connect(m_ui.audioDeviceRateCombo, SIGNAL(activated(int)),
+#if defined( RV_VFX_CY2023 )
+    connect(m_ui.audioDeviceRateWidget, SIGNAL(activated(int)),
             this, SLOT(audioRateChanged(int)));
-    m_ui.audioDeviceRateCombo->installEventFilter(scrollEventEater);
+#else
+    connect(m_ui.audioDeviceRateWidget, SIGNAL(editingFinished()),
+            this, SLOT(audioRateChanged()));
+#endif
+    m_ui.audioDeviceRateWidget->installEventFilter(scrollEventEater);
 
     connect(m_ui.audioDeviceFormatCombo, SIGNAL(activated(int)),
             this, SLOT(audioFormatChanged(int)));
@@ -590,13 +595,13 @@ RvPreferences::update()
         m_ui.audioDeviceCombo->clear();
         m_ui.audioDeviceLayoutCombo->clear();
         m_ui.audioDeviceFormatCombo->clear();
-        m_ui.audioDeviceRateCombo->clear();
+        m_ui.audioDeviceRateWidget->clear();
         m_ui.audioModuleCombo->addItem("Audio Disabled");
         m_ui.audioModuleCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
         m_ui.audioDeviceCombo->setEnabled(false);
         m_ui.audioDeviceLayoutCombo->setEnabled(false);
         m_ui.audioDeviceFormatCombo->setEnabled(false);
-        m_ui.audioDeviceRateCombo->setEnabled(false);
+        m_ui.audioDeviceRateWidget->setEnabled(false);
     }
     else if (!m_ui.audioModuleCombo->count())
     {
@@ -1268,7 +1273,11 @@ RvPreferences::write()
             m_ui.audioDeviceLayoutCombo->currentText() != "Unavailable" &&
             m_ui.audioDeviceLayoutCombo->currentText() != "")
     {
-        settings.setValue("outputRate", m_ui.audioDeviceRateCombo->currentText().toDouble());
+#if defined( RV_VFX_CY2023 )
+        settings.setValue("outputRate", m_ui.audioDeviceRateWidget->currentText().toDouble());
+#else   
+        settings.setValue("outputRate", (double) 1.0 * m_ui.audioDeviceRateWidget->value());
+#endif
         settings.setValue("outputModule", m_ui.audioModuleCombo->currentText());
         settings.setValue("outputDevice", m_ui.audioDeviceCombo->currentText());
 
@@ -2139,31 +2148,41 @@ RvPreferences::initAudioRatesMenu(AudioRenderer::RendererParameters &params,
                                    const AudioRenderer::RateVector &rates,
                                    const size_t &currentRate)
 {
-    m_ui.audioDeviceRateCombo->clear();
+    m_ui.audioDeviceRateWidget->clear();
 
     if (rates.empty())
     {
-        m_ui.audioDeviceRateCombo->clear();
-        m_ui.audioDeviceRateCombo->addItem("Unavailable");
-        m_ui.audioDeviceRateCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
-        m_ui.audioDeviceRateCombo->setCurrentIndex(0);
-        m_ui.audioDeviceRateCombo->setEnabled(false);
+        m_ui.audioDeviceRateWidget->clear();
+#if defined( RV_VFX_CY2023 )
+        m_ui.audioDeviceRateWidget->addItem("Unavailable");
+        m_ui.audioDeviceRateWidget->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
+        m_ui.audioDeviceRateWidget->setCurrentIndex(0);
+#else
+        m_ui.audioDeviceRateWidget->setValue((int)currentRate);
+#endif
+        m_ui.audioDeviceRateWidget->setEnabled(false);
         return false;
     }
     else 
     {
+#if defined( RV_VFX_CY2023 )
         int current = 0;
         for (size_t i = 0; i < rates.size(); i++)
         {
             QString s = QString("%1").arg((unsigned int)(rates[i]));
-            m_ui.audioDeviceRateCombo->addItem(s, (unsigned int)rates[i]);
+            m_ui.audioDeviceRateWidget->addItem(s, (unsigned int)rates[i]);
 
             if (rates[i] == currentRate) current = i;
         }
 
-        m_ui.audioDeviceRateCombo->setEnabled(true);
-        m_ui.audioDeviceRateCombo->setCurrentIndex(current);
+        m_ui.audioDeviceRateWidget->setEnabled(true);
+        m_ui.audioDeviceRateWidget->setCurrentIndex(current);
         params.rate = rates[current];
+#else
+        m_ui.audioDeviceRateWidget->setEnabled(true);
+        m_ui.audioDeviceRateWidget->setValue((int)currentRate);
+        params.rate = currentRate;
+#endif
     }
 
     return true;
@@ -2283,6 +2302,11 @@ RvPreferences::audioModuleChanged(int index)
         }
         renderer->availableRates(d, currentFormat, rates);
     }
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+
     IPCore::App()->resumeAll();
 
     // Create the channel layout choice list
@@ -2386,6 +2410,11 @@ RvPreferences::audioDeviceChanged(int index)
         }
         renderer->availableRates(d, currentFormat, rates);
     }
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+
     IPCore::App()->resumeAll();
 
     // Create the channel layout choice list
@@ -2465,6 +2494,11 @@ RvPreferences::audioChannelsChanged(int index)
         }
         renderer->availableRates(d, currentFormat, rates);
     }
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
+
     IPCore::App()->resumeAll();
 
     // Create format choice list
@@ -2527,6 +2561,10 @@ RvPreferences::audioFormatChanged(int index)
     IPCore::App()->stopAll();
     renderer->shutdown();
     renderer->availableRates(d, currentFormat, rates);
+#if defined( RV_VFX_CY2024 )
+    m_ui.audioDeviceRateWidget->setMinimum(rates.front());
+    m_ui.audioDeviceRateWidget->setMaximum(rates.back());
+#endif
     IPCore::App()->resumeAll();
 
     // Create rates choice list
@@ -2541,11 +2579,18 @@ RvPreferences::audioFormatChanged(int index)
 
 
 void
+#if defined( RV_VFX_CY2023 )
 RvPreferences::audioRateChanged(int index)
+#else
+RvPreferences::audioRateChanged()
+#endif
 {
     if (AudioRenderer::audioDisabledAlways()) return;
-    size_t rate = m_ui.audioDeviceRateCombo->currentText().toInt();
-
+#if defined( RV_VFX_CY2023 )
+    size_t rate = m_ui.audioDeviceRateWidget->currentText().toInt();
+#else
+    size_t rate = m_ui.audioDeviceRateWidget->value();
+#endif
     AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
     params.rate = rate;
     AudioRenderer::setDefaultParameters(params);
