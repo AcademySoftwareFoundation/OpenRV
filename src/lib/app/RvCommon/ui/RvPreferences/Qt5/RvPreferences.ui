@@ -1855,7 +1855,7 @@
               <widget class="QComboBox" name="audioDeviceFormatCombo"/>
              </item>
              <item>
-              <widget class="QComboBox" name="audioDeviceRateCombo"/>
+              <widget class="QComboBox" name="audioDeviceRateWidget"/>
              </item>
              <item>
               <widget class="QLabel" name="label_61">
@@ -3442,7 +3442,7 @@
   <tabstop>audioDeviceCombo</tabstop>
   <tabstop>audioDeviceLayoutCombo</tabstop>
   <tabstop>audioDeviceFormatCombo</tabstop>
-  <tabstop>audioDeviceRateCombo</tabstop>
+  <tabstop>audioDeviceRateWidget</tabstop>
   <tabstop>volumeSlider</tabstop>
   <tabstop>audioGlobalOffsetEdit</tabstop>
   <tabstop>audioDevicePacketEdit</tabstop>
