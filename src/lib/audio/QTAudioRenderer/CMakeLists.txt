@@ -20,7 +20,12 @@ SET(_target
     "QTAudioRenderer"
 )
 
-FILE(GLOB _sources QTAudioRenderer.cpp QTAudioRenderer/QTAudioRenderer.h)
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  FILE(GLOB _sources QTAudioRenderer.cpp QTAudioRenderer/QTAudioRenderer.h)
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
+  FILE(GLOB _sources QT5AudioRenderer.cpp QTAudioRenderer/QT5AudioRenderer.h)
+ENDIF()
+
 ADD_LIBRARY(
   ${_target} STATIC
   ${_sources}
