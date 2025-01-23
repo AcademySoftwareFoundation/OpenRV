@@ -39,6 +39,7 @@ IOhtj2k::IOhtj2k(IOType type,
                  size_t chunkSize,
                  int maxAsync) 
     : StreamingFrameBufferIO("IOhtj2k", "m7", type, chunkSize, maxAsync)
+    // Note for the sortKey we need to be sooner than OpenImageIO since that will be the fallback.
 {
     //
     //  Indicate which extensions this plugin will handle The
@@ -94,6 +95,34 @@ IOhtj2k::getImageInfo(const std::string& filename, FBInfo& fbi) const
     }
 
 }
+
+ojph::si16 convert_si32_to_si16(const ojph::si32 si32_value, bool convert_special_numbers_to_finite_numbers = false)
+  {
+    if (si32_value > INT16_MAX)
+      return INT16_MAX;
+    else if (si32_value < INT16_MIN)
+      return INT16_MIN;
+    else if (true == convert_special_numbers_to_finite_numbers)
+    {
+      const ojph::si16 si16_value = (ojph::si16)si32_value;
+      half half_value;
+      half_value.setBits(si16_value);
+      if (half_value.isFinite())
+        return si16_value;
+
+      // handle non-real number to real-number mapping
+      if (half_value.isNan())
+        half_value = 0.0f;
+      else if (half_value.isInfinity() && !half_value.isNegative())
+        half_value = HALF_MAX;
+      else if (half_value.isInfinity() && half_value.isNegative())
+        half_value = -1.0f * HALF_MAX;
+      
+      return half_value.bits();
+    }  
+    else
+      return (ojph::si16)si32_value;
+  }
 
 void
 IOhtj2k::readImage(FrameBuffer& fb,
@@ -163,11 +192,18 @@ IOhtj2k::readImage(FrameBuffer& fb,
                         *dout = *sp++;
                     }
                 }
-                if (dtype == FrameBuffer::USHORT || dtype == FrameBuffer::HALF){
+                if (dtype == FrameBuffer::USHORT){
                     unsigned short* dout = fb.scanline<unsigned short>(h - i - 1);
                     dout += c;
                     for(ojph::ui32 j=w; j > 0; j--, dout += ch){
                         *dout = *sp++;
+                    }    
+                }
+                if (dtype == FrameBuffer::HALF){
+                    ojph::si16* dout = (ojph::si16 *)fb.scanline<unsigned short>(h - i - 1);
+                    dout += c;
+                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                        *dout = convert_si32_to_si16(*sp++);
                     }
                 }
             }
@@ -189,11 +225,18 @@ IOhtj2k::readImage(FrameBuffer& fb,
                         *dout = *sp++;
                     }
                 }
-                if (dtype == FrameBuffer::USHORT || dtype == FrameBuffer::HALF){
+                if (dtype == FrameBuffer::USHORT){
                     unsigned short* dout = fb.scanline<unsigned short>(h - i - 1);
                     dout += c;
                     for(ojph::ui32 j=w; j > 0; j--, dout += ch){
                         *dout = *sp++;
+                    }
+                }
+                if (dtype == FrameBuffer::HALF){
+                    ojph::si16* dout = (ojph::si16 *)fb.scanline<unsigned short>(h - i - 1);
+                    dout += c;
+                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                        *dout = convert_si32_to_si16(*sp++);
                     }
                 }
             }
