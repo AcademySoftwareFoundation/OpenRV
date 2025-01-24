@@ -170,6 +170,10 @@ class FileSourceIPNode : public SourceIPNode
 
     static std::string cacheHash(const std::string& filename, const std::string& prefix);
 
+    // Lookup filename in the media library, save associated HTTP header and cookies if any, 
+    // and return the actual filename to be used for opening the movie in case of redirection.
+    std::string lookupFilenameInMediaLibrary(const std::string& filename);
+
     static void setSourceNameInID(bool b) { m_sourceNameInID = b; }
     static bool sourceNameInID() { return m_sourceNameInID; };
 
