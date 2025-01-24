@@ -154,9 +154,662 @@ namespace TwkMovie
 
         ~TimingDetails()
         {
-            map<string, MovieTimer*>::iterator timerItr;
-            for (timerItr = m_timers.begin(); timerItr != m_timers.end();
-                 timerItr++)
+            m_timers[name] = new MovieTimer();
+        }
+        m_timers[name]->start();
+    };
+
+    double pauseTimer(string name)
+    {
+        return m_timers[name]->stop();
+    };
+
+    string summary()
+    {
+        ostringstream summary;
+        summary << "timing summary (time/runs = avg) ";
+        map <string, MovieTimer*>::iterator timerItr;
+        for(timerItr = m_timers.begin(); timerItr != m_timers.end(); timerItr++)
+        {
+            string name = timerItr->first;
+            summary << name <<
+                ": " << m_timers[name]->duration <<
+                               " / " << m_timers[name]->runs <<
+                " = " << m_timers[name]->duration/float(m_timers[name]->runs)
+                << " ";
+        }
+        return summary.str();
+    };
+
+    map <string, MovieTimer*> m_timers;
+};
+
+struct AudioState
+{
+    AudioState() { layout = UnknownLayout; };
+    ~AudioState() { };
+
+    ChannelsMap    chmap;
+    ChannelsVector channels;
+    int            channelsPerTrack;
+    Layout         layout;
+};
+
+
+//
+// AudioTrack and VideoTrack are used by both MovieFFMpegReader and
+// MovieFFMpegWriter to store additional information about the AVStreams in
+// each file. These objects contain special AVClasses that are used to both
+// decode and encode as appropriate for reading and writing.
+//
+
+struct AudioTrack
+{
+    AudioTrack()
+        : audioPacket(0),
+          audioFrame(0),
+          lastDecodedAudio(AV_NOPTS_VALUE),
+          lastEncodedAudio(0),
+          bufferStart(AV_NOPTS_VALUE),
+          bufferEnd(AV_NOPTS_VALUE),
+          bufferLength(0),
+          isOpen(false),
+          numChannels(0),
+          start(0),
+          desired(0),
+          bufferPointer(0),
+          avCodecContext(0)
+    {
+        audioFrame = av_frame_alloc();
+        audioPacket = av_packet_alloc();
+    };
+
+    ~AudioTrack()
+    {
+        if (audioPacket) av_packet_free(&audioPacket);
+        if (audioFrame) av_frame_free(&audioFrame);
+    };
+
+    AudioTrack& initFrom(const AudioTrack* t)
+    {
+        number        = t->number;
+        numChannels   = t->numChannels;
+        return *this;
+    }
+
+    int                 number;
+    int                 numChannels;
+    bool                isOpen;
+    int64_t             lastDecodedAudio;
+    int64_t             lastEncodedAudio;
+    int64_t             bufferStart;
+    int64_t             bufferEnd;
+    int64_t             bufferLength;
+    AVPacket*           audioPacket;
+    AVFrame*            audioFrame;
+    SampleTime          start;
+    SampleTime          desired;
+    float*              bufferPointer;
+    AVCodecContext*     avCodecContext;
+};
+
+struct VideoTrack
+{
+    VideoTrack()
+        : videoPacket(0),
+          videoFrame(0),
+          lastDecodedVideo(-1),
+          lastEncodedVideo(0),
+          imgConvertContext(0),
+          isOpen(false),
+          rotate(false),
+          colrType(""),
+          avCodecContext(0)
+    {
+        videoFrame = av_frame_alloc();
+        videoPacket = av_packet_alloc();
+        inPicture = av_frame_alloc();
+        outPicture = av_frame_alloc();
+    };
+
+    ~VideoTrack()
+    {
+        //
+        //  Be paranoid: get rid of these pointers that were borrowed
+        //  from AVFrame. ffmpeg doesn't touch them on deletion, but
+        //  it also doesn't say it won't
+        //
+
+        for (size_t i = 0; i < AV_NUM_DATA_POINTERS; i++)
+        {
+            videoFrame->data[i] = 0;
+            videoFrame->linesize[i] = 0;
+        }
+
+        if (imgConvertContext) sws_freeContext(imgConvertContext);
+        if (videoPacket) av_packet_free(&videoPacket);
+        if (videoFrame) av_frame_free(&videoFrame);
+        av_frame_free(&inPicture);
+        av_frame_free(&outPicture);
+    };
+
+    VideoTrack& initFrom(const VideoTrack* t)
+    {
+        fb.copyFrom(&t->fb);
+
+        name              = t->name;
+        number            = t->number;
+        rotate            = t->rotate;
+        return *this;
+    }
+
+    string              name;
+    int                 number;
+    bool                isOpen;
+    bool                rotate;
+    int                 lastDecodedVideo;
+    int                 lastEncodedVideo;
+    set<int64_t>        tsSet;
+    FrameBuffer         fb;
+    struct SwsContext*  imgConvertContext;
+    AVPacket*           videoPacket;
+    AVFrame*            videoFrame;
+    AVFrame*            inPicture;
+    AVFrame*            outPicture;
+    string              colrType;
+    AVCodecContext*     avCodecContext;
+};
+
+//
+//  Manage limited pool of open contexts.
+//
+//  ContextPool does not open codecs, but does close them if a Reservation
+//  object is requested, the requested context is closed, and the ContextPool
+//  size is at it's max.
+//
+
+class ContextPool
+{
+  public:
+
+    ContextPool(int poolSize) :
+        m_maxOpenThreads(poolSize),
+        m_currentOpenThreads(0) {}
+
+  private:
+
+    //
+    //  Wrapper for AV codec context
+    //
+
+    struct Context
+    {
+        Context() :
+            reader(0),
+            streamIndex(-1),
+            avContext(0),
+            vTrack(0),
+            aTrack(0),
+            reserved(false),
+            inOpenList(false) {};
+
+        MovieFFMpegReader* reader;
+        int                streamIndex;
+        AVCodecContext*    avContext;
+        VideoTrack*        vTrack;
+        AudioTrack*        aTrack;
+
+        std::list<Context*>::iterator listIterator;
+
+        bool               reserved;
+        bool               inOpenList;
+    };
+
+  public:
+
+    //
+    //  State/lock object for reserved contexts.  Contexts are reserved by
+    //  MovieFFMpeg during use, cannot be closed while reserved.
+    //
+
+    class Reservation
+    {
+      public:
+        Reservation(MovieFFMpegReader* reader, int streamIndex);
+        ~Reservation();
+
+      private:
+        Context* m_context;
+        int      m_dbline;
+        int      m_dblline;
+    };
+
+    //
+    //  MovieFFMpeg calls flushContext() when it is going to close the context
+    //  itself.
+    //
+
+    static void flushContext(MovieFFMpegReader* reader, int streamIndex);
+
+  private:
+
+    typedef std::pair<MovieFFMpegReader*,int>  ContextKey;
+    typedef std::map<ContextKey, Context>      ContextMap;
+    typedef std::list<Context*>                ContextList;
+    typedef boost::mutex                       Mutex;
+    typedef boost::lock_guard<Mutex>           LockGuard;
+
+    ContextMap  m_contextMap;
+    ContextList m_openContexts;
+    Mutex       m_mutex;
+    int         m_maxOpenThreads;
+    int         m_currentOpenThreads;
+};
+
+//
+//  Global pool object:
+//
+
+ContextPool* globalContextPool = 0;
+
+void
+ContextPool::flushContext(MovieFFMpegReader* reader, int streamIndex)
+{
+    if (!globalContextPool) return;
+
+    ContextPool& gcp = *globalContextPool;
+
+    LockGuard lock(gcp.m_mutex);
+
+    ContextMap::iterator i = gcp.m_contextMap.find(ContextKey(reader, streamIndex));
+
+    if (i == gcp.m_contextMap.end()) return;
+
+    Context& context = i->second;
+
+    if (context.inOpenList)
+    {
+        gcp.m_openContexts.erase(context.listIterator);
+        gcp.m_currentOpenThreads -= context.avContext->thread_count;
+    }
+
+    gcp.m_contextMap.erase(i);
+}
+
+ContextPool::Reservation::Reservation(MovieFFMpegReader* reader,
+    int streamIndex) : m_context(0), m_dbline(0), m_dblline(0)
+{
+    if (!globalContextPool) return;
+
+    ContextPool& gcp = *globalContextPool;
+
+    LockGuard lock(gcp.m_mutex);
+
+    //
+    //  Look up Context object, possibly creating an empty one at this point.
+    //
+
+    Context& context = gcp.m_contextMap[ContextKey(reader, streamIndex)];
+    m_context = &context;
+
+    context.reserved    = true;
+    context.reader      = reader;
+    context.streamIndex = streamIndex;
+
+    //
+    //  If it's already in the list move it to the front now.
+    //
+
+    if (context.inOpenList)
+    {
+        gcp.m_openContexts.erase(context.listIterator);
+        gcp.m_openContexts.push_front(&context);
+        context.listIterator = gcp.m_openContexts.begin();
+    }
+
+    //
+    //  Make sure there is room in the list, in case we are about to open this
+    //  context.
+    //
+
+    while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads)
+    {
+        Context& closeContext = *gcp.m_openContexts.back();
+        gcp.m_openContexts.pop_back();
+
+        closeContext.inOpenList = false;
+
+        if (closeContext.reserved)
+        {
+            //
+            //  XXX Should never happen since reserved Contexts get pushed to
+            //  front of list, but how do we ensure it never happens ?
+            //
+
+            cout << "ERROR: Attempted to reuse reserved context! ("
+                 << closeContext.reader->filename() << ")" << endl;
+        }
+        else if (closeContext.avContext)
+        {
+            DB ("closing " << closeContext.reader << " "
+                << closeContext.reader->filename() << ", stream "
+                << closeContext.streamIndex << ", threads "
+                << closeContext.avContext->thread_count << endl);
+
+            gcp.m_currentOpenThreads -= closeContext.avContext->thread_count;
+
+            avcodec_free_context(&closeContext.avContext);
+
+            if (closeContext.vTrack) closeContext.vTrack->isOpen = false;
+            if (closeContext.aTrack) closeContext.aTrack->isOpen = false;
+        }
+    }
+}
+
+ContextPool::Reservation::~Reservation()
+{
+    if (!globalContextPool) return;
+
+    ContextPool& gcp = *globalContextPool;
+
+    LockGuard lock(gcp.m_mutex);
+
+    Context& context = *m_context;
+
+    context.reserved = false;
+
+    //
+    //  Make sure the context still exists and we aren't closing.
+    //
+
+    ContextKey key(context.reader, context.streamIndex);
+    if (gcp.m_contextMap.find(key) == gcp.m_contextMap.end()) return;
+
+    //
+    //  If this is the first time we've encountered this Context, it's only now
+    //  that it corresponds to an actual AVCodecContext, so look that up and
+    //  add to Context struct.  Also find and remember corresponding Track.
+    //
+
+    if (!context.avContext)
+    {
+        AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
+
+        context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
+        if (context.vTrack)
+        {
+          context.avContext = context.vTrack->avCodecContext;
+        }
+        else if (context.aTrack)
+        {
+          context.avContext = context.aTrack->avCodecContext;
+        }
+    }
+
+    //
+    //  If the context is not open at this point, something went wrong.
+    //  Otherwise we want to push it to the front of the open list, adding it
+    //  first if necessary.
+    //
+
+    if (!context.avContext)
+    {
+        if (context.inOpenList)
+        {
+            gcp.m_openContexts.erase(context.listIterator);
+            context.inOpenList = false;
+        }
+    }
+    else if (gcp.m_openContexts.empty() || gcp.m_openContexts.front() != &context)
+    {
+        if (context.inOpenList)
+        //
+        //  We're going to add it to the front of the list, so remove it from
+        //  it's current location.
+        //
+        {
+            gcp.m_openContexts.erase(context.listIterator);
+        }
+        else
+        //
+        //  It's not in the list, so it's threads are not accounted for yet in
+        //  global thread count, so do that.
+        //
+        {
+            gcp.m_currentOpenThreads += context.avContext->thread_count;
+        }
+
+        gcp.m_openContexts.push_front(&context);
+
+        context.inOpenList = true;
+        context.listIterator = gcp.m_openContexts.begin();
+    }
+}
+
+namespace
+{
+
+//----------------------------------------------------------------------
+//
+// Static Lookups
+//
+//----------------------------------------------------------------------
+
+//
+//  Put anything we know about in here: some of these we don't
+//  actually support. But just in case ....
+//
+
+const char* slowRandomAccessCodecsArray[] = {
+    "3iv2", "3ivd", "ap41", "avc1", "div1", "div2", "div3", "div4", "div5",
+    "div6", "divx", "dnxhd", "dx50", "h263", "h264", "i263", "iv31", "iv32",
+    "m4s2", "mp42", "mp43", "mp4s", "mp4v", "mpeg4", "mpg1", "mpg3", "mpg4",
+    "pim1", "s263", "svq1", "svq3", "u263", "vc1", "vc1_vdpau", "vc1image",
+    "viv1", "wmv3", "wmv3_vdpau", "wmv3image", "xith", "xvid", "libdav1d",
+    0 };
+
+const char* supportedEncodingCodecsArray[] = {
+    "dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo",
+    0 };
+
+const char* metadataFieldsArray[] = {
+    "album", "album_artist", "artist", "author", "comment", "composer",
+    "copyright", "description", "encoder", "episode_id", "genre", "grouping",
+    "lyrics", "network", "rotate", "show", "synopsis", "title", "track", "year",
+    0 };
+
+const char* ignoreMetadataFieldsArray[] = { 
+    "major_brand", "minor_version","compatible_brands", "handler_name",
+    "vendor_id", "language",
+    "duration", // We ignore it here, since its explicitly added elsewhere.
+    0};
+
+//----------------------------------------------------------------------
+//
+// Static Helpers
+//
+//----------------------------------------------------------------------
+
+string
+avErr2Str(int errNum)
+{
+    char errBuf[AV_ERROR_MAX_STRING_SIZE];
+    av_make_error_string(&errBuf[0], AV_ERROR_MAX_STRING_SIZE, errNum);
+    return string(errBuf);
+}
+
+void
+avLogCallback(void *ptr, int level, const char *fmt, va_list vargs)
+{
+    if ((string(fmt).substr(0,51) ==
+         "Encoder did not produce proper pts, making some up.") ||
+        (string(fmt).substr(0,47) ==
+         "No accelerated colorspace conversion found from") ||
+        (string(fmt).substr(0,28) ==
+         "Increasing reorder buffer to") ||
+        (string(fmt).substr(0,34) ==
+         "sample aspect ratio already set to") ||
+        (string(fmt).substr(0,67) ==
+         "deprecated pixel format used, make sure you did set range correctly") ||
+        (string(fmt).substr(0,20) ==
+         "overread end of atom") ||
+        (string(fmt).substr(0,19) ==
+         "Timecode frame rate") ||
+        (string(fmt).substr(0,32) ==
+         "unsupported color_parameter_type"))
+    {
+        return;
+    }
+
+    ostringstream message;
+    if (level > av_log_get_level())
+    {
+        return;
+    }
+    else if (level > AV_LOG_WARNING)
+    {
+        message << "INFO";
+    }
+    else if (level == AV_LOG_WARNING)
+    {
+        message << "WARNING";
+    }
+    else
+    {
+        message << "ERROR";
+    }
+    #if DB_GENERAL & DB_LEVEL
+        message << " [" << level << "]: ";
+        message << "MovieFFMpeg";
+    #endif
+    message << ": " << string(fmt);
+    vprintf(message.str().c_str(), vargs);
+}
+
+bool
+codecHasSlowAccess(string name)
+{
+    boost::algorithm::to_lower(name);
+    for (const char** p = slowRandomAccessCodecsArray; *p; p++)
+    {
+        if (*p == name)
+        {
+            return true;
+        }
+    }
+    return false;
+};
+
+bool
+isMP4format(AVFormatContext* avFormatContext)
+{
+    return avFormatContext!=nullptr 
+            && avFormatContext->iformat!=nullptr 
+            && avFormatContext->iformat->name!=nullptr  
+            && strstr(avFormatContext->iformat->name, "mp4") != nullptr;
+}
+
+bool
+isMOVformat(AVFormatContext* avFormatContext)
+{
+    return avFormatContext!=nullptr 
+            && avFormatContext->iformat!=nullptr 
+            && avFormatContext->iformat->name!=nullptr  
+            && strstr(avFormatContext->iformat->name, "mov") != nullptr;
+}
+
+int64_t
+findBestTS(int64_t goalTS, double frameDur, VideoTrack* track, bool finalPacket)
+{
+    //
+    //  The timestamps we have collected from unordered packets give us a view
+    //  into the future timestamps for the frames we _will_ decode. This helps
+    //  us "predict the future" for interframe codecs and do a better job of
+    //  finding the best timestamp match for RV's frame request.
+    //
+    //  Below we look through the timestamps we know are coming to find the one
+    //  that is closest to the goalTS that represents the RV requested frame
+    //
+
+    int64_t smallest = -1;
+    map<int64_t,int64_t> diffs;
+    for (set<int64_t>::iterator ts = track->tsSet.begin();
+        ts != track->tsSet.end(); ts++)
+    {
+        int64_t diff = abs(goalTS - *ts);
+        if (diff < smallest || smallest == -1) smallest = diff;
+        diffs[diff] = *ts;
+    }
+    return (smallest != -1 && (smallest < (frameDur * 0.5) || finalPacket)) ?
+        diffs[smallest] : goalTS;
+}
+
+bool
+fpsEquals(double& fps, double f)
+{
+    //
+    //  We get fps from all kinds of places, may have varying sig figs,
+    //  so compare to "standard" values loosely.
+    //
+
+    if (fabs(fps - f) < 0.01)
+    {
+        fps = f;
+        return true;
+    }
+    return false;
+}
+
+AVPixelFormat
+getBestAVFormat(AVPixelFormat native)
+{
+    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
+    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
+    bool hasAlpha = true; //(desc->flags & AV_PIX_FMT_FLAG_ALPHA);
+    return (hasAlpha) ?
+        ((bitSize > 8) ? AV_PIX_FMT_RGBA64 : AV_PIX_FMT_RGBA) :
+        ((bitSize > 8) ? AV_PIX_FMT_RGB48 : AV_PIX_FMT_RGB24);
+}
+
+AVPixelFormat
+getBestRVFormat(AVPixelFormat native)
+{
+    //
+    // This method is primarily designed to be run on pixel formats for which
+    // RV cannot natively make use of. Right now that primarily means 10-bit
+    // YUV & YUVA data, but could also include anything we haven't found
+    // samples of or we simply don't have any anologous FrameBuffer format.
+    //
+    // NOTE: The one type of formats we do natively support that can pass
+    // through this unchanged are the 8-bit YUV & YUVA formats.
+    //
+
+    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
+    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
+    bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
+    bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
+    bool isRGB = (desc->flags & AV_PIX_FMT_FLAG_RGB);
+    AVPixelFormat best = AV_PIX_FMT_NONE;
+
+    // Planar YUV+
+    if (isPlanar && !isRGB)
+    {
+        if (bitSize == 8)
+        {
+           best = native;
+        }
+        else if (bitSize < 8)
+        {
+            best = (hasAlpha) ? AV_PIX_FMT_YUVA444P : AV_PIX_FMT_YUV444P;
+        }
+        else if (bitSize > 8)
+        {
+            int log2w, log2h;
+            av_pix_fmt_get_chroma_sub_sample(native, &log2w, &log2h);
+            int usampling = int(pow(2.0f, log2w));
+            int vsampling = int(pow(2.0f, log2h));
+            int hfourcc = 4 / (usampling * vsampling);
+            switch (hfourcc)
             {
                 delete m_timers[timerItr->first];
             }
@@ -1421,8 +2074,59 @@ namespace TwkMovie
             return false;
         }
 
-#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
-        if (avStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
+    //
+    //  We may be _re-opening_ the context here so be sure we don't rely on
+    //  previous state
+    //
+
+    VideoTrack* vTrack;
+    AudioTrack* aTrack;
+    trackFromStreamIndex(index, vTrack, aTrack);
+
+    if (vTrack) vTrack->lastDecodedVideo = -1;
+    if (aTrack) aTrack->lastDecodedAudio = AV_NOPTS_VALUE;
+
+    // Make sure to only use allowed codecs
+    if (!m_io->codecIsAllowed((*avCodecContext)->codec->name, true))
+    {
+        cout << "ERROR: MovieFFMpeg: Unallowed codec '" <<
+            (*avCodecContext)->codec->name << "' in " << m_filename << endl;
+        avcodec_free_context(avCodecContext);
+        return false;
+    }
+
+    return true;
+}
+
+int64_t
+MovieFFMpegReader::getFirstFrame(AVRational rate)
+{
+    //
+    // XXX I am working from the assumption that timestamp 0 is true start of
+    // every type of media. Therefore if we get a positive timestamp for the
+    // format start time, then we have to assume that the source's start is
+    // offset by the given positive value.
+    //
+
+    m_formatStartFrame = max(int64_t(0), int64_t(0.49 + av_q2d(rate) *
+        double(m_avFormatContext->start_time) / double(AV_TIME_BASE)));
+    int64_t firstFrame = max(int64_t(m_formatStartFrame), int64_t(1));
+
+    for (int i = 0; i < m_avFormatContext->nb_streams; i++)
+    {
+        AVStream *tsStream = m_avFormatContext->streams[i];
+
+        AVRational tcRate = {tsStream->time_base.den,
+                           tsStream->time_base.num};
+
+        if (isMOVformat(m_avFormatContext))
+        {
+            tcRate = tsStream->avg_frame_rate;
+        }
+
+        AVDictionaryEntry *tcrEntry;
+        tcrEntry = av_dict_get(tsStream->metadata, "reel_name", NULL, 0);
+        if (tcrEntry != NULL)
         {
             deviceType = av_hwdevice_find_type_by_name("videotoolbox");
             if (deviceType == AV_HWDEVICE_TYPE_NONE)
@@ -4090,10 +4794,79 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             break;
         }
 
-        // Assign the AVFrame data to our frame buffer
-        outFrame->data[0] = out->pixels<unsigned char>();
-        FrameBuffer* fb = out->nextPlane();
-        for (int p = 1; p < numPlanes && fb; p++, fb = fb->nextPlane())
+        HOP_PROF("sws_scale()");
+        sws_scale(track->imgConvertContext, track->videoFrame->data,
+            track->videoFrame->linesize, 0, height,
+            outFrame->data, outFrame->linesize);
+    }
+    else
+    {
+        av_image_copy(outFrame->data, outFrame->linesize, track->videoFrame->data, track->videoFrame->linesize, videoCodecContext->pix_fmt, width, height);
+    }
+
+    // Clean up
+    av_frame_free(&outFrame);
+
+    //
+    // XXX For now we will handle any rotation in software. Eventually we plan
+    // to handle this with the renderer in hardware.
+    //
+
+    if (track->rotate)
+    {
+        HOP_PROF("track->rotate");
+        FrameBuffer* Y = out->firstPlane();
+        FrameBuffer* U = out->nextPlane();
+        FrameBuffer* V = U->nextPlane();
+
+        FrameBuffer::StringVector YChannelName(1, "Y");
+        FrameBuffer* Yrot = new FrameBuffer(FrameBuffer::PixelCoordinates,
+            Y->height(), Y->width(), 0, 1,
+            dataType, NULL, &YChannelName, track->fb.orientation(), true, 0, 0);
+
+        FrameBuffer::StringVector UChannelName(1, "U");
+        FrameBuffer* Urot = new FrameBuffer(FrameBuffer::PixelCoordinates,
+            U->height(), U->width(), 0, 1,
+            dataType, NULL, &UChannelName, track->fb.orientation(), true, 0, 0);
+
+        FrameBuffer::StringVector VChannelName(1, "V");
+        FrameBuffer* Vrot = new FrameBuffer(FrameBuffer::PixelCoordinates,
+            V->height(), V->width(), 0, 1,
+            dataType, NULL, &VChannelName, track->fb.orientation(), true, 0, 0);
+
+        rowColumnSwap(Y->pixels<unsigned char>(), Y->width(), Y->height(),
+            Yrot->pixels<unsigned char>());
+        rowColumnSwap(U->pixels<unsigned char>(), U->width(), U->height(),
+            Urot->pixels<unsigned char>());
+        rowColumnSwap(V->pixels<unsigned char>(), V->width(), V->height(),
+            Vrot->pixels<unsigned char>());
+
+        Yrot->appendPlane(Urot);
+        Yrot->appendPlane(Vrot);
+
+        delete out;
+        out = Yrot;
+    }
+
+    //
+    // Add Timecode if necessary
+    //
+
+    if (m_timecodeTrack != -1)
+    {
+        AVStream *tsStream = m_avFormatContext->streams[m_timecodeTrack];
+        AVDictionaryEntry *tcEntry;
+        tcEntry = av_dict_get(tsStream->metadata, "timecode", NULL, 0);
+        AVRational rate = {tsStream->time_base.den,
+                           tsStream->time_base.num};
+
+        if (isMOVformat(m_avFormatContext))
+        {
+            rate = tsStream->avg_frame_rate;
+        }
+
+        // Correct wrong frame rates that seem to be generated by some codecs
+        if ( rate.num > 1000 && rate.den == 1)
         {
             outFrame->data[p] = fb->pixels<unsigned char>();
         }

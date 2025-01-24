@@ -6,22 +6,26 @@
 # *****************************************************************************
 
 
+import logging
 import effectHook
 import opentimelineio as otio
 from rv import commands, extra_commands
 
 
-def hook_function(in_timeline, argument_map=None) -> None:
+def hook_function(
+    in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None
+) -> None:
+    """A hook for the annotation schema"""
     for layer in in_timeline.layers:
         if layer.name == "Paint":
-            if type(layer.layer_range) is otio._opentime.TimeRange:
-                range = layer.layer_range
+            if isinstance(layer.layer_range, otio._opentime.TimeRange):
+                time_range = layer.layer_range
             else:
-                range = otio.opentime.TimeRange(
+                time_range = otio.opentime.TimeRange(
                     layer.layer_range["start_time"], layer.layer_range["duration"]
                 )
 
-            relative_time = range.end_time_inclusive()
+            relative_time = time_range.end_time_inclusive()
             frame = relative_time.to_frames()
 
             source_node = argument_map.get("source_group")
@@ -40,12 +44,12 @@ def hook_function(in_timeline, argument_map=None) -> None:
             effectHook.add_rv_effect_props(
                 pen_component,
                 {
-                    "color": [float(x) for x in layer.rgba],
+                    "color": list(map(float, layer.rgba)),
                     "brush": layer.brush,
                     "debug": 1,
                     "join": 3,
-                    "cap": 2,
-                    "splat": 1,
+                    "cap": 1,
+                    "splat": 0,
                     "mode": 0 if layer.type == "COLOR" else 1,
                 },
             )
@@ -58,6 +62,24 @@ def hook_function(in_timeline, argument_map=None) -> None:
             )
 
             global_scale = argument_map.get("global_scale")
+            if global_scale is None:
+                logging.warning(
+                    "Unable to get the global scale, using the aspect ratio of the first media file"
+                )
+                try:
+                    first_source_node = commands.sourcesAtFrame(0)[0]
+                    media_info = commands.sourceMediaInfo(first_source_node)
+                    height = media_info["height"]
+                    aspect_ratio = media_info["width"] / height
+                except Exception:
+                    logging.exception(
+                        "Unable to determine aspect ratio, using default value of 16:9"
+                    )
+                    aspect_ratio = 1920 / 1080
+                finally:
+                    scale = aspect_ratio / 16
+                    global_scale = otio.schema.V2d(scale, scale)
+
             points_property = f"{pen_component}.points"
             width_property = f"{pen_component}.width"
 
@@ -69,18 +91,10 @@ def hook_function(in_timeline, argument_map=None) -> None:
             global_width = 2 / 15  # 0.133333...
 
             for point in layer.points:
-                points = commands.getFloatProperty(points_property)
-                if (
-                    len(points) > 1
-                    and points[-1] == point.y * global_scale.y
-                    and points[-2] == point.x * global_scale.x
-                ):
-                    pass
-                else:
-                    commands.insertFloatProperty(
-                        points_property,
-                        [point.x * global_scale.x, point.y * global_scale.y],
-                    )
-                    commands.insertFloatProperty(
-                        width_property, [point.width * global_width]
-                    )
+                commands.insertFloatProperty(
+                    points_property,
+                    [point.x * global_scale.x, point.y * global_scale.y],
+                )
+                commands.insertFloatProperty(
+                    width_property, [point.width * global_width]
+                )

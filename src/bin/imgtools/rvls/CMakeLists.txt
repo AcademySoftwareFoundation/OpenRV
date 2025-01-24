@@ -46,6 +46,7 @@ TARGET_LINK_LIBRARIES(
           Boost::headers
           yaml_cpp
           Qt::Core
+          PyTwkApp
 )
 
 IF(RV_TARGET_DARWIN)

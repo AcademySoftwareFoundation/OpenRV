@@ -26,11 +26,13 @@ namespace AJADevices
 {
     using namespace std;
 
-    AJAModule::AJAModule(NativeDisplayPtr p, unsigned int appID,
-                         OperationMode mode)
-        : VideoModule()
-        , m_mode(mode)
-        , m_appID(appID)
+  AJAModule::AJAModule( NativeDisplayPtr p, unsigned int appID,
+                        OperationMode mode )
+      : VideoModule(), m_mode( mode ), m_appID( appID )
+  {
+    open();
+
+    if( !isOpen() )
     {
         open();
 
@@ -40,13 +42,60 @@ namespace AJADevices
         }
     }
 
-    AJAModule::~AJAModule() { close(); }
+  AJAModule::~AJAModule()
+  {
+    close();
+  }
 
-    string AJAModule::name() const
+  string AJAModule::name() const
+  {
+    return m_mode == OperationMode::SimpleMode ? "AJA (Control Panel)" : "AJA";
+  }
+
+  string AJAModule::SDKIdentifier() const
+  {
+    ostringstream str;
+    str << "AJA NTV2 SDK Version " << AJA_NTV2_SDK_VERSION_MAJOR << "."
+        << AJA_NTV2_SDK_VERSION_MINOR << "." << AJA_NTV2_SDK_VERSION_POINT;
+    return str.str();
+  }
+
+  string AJAModule::SDKInfo() const
+  {
+    return "";
+  }
+
+  void AJAModule::open()
+  {
+    if (isOpen())
     {
-        return m_mode == OperationMode::SimpleMode ? "AJA (Control Panel)"
-                                                   : "AJA";
+      return;
     }
+
+    CNTV2Card device;
+    ULWord deviceIndex = 0;
+
+    while (CNTV2DeviceScanner::GetDeviceAtIndex(deviceIndex, device))
+    {
+      auto konaVideoDevice = std::make_unique<KonaVideoDevice>(this, device.GetDisplayName(), deviceIndex, m_appID,
+                              static_cast<KonaVideoDevice::OperationMode>(m_mode));
+      
+      m_devices.push_back(konaVideoDevice.release());
+
+      deviceIndex++;
+    }
+
+#ifdef PLATFORM_WINDOWS
+    GLenum error = glewInit(nullptr);
+    if (error != GLEW_OK)
+    {
+        std::string message = "AJA: GLEW initialization failed: ";
+        throw std::runtime_error(
+            message + reinterpret_cast<const char*>(glewGetErrorString(error))
+        );
+    }
+#endif
+  }
 
     string AJAModule::SDKIdentifier() const
     {

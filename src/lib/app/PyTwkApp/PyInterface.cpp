@@ -412,7 +412,25 @@ namespace TwkApp
             }
         }
 
-        return Mu::Pointer(0);
+  void initPython( int argc, char** argv )
+  {
+    // PreInitialize Python
+    // Note: This is necessary for Python to utilize environment variables like PYTHONUTF8
+    PyPreConfig preconfig;
+    PyPreConfig_InitPythonConfig(&preconfig);
+    PyStatus status=Py_PreInitialize(&preconfig);
+    if (PyStatus_Exception(status)) {
+      Py_ExitStatusException(status);
+    }
+
+    Py_InitializeEx( 1 );
+    static wchar_t delim = L'\0';
+
+    wchar_t** w_argv = new wchar_t*[argc + 1];
+    w_argv[argc] = &delim;
+
+    for (int i = 0; i < argc; ++i ){
+      w_argv[i] = Py_DecodeLocale(argv[i], nullptr);
     }
 
     static void* convertSymbolToMuSymbol(const Mu::Type* t, void* p)

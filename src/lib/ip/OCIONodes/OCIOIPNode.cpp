@@ -68,7 +68,9 @@ namespace IPCore
         if (const StringProperty* p = property<StringProperty>(name))
         {
             if (!p->empty() && p->front() != "")
+            {
                 return p->front();
+            }
         }
 
         return defaultValue;
@@ -79,7 +81,9 @@ namespace IPCore
         if (const IntProperty* p = property<IntProperty>(name))
         {
             if (!p->empty())
+            {
                 return p->front();
+            }
         }
 
         return defaultValue;
@@ -139,7 +143,11 @@ namespace IPCore
         m_state = new OCIOState;
 
         if (!getenv("OCIO_LOGGING_LEVEL"))
+        {
             OCIO::SetLoggingLevel(OCIO::LOGGING_LEVEL_WARNING);
+        }
+
+        updateConfig();
 
         if (GPULanguage == GPU_LANGUAGE_UNKNOWN)
         {
@@ -156,19 +164,19 @@ namespace IPCore
                 // Note: 1.2 is currently the lowest available value in OCIO
                 GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_2;
             }
-            else
+            else if (ociofunction == "look")
             {
                 GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_3;
             }
         }
-
-        updateConfig();
     }
 
     OCIOIPNode::~OCIOIPNode()
     {
         if (m_state->function)
+        {
             m_state->function->retire();
+        }
         delete m_state;
     }
 
@@ -233,8 +241,13 @@ namespace IPCore
 
         m_state->shaderID = "";
 
+        if (m_state->function)
+        {
+            m_state->function->retire();
+        }
+        m_state->function = 0;
+
         updateContext();
-        updateFunction();
     }
 
     void OCIOIPNode::updateContext()
@@ -257,6 +270,12 @@ namespace IPCore
                                                        sp->front().c_str());
                     }
                 }
+
+                processor = m_state->config->getProcessor(
+                    m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
+
+                size_t hashValue = string_hash(name());
+                shaderName << "OCIO_sl_" << name() << "_" << hex << hashValue;
             }
         }
     }
@@ -330,40 +349,113 @@ namespace IPCore
         return matrix_xyz_to_rec709;
     }
 
+    // Note: Ensure that the m_lock mutex is locked prior to calling this
+    // function
     OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformXYZToRec709()
     {
         if (!m_matrix_xyz_to_rec709)
         {
-            m_matrix_xyz_to_rec709 = createMatrixTransformXYZToRec709();
+            if (!m_matrix_xyz_to_rec709)
+            {
+                m_matrix_xyz_to_rec709 = createMatrixTransformXYZToRec709();
+            }
         }
 
         return m_matrix_xyz_to_rec709;
     }
 
+    // Note: Ensure that the m_lock mutex is locked prior to calling this
+    // function
     OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformRec709ToXYZ()
     {
         if (!m_matrix_rec709_to_xyz)
         {
-            m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
-            m_matrix_rec709_to_xyz->setDirection(
-                OCIO::TRANSFORM_DIR_INVERSE);
+            if (!m_matrix_rec709_to_xyz)
+            {
+                m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
+                m_matrix_rec709_to_xyz->setDirection(
+                    OCIO::TRANSFORM_DIR_INVERSE);
+            }
         }
 
         return m_matrix_rec709_to_xyz;
     }
 
-    void OCIOIPNode::updateFunction()
+    IPImage* OCIOIPNode::evaluate(const Context& context)
     {
-        if (m_activeProperty->size() != 1 || m_activeProperty->front() == 0)
-            return;
-
         string ociofunction = stringProp("ocio.function", "color");
+        IPImage* image = 0;
 
+        //
+        //  We don't really know _why_ we need an intermediate-buffer-generating
+        //  node in the Display Pipeline, but we seem to.  In particular, if
+        //  you've replaced the RVColorNode with an OCIODisplay node, and you
+        //  don't generate an intermediate buffer, the result is much lower res.
+        //  So now we generate an intermediate buffer in the "display" case.
+        //
+
+        if (ociofunction != "display" && ociofunction != "syndisplay")
+        {
+            image = IPNode::evaluate(context);
+            if (!image)
+            {
+                return IPImage::newNoImage(this, "No Input");
+            }
+            if (m_activeProperty->size() != 1 || m_activeProperty->front() == 0)
+            {
+                return image;
+            }
+
+            IPImageVector images(1);
+            IPImageSet modifiedImages;
+            images[0] = image;
+
+            convertBlendRenderTypeToIntermediate(images, modifiedImages);
+            balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8,
+                                 8, 81, 1);
+        }
+        else
+        {
+            Context newContext = context;
+            IPImage* child = IPNode::evaluate(newContext);
+            if (!child)
+            {
+                return IPImage::newNoImage(this, "No Input");
+            }
+
+            if (m_activeProperty->size() != 1 || m_activeProperty->front() == 0)
+            {
+                return child;
+            }
+
+            //
+            //  Don't make a separate intermediate images unless we really have
+            //  to.
+            //
+            if (willConvertToIntermediate(child))
+            {
+                image = new IPImage(this, IPImage::BlendRenderType,
+                                    context.viewWidth, context.viewHeight, 1.0,
+                                    IPImage::IntermediateBuffer,
+                                    IPImage::FloatDataType);
+
+                image->appendChild(child);
+                image->shaderExpr = Shader::newSourceRGBA(image);
+            }
+            else
+            {
+                IPImageVector images(1);
+                IPImageSet modifiedImages;
+                images[0] = image = child;
+
+                convertBlendRenderTypeToIntermediate(images, modifiedImages);
+                balanceResourceUsage(IPNode::accumulate, images, modifiedImages,
+                                     8, 8, 81, 1);
+                image = images[0];
+            }
+        }
         boost::hash<string> string_hash;
         string inName = stringProp("ocio.inColorSpace", m_state->linear);
-
-	if (inName.empty())
-	    return;
 
         try
         {
@@ -378,7 +470,7 @@ namespace IPCore
                 //  Emulate the nuke OCIOColor node
                 //
 
-                string outName = stringProp("ocio_color.outColorSpace", m_state->linear);
+                string outName = stringProp("ocio_color.outColorSpace", "");
                 OCIO::ConstColorSpaceRcPtr dstCS =
                     m_state->config->getColorSpace(outName.c_str());
                 processor = m_state->config->getProcessor(m_state->context,
@@ -441,8 +533,8 @@ namespace IPCore
 
                 OCIO::DisplayViewTransformRcPtr transform =
                     OCIO::DisplayViewTransform::Create();
-                string display = stringProp("ocio_display.display", m_state->display);
-                string view = stringProp("ocio_display.view", m_state->view);
+                string display = stringProp("ocio_display.display", "");
+                string view = stringProp("ocio_display.view", "");
 
                 transform->setSrc(inName.c_str());
                 transform->setDisplay(display.c_str());
@@ -470,35 +562,39 @@ namespace IPCore
 
                 if (!m_transform)
                 {
-                    m_transform = OCIO::GroupTransform::Create();
-
-                    // Is the input transform specified via a data array ?
-                    if (inTransformURL.empty())
+                    QMutexLocker lock(&this->m_lock);
+                    if (!m_transform)
                     {
-                        // We need to provide a unique name to OCIOv2,
-                        // otherwise it might use a potentially incorrect
-                        // color transform with the same name already in its
-                        // cache.
-                        static int uniqueCounter = 0;
-                        inTransformURL =
-                            name() + "." + std::to_string(uniqueCounter++)
-                            + "."
-                            + ConfigIOProxy::USE_IN_TRANSFORM_DATA_PROPERTY;
+                        m_transform = OCIO::GroupTransform::Create();
+
+                        // Is the input transform specified via a data array ?
+                        if (inTransformURL.empty())
+                        {
+                            // We need to provide a unique name to OCIOv2,
+                            // otherwise it might use a potentially incorrect
+                            // color transform with the same name already in its
+                            // cache.
+                            static int uniqueCounter = 0;
+                            inTransformURL =
+                                name() + "." + std::to_string(uniqueCounter++)
+                                + "."
+                                + ConfigIOProxy::USE_IN_TRANSFORM_DATA_PROPERTY;
+                        }
+
+                        // Inverse the ICC transform
+                        OCIO::FileTransformRcPtr transform =
+                            OCIO::FileTransform::Create();
+                        transform->setSrc(inTransformURL.c_str());
+                        transform->setInterpolation(OCIO::INTERP_BEST);
+                        transform->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
+                        m_transform->appendTransform(transform);
+
+                        // Concatenate it with the RV's working space transform
+                        // which is currently assumed to be 709 linear like the
+                        // original EXR spec.
+                        m_transform->appendTransform(
+                            getMatrixTransformXYZToRec709());
                     }
-
-                    // Inverse the ICC transform
-                    OCIO::FileTransformRcPtr transform =
-                        OCIO::FileTransform::Create();
-                    transform->setSrc(inTransformURL.c_str());
-                    transform->setInterpolation(OCIO::INTERP_BEST);
-                    transform->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
-                    m_transform->appendTransform(transform);
-
-                    // Concatenate it with the RV's working space transform
-                    // which is currently assumed to be 709 linear like the
-                    // original EXR spec.
-                    m_transform->appendTransform(
-                        getMatrixTransformXYZToRec709());
                 }
 
                 processor = m_state->config->getProcessor(
@@ -521,21 +617,25 @@ namespace IPCore
 
                 if (!m_transform)
                 {
-                    m_transform = OCIO::GroupTransform::Create();
+                    QMutexLocker lock(&this->m_lock);
+                    if (!m_transform)
+                    {
+                        m_transform = OCIO::GroupTransform::Create();
 
-                    // RV's working space is currently assumed to be 709
-                    // linear like the original EXR spec. In the display
-                    // case this transform is inverted.
-                    m_transform->appendTransform(
-                        getMatrixTransformRec709ToXYZ());
+                        // RV's working space is currently assumed to be 709
+                        // linear like the original EXR spec. In the display
+                        // case this transform is inverted.
+                        m_transform->appendTransform(
+                            getMatrixTransformRec709ToXYZ());
 
-                    // Concatenate the inverse workingSpaceTransform with
-                    // the ICC monitor profile transforma
-                    OCIO::FileTransformRcPtr transform =
-                        OCIO::FileTransform::Create();
-                    transform->setSrc(outTransformURL.c_str());
-                    transform->setInterpolation(OCIO::INTERP_BEST);
-                    m_transform->appendTransform(transform);
+                        // Concatenate the inverse workingSpaceTransform with
+                        // the ICC monitor profile transforma
+                        OCIO::FileTransformRcPtr transform =
+                            OCIO::FileTransform::Create();
+                        transform->setSrc(outTransformURL.c_str());
+                        transform->setInterpolation(OCIO::INTERP_BEST);
+                        m_transform->appendTransform(transform);
+                    }
                 }
 
                 processor = m_state->config->getProcessor(
@@ -545,6 +645,7 @@ namespace IPCore
                 shaderName << "OCIO_sd_" << name() << "_" << hex << hashValue;
             }
 
+            QMutexLocker lock(&this->m_lock);
             OCIO::GpuShaderDescRcPtr shaderDesc =
                 OCIO::GpuShaderDesc::CreateShaderDesc();
             shaderDesc->setFunctionName(shaderName.str().c_str());
@@ -568,11 +669,12 @@ namespace IPCore
             gpuProcessor->extractGpuShaderInfo(shaderDesc);
 
             string shaderCacheID = gpuProcessor->getCacheID();
-
             if (m_state->shaderID != shaderCacheID)
             {
                 if (m_state->function)
+                {
                     m_state->function->retire();
+                }
 
                 string glsl(shaderDesc->getShaderText());
 
@@ -605,7 +707,7 @@ namespace IPCore
 
                 m_state->function = new Shader::Function(
                     shaderDesc->getFunctionName(), glsl,
-                    Shader::Function::Color, numTextures+num3DTextures);
+                    Shader::Function::Color, 1 /*numFetchesApprox*/);
                 m_state->shaderID = shaderCacheID;
 
                 if (Shader::debuggingType() != Shader::NoDebugInfo)
@@ -618,109 +720,53 @@ namespace IPCore
                          << shaderDesc->getFunctionName() << "':" << endl
                          << glsl << endl;
                 }
+
+                processor = m_state->config->getProcessor(
+                    m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
+
+                size_t hashValue = string_hash(outTransformURL);
+                shaderName << "OCIO_sd_" << name() << "_" << hex << hashValue;
+            }
+
+            if (image->mergeExpr || image->shaderExpr)
+            {
+                const Shader::Function* F = m_state->function;
+                Shader::ArgumentVector args(F->parameters().size());
+                Shader::Expression*& expr =
+                    image->mergeExpr ? image->mergeExpr : image->shaderExpr;
+
+                args[0] = new Shader::BoundExpression(F->parameters()[0], expr);
+
+                // Add the 3D LUTs expressions (if any)
+                for (unsigned idx = 0; idx < m_3DLUTs.size(); ++idx)
+                {
+                    args[idx + 1] = new Shader::BoundSampler(
+                        F->parameters()[idx + 1],
+                        Shader::ImageOrFB(
+                            m_3DLUTs[m_3DLUTs.size() - 1 - idx]->lutfb(), 0));
+                }
+
+                // Add the 1D LUTs expressions (if any)
+                for (unsigned idx = 0; idx < m_1DLUTs.size(); ++idx)
+                {
+                    args[idx + m_3DLUTs.size() + 1] = new Shader::BoundSampler(
+                        F->parameters()[idx + m_3DLUTs.size() + 1],
+                        Shader::ImageOrFB(
+                            m_1DLUTs[m_1DLUTs.size() - 1 - idx]->lutfb(), 0));
+                }
+
+                expr = new Shader::Expression(F, args, image);
+
+                if (ociofunction == "display" && image->shaderExpr)
+                {
+                    image->resourceUsage =
+                        image->shaderExpr->computeResourceUsageRecursive();
+                }
             }
         }
         catch (std::exception& exc)
         {
             cerr << "ERROR: OCIOIPNode: " << exc.what() << endl;
-        }
-    }
-
-    IPImage* OCIOIPNode::evaluate(const Context& context)
-    {
-        IPImage* image = IPNode::evaluate(context);
-        if (!image)
-            return IPImage::newNoImage(this, "No Input");
-
-        if (m_activeProperty->size() != 1 || m_activeProperty->front() == 0
-            || !m_state->function)
-            return image;
-
-        string ociofunction = stringProp("ocio.function", "color");
-
-        //
-        //  We don't really know _why_ we need an intermediate-buffer-generating
-        //  node in the Display Pipeline, but we seem to.  In particular, if
-        //  you've replaced the RVColorNode with an OCIODisplay node, and you
-        //  don't generate an intermediate buffer, the result is much lower res.
-        //  So now we generate an intermediate buffer in the "display" case.
-        //
-
-        if (ociofunction != "display" && ociofunction != "syndisplay")
-        {
-            IPImageVector images(1);
-            IPImageSet modifiedImages;
-            images[0] = image;
-
-            convertBlendRenderTypeToIntermediate(images, modifiedImages);
-            balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8,
-                                 8, 81, 1);
-        }
-        else
-        {
-            IPImage* child = image;
-
-            //
-            //  Don't make a separate intermediate images unless we really have
-            //  to.
-            //
-            if (willConvertToIntermediate(child))
-            {
-                image = new IPImage(this, IPImage::BlendRenderType,
-                                    context.viewWidth, context.viewHeight, 1.0,
-                                    IPImage::IntermediateBuffer,
-                                    IPImage::FloatDataType);
-
-                image->appendChild(child);
-                image->shaderExpr = Shader::newSourceRGBA(image);
-            }
-            else
-            {
-                IPImageVector images(1);
-                IPImageSet modifiedImages;
-                images[0] = image = child;
-
-                convertBlendRenderTypeToIntermediate(images, modifiedImages);
-                balanceResourceUsage(IPNode::accumulate, images, modifiedImages,
-                                     8, 8, 81, 1);
-                image = images[0];
-            }
-        }
-
-        if (image->mergeExpr || image->shaderExpr)
-        {
-            const Shader::Function* F = m_state->function;
-            Shader::ArgumentVector args(F->parameters().size());
-            Shader::Expression*& expr =
-                image->mergeExpr ? image->mergeExpr : image->shaderExpr;
-
-            args[0] = new Shader::BoundExpression(F->parameters()[0], expr);
-
-            // Add the 3D LUTs expressions (if any)
-            for (unsigned idx = 0; idx < m_3DLUTs.size(); ++idx)
-            {
-                args[idx + 1] = new Shader::BoundSampler(
-                    F->parameters()[idx + 1],
-                    Shader::ImageOrFB(
-                        m_3DLUTs[m_3DLUTs.size() - 1 - idx]->lutfb(), 0));
-            }
-
-            // Add the 1D LUTs expressions (if any)
-            for (unsigned idx = 0; idx < m_1DLUTs.size(); ++idx)
-            {
-                args[idx + m_3DLUTs.size() + 1] = new Shader::BoundSampler(
-                    F->parameters()[idx + m_3DLUTs.size() + 1],
-                    Shader::ImageOrFB(
-                        m_1DLUTs[m_1DLUTs.size() - 1 - idx]->lutfb(), 0));
-            }
-
-            expr = new Shader::Expression(F, args, image);
-
-            if (ociofunction == "display" && image->shaderExpr)
-            {
-                image->resourceUsage =
-                    image->shaderExpr->computeResourceUsageRecursive();
-            }
         }
 
         return image;
@@ -731,7 +777,9 @@ namespace IPCore
         if (Component* context = component("ocio_context"))
         {
             if (context->hasProperty(p))
+            {
                 updateContext();
+            }
         }
 
         // synlinearize/syndisplay functions:
@@ -743,15 +791,12 @@ namespace IPCore
             m_transform.reset();
         }
 
-        updateFunction();
-
         IPNode::propertyChanged(p);
     }
 
     void OCIOIPNode::readCompleted(const string& t, unsigned int v)
     {
         updateContext();
-        updateFunction();
 
         IPNode::readCompleted(t, v);
     }
