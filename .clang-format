@@ -62,7 +62,7 @@ IndentPPDirectives: None
 IndentRequiresClause: true
 IndentWidth: 4
 IndentWrappedFunctionNames: false
-InsertBraces:    false
+InsertBraces:    true
 InsertNewlineAtEOF: true
 InsertTrailingCommas: None
 IntegerLiteralSeparator:
@@ -101,7 +101,7 @@ PenaltyIndentedWhitespace: 0
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Left
 PPIndentWidth:   -1
-QualifierAlignment: Leave
+QualifierAlignment: Left
 ReferenceAlignment: Pointer
 RemoveBracesLLVM: false
 RemoveParentheses: Leave
@@ -148,5 +148,6 @@ SpacesInLineCommentPrefix:
 SpacesInParens:  Never
 SpacesInSquareBrackets: false
 Standard:        Latest
+TabWidth:        8
 UseTab:          Never
 ...

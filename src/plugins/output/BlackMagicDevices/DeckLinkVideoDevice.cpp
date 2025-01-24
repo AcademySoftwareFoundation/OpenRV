@@ -63,7 +63,213 @@ namespace BlackMagicDevices
 
     const char* const HDMI_HDR_METADATA_ARG = "hdmi-hdr-metadata";
 
-    struct DeckLinkSyncMode
+  struct DeckLinkSyncMode
+  {
+    const char* desc;
+    size_t value;
+  };
+
+  struct DeckLinkSyncSource
+  {
+    const char* desc;
+    size_t value;
+  };
+
+  static DeckLinkDataFormat dataFormats[] = {
+      { "8 Bit YUV", bmdFormat8BitYUV, VideoDevice::Y0CbY1Cr_8_422, false },
+      { "10 Bit YUV", bmdFormat10BitYUV, VideoDevice::YCrCb_BM_10_422, false },
+      //{"8 Bit ARGB", bmdFormat8BitARGB, VideoDevice::BGRA8, true},
+      //{"8 Bit BGRA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true}, // CHANGED
+      // NAME
+      { "8 Bit RGBA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true },
+      //{"10 Bit RGB", bmdFormat10BitRGB, VideoDevice::RGB10X2, true},
+      //{"10 Bit RGBX", bmdFormat10BitRGBX, VideoDevice::RGB10X2, true},
+      //{"10 Bit RGBXLE", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true}, //
+      // CHANGED NAME
+      { "10 Bit RGB", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true },
+      { "12 Bit RGB", bmdFormat12BitRGBLE, VideoDevice::RGB16, true },
+
+      { "Stereo 8 Bit YUV", bmdFormat8BitYUV, VideoDevice::Y0CbY1Cr_8_422,
+        false },
+      { "Stereo 10 Bit YUV", bmdFormat10BitYUV, VideoDevice::YCrCb_BM_10_422,
+        false },
+      //{"Stereo 8 Bit ARGB", bmdFormat8BitARGB, VideoDevice::BGRA8, true},
+      //{"Stereo 8 Bit BGRA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true}, //
+      // CHANGED NAME
+      { "Stereo 8 Bit RGBA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true },
+      //{"Stereo 10 Bit RGB", bmdFormat10BitRGB, VideoDevice::RGB10X2, true},
+      //{"Stereo 10 Bit RGBX", bmdFormat10BitRGBX, VideoDevice::RGB10X2, true},
+      //{"Stereo 10 Bit RGBXLE", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2,
+      // true}, // CHANGED NAME
+      { "Stereo 10 Bit RGB", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true },
+      { "Stereo 12 Bit RGB", bmdFormat12BitRGBLE, VideoDevice::RGB16, true },
+      { NULL, bmdFormat8BitBGRA, VideoDevice::BGRA8, true } };
+
+  //
+  // The 1556p formats are commented out. None of our Declink cards seem
+  // to support it.
+  //
+  DeckLinkVideoFormat videoFormats[] = {
+      { 1280, 720, 1.0, 50.00, "720p 50Hz", bmdModeHD720p50 },
+      { 1280, 720, 1.0, 59.94, "720p 59.94Hz", bmdModeHD720p5994 },
+      { 1280, 720, 1.0, 60.00, "720p 60Hz", bmdModeHD720p60 },
+      { 1920, 1080, 1.0, 25.00, "1080i 50Hz", bmdModeHD1080i50 },
+      { 1920, 1080, 1.0, 29.97, "1080i 59.94Hz", bmdModeHD1080i5994 },
+      { 1920, 1080, 1.0, 30.00, "1080i 60Hz", bmdModeHD1080i6000 },
+      { 1920, 1080, 1.0, 23.98, "1080p 23.98Hz", bmdModeHD1080p2398 },
+      { 1920, 1080, 1.0, 24.00, "1080p 24Hz", bmdModeHD1080p24 },
+      { 1920, 1080, 1.0, 25.00, "1080p 25Hz", bmdModeHD1080p25 },
+      { 1920, 1080, 1.0, 29.97, "1080p 29.97Hz", bmdModeHD1080p2997 },
+      { 1920, 1080, 1.0, 30.00, "1080p 30Hz", bmdModeHD1080p30 },
+      { 1920, 1080, 1.0, 50.00, "1080p 50Hz", bmdModeHD1080p50 },
+      { 1920, 1080, 1.0, 59.94, "1080p 59.94Hz", bmdModeHD1080p5994 },
+      { 1920, 1080, 1.0, 60.00, "1080p 60Hz", bmdModeHD1080p6000 },
+      { 2048, 1080, 1.0, 23.98, "1080p (2048x1080) DCI 2K 23.98Hz",
+        bmdMode2kDCI2398 },
+      { 2048, 1080, 1.0, 24.00, "1080p (2048x1080) DCI 2K 24Hz",
+        bmdMode2kDCI24 },
+      { 2048, 1080, 1.0, 25.00, "1080p (2048x1080) DCI 2K 25Hz",
+        bmdMode2kDCI25 },
+      { 2048, 1080, 1.0, 29.97, "1080p (2048x1080) DCI 2K 29.97Hz",
+        bmdMode2kDCI2997 },
+      { 2048, 1080, 1.0, 30.00, "1080p (2048x1080) DCI 2K 30Hz",
+        bmdMode2kDCI30 },
+      { 2048, 1080, 1.0, 50.00, "1080p (2048x1080) DCI 2K 50Hz",
+        bmdMode2kDCI50 },
+      { 2048, 1080, 1.0, 59.94, "1080p (2048x1080) DCI 2K 59.94Hz",
+        bmdMode2kDCI5994 },
+      { 2048, 1080, 1.0, 60.00, "1080p (2048x1080) DCI 2K 60Hz",
+        bmdMode2kDCI60 },
+      { 3840, 2160, 1.0, 23.98, "2160p (3840x2160) UHD 4K 23.98Hz",
+        bmdMode4K2160p2398 },
+      { 3840, 2160, 1.0, 24.00, "2160p (3840x2160) UHD 4K 24Hz",
+        bmdMode4K2160p24 },
+      { 3840, 2160, 1.0, 25.00, "2160p (3840x2160) UHD 4K 25Hz",
+        bmdMode4K2160p25 },
+      { 3840, 2160, 1.0, 29.97, "2160p (3840x2160) UHD 4K 29.97Hz",
+        bmdMode4K2160p2997 },
+      { 3840, 2160, 1.0, 30.00, "2160p (3840x2160) UHD 4K 30Hz",
+        bmdMode4K2160p30 },
+      { 3840, 2160, 1.0, 50.00, "2160p (3840x2160) UHD 4K 50Hz",
+        bmdMode4K2160p50 },
+      { 3840, 2160, 1.0, 59.94, "2160p (3840x2160) UHD 4K 59.94Hz",
+        bmdMode4K2160p5994 },
+      { 3840, 2160, 1.0, 60.00, "2160p (3840x2160) UHD 4K 60Hz",
+        bmdMode4K2160p60 },
+      { 4096, 2160, 1.0, 23.98, "2160p (4096x2160) DCI 4K 23.98Hz",
+        bmdMode4kDCI2398 },
+      { 4096, 2160, 1.0, 24.00, "2160p (4096x2160) DCI 4K 24Hz",
+        bmdMode4kDCI24 },
+      { 4096, 2160, 1.0, 25.00, "2160p (4096x2160) DCI 4K 25Hz",
+        bmdMode4kDCI25 },
+      { 4096, 2160, 1.0, 29.97, "2160p (4096x2160) DCI 4K 29.97Hz",
+        bmdMode4kDCI2997 },
+      { 4096, 2160, 1.0, 30.00, "2160p (4096x2160) DCI 4K 30Hz",
+        bmdMode4kDCI30 },
+      { 4096, 2160, 1.0, 50.00, "2160p (4096x2160) DCI 4K 50Hz",
+        bmdMode4kDCI50 },
+      { 4096, 2160, 1.0, 59.94, "2160p (4096x2160) DCI 4K 59.94Hz",
+        bmdMode4kDCI5994 },
+      { 4096, 2160, 1.0, 60.00, "2160p (4096x2160) DCI 4K 60Hz",
+        bmdMode4kDCI60 },
+      { 7680, 4320, 1.0, 23.98, "4320p (7680x4320) UHD 8K 23.98Hz",
+        bmdMode8K4320p2398 },
+      { 7680, 4320, 1.0, 24.00, "4320p (7680x4320) UHD 8K 24Hz",
+        bmdMode8K4320p24 },
+      { 7680, 4320, 1.0, 25.00, "4320p (7680x4320) UHD 8K 25Hz",
+        bmdMode8K4320p25 },
+      { 7680, 4320, 1.0, 29.97, "4320p (7680x4320) UHD 8K 29.97Hz",
+        bmdMode8K4320p2997 },
+      { 7680, 4320, 1.0, 30.00, "4320p (7680x4320) UHD 8K 30Hz",
+        bmdMode8K4320p30 },
+      { 7680, 4320, 1.0, 50.00, "4320p (7680x4320) UHD 8K 50Hz",
+        bmdMode8K4320p50 },
+      { 7680, 4320, 1.0, 59.94, "4320p (7680x4320) UHD 8K 59.94Hz",
+        bmdMode8K4320p5994 },
+      { 7680, 4320, 1.0, 60.00, "4320p (7680x4320) UHD 8K 60Hz",
+        bmdMode8K4320p60 },
+      { 8192, 4320, 1.0, 23.98, "4320p (8192x4320) DCI 8K 23.98Hz",
+        bmdMode8kDCI2398 },
+      { 8192, 4320, 1.0, 24.00, "4320p (8192x4320) DCI 8K 24Hz",
+        bmdMode8kDCI24 },
+      { 8192, 4320, 1.0, 25.00, "4320p (8192x4320) DCI 8K 25Hz",
+        bmdMode8kDCI25 },
+      { 8192, 4320, 1.0, 29.97, "4320p (8192x4320) DCI 8K 29.97Hz",
+        bmdMode8kDCI2997 },
+      { 8192, 4320, 1.0, 30.00, "4320p (8192x4320) DCI 8K 30Hz",
+        bmdMode8kDCI30 },
+      { 8192, 4320, 1.0, 50.00, "4320p (8192x4320) DCI 8K 50Hz",
+        bmdMode8kDCI50 },
+      { 8192, 4320, 1.0, 59.94, "4320p (8192x4320) DCI 8K 59.94Hz",
+        bmdMode8kDCI5994 },
+      { 8192, 4320, 1.0, 60.00, "4320p (8192x4320) DCI 8K 60Hz",
+        bmdMode8kDCI60 },
+      { 1920, 1080, 1.0, 47.95, "1080p 47.95Hz", bmdModeHD1080p4795 },
+      { 2048, 1080, 1.0, 47.95, "1080p (2048x1080) DCI 2K 47.95Hz",
+        bmdMode2kDCI4795 },
+      { 3840, 2160, 1.0, 47.95, "2160p (3840x2160) UHD 4K 47.95Hz",
+        bmdMode4K2160p4795 },
+      { 4096, 2160, 1.0, 47.95, "2160p (4096x2160) DCI 4K 47.95Hz",
+        bmdMode4kDCI4795 },
+      { 7680, 4320, 1.0, 47.95, "4320p (7680x4320) UHD 8K 47.95Hz",
+        bmdMode8K4320p4795 },
+      { 8192, 4320, 1.0, 47.95, "4320p (8192x4320) DCI 8K 47.95Hz",
+        bmdMode8kDCI4795 },
+      { 1920, 1080, 1.0, 48.00, "1080p 48Hz", bmdModeHD1080p48 },
+      { 2048, 1080, 1.0, 48.00, "1080p (2048x1080) DCI 2K 48Hz",
+        bmdMode2kDCI48 },
+      { 3840, 2160, 1.0, 48.00, "2160p (3840x2160) UHD 4K 48Hz",
+        bmdMode4K2160p48 },
+      { 4096, 2160, 1.0, 48.00, "2160p (4096x2160) DCI 4K 48Hz",
+        bmdMode4kDCI48 },
+      { 7680, 4320, 1.0, 48.00, "4320p (7680x4320) UHD 8K 48Hz",
+        bmdMode8K4320p48 },
+      { 8192, 4320, 1.0, 48.00, "4320p (8192x4320) DCI 8K 48Hz",
+        bmdMode8kDCI48 },
+      { 0, 0, 1.0, 00.00, NULL, bmdModeHD720p50 },
+  };
+
+  static DeckLinkAudioFormat audioFormats[] = {
+      { 48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int16Format,
+        bmdAudioSampleType16bitInteger, 2, TwkAudio::Stereo_2,
+        "16 bit 48kHz Stereo" },
+      { 48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
+        bmdAudioSampleType32bitInteger, 2, TwkAudio::Stereo_2,
+        "24 bit 48kHz Stereo" },
+      { 48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
+        bmdAudioSampleType32bitInteger, 8, TwkAudio::Surround_7_1,
+        "24 bit 48kHz 7.1 Surround" },
+      { 48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
+        bmdAudioSampleType32bitInteger, 8, TwkAudio::SDDS_7_1,
+        "24 bit 48kHz 7.1 Surround SDDS" },
+      { 48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
+        bmdAudioSampleType32bitInteger, 16, TwkAudio::Generic_16,
+        "24 bit 48kHz 16 channel" } };
+
+  // 4K/8K Transport combo box items indices
+  // Note: VIDEO_TRANSPORT_DEFAULT = SingleLink but kept for backward
+  // compatibility
+  const size_t VIDEO_TRANSPORT_DEFAULT = 0;
+  const size_t VIDEO_TRANSPORT_SINGLE_LINK = 1;
+  const size_t VIDEO_TRANSPORT_DUAL_LINK = 2;
+  const size_t VIDEO_TRANSPORT_QUAD_LINK = 3;
+  const size_t VIDEO_TRANSPORT_QUADRANTS = 4;
+
+  DeckLinkVideo4KTransport video4KTransports[] = {
+      { "Default", VIDEO_TRANSPORT_DEFAULT },
+      { "Single Link", VIDEO_TRANSPORT_SINGLE_LINK },
+      { "Dual Link", VIDEO_TRANSPORT_DUAL_LINK },
+      { "Quad Link", VIDEO_TRANSPORT_QUAD_LINK },
+      { "Quad Link-Square Division Quad Split mode",
+        VIDEO_TRANSPORT_QUADRANTS },
+  };
+
+  BMDSupportedVideoModeFlags getBmdSupportedVideoModeFlag(
+      const size_t in_video4KTransport )
+  {
+    BMDSupportedVideoModeFlags bmdSupportedVideoModeFlag =
+        bmdSupportedVideoModeDefault;
+    switch( in_video4KTransport )
     {
         const char* desc;
         size_t value;

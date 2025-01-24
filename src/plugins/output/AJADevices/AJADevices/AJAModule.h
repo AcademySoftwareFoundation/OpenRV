@@ -43,4 +43,19 @@ namespace AJADevices
         unsigned int m_appID{0};
     };
 
-} // namespace AJADevices
+    AJAModule( NativeDisplayPtr, unsigned int appID, OperationMode );
+    ~AJAModule() override;
+
+    [[nodiscard]] std::string name() const override;
+    [[nodiscard]] std::string SDKIdentifier() const override;
+    [[nodiscard]] std::string SDKInfo() const override;
+    void open() override;
+    void close() override;
+    [[nodiscard]] bool isOpen() const override;
+
+   private:
+    OperationMode m_mode{ OperationMode::ProMode };
+    unsigned int m_appID{ 0 };
+  };
+
+}  // namespace AJADevices

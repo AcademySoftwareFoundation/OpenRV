@@ -2883,58 +2883,79 @@ namespace IPCore
         }
 
         SharedMediaPointer sharedMedia(
-            newSharedMedia(mov, true /*hasValidRange*/));
-        addMedia(sharedMedia, proxySharedMedia);
+            newSharedMedia( mov, find( "proxy.range" ) ) );
+        sharedMedias[i] = sharedMedia;
+        addMedia( sharedMedia );
+      }
+      else
+      {
+        filename = lookupFilenameInMediaLibrary( filename );
+
+        openMovieTask( filename, SharedMediaPointer() );
+      }
     }
 
     string FileSourceIPNode::cacheHash(const string& filename,
                                        const string& prefix)
     {
-        string hashString;
-
-        const bool filepathIsURL = TwkUtil::pathIsURL(filename);
-        if (!filepathIsURL)
+      if( !media.empty() )
+      {
+        // Lookup the filenames in the media library, save associated HTTP header and cookies
+        // if any, and return the actual filename to be used for opening the movie in case of 
+        // redirection.
+        // Note: This needs to be done in the main thread, NOT in the worker thread
+        // because the media library is python based and thus should only be executed 
+        // in the main thread.
+        for( size_t i = 0; i < media.size(); i++ )
         {
-            if (TwkUtil::fileExists(filename.c_str()))
-            {
-                try
-                {
-                    boost::filesystem::path p(UNICODE_STR(filename));
-                    const auto size = boost::filesystem::file_size(p);
-
-                    //
-                    //  should this function be hashing the first 256 bytes or
-                    //  so of the file to be safe?
-                    //
-
-                    ostringstream name;
-                    boost::hash<string> string_hash;
-                    name << filename << "::" << size;
-                    ostringstream fullHash;
-                    fullHash << prefix << hex << string_hash(name.str()) << dec;
-                    hashString = fullHash.str();
-                }
-                catch (...)
-                {
-                    // nothing
-                }
-            }
+          media[i] = lookupFilenameInMediaLibrary( media[i] );
         }
 
-        return hashString;
+        // Then add a work item to load the actual media movies.
+        m_workItemID = graph()->addWorkItem(
+            [this, sharedMedias, media]()
+            {
+              if( !media.empty() )
+              {
+                for( size_t i = 0; i < media.size(); i++ )
+                {
+                  openMovieTask( media[i], sharedMedias[i] );
+                }
+              }
+            } );
+
+        // Add it to the set of media currently loading
+        setLoadingID( m_workItemID );
+      }
     }
+  }
+
+  void FileSourceIPNode::openMovieTask(
+      const string& filename, const SharedMediaPointer& proxySharedMedia )
+  {
+    HOP_PROF_FUNC();
+
+    debuggingLoadDelay();
+
+    //
+    //  NOTE: addMedia() will cause a propagateRangeChange() down the
+    //  graph using this thread (which is usually some worker thread
+    //  in IPGraph).
+    //
 
     string
     FileSourceIPNode::lookupFilenameInMediaLibrary(const string& filename)
     {
         string file(filename);
 
-        if (TwkMediaLibrary::isLibraryURL(file))
-        {
-            //
-            //  If this file looks like a library URL try to convert it
-            //  into a local file URL and then a path
-            //
+    try
+    {
+      mov = openMovie( filename );
+    }
+    catch( std::exception& exc )
+    {
+      failed = true;
+      errMsg << "Open of '" << filename << "' failed: " << exc.what();
 
             file = TwkMediaLibrary::libraryURLtoMediaURL(file);
             file.erase(0, 7); // assuming "file://" not good
@@ -3030,21 +3051,16 @@ namespace IPCore
     bool FileSourceIPNode::findCachedMediaMetaData(const string& filename,
                                                    PropertyContainer* pc)
     {
-        //
-        //  Check this node first -- we may find it here if a session is being
-        //  read
-        //
-
-        Bundle* bundle = Bundle::mainBundle();
-        string cacheItemString = cacheHash(filename, "movpd_");
-
-        if (cacheItemString == "")
-            return false;
+      if( errMsg.tellp() == std::streampos( 0 ) )
+      {
+        errMsg << "Could not locate \"" << filename
+               << "\". Relocate source to fix.";
+      }
 
       mov = openProxyMovie( errMsg.str(), 0.0, filename, defaultFPS );
 
       ostringstream str;
-      str << name() << ";;" << file << ";;" << mediaRepName();
+      str << name() << ";;" << filename << ";;" << mediaRepName();
       TwkApp::GenericStringEvent event( "source-media-unavailable", graph(), str.str() );
 
       // The following instructions can only be executed on the main thread.
@@ -3148,7 +3164,110 @@ namespace IPCore
         return false;
     }
 
-    FileSourceIPNode::Movie* FileSourceIPNode::openMovie(const string& filename)
+    return hashString;
+  }
+
+  string FileSourceIPNode::lookupFilenameInMediaLibrary( const string& filename )
+  {
+    string file(filename);
+
+    if( TwkMediaLibrary::isLibraryURL( file ) )
+    {
+      //
+      //  If this file looks like a library URL try to convert it
+      //  into a local file URL and then a path
+      //
+
+      file = TwkMediaLibrary::libraryURLtoMediaURL( file );
+      file.erase( 0, 7 );  // assuming "file://" not good
+      return file;
+    }
+
+    if( TwkMediaLibrary::isLibraryMediaURL( file ) )
+    {
+      //
+      //  URL is a media URL tracked by one of the libraries. Find its
+      //  media node and find out if its streaming.
+      //
+
+      TwkMediaLibrary::NodeVector nodes =
+          TwkMediaLibrary::libraryNodesAssociatedWithURL( file );
+      for( int n = 0; n < nodes.size(); n++ )
+      {
+        const TwkMediaLibrary::Node* node = nodes[n];
+        std::string nodeName = node->name();
+
+        if( const TwkMediaLibrary::MediaAPI* api =
+                TwkMediaLibrary::api_cast<TwkMediaLibrary::MediaAPI>( node ) )
+        {
+          if( api->isStreaming() )
+          {
+            TwkMediaLibrary::HTTPCookieVector cookies = api->httpCookies();
+            if( !cookies.empty() )
+            {
+              ostringstream cookieStm;
+
+              for( int c = 0; c < cookies.size(); c++ )
+              {
+                if( c > 0 ) cookieStm << "\n";
+                cookieStm << cookies[c].name << "=" << cookies[c].value;
+
+                if( !cookies[c].path.empty() )
+                  cookieStm << "; path=" << cookies[c].path;
+                if( !cookies[c].domain.empty() )
+                  cookieStm << "; domain=" << cookies[c].domain;
+              }
+
+              if (evDebugCookies.getValue()) std::cout << "Cookies:\n" << cookieStm.str() << std::endl;
+
+              m_inparams.push_back( StringPair( "cookies", cookieStm.str() ) );
+            }
+
+            TwkMediaLibrary::HTTPHeaderVector headers = api->httpHeaders();
+            if( !headers.empty() )
+            {
+              ostringstream headersStm;
+
+              for( size_t h = 0, size = headers.size(); h < size; ++h )
+              {
+                if( h > 0 ) headersStm << "\r\n";
+                headersStm << headers[h].name << ": " << headers[h].value;
+              }
+
+              if (evDebugCookies.getValue()) std::cout << "Headers:\n" << headersStm.str() << std::endl;
+
+              m_inparams.push_back( StringPair( "headers", headersStm.str() ) );
+            }
+          }
+
+          if( api->isRedirecting() )
+          {
+            std::string redirection = api->httpRedirection();
+            std::cout << "INFO: " << nodeName << " is redirecting " << file
+                      << " to " << redirection << std::endl;
+            file = redirection;
+          }
+        }
+      }
+    }
+
+    return file;
+  }
+
+  bool FileSourceIPNode::findCachedMediaMetaData( const string& filename,
+                                                  PropertyContainer* pc )
+  {
+    //
+    //  Check this node first -- we may find it here if a session is being
+    //  read
+    //
+
+    Bundle* bundle = Bundle::mainBundle();
+    string cacheItemString = cacheHash( filename, "movpd_" );
+
+    if( cacheItemString == "" ) return false;
+
+    if( Component* c = component( cacheItemString ) )
     {
         // Ensure file exists and is accessible by the current user before
         // continuing

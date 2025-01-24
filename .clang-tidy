@@ -1,7 +1,6 @@
 ---
 Checks: >
   bugprone-*,
-  -bugprone-easily-swappable-parameters,
   cert-*,
   clang-diagnostic-*,
   clang-analyzer-*,
@@ -14,7 +13,8 @@ Checks: >
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
-  -readability-uppercase-literal-suffix,
+
 WarningsAsErrors: ''
+HeaderFilterRegex: ''
 FormatStyle: 'file'
 ...
