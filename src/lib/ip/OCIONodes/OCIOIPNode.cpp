@@ -483,10 +483,7 @@ namespace IPCore
 
                 if (!m_transform)
                 {
-                    m_transform = OCIO::GroupTransform::Create();
-
-                    // Is the input transform specified via a data array ?
-                    if (inTransformURL.empty())
+                    if (!sp->empty())
                     {
                         // We need to provide a unique name to OCIOv2,
                         // otherwise it might use a potentially incorrect
@@ -533,7 +530,10 @@ namespace IPCore
 
                 if (!m_transform)
                 {
-                    m_transform = OCIO::GroupTransform::Create();
+                    QMutexLocker lock(&this->m_lock);
+                    if (!m_transform)
+                    {
+                        m_transform = OCIO::GroupTransform::Create();
 
                     // RV's working space is currently assumed to be 709
                     // linear like the original EXR spec. In the display

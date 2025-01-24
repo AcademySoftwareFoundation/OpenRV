@@ -1234,8 +1234,12 @@ namespace IPCore
                     f.setSampleRate(rate);
                     if (device.isFormatSupported(f))
                     {
-                        formats.push_back(fmt);
-                        break;
+                        f.setSampleRate(rates[i]);
+                        if (info.isFormatSupported(f))
+                        {
+                            formats.push_back(fmt);
+                            break;
+                        }
                     }
                 }
             }

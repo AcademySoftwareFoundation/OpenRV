@@ -985,7 +985,6 @@ namespace Rv
             {
                 windowOnTargetScreen = window;
             }
-        }
 
         if (!windowOnTargetScreen)
         {
