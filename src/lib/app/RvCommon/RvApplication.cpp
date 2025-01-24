@@ -876,8 +876,8 @@ namespace Rv
                 connect(m_newTimer, SIGNAL(timeout()), this,
                         SLOT(runCreateSession()));
             }
-            // TODO_CED TIMER
-            m_newTimer->start(int(1.0 / 50.0 * 1000.0));
+
+            m_newTimer->start(int(1.0 / 192.0 * 1000.0));
         }
 
         m_newSessions.push_back(sv);

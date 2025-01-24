@@ -158,10 +158,6 @@ namespace Rv
         setAcceptDrops(true);
         setFocusPolicy(Qt::StrongFocus);
 
-        // NOTE_QT: setAutoBufferSwap does not exist anymore.
-        // QUESTON_QT: Is there something else?
-        // setAutoBufferSwap(false);
-
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this,
                 SLOT(eventProcessingTimeout()));
@@ -239,8 +235,6 @@ namespace Rv
             fmt.setBlueBufferSize(blue);
         if (alpha >= 0)
         {
-            // NOTE_QT6: setAlpha does not exist anymore. Using only
-            // setAlphaBufferSize.
             fmt.setAlphaBufferSize(alpha);
         }
 
@@ -316,7 +310,6 @@ namespace Rv
                 // box.exec();
             }
 #endif
-            // NOTE_QT6: stencil does not exist anymore
             if (f.stencilBufferSize() == 0)
             {
                 cout << "WARNING: no stencil buffer available" << endl;
@@ -499,8 +492,6 @@ namespace Rv
 #ifdef PLATFORM_DARWIN
                 session->outputVideoDevice()->syncBuffers();
                 makeCurrent();
-                // NOTE_QT6: swapBuffers is under the QOpenGLContext object in
-                // Qt6.
                 context()->swapBuffers(context()->surface());
 #else
                 session->outputVideoDevice()->syncBuffers();
@@ -510,8 +501,6 @@ namespace Rv
             }
             else
             {
-                // NOTE_QT6: swapBuffers is under the QOpenGLContext object in
-                // Qt6.
                 m_videoDevice->widget()->context()->swapBuffers(
                     m_videoDevice->widget()->context()->surface());
             }
@@ -556,8 +545,6 @@ namespace Rv
                 // session->outputVideoDevice()->syncBuffers();
 
                 makeCurrent();
-                // NOTE_QT6: swapBuffers is under the QOpenGLContext object in
-                // Qt6.
                 context()->swapBuffers(context()->surface());
 #else
                 session->outputVideoDevice()->syncBuffers();
@@ -567,8 +554,6 @@ namespace Rv
             }
             else
             {
-                // NOTE_QT6: swapBuffers is under the QOpenGLContext object in
-                // Qt6.
                 context()->swapBuffers(context()->surface());
             }
         }

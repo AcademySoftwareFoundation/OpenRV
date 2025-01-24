@@ -176,8 +176,6 @@ namespace Rv
         if (!isWorkerDevice())
         {
             makeCurrent();
-            // NOTE_QT: swapBuffers() does not exist in the QOpenGLWidget. It
-            // under the context.
             m_view->context()->swapBuffers(m_view->context()->surface());
         }
     }

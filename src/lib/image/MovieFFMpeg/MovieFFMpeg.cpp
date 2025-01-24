@@ -6124,4 +6124,4 @@ namespace TwkMovie
     {
         return getDoubleAttribute("defaultFPS");
     }
-} // End namespace TwkMovie
+} // namespace TwkMovie

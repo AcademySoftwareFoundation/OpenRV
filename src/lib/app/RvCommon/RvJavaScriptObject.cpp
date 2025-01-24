@@ -137,11 +137,11 @@ namespace Rv
 
         for (size_t i = 0; i < m_eventNames.size(); i++)
         {
+<<<<<<< HEAD
             if (m_eventNames[i].match(name).hasMatch())
+=======
+            if (m_eventNames[i].indexIn(name) != -1)
             {
-                if (const GenericStringEvent* ge =
-                        dynamic_cast<const GenericStringEvent*>(&event))
-                {
                     emit eventString(ge->name().c_str(),
                                      ge->stringContent().c_str(),
                                      ge->senderName().c_str());

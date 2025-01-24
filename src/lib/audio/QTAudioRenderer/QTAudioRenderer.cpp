@@ -964,7 +964,6 @@ namespace IPCore
         // The AudioRenderer::defaultParameters().framesPerBuffer is zero it
         // means the audio preference "Audio Cache samples" is zero; in which
         // case we calculate what the audioOutput bufferSize should be.
-
         if (AudioRenderer::defaultParameters().framesPerBuffer == 0)
         {
 #ifdef PLATFORM_DARWIN
@@ -1408,8 +1407,12 @@ namespace IPCore
                     f.setSampleRate(rate);
                     if (device.isFormatSupported(f))
                     {
-                        formats.push_back(fmt);
-                        break;
+                        f.setSampleRate(rates[i]);
+                        if (info.isFormatSupported(f))
+                        {
+                            formats.push_back(fmt);
+                            break;
+                        }
                     }
                 }
             }
