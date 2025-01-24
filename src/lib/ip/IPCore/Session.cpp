@@ -312,14 +312,14 @@ Session::Session(IPGraph* graph)
       m_waitForUploadThreadPrefetch(false),
       m_readingGTO(false),
       m_sessionType(SequenceSession),
-      m_rangeStart(1),
-      m_rangeEnd(2),
+      m_rangeStart(0),
+      m_rangeEnd(1),
       m_outputVideoDevice(0),
       m_controlVideoDevice(0),
-      m_narrowedRangeStart(1),
-      m_narrowedRangeEnd(2),
-      m_inPoint(1),
-      m_outPoint(2),
+      m_narrowedRangeStart(0),
+      m_narrowedRangeEnd(1),
+      m_inPoint(0),
+      m_outPoint(1),
       m_notPersistent(0),
       m_inc(1),
       //m_loadingError(false),
@@ -336,7 +336,7 @@ Session::Session(IPGraph* graph)
       m_overhead(0),
       m_shift(0),
       m_skipped(0),
-      m_frame(1),
+      m_frame(0),
       m_fastStart(true),
       m_bufferWait(false),
       m_latencyWait(false),
@@ -1706,11 +1706,11 @@ Session::clear()
     graph().flushAudioCache();
     if (!m_beingDeleted) graph().reset(App()->videoModules());
     setFileName("Untitled");
-    setInPoint(1);
-    setOutPoint(2);
-    setRangeStart(1);
-    setRangeEnd(2);
-    setFrameInternal(1);
+    setInPoint(0);
+    setOutPoint(1);
+    setRangeStart(0);
+    setRangeEnd(1);
+    setFrameInternal(0);
 
     if (!m_beingDeleted)
     {

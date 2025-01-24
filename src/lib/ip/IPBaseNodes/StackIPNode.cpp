@@ -291,7 +291,7 @@ StackIPNode::computeRanges()
 
     m_info.cutIn  = m_info.start;
     m_info.cutOut = m_info.end;
-    m_offset      = m_info.start - 1;
+    m_offset      = std::max(m_info.start - 1, 0);
 
     if (m_outputFPS->front() == 0.0 && !m_rangeInfos.empty() && ! m_rangeInfos[0].isUndiscovered)
     {
