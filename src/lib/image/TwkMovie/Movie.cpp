@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001-2002 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #include <TwkMovie/Movie.h>
 #include <TwkExc/Exception.h>
@@ -25,82 +25,117 @@
 #include <unistd.h>
 #endif
 
-namespace TwkMovie {
-using namespace std;
-using namespace stl_ext;
-using namespace TwkMath;
-using namespace TwkAudio;
-
-Movie::Movie() 
-    : m_threadSafe(false),
-      m_audioAsync(true)
+namespace TwkMovie
 {
-}
+    using namespace std;
+    using namespace stl_ext;
+    using namespace TwkMath;
+    using namespace TwkAudio;
 
-Movie::~Movie() 
-{ 
-}
-
-bool Movie::hasAudio() const { return info().audio; }
-bool Movie::hasVideo() const { return info().video; }
-
-void Movie::imagesAtFrame(const ReadRequest&, FrameBufferVector& fbs) {}
-void Movie::identifiersAtFrame(const ReadRequest&, IdentifierVector&) {}
-void Movie::attributesAtFrame(const ReadRequest&, FrameBufferVector&) {}
-void Movie::flush() {}
-size_t Movie::audioFillBuffer(const AudioReadRequest&, AudioBuffer&) { return 0; }
-bool Movie::canConvertAudioRate() const { return false; }
-bool Movie::canConvertAudioChannels() const { return false; }
-void Movie::audioConfigure(const AudioConfiguration&) {}
-Movie* Movie::clone() const { abort(); return 0; }
-
-void
-Movie::cacheAudioForFrames(AudioBuffer& buffer, const Frames& frames)
-{
-    //
-    //  Take a list of (img) frames and assemble an audio track that
-    //  corresponds to these
-    //
-
-    const unsigned int numChannels = m_info.audioChannels.size();
-    const double       rate        = m_info.audioSampleRate;
-    const double       afpf        = rate / double(m_info.fps);
-    const size_t       aframes     = size_t(afpf * frames.size()) + 1;
-
-    buffer.reconfigure(aframes, m_info.audioChannels, rate);
-
-    Time t0 = m_info.start / Time(m_info.fps);
-
-    float* ap = buffer.pointer();
-
-    for (int i=0; i < frames.size(); i++)
+    Movie::Movie()
+        : m_threadSafe(false)
+        , m_audioAsync(true)
     {
-        int    f     = frames[i];
-        Time   ts    = double(f) / m_info.fps - t0;
-        Time   te    = double(f+1) / m_info.fps - t0;
-        size_t start = size_t(ts * rate);
-        size_t end   = size_t(te * rate) - 1;
-        size_t len   = end - start;
-
-        double startTime = double(start) / rate;
-        double duration  = double(len) / rate;
-
-        AudioBuffer temp(ap, m_info.audioChannels, len, startTime, rate);
-        AudioReadRequest req(startTime, duration);
-        audioFillBuffer(req, temp);
-
-        ap += len * numChannels;
     }
-}
 
-bool Movie::getBoolAttribute(const std::string& name) const { return false; }
-void Movie::setBoolAttribute(const std::string& name, bool value) { }
-int Movie::getIntAttribute(const std::string& name) const { return false; }
-void Movie::setIntAttribute(const std::string& name, int value) { }
-string Movie::getStringAttribute(const std::string& name) const { return ""; }
-void Movie::setStringAttribute(const std::string& name, const std::string& value) { }
-double Movie::getDoubleAttribute(const std::string& name) const { return 0.0; }
-void Movie::setDoubleAttribute(const std::string& name, double value) const {}
+    Movie::~Movie() {}
+
+    bool Movie::hasAudio() const { return info().audio; }
+
+    bool Movie::hasVideo() const { return info().video; }
+
+    void Movie::imagesAtFrame(const ReadRequest&, FrameBufferVector& fbs) {}
+
+    void Movie::identifiersAtFrame(const ReadRequest&, IdentifierVector&) {}
+
+    void Movie::attributesAtFrame(const ReadRequest&, FrameBufferVector&) {}
+
+    void Movie::flush() {}
+
+    size_t Movie::audioFillBuffer(const AudioReadRequest&, AudioBuffer&)
+    {
+        return 0;
+    }
+
+    bool Movie::canConvertAudioRate() const { return false; }
+
+    bool Movie::canConvertAudioChannels() const { return false; }
+
+    void Movie::audioConfigure(const AudioConfiguration&) {}
+
+    Movie* Movie::clone() const
+    {
+        abort();
+        return 0;
+    }
+
+    void Movie::cacheAudioForFrames(AudioBuffer& buffer, const Frames& frames)
+    {
+        //
+        //  Take a list of (img) frames and assemble an audio track that
+        //  corresponds to these
+        //
+
+        const unsigned int numChannels = m_info.audioChannels.size();
+        const double rate = m_info.audioSampleRate;
+        const double afpf = rate / double(m_info.fps);
+        const size_t aframes = size_t(afpf * frames.size()) + 1;
+
+        buffer.reconfigure(aframes, m_info.audioChannels, rate);
+
+        Time t0 = m_info.start / Time(m_info.fps);
+
+        float* ap = buffer.pointer();
+
+        for (int i = 0; i < frames.size(); i++)
+        {
+            int f = frames[i];
+            Time ts = double(f) / m_info.fps - t0;
+            Time te = double(f + 1) / m_info.fps - t0;
+            size_t start = size_t(ts * rate);
+            size_t end = size_t(te * rate) - 1;
+            size_t len = end - start;
+
+            double startTime = double(start) / rate;
+            double duration = double(len) / rate;
+
+            AudioBuffer temp(ap, m_info.audioChannels, len, startTime, rate);
+            AudioReadRequest req(startTime, duration);
+            audioFillBuffer(req, temp);
+
+            ap += len * numChannels;
+        }
+    }
+
+    bool Movie::getBoolAttribute(const std::string& name) const
+    {
+        return false;
+    }
+
+    void Movie::setBoolAttribute(const std::string& name, bool value) {}
+
+    int Movie::getIntAttribute(const std::string& name) const { return false; }
+
+    void Movie::setIntAttribute(const std::string& name, int value) {}
+
+    string Movie::getStringAttribute(const std::string& name) const
+    {
+        return "";
+    }
+
+    void Movie::setStringAttribute(const std::string& name,
+                                   const std::string& value)
+    {
+    }
+
+    double Movie::getDoubleAttribute(const std::string& name) const
+    {
+        return 0.0;
+    }
+
+    void Movie::setDoubleAttribute(const std::string& name, double value) const
+    {
+    }
 
 #if 0
 //
@@ -224,5 +259,4 @@ Movie::resampleAudioToOutput(const AudioCache& in,
 
 #endif
 
-} // End namespace Rv
-
+} // namespace TwkMovie

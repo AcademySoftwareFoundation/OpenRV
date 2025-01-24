@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2008 Tweak Inc. 
+// Copyright (c) 2008 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <TwkFB/Attribute.h>
@@ -12,47 +12,51 @@
 #include <assert.h>
 #include <stdlib.h>
 
-namespace TwkFB {
-using namespace std;
-
-TWK_CLASS_NEW_DELETE(FBAttribute)
-
-FBAttribute*
-DataContainerAttribute::copy() const
+namespace TwkFB
 {
-    return new DataContainerAttribute(name(), data(), size());
-}
+    using namespace std;
 
-FBAttribute*
-DataContainerAttribute::copyWithPrefix(const string& prefix) const
-{
-    return new DataContainerAttribute(prefix + name(), data(), size());
-}
+    TWK_CLASS_NEW_DELETE(FBAttribute)
 
-string
-DataContainerAttribute::valueAsString() const
-{
-    ostringstream str;
-    str << "(" << size() << " bytes of data)";
-    return str.str();
-}
+    FBAttribute* DataContainerAttribute::copy() const
+    {
+        return new DataContainerAttribute(name(), data(), size());
+    }
 
-template<>
-TypedFBAttribute<const char*>::TypedFBAttribute(const std::string& name, const char* value)
-    : FBAttribute(name)
-{
-    //  FRIENDLY REMINDER: USE A STRING ATTR INSTEAD OF CHAR*
-    cout << "ERROR: TypedFBAttribute<T> where T is const char* is not allowed" << endl;
-    abort();
-}
+    FBAttribute*
+    DataContainerAttribute::copyWithPrefix(const string& prefix) const
+    {
+        return new DataContainerAttribute(prefix + name(), data(), size());
+    }
 
-template<>
-TypedFBAttribute<char*>::TypedFBAttribute(const std::string& name, char* value)
-    : FBAttribute(name)
-{
-    //  FRIENDLY REMINDER: USE A STRING ATTR INSTEAD OF CHAR*
-    cout << "ERROR: TypedFBAttribute<T> where T is char* is not allowed" << endl;
-    abort();
-}
+    string DataContainerAttribute::valueAsString() const
+    {
+        ostringstream str;
+        str << "(" << size() << " bytes of data)";
+        return str.str();
+    }
 
-} // TwkFB
+    template <>
+    TypedFBAttribute<const char*>::TypedFBAttribute(const std::string& name,
+                                                    const char* value)
+        : FBAttribute(name)
+    {
+        //  FRIENDLY REMINDER: USE A STRING ATTR INSTEAD OF CHAR*
+        cout << "ERROR: TypedFBAttribute<T> where T is const char* is not "
+                "allowed"
+             << endl;
+        abort();
+    }
+
+    template <>
+    TypedFBAttribute<char*>::TypedFBAttribute(const std::string& name,
+                                              char* value)
+        : FBAttribute(name)
+    {
+        //  FRIENDLY REMINDER: USE A STRING ATTR INSTEAD OF CHAR*
+        cout << "ERROR: TypedFBAttribute<T> where T is char* is not allowed"
+             << endl;
+        abort();
+    }
+
+} // namespace TwkFB

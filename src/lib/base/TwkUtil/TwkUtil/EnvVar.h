@@ -17,402 +17,417 @@
 #include <string>
 #include <vector>
 
-namespace TwkUtil {
+namespace TwkUtil
+{
 
-/*==============================================================================
- * USEFULL MACROS
- *============================================================================*/
+    /*==============================================================================
+     * USEFULL MACROS
+     *============================================================================*/
 
-#define ENVVAR_CONCAT2(a,b) a##b
-#define ENVVAR_CONCAT(a,b) ENVVAR_CONCAT2(a,b)
+#define ENVVAR_CONCAT2(a, b) a##b
+#define ENVVAR_CONCAT(a, b) ENVVAR_CONCAT2(a, b)
 
-// Use the following for global and static EnvVar variables.
+    // Use the following for global and static EnvVar variables.
 
-#define ENVVAR_STRING(T, V, D) \
-    TwkUtil::EnvVar<std::string> T = { { V, false, 0, 0 }, D, 0, false }; \
-    static TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
-
-#ifdef INTERNAL
-    #define ENVVAR_STRING_INTERNAL ENVVAR_STRING
-#else
-    #define ENVVAR_STRING_INTERNAL(T, V, D) \
-    static struct { std::string getValue() const { return D; } } T
-#endif
-
-#define ENVVAR_BOOL(T, V, D) \
-    TwkUtil::EnvVar<bool> T = { { V, false, 0, 0 }, D, D, false }; \
-    static TwkUtil::RegEnvVar<bool> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+#define ENVVAR_STRING(T, V, D)                                                 \
+    TwkUtil::EnvVar<std::string> T = {{V, false, 0, 0}, D, 0, false};          \
+    static TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq, __LINE__)( \
+        __FILE__, T)
 
 #ifdef INTERNAL
-    #define ENVVAR_BOOL_INTERNAL ENVVAR_BOOL
+#define ENVVAR_STRING_INTERNAL ENVVAR_STRING
 #else
-    #define ENVVAR_BOOL_INTERNAL(T, V, D) \
-    static struct { bool getValue() const { return D; } } T
+#define ENVVAR_STRING_INTERNAL(T, V, D)            \
+    static struct                                  \
+    {                                              \
+        std::string getValue() const { return D; } \
+    } T
 #endif
 
-#define ENVVAR_INT(T, V, D) \
-    TwkUtil::EnvVar<int> T = { { V, false, 0, 0 }, D, D, false }; \
-    static TwkUtil::RegEnvVar<int> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+#define ENVVAR_BOOL(T, V, D)                                   \
+    TwkUtil::EnvVar<bool> T = {{V, false, 0, 0}, D, D, false}; \
+    static TwkUtil::RegEnvVar<bool> ENVVAR_CONCAT(evRegUniq,   \
+                                                  __LINE__)(__FILE__, T)
 
 #ifdef INTERNAL
-    #define ENVVAR_INT_INTERNAL ENVVAR_INT
+#define ENVVAR_BOOL_INTERNAL ENVVAR_BOOL
 #else
-    #define ENVVAR_INT_INTERNAL(T, V, D) \
-    static struct { int getValue() const { return D; } } T
+#define ENVVAR_BOOL_INTERNAL(T, V, D)       \
+    static struct                           \
+    {                                       \
+        bool getValue() const { return D; } \
+    } T
 #endif
 
-#define ENVVAR_FLOAT(T, V, D) \
-    TwkUtil::EnvVar<float> T = { { V, false, 0, 0 }, D, D, false }; \
-    static TwkUtil::RegEnvVar<float> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+#define ENVVAR_INT(T, V, D)                                   \
+    TwkUtil::EnvVar<int> T = {{V, false, 0, 0}, D, D, false}; \
+    static TwkUtil::RegEnvVar<int> ENVVAR_CONCAT(evRegUniq,   \
+                                                 __LINE__)(__FILE__, T)
 
 #ifdef INTERNAL
-    #define ENVVAR_FLOAT_INTERNAL ENVVAR_FLOAT
+#define ENVVAR_INT_INTERNAL ENVVAR_INT
 #else
-    #define ENVVAR_FLOAT_INTERNAL(T, V, D) \
-    static struct { float getValue() const { return D; } } T
+#define ENVVAR_INT_INTERNAL(T, V, D)       \
+    static struct                          \
+    {                                      \
+        int getValue() const { return D; } \
+    } T
 #endif
 
-// Use the following for temporary local on-stack EnvVar variables.
+#define ENVVAR_FLOAT(T, V, D)                                   \
+    TwkUtil::EnvVar<float> T = {{V, false, 0, 0}, D, D, false}; \
+    static TwkUtil::RegEnvVar<float> ENVVAR_CONCAT(evRegUniq,   \
+                                                   __LINE__)(__FILE__, T)
 
-#define ONSTACK_ENVVAR_STRING(T, V, D) \
-    TwkUtil::EnvVar<std::string> T = { { V, false, 0, 0 }, D, 0, false }; \
-    TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+#ifdef INTERNAL
+#define ENVVAR_FLOAT_INTERNAL ENVVAR_FLOAT
+#else
+#define ENVVAR_FLOAT_INTERNAL(T, V, D)       \
+    static struct                            \
+    {                                        \
+        float getValue() const { return D; } \
+    } T
+#endif
 
-#define ONSTACK_ENVVAR_BOOL(T, V, D) \
-    TwkUtil::EnvVar<bool> T = { { V, false, 0, 0 }, D, D, false }; \
-    TwkUtil::RegEnvVar<bool> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+    // Use the following for temporary local on-stack EnvVar variables.
 
-#define ONSTACK_ENVVAR_INT(T, V, D) \
-    TwkUtil::EnvVar<int> T = { { V, false, 0, 0 }, D, D, false }; \
-    TwkUtil::RegEnvVar<int> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+#define ONSTACK_ENVVAR_STRING(T, V, D)                                \
+    TwkUtil::EnvVar<std::string> T = {{V, false, 0, 0}, D, 0, false}; \
+    TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq,          \
+                                                  __LINE__)(__FILE__, T)
 
-#define ONSTACK_ENVVAR_FLOAT(T, V, D) \
-    TwkUtil::EnvVar<float> T = { { V, false, 0, 0 }, D, D, false }; \
-    TwkUtil::RegEnvVar<float> ENVVAR_CONCAT(evRegUniq,__LINE__)(__FILE__, T)
+#define ONSTACK_ENVVAR_BOOL(T, V, D)                           \
+    TwkUtil::EnvVar<bool> T = {{V, false, 0, 0}, D, D, false}; \
+    TwkUtil::RegEnvVar<bool> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
+#define ONSTACK_ENVVAR_INT(T, V, D)                           \
+    TwkUtil::EnvVar<int> T = {{V, false, 0, 0}, D, D, false}; \
+    TwkUtil::RegEnvVar<int> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
-/*==============================================================================
- * CLASS EnvVarRegistry
- *============================================================================*/
+#define ONSTACK_ENVVAR_FLOAT(T, V, D)                           \
+    TwkUtil::EnvVar<float> T = {{V, false, 0, 0}, D, D, false}; \
+    TwkUtil::RegEnvVar<float> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
-/*==============================================================================
- * CLASS EnvVar
- *============================================================================*/
+    /*==============================================================================
+     * CLASS EnvVarRegistry
+     *============================================================================*/
 
-// <summary> Statically initializable env. variable descriptor. </summary>
+    /*==============================================================================
+     * CLASS EnvVar
+     *============================================================================*/
 
-// Allows itself to be completely statically initialisable by being a POT
-// (plain-old-data), avoiding order-of-initialization problems. Thus it
-// must:
-//
-//    - *not* contain data with constructor or virtual functions.
-//    - *not* contain virtual functions.
-//    - *not* have constructor, destructor and assignment operator.
-struct BaseEnvVar {
+    // <summary> Statically initializable env. variable descriptor. </summary>
 
-    //Definition of a function pointer for the callback
-    typedef void ( *ChangeValueCallBackFunctionDef )( void *data );
+    // Allows itself to be completely statically initialisable by being a POT
+    // (plain-old-data), avoiding order-of-initialization problems. Thus it
+    // must:
+    //
+    //    - *not* contain data with constructor or virtual functions.
+    //    - *not* contain virtual functions.
+    //    - *not* have constructor, destructor and assignment operator.
+    struct BaseEnvVar
+    {
 
-    // Enum
-    //data type
-    enum EnvVarType {
-        EV_NONE,
-        EV_STRING,
-        EV_BOOL,
-        EV_INT,
-        EV_FLOAT
+        // Definition of a function pointer for the callback
+        typedef void (*ChangeValueCallBackFunctionDef)(void* data);
+
+        // Enum
+        // data type
+        enum EnvVarType
+        {
+            EV_NONE,
+            EV_STRING,
+            EV_BOOL,
+            EV_INT,
+            EV_FLOAT
+        };
+
+        // available field
+        enum EnvVarField
+        {
+            EV_NAME,
+            EV_VALUE,
+            EV_DEF_VALUE,
+            EV_FILE_NAME
+        };
+
+        // defines
+        static const int MAX_NAME_LENGTH = 128;
+        static const int MAX_STR_VALUE_LENGTH = 128;
+
+        /*----- member functions -----*/
+
+        // Get name.
+        const char* getName() const;
+
+        // Set a callback
+        void setChangeValueCallback(
+            ChangeValueCallBackFunctionDef changeValueFunctionCallback,
+            void* changeValueCallbackParameter);
+
+        // Called when the value of this envVar change, invoke the callback
+        // function if it have been set.
+        void invokeChangeValueCallback();
+
+        /*----- data members -----*/
+
+        // What environment string to use?
+        const char* const _name;
+
+        // Since the envvars are often declared statically, and there
+        // is no way to predict the static initialization order, we have to
+        // ensure the object is fully constructed before using it.
+        bool _ready;
+
+        // Pointer on the funciton to be called
+        ChangeValueCallBackFunctionDef _changeValueFunctionCallback;
+        // The callback parameters
+        void* _changeValueCallbackParameter;
     };
 
-    //available field
-    enum EnvVarField {
-        EV_NAME,
-        EV_VALUE,
-        EV_DEF_VALUE,
-        EV_FILE_NAME
+    // <summary> Maps the type of the user-level class template
+    //           to its implementation type. </summary>
+
+    template <class T> struct EnvVarMapper;
+
+    template <> struct EnvVarMapper<bool>
+    {
+        typedef bool type;
     };
 
-   // defines
-   static const int MAX_NAME_LENGTH = 128 ;
-   static const int MAX_STR_VALUE_LENGTH = 128 ;
+    template <> struct EnvVarMapper<int>
+    {
+        typedef int type;
+    };
 
-   /*----- member functions -----*/
+    template <> struct EnvVarMapper<float>
+    {
+        typedef float type;
+    };
 
-   // Get name.
-   const char* getName() const;
+    template <> struct EnvVarMapper<std::string>
+    {
+        typedef const char* type;
+    };
 
-   // Set a callback
-   void setChangeValueCallback(
-    	ChangeValueCallBackFunctionDef changeValueFunctionCallback,
-    	void *changeValueCallbackParameter
-   );
-
-   // Called when the value of this envVar change, invoke the callback function
-   // if it have been set.
-   void invokeChangeValueCallback();
+    // <summary> Concrete env. var type. </summary>
+    template <typename T> struct EnvVar
+    {
+        /*----- member types -----*/
 
-   /*----- data members -----*/
+        typedef typename EnvVarMapper<T>::type U;
 
-   // What environment string to use?
-   const char* const    _name;
+        // Get name.
+        const char* getName() const;
 
-   // Since the envvars are often declared statically, and there 
-   // is no way to predict the static initialization order, we have to 
-   // ensure the object is fully constructed before using it.
-   bool _ready;
+        // Set a callback
+        void setChangeValueCallback(BaseEnvVar::ChangeValueCallBackFunctionDef
+                                        changeValueFunctionCallback,
+                                    void* changeValueCallbackParameter);
 
-   // Pointer on the funciton to be called
-   ChangeValueCallBackFunctionDef   _changeValueFunctionCallback;
-   // The callback parameters
-   void             	    	    *_changeValueCallbackParameter;
-};
+        // Called when the value of this envVar change, invoke the callback
+        // function if it have been set.
+        void invokeChangeValueCallback();
 
-// <summary> Maps the type of the user-level class template
-//           to its implementation type. </summary>
+        // Get type
+        BaseEnvVar::EnvVarType getType() const;
 
-template <class T> struct EnvVarMapper;
-template<> struct EnvVarMapper<bool> { typedef bool type; };
-template<> struct EnvVarMapper<int> { typedef int type; };
-template<> struct EnvVarMapper<float> { typedef float type; };
-template<> struct EnvVarMapper<std::string> { typedef const char* type; };
+        // Get value.
+        T getValue() const;
 
-// <summary> Concrete env. var type. </summary>
-template <typename T>
-struct EnvVar {
-   /*----- member types -----*/
+        // Get value as char
+        void getValueAsStr(char* strPtr, int size) const;
 
-   typedef typename EnvVarMapper<T>::type U;
+        // Get default value.
+        T getDefaultValue() const;
 
-   // Get name.
-   const char* getName() const;
+        // Get the default status.
+        bool isDefault() const;
 
-   // Set a callback
-   void setChangeValueCallback(
-    	BaseEnvVar::ChangeValueCallBackFunctionDef changeValueFunctionCallback,
-    	void *changeValueCallbackParameter
-   );
+        // Get default value as char
+        void getDefaultValueAsStr(char* strPtr, int size) const;
 
-   // Called when the value of this envVar change, invoke the callback function
-   // if it have been set.
-   void invokeChangeValueCallback();
+        // Get the readonly status.
+        bool isReadOnly() const;
 
-   // Get type
-   BaseEnvVar::EnvVarType getType() const;
-   
-   // Get value.
-   T getValue() const;
+        // set value and propagate to all
+        void setValue(T newValue);
 
-   // Get value as char
-   void getValueAsStr( char * strPtr, int size ) const;
+        // set value but don't propagate
+        void setValueOnly(T newValue);
 
-   // Get default value.
-   T getDefaultValue() const;
- 
-   // Get the default status.
-   bool isDefault() const;
+        // set default value
+        void setDefaultValue(T newValue);
 
-   // Get default value as char
-   void getDefaultValueAsStr( char * strPtr, int size ) const;
+        // set the readonly status.
+        void setReadOnlyStatus(bool isReadOnly);
 
-   // Get the readonly status.
-   bool isReadOnly() const;
+        // Refresh value.
+        void refresh();
 
-   // set value and propagate to all
-   void setValue( T newValue );
+        // Dump.
+        std::ostream& dump(std::ostream& os) const;
 
-   // set value but don't propagate
-   void setValueOnly(T newValue);
+        /*----- data members -----*/
 
-   // set default value
-   void setDefaultValue( T newValue );
+        BaseEnvVar _base;
+        // Current default value.
+        // In the case of const char*, allocated memory via strdup() if _ready.
+        U _defaultValue;
+        // Current value.
+        // In the case of const char*, allocated memory via strdup() if
+        // non-null.
+        U _value;
+        // If true the value cannot be changed.
+        bool _isReadOnly;
+    };
 
-   // set the readonly status.
-   void setReadOnlyStatus(bool isReadOnly);
+    /*==============================================================================
+     * CLASS RegEnvVar
+     *============================================================================*/
 
-   // Refresh value.
-   void refresh();
+    // <summary> Environment string wrapper. </summary>
 
-   // Dump.
-   std::ostream& dump( std::ostream& os ) const;
+    // Wraps 'getenv', gets named environment string on construction and
+    // keep the value. Value can be explicitly refreshed.
+    class BaseRegEnvVar
+    {
 
-   /*----- data members -----*/
+    public:
+        /*----- member functions -----*/
 
-   BaseEnvVar _base;
-   // Current default value.
-   // In the case of const char*, allocated memory via strdup() if _ready.
-   U _defaultValue;
-   // Current value.
-   // In the case of const char*, allocated memory via strdup() if non-null.
-   U _value;
-   // If true the value cannot be changed.
-   bool _isReadOnly;
-};
+        BaseRegEnvVar();
 
+        // Destruct, no op.
+        virtual ~BaseRegEnvVar();
 
-/*==============================================================================
- * CLASS RegEnvVar
- *============================================================================*/
+        BaseRegEnvVar(const char* fileName);
 
-// <summary> Environment string wrapper. </summary>
+        const char* getFileName() const;
 
-// Wraps 'getenv', gets named environment string on construction and
-// keep the value. Value can be explicitly refreshed.
-class BaseRegEnvVar {
+        // Get name.
+        virtual const char* getName() const = 0;
 
-public:
+        // Get type
+        virtual BaseEnvVar::EnvVarType getType() const = 0;
 
-   /*----- member functions -----*/
+        // Get value as char
+        virtual void getValueAsStr(char* strPtr, int size) const = 0;
 
-   BaseRegEnvVar();
+        // Get default value as char
+        virtual void getDefaultValueAsStr(char* strPtr, int size) const = 0;
 
-   // Destruct, no op.
-   virtual ~BaseRegEnvVar();
+        // Get the readonly status.
+        virtual bool isReadOnly() const = 0;
 
-   BaseRegEnvVar(
-      const char* fileName
-   );
+        // Dump.
+        virtual std::ostream& dump(std::ostream& os) const = 0;
 
-   const char* getFileName() const;
+    private:
+        // Set the value. Only set if the value is of the proper type, else
+        // asserts.
+        virtual void dynSetValue(bool newValue);
+        virtual void dynSetValue(int newValue);
+        virtual void dynSetValue(float newValue);
+        virtual void dynSetValue(std::string newValue);
 
-   // Get name.
-   virtual const char* getName() const = 0;
+        /*----- data members -----*/
 
-   // Get type
-   virtual BaseEnvVar::EnvVarType getType() const = 0;
- 
-   // Get value as char
-   virtual void getValueAsStr( char * strPtr, int size ) const = 0;
+        // The file where the environment variable is created
+        std::string _fileName;
 
-   // Get default value as char
-   virtual void getDefaultValueAsStr( char * strPtr, int size ) const = 0;
+        // Give access to dynSetValue.
+        friend struct EnvVar<std::string>;
+        friend struct EnvVar<int>;
+        friend struct EnvVar<bool>;
+        friend struct EnvVar<float>;
+    };
 
-   // Get the readonly status.
-   virtual bool isReadOnly() const = 0;
+    template <class T> class RegEnvVar : public BaseRegEnvVar
+    {
 
-   // Dump.
-   virtual std::ostream& dump( std::ostream& os ) const = 0;
+    public:
+        /*----- member functions -----*/
 
-private: 
+        RegEnvVar();
 
-   // Set the value. Only set if the value is of the proper type, else asserts.
-   virtual void dynSetValue( bool newValue );
-   virtual void dynSetValue( int newValue );
-   virtual void dynSetValue( float newValue );
-   virtual void dynSetValue( std::string newValue );
+        // Destruct, no op.
+        ~RegEnvVar();
 
-   /*----- data members -----*/
+        RegEnvVar(const char* fileName, EnvVar<T>& var);
 
-   // The file where the environment variable is created
-   std::string    _fileName;
+        // Get name.
+        const char* getName() const;
 
-   // Give access to dynSetValue.
-   friend struct EnvVar<std::string>;
-   friend struct EnvVar<int>;
-   friend struct EnvVar<bool>;
-   friend struct EnvVar<float>;
-};
+        // Get type
+        BaseEnvVar::EnvVarType getType() const;
 
-template <class T>
-class RegEnvVar : public BaseRegEnvVar {
+        // Get value as char
+        void getValueAsStr(char* strPtr, int size) const;
 
-public:
+        // Get default value as char
+        void getDefaultValueAsStr(char* strPtr, int size) const;
 
-   /*----- member functions -----*/
+        // Get the readonly status.
+        bool isReadOnly() const;
 
-   RegEnvVar();
+        // Dump.
+        std::ostream& dump(std::ostream& os) const;
 
-   // Destruct, no op.
-   ~RegEnvVar();
+        // Get value.
+        inline T getValue() const { return _var.getValue(); }
 
-   RegEnvVar(
-      const char* fileName,
-      EnvVar<T>& var
-   );
+        // set value and propagate to all
+        inline void setValue(T newValue) { _var.setValue(newValue); }
 
-   // Get name.
-   const char* getName() const;
+        // Get default value.
+        inline T getDefaultValue() const { return _var.getDefaultValue(); }
 
-   // Get type
-   BaseEnvVar::EnvVarType getType() const;
- 
-   // Get value as char
-   void getValueAsStr( char * strPtr, int size ) const;
+    private:
+        // Set value implementation detail.
+        void dynSetValue(T newValue);
 
-   // Get default value as char
-   void getDefaultValueAsStr( char * strPtr, int size ) const;
+        /*----- data members -----*/
 
-   // Get the readonly status.
-   bool isReadOnly() const;
+        // The real env. variable.
+        EnvVar<T>& _var;
+    };
 
-   // Dump.
-   std::ostream& dump( std::ostream& os ) const;
+    class EnvVarRegistry
+    {
 
-   // Get value.
-   inline T getValue() const { return _var.getValue(); }
+    public:
+        /*----- static member functions -----*/
 
-   // set value and propagate to all
-   inline void setValue( T newValue ) { _var.setValue( newValue ); }
+        static EnvVarRegistry& getInstance();
 
-   // Get default value.
-   inline T getDefaultValue() const { return _var.getDefaultValue(); }
- 
-private: 
+        /*---- member functions -----*/
 
-   // Set value implementation detail.
-   void dynSetValue( T newValue );
+        virtual ~EnvVarRegistry();
 
-   /*----- data members -----*/
+        virtual BaseRegEnvVar* getEnvVar(int i) const = 0;
 
-   // The real env. variable.
-   EnvVar<T>&    _var;
-};
+        virtual std::vector<int> search(const char* searchStr, int searchType,
+                                        bool exact) = 0;
 
+        virtual int getNumElements() const = 0;
 
-class EnvVarRegistry {
+        virtual void remove(BaseRegEnvVar* var) = 0;
+        virtual void dump(std::ostream& os) const = 0;
 
-public: 
+        virtual void dumpHtml(std::ostream& os) const = 0;
 
-   /*----- static member functions -----*/
+    protected:
+        /*----- member functions -----*/
 
-   static EnvVarRegistry& getInstance();
+        EnvVarRegistry();
+    };
 
-   /*---- member functions -----*/
+    // <summary> EnvVar global functions </summary>
+    // Output operator.
+    std::ostream& operator<<(std::ostream& os, const BaseRegEnvVar& var);
 
-   virtual ~EnvVarRegistry();
-
-   virtual BaseRegEnvVar* getEnvVar(int i) const = 0;
-
-   virtual std::vector<int> search(const char* searchStr, int searchType,
-   bool exact ) = 0;
-
-   virtual int getNumElements() const = 0;
-
-   virtual void remove( BaseRegEnvVar* var ) = 0;
-   virtual void dump(
-      std::ostream& os
-   ) const = 0;
-   
-   virtual void dumpHtml(
-      std::ostream& os
-   ) const = 0;
-
-protected:
-
-   /*----- member functions -----*/
-
-   EnvVarRegistry();
-};
-
-// <summary> EnvVar global functions </summary>
-// Output operator.
-std::ostream& operator<<(
-   std::ostream& os,
-   const BaseRegEnvVar& var
-);
-
-std::ostream& operator<<(
-   std::ostream&         os,
-   const EnvVarRegistry& reg
-);
+    std::ostream& operator<<(std::ostream& os, const EnvVarRegistry& reg);
 
 } // end namespace TwkUtil
 

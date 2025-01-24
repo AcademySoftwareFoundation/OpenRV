@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <Mu/ClassInstance.h>
 #include <Mu/Exception.h>
@@ -35,56 +35,54 @@
 
 namespace TwkApp
 {
-  using namespace std;
+    using namespace std;
 
-  static Mu::Value pyToMu( PyObject* obj )
-  {
-    return Mu::Value();
-  }
+    static Mu::Value pyToMu(PyObject* obj) { return Mu::Value(); }
 
-  /* 'self' is not used */
-  static PyObject* mu_eval( PyObject* self, PyObject* args )
-  {
-    PyLockObject locker;
-    const char* s;
-    if( !PyArg_ParseTuple( args, "s", &s ) ) return NULL;
-    Mu::Context::ModuleList modules;
-    string r = muEval( muContext(), muProcess(), modules, s, "muEval" );
-    return Py_BuildValue( "s", r.c_str() );
-  }
+    /* 'self' is not used */
+    static PyObject* mu_eval(PyObject* self, PyObject* args)
+    {
+        PyLockObject locker;
+        const char* s;
+        if (!PyArg_ParseTuple(args, "s", &s))
+            return NULL;
+        Mu::Context::ModuleList modules;
+        string r = muEval(muContext(), muProcess(), modules, s, "muEval");
+        return Py_BuildValue("s", r.c_str());
+    }
 
-  static PyMethodDef pymu_methods[] = {
-      {"muEval", mu_eval, METH_VARARGS,
-       "evaluate mu code -- to be used a fallback only"},
-      {NULL, NULL} /* sentinel */
-  };
+    static PyMethodDef pymu_methods[] = {
+        {"muEval", mu_eval, METH_VARARGS,
+         "evaluate mu code -- to be used a fallback only"},
+        {NULL, NULL} /* sentinel */
+    };
 
-  static struct PyModuleDef moduledef = {
-      {
-          1,    /* ob_refcnt */
-          NULL, /* ob_type */
-          NULL, /* m_init */
-          0,    /* m_index */
-          NULL, /* m_copy */
-      },
-      "pymu",       /* m_name */
-      NULL,         /* m_doc */
-      -1,           /* m_size */
-      pymu_methods, /* m_methods */
-      NULL,         /* m_reload */
-      NULL,         /* m_traverse */
-      NULL,         /* m_clear */
-      NULL,         /* m_free */
-  };
+    static struct PyModuleDef moduledef = {
+        {
+            1,    /* ob_refcnt */
+            NULL, /* ob_type */
+            NULL, /* m_init */
+            0,    /* m_index */
+            NULL, /* m_copy */
+        },
+        "pymu",       /* m_name */
+        NULL,         /* m_doc */
+        -1,           /* m_size */
+        pymu_methods, /* m_methods */
+        NULL,         /* m_reload */
+        NULL,         /* m_traverse */
+        NULL,         /* m_clear */
+        NULL,         /* m_free */
+    };
 
-  PyObject* initPyMu()
-  {
-    PyLockObject locker;
-    PyObject* pymu = PyImport_AddModule( "pymu" );
+    PyObject* initPyMu()
+    {
+        PyLockObject locker;
+        PyObject* pymu = PyImport_AddModule("pymu");
 
-    PyModule_Create( &moduledef );
+        PyModule_Create(&moduledef);
 
-    return pymu;
-  }
+        return pymu;
+    }
 
-}  // namespace TwkApp
+} // namespace TwkApp

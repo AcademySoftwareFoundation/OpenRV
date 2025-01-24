@@ -4,45 +4,48 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/config.h>
 #include <Mu/ClassInstance.h>
 
-namespace Mu {
-class Signature;
-class Function;
-class FunctionType;
-
-//
-//  class FunctionObject
-//
-//  This object holds either a function or a lambda object.
-//
-
-class FunctionObject : public ClassInstance
+namespace Mu
 {
-  public:
-    FunctionObject(const FunctionType*);
-    FunctionObject(const Function*);
-    FunctionObject(Thread&, const char*);
+    class Signature;
+    class Function;
+    class FunctionType;
 
-    void setFunction(const Function* f) { _function = f; }
-    const Function* function() const { return _function; }
+    //
+    //  class FunctionObject
+    //
+    //  This object holds either a function or a lambda object.
+    //
 
-    void setDependent(FunctionObject* o) { _dependent = o; }
-    FunctionObject* dependent() const { return _dependent; }
+    class FunctionObject : public ClassInstance
+    {
+    public:
+        FunctionObject(const FunctionType*);
+        FunctionObject(const Function*);
+        FunctionObject(Thread&, const char*);
 
-  protected:
-    FunctionObject();
-    ~FunctionObject();
+        void setFunction(const Function* f) { _function = f; }
 
-  protected:
-    const Function* _function;
-    FunctionObject* _dependent;
+        const Function* function() const { return _function; }
 
-    friend class FunctionType;
-};
+        void setDependent(FunctionObject* o) { _dependent = o; }
+
+        FunctionObject* dependent() const { return _dependent; }
+
+    protected:
+        FunctionObject();
+        ~FunctionObject();
+
+    protected:
+        const Function* _function;
+        FunctionObject* _dependent;
+
+        friend class FunctionType;
+    };
 
 } // namespace Mu
 

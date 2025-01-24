@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <mu_test/TestModule.h>
 #include <mu_test/SequenceInterface.h>
@@ -23,58 +23,50 @@
 #include <iostream>
 #include <stdlib.h>
 
-namespace Mu {
-using namespace std;
-
-TestModule::TestModule(Context* c, const char *name)
-    : Module(c, name)
+namespace Mu
 {
-}
+    using namespace std;
 
-TestModule::~TestModule()
-{
-}
+    TestModule::TestModule(Context* c, const char* name)
+        : Module(c, name)
+    {
+    }
 
-void
-TestModule::load()
-{
-    Function::ArgKeyword Return     = Function::Return;
-    Function::ArgKeyword Args       = Function::Args;
-    Function::ArgKeyword Optional   = Function::Optional;
-    Function::ArgKeyword End        = Function::End;
-    Function::ArgKeyword Parameters = Function::Parameters;
+    TestModule::~TestModule() {}
 
-    Function::Attributes CommOp     = Function::Mapped |
-                                      Function::Commutative |
-                                      Function::Operator |
-                                      Function::NoSideEffects;
-    Function::Attributes Op         = Function::Mapped |
-                                      Function::Operator |
-                                      Function::NoSideEffects;
-    Function::Attributes Mapped     = Function::Mapped |
-                                      Function::NoSideEffects;
-    Function::Attributes Cast       = Mapped | Function::Cast;
-    Function::Attributes Lossy      = Cast | Function::Lossy;
-    Function::Attributes AsOp       = Function::MemberOperator |
-                                      Function::Operator;
+    void TestModule::load()
+    {
+        Function::ArgKeyword Return = Function::Return;
+        Function::ArgKeyword Args = Function::Args;
+        Function::ArgKeyword Optional = Function::Optional;
+        Function::ArgKeyword End = Function::End;
+        Function::ArgKeyword Parameters = Function::Parameters;
 
-    MuLangContext* context = (MuLangContext*)globalModule()->context();
+        Function::Attributes CommOp = Function::Mapped | Function::Commutative
+                                      | Function::Operator
+                                      | Function::NoSideEffects;
+        Function::Attributes Op =
+            Function::Mapped | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Mapped =
+            Function::Mapped | Function::NoSideEffects;
+        Function::Attributes Cast = Mapped | Function::Cast;
+        Function::Attributes Lossy = Cast | Function::Lossy;
+        Function::Attributes AsOp =
+            Function::MemberOperator | Function::Operator;
 
-    typedef ParameterVariable Param;
+        MuLangContext* context = (MuLangContext*)globalModule()->context();
 
-    Class* base = new BaseType(context);
-    Class* a    = new AClassType(context, base);
-    Class* b    = new BClassType(context, base);
-    Class* c    = new CClassType(context, base);
+        typedef ParameterVariable Param;
 
-    addSymbols( new SequenceInterface(context), 
-                new BarInterface(context),
-                base, 
-                a, b, c,
+        Class* base = new BaseType(context);
+        Class* a = new AClassType(context, base);
+        Class* b = new BClassType(context, base);
+        Class* c = new CClassType(context, base);
 
-		EndArguments );
+        addSymbols(new SequenceInterface(context), new BarInterface(context),
+                   base, a, b, c,
 
-
-}
+                   EndArguments);
+    }
 
 } // namespace Mu

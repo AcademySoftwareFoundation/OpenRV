@@ -13,47 +13,47 @@
 namespace TwkMediaLibrary
 {
 
-  class PyMediaLibrary;
+    class PyMediaLibrary;
 
-  enum PyNodeType
-  {
-    PyNoType = 0,
-    PyRootType,
-    PyMediaType
-  };
+    enum PyNodeType
+    {
+        PyNoType = 0,
+        PyRootType,
+        PyMediaType
+    };
 
-  std::string nameFromPyNodeType( PyNodeType t );
+    std::string nameFromPyNodeType(PyNodeType t);
 
-  class PyNode : public Node
-  {
-   public:
-    using PyNodeVector = std::vector<PyNode*>;
-    using NodeAPIVector = std::vector<NodeAPI*>;
+    class PyNode : public Node
+    {
+    public:
+        using PyNodeVector = std::vector<PyNode*>;
+        using NodeAPIVector = std::vector<NodeAPI*>;
 
-    const Node* parent() const override;
-    size_t numChildren() const override;
-    const Node* child( size_t index ) const override;
+        const Node* parent() const override;
+        size_t numChildren() const override;
+        const Node* child(size_t index) const override;
 
-    std::string name() const override;
-    std::string typeName() const override;
+        std::string name() const override;
+        std::string typeName() const override;
 
-   protected:
-    explicit PyNode( Library*, PyNode* parent = nullptr, std::string name = "",
-                     PyNodeType type = PyNoType );
-    virtual ~PyNode() = default;
+    protected:
+        explicit PyNode(Library*, PyNode* parent = nullptr,
+                        std::string name = "", PyNodeType type = PyNoType);
+        virtual ~PyNode() = default;
 
-    void addChild( PyNode* );
-    void setName( const std::string& ) override;
+        void addChild(PyNode*);
+        void setName(const std::string&) override;
 
-    friend class PyMediaLibrary;
+        friend class PyMediaLibrary;
 
-   private:
-    PyNodeType m_type;
-    std::string m_name;
-    PyNode* m_parent;
-    PyNodeVector m_children;
-    NodeAPIVector m_apiVector;
-    URL m_mediaURL;
-  };
+    private:
+        PyNodeType m_type;
+        std::string m_name;
+        PyNode* m_parent;
+        PyNodeVector m_children;
+        NodeAPIVector m_apiVector;
+        URL m_mediaURL;
+    };
 
-}  // namespace TwkMediaLibrary
+} // namespace TwkMediaLibrary

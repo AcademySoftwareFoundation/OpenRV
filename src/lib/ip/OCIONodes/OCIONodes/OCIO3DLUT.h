@@ -16,23 +16,20 @@
 namespace IPCore
 {
 
-  namespace OCIO = OCIO_NAMESPACE;
+    namespace OCIO = OCIO_NAMESPACE;
 
-  // An OCIO 3D LUT representation (a GPU texture) with its associated
-  // frame buffer.
-  //
-  class OCIO3DLUT : public OCIOLUT
-  {
-   public:
-    OCIO3DLUT( OCIO::GpuShaderDescRcPtr& shaderDesc, unsigned int idx,
-               const std::string& shaderCacheID );
-    virtual ~OCIO3DLUT() {};
-
-    // Returns the LUT sampler type: sampler3D, sampler2D, or sampler1D
-    std::string samplerType() const override
+    // An OCIO 3D LUT representation (a GPU texture) with its associated
+    // frame buffer.
+    //
+    class OCIO3DLUT : public OCIOLUT
     {
-      return "sampler3D";
-    }
-  };
+    public:
+        OCIO3DLUT(OCIO::GpuShaderDescRcPtr& shaderDesc, unsigned int idx,
+                  const std::string& shaderCacheID);
+        virtual ~OCIO3DLUT() {};
 
-}  // namespace IPCore
+        // Returns the LUT sampler type: sampler3D, sampler2D, or sampler1D
+        std::string samplerType() const override { return "sampler3D"; }
+    };
+
+} // namespace IPCore

@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #ifndef __RIMUBINDINGS_H__
 #define __RIMUBINDINGS_H__
@@ -16,76 +16,72 @@
 
 #include <ri.h>
 
-namespace RiMu {
-
-typedef std::vector<RtLightHandle> LightHandles;
-
-class RiMuBindings
+namespace RiMu
 {
-public:
-    RiMuBindings() {}
-    ~RiMuBindings() {}
-    
-    static void addSymbols( Mu::Context *context );
 
-    static NODE_DECLARATION( RiAttributeBegin, void );
-    static NODE_DECLARATION( RiAttribute, void );
-    static NODE_DECLARATION( RiAttributeEnd, void );
+    typedef std::vector<RtLightHandle> LightHandles;
 
-    static NODE_DECLARATION( RiTransformBegin, void );
-    static NODE_DECLARATION( RiTransformEnd, void );
-    static NODE_DECLARATION( RiTranslatef, void );
-    static NODE_DECLARATION( RiTranslatev, void );
-    static NODE_DECLARATION( RiRotate, void );
-    static NODE_DECLARATION( RiScale, void );
-    static NODE_DECLARATION( RiTransformF, void );
-    static NODE_DECLARATION( RiTransformM, void );
-    static NODE_DECLARATION( RiConcatTransformF, void );
-    static NODE_DECLARATION( RiConcatTransformM, void );
+    class RiMuBindings
+    {
+    public:
+        RiMuBindings() {}
 
-    static NODE_DECLARATION( RiMotionBegin, void );
-    static NODE_DECLARATION( RiMotionEnd, void );
+        ~RiMuBindings() {}
 
-    static NODE_DECLARATION( RiColor, void );
-    static NODE_DECLARATION( RiColorf, void );
-    static NODE_DECLARATION( RiOpacity, void );
-    static NODE_DECLARATION( RiOpacityf, void );
-    static NODE_DECLARATION( RiMatte, void );
-    static NODE_DECLARATION( RiSurface, void );
-    static NODE_DECLARATION( RiDisplacement, void );
+        static void addSymbols(Mu::Context* context);
 
-    static NODE_DECLARATION( RiLightSource, int );
-    static NODE_DECLARATION( RiIlluminate, void );
+        static NODE_DECLARATION(RiAttributeBegin, void);
+        static NODE_DECLARATION(RiAttribute, void);
+        static NODE_DECLARATION(RiAttributeEnd, void);
 
-    static NODE_DECLARATION( RiBasis, void );
-    static NODE_DECLARATION( RiPoints, void );
-    static NODE_DECLARATION( RiCurves, void );
-    static NODE_DECLARATION( RiSphere, void );
-    static NODE_DECLARATION( RiPolygon, void );
+        static NODE_DECLARATION(RiTransformBegin, void);
+        static NODE_DECLARATION(RiTransformEnd, void);
+        static NODE_DECLARATION(RiTranslatef, void);
+        static NODE_DECLARATION(RiTranslatev, void);
+        static NODE_DECLARATION(RiRotate, void);
+        static NODE_DECLARATION(RiScale, void);
+        static NODE_DECLARATION(RiTransformF, void);
+        static NODE_DECLARATION(RiTransformM, void);
+        static NODE_DECLARATION(RiConcatTransformF, void);
+        static NODE_DECLARATION(RiConcatTransformM, void);
 
-    static NODE_DECLARATION( RiProcedural, void );
-    static NODE_DECLARATION( RiTransformPoints, bool );
+        static NODE_DECLARATION(RiMotionBegin, void);
+        static NODE_DECLARATION(RiMotionEnd, void);
 
-private:
-    static void RiProceduralFinished( RtPointer data );
-    static RtBasis &basisFromStr( std::string name );
+        static NODE_DECLARATION(RiColor, void);
+        static NODE_DECLARATION(RiColorf, void);
+        static NODE_DECLARATION(RiOpacity, void);
+        static NODE_DECLARATION(RiOpacityf, void);
+        static NODE_DECLARATION(RiMatte, void);
+        static NODE_DECLARATION(RiSurface, void);
+        static NODE_DECLARATION(RiDisplacement, void);
 
-    static bool parseTokens( const Mu::Node &node_, 
-                             Mu::Thread &thread_,
-                             RtToken *tokens,
-                             RtPointer *pointers,
-                             int &numTokens,
-                             int &numP,
-                             int startAtArg = 0 );
+        static NODE_DECLARATION(RiLightSource, int);
+        static NODE_DECLARATION(RiIlluminate, void);
 
-    static void freeTokens( RtToken *tokens,
-                            int numTokens,
-                            int startAtArg = 0 );
+        static NODE_DECLARATION(RiBasis, void);
+        static NODE_DECLARATION(RiPoints, void);
+        static NODE_DECLARATION(RiCurves, void);
+        static NODE_DECLARATION(RiSphere, void);
+        static NODE_DECLARATION(RiPolygon, void);
 
-    static LightHandles m_lightHandles;
-};
+        static NODE_DECLARATION(RiProcedural, void);
+        static NODE_DECLARATION(RiTransformPoints, bool);
 
-}  //  End namespace RiMu
+    private:
+        static void RiProceduralFinished(RtPointer data);
+        static RtBasis& basisFromStr(std::string name);
 
-#endif    // End #ifdef __RIMUBINDINGS_H__
+        static bool parseTokens(const Mu::Node& node_, Mu::Thread& thread_,
+                                RtToken* tokens, RtPointer* pointers,
+                                int& numTokens, int& numP, int startAtArg = 0);
 
+        static void freeTokens(RtToken* tokens, int numTokens,
+                               int startAtArg = 0);
+
+        static LightHandles m_lightHandles;
+    };
+
+} //  End namespace RiMu
+
+#endif // End #ifdef __RIMUBINDINGS_H__

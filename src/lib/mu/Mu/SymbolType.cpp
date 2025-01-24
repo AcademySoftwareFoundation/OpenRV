@@ -1,8 +1,8 @@
 //
 // Copyright (c) 2010, Jim Hourihan
 // All rights reserved.
-// 
-// SPDX-License-Identifier: Apache-2.0 
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <Mu/SymbolType.h>
 #include <Mu/Function.h>
@@ -15,114 +15,110 @@
 #include <Mu/config.h>
 #include <iostream>
 
-namespace Mu {
-using namespace std;
-
-SymbolType::SymbolType(Context* c, const char* name) 
-    : OpaqueType(c, name)
+namespace Mu
 {
-}
+    using namespace std;
 
-SymbolType::~SymbolType() {}
-
-void 
-SymbolType::outputValue(ostream &o, const Value &value, bool full) const
-{
-    o << "<#" << fullyQualifiedName() << " ";
-
-    if (value._Pointer)
+    SymbolType::SymbolType(Context* c, const char* name)
+        : OpaqueType(c, name)
     {
-        const Symbol* s = reinterpret_cast<const Symbol*>(value._Pointer);
-        o << s->fullyQualifiedName() << " " << s;
-    }
-    else
-    {
-        o << "nil";
     }
 
-    o << ">";
-}
+    SymbolType::~SymbolType() {}
 
-void
-SymbolType::outputValueRecursive(ostream &o, 
-                                 const ValuePointer vp,
-                                 ValueOutputState& state) const
-{
-    Pointer p = *reinterpret_cast<Pointer*>(vp);
-
-    o << "<#" << fullyQualifiedName() << " ";
-
-    if (p)
+    void SymbolType::outputValue(ostream& o, const Value& value,
+                                 bool full) const
     {
-        const Symbol* s = reinterpret_cast<const Symbol*>(p);
-        o << s->fullyQualifiedName() << " " << s;
-    }
-    else
-    {
-        o << "nil";
+        o << "<#" << fullyQualifiedName() << " ";
+
+        if (value._Pointer)
+        {
+            const Symbol* s = reinterpret_cast<const Symbol*>(value._Pointer);
+            o << s->fullyQualifiedName() << " " << s;
+        }
+        else
+        {
+            o << "nil";
+        }
+
+        o << ">";
     }
 
-    o << ">";
-}
+    void SymbolType::outputValueRecursive(ostream& o, const ValuePointer vp,
+                                          ValueOutputState& state) const
+    {
+        Pointer p = *reinterpret_cast<Pointer*>(vp);
 
-void
-SymbolType::load()
-{
-    OpaqueType::load();
+        o << "<#" << fullyQualifiedName() << " ";
 
-    USING_MU_FUNCTION_SYMBOLS;
-    Symbol *s = scope();
+        if (p)
+        {
+            const Symbol* s = reinterpret_cast<const Symbol*>(p);
+            o << s->fullyQualifiedName() << " " << s;
+        }
+        else
+        {
+            o << "nil";
+        }
 
-    string rname = name();
-    rname += "&";
-    const char* n = fullyQualifiedName().c_str();
-    string nref = n;
-    nref += "&";
-    const char* nr = nref.c_str();
+        o << ">";
+    }
 
-    Context* c = context();
+    void SymbolType::load()
+    {
+        OpaqueType::load();
 
-    globalScope()->addSymbols(
+        USING_MU_FUNCTION_SYMBOLS;
+        Symbol* s = scope();
 
-		   EndArguments);
+        string rname = name();
+        rname += "&";
+        const char* n = fullyQualifiedName().c_str();
+        string nref = n;
+        nref += "&";
+        const char* nr = nref.c_str();
 
-}
+        Context* c = context();
 
+        globalScope()->addSymbols(
 
-//----------------------------------------------------------------------
+            EndArguments);
+    }
 
-TypeSymbolType::TypeSymbolType(Context* c, const char* name) 
-    : SymbolType(c, name)
-{
-}
+    //----------------------------------------------------------------------
 
-TypeSymbolType::~TypeSymbolType() {}
+    TypeSymbolType::TypeSymbolType(Context* c, const char* name)
+        : SymbolType(c, name)
+    {
+    }
 
-//----------------------------------------------------------------------
+    TypeSymbolType::~TypeSymbolType() {}
 
-FunctionSymbolType::FunctionSymbolType(Context* c, const char* name) 
-    : SymbolType(c, name)
-{
-}
+    //----------------------------------------------------------------------
 
-FunctionSymbolType::~FunctionSymbolType() {}
+    FunctionSymbolType::FunctionSymbolType(Context* c, const char* name)
+        : SymbolType(c, name)
+    {
+    }
 
-//----------------------------------------------------------------------
+    FunctionSymbolType::~FunctionSymbolType() {}
 
-VariableSymbolType::VariableSymbolType(Context* c, const char* name) 
-    : SymbolType(c, name)
-{
-}
+    //----------------------------------------------------------------------
 
-VariableSymbolType::~VariableSymbolType() {}
+    VariableSymbolType::VariableSymbolType(Context* c, const char* name)
+        : SymbolType(c, name)
+    {
+    }
 
-//----------------------------------------------------------------------
+    VariableSymbolType::~VariableSymbolType() {}
 
-ParameterSymbolType::ParameterSymbolType(Context* c, const char* name) 
-    : SymbolType(c, name)
-{
-}
+    //----------------------------------------------------------------------
 
-ParameterSymbolType::~ParameterSymbolType() {}
+    ParameterSymbolType::ParameterSymbolType(Context* c, const char* name)
+        : SymbolType(c, name)
+    {
+    }
+
+    ParameterSymbolType::~ParameterSymbolType() {}
 
 } // namespace Mu

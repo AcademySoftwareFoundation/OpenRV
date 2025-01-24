@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <MuLang/ObjectInterface.h>
 #include <Mu/BaseFunctions.h>
@@ -15,50 +15,44 @@
 #include <Mu/Thread.h>
 #include <MuLang/StringType.h>
 
-namespace Mu {
-
-using namespace std;
-
-ObjectInterface::ObjectInterface(Context* c) : Interface(c, "object")
+namespace Mu
 {
-}
 
-ObjectInterface::~ObjectInterface()
-{
-}
+    using namespace std;
 
-void
-ObjectInterface::load()
-{
-    USING_MU_FUNCTION_SYMBOLS;
+    ObjectInterface::ObjectInterface(Context* c)
+        : Interface(c, "object")
+    {
+    }
 
-    Symbol *s = scope();
-    Context* c = context();
+    ObjectInterface::~ObjectInterface() {}
 
-    const char* tn = "object";
-    const char* rn = "object&";
+    void ObjectInterface::load()
+    {
+        USING_MU_FUNCTION_SYMBOLS;
 
-    s->addSymbols(new ReferenceType(c, "object&", this), 
-                  
-                  new Function(c, "object", BaseFunctions::dereference, 
-                               Cast,
-                               Return, tn,
-                               Args, rn, End),
+        Symbol* s = scope();
+        Context* c = context();
 
-                  EndArguments);
+        const char* tn = "object";
+        const char* rn = "object&";
 
-    addSymbols( new MemberFunction(c, "identity", ObjectInterface::identity, None,
-                                   Return, tn,
-                                   Args, tn,
-                                   End),
+        s->addSymbols(new ReferenceType(c, "object&", this),
 
-                EndArguments);
+                      new Function(c, "object", BaseFunctions::dereference,
+                                   Cast, Return, tn, Args, rn, End),
 
-    globalScope()->addSymbols(
+                      EndArguments);
 
-		   new Function(c, "=", BaseFunctions::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
+        addSymbols(new MemberFunction(c, "identity", ObjectInterface::identity,
+                                      None, Return, tn, Args, tn, End),
+
+                   EndArguments);
+
+        globalScope()->addSymbols(
+
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
+                         rn, tn, End),
 
 #if 0
                    new Function(c, "eq", BaseFunctions::eq, CommOp,
@@ -66,14 +60,12 @@ ObjectInterface::load()
                                 Args, tn, tn, End),
 #endif
 
-                   EndArguments );
+            EndArguments);
+    }
 
-}
+    NODE_IMPLEMENTATION(ObjectInterface::identity, Pointer)
+    {
+        NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, Object));
+    }
 
-
-NODE_IMPLEMENTATION(ObjectInterface::identity, Pointer)
-{
-    NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, Object));
-}
-
-} // Mu
+} // namespace Mu

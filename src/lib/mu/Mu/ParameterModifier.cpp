@@ -2,33 +2,27 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <Mu/ParameterModifier.h>
 #include <iostream>
 
-namespace Mu {
-
-ParameterModifier::ParameterModifier(Context* context, const char* name) 
-    : Symbol(context, name)
+namespace Mu
 {
-}
 
-ParameterModifier::~ParameterModifier()
-{
-}
+    ParameterModifier::ParameterModifier(Context* context, const char* name)
+        : Symbol(context, name)
+    {
+    }
 
-void 
-ParameterModifier::outputNode(std::ostream& o,const Node*) const
-{
-    output(o);
-}
+    ParameterModifier::~ParameterModifier() {}
 
-void
-ParameterModifier::output(std::ostream& o) const
-{
-    Symbol::output(o);
-}
+    void ParameterModifier::outputNode(std::ostream& o, const Node*) const
+    {
+        output(o);
+    }
 
-} // Mu
+    void ParameterModifier::output(std::ostream& o) const { Symbol::output(o); }
+
+} // namespace Mu

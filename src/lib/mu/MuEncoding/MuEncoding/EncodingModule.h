@@ -4,27 +4,27 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Node.h>
 #include <Mu/Module.h>
 
-namespace Mu {
-
-class EncodingModule : public Module
+namespace Mu
 {
-  public:
-    EncodingModule(Context* c, const char *name);
-    virtual ~EncodingModule();
-    
-    virtual void load();
 
-    static NODE_DECLARATION(to_base64, Pointer);
-    static NODE_DECLARATION(from_base64, Pointer);
-    static NODE_DECLARATION(string_to_utf8, Pointer);
-    static NODE_DECLARATION(utf8_to_string, Pointer);
-};
+    class EncodingModule : public Module
+    {
+    public:
+        EncodingModule(Context* c, const char* name);
+        virtual ~EncodingModule();
 
+        virtual void load();
+
+        static NODE_DECLARATION(to_base64, Pointer);
+        static NODE_DECLARATION(from_base64, Pointer);
+        static NODE_DECLARATION(string_to_utf8, Pointer);
+        static NODE_DECLARATION(utf8_to_string, Pointer);
+    };
 
 } // namespace Mu
 

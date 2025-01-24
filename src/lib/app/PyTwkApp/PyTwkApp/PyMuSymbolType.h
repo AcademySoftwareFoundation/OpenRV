@@ -1,9 +1,9 @@
 //
 //  Copyright (c) 2011 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __PyTwkApp__PyMuSymbol__h__
 #define __PyTwkApp__PyMuSymbol__h__
@@ -14,26 +14,25 @@
 
 namespace Mu
 {
-  class Symbol;
-  class Function;
-}  // namespace Mu
+    class Symbol;
+    class Function;
+} // namespace Mu
 
 namespace TwkApp
 {
-  class Event;
-  class Document;
+    class Event;
+    class Document;
 
-  typedef struct
-  {
-    PyObject_HEAD
-    const Mu::Symbol* symbol;
-    const Mu::Function* function;
-  } PyMuSymbolObject;
+    typedef struct
+    {
+        PyObject_HEAD const Mu::Symbol* symbol;
+        const Mu::Function* function;
+    } PyMuSymbolObject;
 
-  PyTypeObject* pyMuSymbolType();
+    PyTypeObject* pyMuSymbolType();
 
-  void initPyMuSymbolType();
+    void initPyMuSymbolType();
 
-}  // namespace TwkApp
+} // namespace TwkApp
 
-#endif  // __PyTwkApp__PyMuSymbol__h__
+#endif // __PyTwkApp__PyMuSymbol__h__
