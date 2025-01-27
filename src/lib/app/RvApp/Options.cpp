@@ -509,6 +509,8 @@ namespace Rv
 #endif
 
         imageFilter = GL_LINEAR;
+
+        ffmpegThreads = 1;
     }
 
     Options::SourceArgsVector Options::parseSourceArgs(const Files& inputFiles)
@@ -874,6 +876,7 @@ namespace Rv
         ffmpeg << rvffm;
 
         addIfMissing(ffmpeg, rvffm, "--defaultFPS", defaultfps);
+        addIfMissing(ffmpeg, rvffm, "--codecThreads", ffmpegThreads);
         bundle->setEnvVar("MOVIEFFMPEG_ARGS", ffmpeg.str().c_str(), true);
     }
 
