@@ -14,29 +14,29 @@
 
 namespace TwkMediaLibrary
 {
-  class PyRootNode;
-  class PyMediaNode;
+    class PyRootNode;
+    class PyMediaNode;
 
-  class PyMediaLibrary : public Library
-  {
-   public:
-    using StreamingURLNodeMap = std::map<URL, PyMediaNode*>;
+    class PyMediaLibrary : public Library
+    {
+    public:
+        using StreamingURLNodeMap = std::map<URL, PyMediaNode*>;
 
-    explicit PyMediaLibrary( const std::string& appName );
-    virtual ~PyMediaLibrary();
+        explicit PyMediaLibrary(const std::string& appName);
+        virtual ~PyMediaLibrary();
 
-    size_t numNodeTypeNames() const override;
-    std::string nodeTypeName( size_t ) const override;
+        size_t numNodeTypeNames() const override;
+        std::string nodeTypeName(size_t) const override;
 
-    bool isLibraryMediaURL( const URL& ) const override;
+        bool isLibraryMediaURL(const URL&) const override;
 
-    const Node* rootNode() const override;
+        const Node* rootNode() const override;
 
-    NodeVector associatedNodes( const URL& url ) const override;
-    const NodeAPI* nodeAPI( const Node* ) const override;
+        NodeVector associatedNodes(const URL& url) const override;
+        const NodeAPI* nodeAPI(const Node*) const override;
 
-   private:
-    PyRootNode* m_root;
-  };
+    private:
+        PyRootNode* m_root;
+    };
 
-}  // namespace TwkMediaLibrary
+} // namespace TwkMediaLibrary

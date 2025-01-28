@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #include "../../utf8Main.h"
@@ -63,66 +63,65 @@ usage: rvpush [-tag <tag>] <command> <commandArgs>\n\
 ";
 
 #if 0
-#define DB(x)           cerr << dec << x << endl
-#define DBL(level, x)   cerr << dec << x << endl
+#define DB(x) cerr << dec << x << endl
+#define DBL(level, x) cerr << dec << x << endl
 #else
-#define DB(x)    
+#define DB(x)
 #define DBL(level, x)
 #endif
 
-int utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
-    if (argc < 2 || strcmp (argv[1],"-help") == 0)
+    if (argc < 2 || strcmp(argv[1], "-help") == 0)
     {
         cerr << usage << endl;
-        exit (1);
+        exit(1);
     }
 
     int commandPos = 1;
     string tag;
-    DB ("argv1 '" << argv[1] << "'");
+    DB("argv1 '" << argv[1] << "'");
     if (string(argv[1]) == "-tag")
     {
-        if (argc < 3) 
-	{
-	    cerr << "ERROR: missing tag" << endl;
-	    cerr << usage << endl;
-	    exit (2);
-	}
-	tag = argv[2];
-	commandPos = 3;
+        if (argc < 3)
+        {
+            cerr << "ERROR: missing tag" << endl;
+            cerr << usage << endl;
+            exit(2);
+        }
+        tag = argv[2];
+        commandPos = 3;
     }
     string command = argv[commandPos];
-    DB ("commandPos " << commandPos << " command " << command);
-    
-    if (command != "set" && 
-	command != "merge" && 
-	command != "mu-eval" && 
-	command != "mu-eval-return" && 
-	command != "py-eval" && 
-	command != "py-eval-return" && 
-	command != "py-exec" && 
-	command != "url")
+    DB("commandPos " << commandPos << " command " << command);
+
+    if (command != "set" && command != "merge" && command != "mu-eval"
+        && command != "mu-eval-return" && command != "py-eval"
+        && command != "py-eval-return" && command != "py-exec"
+        && command != "url")
     {
         cerr << usage << endl;
-        exit (3);
+        exit(3);
     }
 
     vector<string> commandArgv;
     if (command == "url")
     {
-	string url;
+        string url;
 
-	for (int i = commandPos+1; i < argc; ++i)
-	{
-	    if (i > commandPos+1) url += " ";
-	    url += argv[i];
-	}
-	commandArgv.push_back (url);
+        for (int i = commandPos + 1; i < argc; ++i)
+        {
+            if (i > commandPos + 1)
+                url += " ";
+            url += argv[i];
+        }
+        commandArgv.push_back(url);
     }
-    else for (int i = commandPos+1; i < argc; ++i) commandArgv.push_back (argv[i]);
-    DB ("command " << command << " tag " << tag);
-    
+    else
+        for (int i = commandPos + 1; i < argc; ++i)
+            commandArgv.push_back(argv[i]);
+    DB("command " << command << " tag " << tag);
+
     QCoreApplication app(argc, argv);
 
     RvPusher pusher(app, tag, command, commandArgv);
@@ -133,9 +132,10 @@ int utf8Main(int argc, char *argv[])
     //  running RV over the network).
     //
 
-    if (pusher.error() == 0 && !pusher.rvStarted()) app.exec();
+    if (pusher.error() == 0 && !pusher.rvStarted())
+        app.exec();
 
-    DB ("exiting, return " << pusher.error());
+    DB("exiting, return " << pusher.error());
 
-    exit (pusher.error());
+    exit(pusher.error());
 }

@@ -4,277 +4,317 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Node.h>
 #include <Mu/Name.h>
 #include <Mu/NodePatch.h>
 #include <Mu/BaseFunctions.h>
 
-namespace Mu {
-class NodeAssembler;
-class StackVariable;
-class NodePatch;
-
-//
-//  Base of the ASTNode hierarchy. ASTNodes should be completely
-//  removed by the end of parsing.
-//
-//  ASTNodes are AnnotatedNodes so they have source file line
-//  information. They also store the current scope that existed when
-//  the ASTNode was created. This is the scope that any declarations
-//  and lookups will occur in when resolving the ASTNode tree for the
-//  given ASTNode.
-//
-
-class ASTNode : public AnnotatedNode
+namespace Mu
 {
-  public:
-    typedef NodeAssembler::ScopeState ScopeState;
-    typedef NodeAssembler::NodeList NodeList;
-
-    ASTNode(NodeAssembler& as, int numArgs, const Symbol* s)
-        : AnnotatedNode(numArgs, BaseFunctions::unresolved, s, 
-                        as.lineNum(), as.charNum(), as.sourceName()),
-          scope(as.scopeState()) {}
-
-    virtual ~ASTNode();
-
-    const ScopeState* scope;
+    class NodeAssembler;
+    class StackVariable;
+    class NodePatch;
 
     //
-    //  The NodePatch's NodeAssembler will have its scope restored to
-    //  this ASTNode's scope state prior to calling these.
+    //  Base of the ASTNode hierarchy. ASTNodes should be completely
+    //  removed by the end of parsing.
+    //
+    //  ASTNodes are AnnotatedNodes so they have source file line
+    //  information. They also store the current scope that existed when
+    //  the ASTNode was created. This is the scope that any declarations
+    //  and lookups will occur in when resolving the ASTNode tree for the
+    //  given ASTNode.
     //
 
-    virtual Node* preResolve(NodePatch&);
-    virtual Node* resolve(NodePatch&) = 0;
-    virtual void childVisit(NodePatch&, Node*, size_t);
-};
+    class ASTNode : public AnnotatedNode
+    {
+    public:
+        typedef NodeAssembler::ScopeState ScopeState;
+        typedef NodeAssembler::NodeList NodeList;
 
-//
-//  ASTName holds a single name
-//
+        ASTNode(NodeAssembler& as, int numArgs, const Symbol* s)
+            : AnnotatedNode(numArgs, BaseFunctions::unresolved, s, as.lineNum(),
+                            as.charNum(), as.sourceName())
+            , scope(as.scopeState())
+        {
+        }
 
-class ASTName : public ASTNode
-{
-  public:
-    ASTName(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
-        : ASTNode(as, numArgs, s),
-          name(n) {}
+        virtual ~ASTNode();
 
-    Name name;
-};
+        const ScopeState* scope;
 
-//
-//  ASTSymbol holds a single symbol
-//
+        //
+        //  The NodePatch's NodeAssembler will have its scope restored to
+        //  this ASTNode's scope state prior to calling these.
+        //
 
-class ASTSymbol : public ASTNode
-{
-  public:
-    ASTSymbol(NodeAssembler& as, int numArgs, const Symbol* s, const Symbol* sym)
-        : ASTNode(as, numArgs, s),
-          symbol(sym) {}
+        virtual Node* preResolve(NodePatch&);
+        virtual Node* resolve(NodePatch&) = 0;
+        virtual void childVisit(NodePatch&, Node*, size_t);
+    };
 
-    const Symbol* symbol;
-};
+    //
+    //  ASTName holds a single name
+    //
 
-//
-//  ASTCall is a call on an any name. This basically means its either
-//  a function, a memeber function, or a class instance with
-//  operator() defined (until that can be removed)
-//
+    class ASTName : public ASTNode
+    {
+    public:
+        ASTName(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
+            : ASTNode(as, numArgs, s)
+            , name(n)
+        {
+        }
 
-class ASTCall : public ASTName
-{
-  public:
-    ASTCall(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
-        : ASTName(as, numArgs, s, n) {}
+        Name name;
+    };
 
-    virtual Node* resolve(NodePatch&);
-};
+    //
+    //  ASTSymbol holds a single symbol
+    //
 
-//
-//  ASTAssign
-//
+    class ASTSymbol : public ASTNode
+    {
+    public:
+        ASTSymbol(NodeAssembler& as, int numArgs, const Symbol* s,
+                  const Symbol* sym)
+            : ASTNode(as, numArgs, s)
+            , symbol(sym)
+        {
+        }
 
-class ASTAssign : public ASTCall
-{
-  public:
-    ASTAssign(NodeAssembler& as, const Symbol* s, Node* lhs, Node* rhs);
-    virtual Node* resolve(NodePatch&);
-};
+        const Symbol* symbol;
+    };
 
-//
-//  ASTCast 
-//
+    //
+    //  ASTCall is a call on an any name. This basically means its either
+    //  a function, a memeber function, or a class instance with
+    //  operator() defined (until that can be removed)
+    //
 
-class ASTCast : public ASTCall
-{
-  public:
-    ASTCast(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
-        : ASTCall(as, numArgs, s, n) {}
+    class ASTCall : public ASTName
+    {
+    public:
+        ASTCall(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
+            : ASTName(as, numArgs, s, n)
+        {
+        }
 
-    virtual Node* resolve(NodePatch&);
-};
+        virtual Node* resolve(NodePatch&);
+    };
 
-//
-//  ASTMemberCall 
-//
+    //
+    //  ASTAssign
+    //
 
-class ASTMemberCall : public ASTCall
-{
-  public:
-    ASTMemberCall(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
-        : ASTCall(as, numArgs, s, n) {}
+    class ASTAssign : public ASTCall
+    {
+    public:
+        ASTAssign(NodeAssembler& as, const Symbol* s, Node* lhs, Node* rhs);
+        virtual Node* resolve(NodePatch&);
+    };
 
-    virtual Node* resolve(NodePatch&);
-};
+    //
+    //  ASTCast
+    //
 
-//
-//  ASTMemberReference
-//
+    class ASTCast : public ASTCall
+    {
+    public:
+        ASTCast(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
+            : ASTCall(as, numArgs, s, n)
+        {
+        }
 
-class ASTMemberReference : public ASTName
-{
-  public:
-    ASTMemberReference(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
-        : ASTName(as, numArgs, s, n) {}
+        virtual Node* resolve(NodePatch&);
+    };
 
-    virtual Node* resolve(NodePatch&);
-};
+    //
+    //  ASTMemberCall
+    //
 
+    class ASTMemberCall : public ASTCall
+    {
+    public:
+        ASTMemberCall(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
+            : ASTCall(as, numArgs, s, n)
+        {
+        }
 
-//
-//  ASTStackReference is a reference (or dereference) to a (not yet fixed)
-//  location on the stack.
-//
+        virtual Node* resolve(NodePatch&);
+    };
 
-class ASTStackReference : public ASTSymbol
-{
-  public:
-    ASTStackReference(NodeAssembler& as, int numArgs, const Symbol* s, const Symbol* sym)
-        : ASTSymbol(as, numArgs, s, sym),
-          dereference(false) {}
+    //
+    //  ASTMemberReference
+    //
 
-    bool dereference;
-    virtual Node* resolve(NodePatch&);
-};
+    class ASTMemberReference : public ASTName
+    {
+    public:
+        ASTMemberReference(NodeAssembler& as, int numArgs, const Symbol* s,
+                           Name n)
+            : ASTName(as, numArgs, s, n)
+        {
+        }
 
-//
-//  ASTReference is a reference to a name that probably has not been
-//  defined (yet). The name is probably being dereferenced.
-//
+        virtual Node* resolve(NodePatch&);
+    };
 
-class ASTReference : public ASTName
-{
-  public:
-    ASTReference(NodeAssembler& as, const Symbol* s, Name n)
-        : ASTName(as, 0, s, n) {}
+    //
+    //  ASTStackReference is a reference (or dereference) to a (not yet fixed)
+    //  location on the stack.
+    //
 
-    virtual Node* resolve(NodePatch&);
-};
+    class ASTStackReference : public ASTSymbol
+    {
+    public:
+        ASTStackReference(NodeAssembler& as, int numArgs, const Symbol* s,
+                          const Symbol* sym)
+            : ASTSymbol(as, numArgs, s, sym)
+            , dereference(false)
+        {
+        }
 
-//
-//  ASTDereference 
-//
+        bool dereference;
+        virtual Node* resolve(NodePatch&);
+    };
 
-class ASTDereference : public ASTNode
-{
-  public:
-    ASTDereference(NodeAssembler& as, const Symbol* s, Node* n)
-        : ASTNode(as, 1, s) { setArg(n, 0); }
+    //
+    //  ASTReference is a reference to a name that probably has not been
+    //  defined (yet). The name is probably being dereferenced.
+    //
 
-    virtual Node* resolve(NodePatch&);
-};
+    class ASTReference : public ASTName
+    {
+    public:
+        ASTReference(NodeAssembler& as, const Symbol* s, Name n)
+            : ASTName(as, 0, s, n)
+        {
+        }
 
-//
-//  ASTDeclaration
-//
+        virtual Node* resolve(NodePatch&);
+    };
 
-class ASTDeclaration : public ASTName
-{
-  public:
-    ASTDeclaration(NodeAssembler& as, const Symbol* s, Name n)
-        : ASTName(as, 0, s, n) {}
+    //
+    //  ASTDereference
+    //
 
-    virtual Node* resolve(NodePatch&);
-};
+    class ASTDereference : public ASTNode
+    {
+    public:
+        ASTDereference(NodeAssembler& as, const Symbol* s, Node* n)
+            : ASTNode(as, 1, s)
+        {
+            setArg(n, 0);
+        }
 
-//
-//  ASTStackDeclaration
-//
+        virtual Node* resolve(NodePatch&);
+    };
 
-class ASTStackDeclaration : public ASTName
-{
-  public:
-    ASTStackDeclaration(NodeAssembler& as, const Symbol* s, Name n, StackVariable* sv)
-        : ASTName(as, 0, s, n), dummy(sv) {}
-    
-    StackVariable* dummy;
-    virtual Node* resolve(NodePatch&);
-};
+    //
+    //  ASTDeclaration
+    //
 
-//
-//  ASTListConstructor
-//
+    class ASTDeclaration : public ASTName
+    {
+    public:
+        ASTDeclaration(NodeAssembler& as, const Symbol* s, Name n)
+            : ASTName(as, 0, s, n)
+        {
+        }
 
-class ASTListConstructor : public ASTNode
-{
-  public:
-    ASTListConstructor(NodeAssembler& as, int numArgs, Node** args, const Symbol* s)
-        : ASTNode(as, numArgs, s) 
-        { setArgs(args, numArgs); }
-    
-    virtual Node* resolve(NodePatch&);
-};
+        virtual Node* resolve(NodePatch&);
+    };
 
-//
-//  ASTTupleConstructor
-//
+    //
+    //  ASTStackDeclaration
+    //
 
-class ASTTupleConstructor : public ASTNode
-{
-  public:
-    ASTTupleConstructor(NodeAssembler& as, int numArgs, Node** args, const Symbol* s)
-        : ASTNode(as, numArgs, s)
-        { setArgs(args, numArgs); }
-    
-    virtual Node* resolve(NodePatch&);
-};
+    class ASTStackDeclaration : public ASTName
+    {
+    public:
+        ASTStackDeclaration(NodeAssembler& as, const Symbol* s, Name n,
+                            StackVariable* sv)
+            : ASTName(as, 0, s, n)
+            , dummy(sv)
+        {
+        }
 
-//
-//  ASTTupleConstructor
-//
+        StackVariable* dummy;
+        virtual Node* resolve(NodePatch&);
+    };
 
-class ASTIndexMember : public ASTNode
-{
-  public:
-    ASTIndexMember(NodeAssembler& as, int numArgs, Node** args, const Symbol* s)
-        : ASTNode(as, numArgs, s)
-        { setArgs(args, numArgs); }
-    
-    virtual Node* resolve(NodePatch&);
-};
+    //
+    //  ASTListConstructor
+    //
 
-//
-//  ASTForEach
-//
+    class ASTListConstructor : public ASTNode
+    {
+    public:
+        ASTListConstructor(NodeAssembler& as, int numArgs, Node** args,
+                           const Symbol* s)
+            : ASTNode(as, numArgs, s)
+        {
+            setArgs(args, numArgs);
+        }
 
-class ASTForEach : public ASTNode
-{
-  public:
-    ASTForEach(NodeAssembler& as, Node** args, const Symbol* s)
-        : ASTNode(as, 3, s)
-        { setArgs(args, 3); }
+        virtual Node* resolve(NodePatch&);
+    };
 
-    Node* declNode;
+    //
+    //  ASTTupleConstructor
+    //
 
-    virtual Node* resolve(NodePatch&);
-    virtual void childVisit(NodePatch&, Node*, size_t);
-};
+    class ASTTupleConstructor : public ASTNode
+    {
+    public:
+        ASTTupleConstructor(NodeAssembler& as, int numArgs, Node** args,
+                            const Symbol* s)
+            : ASTNode(as, numArgs, s)
+        {
+            setArgs(args, numArgs);
+        }
 
+        virtual Node* resolve(NodePatch&);
+    };
+
+    //
+    //  ASTTupleConstructor
+    //
+
+    class ASTIndexMember : public ASTNode
+    {
+    public:
+        ASTIndexMember(NodeAssembler& as, int numArgs, Node** args,
+                       const Symbol* s)
+            : ASTNode(as, numArgs, s)
+        {
+            setArgs(args, numArgs);
+        }
+
+        virtual Node* resolve(NodePatch&);
+    };
+
+    //
+    //  ASTForEach
+    //
+
+    class ASTForEach : public ASTNode
+    {
+    public:
+        ASTForEach(NodeAssembler& as, Node** args, const Symbol* s)
+            : ASTNode(as, 3, s)
+        {
+            setArgs(args, 3);
+        }
+
+        Node* declNode;
+
+        virtual Node* resolve(NodePatch&);
+        virtual void childVisit(NodePatch&, Node*, size_t);
+    };
 
 } // namespace Mu
 

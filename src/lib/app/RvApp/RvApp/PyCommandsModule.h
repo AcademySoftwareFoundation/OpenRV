@@ -1,18 +1,19 @@
 //
-//  Copyright (c) 2011 Tweak Software. 
+//  Copyright (c) 2011 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __RvApp__PyCommandsModule__h__
 #define __RvApp__PyCommandsModule__h__
 #include <iostream>
 
-namespace Rv {
+namespace Rv
+{
 
-void* pyRvAppCommands();
+    void* pyRvAppCommands();
 
-} // Rv
+} // namespace Rv
 
 #endif // __RvApp__PyCommandsModule__h__

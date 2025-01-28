@@ -2,9 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
-
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #ifndef __MU_H__
 #define __MU_H__
@@ -66,5 +65,4 @@
 #include <Mu/Variable.h>
 #include <Mu/Vector.h>
 
-
-#endif    // End #ifdef __MU_H__
+#endif // End #ifdef __MU_H__

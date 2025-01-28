@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __IOoiio__IOoiio__h__
 #define __IOoiio__IOoiio__h__
@@ -12,31 +12,28 @@
 #include <TwkFB/IO.h>
 #include <fstream>
 
-namespace TwkFB {
-
-/// OpenImageIO reader
-
-class IOoiio : public FrameBufferIO
+namespace TwkFB
 {
-public:
 
-    IOoiio();
-    virtual ~IOoiio();
+    /// OpenImageIO reader
 
-    virtual void readImage(FrameBuffer& fb,
-                           const std::string& filename,
-                           const ReadRequest& request) const;
+    class IOoiio : public FrameBufferIO
+    {
+    public:
+        IOoiio();
+        virtual ~IOoiio();
 
-    virtual void writeImage(const FrameBuffer& img, 
-                            const std::string& filename,
-                            const WriteRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename,
+                               const ReadRequest& request) const;
 
-    virtual std::string about() const;
-    virtual void getImageInfo(const std::string& filename, FBInfo&) const;
+        virtual void writeImage(const FrameBuffer& img,
+                                const std::string& filename,
+                                const WriteRequest& request) const;
 
-};
+        virtual std::string about() const;
+        virtual void getImageInfo(const std::string& filename, FBInfo&) const;
+    };
 
-} // TwkFB
+} // namespace TwkFB
 
 #endif // __IOoiio__IOoiio__h__
-

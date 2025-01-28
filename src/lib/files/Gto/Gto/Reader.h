@@ -1,8 +1,8 @@
 //
 // Copyright (c) 2009, Tweak Software
 // All rights reserved.
-// 
-// SPDX-License-Identifier: Apache-2.0 
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #ifndef __Gto__Reader__h__
@@ -24,375 +24,379 @@
 
 class GTOFlexLexer;
 
-namespace Gto {
-
-//
-//  class Reader
-//
-//  Reads a GTO file as a byte stream or with random access. If compiled
-//  with GTO_SUPPORT_ZIP defined, it can read gzipped gto files directly.
-//
-
-class Reader
+namespace Gto
 {
-public:
+
     //
-    //  Types
+    //  class Reader
+    //
+    //  Reads a GTO file as a byte stream or with random access. If compiled
+    //  with GTO_SUPPORT_ZIP defined, it can read gzipped gto files directly.
     //
 
-    struct ObjectInfo;
-    struct ComponentInfo;
-    struct PropertyInfo;
-    friend class ::GTOFlexLexer;   // for ascii parser
-
-    struct ObjectInfo : ObjectHeader
+    class Reader
     {
-        void*               objectData; // whatever was returned from object()
+    public:
+        //
+        //  Types
+        //
 
-        int componentOffset() const { return coffset; }
+        struct ObjectInfo;
+        struct ComponentInfo;
+        struct PropertyInfo;
+        friend class ::GTOFlexLexer; // for ascii parser
 
-    private:
-        int                 coffset;
-        bool                requested;
-        friend class Reader;
-    };
+        struct ObjectInfo : ObjectHeader
+        {
+            void* objectData; // whatever was returned from object()
 
-    struct ComponentInfo : ComponentHeader
-    {
-        void*                componentData; // return value of component()
-        const ObjectInfo*    object;
-        std::string          fullName;
-        const ComponentInfo* parent;
+            int componentOffset() const { return coffset; }
 
-        int propertyOffset() const { return poffset; }
+        private:
+            int coffset;
+            bool requested;
+            friend class Reader;
+        };
 
-    private:
-        int                 poffset;
-        bool                requested;
-        friend class Reader;
-    };
+        struct ComponentInfo : ComponentHeader
+        {
+            void* componentData; // return value of component()
+            const ObjectInfo* object;
+            std::string fullName;
+            const ComponentInfo* parent;
 
-    struct PropertyInfo : PropertyHeader
-    {
-        void*                propertyData;
-        int                  offset;    // file offset
-        std::string          fullName;
+            int propertyOffset() const { return poffset; }
 
-        const ComponentInfo* component;
+        private:
+            int poffset;
+            bool requested;
+            friend class Reader;
+        };
 
-    private:
-        bool                 requested;
-        friend class Reader;
-    };
+        struct PropertyInfo : PropertyHeader
+        {
+            void* propertyData;
+            int offset; // file offset
+            std::string fullName;
 
-    typedef std::vector<ObjectInfo>    Objects;
-    typedef std::vector<ComponentInfo> Components;
-    typedef std::vector<std::string>   NameStack;
-    typedef std::vector<size_t>        IndexStack;
-    typedef std::vector<PropertyInfo>  Properties;
-    typedef std::vector<std::string>   StringTable;
-    typedef std::vector<unsigned char> ByteArray;
-    typedef std::map<std::string,int>  StringMap;
+            const ComponentInfo* component;
 
+        private:
+            bool requested;
+            friend class Reader;
+        };
 
-    //
-    //  The open modes:
-    //
-    //  None: the file is read as a stream with default API
-    //  behavior. The file may be text, binary, or compressed binary. 
-    //
-    //  BinaryOnly: only binary and compressed binary files will be
-    //  accepted. 
-    //
-    //  TextOnly: only text files will be accepted.
-    //
-    //  HeaderOnly: only the header information will be read. This is
-    //  equivalent to requesting none of the data, but it will short
-    //  circuit the reader into finishing successfully without seeking
-    //  through the file. 
-    //
-    //  RandomAccess: the file should be prepared for random access:
-    //  no header functions or data will be called until you
-    //  specifically ask for an object by name -- then they will
-    //  called as if the file contained only that data. You can do
-    //  this as many times as you want using the accessObject()
-    //  function. RandomAccess implies BinaryOnly.
-    //
-    //
+        typedef std::vector<ObjectInfo> Objects;
+        typedef std::vector<ComponentInfo> Components;
+        typedef std::vector<std::string> NameStack;
+        typedef std::vector<size_t> IndexStack;
+        typedef std::vector<PropertyInfo> Properties;
+        typedef std::vector<std::string> StringTable;
+        typedef std::vector<unsigned char> ByteArray;
+        typedef std::map<std::string, int> StringMap;
 
-    enum ReadMode
-    {
-        None             = 0,
-        HeaderOnly       = 1 << 0,
-        RandomAccess     = 1 << 1,
-        BinaryOnly       = 1 << 2,
-        TextOnly         = 1 << 3,
-    };
+        //
+        //  The open modes:
+        //
+        //  None: the file is read as a stream with default API
+        //  behavior. The file may be text, binary, or compressed binary.
+        //
+        //  BinaryOnly: only binary and compressed binary files will be
+        //  accepted.
+        //
+        //  TextOnly: only text files will be accepted.
+        //
+        //  HeaderOnly: only the header information will be read. This is
+        //  equivalent to requesting none of the data, but it will short
+        //  circuit the reader into finishing successfully without seeking
+        //  through the file.
+        //
+        //  RandomAccess: the file should be prepared for random access:
+        //  no header functions or data will be called until you
+        //  specifically ask for an object by name -- then they will
+        //  called as if the file contained only that data. You can do
+        //  this as many times as you want using the accessObject()
+        //  function. RandomAccess implies BinaryOnly.
+        //
+        //
 
-    explicit Reader(unsigned int mode = None);
-    virtual ~Reader();
+        enum ReadMode
+        {
+            None = 0,
+            HeaderOnly = 1 << 0,
+            RandomAccess = 1 << 1,
+            BinaryOnly = 1 << 2,
+            TextOnly = 1 << 3,
+        };
 
-    //
-    //  Open takes the path to the .gto file. If the GTO_SUPPORT_ZIP
-    //  is enabled then open will automatically attempt to find a
-    //  gziped version of the file if the file does not exist.
-    //
-    //  If the mode is RandomAccess, then open will return having only read
-    //  the header information.
-    //
-    //  The stream open function can take additional ReadMode enum
-    //  to modify the input type. The ormode is |'d with the open mode.
-    //
+        explicit Reader(unsigned int mode = None);
+        virtual ~Reader();
 
-    virtual bool        open(void const *pData, size_t dataSize, const char *name);
-    virtual bool        open(const char *filename);
-    virtual bool        open(std::istream&,
-                             const char *name, 
-                             unsigned int ormode = 0);
-    void                close();
+        //
+        //  Open takes the path to the .gto file. If the GTO_SUPPORT_ZIP
+        //  is enabled then open will automatically attempt to find a
+        //  gziped version of the file if the file does not exist.
+        //
+        //  If the mode is RandomAccess, then open will return having only read
+        //  the header information.
+        //
+        //  The stream open function can take additional ReadMode enum
+        //  to modify the input type. The ormode is |'d with the open mode.
+        //
 
-    //
-    //  If it failed. why() will return a description.
-    //
-    void                fail( std::string why = "" );
+        virtual bool open(void const* pData, size_t dataSize, const char* name);
+        virtual bool open(const char* filename);
+        virtual bool open(std::istream&, const char* name,
+                          unsigned int ormode = 0);
+        void close();
 
-    const std::string&  why() const { return m_why; }
+        //
+        //  If it failed. why() will return a description.
+        //
+        void fail(std::string why = "");
 
-    const std::string&  stringFromId(unsigned int i);
-    unsigned int        idFromString(const std::string&);
-    const StringTable&  stringTable() { return m_strings; }
+        const std::string& why() const { return m_why; }
 
-    bool                isSwapped() const { return m_swapped; }
-    unsigned int        readMode() const { return m_mode; }
+        const std::string& stringFromId(unsigned int i);
+        unsigned int idFromString(const std::string&);
 
-    const std::string&  infileName() const { return m_inName; }
+        const StringTable& stringTable() { return m_strings; }
 
-    std::istream*       in() const { return m_in; }
-    int                 linenum() const { return m_linenum; }
-    int                 charnum() const { return m_charnum; }
+        bool isSwapped() const { return m_swapped; }
 
-    Header&             fileHeader() { return m_header; }
+        unsigned int readMode() const { return m_mode; }
 
-    //
-    //  This function is called right after the file header is read. 
-    //
+        const std::string& infileName() const { return m_inName; }
 
-    virtual void        header(const Header&);
+        std::istream* in() const { return m_in; }
 
-    //
-    //  This function is called after all file, object, component, and
-    //  property structures have been read. For binary files, this is
-    //  just before the data is read. For text files, this is after the
-    //  entire file has been read.
-    //
+        int linenum() const { return m_linenum; }
 
-    virtual void        descriptionComplete();
+        int charnum() const { return m_charnum; }
 
-    //
-    //  RandomAccess functions. When the file is openned as RandomAccess,
-    //  you can get ahold of an ObjectInfo and pass it to this function to
-    //  have the reader seek directly.
-    //
-    //  accessObject() requires that the reference passed in be from the
-    //  reader's object cache, not a copy.
-    //
-    //  The components() and properties() functions are there to make it
-    //  easy to take parts for later retrieval with accessObject()
-    //
+        Header& fileHeader() { return m_header; }
 
-    Objects&            objects() { return m_objects; }
-    bool                accessObject(ObjectInfo&);
+        //
+        //  This function is called right after the file header is read.
+        //
 
-    Components&         components() { return m_components; }
-    bool                accessComponent(ComponentInfo&);
+        virtual void header(const Header&);
 
-    Properties&         properties() { return m_properties; }
-    bool                accessProperty(PropertyInfo&);
+        //
+        //  This function is called after all file, object, component, and
+        //  property structures have been read. For binary files, this is
+        //  just before the data is read. For text files, this is after the
+        //  entire file has been read.
+        //
 
-    //
-    //  These are used to declare a component or property. The
-    //  functions are called expecting the return value to be non-zero
-    //  (or your own pointer) if the reader should try and read the
-    //  data associated with the component or property -- the default
-    //  is non-zero.
-    //
+        virtual void descriptionComplete();
 
-    struct Request
-    {
-        Request()
-            : m_want(true), m_data(0) {}
-        Request(bool want, void* data = 0)
-            : m_want(want), m_data(data) {}
+        //
+        //  RandomAccess functions. When the file is openned as RandomAccess,
+        //  you can get ahold of an ObjectInfo and pass it to this function to
+        //  have the reader seek directly.
+        //
+        //  accessObject() requires that the reference passed in be from the
+        //  reader's object cache, not a copy.
+        //
+        //  The components() and properties() functions are there to make it
+        //  easy to take parts for later retrieval with accessObject()
+        //
 
-        bool  want() const { return m_want; }
-        void* data() const { return m_data; }
+        Objects& objects() { return m_objects; }
 
-    private:
-        bool        m_want;
-        void*       m_data;
-        friend class Reader;
-    };
+        bool accessObject(ObjectInfo&);
 
-    //
-    //  Version 3 API
-    //
+        Components& components() { return m_components; }
 
-    virtual Request     object(const std::string& name,
+        bool accessComponent(ComponentInfo&);
+
+        Properties& properties() { return m_properties; }
+
+        bool accessProperty(PropertyInfo&);
+
+        //
+        //  These are used to declare a component or property. The
+        //  functions are called expecting the return value to be non-zero
+        //  (or your own pointer) if the reader should try and read the
+        //  data associated with the component or property -- the default
+        //  is non-zero.
+        //
+
+        struct Request
+        {
+            Request()
+                : m_want(true)
+                , m_data(0)
+            {
+            }
+
+            Request(bool want, void* data = 0)
+                : m_want(want)
+                , m_data(data)
+            {
+            }
+
+            bool want() const { return m_want; }
+
+            void* data() const { return m_data; }
+
+        private:
+            bool m_want;
+            void* m_data;
+            friend class Reader;
+        };
+
+        //
+        //  Version 3 API
+        //
+
+        virtual Request object(const std::string& name,
                                const std::string& protocol,
                                unsigned int protocolVersion,
-                               const ObjectInfo &header);
+                               const ObjectInfo& header);
 
-
-    virtual Request     component(const std::string& name,
+        virtual Request component(const std::string& name,
                                   const std::string& interp,
-                                  const ComponentInfo &header);
+                                  const ComponentInfo& header);
 
-
-    virtual Request     property(const std::string& name,
+        virtual Request property(const std::string& name,
                                  const std::string& interp,
-                                 const PropertyInfo &header);
+                                 const PropertyInfo& header);
 
-    //
-    //  Version 2 API still works, if the version 3 API (above) is not
-    //  overriden. New applications should not use these functions.
-    //
+        //
+        //  Version 2 API still works, if the version 3 API (above) is not
+        //  overriden. New applications should not use these functions.
+        //
 
-    virtual Request     component(const std::string& name,
-                                  const ComponentInfo &header);
+        virtual Request component(const std::string& name,
+                                  const ComponentInfo& header);
 
-    virtual Request     property(const std::string& name,
-                                 const PropertyInfo &header);
+        virtual Request property(const std::string& name,
+                                 const PropertyInfo& header);
 
-    //
-    //  Data should return a pointer to a region of memory large
-    //  enough to hold the data that will be read for
-    //  PropertyInfo. The bytes parameter tells you how much memory
-    //  (in bytes) will be required
-    //
+        //
+        //  Data should return a pointer to a region of memory large
+        //  enough to hold the data that will be read for
+        //  PropertyInfo. The bytes parameter tells you how much memory
+        //  (in bytes) will be required
+        //
 
-    virtual void*       data(const PropertyInfo&, size_t bytes);
+        virtual void* data(const PropertyInfo&, size_t bytes);
 
-    //
-    //  dataRead() (read "data red") is called after the data is
-    //  succesfully read (so after the data() function is called)
-    //
+        //
+        //  dataRead() (read "data red") is called after the data is
+        //  succesfully read (so after the data() function is called)
+        //
 
-    virtual void        dataRead(const PropertyInfo&);
+        virtual void dataRead(const PropertyInfo&);
 
-    //------------------------------------------------------------
-    //
-    //  Text file parser
-    //
+        //------------------------------------------------------------
+        //
+        //  Text file parser
+        //
 
-    //
-    //  Override these to redirect error messages. If you throw
-    //  you will stop the parsing
-    //
+        //
+        //  Override these to redirect error messages. If you throw
+        //  you will stop the parsing
+        //
 
-    virtual void        parseError(const char* msg);
-    virtual void        parseWarning(const char* msg);
+        virtual void parseError(const char* msg);
+        virtual void parseWarning(const char* msg);
 
+        //
+        //  Used by the text file parser
+        //
 
-    //
-    //  Used by the text file parser
-    //
+        void beginHeader(uint32 version);
+        void beginObject(unsigned int name, unsigned int protocol,
+                         unsigned int pversion = 1);
 
-    void                beginHeader(uint32 version);
-    void                beginObject(unsigned int name,
-                                    unsigned int protocol,
-                                    unsigned int pversion=1);
+        void beginComponent(unsigned int name, unsigned int interp);
 
-    void                beginComponent(unsigned int name,
-                                       unsigned int interp);
+        void beginProperty(unsigned int name, unsigned int interp,
+                           unsigned int size, DataType type,
+                           const Dimensions& dims);
 
-    void                beginProperty(unsigned int name,
-                                      unsigned int interp,
-                                      unsigned int size,
-                                      DataType type,
-                                      const Dimensions& dims);
+        void endComponent();
+        void endProperty();
+        void endFile();
 
-    void                endComponent();
-    void                endProperty();
-    void                endFile();
+        void addObject(const ObjectInfo&);
+        void addComponent(const ComponentInfo&);
 
-    void                addObject(const ObjectInfo&);
-    void                addComponent(const ComponentInfo&);
+        const TypeSpec& currentType() const { return m_currentType; }
 
-    const TypeSpec&     currentType() const { return m_currentType; }
+        template <typename T> void addToPropertyBuffer(T);
 
-    template <typename T>
-    void                addToPropertyBuffer(T);
+        size_t numAtomicValuesInBuffer() const;
+        size_t numElementsInBuffer() const;
+        void fillToSize(size_t);
 
-    size_t              numAtomicValuesInBuffer() const;
-    size_t              numElementsInBuffer() const;
-    void                fillToSize(size_t);
+        int internString(const std::string&);
 
-    int                 internString(const std::string&);
+    protected:
+        //
+        //  This function is responsible for calling the data functions
+        //  above. If you need to do some unpacking at the stream level
+        //  you can override this function. The function should return
+        //  true on success, false otherwise.
+        //
 
-protected:
-    //
-    //  This function is responsible for calling the data functions
-    //  above. If you need to do some unpacking at the stream level
-    //  you can override this function. The function should return
-    //  true on success, false otherwise.
-    //
+        virtual bool readProperty(PropertyInfo&);
 
-    virtual bool        readProperty(PropertyInfo&);
+    private:
+        bool readBinaryGTO();
+        bool readTextGTO();
+        void readMagicNumber();
+        void readHeader();
+        void readStringTable();
+        void readObjects();
+        void readComponents();
+        void readProperties();
 
-private:
-    bool                readBinaryGTO();
-    bool                readTextGTO();
-    void                readMagicNumber();
-    void                readHeader();
-    void                readStringTable();
-    void                readObjects();
-    void                readComponents();
-    void                readProperties();
+        void read(char*, size_t);
+        void get(char&);
+        bool notEOF();
+        void seekForward(size_t);
+        int tell();
+        void seekTo(size_t);
 
-    void                read(char *, size_t);
-    void                get(char &);
-    bool                notEOF();
-    void                seekForward(size_t);
-    int                 tell();
-    void                seekTo(size_t);
+    private:
+        Header m_header;
+        Objects m_objects;
+        Components m_components;
+        NameStack m_nameStack;
+        IndexStack m_indexStack;
+        Properties m_properties;
+        StringTable m_strings;
+        StringMap m_stringMap;
+        std::istream* m_in;
+        char* m_inRAM;
+        size_t m_inRAMSize;
+        size_t m_inRAMCurrentPos;
+        void* m_gzfile;
+        int m_gzrval;
+        std::string m_inName;
+        bool m_needsClosing;
+        bool m_error;
+        std::string m_why;
+        bool m_swapped;
+        unsigned int m_mode;
+        int m_linenum;
+        int m_charnum;
+        ByteArray m_buffer;
+        TypeSpec m_currentType;
+    };
 
-private:
-    Header              m_header;
-    Objects             m_objects;
-    Components          m_components;
-    NameStack           m_nameStack;
-    IndexStack          m_indexStack;
-    Properties          m_properties;
-    StringTable         m_strings;
-    StringMap           m_stringMap;
-    std::istream*       m_in;
-    char*               m_inRAM;
-    size_t              m_inRAMSize;
-    size_t              m_inRAMCurrentPos;
-    void*               m_gzfile;
-    int                 m_gzrval;
-    std::string         m_inName;
-    bool                m_needsClosing;
-    bool                m_error;
-    std::string         m_why;
-    bool                m_swapped;
-    unsigned int        m_mode;
-    int                 m_linenum;
-    int                 m_charnum;
-    ByteArray           m_buffer;
-    TypeSpec            m_currentType;
-};
+    template <typename T> void Reader::addToPropertyBuffer(T val)
+    {
+        size_t i = m_buffer.size();
+        m_buffer.insert(m_buffer.end(), sizeof(T), 0);
+        T* p = reinterpret_cast<T*>(&m_buffer[i]);
+        *p = val;
+    }
 
-template <typename T>
-void
-Reader::addToPropertyBuffer(T val)
-{
-    size_t i = m_buffer.size();
-    m_buffer.insert(m_buffer.end(), sizeof(T), 0);
-    T* p = reinterpret_cast<T*>(&m_buffer[i]);
-    *p = val;
-}
-
-} // Gto
+} // namespace Gto
 
 #endif // __Gto__Reader__h__

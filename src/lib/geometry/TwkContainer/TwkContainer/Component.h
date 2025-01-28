@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2002 Tweak Inc. 
+// Copyright (c) 2002 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __TwkContainer__Component__h__
 #define __TwkContainer__Component__h__
@@ -11,198 +11,197 @@
 #include <vector>
 #include <map>
 
-namespace TwkContainer {
-class Property;
-class PropertyContainer;
-
-//
-//  class Component
-//
-//  A Component is a group of Properties. An example would be "points"
-//  which might contain the properties "position", "velocity", "mass",
-//  etc. Typically, a component will have properties whose sizes are
-//  the same. However, there is no enforcement of this.
-//
-
-class Component
+namespace TwkContainer
 {
-public:
-    typedef std::vector<std::string>        StringVector;
-    typedef StringVector::const_iterator    NameIterator;
-    typedef std::vector<Property*>          Container;
-    typedef Container                       Properties;
-    typedef std::vector<Component*>         Components;
-    typedef std::vector<const Component*>   ConstComponents;
-    typedef std::map<std::string,Property*> NamedPropertyMap;
+    class Property;
+    class PropertyContainer;
 
     //
-    //	Transposable components should have all properties of the same
-    //	size.
+    //  class Component
+    //
+    //  A Component is a group of Properties. An example would be "points"
+    //  which might contain the properties "position", "velocity", "mass",
+    //  etc. Typically, a component will have properties whose sizes are
+    //  the same. However, there is no enforcement of this.
     //
 
-    explicit Component(const std::string& name, bool transposable=false);
-    ~Component();
-    
-    //
-    //	Returns the values passed into the constructor.
-    //
+    class Component
+    {
+    public:
+        typedef std::vector<std::string> StringVector;
+        typedef StringVector::const_iterator NameIterator;
+        typedef std::vector<Property*> Container;
+        typedef Container Properties;
+        typedef std::vector<Component*> Components;
+        typedef std::vector<const Component*> ConstComponents;
+        typedef std::map<std::string, Property*> NamedPropertyMap;
 
-    bool		isSynchronized() const { return m_transposable; }
-    bool		isTransposable() const { return m_transposable; }
-    const std::string&	name() const { return m_name; }
-    PropertyContainer*  container() { return m_container; }
-    const PropertyContainer*  container() const { return m_container; }
+        //
+        //	Transposable components should have all properties of the same
+        //	size.
+        //
 
-    //
-    //	Component Management
-    //
+        explicit Component(const std::string& name, bool transposable = false);
+        ~Component();
 
-    Components&		    components() { return m_components; }
-    const Components&	    components() const { return m_components; }
+        //
+        //	Returns the values passed into the constructor.
+        //
 
-    Component*              component(NameIterator, NameIterator);
-    const Component*	    component(NameIterator, NameIterator) const;
+        bool isSynchronized() const { return m_transposable; }
 
-    void                    add(Component*);
-    void                    remove(Component*);
+        bool isTransposable() const { return m_transposable; }
 
-    //
-    //	Access to properties and components
-    //
+        const std::string& name() const { return m_name; }
 
-    Component*		    component(const std::string& fullname);
-    const Component*	    component(const std::string& fullname) const;
+        PropertyContainer* container() { return m_container; }
 
-    bool                    hasComponent(Component*) const;
-    bool                    hasComponentRecursive(Component*) const;
+        const PropertyContainer* container() const { return m_container; }
 
-    //
-    //	Will return an existing component.
-    //
+        //
+        //	Component Management
+        //
 
-    Component*		    createComponent(const std::string& fullname,
-					    bool synchronized=false);
+        Components& components() { return m_components; }
 
-    Component*		    createComponent(NameIterator i,
-                                            NameIterator end,
-                                            bool synchronized=false);
+        const Components& components() const { return m_components; }
 
+        Component* component(NameIterator, NameIterator);
+        const Component* component(NameIterator, NameIterator) const;
 
-    //
-    //	Property management
-    //
+        void add(Component*);
+        void remove(Component*);
 
-    const Container&	properties() const  { return m_properties; }
-    Container&		properties() { return m_properties; }
+        //
+        //	Access to properties and components
+        //
 
-    void                propertiesAsMap(NamedPropertyMap&, std::string prefix) const;
+        Component* component(const std::string& fullname);
+        const Component* component(const std::string& fullname) const;
 
-    void		add(Property* p);
-    void		remove(Property*);
-    void		remove(const std::string&);
+        bool hasComponent(Component*) const;
+        bool hasComponentRecursive(Component*) const;
 
-    const Property*	find(const std::string&) const;
-    Property*		find(const std::string&);
-    
-    const Property*     find(NameIterator, NameIterator) const;
-    Property*           find(NameIterator, NameIterator);
+        //
+        //	Will return an existing component.
+        //
 
-    bool                hasProperty(const Property*) const;
-    bool                propertyPath(ConstComponents& path, const Property*) const;
+        Component* createComponent(const std::string& fullname,
+                                   bool synchronized = false);
 
-    template<class T>
-    T*			property(const std::string& name);
+        Component* createComponent(NameIterator i, NameIterator end,
+                                   bool synchronized = false);
 
-    template<class T>
-    const T*		property(const std::string& name) const;
+        //
+        //	Property management
+        //
 
-    //
-    //	resizing all properties in a component
-    //
+        const Container& properties() const { return m_properties; }
 
-    void		resize(size_t s);
+        Container& properties() { return m_properties; }
 
-    //
-    //  range deletion 
-    //
+        void propertiesAsMap(NamedPropertyMap&, std::string prefix) const;
 
-    void                erase(size_t start, size_t num);
-    void                eraseUnsorted(size_t start, size_t num);
+        void add(Property* p);
+        void remove(Property*);
+        void remove(const std::string&);
 
-    //
-    //  resize to the first non-zero property size
-    //
+        const Property* find(const std::string&) const;
+        Property* find(const std::string&);
 
-    void		resizeNonZero();
+        const Property* find(NameIterator, NameIterator) const;
+        Property* find(NameIterator, NameIterator);
 
-    //
-    //	Copy everthing
-    //
+        bool hasProperty(const Property*) const;
+        bool propertyPath(ConstComponents& path, const Property*) const;
 
-    Component*		copy() const;
+        template <class T> T* property(const std::string& name);
 
-    //
-    //  Copy other to this
-    //
+        template <class T> const T* property(const std::string& name) const;
 
-    void                copy(const Component*);
+        //
+        //	resizing all properties in a component
+        //
 
-    //
-    //  Shallow copy copies the component, but the properties are
-    //  shared between this component and the new one
-    //
+        void resize(size_t s);
 
-    Component*          shallowCopy();
+        //
+        //  range deletion
+        //
 
-    //
-    //  Similar to PropertyContainer::shallowDiffCopy() but for this
-    //  component only.
-    //
-    
-    Component*          shallowDiffCopy(const Component* ref);
+        void erase(size_t start, size_t num);
+        void eraseUnsorted(size_t start, size_t num);
 
-    //
-    //  Contatenate. Presumably the passed in component has all the
-    //  same properties as this one. However, its not an error to pass
-    //  in somethign that doesn't have all the same props.
-    //
+        //
+        //  resize to the first non-zero property size
+        //
 
-    void                concatenate(const Component*);
+        void resizeNonZero();
 
-    //
-    //  Archive
-    //
+        //
+        //	Copy everthing
+        //
 
-    bool                isPersistent() const;
-    bool                isCopyable() const;
- 
-private:
-    std::string		m_name;
-    Container		m_properties;
-    bool		m_transposable;
-    PropertyContainer*  m_container;
-    Components          m_components;
+        Component* copy() const;
 
-    friend class PropertyContainer;
-};
+        //
+        //  Copy other to this
+        //
 
-//----------------------------------------------------------------------
+        void copy(const Component*);
 
-template<class T>
-inline T*
-Component::property(const std::string& name)
-{
-    return dynamic_cast<T*>(find(name));
-}
+        //
+        //  Shallow copy copies the component, but the properties are
+        //  shared between this component and the new one
+        //
 
-template<class T>
-inline const T*
-Component::property(const std::string& name) const
-{
-    return dynamic_cast<const T*>(find(name));
-}
+        Component* shallowCopy();
 
+        //
+        //  Similar to PropertyContainer::shallowDiffCopy() but for this
+        //  component only.
+        //
 
-} // TwkContainer
+        Component* shallowDiffCopy(const Component* ref);
+
+        //
+        //  Contatenate. Presumably the passed in component has all the
+        //  same properties as this one. However, its not an error to pass
+        //  in somethign that doesn't have all the same props.
+        //
+
+        void concatenate(const Component*);
+
+        //
+        //  Archive
+        //
+
+        bool isPersistent() const;
+        bool isCopyable() const;
+
+    private:
+        std::string m_name;
+        Container m_properties;
+        bool m_transposable;
+        PropertyContainer* m_container;
+        Components m_components;
+
+        friend class PropertyContainer;
+    };
+
+    //----------------------------------------------------------------------
+
+    template <class T> inline T* Component::property(const std::string& name)
+    {
+        return dynamic_cast<T*>(find(name));
+    }
+
+    template <class T>
+    inline const T* Component::property(const std::string& name) const
+    {
+        return dynamic_cast<const T*>(find(name));
+    }
+
+} // namespace TwkContainer
 
 #endif // __TwkContainer__Component__h__

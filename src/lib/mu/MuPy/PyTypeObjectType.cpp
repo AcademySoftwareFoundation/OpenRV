@@ -1,8 +1,8 @@
 //
 // Copyright (c) 2011, Jim Hourihan
 // All rights reserved.
-// 
-// SPDX-License-Identifier: Apache-2.0 
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <MuPy/PyTypeObjectType.h>
 
@@ -18,78 +18,75 @@
 #include <Mu/config.h>
 #include <iostream>
 
-namespace Mu {
-using namespace std;
-
-PyTypeObjectType::PyTypeObjectType(Context* c, const char* name)
-    : OpaqueType(c, name)
+namespace Mu
 {
-}
+    using namespace std;
 
-PyTypeObjectType::~PyTypeObjectType() {}
-
-void
-PyTypeObjectType::outputValue(ostream &o, const Value &value, bool full) const
-{
-    o << "<#" << fullyQualifiedName() << " ";
-
-    if (value._Pointer)
+    PyTypeObjectType::PyTypeObjectType(Context* c, const char* name)
+        : OpaqueType(c, name)
     {
-        PyTypeObject* t = reinterpret_cast<PyTypeObject*>(value._Pointer);
-        o << t->tp_name;
-    }
-    else
-    {
-        o << "nil";
     }
 
-    o << ">";
-}
+    PyTypeObjectType::~PyTypeObjectType() {}
 
-void
-PyTypeObjectType::outputValueRecursive(ostream &o,
-                                 const ValuePointer vp,
-                                 ValueOutputState& state) const
-{
-    Pointer p = *reinterpret_cast<Pointer*>(vp);
-
-    o << "<#" << fullyQualifiedName() << " ";
-
-    if (p)
+    void PyTypeObjectType::outputValue(ostream& o, const Value& value,
+                                       bool full) const
     {
-        PyTypeObject* t = reinterpret_cast<PyTypeObject*>(p);
-        o << t->tp_name;
-    }
-    else
-    {
-        o << "nil";
+        o << "<#" << fullyQualifiedName() << " ";
+
+        if (value._Pointer)
+        {
+            PyTypeObject* t = reinterpret_cast<PyTypeObject*>(value._Pointer);
+            o << t->tp_name;
+        }
+        else
+        {
+            o << "nil";
+        }
+
+        o << ">";
     }
 
-    o << ">";
-}
+    void PyTypeObjectType::outputValueRecursive(ostream& o,
+                                                const ValuePointer vp,
+                                                ValueOutputState& state) const
+    {
+        Pointer p = *reinterpret_cast<Pointer*>(vp);
 
-void
-PyTypeObjectType::load()
-{
-    OpaqueType::load();
+        o << "<#" << fullyQualifiedName() << " ";
 
-    USING_MU_FUNCTION_SYMBOLS;
-    Symbol *s = scope();
+        if (p)
+        {
+            PyTypeObject* t = reinterpret_cast<PyTypeObject*>(p);
+            o << t->tp_name;
+        }
+        else
+        {
+            o << "nil";
+        }
 
-    string rname = name();
-    rname += "&";
-    const char* n = fullyQualifiedName().c_str();
-    string nref = n;
-    nref += "&";
-    const char* nr = nref.c_str();
+        o << ">";
+    }
 
-    Context* c = context();
+    void PyTypeObjectType::load()
+    {
+        OpaqueType::load();
 
-    globalScope()->addSymbols(
+        USING_MU_FUNCTION_SYMBOLS;
+        Symbol* s = scope();
 
-		   EndArguments);
+        string rname = name();
+        rname += "&";
+        const char* n = fullyQualifiedName().c_str();
+        string nref = n;
+        nref += "&";
+        const char* nr = nref.c_str();
 
-}
+        Context* c = context();
 
-} // Mu
+        globalScope()->addSymbols(
 
+            EndArguments);
+    }
+
+} // namespace Mu

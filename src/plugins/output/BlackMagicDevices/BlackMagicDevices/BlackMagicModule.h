@@ -15,18 +15,18 @@
 namespace BlackMagicDevices
 {
 
-  class BlackMagicModule : public TwkApp::VideoModule
-  {
-   public:
-    BlackMagicModule( NativeDisplayPtr );
-    virtual ~BlackMagicModule();
+    class BlackMagicModule : public TwkApp::VideoModule
+    {
+    public:
+        BlackMagicModule(NativeDisplayPtr);
+        virtual ~BlackMagicModule();
 
-    virtual std::string name() const;
-    virtual std::string SDKIdentifier() const;
-    virtual std::string SDKInfo() const;
-    virtual void open();
-    virtual void close();
-    virtual bool isOpen() const;
-  };
+        virtual std::string name() const;
+        virtual std::string SDKIdentifier() const;
+        virtual std::string SDKInfo() const;
+        virtual void open();
+        virtual void close();
+        virtual bool isOpen() const;
+    };
 
-}  // namespace BlackMagicDevices
+} // namespace BlackMagicDevices

@@ -1,11 +1,10 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
-static int
-QVariant_toInt_int(Thread& NODE_THREAD, Pointer param_this)
+static int QVariant_toInt_int(Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QVariant arg0 = getqtype<QVariantType>(param_this);
@@ -29,6 +28,7 @@ QVariant_toQObject_QObject(Thread& NODE_THREAD, Pointer param_this)
 
 static NODE_IMPLEMENTATION(toQObject, Pointer)
 {
-    NODE_RETURN(QVariant_toQObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    NODE_RETURN(QVariant_toQObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0,
+Pointer)));
 }
 */

@@ -11,10 +11,11 @@
 namespace Rv
 {
 
-  RvConsoleApplication::RvConsoleApplication()
-      : IPCore::Application(), m_pyLibrary( INTERNAL_APPLICATION_NAME )
-  {
-    m_pyLibrary.setName( "py-media-library" );
-  }
+    RvConsoleApplication::RvConsoleApplication()
+        : IPCore::Application()
+        , m_pyLibrary(INTERNAL_APPLICATION_NAME)
+    {
+        m_pyLibrary.setName("py-media-library");
+    }
 
-}  // namespace Rv
+} // namespace Rv
