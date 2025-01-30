@@ -254,6 +254,7 @@ Supported RAW formats
 | ------------------ | ----------------------- |
 | .arw               | Sony/Minolta RAW        |
 | .cr2               | Canon RAW 2             |
+| .cr3               | Canon RAW 3             |
 | .crw               | Canon RAW               |
 | .dng               | Digital NeGative        |
 | .nef               | Nikon Electronic Format |
