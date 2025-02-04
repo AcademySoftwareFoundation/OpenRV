@@ -1,6 +1,6 @@
 //******************************************************************************
-//
-// Copyright (C) 2025 Autodesk, Inc. All Rights Reserved.
+// Copyright (c) 2012 Tweak Inc.
+// All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -49,6 +49,7 @@ extern "C"
 #include <libavutil/timecode.h>
 #include <libavutil/display.h>
 #include <libswscale/swscale.h>
+    // #include <libavcodec/ass_split.h>
 }
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming,
@@ -154,662 +155,9 @@ namespace TwkMovie
 
         ~TimingDetails()
         {
-            m_timers[name] = new MovieTimer();
-        }
-        m_timers[name]->start();
-    };
-
-    double pauseTimer(string name)
-    {
-        return m_timers[name]->stop();
-    };
-
-    string summary()
-    {
-        ostringstream summary;
-        summary << "timing summary (time/runs = avg) ";
-        map <string, MovieTimer*>::iterator timerItr;
-        for(timerItr = m_timers.begin(); timerItr != m_timers.end(); timerItr++)
-        {
-            string name = timerItr->first;
-            summary << name <<
-                ": " << m_timers[name]->duration <<
-                               " / " << m_timers[name]->runs <<
-                " = " << m_timers[name]->duration/float(m_timers[name]->runs)
-                << " ";
-        }
-        return summary.str();
-    };
-
-    map <string, MovieTimer*> m_timers;
-};
-
-struct AudioState
-{
-    AudioState() { layout = UnknownLayout; };
-    ~AudioState() { };
-
-    ChannelsMap    chmap;
-    ChannelsVector channels;
-    int            channelsPerTrack;
-    Layout         layout;
-};
-
-
-//
-// AudioTrack and VideoTrack are used by both MovieFFMpegReader and
-// MovieFFMpegWriter to store additional information about the AVStreams in
-// each file. These objects contain special AVClasses that are used to both
-// decode and encode as appropriate for reading and writing.
-//
-
-struct AudioTrack
-{
-    AudioTrack()
-        : audioPacket(0),
-          audioFrame(0),
-          lastDecodedAudio(AV_NOPTS_VALUE),
-          lastEncodedAudio(0),
-          bufferStart(AV_NOPTS_VALUE),
-          bufferEnd(AV_NOPTS_VALUE),
-          bufferLength(0),
-          isOpen(false),
-          numChannels(0),
-          start(0),
-          desired(0),
-          bufferPointer(0),
-          avCodecContext(0)
-    {
-        audioFrame = av_frame_alloc();
-        audioPacket = av_packet_alloc();
-    };
-
-    ~AudioTrack()
-    {
-        if (audioPacket) av_packet_free(&audioPacket);
-        if (audioFrame) av_frame_free(&audioFrame);
-    };
-
-    AudioTrack& initFrom(const AudioTrack* t)
-    {
-        number        = t->number;
-        numChannels   = t->numChannels;
-        return *this;
-    }
-
-    int                 number;
-    int                 numChannels;
-    bool                isOpen;
-    int64_t             lastDecodedAudio;
-    int64_t             lastEncodedAudio;
-    int64_t             bufferStart;
-    int64_t             bufferEnd;
-    int64_t             bufferLength;
-    AVPacket*           audioPacket;
-    AVFrame*            audioFrame;
-    SampleTime          start;
-    SampleTime          desired;
-    float*              bufferPointer;
-    AVCodecContext*     avCodecContext;
-};
-
-struct VideoTrack
-{
-    VideoTrack()
-        : videoPacket(0),
-          videoFrame(0),
-          lastDecodedVideo(-1),
-          lastEncodedVideo(0),
-          imgConvertContext(0),
-          isOpen(false),
-          rotate(false),
-          colrType(""),
-          avCodecContext(0)
-    {
-        videoFrame = av_frame_alloc();
-        videoPacket = av_packet_alloc();
-        inPicture = av_frame_alloc();
-        outPicture = av_frame_alloc();
-    };
-
-    ~VideoTrack()
-    {
-        //
-        //  Be paranoid: get rid of these pointers that were borrowed
-        //  from AVFrame. ffmpeg doesn't touch them on deletion, but
-        //  it also doesn't say it won't
-        //
-
-        for (size_t i = 0; i < AV_NUM_DATA_POINTERS; i++)
-        {
-            videoFrame->data[i] = 0;
-            videoFrame->linesize[i] = 0;
-        }
-
-        if (imgConvertContext) sws_freeContext(imgConvertContext);
-        if (videoPacket) av_packet_free(&videoPacket);
-        if (videoFrame) av_frame_free(&videoFrame);
-        av_frame_free(&inPicture);
-        av_frame_free(&outPicture);
-    };
-
-    VideoTrack& initFrom(const VideoTrack* t)
-    {
-        fb.copyFrom(&t->fb);
-
-        name              = t->name;
-        number            = t->number;
-        rotate            = t->rotate;
-        return *this;
-    }
-
-    string              name;
-    int                 number;
-    bool                isOpen;
-    bool                rotate;
-    int                 lastDecodedVideo;
-    int                 lastEncodedVideo;
-    set<int64_t>        tsSet;
-    FrameBuffer         fb;
-    struct SwsContext*  imgConvertContext;
-    AVPacket*           videoPacket;
-    AVFrame*            videoFrame;
-    AVFrame*            inPicture;
-    AVFrame*            outPicture;
-    string              colrType;
-    AVCodecContext*     avCodecContext;
-};
-
-//
-//  Manage limited pool of open contexts.
-//
-//  ContextPool does not open codecs, but does close them if a Reservation
-//  object is requested, the requested context is closed, and the ContextPool
-//  size is at it's max.
-//
-
-class ContextPool
-{
-  public:
-
-    ContextPool(int poolSize) :
-        m_maxOpenThreads(poolSize),
-        m_currentOpenThreads(0) {}
-
-  private:
-
-    //
-    //  Wrapper for AV codec context
-    //
-
-    struct Context
-    {
-        Context() :
-            reader(0),
-            streamIndex(-1),
-            avContext(0),
-            vTrack(0),
-            aTrack(0),
-            reserved(false),
-            inOpenList(false) {};
-
-        MovieFFMpegReader* reader;
-        int                streamIndex;
-        AVCodecContext*    avContext;
-        VideoTrack*        vTrack;
-        AudioTrack*        aTrack;
-
-        std::list<Context*>::iterator listIterator;
-
-        bool               reserved;
-        bool               inOpenList;
-    };
-
-  public:
-
-    //
-    //  State/lock object for reserved contexts.  Contexts are reserved by
-    //  MovieFFMpeg during use, cannot be closed while reserved.
-    //
-
-    class Reservation
-    {
-      public:
-        Reservation(MovieFFMpegReader* reader, int streamIndex);
-        ~Reservation();
-
-      private:
-        Context* m_context;
-        int      m_dbline;
-        int      m_dblline;
-    };
-
-    //
-    //  MovieFFMpeg calls flushContext() when it is going to close the context
-    //  itself.
-    //
-
-    static void flushContext(MovieFFMpegReader* reader, int streamIndex);
-
-  private:
-
-    typedef std::pair<MovieFFMpegReader*,int>  ContextKey;
-    typedef std::map<ContextKey, Context>      ContextMap;
-    typedef std::list<Context*>                ContextList;
-    typedef boost::mutex                       Mutex;
-    typedef boost::lock_guard<Mutex>           LockGuard;
-
-    ContextMap  m_contextMap;
-    ContextList m_openContexts;
-    Mutex       m_mutex;
-    int         m_maxOpenThreads;
-    int         m_currentOpenThreads;
-};
-
-//
-//  Global pool object:
-//
-
-ContextPool* globalContextPool = 0;
-
-void
-ContextPool::flushContext(MovieFFMpegReader* reader, int streamIndex)
-{
-    if (!globalContextPool) return;
-
-    ContextPool& gcp = *globalContextPool;
-
-    LockGuard lock(gcp.m_mutex);
-
-    ContextMap::iterator i = gcp.m_contextMap.find(ContextKey(reader, streamIndex));
-
-    if (i == gcp.m_contextMap.end()) return;
-
-    Context& context = i->second;
-
-    if (context.inOpenList)
-    {
-        gcp.m_openContexts.erase(context.listIterator);
-        gcp.m_currentOpenThreads -= context.avContext->thread_count;
-    }
-
-    gcp.m_contextMap.erase(i);
-}
-
-ContextPool::Reservation::Reservation(MovieFFMpegReader* reader,
-    int streamIndex) : m_context(0), m_dbline(0), m_dblline(0)
-{
-    if (!globalContextPool) return;
-
-    ContextPool& gcp = *globalContextPool;
-
-    LockGuard lock(gcp.m_mutex);
-
-    //
-    //  Look up Context object, possibly creating an empty one at this point.
-    //
-
-    Context& context = gcp.m_contextMap[ContextKey(reader, streamIndex)];
-    m_context = &context;
-
-    context.reserved    = true;
-    context.reader      = reader;
-    context.streamIndex = streamIndex;
-
-    //
-    //  If it's already in the list move it to the front now.
-    //
-
-    if (context.inOpenList)
-    {
-        gcp.m_openContexts.erase(context.listIterator);
-        gcp.m_openContexts.push_front(&context);
-        context.listIterator = gcp.m_openContexts.begin();
-    }
-
-    //
-    //  Make sure there is room in the list, in case we are about to open this
-    //  context.
-    //
-
-    while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads)
-    {
-        Context& closeContext = *gcp.m_openContexts.back();
-        gcp.m_openContexts.pop_back();
-
-        closeContext.inOpenList = false;
-
-        if (closeContext.reserved)
-        {
-            //
-            //  XXX Should never happen since reserved Contexts get pushed to
-            //  front of list, but how do we ensure it never happens ?
-            //
-
-            cout << "ERROR: Attempted to reuse reserved context! ("
-                 << closeContext.reader->filename() << ")" << endl;
-        }
-        else if (closeContext.avContext)
-        {
-            DB ("closing " << closeContext.reader << " "
-                << closeContext.reader->filename() << ", stream "
-                << closeContext.streamIndex << ", threads "
-                << closeContext.avContext->thread_count << endl);
-
-            gcp.m_currentOpenThreads -= closeContext.avContext->thread_count;
-
-            avcodec_free_context(&closeContext.avContext);
-
-            if (closeContext.vTrack) closeContext.vTrack->isOpen = false;
-            if (closeContext.aTrack) closeContext.aTrack->isOpen = false;
-        }
-    }
-}
-
-ContextPool::Reservation::~Reservation()
-{
-    if (!globalContextPool) return;
-
-    ContextPool& gcp = *globalContextPool;
-
-    LockGuard lock(gcp.m_mutex);
-
-    Context& context = *m_context;
-
-    context.reserved = false;
-
-    //
-    //  Make sure the context still exists and we aren't closing.
-    //
-
-    ContextKey key(context.reader, context.streamIndex);
-    if (gcp.m_contextMap.find(key) == gcp.m_contextMap.end()) return;
-
-    //
-    //  If this is the first time we've encountered this Context, it's only now
-    //  that it corresponds to an actual AVCodecContext, so look that up and
-    //  add to Context struct.  Also find and remember corresponding Track.
-    //
-
-    if (!context.avContext)
-    {
-        AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
-
-        context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
-        if (context.vTrack)
-        {
-          context.avContext = context.vTrack->avCodecContext;
-        }
-        else if (context.aTrack)
-        {
-          context.avContext = context.aTrack->avCodecContext;
-        }
-    }
-
-    //
-    //  If the context is not open at this point, something went wrong.
-    //  Otherwise we want to push it to the front of the open list, adding it
-    //  first if necessary.
-    //
-
-    if (!context.avContext)
-    {
-        if (context.inOpenList)
-        {
-            gcp.m_openContexts.erase(context.listIterator);
-            context.inOpenList = false;
-        }
-    }
-    else if (gcp.m_openContexts.empty() || gcp.m_openContexts.front() != &context)
-    {
-        if (context.inOpenList)
-        //
-        //  We're going to add it to the front of the list, so remove it from
-        //  it's current location.
-        //
-        {
-            gcp.m_openContexts.erase(context.listIterator);
-        }
-        else
-        //
-        //  It's not in the list, so it's threads are not accounted for yet in
-        //  global thread count, so do that.
-        //
-        {
-            gcp.m_currentOpenThreads += context.avContext->thread_count;
-        }
-
-        gcp.m_openContexts.push_front(&context);
-
-        context.inOpenList = true;
-        context.listIterator = gcp.m_openContexts.begin();
-    }
-}
-
-namespace
-{
-
-//----------------------------------------------------------------------
-//
-// Static Lookups
-//
-//----------------------------------------------------------------------
-
-//
-//  Put anything we know about in here: some of these we don't
-//  actually support. But just in case ....
-//
-
-const char* slowRandomAccessCodecsArray[] = {
-    "3iv2", "3ivd", "ap41", "avc1", "div1", "div2", "div3", "div4", "div5",
-    "div6", "divx", "dnxhd", "dx50", "h263", "h264", "i263", "iv31", "iv32",
-    "m4s2", "mp42", "mp43", "mp4s", "mp4v", "mpeg4", "mpg1", "mpg3", "mpg4",
-    "pim1", "s263", "svq1", "svq3", "u263", "vc1", "vc1_vdpau", "vc1image",
-    "viv1", "wmv3", "wmv3_vdpau", "wmv3image", "xith", "xvid", "libdav1d",
-    0 };
-
-const char* supportedEncodingCodecsArray[] = {
-    "dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo",
-    0 };
-
-const char* metadataFieldsArray[] = {
-    "album", "album_artist", "artist", "author", "comment", "composer",
-    "copyright", "description", "encoder", "episode_id", "genre", "grouping",
-    "lyrics", "network", "rotate", "show", "synopsis", "title", "track", "year",
-    0 };
-
-const char* ignoreMetadataFieldsArray[] = { 
-    "major_brand", "minor_version","compatible_brands", "handler_name",
-    "vendor_id", "language",
-    "duration", // We ignore it here, since its explicitly added elsewhere.
-    0};
-
-//----------------------------------------------------------------------
-//
-// Static Helpers
-//
-//----------------------------------------------------------------------
-
-string
-avErr2Str(int errNum)
-{
-    char errBuf[AV_ERROR_MAX_STRING_SIZE];
-    av_make_error_string(&errBuf[0], AV_ERROR_MAX_STRING_SIZE, errNum);
-    return string(errBuf);
-}
-
-void
-avLogCallback(void *ptr, int level, const char *fmt, va_list vargs)
-{
-    if ((string(fmt).substr(0,51) ==
-         "Encoder did not produce proper pts, making some up.") ||
-        (string(fmt).substr(0,47) ==
-         "No accelerated colorspace conversion found from") ||
-        (string(fmt).substr(0,28) ==
-         "Increasing reorder buffer to") ||
-        (string(fmt).substr(0,34) ==
-         "sample aspect ratio already set to") ||
-        (string(fmt).substr(0,67) ==
-         "deprecated pixel format used, make sure you did set range correctly") ||
-        (string(fmt).substr(0,20) ==
-         "overread end of atom") ||
-        (string(fmt).substr(0,19) ==
-         "Timecode frame rate") ||
-        (string(fmt).substr(0,32) ==
-         "unsupported color_parameter_type"))
-    {
-        return;
-    }
-
-    ostringstream message;
-    if (level > av_log_get_level())
-    {
-        return;
-    }
-    else if (level > AV_LOG_WARNING)
-    {
-        message << "INFO";
-    }
-    else if (level == AV_LOG_WARNING)
-    {
-        message << "WARNING";
-    }
-    else
-    {
-        message << "ERROR";
-    }
-    #if DB_GENERAL & DB_LEVEL
-        message << " [" << level << "]: ";
-        message << "MovieFFMpeg";
-    #endif
-    message << ": " << string(fmt);
-    vprintf(message.str().c_str(), vargs);
-}
-
-bool
-codecHasSlowAccess(string name)
-{
-    boost::algorithm::to_lower(name);
-    for (const char** p = slowRandomAccessCodecsArray; *p; p++)
-    {
-        if (*p == name)
-        {
-            return true;
-        }
-    }
-    return false;
-};
-
-bool
-isMP4format(AVFormatContext* avFormatContext)
-{
-    return avFormatContext!=nullptr 
-            && avFormatContext->iformat!=nullptr 
-            && avFormatContext->iformat->name!=nullptr  
-            && strstr(avFormatContext->iformat->name, "mp4") != nullptr;
-}
-
-bool
-isMOVformat(AVFormatContext* avFormatContext)
-{
-    return avFormatContext!=nullptr 
-            && avFormatContext->iformat!=nullptr 
-            && avFormatContext->iformat->name!=nullptr  
-            && strstr(avFormatContext->iformat->name, "mov") != nullptr;
-}
-
-int64_t
-findBestTS(int64_t goalTS, double frameDur, VideoTrack* track, bool finalPacket)
-{
-    //
-    //  The timestamps we have collected from unordered packets give us a view
-    //  into the future timestamps for the frames we _will_ decode. This helps
-    //  us "predict the future" for interframe codecs and do a better job of
-    //  finding the best timestamp match for RV's frame request.
-    //
-    //  Below we look through the timestamps we know are coming to find the one
-    //  that is closest to the goalTS that represents the RV requested frame
-    //
-
-    int64_t smallest = -1;
-    map<int64_t,int64_t> diffs;
-    for (set<int64_t>::iterator ts = track->tsSet.begin();
-        ts != track->tsSet.end(); ts++)
-    {
-        int64_t diff = abs(goalTS - *ts);
-        if (diff < smallest || smallest == -1) smallest = diff;
-        diffs[diff] = *ts;
-    }
-    return (smallest != -1 && (smallest < (frameDur * 0.5) || finalPacket)) ?
-        diffs[smallest] : goalTS;
-}
-
-bool
-fpsEquals(double& fps, double f)
-{
-    //
-    //  We get fps from all kinds of places, may have varying sig figs,
-    //  so compare to "standard" values loosely.
-    //
-
-    if (fabs(fps - f) < 0.01)
-    {
-        fps = f;
-        return true;
-    }
-    return false;
-}
-
-AVPixelFormat
-getBestAVFormat(AVPixelFormat native)
-{
-    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
-    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
-    bool hasAlpha = true; //(desc->flags & AV_PIX_FMT_FLAG_ALPHA);
-    return (hasAlpha) ?
-        ((bitSize > 8) ? AV_PIX_FMT_RGBA64 : AV_PIX_FMT_RGBA) :
-        ((bitSize > 8) ? AV_PIX_FMT_RGB48 : AV_PIX_FMT_RGB24);
-}
-
-AVPixelFormat
-getBestRVFormat(AVPixelFormat native)
-{
-    //
-    // This method is primarily designed to be run on pixel formats for which
-    // RV cannot natively make use of. Right now that primarily means 10-bit
-    // YUV & YUVA data, but could also include anything we haven't found
-    // samples of or we simply don't have any anologous FrameBuffer format.
-    //
-    // NOTE: The one type of formats we do natively support that can pass
-    // through this unchanged are the 8-bit YUV & YUVA formats.
-    //
-
-    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
-    int bitSize = desc->comp[0].depth - desc->comp[0].shift;
-    bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
-    bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
-    bool isRGB = (desc->flags & AV_PIX_FMT_FLAG_RGB);
-    AVPixelFormat best = AV_PIX_FMT_NONE;
-
-    // Planar YUV+
-    if (isPlanar && !isRGB)
-    {
-        if (bitSize == 8)
-        {
-           best = native;
-        }
-        else if (bitSize < 8)
-        {
-            best = (hasAlpha) ? AV_PIX_FMT_YUVA444P : AV_PIX_FMT_YUV444P;
-        }
-        else if (bitSize > 8)
-        {
-            int log2w, log2h;
-            av_pix_fmt_get_chroma_sub_sample(native, &log2w, &log2h);
-            int usampling = int(pow(2.0f, log2w));
-            int vsampling = int(pow(2.0f, log2h));
-            int hfourcc = 4 / (usampling * vsampling);
-            switch (hfourcc)
+            map<string, MovieTimer*>::iterator timerItr;
+            for (timerItr = m_timers.begin(); timerItr != m_timers.end();
+                 timerItr++)
             {
                 delete m_timers[timerItr->first];
             }
@@ -918,12 +266,6 @@ getBestRVFormat(AVPixelFormat native)
         AVCodecContext* avCodecContext;
     };
 
-    struct HardwareContext
-    {
-        AVPixelFormat pixelFormat;
-        AVBufferRef* deviceContext;
-    };
-
     struct VideoTrack
     {
         VideoTrack()
@@ -936,7 +278,6 @@ getBestRVFormat(AVPixelFormat native)
             , rotate(false)
             , colrType("")
             , avCodecContext(0)
-            , hardwareContext({AV_PIX_FMT_NONE, nullptr})
         {
             videoFrame = av_frame_alloc();
             videoPacket = av_packet_alloc();
@@ -993,7 +334,6 @@ getBestRVFormat(AVPixelFormat native)
         AVFrame* outPicture;
         string colrType;
         AVCodecContext* avCodecContext;
-        struct HardwareContext hardwareContext;
     };
 
     //
@@ -1278,7 +618,6 @@ getBestRVFormat(AVPixelFormat native)
 
     namespace
     {
-        constexpr int rv_seek_frame_offset = 1;
 
         //----------------------------------------------------------------------
         //
@@ -1290,54 +629,50 @@ getBestRVFormat(AVPixelFormat native)
         //  Put anything we know about in here: some of these we don't
         //  actually support. But just in case ....
         //
-        constexpr std::array slowRandomAccessCodecs = {"3iv2"sv,
-                                                       "3ivd"sv,
-                                                       "ap41"sv,
-                                                       "avc1"sv,
-                                                       "div1"sv,
-                                                       "div2"sv,
-                                                       "div3"sv,
-                                                       "div4"sv,
-                                                       "div5"sv,
-                                                       "div6"sv,
-                                                       "divx"sv,
-                                                       "dnxhd"sv,
-                                                       "dx50"sv,
-                                                       "h263"sv,
-                                                       "h264"sv,
-                                                       "i263"sv,
-                                                       "iv31"sv,
-                                                       "iv32"sv,
-                                                       "m4s2"sv,
-                                                       "mp42"sv,
-                                                       "mp43"sv,
-                                                       "mp4s"sv,
-                                                       "mp4v"sv,
-                                                       "mpeg4"sv,
-                                                       "mpg1"sv,
-                                                       "mpg3"sv,
-                                                       "mpg4"sv,
-                                                       "pim1"sv,
-                                                       "png"sv,
-                                                       "s263"sv,
-                                                       "svq1"sv,
-                                                       "svq3"sv,
-                                                       "u263"sv,
-                                                       "vc1"sv,
-                                                       "vc1_vdpau"sv,
-                                                       "vc1image"sv,
-                                                       "viv1"sv,
-                                                       "wmv3"sv,
-                                                       "wmv3_vdpau"sv,
-                                                       "wmv3image"sv,
-                                                       "xith"sv,
-                                                       "xvid"sv,
-                                                       "libdav1d"sv
-#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
-                                                       ,
-                                                       "prores"sv
-#endif
-        };
+
+        const char* slowRandomAccessCodecsArray[] = {"3iv2",
+                                                     "3ivd",
+                                                     "ap41",
+                                                     "avc1",
+                                                     "div1",
+                                                     "div2",
+                                                     "div3",
+                                                     "div4",
+                                                     "div5",
+                                                     "div6",
+                                                     "divx",
+                                                     "dnxhd",
+                                                     "dx50",
+                                                     "h263",
+                                                     "h264",
+                                                     "i263",
+                                                     "iv31",
+                                                     "iv32",
+                                                     "m4s2",
+                                                     "mp42",
+                                                     "mp43",
+                                                     "mp4s",
+                                                     "mp4v",
+                                                     "mpeg4",
+                                                     "mpg1",
+                                                     "mpg3",
+                                                     "mpg4",
+                                                     "pim1",
+                                                     "s263",
+                                                     "svq1",
+                                                     "svq3",
+                                                     "u263",
+                                                     "vc1",
+                                                     "vc1_vdpau",
+                                                     "vc1image",
+                                                     "viv1",
+                                                     "wmv3",
+                                                     "wmv3_vdpau",
+                                                     "wmv3image",
+                                                     "xith",
+                                                     "xvid",
+                                                     "libdav1d",
+                                                     0};
 
         const char* supportedEncodingCodecsArray[] = {
             "dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo", 0};
@@ -1417,10 +752,15 @@ getBestRVFormat(AVPixelFormat native)
         bool codecHasSlowAccess(string name)
         {
             boost::algorithm::to_lower(name);
-            return std::any_of(
-                slowRandomAccessCodecs.begin(), slowRandomAccessCodecs.end(),
-                [name](const auto& codec) { return codec == name; });
-        }
+            for (const char** p = slowRandomAccessCodecsArray; *p; p++)
+            {
+                if (*p == name)
+                {
+                    return true;
+                }
+            }
+            return false;
+        };
 
         bool isMP4format(AVFormatContext* avFormatContext)
         {
@@ -1681,58 +1021,6 @@ getBestRVFormat(AVPixelFormat native)
                     }
                 }
             }
-        }
-
-        int hardwareDecoderInit(AVCodecContext* codecContext,
-                                const AVHWDeviceType deviceType)
-        {
-            HardwareContext* hardwareContext =
-                static_cast<HardwareContext*>(codecContext->opaque);
-            if (hardwareContext == nullptr)
-            {
-                return -1;
-            }
-
-            AVBufferRef* hardwareDeviceContext = hardwareContext->deviceContext;
-
-            const int result = av_hwdevice_ctx_create(
-                &hardwareDeviceContext, deviceType, nullptr, nullptr, 0);
-
-            if (result < 0)
-            {
-                std::cerr << "ERROR: Failed to create specified hardware "
-                             "device type.\n";
-                return result;
-            }
-
-            codecContext->hw_device_ctx = av_buffer_ref(hardwareDeviceContext);
-
-            return result;
-        }
-
-        AVPixelFormat getHardwareFormat(AVCodecContext* codecContext,
-                                        const AVPixelFormat* pixelFormats)
-        {
-            HardwareContext* hardwareContext =
-                static_cast<HardwareContext*>(codecContext->opaque);
-            if (hardwareContext != nullptr)
-            {
-                const enum AVPixelFormat* pixelFormat = nullptr;
-                AVPixelFormat hardwarePixelFormat =
-                    hardwareContext->pixelFormat;
-
-                for (pixelFormat = pixelFormats; *pixelFormat != -1;
-                     pixelFormat++)
-                {
-                    if (*pixelFormat == hardwarePixelFormat)
-                    {
-                        return *pixelFormat;
-                    }
-                }
-                std::cerr << "ERROR: Failed to get hardware surface format.\n";
-            }
-            std::cerr << "ERROR: Failed to get hardware context.\n";
-            return AV_PIX_FMT_NONE;
         }
 
     } // namespace
@@ -2011,11 +1299,10 @@ getBestRVFormat(AVPixelFormat native)
     }
 
     bool MovieFFMpegReader::openAVCodec(int index,
-                                        AVCodecContext** avCodecContext,
-                                        HardwareContext* hardwareContext)
+                                        AVCodecContext** avCodecContext)
     {
         // Make sure the format is opened
-        if (m_avFormatContext == nullptr)
+        if (m_avFormatContext == 0)
         {
             openAVFormat();
             findStreamInfo();
@@ -2023,15 +1310,11 @@ getBestRVFormat(AVPixelFormat native)
 
         // Get the codec context
         AVStream* avStream = m_avFormatContext->streams[index];
-        if (*avCodecContext != nullptr && avcodec_is_open(*avCodecContext) != 0)
-        {
+        if (*avCodecContext && avcodec_is_open(*avCodecContext))
             return true;
-        }
-
-        const AVCodec* avCodec = nullptr;
-        AVHWDeviceType deviceType = AV_HWDEVICE_TYPE_NONE;
 
         // Find the decoder for the av stream
+        const AVCodec* avCodec = 0;
         switch (avStream->codecpar->codec_id)
         {
         case AV_CODEC_ID_H264:
@@ -2045,129 +1328,40 @@ getBestRVFormat(AVPixelFormat native)
             avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
             break;
         }
-
-        if (avCodec == nullptr)
+        if (avCodec == 0)
         {
-            std::cerr << "ERROR: MovieFFMpeg: Unsupported codec_id '"
-                      << avStream->codecpar->codec_id << "' in " << m_filename
-                      << '\n';
+            cout << "ERROR: MovieFFMpeg: Unsupported codec_id '"
+                 << avStream->codecpar->codec_id << "' in " << m_filename
+                 << endl;
             return false;
         }
 
         *avCodecContext = avcodec_alloc_context3(avCodec);
-        if (*avCodecContext == nullptr)
+        if (!*avCodecContext)
         {
-            std::cerr
-                << "ERROR: MovieFFMpeg: Failed to allocate codec context '"
-                << avCodec->name << "' for " << m_filename << '\n';
+            cout << "ERROR: MovieFFMpeg: Failed to allocate codec context '"
+                 << avCodec->name << "' for " << m_filename << endl;
             return false;
+            ;
         }
 
         // Copy codec parameters from input stream to output codec context
         if (avcodec_parameters_to_context(*avCodecContext, avStream->codecpar)
             < 0)
         {
-            std::cerr << "ERROR: MovieFFMpeg: Failed to copy '" << avCodec->name
-                      << "' codec parameters to decoder context for "
-                      << m_filename << '\n';
+            cout << "ERROR: MovieFFMpeg: Failed to copy '" << avCodec->name
+                 << "' codec parameters to decoder context for " << m_filename
+                 << endl;
             avcodec_free_context(avCodecContext);
             return false;
         }
 
-    //
-    //  We may be _re-opening_ the context here so be sure we don't rely on
-    //  previous state
-    //
-
-    VideoTrack* vTrack;
-    AudioTrack* aTrack;
-    trackFromStreamIndex(index, vTrack, aTrack);
-
-    if (vTrack) vTrack->lastDecodedVideo = -1;
-    if (aTrack) aTrack->lastDecodedAudio = AV_NOPTS_VALUE;
-
-    // Make sure to only use allowed codecs
-    if (!m_io->codecIsAllowed((*avCodecContext)->codec->name, true))
-    {
-        cout << "ERROR: MovieFFMpeg: Unallowed codec '" <<
-            (*avCodecContext)->codec->name << "' in " << m_filename << endl;
-        avcodec_free_context(avCodecContext);
-        return false;
-    }
-
-    return true;
-}
-
-int64_t
-MovieFFMpegReader::getFirstFrame(AVRational rate)
-{
-    //
-    // XXX I am working from the assumption that timestamp 0 is true start of
-    // every type of media. Therefore if we get a positive timestamp for the
-    // format start time, then we have to assume that the source's start is
-    // offset by the given positive value.
-    //
-
-    m_formatStartFrame = max(int64_t(0), int64_t(0.49 + av_q2d(rate) *
-        double(m_avFormatContext->start_time) / double(AV_TIME_BASE)));
-    int64_t firstFrame = max(int64_t(m_formatStartFrame), int64_t(1));
-
-    for (int i = 0; i < m_avFormatContext->nb_streams; i++)
-    {
-        AVStream *tsStream = m_avFormatContext->streams[i];
-
-        AVRational tcRate = {tsStream->time_base.den,
-                           tsStream->time_base.num};
-
-        if (isMOVformat(m_avFormatContext))
-        {
-            tcRate = tsStream->avg_frame_rate;
-        }
-
-        AVDictionaryEntry *tcrEntry;
-        tcrEntry = av_dict_get(tsStream->metadata, "reel_name", NULL, 0);
-        if (tcrEntry != NULL)
-        {
-            deviceType = av_hwdevice_find_type_by_name("videotoolbox");
-            if (deviceType == AV_HWDEVICE_TYPE_NONE)
-            {
-                std::cerr << "ERROR: Device type" << deviceType
-                          << "is not supported.\n";
-                return false;
-            }
-
-            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
-            if (config == nullptr)
-            {
-                std::cerr << "ERROR: Decoder " << avCodec->name
-                          << " does not support device type "
-                          << av_hwdevice_get_type_name(deviceType) << '\n';
-                return false;
-            }
-            // Check if the hardware device context flag is set and the device
-            // type matches
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
-                && config->device_type == deviceType)
-            {
-                hardwareContext->pixelFormat = config->pix_fmt;
-            }
-
-            (*avCodecContext)->opaque = hardwareContext;
-            (*avCodecContext)->get_format = getHardwareFormat;
-
-            if (hardwareDecoderInit(*avCodecContext, deviceType) < 0)
-            {
-                return false;
-            }
-        }
-#endif
-
         // Open the codec
         (*avCodecContext)->thread_count = m_io->codecThreads();
-        if (avcodec_open2(*avCodecContext, avCodec, nullptr) < 0)
+        if (avcodec_open2(*avCodecContext, avCodec, 0) < 0)
         {
-            std::cerr << "ERROR: MovieFFMpeg: Failed to open codec '"
-                      << avCodec->name << "' for " << m_filename << '\n';
+            cout << "ERROR: MovieFFMpeg: Failed to open codec '"
+                 << avCodec->name << "' for " << m_filename << endl;
             avcodec_free_context(avCodecContext);
             return false;
         }
@@ -2175,12 +1369,12 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
         // Check if this is a valid Video Pixel Format
         if ((*avCodecContext)->codec_type == AVMEDIA_TYPE_VIDEO)
         {
-            const AVPixelFormat nativeFormat = (*avCodecContext)->pix_fmt;
+            AVPixelFormat nativeFormat = (*avCodecContext)->pix_fmt;
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-            if (desc == nullptr)
+            if (desc == NULL)
             {
-                std::cerr << "ERROR: MovieFFMpeg: Invalid pixel format! "
-                          << m_filename << '\n';
+                cout << "ERROR: MovieFFMpeg: Invalid pixel format! "
+                     << m_filename << endl;
                 avcodec_free_context(avCodecContext);
                 return false;
             }
@@ -2191,26 +1385,21 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
         //  previous state
         //
 
-        VideoTrack* videoTrack = nullptr;
-        AudioTrack* audioTrack = nullptr;
-        trackFromStreamIndex(index, videoTrack, audioTrack);
+        VideoTrack* vTrack;
+        AudioTrack* aTrack;
+        trackFromStreamIndex(index, vTrack, aTrack);
 
-        if (videoTrack != nullptr)
-        {
-            videoTrack->lastDecodedVideo = -1;
-        }
-
-        if (audioTrack != nullptr)
-        {
-            audioTrack->lastDecodedAudio = AV_NOPTS_VALUE;
-        }
+        if (vTrack)
+            vTrack->lastDecodedVideo = -1;
+        if (aTrack)
+            aTrack->lastDecodedAudio = AV_NOPTS_VALUE;
 
         // Make sure to only use allowed codecs
         if (!m_io->codecIsAllowed((*avCodecContext)->codec->name, true))
         {
-            std::cerr << "ERROR: MovieFFMpeg: Unallowed codec '"
-                      << (*avCodecContext)->codec->name << "' in " << m_filename
-                      << '\n';
+            cout << "ERROR: MovieFFMpeg: Unallowed codec '"
+                 << (*avCodecContext)->codec->name << "' in " << m_filename
+                 << endl;
             avcodec_free_context(avCodecContext);
             return false;
         }
@@ -2463,60 +1652,12 @@ MovieFFMpegReader::getFirstFrame(AVRational rate)
             }
             else
             {
-                unsigned char *profile = NULL;
-                uint32_t size = 0;
-                mp4v2Utils::getPROFValues(fileHandle, streamIndex, profile, size);
-
-                track->fb.setICCprofile((void*)profile, size);
-                track->fb.setTransferFunction(TwkFB::ColorSpace::ICCProfile());
-                track->fb.setPrimaryColorSpace(TwkFB::ColorSpace::ICCProfile());
-            }
-        }
-        mp4v2Utils::closeFile(fileHandle);
-    }
-
-    return foundIndividualValues;
-}
-
-FrameBuffer::Orientation
-MovieFFMpegReader::snagOrientation(VideoTrack* track)
-{
-    AVStream* videoStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* videoCodecContext = track->avCodecContext;
-    AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
-    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-    bool yuvPlanar = (!(desc->flags & AV_PIX_FMT_FLAG_ALPHA) &&
-                       (desc->flags & AV_PIX_FMT_FLAG_PLANAR) &&
-                      !(desc->flags & AV_PIX_FMT_FLAG_RGB));
-
-    int rotation = 0;
-    AVDictionaryEntry *rotEntry;
-
-    // Trying to get rotation from metadata
-    rotEntry = av_dict_get(videoStream->metadata, "rotate", NULL, 0);
-    rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
-
-    // If rotation metadata not in metadata, try to get it from side data
-    if (!rotEntry && videoCodecContext->nb_coded_side_data > 0)
-    {
-        double rotationFromSideData = 0;
-        for (int i = 0; i < videoCodecContext->nb_coded_side_data; ++i)
-        {
-            const AVPacketSideData *sd = &videoStream->codecpar->coded_side_data[i];
-            if (sd->type == AV_PKT_DATA_DISPLAYMATRIX) 
-            {
-                rotationFromSideData = av_display_rotation_get((int32_t *)sd->data);
+                m_info.proxy.attribute<string>("Rotation") = charRotation;
             }
         }
 
-        // Getting rid of negative rotation metadata
-        rotation = rotationFromSideData < 0 ? lround(rotationFromSideData) + 360 : lround(rotationFromSideData);
-        
-        // Setting rotation
-        char charRotation[5]; // Expecting a number between -360 and 360 (inclusive)
-        sprintf(charRotation, "%d", rotation);
-        if (av_dict_set(
-            &videoStream->metadata, "rotate", charRotation, 0) < 0) 
+        bool rotate = false;
+        switch (rotation)
         {
         case 270:
         case -90:
@@ -2916,8 +2057,9 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
         bool foundStreams = false;
         if (m_avFormatContext->nb_streams == 0)
         {
-            string tsLang = streamLang(i);
-            int numChans = tsStream->codecpar->ch_layout.nb_channels;
+            findStreamInfo();
+            foundStreams = true;
+        }
 
         //
         // These series of checks are an attempt to cover for bad or missing
@@ -3066,7 +2208,8 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
                         ostringstream trk;
                         trk << "Track" << i;
 
-                        snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
+                        snagMetadata(tsStream->metadata, trk.str(),
+                                     &m_info.proxy);
                     }
                     else
                     {
@@ -3088,7 +2231,8 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
                         ostringstream trk;
                         trk << "Track" << i;
 
-                        snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
+                        snagMetadata(tsStream->metadata, trk.str(),
+                                     &m_info.proxy);
                     }
                     else
                     {
@@ -3354,15 +2498,24 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
         ChannelsVector audioChannels;
         for (int i = m_audioTracks.size() - 1; i >= 0; i--)
         {
-            TWK_THROW_EXC_STREAM("Audio sample rate must match for each track!");
-        }
-        audioSampleRate = audioCodecContext->sample_rate;
-        if (numChannels != 0 && numChannels != audioCodecContext->ch_layout.nb_channels)
-        {
-            TWK_THROW_EXC_STREAM("Audio channel count must match for each track!");
-        }
-        numChannels = audioCodecContext->ch_layout.nb_channels;
-        track->numChannels = numChannels;
+            AudioTrack* track = m_audioTracks[i];
+            AVStream* audioStream = m_avFormatContext->streams[track->number];
+            AVCodecContext* audioCodecContext = track->avCodecContext;
+            if (audioSampleRate != 0
+                && audioSampleRate != audioCodecContext->sample_rate)
+            {
+                TWK_THROW_EXC_STREAM(
+                    "Audio sample rate must match for each track!");
+            }
+            audioSampleRate = audioCodecContext->sample_rate;
+            if (numChannels != 0
+                && numChannels != audioCodecContext->ch_layout.nb_channels)
+            {
+                TWK_THROW_EXC_STREAM(
+                    "Audio channel count must match for each track!");
+            }
+            numChannels = audioCodecContext->ch_layout.nb_channels;
+            track->numChannels = numChannels;
 
             double timebase = av_q2d(audioStream->time_base);
             int64_t duration = audioStream->duration;
@@ -3386,9 +2539,9 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
                     << " channels: " << numChannels
                     << " timebase: " << timebase);
 
-        // Get the input source channels
-        AVChannelLayout layout = audioCodecContext->ch_layout;
-        audioChannels = idAudioChannels(layout, numChannels);
+            // Get the input source channels
+            AVChannelLayout layout = audioCodecContext->ch_layout;
+            audioChannels = idAudioChannels(layout, numChannels);
 
             // XXX Assume this thread will never decode audio
             avcodec_free_context(&audioCodecContext);
@@ -3597,61 +2750,7 @@ MovieFFMpegReader::snagOrientation(VideoTrack* track)
                 }
             }
         }
-    }
-    if (timeDuration == 0)
-    {
-        if (audioLength > 0) timeDuration = audioLength;
-        else timeDuration = formatTimeDur;
-    }
-    if (timeDuration <= 0)
-    {
-        TWK_THROW_EXC_STREAM("Could not determine playback timing: " << m_filename);
-    }
-    if (frames == 0)
-    {
-        frames = timeDuration * m_io->defaultFPS();
-        rate.num = m_io->defaultFPS();
-        rate.den = 1.0f;
-    }
-    if (frames <= 0)
-    {
-        TWK_THROW_EXC_STREAM("Unable to locate frames: " << m_filename);
-    }
-
-    //
-    // Set the MovieInfo based on the calculated frame rate
-    //
-
-    m_info.start = getFirstFrame(rate);
-    m_info.end = m_info.start + frames - 1;
-    m_info.inc = 1;
-    m_info.fps = floor(av_q2d(rate) * FPS_PRECISION_LIMIT)/ FPS_PRECISION_LIMIT;
-}
-
-bool
-MovieFFMpegReader::isImageFormat(const char* format)
-{
-    if(!std::strcmp(format, "png_pipe") || !std::strcmp(format, "jpeg_pipe"))
-    {
-        return true;
-    }
-    return false;
-}
-
-ChannelsVector
-MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
-{
-    uint64_t unmasked;
-    ChannelsVector chans;
-
-    // Layout can have max 64 channels; one bit per channel. See avutil/channel_layout.h
-    for (int i = 0; i < 64 && chans.size() < numChannels; i++)
-    {
-        unmasked = layout.u.mask & (1ULL << i);
-
-        if (!unmasked) continue;
-
-        switch (unmasked)
+        if (timeDuration == 0)
         {
             if (audioLength > 0)
                 timeDuration = audioLength;
@@ -3674,20 +2773,15 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             TWK_THROW_EXC_STREAM("Unable to locate frames: " << m_filename);
         }
 
-        AVChannel avChannel = av_channel_layout_channel_from_index(&layout, i);
-        std::array<char, 64> chName;
-        std::array<char, 256> chDesc;
+        //
+        // Set the MovieInfo based on the calculated frame rate
+        //
 
-        // av_channel_name and av_channel_description functions
-        // return amount of bytes needed to hold the output string,
-        // or a negative AVERROR on failure.
-        if (av_channel_name(chName.data(), chName.size(), avChannel) > 0 &&
-            av_channel_description(chDesc.data(), chDesc.size(), avChannel) > 0)
-        {
-            DBL (DB_AUDIO, "Audio ch " << (chans.size()-1)
-                        << " is: '" << chName.data()
-                        << "-" << chDesc.data());
-        }
+        m_info.start = getFirstFrame(rate);
+        m_info.end = m_info.start + frames - 1;
+        m_info.inc = 1;
+        m_info.fps =
+            floor(av_q2d(rate) * FPS_PRECISION_LIMIT) / FPS_PRECISION_LIMIT;
     }
 
     bool MovieFFMpegReader::isImageFormat(const char* format)
@@ -3698,100 +2792,6 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             return true;
         }
         return false;
-    }
-
-    void MovieFFMpegReader::copyFrame(const AVFrame* srcFrame,
-                                      AVFrame* dstFrame, int width, int height,
-                                      bool convertFormat,
-                                      SwsContext*& imgConvertContext)
-    {
-        HOP_PROF("copyFrame()");
-
-        // Simply copy the data if no format conversion required
-        if (!convertFormat)
-        {
-            av_image_copy(static_cast<uint8_t* const*>(dstFrame->data),
-                          static_cast<const int*>(dstFrame->linesize),
-                          const_cast<const uint8_t**>(srcFrame->data),
-                          static_cast<const int*>(srcFrame->linesize),
-                          static_cast<AVPixelFormat>(srcFrame->format), width,
-                          height);
-
-            return;
-        }
-
-#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
-        // FFmpeg sws_scale() function is not optimized for the following
-        // conversions which are used when decoding ProRes 422 and ProRes 4444
-        // videos on Apple Silicon via VideoToolbox:
-        // AV_PIX_FMT_P210LE -> AV_PIX_FMT_YUV422P16LE
-        // AV_PIX_FMT_P416LE -> AV_PIX_FMT_YUV444P16LE
-        // Latest benchmarks for a UHD image conversion via sws_scale() on
-        // ARM64 was 30 ms and 46 ms respectively for the two conversions.
-        // Whereas it was 3 ms and 2 ms with the following custom functions.
-        bool isProRes422 = srcFrame->format == AV_PIX_FMT_P210LE
-                           && dstFrame->format == AV_PIX_FMT_YUV422P16LE;
-        bool isProRes4444 = srcFrame->format == AV_PIX_FMT_P416LE
-                            && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
-
-        if ((isProRes422 || isProRes4444))
-        {
-            const uint16_t* srcY =
-                reinterpret_cast<const uint16_t*>(srcFrame->data[0]);
-            const uint16_t* srcCbCr =
-                reinterpret_cast<const uint16_t*>(srcFrame->data[1]);
-
-            const size_t srcStrideY = srcFrame->linesize[0];
-            const size_t srcStrideCbCr = srcFrame->linesize[1];
-
-            uint16_t* dstY = reinterpret_cast<uint16_t*>(dstFrame->data[0]);
-            uint16_t* dstCb = reinterpret_cast<uint16_t*>(dstFrame->data[1]);
-            uint16_t* dstCr = reinterpret_cast<uint16_t*>(dstFrame->data[2]);
-
-            const size_t dstStrideY = dstFrame->linesize[0];
-            const size_t dstStrideCb = dstFrame->linesize[1];
-            const size_t dstStrideCr = dstFrame->linesize[2];
-
-            if (isProRes422)
-            {
-                planarP210_to_planarYUV422P16(
-                    width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
-                    dstY, dstCb, dstCr, dstStrideY, dstStrideCb, dstStrideCr);
-
-                return;
-            }
-
-            if (isProRes4444)
-            {
-                planarP416_to_planarYUV444P16(
-                    width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
-                    dstY, dstCb, dstCr, dstStrideY, dstStrideCb, dstStrideCr);
-
-                return;
-            }
-        }
-#endif
-
-        // Reuse or allocate a new image conversion context
-        // Note: If track->imgConvertContext is NULL, sws_getCachedContext
-        // just calls sws_getContext() to get a new context. Otherwise, it
-        // checks if the parameters are the ones already saved in context.
-        // If that is the case, it returns the current context. Otherwise,
-        // it frees context and gets a new context with the new parameters.
-        imgConvertContext = sws_getCachedContext(
-            imgConvertContext, width, height,
-            static_cast<AVPixelFormat>(srcFrame->format), width, height,
-            static_cast<AVPixelFormat>(dstFrame->format), SWS_BICUBIC, 0, 0, 0);
-        if (imgConvertContext == nullptr)
-        {
-            throw std::runtime_error("Can't initialize conversion context");
-        }
-
-        sws_scale(imgConvertContext,
-                  static_cast<const uint8_t* const*>(srcFrame->data),
-                  static_cast<const int*>(srcFrame->linesize), 0 /*srcSliceY*/,
-                  height, static_cast<uint8_t* const*>(dstFrame->data),
-                  static_cast<const int*>(dstFrame->linesize));
     }
 
     ChannelsVector MovieFFMpegReader::idAudioChannels(AVChannelLayout layout,
@@ -4347,11 +3347,11 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
         m_timingDetails->startTimer("seek");
 #endif
 
-        // Before FFmpeg 6, the offset was 1 frame. Let's keep that assumption
-        // for now. Note: FFmpeg internally seeks with the dts timestamp and not
-        // the pts timestamp. We need to have a bit of a buffer.
-        const int64_t seekTarget =
-            int64_t((inframe - rv_seek_frame_offset) * frameDur);
+        // To make seeking a bit more robust, step back 3 frames from the
+        // intended frame. This is because FFmpeg internally seeks with the dts
+        // timestamp and not the pts timestamp, so we need to have a bit of a
+        // buffer.
+        const int64_t seekTarget = int64_t((inframe - 3) * frameDur);
 
         DBL(DB_VIDEO, "seekTarget: " << seekTarget
                                      << " last: " << track->lastDecodedVideo
@@ -4359,13 +3359,10 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
 
         avcodec_send_packet(track->avCodecContext, nullptr);
 
-        int ret;
-        while ((ret = avcodec_receive_frame(track->avCodecContext,
-                                            track->videoFrame))
-               != AVERROR_EOF)
-        {
-            // Discard received frames until the end of the stream is reached
-        }
+        int ret = 0;
+        while (ret != AVERROR_EOF)
+            ret =
+                avcodec_receive_frame(track->avCodecContext, track->videoFrame);
 
         avcodec_flush_buffers(track->avCodecContext);
         if (av_seek_frame(m_avFormatContext, track->number, seekTarget,
@@ -4480,7 +3477,7 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
     {
         // The goal timestamp is the same as the seek target adjusted
         // for pts vs dts.
-        const int64_t goalTS = (inframe - rv_seek_frame_offset) * frameDur;
+        const int64_t goalTS = (inframe - 1) * frameDur;
 
         // If it is the first time we try to decode the stream, we need
         // to start by reading a packet.
@@ -4669,35 +3666,8 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
         // outFrame          - AVFrame linked to output FrameBuffer to copy into
         //
 
-        AVFrame* softwareFrame = nullptr;
-        AVFrame* videoFrame = nullptr;
-        int result = 0;
-
-        HardwareContext* hardwareContext =
-            static_cast<HardwareContext*>(track->avCodecContext->opaque);
-
-        if (hardwareContext != nullptr)
-        {
-            AVPixelFormat hardwarePixelFormat = hardwareContext->pixelFormat;
-
-            if (track->videoFrame->format == hardwarePixelFormat)
-            {
-                // retrieve data from GPU to CPU
-                softwareFrame = av_frame_alloc();
-                result = av_hwframe_transfer_data(softwareFrame,
-                                                  track->videoFrame, 0);
-                if (result < 0)
-                {
-                    std::cerr
-                        << "ERROR: Failed to transfer data to system memory\n";
-                }
-                videoFrame = softwareFrame;
-            }
-        }
-        else
-        {
-            videoFrame = track->videoFrame;
-        }
+        AVFrame* outFrame = 0;
+        outFrame = av_frame_alloc();
 
         //
         // Determine the native pixel format and make an effort to reconfigure
@@ -4707,9 +3677,7 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
         // needs conversion.
         //
 
-        AVFrame* outFrame = av_frame_alloc();
-        AVPixelFormat nativeFormat = videoCodecContext->sw_pix_fmt;
-        outFrame->format = nativeFormat;
+        AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         int numPlanes = 0;
@@ -4721,8 +3689,8 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             (bitSize > 8) ? FrameBuffer::USHORT : FrameBuffer::UCHAR;
         FrameBuffer::StringVector chans(3);
         FrameBuffer* out = 0;
-        av_image_fill_arrays(outFrame->data, outFrame->linesize, nullptr,
-                             nativeFormat, width, height, 1 /*align*/);
+        av_image_fill_arrays(outFrame->data, outFrame->linesize, 0,
+                             nativeFormat, width, height, 1);
 
         // Note: We're about to use offset_plus1 here to derive the RGB channel
         // ordering. Here is the definition of offset_plus1 according to the
@@ -4794,99 +3762,49 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             break;
         }
 
-        HOP_PROF("sws_scale()");
-        sws_scale(track->imgConvertContext, track->videoFrame->data,
-            track->videoFrame->linesize, 0, height,
-            outFrame->data, outFrame->linesize);
-    }
-    else
-    {
-        av_image_copy(outFrame->data, outFrame->linesize, track->videoFrame->data, track->videoFrame->linesize, videoCodecContext->pix_fmt, width, height);
-    }
-
-    // Clean up
-    av_frame_free(&outFrame);
-
-    //
-    // XXX For now we will handle any rotation in software. Eventually we plan
-    // to handle this with the renderer in hardware.
-    //
-
-    if (track->rotate)
-    {
-        HOP_PROF("track->rotate");
-        FrameBuffer* Y = out->firstPlane();
-        FrameBuffer* U = out->nextPlane();
-        FrameBuffer* V = U->nextPlane();
-
-        FrameBuffer::StringVector YChannelName(1, "Y");
-        FrameBuffer* Yrot = new FrameBuffer(FrameBuffer::PixelCoordinates,
-            Y->height(), Y->width(), 0, 1,
-            dataType, NULL, &YChannelName, track->fb.orientation(), true, 0, 0);
-
-        FrameBuffer::StringVector UChannelName(1, "U");
-        FrameBuffer* Urot = new FrameBuffer(FrameBuffer::PixelCoordinates,
-            U->height(), U->width(), 0, 1,
-            dataType, NULL, &UChannelName, track->fb.orientation(), true, 0, 0);
-
-        FrameBuffer::StringVector VChannelName(1, "V");
-        FrameBuffer* Vrot = new FrameBuffer(FrameBuffer::PixelCoordinates,
-            V->height(), V->width(), 0, 1,
-            dataType, NULL, &VChannelName, track->fb.orientation(), true, 0, 0);
-
-        rowColumnSwap(Y->pixels<unsigned char>(), Y->width(), Y->height(),
-            Yrot->pixels<unsigned char>());
-        rowColumnSwap(U->pixels<unsigned char>(), U->width(), U->height(),
-            Urot->pixels<unsigned char>());
-        rowColumnSwap(V->pixels<unsigned char>(), V->width(), V->height(),
-            Vrot->pixels<unsigned char>());
-
-        Yrot->appendPlane(Urot);
-        Yrot->appendPlane(Vrot);
-
-        delete out;
-        out = Yrot;
-    }
-
-    //
-    // Add Timecode if necessary
-    //
-
-    if (m_timecodeTrack != -1)
-    {
-        AVStream *tsStream = m_avFormatContext->streams[m_timecodeTrack];
-        AVDictionaryEntry *tcEntry;
-        tcEntry = av_dict_get(tsStream->metadata, "timecode", NULL, 0);
-        AVRational rate = {tsStream->time_base.den,
-                           tsStream->time_base.num};
-
-        if (isMOVformat(m_avFormatContext))
-        {
-            rate = tsStream->avg_frame_rate;
-        }
-
-        // Correct wrong frame rates that seem to be generated by some codecs
-        if ( rate.num > 1000 && rate.den == 1)
+        // Assign the AVFrame data to our frame buffer
+        outFrame->data[0] = out->pixels<unsigned char>();
+        FrameBuffer* fb = out->nextPlane();
+        for (int p = 1; p < numPlanes && fb; p++, fb = fb->nextPlane())
         {
             outFrame->data[p] = fb->pixels<unsigned char>();
         }
 
-#if DB_TIMING & DB_LEVEL
-        m_timingDetails->startTimer("copyFrame");
-#endif
+        if (convertFormat)
+        {
+            DBL(DB_VIDEO, "Converting video format");
 
-        // Copy decoded video frame to output frame
-        copyFrame(videoFrame, outFrame, width, height, convertFormat,
-                  track->imgConvertContext);
+            // Reuse or allocate a new image conversion context
+            AVPixelFormat original = videoCodecContext->pix_fmt;
+            AVPixelFormat conv = getBestRVFormat(original);
+            HOP_PROF("sws_getCachedContext()");
+            // Note: If track->imgConvertContext is NULL, sws_getCachedContext
+            // just calls sws_getContext() to get a new context. Otherwise, it
+            // checks if the parameters are the ones already saved in context.
+            // If that is the case, it returns the current context. Otherwise,
+            // it frees context and gets a new context with the new parameters.
+            track->imgConvertContext = sws_getCachedContext(
+                track->imgConvertContext, width, height, original, width,
+                height, conv, SWS_BICUBIC, 0, 0, 0);
+            if (track->imgConvertContext == 0)
+            {
+                TWK_THROW_EXC_STREAM("Can't initialize conversion context!");
+            }
 
-#if DB_TIMING & DB_LEVEL
-        double duration = m_timingDetails->pauseTimer("copyFrame");
-        DBL(DB_TIMING, "frame: " << inframe << " copyFrame: " << duration);
-#endif
+            HOP_PROF("sws_scale()");
+            sws_scale(track->imgConvertContext, track->videoFrame->data,
+                      track->videoFrame->linesize, 0, height, outFrame->data,
+                      outFrame->linesize);
+        }
+        else
+        {
+            av_image_copy(outFrame->data, outFrame->linesize,
+                          track->videoFrame->data, track->videoFrame->linesize,
+                          videoCodecContext->pix_fmt, width, height);
+        }
 
         // Clean up
         av_frame_free(&outFrame);
-        av_frame_free(&softwareFrame);
 
         //
         // XXX For now we will handle any rotation in software. Eventually we
@@ -4993,8 +3911,7 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
         {
             VideoTrack* track = m_videoTracks[i];
             ContextPool::Reservation reserve(this, track->number);
-            track->isOpen = openAVCodec(track->number, &track->avCodecContext,
-                                        &track->hardwareContext);
+            track->isOpen = openAVCodec(track->number, &track->avCodecContext);
             if (!track->isOpen)
             {
                 cout << "ERROR: Unable to read from audio stream: "
@@ -5329,7 +4246,6 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
         {
             avStream->time_base.num = m_duration;
             avStream->time_base.den = m_timeScale;
-            avStream->avg_frame_rate = av_d2q(m_info.fps, INT_MAX);
             avCodecContext->time_base.num = m_duration;
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
@@ -5338,7 +4254,6 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             avCodecContext->width = m_info.width;
             avCodecContext->height = m_info.height;
             avCodecContext->color_primaries = AVCOL_PRI_BT709; // 1
-            avCodecContext->framerate = avStream->avg_frame_rate;
             //
             //  XXX should come back to this.  should transfer function also be
             //  something else for mjpeg ?  Maybe need user control.
@@ -5380,74 +4295,8 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             //  matrix except jpeg, or RGB pixel formats
             //
 
-        if (codec == "jpegls" || codec == "ljpeg" || codec == "mjpeg" ||
-            codec == "mjpegb" || codec == "v210")
-        {
-            avCodecContext->colorspace  = AVCOL_SPC_SMPTE170M;        // 6
-        }
-        else
-        {
-            const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(avCodecContext->pix_fmt);
-            bool isRGB = (desc && (desc->flags & AV_PIX_FMT_FLAG_RGB));
-
-            if (isRGB) avCodecContext->colorspace  = AVCOL_SPC_RGB;   // 0
-            else       avCodecContext->colorspace  = AVCOL_SPC_BT709; // 1
-        }
-
-        avCodecContext->sample_aspect_ratio =
-            av_d2q(m_request.pixelAspect, INT_MAX);
-
-        AVPixelFormat requestFormat = (m_canControlRequest) ?
-            getBestAVFormat(avCodecContext->pix_fmt) : RV_OUTPUT_FFMPEG_FMT;
-        const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(requestFormat);
-        int bitSize = desc->comp[0].depth - desc->comp[0].shift;
-        bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
-
-        // XXX might need to set avCodecContext->bits_per_raw_sample to match
-        // something appropriate for the pix_fmt
-
-        m_info.pixelAspect  = m_request.pixelAspect;
-        m_info.orientation  = FrameBuffer::TOPLEFT;
-        m_info.numChannels  = (hasAlpha) ? 4 : 3;
-        m_info.dataType     = (bitSize > 8) ?
-            FrameBuffer::USHORT : FrameBuffer::UCHAR;
-
-        // Backwards compatibility for quality setting
-        if (codec == "mjpeg")
-        {
-            avCodecContext->flags |= AV_CODEC_FLAG_QSCALE;
-            avCodecContext->global_quality =
-                pow(100000, 1.0 - m_request.quality);
-        }
-
-        VideoTrack* track = new VideoTrack;
-        track->number = avStream->id;
-        track->avCodecContext = avCodecContext;
-        m_videoTracks.push_back(track);
-
-        // Set the reel name if provided
-        if (m_reelName != "")
-        {
-            av_dict_set(&avStream->metadata, "reel_name", m_reelName.c_str(), 0);
-        }
-    }
-    else
-    {
-        avStream->time_base.num                 = 1;
-        avStream->time_base.den                 = m_info.audioSampleRate;
-        avCodecContext->time_base.num           = 1;
-        avCodecContext->time_base.den           = m_info.audioSampleRate;
-        avCodecContext->codec_id                = avCodec->id;
-        avCodecContext->codec_type              = AVMEDIA_TYPE_AUDIO;
-        avCodecContext->sample_rate             = m_info.audioSampleRate;
-        avCodecContext->ch_layout.nb_channels   = m_info.audioChannels.size();
-        av_channel_layout_default(&(avCodecContext->ch_layout), avCodecContext->ch_layout.nb_channels);
-
-        if (m_parameters.find("sample_fmt") != m_parameters.end())
-        {
-            avCodecContext->sample_fmt = av_get_sample_fmt(
-                m_parameters["sample_fmt"].c_str());
-            if (removeAppliedCodecParametersFromTheList)
+            if (codec == "jpegls" || codec == "ljpeg" || codec == "mjpeg"
+                || codec == "mjpegb" || codec == "v210")
             {
                 avCodecContext->colorspace = AVCOL_SPC_SMPTE170M; // 6
             }
@@ -5515,144 +4364,7 @@ MovieFFMpegReader::idAudioChannels(AVChannelLayout layout, int numChannels)
             av_channel_layout_default(&(avCodecContext->ch_layout),
                                       avCodecContext->ch_layout.nb_channels);
 
-        AudioTrack* track = new AudioTrack;
-        track->number = avStream->id;
-        track->avCodecContext = avCodecContext;
-        m_audioTracks.push_back(track);
-
-        // Step back a frame for AAC pre-roll
-        if (codec == "aac") track->audioFrame->pts = -2048;
-    }
-
-    // Some formats want stream headers to be separate.
-    if (m_avFormatContext->oformat->flags & AVFMT_GLOBALHEADER)
-    {
-        avCodecContext->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-    }
-
-    // Enable experimental compliance if the codec supports it
-    if (avCodec->capabilities & AV_CODEC_CAP_EXPERIMENTAL)
-    {
-        avCodecContext->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-    }
-
-    // Set any relevant codec options
-    applyCodecParameters(avCodecContext, removeAppliedCodecParametersFromTheList);
-
-    int ret = avcodec_open2(avCodecContext, avCodec, NULL);
-    if (ret < 0)
-    {
-        TWK_THROW_EXC_STREAM("Could not open codec: " << avErr2Str(ret));
-    }
-
-    // Copy codec parameters from AVCodecContext to AVStream.
-    if (avcodec_parameters_from_context(avStream->codecpar, avCodecContext) < 0) {
-        TWK_THROW_EXC_STREAM("Failed to copy codec parameters from context to stream");
-    }
-
-    // Post codec open initializations
-    if (isVideo) initVideoTrack(avStream);
-    else
-    {
-        // If there is no preferred sample size in this codec then use 2048
-        m_audioFrameSize = (avCodecContext->frame_size) ?
-            avCodecContext->frame_size : 2048;
-        if (m_audioSamples) av_freep(&m_audioSamples);
-        m_audioSamples = av_malloc(avCodecContext->ch_layout.nb_channels * m_audioFrameSize *
-            av_get_bytes_per_sample(avCodecContext->sample_fmt));
-    }
-}
-
-void
-MovieFFMpegWriter::applyCodecParameters(AVCodecContext* avCodecContext,
-    bool removeAppliedCodecParametersFromTheList /*=true*/)
-{
-    //
-    // Find and apply parameters for AVCodecContext (*cc:) and AVCodec (*c:).
-    // Keep track of what we applied to remove from further processing.
-    //
-
-    vector<string> applied;
-    for (map<string, string>::iterator left = m_parameters.begin();
-            left != m_parameters.end(); left++)
-    {
-        string name  = left->first;
-        string value = left->second;
-
-        void* avObj         = NULL;
-        const AVOption* opt = NULL;
-        if (name.substr(1,3) == "cc:")
-        {
-            avObj = (void*)avCodecContext;
-            string sub = name.substr(4);
-            opt = av_opt_find(avObj, sub.c_str(), NULL, 0, 0);
-        }
-        else if (name.substr(1,2) == "c:")
-        {
-            avObj = avCodecContext->priv_data;
-            string sub = name.substr(3);
-            opt = av_opt_find(avObj, sub.c_str(), NULL, 0, 0);
-        }
-        if (opt != NULL && avObj != NULL)
-        {
-            DBL (DB_WRITE, "Found option: " << opt->name
-                        << " for name: " << name
-                        << " value: " << value);
-
-            if (setOption(opt, avObj, value))
-                applied.push_back(left->first);
-        }
-    }
-
-    //
-    // Remove what we applied because we will report what was unmatched later
-    //
-    if (removeAppliedCodecParametersFromTheList)
-    {
-        for (vector<string>::iterator erase = applied.begin();
-                erase != applied.end(); erase++)
-        {
-            m_parameters.erase(*erase);
-        }
-    }
-}
-
-void
-MovieFFMpegWriter::applyFormatParameters()
-{
-    //
-    // Keep track of if we set the comment and copyright, because we have
-    // default values for these fields if they are not set explicitly by the
-    // user.
-    //
-
-    bool comment = false;
-    bool copyright = false;
-    for (int i = 0; i < m_request.parameters.size(); i++)
-    {
-        const string& name  = m_request.parameters[i].first;
-        const string& value = m_request.parameters[i].second;
-
-        DBL (DB_WRITE, "parameter name: " << name << " value: " << value);
-
-        //
-        // Handle tweak specific parameter options
-        //
-
-        if (name.substr(0,7)  == "output/"   ||
-            name.substr(0,8)  == "duration"  ||
-            name.substr(0,9)  == "timescale" ||
-            name.substr(0,17) == "libx264autoresize") continue;
-
-        //
-        // If the timecode string has no ":" in it then it treat it as a frame
-        // number.
-        //
-
-        if (name == "timecode")
-        {
-            string tcval = value.c_str();
-            if (value.find(":") == string::npos)
+            if (m_parameters.find("sample_fmt") != m_parameters.end())
             {
                 avCodecContext->sample_fmt =
                     av_get_sample_fmt(m_parameters["sample_fmt"].c_str());
@@ -6139,31 +4851,8 @@ MovieFFMpegWriter::applyFormatParameters()
         }
     }
 
-    AudioTrack* track = m_audioTracks[0];
-    AVStream* audioStream = m_avFormatContext->streams[track->number];
-    AVCodecContext* audioCodecContext = track->avCodecContext;
-    AVSampleFormat audioFormat = audioCodecContext->sample_fmt;
-    int audioChannels = audioCodecContext->ch_layout.nb_channels;
-    int sampleSize = av_get_bytes_per_sample(audioFormat);
-    int totalOutputSize = audioBuffer.size() * audioChannels * sampleSize;
-    bool planar = av_sample_fmt_is_planar(audioFormat);
-
-    DBL (DB_WRITE, "nsamps: " << nsamps
-                << " planar: " << planar
-                << " bufSize: " << audioBuffer.size()
-                << " audioChannels: " << audioChannels
-                << " bufChannels: " << audioBuffer.numChannels()
-                << " audioSampleRate: " << m_info.audioSampleRate
-                << " bufRate: " << audioBuffer.rate()
-                << " audioLength: " << audioLength
-                << " bufLength: " << audioBuffer.duration()
-                << " bufTotalSize: " << audioBuffer.sizeInBytes()
-                << " totalOutputSize: " << totalOutputSize
-                << " m_lastAudioTime: " << m_lastAudioTime
-                << " bufStart: " << audioBuffer.startTime()
-                << " overflow: " << overflow);
-
-    switch (audioFormat)
+    bool MovieFFMpegWriter::fillAudio(Movie* inMovie, double overflow,
+                                      bool lastPass)
     {
         //
         //  Compute the start and end samples for this audio
@@ -6251,60 +4940,6 @@ MovieFFMpegWriter::applyFormatParameters()
         case AV_SAMPLE_FMT_NONE:
         default:
             TWK_THROW_EXC_STREAM("Unsupported audio format.");
-    }
-
-    //
-    // It is critical to set the number of samples in the audio AVFrame before
-    // calling fill frame and encode.
-    //
-
-    track->audioFrame->nb_samples = nsamps;
-    track->audioFrame->format = audioFormat;
-    track->audioFrame->ch_layout.nb_channels = audioCodecContext->ch_layout.nb_channels;
-    track->audioFrame->ch_layout = audioCodecContext->ch_layout;
-    avcodec_fill_audio_frame(track->audioFrame, audioChannels,
-        audioFormat, (uint8_t*)m_audioSamples, totalOutputSize, 0);
-
-    //
-    // Make sure the frame has a valid pts to seed the packet.
-    //
-
-    if (track->audioFrame->pts == AV_NOPTS_VALUE)
-    {
-        track->audioFrame->pts = track->lastEncodedAudio;
-    }
-    track->lastEncodedAudio = track->audioFrame->pts + track->audioFrame->nb_samples;
-
-    encodeAudio(audioCodecContext, track->audioFrame, track->audioPacket, 
-                audioStream, &nsamps, track->lastDecodedAudio);
-    if (lastPass)
-    {
-        // It is important to call encodeAudio (above) to make sure that all frames as been sent
-        // to the encoder before entering draining mode by passing NULL.
-        // Send a NULL frame to enter draining mode.
-        encodeAudio(audioCodecContext, NULL, track->audioPacket, 
-                    audioStream, NULL, track->lastDecodedAudio);
-        // Returned value as no value at this point.
-    }
-
-    return audioFinished;
-}
-
-void 
-MovieFFMpegWriter::encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, 
-                               AVStream* stream, int lastEncVideo)
-{
-    int ret = avcodec_send_frame(ctx, frame);
-    if (ret < 0)
-    {
-        TWK_THROW_EXC_STREAM("Error encoding video frame: " << avErr2Str(ret));
-    }
-
-    while (ret >= 0)
-    {
-        ret = avcodec_receive_packet(ctx, pkt);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-            return;
         }
 
         //
@@ -7086,7 +5721,6 @@ MovieFFMpegWriter::encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pk
         {
             VideoTrack* track = m_videoTracks[i];
             avcodec_free_context(&track->avCodecContext);
-            av_buffer_unref(&track->hardwareContext.deviceContext);
             delete track;
         }
         if (m_audioSamples)

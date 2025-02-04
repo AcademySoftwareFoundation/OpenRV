@@ -85,10 +85,9 @@ namespace Rv
 
         QWebChannel* m_channel;
 
-    QList<QRegularExpression> m_eventNames;
-};
+        QWebEnginePage* m_frame;
 
-        QList<QRegExp> m_eventNames;
+        QList<QRegularExpression> m_eventNames;
     };
 
 } // namespace Rv

@@ -90,8 +90,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 #else
-    #include <TwkGLFFBO/FBOVideoDevice.h>
-    #include <IPCore/ImageRenderer.h>
+#include <TwkGLFFBO/FBOVideoDevice.h>
+#include <IPCore/ImageRenderer.h>
 #endif
 
 #include <QTextCodec>
@@ -101,7 +101,7 @@
 
 // TODO_QT: Remove if everything works.
 // Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
-//#include <QtGlobal>
+// #include <QtGlobal>
 
 extern const char* rv_linux_dark;
 

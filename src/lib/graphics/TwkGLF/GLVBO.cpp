@@ -7,47 +7,7 @@
 //
 #include <TwkGLF/GLVBO.h>
 
-namespace TwkGLF {
-using namespace std;
-
-
-//
-//  Returns a VBO for the renderer to use. if none available in
-//  m_vboList, then make a new one
-//
-//  NOTE: VBO caching mechanism is single threaded only. 
-//
-
-GLVBO::GLVBO() 
-{
-    glGenBuffers(1, &m_vbo);
-    m_available = true;
-    m_totalBytes = 0;
-}
-
-GLVBO::~GLVBO()
-{
-    if (m_vbo != 0) glDeleteBuffers(1, &m_vbo);
-}
-
-//size is in bytes
-void 
-GLVBO::setupData(const GLvoid* data, GLenum type, size_t size)
-{
-    glBindBuffer(type, m_vbo);
-    glBufferData(type, size, data, GL_STATIC_DRAW);
-    glBindBuffer(type, 0);
-    m_totalBytes = size;
-}
-
-bool 
-GLVBO::isValid() const
-{
-    return (m_vbo != 0);
-}
-
-GLVBO* 
-GLVBO::availableVBO(GLVBOVector& vbos)
+namespace TwkGLF
 {
     using namespace std;
 
@@ -57,6 +17,30 @@ GLVBO::availableVBO(GLVBOVector& vbos)
     //
     //  NOTE: VBO caching mechanism is single threaded only.
     //
+
+    GLVBO::GLVBO()
+    {
+        glGenBuffers(1, &m_vbo);
+        m_available = true;
+        m_totalBytes = 0;
+    }
+
+    GLVBO::~GLVBO()
+    {
+        if (m_vbo != 0)
+            glDeleteBuffers(1, &m_vbo);
+    }
+
+    // size is in bytes
+    void GLVBO::setupData(const GLvoid* data, GLenum type, size_t size)
+    {
+        glBindBuffer(type, m_vbo);
+        glBufferData(type, size, data, GL_STATIC_DRAW);
+        glBindBuffer(type, 0);
+        m_totalBytes = size;
+    }
+
+    bool GLVBO::isValid() const { return (m_vbo != 0); }
 
     GLVBO* GLVBO::availableVBO(GLVBOVector& vbos)
     {

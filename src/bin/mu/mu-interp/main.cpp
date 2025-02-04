@@ -46,7 +46,7 @@
 #include <MuImage/ImageModule.h>
 #include <MuEncoding/EncodingModule.h>
 
-#if defined( RV_VFX_CY2023 )
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/qtUtils.h>
 #include <MuQt5/qtModule.h>
 #else

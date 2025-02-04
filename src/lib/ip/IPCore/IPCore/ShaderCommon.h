@@ -252,14 +252,6 @@ namespace IPCore
             const TwkMath::Vec2f& center, const TwkMath::Vec2f& f,
             const TwkMath::Vec2f& cropRatio);
 
-        Expression* newOpacity(const IPImage* image, Expression* expr,
-                               float opacity);
-
-        Expression* newAngularMask(const IPImage* image, Expression* expr,
-                                   const TwkMath::Vec2f& pivot,
-                                   float angleInRadians,
-                                   bool isReverseAngularMask);
-
         //
         //  ICC profile shaders
         //

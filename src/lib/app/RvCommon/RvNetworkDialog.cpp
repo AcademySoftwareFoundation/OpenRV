@@ -105,18 +105,10 @@ namespace Rv
 
     RvNetworkDialog::~RvNetworkDialog()
     {
-        QRegularExpression re(string);
-        int index = -1;
-        
-        // Search for the first matching environment variable.
-        for (int i = 0; i < environment.size(); ++i)
-        {
-            if (re.match(environment.at(i)).hasMatch())
-            {
-                index = i;
-                break;
-            }
-        }
+        DB("RvNetworkDialog::~RvNetworkDialog");
+        if (m_client)
+            toggleServer();
+    }
 
     void RvNetworkDialog::loadSettings()
     {
@@ -154,7 +146,18 @@ namespace Rv
 
         foreach (QString string, envVariables)
         {
-            int index = environment.indexOf(QRegExp(string));
+            QRegularExpression re(string);
+            int index = -1;
+
+            // Search for the first matching environment variable.
+            for (int i = 0; i < environment.size(); ++i)
+            {
+                if (re.match(environment.at(i)).hasMatch())
+                {
+                    index = i;
+                    break;
+                }
+            }
 
             if (index != -1)
             {

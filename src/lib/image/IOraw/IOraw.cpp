@@ -140,8 +140,7 @@ namespace TwkFB
         addType("arw", "Sony/Minolta RAW", capabilities, codecs); // tested
         addType("bay", "Casio Bayer RAW", capabilities, codecs);
         addType("cr2", "Canon RAW 2", capabilities, codecs); // tested
-        addType("cr3", "Canon RAW 3", capabilities, codecs);
-        addType("crw", "Canon RAW", capabilities, codecs); // tested
+        addType("crw", "Canon RAW", capabilities, codecs);   // tested
         addType("dc2", "Kodak RAW 3", capabilities, codecs);
         addType("dcr", "Kodak RAW", capabilities, codecs);
         addType("dng", "Digital NeGative", capabilities, codecs); // tested

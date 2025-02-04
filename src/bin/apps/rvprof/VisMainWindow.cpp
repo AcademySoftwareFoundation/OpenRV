@@ -477,22 +477,22 @@ void VisMainWindow::rangeChanged()
 //----------------------------------------------------------------------
 
 GLView::GLView(QWidget* parent, QTextEdit* readout, VisMainWindow* visWin)
-    : QOpenGLWidget(parent, Qt::Widget),
-      m_scale(1.0),
-      m_xtran(0),
-      m_ytran(0),
-      m_rangeStart(0),
-      m_rangeEnd(0),
-      m_rangeStartIndex(size_t(-1)),
-      m_rangeEndIndex(size_t(-1)),
-      m_actualFPS(0.0),
-      m_showIdealFrames(false),
-      m_showEvalTiming(true),
-      m_readoutSample(-1),
-      m_readout(readout),
-      m_computedRefresh(0.0),
-      m_computedFPS(0.0),
-      m_visWin(visWin)
+    : QOpenGLWidget(parent, Qt::Widget)
+    , m_scale(1.0)
+    , m_xtran(0)
+    , m_ytran(0)
+    , m_rangeStart(0)
+    , m_rangeEnd(0)
+    , m_rangeStartIndex(size_t(-1))
+    , m_rangeEndIndex(size_t(-1))
+    , m_actualFPS(0.0)
+    , m_showIdealFrames(false)
+    , m_showEvalTiming(true)
+    , m_readoutSample(-1)
+    , m_readout(readout)
+    , m_computedRefresh(0.0)
+    , m_computedFPS(0.0)
+    , m_visWin(visWin)
 {
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
@@ -557,7 +557,8 @@ void GLView::setTimeRange(float start, float end)
             }
         }
     }
-    //  cerr << "rangeEnd " << m_rangeEnd << " index " << m_rangeEndIndex << endl;
+    //  cerr << "rangeEnd " << m_rangeEnd << " index " << m_rangeEndIndex <<
+    //  endl;
     update();
 }
 
@@ -606,10 +607,9 @@ void GLView::rebuildIdealFrames()
         return;
 }
 
-void 
-GLView::setActualFPS(float fps) 
-{ 
-    m_actualFPS = fps; 
+void GLView::setActualFPS(float fps)
+{
+    m_actualFPS = fps;
     update();
 }
 
@@ -619,10 +619,9 @@ void GLView::setShowEvalTiming(bool b)
     update();
 }
 
-void 
-GLView::setShowIdealFrames(bool b) 
-{ 
-    m_showIdealFrames = b; 
+void GLView::setShowIdealFrames(bool b)
+{
+    m_showIdealFrames = b;
     update();
 }
 
@@ -1048,10 +1047,10 @@ void GLView::wheelEvent(QWheelEvent* event)
     Vec t(.5 * (m_endTime - m_startTime),
           .5 * (m_endTime - m_startTime) * (h / w), 0);
 
-#if defined( RV_VFX_CY2023 )
+#if defined(RV_VFX_CY2023)
     float a = event->delta() * .8;
 #else
-    float a = event->angleDelta().y()  * .8;
+    float a = event->angleDelta().y() * .8;
 #endif
 
     a *= 0.001;
@@ -1074,7 +1073,7 @@ void GLView::initializeGL()
 void GLView::resizeGL(int, int)
 {
     glViewport(0, 0, width(), height());
-    update(); 
+    update();
 }
 
 static void drawBox(float r, float g, float b, float a, float llx, float lly,

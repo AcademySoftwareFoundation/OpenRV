@@ -42,7 +42,7 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>
 
-#if defined( RV_VFX_CY2023 )
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/QNetworkAccessManagerType.h>
 #include <MuQt5/QTabWidgetType.h>
 #include <MuQt5/QToolBarType.h>
@@ -55,7 +55,6 @@
 #include <MuQt6/qtUtils.h>
 #include <MuQt6/QUrlType.h>
 #endif
-
 
 #include <TwkQtCoreUtil/QtConvert.h>
 #include <RvApp/Options.h>
@@ -83,7 +82,7 @@
 //  Related to MainWindow UI
 //  May want to move into separate module/library later on
 //----------------------------------------------------------------------
-#if defined( RV_VFX_CY2023 )
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/qtModule.h>
 #include <MuQt5/QActionType.h>
 #include <MuQt5/QWidgetType.h>

@@ -17,45 +17,31 @@
 #include <TwkUtil/Timer.h>
 #include <boost/thread/thread.hpp>
 
-namespace Rv {
-class RvDocument;
-class QTFrameBuffer;
-class QTGLVideoDevice;
-
-class GLView : public QOpenGLWidget, protected QOpenGLFunctions
+namespace Rv
 {
     class RvDocument;
     class QTFrameBuffer;
     class QTGLVideoDevice;
 
-    class GLView : public QGLWidget
+    class GLView
+        : public QOpenGLWidget
+        , protected QOpenGLFunctions
     {
         Q_OBJECT
 
-    GLView(QWidget* parent, 
-           QOpenGLContext* sharedContext, 
-           RvDocument* doc, 
-           bool stereo=false,
-           bool vsync=true,
-           bool doubleBuffer=true,
-           int red=0,
-           int green=0,
-           int blue=0,
-           int alpha=0,
-           bool noResize=true);
-    ~GLView();
+    public:
+        typedef TwkUtil::Timer Timer;
 
-    static QSurfaceFormat rvGLFormat(bool stereo=false,
-                                     bool vsync=true,
-                                     bool doubleBuffer=true,
-                                     int red=8,
-                                     int green=8,
-                                     int blue=8,
-                                     int alpha=8);
+        GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc,
+               bool stereo = false, bool vsync = true, bool doubleBuffer = true,
+               int red = 0, int green = 0, int blue = 0, int alpha = 0,
+               bool noResize = true);
+        ~GLView();
 
-        static QGLFormat rvGLFormat(bool stereo = false, bool vsync = true,
-                                    bool doubleBuffer = true, int red = 8,
-                                    int green = 8, int blue = 8, int alpha = 8);
+        static QSurfaceFormat rvGLFormat(bool stereo = false, bool vsync = true,
+                                         bool doubleBuffer = true, int red = 8,
+                                         int green = 8, int blue = 8,
+                                         int alpha = 8);
 
         void absolutePosition(int& x, int& y) const;
 
@@ -78,31 +64,8 @@ class GLView : public QOpenGLWidget, protected QOpenGLFunctions
 
         void* syncClosure() const { return m_syncThreadData; }
 
-private:
-    RvDocument*      m_doc;
-    //QTFrameBuffer*   m_frameBuffer;
-    boost::thread    m_swapThread;
-    QTGLVideoDevice* m_videoDevice;
-    unsigned int     m_lastKey;
-    QEvent::Type     m_lastKeyType;
-    Timer            m_activityTimer;
-    Timer            m_renderTimer;
-    QTimer           m_eventProcessingTimer;
-    bool             m_userActive;
-    size_t           m_renderCount;
-    Timer            m_activationTimer;
-    bool             m_firstPaintCompleted;
-    QSize            m_csize;
-    QSize            m_msize;
-    int              m_red;
-    int              m_green;
-    int              m_blue;
-    int              m_alpha;
-    bool             m_postFirstNonEmptyRender;
-    bool             m_stopProcessingEvents;
-    void*            m_syncThreadData;
-    QOpenGLContext* m_sharedContext;
-};
+    public slots:
+        void eventProcessingTimeout();
 
     protected:
         void initializeGL();
@@ -133,6 +96,7 @@ private:
         bool m_postFirstNonEmptyRender;
         bool m_stopProcessingEvents;
         void* m_syncThreadData;
+        QOpenGLContext* m_sharedContext;
     };
 
 } // namespace Rv

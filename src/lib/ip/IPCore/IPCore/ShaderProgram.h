@@ -188,6 +188,7 @@ namespace IPCore
             // output uniform variables needed in case of uncropped images
             void outputUncropUniforms(std::ostream&, const Expression*);
 
+        private:
             Expression* m_expr;
             GraphIDSet m_outputSTSet;
             GraphIDSet m_outputSizeSet;
@@ -202,9 +203,8 @@ namespace IPCore
             size_t m_totalST;
             Function* m_main;
             std::string m_vertexCode;
-            bool m_needOutputSize{false};
-            bool m_needOutputST{false};
-            bool m_needFragmentPosition{false};
+            bool m_needOutputSize;
+            bool m_needOutputST;
         };
 
         class ProgramCache

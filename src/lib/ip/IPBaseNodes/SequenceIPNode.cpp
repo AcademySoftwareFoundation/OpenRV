@@ -87,30 +87,9 @@ namespace IPCore
         // just like any other per-input EDL information.
         m_inputsBlendingModes = declareProperty<StringProperty>(
             "composite.inputBlendModes", "", 0, false);
-
-        m_inputsOpacities = declareProperty<FloatProperty>(
-            "composite.inputOpacities", 1.0f, nullptr, false);
-
-        m_inputsAngularMaskPivotX = declareProperty<FloatProperty>(
-            "composite.inputAngularMaskPivotX", 0.0f, nullptr, false);
-        m_inputsAngularMaskPivotY = declareProperty<FloatProperty>(
-            "composite.inputAngularMaskPivotY", 0.0f, nullptr, false);
-        m_inputsAngularMaskAngleInRadians = declareProperty<FloatProperty>(
-            "composite.inputAngularMaskAngleInRadians", 0.0f, nullptr, false);
-        m_inputsAngularMaskActive =
-            declareProperty<IntProperty>("composite.inputAngularMaskActive", 1);
-        m_inputsReverseAngularMask =
-            declareProperty<IntProperty>("composite.swapAngularMaskInput", 1);
-
-        // since they are per input, make sure the property containers are
-        // emptied at creation time
+        // since it is per input, make sure the property contains is emptied at
+        // creation time
         m_inputsBlendingModes->erase(0, 1);
-        m_inputsOpacities->erase(0, 1);
-        m_inputsAngularMaskPivotX->erase(0, 1);
-        m_inputsAngularMaskPivotY->erase(0, 1);
-        m_inputsAngularMaskAngleInRadians->erase(0, 1);
-        m_inputsAngularMaskActive->erase(0, 1);
-        m_inputsReverseAngularMask->erase(0, 1);
 
         // By default, the output of this node support reverse-order blending.
         // this is mainly kept for backward compatibility reason.
@@ -392,34 +371,6 @@ namespace IPCore
         //
 
         // Shader::installAdaptiveBoxResizeRecursive(root);
-
-        // If we have per-input opacities, now is the time to use them
-        if (source >= 0 && source < m_inputsOpacities->size()
-            && child->shaderExpr != nullptr)
-        {
-            child->shaderExpr = Shader::newOpacity(
-                child, child->shaderExpr, (*m_inputsOpacities)[source]);
-        }
-
-        const bool isSourceValid =
-            source >= 0 && source < m_inputsAngularMaskPivotX->size()
-            && source < m_inputsAngularMaskPivotY->size()
-            && source < m_inputsAngularMaskAngleInRadians->size()
-            && source < m_inputsAngularMaskActive->size()
-            && source < m_inputsReverseAngularMask->size();
-
-        if (isSourceValid && ((*m_inputsAngularMaskActive)[source] != 0))
-        {
-
-            const float pivotX = (*m_inputsAngularMaskPivotX)[source];
-            const float pivotY = (*m_inputsAngularMaskPivotY)[source];
-            const float angleInRadians =
-                (*m_inputsAngularMaskAngleInRadians)[source];
-
-            child->shaderExpr = Shader::newAngularMask(
-                child, child->shaderExpr, Vec2f(pivotX, pivotY), angleInRadians,
-                (*m_inputsReverseAngularMask)[source] != 0);
-        }
 
         root->appendChild(child);
 
