@@ -4,213 +4,225 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Type.h>
 
-namespace Mu {
-class MemberFunction;
-class MemberVariable;
-class InternalTypeMemberVariable;
-class Interface;
-class InterfaceImp;
-class Function;
-class Signature;
-class ClassInstance;
-
-//
-//  class Class
-//
-//  "Class" represents a method for generating ClassInstance
-//  Objects. These are objects which have methods and data members. 
-//
-
-class Class : public Type
+namespace Mu
 {
-  public:
-    typedef STLVector<const MemberFunction*>::Type MemberFunctionVector;
-    typedef STLVector<MemberVariable*>::Type       MemberVariableVector;
-    typedef STLVector<const Class*>::Type          ClassVector;
-    typedef STLVector<InterfaceImp*>::Type         InterfaceImps;
-    typedef STLVector<size_t>::Type                ClassOffsets;
-    typedef STLVector<InternalTypeMemberVariable*>::Type  TypeMemberVariableVector;
-
-    Class(Context* context, const char *name, Class* superClass = 0);
-    Class(Context* context, const char *name, const ClassVector& superClasses);
-    virtual ~Class();
+    class MemberFunction;
+    class MemberVariable;
+    class InternalTypeMemberVariable;
+    class Interface;
+    class InterfaceImp;
+    class Function;
+    class Signature;
+    class ClassInstance;
 
     //
-    //  Used by Archive
+    //  class Class
+    //
+    //  "Class" represents a method for generating ClassInstance
+    //  Objects. These are objects which have methods and data members.
     //
 
-    void addSuperClass(const Class*);
+    class Class : public Type
+    {
+    public:
+        typedef STLVector<const MemberFunction*>::Type MemberFunctionVector;
+        typedef STLVector<MemberVariable*>::Type MemberVariableVector;
+        typedef STLVector<const Class*>::Type ClassVector;
+        typedef STLVector<InterfaceImp*>::Type InterfaceImps;
+        typedef STLVector<size_t>::Type ClassOffsets;
+        typedef STLVector<InternalTypeMemberVariable*>::Type
+            TypeMemberVariableVector;
 
-    //
-    //	Symbol + Type API
-    //
+        Class(Context* context, const char* name, Class* superClass = 0);
+        Class(Context* context, const char* name,
+              const ClassVector& superClasses);
+        virtual ~Class();
 
-    virtual Value	    nodeEval(const Node*, Thread&) const;
-    virtual void	    nodeEval(void *, const Node*, Thread&) const;
+        //
+        //  Used by Archive
+        //
 
-    virtual Object*         newObject() const;
-    virtual size_t          objectSize() const;
-    virtual void            deleteObject(Object*) const;
+        void addSuperClass(const Class*);
 
-    virtual void            outputValue(std::ostream&, const Value&, bool full=false) const;
-    virtual void            outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
-    virtual void            symbolDependancies(ConstSymbolVector&) const;
+        //
+        //	Symbol + Type API
+        //
 
-    virtual const Type*     fieldType(size_t) const;
-    virtual ValuePointer    fieldPointer(Object*, size_t) const;
-    virtual const ValuePointer  fieldPointer(const Object*, size_t) const;
-    virtual void            constructInstance(Pointer) const;
-    virtual void            copyInstance(Pointer,Pointer) const;
+        virtual Value nodeEval(const Node*, Thread&) const;
+        virtual void nodeEval(void*, const Node*, Thread&) const;
 
-    //
-    //	As symbols are added to the class, it may add virtual function
-    //	table entries. Note that this may have an effect on derived
-    //	classes, so the base class must keep track of all derived
-    //	classes.
-    //
+        virtual Object* newObject() const;
+        virtual size_t objectSize() const;
+        virtual void deleteObject(Object*) const;
 
-    virtual void	    addSymbol(Symbol*);
+        virtual void outputValue(std::ostream&, const Value&,
+                                 bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
+                                          ValueOutputState&) const;
+        virtual void symbolDependancies(ConstSymbolVector&) const;
 
-    //
-    //	Overriden from Symbol, this function looks up the class tree to
-    //	find the specified name. Note: this function does not handle
-    //	overriden names very well.
-    //
+        virtual const Type* fieldType(size_t) const;
+        virtual ValuePointer fieldPointer(Object*, size_t) const;
+        virtual const ValuePointer fieldPointer(const Object*, size_t) const;
+        virtual void constructInstance(Pointer) const;
+        virtual void copyInstance(Pointer, Pointer) const;
 
-    virtual const Symbol*       findSymbol(Name) const;
-    virtual void        	findSymbols(QualifiedName, SymbolVector&);
-    virtual void                findSymbols(QualifiedName, ConstSymbolVector&) const;
+        //
+        //	As symbols are added to the class, it may add virtual function
+        //	table entries. Note that this may have an effect on derived
+        //	classes, so the base class must keep track of all derived
+        //	classes.
+        //
 
-    //
-    //  Find the function of the given name and signature in the class
-    //  or the super class. Returns 0 on failure.
-    //
+        virtual void addSymbol(Symbol*);
 
-    const Function*         findFunction(Name, const Signature*) const;
+        //
+        //	Overriden from Symbol, this function looks up the class tree to
+        //	find the specified name. Note: this function does not handle
+        //	overriden names very well.
+        //
 
-    //
-    //	Returns the class passed into the constructor
-    //
+        virtual const Symbol* findSymbol(Name) const;
+        virtual void findSymbols(QualifiedName, SymbolVector&);
+        virtual void findSymbols(QualifiedName, ConstSymbolVector&) const;
 
-    const ClassVector&      superClasses() const { return _superClasses; }
-    const ClassVector&	    derivedClasses() const { return _children; }
-    const ClassOffsets&     superOffsets() const { return _superOffsets; }
+        //
+        //  Find the function of the given name and signature in the class
+        //  or the super class. Returns 0 on failure.
+        //
 
-    const TypeMemberVariableVector& typeMembers() const { return _typeMembers; }
+        const Function* findFunction(Name, const Signature*) const;
 
-    //
-    //	Determine if this class is derived class (ancestor) of another
-    //
+        //
+        //	Returns the class passed into the constructor
+        //
 
-    bool		    isA(const Class*) const;
+        const ClassVector& superClasses() const { return _superClasses; }
 
-    //
-    //  Can a ClassInstance of this class be substituted for the given
-    //  class. In single inheritance situations this will always be
-    //  true and isA() should always be true for the input. In
-    //  multiple inheritance cases a dynamic cast maybe needed to
-    //  adjust the ClassInstance
-    //
+        const ClassVector& derivedClasses() const { return _children; }
 
-    bool                    substitutable(const Class*) const;
+        const ClassOffsets& superOffsets() const { return _superOffsets; }
 
-    //
-    //  May return a ClassInstance pointer inside the passed in object
-    //
+        const TypeMemberVariableVector& typeMembers() const
+        {
+            return _typeMembers;
+        }
 
-    ClassInstance*          dynamicCast(ClassInstance*, 
-                                        const Class*,
-                                        bool upcastOK) const;
+        //
+        //	Determine if this class is derived class (ancestor) of another
+        //
 
-    //
-    //	Returns true if the types match. 
-    //
+        bool isA(const Class*) const;
 
-    virtual MatchResult	    match(const Type*, Bindings&) const;
+        //
+        //  Can a ClassInstance of this class be substituted for the given
+        //  class. In single inheritance situations this will always be
+        //  true and isA() should always be true for the input. In
+        //  multiple inheritance cases a dynamic cast maybe needed to
+        //  adjust the ClassInstance
+        //
 
-    //
-    //	Freeze the class -- the virtual function table size is
-    //	computed and filled. No more members may be added to the class
-    //	after freeze is called.
-    //
+        bool substitutable(const Class*) const;
 
-    virtual void	    freeze();
-    bool		    isFrozen() const { return _frozen; }
+        //
+        //  May return a ClassInstance pointer inside the passed in object
+        //
 
-    //
-    //	Virtual function table for this class
-    //
+        ClassInstance* dynamicCast(ClassInstance*, const Class*,
+                                   bool upcastOK) const;
 
-    const MemberVariableVector& memberVariables() const 
-                            { return _memberVariables; }
+        //
+        //	Returns true if the types match.
+        //
 
-    void allMemberVariables(MemberVariableVector&) const;
+        virtual MatchResult match(const Type*, Bindings&) const;
 
-    bool isInBaseClass(const MemberVariable*) const;
+        //
+        //	Freeze the class -- the virtual function table size is
+        //	computed and filled. No more members may be added to the class
+        //	after freeze is called.
+        //
 
-    //
-    //  Dynamic method lookup. Takes any MemberFunction
-    //  (i.e. derived/base,etc) and finds the one that maps to this
-    //  class. This is used at runtime to invoke the correct method.
-    //
+        virtual void freeze();
 
-    const MemberFunction* dynamicLookup(const MemberFunction*) const;
+        bool isFrozen() const { return _frozen; }
 
-    //
-    //	Instance information. This information is only valid after the
-    //	class has been frozen.
-    //
+        //
+        //	Virtual function table for this class
+        //
 
-    size_t		    instanceSize() const { return _instanceSize; }
+        const MemberVariableVector& memberVariables() const
+        {
+            return _memberVariables;
+        }
 
-    //
-    //  May be done at runtime: determines dynamically whether a class
-    //  conforms to an interface. If so, an InterfaceInstance will be
-    //  returned. (These are cached).
-    //
+        void allMemberVariables(MemberVariableVector&) const;
 
-    const InterfaceImp*     implementation(const Interface*) const;
-    const InterfaceImps&    knownInterfaces() const { return _interfaces; }
+        bool isInBaseClass(const MemberVariable*) const;
 
-    //
-    //  Find all functions that override the given member function.
-    //
+        //
+        //  Dynamic method lookup. Takes any MemberFunction
+        //  (i.e. derived/base,etc) and finds the one that maps to this
+        //  class. This is used at runtime to invoke the correct method.
+        //
 
-    void                    findOverridingFunctions(const MemberFunction*,
-                                                    MemberFunctionVector&) const;
+        const MemberFunction* dynamicLookup(const MemberFunction*) const;
 
-protected:
-    //
-    //  Classes with nebulous ancestry need more logic for isA() to
-    //  return a correct answer
-    //
+        //
+        //	Instance information. This information is only valid after the
+        //	class has been frozen.
+        //
 
-    virtual bool            nebulousIsA(const Class*) const;
+        size_t instanceSize() const { return _instanceSize; }
 
+        //
+        //  May be done at runtime: determines dynamically whether a class
+        //  conforms to an interface. If so, an InterfaceInstance will be
+        //  returned. (These are cached).
+        //
 
-private:
-    ClassVector              _superClasses;
-    ClassOffsets             _superOffsets;
-    ClassVector              _castClasses;
-    ClassOffsets             _castOffsets;
-    TypeMemberVariableVector _typeMembers;
-    mutable ClassVector      _children;
-    MemberVariableVector     _memberVariables;
-    mutable InterfaceImps    _interfaces;
+        const InterfaceImp* implementation(const Interface*) const;
 
-protected:
-    size_t		    _instanceSize;
+        const InterfaceImps& knownInterfaces() const { return _interfaces; }
 
-private:
-    mutable bool	    _frozen             : 1;
+        //
+        //  Find all functions that override the given member function.
+        //
 
-protected:
-    bool                    _nebulousAncestry   : 1;
-};
+        void findOverridingFunctions(const MemberFunction*,
+                                     MemberFunctionVector&) const;
+
+    protected:
+        //
+        //  Classes with nebulous ancestry need more logic for isA() to
+        //  return a correct answer
+        //
+
+        virtual bool nebulousIsA(const Class*) const;
+
+    private:
+        ClassVector _superClasses;
+        ClassOffsets _superOffsets;
+        ClassVector _castClasses;
+        ClassOffsets _castOffsets;
+        TypeMemberVariableVector _typeMembers;
+        mutable ClassVector _children;
+        MemberVariableVector _memberVariables;
+        mutable InterfaceImps _interfaces;
+
+    protected:
+        size_t _instanceSize;
+
+    private:
+        mutable bool _frozen : 1;
+
+    protected:
+        bool _nebulousAncestry : 1;
+    };
 
 } // namespace Mu
 

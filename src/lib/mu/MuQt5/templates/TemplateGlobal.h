@@ -15,5 +15,4 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
 
-
 #endif // __MuQt5__$TType__h__

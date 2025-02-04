@@ -1,7 +1,7 @@
 //*****************************************************************************/
 // Copyright (c) 2022 Autodesk, Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
 //
 //*****************************************************************************/
@@ -15,6 +15,5 @@
 #define TWKFBAUX_EXPORT __declspec(dllimport)
 #endif
 #else
-#define TWKFBAUX_EXPORT 
+#define TWKFBAUX_EXPORT
 #endif
-

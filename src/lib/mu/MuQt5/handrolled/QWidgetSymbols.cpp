@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 //
@@ -19,23 +19,15 @@ c->tupleType(ttypes);
 
 addSymbols(
 
-           new Function(c, "windowFlags", _n_QWidget_windowFlags_int, None,
-                        Return, "int",
-                        Parameters,
-                        new Param(c, "this", "qt.QWidget"),
-                        End),
+    new Function(c, "windowFlags", _n_QWidget_windowFlags_int, None, Return,
+                 "int", Parameters, new Param(c, "this", "qt.QWidget"), End),
 
-            new Function(c, "setWindowFlags", _n_QWidget_setWindowFlags_void_int, None,
-                        Return, "void",
-                        Parameters,
-                        new Param(c, "this", "qt.QWidget"),
-                        new Param(c, "windowFlags", "int"),
-                        End),
+    new Function(c, "setWindowFlags", _n_QWidget_setWindowFlags_void_int, None,
+                 Return, "void", Parameters, new Param(c, "this", "qt.QWidget"),
+                 new Param(c, "windowFlags", "int"), End),
 
-           new Function(c, "getContentsMargins", _n_QWidget_getContentsMargins, None,
-                        Return, "(int,int,int,int)",
-                        Parameters,
-                        new Param(c, "this", "qt.QWidget"),
-                        End),
-          
-           EndArguments);
+    new Function(c, "getContentsMargins", _n_QWidget_getContentsMargins, None,
+                 Return, "(int,int,int,int)", Parameters,
+                 new Param(c, "this", "qt.QWidget"), End),
+
+    EndArguments);

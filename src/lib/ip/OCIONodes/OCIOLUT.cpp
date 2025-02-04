@@ -10,16 +10,16 @@
 namespace IPCore
 {
 
-  OCIOLUT::~OCIOLUT()
-  {
-    if( m_lutfb )
+    OCIOLUT::~OCIOLUT()
     {
-      if( !m_lutfb->hasStaticRef() || m_lutfb->staticUnRef() )
-      {
-        delete m_lutfb;
-      }
-      m_lutfb = 0;
+        if (m_lutfb)
+        {
+            if (!m_lutfb->hasStaticRef() || m_lutfb->staticUnRef())
+            {
+                delete m_lutfb;
+            }
+            m_lutfb = 0;
+        }
     }
-  }
 
-}  // namespace IPCore
+} // namespace IPCore

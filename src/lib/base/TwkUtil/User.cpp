@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001-2003 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #include <TwkUtil/User.h>
@@ -20,16 +20,16 @@
 #define _WIN32_WINNT 0x0501
 #define WINVER 0x0501 // both combined stand for Windows XP
 #include <windows.h>
-//#include <lm.h>
+// #include <lm.h>
 #include <sddl.h>
 #endif
 
-namespace TwkUtil {
-using namespace std;
+namespace TwkUtil
+{
+    using namespace std;
 
 #ifdef PLATFORM_WINDOWS
-    string
-    uidString()
+    string uidString()
     {
         LPTSTR str = 0;
         HANDLE h = GetCurrentProcess();
@@ -37,8 +37,8 @@ using namespace std;
 
         if (!OpenProcessToken(h, TOKEN_QUERY, &newH))
         {
-            std::cerr << "ERROR: OpenProcessToken failed: " <<
-                    GetLastError() << std::endl;
+            std::cerr << "ERROR: OpenProcessToken failed: " << GetLastError()
+                      << std::endl;
             return string();
         }
 
@@ -50,17 +50,17 @@ using namespace std;
             if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
             {
                 std::cerr << "ERROR: GetTokenInformation failed: "
-                        << GetLastError() << std::endl;
+                          << GetLastError() << std::endl;
                 return string();
             }
         }
 
-        ptu = (PTOKEN_USER) malloc(outSize);
+        ptu = (PTOKEN_USER)malloc(outSize);
         if (!GetTokenInformation(newH, TokenUser, ptu, outSize, &outSize))
         {
-            std::cerr << "ERROR: GetTokenInformation failed: " <<
-                    GetLastError() << std::endl;
-            free (ptu);
+            std::cerr << "ERROR: GetTokenInformation failed: " << GetLastError()
+                      << std::endl;
+            free(ptu);
             return string();
         }
 
@@ -68,11 +68,10 @@ using namespace std;
         free(ptu);
         CloseHandle(newH);
 
-        return string((char*) str);
+        return string((char*)str);
     }
 #else
-    string
-    uidString()
+    string uidString()
     {
         ostringstream str;
         str << getuid();

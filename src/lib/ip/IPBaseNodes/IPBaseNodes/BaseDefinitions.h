@@ -1,19 +1,20 @@
 //
-//  Copyright (c) 2013 Tweak Software. 
+//  Copyright (c) 2013 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __IPBaseNodes__BaseDefinitions__h__
 #define __IPBaseNodes__BaseDefinitions__h__
 #include <iostream>
 
-namespace IPCore {
+namespace IPCore
+{
 
-class NodeManager;
-void addBaseNodeDefinitions(NodeManager*);
+    class NodeManager;
+    void addBaseNodeDefinitions(NodeManager*);
 
-} // IPCore
+} // namespace IPCore
 
 #endif // __IPBaseNodes__BaseDefinitions__h__

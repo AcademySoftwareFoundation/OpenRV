@@ -1,19 +1,19 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __TwkApp__Exception__h__
 #define __TwkApp__Exception__h__
 #include <TwkExc/Exception.h>
 
-namespace TwkApp {
+namespace TwkApp
+{
 
-TWK_DERIVED_EXCEPTION(DocumentException)
+    TWK_DERIVED_EXCEPTION(DocumentException)
 
-
-} // TwkApp
+} // namespace TwkApp
 
 #endif // __TwkApp__Exception__h__

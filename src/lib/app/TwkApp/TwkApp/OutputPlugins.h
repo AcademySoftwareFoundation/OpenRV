@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #pragma once
@@ -10,50 +10,49 @@
 #include <string>
 #include <unordered_set>
 
-namespace TwkApp {
-
-class OutputPlugin;
-using OutputPluginPtr = std::shared_ptr<TwkApp::OutputPlugin>;
-
-//
-//  OutputPlugins
-//
-//  Manages the audio/video output plugins
-//
-
-class OutputPlugins
+namespace TwkApp
 {
-  public:
 
-    OutputPlugins();
-    virtual ~OutputPlugins();
-
-    using Plugins = std::unordered_set<OutputPluginPtr>;
+    class OutputPlugin;
+    using OutputPluginPtr = std::shared_ptr<TwkApp::OutputPlugin>;
 
     //
-    //  Load all on-disk plugins
+    //  OutputPlugins
+    //
+    //  Manages the audio/video output plugins
     //
 
-    static void loadPlugins(const std::string& envVar);
+    class OutputPlugins
+    {
+    public:
+        OutputPlugins();
+        virtual ~OutputPlugins();
 
-    //
-    //  Unload all on-disk plugins
-    //
+        using Plugins = std::unordered_set<OutputPluginPtr>;
 
-    static void unloadPlugins();
+        //
+        //  Load all on-disk plugins
+        //
 
-    //
-    //  Returns an unordered set of all the currently loaded plugins
-    //
+        static void loadPlugins(const std::string& envVar);
 
-    static Plugins& plugins();
+        //
+        //  Unload all on-disk plugins
+        //
 
-  private:
+        static void unloadPlugins();
 
-    static void addPlugin(const TwkApp::OutputPluginPtr&);
+        //
+        //  Returns an unordered set of all the currently loaded plugins
+        //
 
-    static bool m_loadedAll;
-    static Plugins* m_plugins;
-};
+        static Plugins& plugins();
 
-} // TwkApp
+    private:
+        static void addPlugin(const TwkApp::OutputPluginPtr&);
+
+        static bool m_loadedAll;
+        static Plugins* m_plugins;
+    };
+
+} // namespace TwkApp

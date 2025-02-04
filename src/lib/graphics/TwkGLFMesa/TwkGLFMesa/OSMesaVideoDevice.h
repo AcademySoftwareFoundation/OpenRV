@@ -11,53 +11,50 @@
 #include <TwkFB/FrameBuffer.h>
 #include <TwkGLF/GLVideoDevice.h>
 
-namespace TwkGLF {
-
-struct OSMesaImp;
-
-class OSMesaVideoDevice : public TwkGLF::GLVideoDevice
+namespace TwkGLF
 {
-public:
 
-    OSMesaVideoDevice(TwkApp::VideoModule*,
-                      int w, int h, 
-                      bool alpha, 
-                      bool floatbuffer=true,
-                      bool topleftOrigin=false);
+    struct OSMesaImp;
 
-    virtual ~OSMesaVideoDevice();
+    class OSMesaVideoDevice : public TwkGLF::GLVideoDevice
+    {
+    public:
+        OSMesaVideoDevice(TwkApp::VideoModule*, int w, int h, bool alpha,
+                          bool floatbuffer = true, bool topleftOrigin = false);
 
-    virtual std::string hardwareIdentification() const;
+        virtual ~OSMesaVideoDevice();
 
-    typedef void (*VoidFunc)();
-    typedef VoidFunc (*ProcAddressFunc)(const char*);
+        virtual std::string hardwareIdentification() const;
 
-    static ProcAddressFunc mesaProcAddressFunc();
+        typedef void (*VoidFunc)();
+        typedef VoidFunc (*ProcAddressFunc)(const char*);
 
-    //
-    //  VideoDevice API
-    //
+        static ProcAddressFunc mesaProcAddressFunc();
 
-    void resize(int w, int h, bool alpha);
+        //
+        //  VideoDevice API
+        //
 
-    virtual size_t width() const;
-    virtual size_t height() const;
-    virtual void makeCurrent() const;
-    virtual void redraw() const;
-    virtual void redrawImmediately() const;
+        void resize(int w, int h, bool alpha);
 
-    virtual void makeCurrent(TwkFB::FrameBuffer*) const;
+        virtual size_t width() const;
+        virtual size_t height() const;
+        virtual void makeCurrent() const;
+        virtual void redraw() const;
+        virtual void redrawImmediately() const;
 
-private:
-    int                 m_width;
-    int                 m_height;
-    bool                m_alpha;
-    bool                m_float;
-    bool                m_topleft;
-    OSMesaImp *         m_imp;
-    mutable TwkFB::FrameBuffer* m_currentFB;
-};
+        virtual void makeCurrent(TwkFB::FrameBuffer*) const;
 
-}
+    private:
+        int m_width;
+        int m_height;
+        bool m_alpha;
+        bool m_float;
+        bool m_topleft;
+        OSMesaImp* m_imp;
+        mutable TwkFB::FrameBuffer* m_currentFB;
+    };
+
+} // namespace TwkGLF
 
 #endif // __TwkGLF__OSMesaVideoDevice__h__

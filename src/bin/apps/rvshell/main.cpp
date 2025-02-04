@@ -16,7 +16,7 @@
 
 using namespace std;
 
-int utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
     ShellDialog dialog;
@@ -26,32 +26,30 @@ int utf8Main(int argc, char *argv[])
         cout << endl;
         QHostInfo info = QHostInfo::fromName(argv[2]);
         int port = 45124;
-        if (argc == 4) port = atoi(argv[3]);
+        if (argc == 4)
+            port = atoi(argv[3]);
         QHostAddress addr;
 
-        for (int i=0; i < info.addresses().size(); i++)
+        for (int i = 0; i < info.addresses().size(); i++)
         {
             if (info.addresses()[i].protocol() == QAbstractSocket::IPv4Protocol)
             {
                 addr = info.addresses()[i];
-                cout << "found: " << info.addresses()[i].toString().toUtf8().data() << endl;
+                cout << "found: "
+                     << info.addresses()[i].toString().toUtf8().data() << endl;
                 break;
             }
         }
 
-        cout << "Connecting to " 
-             << argv[1]
-             << " at "
-             << addr.toString().toUtf8().data()
-             << ":" << port
-             << endl;
+        cout << "Connecting to " << argv[1] << " at "
+             << addr.toString().toUtf8().data() << ":" << port << endl;
 
         dialog.client()->connectTo(argv[1], addr, port);
     }
-    else 
+    else
     {
         cerr << "usage: rvshell <name> <host> [port]" << endl;
-        exit (1);
+        exit(1);
     }
 
     dialog.show();

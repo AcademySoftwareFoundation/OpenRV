@@ -4,63 +4,67 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/Symbol.h>
 #include <Mu/Value.h>
 
-namespace Mu {
-class Type;
-
-namespace Archive {
-class Reader;
-class Writer;
-}
-
-class SymbolicConstant : public Symbol
+namespace Mu
 {
-  public:
-    SymbolicConstant(Context* context, const char *name, const Type *, const Value &);
-    SymbolicConstant(Context* context, const char *name, const char *type, const Value &);
-   ~SymbolicConstant();
+    class Type;
 
-    //
-    //	Symbol API
-    //
-    
-    virtual const Type* nodeReturnType(const Node*) const;
-    virtual void outputNode(std::ostream&,const Node*) const;
+    namespace Archive
+    {
+        class Reader;
+        class Writer;
+    } // namespace Archive
 
-    //
-    //	Output the symbol
-    //
+    class SymbolicConstant : public Symbol
+    {
+    public:
+        SymbolicConstant(Context* context, const char* name, const Type*,
+                         const Value&);
+        SymbolicConstant(Context* context, const char* name, const char* type,
+                         const Value&);
+        ~SymbolicConstant();
 
-    virtual void output(std::ostream&) const;
+        //
+        //	Symbol API
+        //
 
-    //
-    //	SymbolicConstant API
-    //
+        virtual const Type* nodeReturnType(const Node*) const;
+        virtual void outputNode(std::ostream&, const Node*) const;
 
-    const Type*	type() const;
+        //
+        //	Output the symbol
+        //
 
-    //
-    //	Value
-    //
+        virtual void output(std::ostream&) const;
 
-    Value value() const { return _value; }
-    void setValue(Value v) { _value = v; }
+        //
+        //	SymbolicConstant API
+        //
 
-  protected:
-    virtual bool resolveSymbols() const;
+        const Type* type() const;
 
-  private:
-    mutable SymbolRef	_type;
-    Value		_value;
+        //
+        //	Value
+        //
 
-    friend class Archive::Reader;
-    friend class Archive::Writer;
-};
+        Value value() const { return _value; }
 
+        void setValue(Value v) { _value = v; }
+
+    protected:
+        virtual bool resolveSymbols() const;
+
+    private:
+        mutable SymbolRef _type;
+        Value _value;
+
+        friend class Archive::Reader;
+        friend class Archive::Writer;
+    };
 
 } // namespace Mu
 
