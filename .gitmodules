@@ -3,5 +3,4 @@
 	url = https://github.com/shotgunsoftware/openrv-WFObj.git
 [submodule "src/pub"]
 	path = src/pub
-	url = https://github.com/cedrik-fuoco-adsk/openrv-pub.git
-	branch = qt6
+	url = https://github.com/shotgunsoftware/openrv-pub.git

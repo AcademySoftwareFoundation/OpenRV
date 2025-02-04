@@ -11,7 +11,7 @@
 #include <Mu/Function.h>
 #include <MuLang/MuLangContext.h>
 
-#if defined( RV_VFX_CY2023 )
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/qtModule.h>
 #else
 #include <MuQt6/qtModule.h>

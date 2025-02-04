@@ -640,8 +640,9 @@ int utf8Main(int argc, char** argv)
     TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION,
                                 REVISION_NUMBER);
 #else
-    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
-    (void) bundle.top();
+    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION,
+                            REVISION_NUMBER);
+    (void)bundle.top();
 #endif
 
     int showVersion = 0;
@@ -737,7 +738,7 @@ int utf8Main(int argc, char** argv)
         TwkApp::initMu(nullptr);
         TwkApp::initPython();
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         cerr << "ERROR: during initialization: " << e.what() << '\n';
         exit(-1);

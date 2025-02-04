@@ -42,30 +42,29 @@ namespace IPCore
             Symbol::Type type;
         };
 
-        const std::array<SymbolTypeAssociation, 23> symbolTypeAssociations = {
-            {{"float", Symbol::FloatType},
-             {"vec2", Symbol::Vec2fType},
-             {"vec3", Symbol::Vec3fType},
-             {"vec4", Symbol::Vec4fType},
-             {"int", Symbol::IntType},
-             {"ivec2", Symbol::Vec2iType},
-             {"ivec3", Symbol::Vec3iType},
-             {"ivec4", Symbol::Vec4iType},
-             {"bool", Symbol::IntType},
-             {"bvec2", Symbol::Vec2bType},
-             {"bvec3", Symbol::Vec3bType},
-             {"bvec4", Symbol::Vec4bType},
-             {"mat4", Symbol::Matrix4fType},
-             {"mat3", Symbol::Matrix3fType},
-             {"mat2", Symbol::Matrix2fType},
-             {"sampler1D", Symbol::Sampler1DType},
-             {"sampler2D", Symbol::Sampler2DType},
-             {"sampler2DRect", Symbol::Sampler2DRectType},
-             {"sampler3D", Symbol::Sampler3DType},
-             {"inputImage", Symbol::InputImageType},
-             {"outputImage", Symbol::OutputImageType},
-             {"fragmentPosition", Symbol::FragmentPositionType},
-             {nullptr, Symbol::VoidType}}};
+        const SymbolTypeAssociation symbolTypeAssociations[] = {
+            {"float", Symbol::FloatType},
+            {"vec2", Symbol::Vec2fType},
+            {"vec3", Symbol::Vec3fType},
+            {"vec4", Symbol::Vec4fType},
+            {"int", Symbol::IntType},
+            {"ivec2", Symbol::Vec2iType},
+            {"ivec3", Symbol::Vec3iType},
+            {"ivec4", Symbol::Vec4iType},
+            {"bool", Symbol::IntType},
+            {"bvec2", Symbol::Vec2bType},
+            {"bvec3", Symbol::Vec3bType},
+            {"bvec4", Symbol::Vec4bType},
+            {"mat4", Symbol::Matrix4fType},
+            {"mat3", Symbol::Matrix3fType},
+            {"mat2", Symbol::Matrix2fType},
+            {"sampler1D", Symbol::Sampler1DType},
+            {"sampler2D", Symbol::Sampler2DType},
+            {"sampler2DRect", Symbol::Sampler2DRectType},
+            {"sampler3D", Symbol::Sampler3DType},
+            {"inputImage", Symbol::InputImageType},
+            {"outputImage", Symbol::OutputImageType},
+            {0, Symbol::VoidType}};
 
         namespace
         {
@@ -162,9 +161,11 @@ namespace IPCore
             , m_type(type)
             , m_parameters(params)
             , m_globals(globals)
-            , m_state(nullptr)
+            , m_state(0)
             , m_doc(doc)
             , m_hash(0)
+            , m_usesOutputSize(false)
+            , m_usesOutputST(false)
             , m_inline(type == Filter || type == MorphologicalFilter)
         {
             initGLSLVersion();
@@ -184,9 +185,11 @@ namespace IPCore
                            size_t numFetchesApprox, const string& doc)
             : m_name(name)
             , m_type(type)
-            , m_state(nullptr)
+            , m_state(0)
             , m_doc(doc)
             , m_hash(0)
+            , m_usesOutputSize(false)
+            , m_usesOutputST(false)
             , m_inline(type == Filter || type == MorphologicalFilter)
         {
             initGLSLVersion();
@@ -508,8 +511,7 @@ namespace IPCore
 
                     pp.special = (name == "time" && ptype == "float")
                                  || (name == "_offset" && ptype == "vec2")
-                                 || ptype == "outputImage"
-                                 || ptype == "fragmentPosition";
+                                 || ptype == "outputImage";
                     pp.name = name;
                     pp.type = ptype;
                     pp.requiresInline = false;
@@ -549,10 +551,11 @@ namespace IPCore
                         regex usesSTRE("\\b" + name
                                        + "\\s*\\.\\s*([stpq]{1,4}|[xyzw]{1,4}|["
                                          "rgba]{1,4})\\b");
-                        regex usesSamplingRE("\\b" + name + R"(\s*\(\s*[^\)])");
-                        regex usesLookupRE("\\b" + name + R"(\s*\(\s*\))");
+                        regex usesSamplingRE("\\b" + name
+                                             + "\\s*\\(\\s*[^\\)]");
+                        regex usesLookupRE("\\b" + name + "\\s*\\(\\s*\\)");
                         regex usesSizeRE("\\b" + name
-                                         + R"(\s*\.\s*size\s*\(\s*\))");
+                                         + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
 
                         pp.usesST = regex_search(m_sourceCode, sm, usesSTRE);
                         pp.usesSampling =
@@ -565,15 +568,11 @@ namespace IPCore
                             pp.usesSampling || pp.usesST || pp.usesSize;
 
                         if (pp.usesSampling)
-                        {
                             usesSampling = true;
-                        }
                     }
 
                     if (pp.requiresInline)
-                    {
                         m_inline = true;
-                    }
 
                     parsedParameters.push_back(pp);
                 }
@@ -734,76 +733,8 @@ namespace IPCore
                             re = regex(",\\s*const\\s+in\\s+outputImage\\s+"
                                        + p.name + "\\b");
                         }
+
                         m_sourceCode = regex_replace(m_sourceCode, re, "");
-                    }
-
-                    else if (p.type == "fragmentPosition")
-                    {
-                        if (!p.q_in || !p.q_const)
-                        {
-                            //  Do not allow fragmentPosition type to be an out
-                            //  or non-constant. Force it to be and then notify
-                            //  user (shader writer)
-                            //
-                            //  NOTE: It's ok to throw here. Throwing here will
-                            //  unwind past the Function constructor and back
-                            //  to whoever tried to make then function. This
-                            //  is expected behavior.
-
-                            throw std::runtime_error(
-                                "inputImage argument '" + p.name
-                                + "' must have qualifier 'const in'");
-                        }
-
-                        //  NOTE: "fragmentPosition" is a special type that
-                        //  shader writers need to be aware of. Remove
-                        //  "fragmentPosition foo" from parameter list because
-                        //  we don't need it. replace foo.size with _windowSize,
-                        //  foo.ABC (where ABC is any legal swizzle op for a
-                        //  vec3) with _fragPosition.
-
-                        boost::smatch stringMatch;
-                        boost::regex regexFunction(
-                            "\\b(" + p.name
-                            + ")\\s*\\.\\s*([stp]{1,3}|[xyz]{1,3}|[rgb]{"
-                              "1,3})\\b");
-
-                        //  Look for occurence of foo.size or swizzle and
-                        //  replace with corresponding symbols.
-
-                        if (boost::regex_search(m_sourceCode, stringMatch,
-                                                regexFunction))
-                        {
-                            m_usesFragmentPosition = true;
-
-                            //  Swap in whatever swizzle the user might have
-                            //  done on the outputImage coords when
-                            //  substituting in fragCoord.
-
-                            m_sourceCode = boost::regex_replace(
-                                m_sourceCode, regexFunction,
-                                "_fragPosition.\\2");
-                            m_inline = true;
-                        }
-
-                        //  remove this parameter
-
-                        boost::regex regex;
-
-                        if (i == 0)
-                        {
-                            regex = boost::regex(
-                                R"(\s*const\s+in\s+fragmentPosition\s+)"
-                                + p.name + "\\s*,");
-                        }
-                        else
-                        {
-                            regex = boost::regex(
-                                R"(,\s*const\s+in\s+fragmentPosition\s+)"
-                                + p.name + "\\b");
-                        }
-
-                        m_sourceCode = regex_replace(m_sourceCode, regex, "");
                     }
                     else
                     {
@@ -835,38 +766,30 @@ namespace IPCore
                         Symbol::Type stype = Symbol::VoidType;
                         unsigned int qualifier = Symbol::Uniform;
 
-                        for (const auto& association : symbolTypeAssociations)
+                        for (const SymbolTypeAssociation* a =
+                                 symbolTypeAssociations;
+                             a->glslName; a++)
                         {
-                            if (p.type == association.glslName)
+                            if (p.type == a->glslName)
                             {
-                                stype = association.type;
+                                stype = a->type;
 
                                 if (p.q_out && p.q_in)
-                                {
                                     qualifier = Symbol::ParameterInOut;
-                                }
                                 else if (p.q_in && p.q_const)
-                                {
                                     qualifier = Symbol::ParameterConstIn;
-                                }
                                 else if (p.q_in && !p.q_const)
-                                {
                                     qualifier = Symbol::ParameterIn;
-                                }
                                 else if (p.q_out)
-                                {
                                     qualifier = Symbol::ParameterOut;
-                                }
 
                                 if (p.special)
-                                {
                                     qualifier |= Symbol::Special;
-                                }
 
-                                auto symbol = std::make_unique<Symbol>(
-                                    static_cast<Symbol::Qualifier>(qualifier),
-                                    p.name, stype);
-                                m_parameters.push_back(symbol.release());
+                                Symbol* s =
+                                    new Symbol((Symbol::Qualifier)qualifier,
+                                               p.name, stype);
+                                m_parameters.push_back(s);
                                 break; // in case of typo in
                                        // symbolTypeAssociations
                             }
@@ -907,769 +830,6 @@ namespace IPCore
             m_sourceCode = prelude.str() + m_sourceCode;
         }
 #endif
-    }
-    else
-    {
-        TWK_THROW_EXC_STREAM("expected to find function definition for \'" 
-                             << name() 
-                             << "\' but did not");
-    }
-}
-
-void
-Function::replaceTextureCalls()
-{
-    //
-    //  If the GLSL version is too low, we need to infer the texture*()
-    //  functions from any sampler arguments. The reason its ok to
-    //  look for patterns like this is that GLSL puts significant
-    //  restrictions on how samplers can be used. The important ones
-    //  for us are:
-    //
-    //      * samplers can be uniforms initialized by gl calls 
-    //      * samplers can be parameters to functions
-    //      * samplers cannot be lvalues
-    //
-    //  That means a texture() call *must* have its first argument be
-    //  one of the parameters to the function (or its an error). So we
-    //  just look for those cases and using the information about the
-    //  parameters we can figure out which of the deprecated texture
-    //  calls needs to be used
-    //
-    //  Doing this avoids the situation where a compatability profile
-    //  doesn't exist (apple) or the old calls cause an error for some
-    //  reason (why?)
-    //
-    //  On the other hand if the user decided to "help" us by using the old
-    //  style texture*() calls and the GLSL version is too *new* we swap in
-    //  the new style for the old.
-    //
-
-    bool useDeprecated = glslMajor <= 1 && glslMinor <= 30;
-    
-    for (size_t i = 0; i < m_parameters.size(); i++)
-    {
-        const Symbol* sym = m_parameters[i];
-        const char* func = 0;
-            
-        switch (sym->type())
-        {
-          case Symbol::Sampler1DType:     func = "texture1D";     break;
-          case Symbol::Sampler2DType:     func = "texture2D";     break;
-          case Symbol::Sampler2DRectType: func = "texture2DRect"; break;
-          case Symbol::Sampler3DType:     func = "texture3D";     break;
-          default: continue;
-        }
-
-        ostringstream reStr;
-        ostringstream replaceStr;
-
-        if (useDeprecated)
-        {
-            reStr << "\\btexture\\s*\\(\\s*" << sym->name() << "\\b";
-            replaceStr << func << "(" << sym->name();
-        }
-        else
-        {
-            //
-            //  Make sure they didn't help us by supporting pre-130 when
-            //  we're using a GLSL newer than that.
-            //
-
-            reStr << "\\b" << func << "\\s*\\(\\s*" << sym->name() << "\\b";
-            replaceStr << "texture(" << sym->name();
-        }
-        
-        m_sourceCode = regex_replace(m_sourceCode, regex(reStr.str()), replaceStr.str());
-    }
-}
-
-namespace {
-    // param: pass the GL_VERSION, not GLSL -- ex: glGetString(GL_VERSION)
-    const char* const get_glsl_header(const char* const glVersion)
-    {
-        if(nullptr == glVersion)
-        {
-            std::cerr << "get_glsl_header error: glVersion is null." << std::endl;
-            return global_glsl;
-        }
-
-        const char* glsl_header = global_glsl;
-        if(Shader::Function::isGLSLVersionLessThan150())
-        {
-            glsl_header = global_glsl_lt_150;
-        }
-        else
-        {
-            glsl_header = glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
-        }
-
-        return glsl_header;
-    }
-void
-compileGLSL(const string& source, GLuint& shaderID, int& status, vector<char>& log)
-{
-    shaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-    const char* glVersion = (const char*)glGetString(GL_VERSION);
-    int logsize;
-
-    const char* src[2];
-    src[0] = get_glsl_header(glVersion);
-    src[1] = source.c_str();
-
-    glShaderSource(shaderID, 2, src, 0);
-    glCompileShader(shaderID);
-    glGetShaderiv(shaderID, GL_COMPILE_STATUS, &status);
-    glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logsize);
-
-    if (logsize > 1)
-    {
-	log.resize(logsize + 1);
-	GLsizei rlen;
-	glGetShaderInfoLog(shaderID, logsize, &rlen, &log.front());
-    }
-    else log.resize(0);
-}
-
-} // namespace
-
-bool
-Function::compile() const
-{
-    //
-    //  Inline shaders are not compiled. The source code is used to
-    //  generate a compiled function later.
-    //
-
-    if (isInline()) return true;
-    if (m_state) return true;
-
-    m_state = new FunctionGLState();
-
-    vector<char> buffer;
-    int status;
-    if (Shader::debuggingType() != Shader::NoDebugInfo)
-    {
-        cout << "INFO: compiling GLSL shader " << name() << " " << m_doc << endl;
-    }
-    
-    compileGLSL(m_sourceCode, m_state->shader, status, buffer);
-    const char* glVersion = (const char*)glGetString(GL_VERSION);
-    const std::string glsl_header(get_glsl_header(glVersion));
-
-    if (status != GL_TRUE)
-    {
-        cout << "ERROR: compiling shader " << m_name << ": "  << endl
-             << &buffer.front()
-             << endl;
-    
-        cout << "ERROR: ----- source follows ----" << endl;
-        outputAnnotatedCode(cout, glsl_header + m_sourceCode);
-        releaseCompiledState();
-    }
-    else if (Shader::debuggingType() != Shader::NoDebugInfo)
-    {
-        cout << "INFO: ---- " << name() << " source follows ----" << endl;
-        outputAnnotatedCode(cout, glsl_header + m_sourceCode);
-    }
-
-    return status == GL_TRUE;
-}
-
-Function::ValidationResult
-Function::validate() const
-{
-    GLuint shader;
-    int status;
-    vector<char> log;
-    const char* glVersion = (const char*)glGetString(GL_VERSION);
-
-    string testGLSL = generateTestGLSL(glVersion[0] <= '2');
-
-    if (Shader::debuggingType() != Shader::NoDebugInfo)
-    {
-        cout << "INFO: validation shader" << endl;
-        outputAnnotatedCode(cout, testGLSL);
-    }
-
-    compileGLSL(testGLSL, shader, status, log);
-    if (log.empty()) log.push_back(0);
-    string logString = &log.front();
-    glDeleteShader(shader);
-
-    return ValidationResult(status == GL_TRUE, logString);
-}
-
-
-string
-Function::prototype(const string& suffix) const
-{
-    ostringstream code;
-    const SymbolVector& symbols = parameters();
-
-    code << glslNameOfSymbolType(returnType()) 
-         << " " << callName() << suffix
-         << "(";
-
-    bool first = true;
-
-    for (size_t q = 0; q < symbols.size(); q++)
-    {
-        if (symbols[q]->type() == Symbol::InputImageType
-            || symbols[q]->type() == Symbol::OutputImageType) continue;
-        if (!first) code << ", ";
-        first = false;
-        code << symbols[q]->glslQualifierName() << " " << symbols[q]->glslTypeName();
-    }
-    
-    code << ")";
-    return code.str();
-}
-
-string 
-Function::rewrite(const string& suffix,
-                  const StringVector& argNames,
-                  const StringVector& graphIDs) const
-{
-    //
-    //  This code is called in the case of Inline functions. Its called
-    //  during the compilation of the final shader because the replacement
-    //  expressions are not know until that time. 
-    //
-    //  The result is inlined into the main program with a unique call for
-    //  each instance.
-    //
-    //  The function's name has suffix appended to it to make it
-    //  unique.
-    //
-    //  Function calls in the text which match the inputImage
-    //  names declared in the function prototype are replaced.
-    //
-
-    assert(argNames.size() == m_inImageParameters.size());
-    
-    regex nameRE("\\b" + callName() + "\\b");
-    string a = regex_replace(source(), nameRE, callName() + suffix);
-
-    const char* glVersion = (const char*)glGetString(GL_VERSION);
-    bool gl2 = glVersion[0] <= '2';
-
-    //
-    //  Replace: inName.st with COORDNAME.st
-    //  Replace: inName.size() with SIZENAME
-    //
-
-    if (argNames.size() == graphIDs.size())
-    {
-        for (size_t i = 0; i < argNames.size(); i++)
-        {
-            try
-            {
-                const ImageParameterInfo& pinfo = m_inImageParameters[i];
-                const string& inName = pinfo.name;
-
-                //
-                //  The ST coordinates are always passed in
-                //  currently. In the future we could pass in a
-                //  uniform matrix and only a single set of STs for
-                //  all images.
-                //
-
-                if (pinfo.usesST)
-                {
-                    ostringstream replaceExpr;
-                    replaceExpr << "TexCoord" << graphIDs[i] << ".\\1";
-
-                    regex re("\\b" + inName + "\\s*\\.\\s*([stpq]{1,4}|[xyzw]{1,4}|[rgba]{1,4})\\b");
-                    a = regex_replace(a, re, replaceExpr.str());
-                }
-
-                //
-                //  The size is passed in directly because there may
-                //  be no corresponding sampler. As a future
-                //  optimization we could find an existing associated
-                //  sampler and use that to determine the size, but
-                //  for the time being just use this one consistant
-                //  method. this is also compatible with GL2
-                //
-
-                if (pinfo.usesSize)
-                {
-                    ostringstream replaceExpr;
-                    replaceExpr << "Size" << graphIDs[i];
-
-                    regex re2("\\b" + inName + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
-                    a = regex_replace(a, re2, replaceExpr.str());
-                }
-            }
-            catch (std::exception& exc)
-            {
-                cout << "CAUGHT: " << exc.what() << endl;
-            }
-        }
-    }
-
-    //
-    //  Replace: inName(...) with ARGNAME(...) or in the case of
-    //  inlined color functions _x_xinName() with ARGNAME()
-    //
-
-    for (size_t i = 0; i < argNames.size(); i++)
-    {
-        const ImageParameterInfo& info = m_inImageParameters[i];
-        const string& inName = info.name;
-
-        if (info.usesSampling)
-        {
-            //
-            //  find anything call inName() and call it _r_inName() so
-            //  they aren't found by the next regex
-            //
-
-            regex re0("\\b" + inName + "\\s*\\(\\s*\\)");
-            a = regex_replace(a, re0, "_r_" + inName + "()");
-
-            //
-            //  Find anything called inName(... and replace it with
-            //  inName(_offset + ... 
-            //
-            //  Don't attempt to find the close paren. A GLSL
-            //  expression using a close paren might be inside the
-            //  "call" syntax. Since that expression must be of type
-            //  vec2 we can use '+' without worrying about operator
-            //  precedence. in GLSL '+' has precedence just below that
-            //  of the parens.
-            //
-
-            regex re("\\b" + inName + "\\s*\\(");
-            a = regex_replace(a, re, argNames[i] + "(_offset + ");
-
-            //
-            //  Finally replace the _r_InName() calls we protected
-            //  above with inName(offset)
-            //
-
-            regex re2("\\b_r_" + inName + "\\s*\\(\\s*\\)");
-            a = regex_replace(a, re2, argNames[i] + "(_offset)");
-        }
-        else
-        {
-            //
-            //  Anything which was marked as a vec4 color param was
-            //  prefixed by _x_x. Replace those too
-            //
-
-            regex re3("\\b_x_x" + inName + "\\b");
-            a = regex_replace(a, re3, inName);
-        }
-    }
-
-    return a;
-}
-
-bool 
-Function::isColor() const
-{
-    return type() == Color || type() == LinearColor;
-}
-
-bool 
-Function::isFilter() const
-{
-    return type() >= Filter;
-}
-
-bool 
-Function::isSource() const
-{
-    return type() == Source;
-}
-
-string
-Function::removeComments(const string& source)
-{
-    //
-    //  The comments are removed at an early stage in shader
-    //  parsing/editing in order to prevent any unexpected
-    //  behavior. This class can currently only "parse" the shader
-    //  using a bunch of cobbled together regexps which is not
-    //  ideal. removing the comments is just insurance against
-    //  spurious regexp matching and/or text rewriting.
-    //
-    //  Comment removal keeps line and char column numbering in
-    //  tact. Currently that means that C++ comments retain the
-    //  newline (since all the rest is comment) and C comments are
-    //  overwritten by spaces (in case the comment is in the middle of
-    //  a line of code).
-    //
-    //  This is done in order to keep error messages with line/column
-    //  numbers generated on the comment-free code corresponding to
-    //  line/column numbers in the original code.
-    //  
-    //  Improvements:
-    //
-    //    * Only doing the C comment space overwriting if the comment is
-    //      really in the middle of a line of code. If the comment has no
-    //      actual code after it there's no reason to keep it.
-    //
-    //    * Use the #line directive where possible. This might reduce the
-    //      total output from this function.
-    //
-    //  NOTE: here's the portion of the spec regarding #line. In not real
-    //  clear on what source-string-number is refering to:
-    //
-    //      line must have, after macro substitution, one of the following
-    //      two forms:
-    //
-    //          #line line
-    //          #line line source-string-number
-    //
-    //      where line and source-string-number are constant integer
-    //      expressions. After processing this directive (including its
-    //      new-line), the implementation will behave as if it is compiling
-    //      at line number line+1 and source string number
-    //      source-string-number. Subsequent source strings will be
-    //      numbered sequentially, until another #line directive overrides
-    //      that numbering.
-    //
-    //  I assume that source-string-number means column number or
-    //  "character since newline or beginning of file" and not "character
-    //  since beginning of file"
-    //
-
-    bool   c_comment   = false;
-    bool   cpp_comment = false;
-    size_t outindex    = 0;
-
-    vector<char> outbuffer(source.size() + 1); // max size needed
-
-    for (size_t i = 0, s = source.size(); i < s; i++)
-    {
-        const char c = source[i];
-        const char p = i ? source[i-1] : 0;
-        
-        if (c_comment)
-	//
-	//  Inside C comment.
-	//
-	{
-	    if (p && p == '*' && c == '/')
-	    {
-		c_comment = false; 
-	    }
-            outbuffer[outindex++] = (c == '\n') ? '\n' : ' ';
-        }
-        else if (cpp_comment)
-	//
-	//  Inside C++ comment.
-	//
-	{
-	    if (c == '\n')
-	    {
-		cpp_comment = false;
-	    }
-            outbuffer[outindex++] = (c == '\n') ? '\n' : ' ';
-        }
-	else if (p && p == '/' && c == '*') 
-	//
-	//  Beginning of C comment.
-	//
-	{
-	    c_comment = true; 
-	    outindex--;
-	    outbuffer[outindex++] = ' ';
-	    outbuffer[outindex++] = ' ';
-        }
-        else if (p && p == '/' && c == '/') 
-	//
-	//  Begining of C++ comment.
-	//
-	{ 
-	    cpp_comment = true; 
-	    outindex--;
-	    outbuffer[outindex++] = ' ';
-	    outbuffer[outindex++] = ' ';
-	}
-	else
-	//
-	//  Add to output buffer.
-        {
-            outbuffer[outindex++] = c;
-        }
-    }
-
-    outbuffer[outindex++] = 0; // terminate c-string
-
-    return string(&outbuffer.front());
-}
-
-void
-Function::hashAuxNames()
-{
-    //
-    //  Make a smaller string without anything inside { and } and runs
-    //  of whitespace reduced to a single ' '. Presumably the string
-    //  has already had comments stripped.
-    //
-    //  GLSL is fairly simple so this should result in a bunch of line
-    //  line strings which are either declarations (of const vars,
-    //  layouts, or external functions) or a function definition. The
-    //  function definition and any struct definitions are relaced by
-    //  "{}" making them simpler to deal with.
-    //
-
-    vector<char> outbuffer;
-    StringVector lines;
-    size_t count = 0;
-    size_t whitespace = 0;
-
-    for (size_t i = 0, s = m_sourceCode.size(); i < s; i++)
-    {
-        const char c = m_sourceCode[i];
-        
-        if (c == '{') 
-        { 
-            count++;
-            whitespace = 0; 
-        }
-        else if (c == '}') 
-        { 
-            count--;
-            whitespace = 0; 
-
-            if (count == 0)
-            {
-                outbuffer.push_back('{');
-                outbuffer.push_back('}');
-                outbuffer.push_back(0);
-                lines.push_back(&outbuffer.front());
-                outbuffer.clear();
-            } 
-        }
-        else if (c == ' ' || c == '\n' || c == '\r' || c == '\t')
-        {
-            if (!whitespace && outbuffer.size()) outbuffer.push_back(' ');
-            whitespace++;
-        }
-        else if (!count) 
-        {
-            whitespace = 0;
-            outbuffer.push_back(c);
-
-            if (c == ';') 
-            {
-                outbuffer.push_back(0);
-                lines.push_back(&outbuffer.front());
-                outbuffer.clear();
-            }
-        }
-    }
-
-    if (outbuffer.size())
-    {
-        outbuffer.push_back(0);
-        lines.push_back(&outbuffer.front());
-    }
-
-    //
-    //  Now we have a bunch of lines each of which is either a declaration
-    //  or a function definition.
-    //
-
-    static regex funcDefRE(" ?\\w+ (\\w+) ?\\([^\\{]+\\{\\}$");
-    static regex varRE("const .*?(\\w+) ?=");
-    static regex varArrayRE("const .*?(\\w+)\\[\\w+] ?= ?\\w+\\[\\w+].*$");
-    static regex uniformSamplerRE("uniform sampler\\wD (\\w+).*$");
-
-    for (size_t i = 0; i < lines.size(); i++)
-    {
-        const string& line = lines[i];
-        smatch sm;
-
-        if (regex_search(line, sm, funcDefRE) ||
-            regex_search(line, sm, varRE) ||
-            regex_search(line, sm, varArrayRE) ||
-            regex_search(line, sm, uniformSamplerRE) )
-        {
-            if (sm[1] != m_name)
-            {
-                const string& s = sm[1];
-                m_auxNames.push_back(s);
-
-                regex re("\\b" + s + "\\b");
-                m_sourceCode = regex_replace(m_sourceCode, re, s + m_hashString);
-            }
-        }
-    }
-}
-
-const Function::ImageParameterInfo*
-Function::imageParameterInfo(size_t index) const
-{
-    const string& name = m_parameters[index]->name();
-
-    for (size_t i = 0; i < m_inImageParameters.size(); i++)
-    {
-        if (m_inImageParameters[i].name == name) 
-        {
-            return &m_inImageParameters[i];
-        }
-    }
-
-    return 0;
-}
-
-bool 
-Function::isInputImageParameter(const std::string& name) const
-{
-    for (size_t i = 0; i < m_inImageParameters.size(); i++)
-    {
-        if (m_inImageParameters[i].name == name) return true;
-    }
-
-    return false;
-}
-
-bool
-Function::equivalentInterface(const Function* other)
-{
-    if (m_type              != other->m_type ||
-        m_parameters.size() != other->m_parameters.size())
-    {
-        return false;
-    }
-
-    for (int i = 0; i < m_parameters.size(); ++i)
-    {
-        const Symbol* a = m_parameters[i];
-        const Symbol* b = other->m_parameters[i];
-        if (! (*a == *b)) return false;
-    }
-
-    return true;
-}
-
-string
-Function::generateTestGLSL(bool gl2) const
-{
-    //
-    //  Create a semantically equivalent GLSL shader from the original
-    //  GLSL shader by swapping in stand-in function prototypes and/or
-    //  unform and varying variables. This shader can then be compiled
-    //  by the GLSL compiler to validate the original GLSL code.  This
-    //  is necessary because shaders will be rewritten and/or inlined
-    //  when actually used. Error reporting becomes difficult when the
-    //  shader is no longer in context.
-    //
-
-    string glsl = m_originalGLSL;
-    size_t lineCount = 0;
-    ostringstream str;
-
-    string inKeyword = gl2 ? "varying" : "in";
-
-    //
-    //  Swap in the call name (hashed name) in case its called "main"
-    //  which in GLSL is reserved for the program entry point
-    //
-
-    regex mainRE("\\b" + name() + "(\\s*\\([^)]*)\\)");
-    glsl = regex_replace(glsl, mainRE, callName() + "\\1)");
-
-    //
-    //  Rename various inputImage parameters so they can be
-    //  individually referenced later.
-    //
-    //  NAME()       _color_NAME
-    //  NAME(...)    _sampler_NAME(...)
-    //  NAME.st      _st_NAME
-    //  NAME.size()  _size_NAME
-    //
-    //  Later we'll convert those into either funciton prototypes
-    //  in the case of NAME(...) or varying/uniform prototypes for
-    //  the rest.
-    //
-
-    for (size_t i = 0; i < m_inImageParameters.size(); i++)
-    {
-        const ImageParameterInfo& info = m_inImageParameters[i];
-
-        if (info.usesLookup)
-        {
-            //
-            //  NAME() -> _color_NAME
-            //
-
-            regex colorRE("\\b(" + info.name + ")\\s*\\(\\s*\\)");
-            string replacePat = "_color_\\1";
-            glsl = regex_replace(glsl, colorRE, replacePat);
-
-            str << inKeyword << " vec4 " << "_color_" << info.name << ";" << endl;
-            lineCount++;
-        }
-
-        if (info.usesST)
-        {
-            //
-            //  NAME.st -> _st_NAME
-            //
-
-            regex stRE("\\b(" + info.name + ")\\s*\\.\\s*([stpq]{1,4}|[xyzw]{1,4}|[rgba]{1,4})\\b");
-            string replacePat = "_st_\\1.\\2";
-            glsl = regex_replace(glsl, stRE, replacePat);
-
-            str << inKeyword << " vec4 " << "_st_" << info.name << ";" << endl;
-            lineCount++;
-        }
-        
-        if (info.usesSize)
-        {
-            //
-            //  NAME.size() -> _size_NAME
-            //
-
-            regex sizeRE("\\b(" + info.name + ")\\s*\\.\\s*size\\s*\\(\\s*\\)");
-            string replacePat = "_size_\\1";
-            glsl = regex_replace(glsl, sizeRE, replacePat);
-
-            str << "uniform vec2 " << "_size_" << info.name << ";" << endl;
-            lineCount++;
-        }
-
-        if (info.usesSampling)
-        {
-            //
-            //  NAME(...) -> _sampler_NAME(...)
-            //
-
-            regex samplingRE("\\b(" + info.name + "\\s*\\(\\s*[^\\)])");
-            string replacePat = "_sampler_\\1";
-            glsl = regex_replace(glsl, samplingRE, replacePat);
-
-            str << "vec4 " << "_sampler_" << info.name << "(const in vec2);" << endl;
-            lineCount++;
-        }
-    }
-
-    const SymbolVector& params = parameters();
-
-    for (size_t i = 0; i < params.size(); i++)
-    {
-        if (params[i]->type() == Symbol::OutputImageType)
-        {
-            string name = params[i]->name();
-            
-            //
-            //  Change any outputImage parameters to blanks. Just in case
-            //  there's a newline in there someplace, put all the whitespace
-            //  back.
-            //
-
-            if (i > 0)
-            {
-                regex outRE = regex(",(\\s*)const(\\s+)in(\\s+)outputImage(\\s+)" + name + "\\b");
-                glsl = regex_replace(glsl, outRE, "\\1\\2\\3\\4");
             }
             else
             {
@@ -1892,23 +1052,16 @@ Function::generateTestGLSL(bool gl2) const
 
             bool first = true;
 
-            for (const auto* symbol : symbols)
+            for (size_t q = 0; q < symbols.size(); q++)
             {
-                // those symbols get passed from the vertex shader to the
-                // fragment shader using the "in"/"out" storage qualifiers, so
-                // we don't have to include them in the function's prototype.
-                if (symbol->type() == Symbol::InputImageType
-                    || symbol->type() == Symbol::OutputImageType
-                    || symbol->type() == Symbol::FragmentPositionType)
-                {
+                if (symbols[q]->type() == Symbol::InputImageType
+                    || symbols[q]->type() == Symbol::OutputImageType)
                     continue;
-                }
-
                 if (!first)
                     code << ", ";
                 first = false;
-                code << symbol->glslQualifierName() << " "
-                     << symbol->glslTypeName();
+                code << symbols[q]->glslQualifierName() << " "
+                     << symbols[q]->glslTypeName();
             }
 
             code << ")";
@@ -2483,21 +1636,6 @@ Function::generateTestGLSL(bool gl2) const
                         glsl = regex_replace(glsl, outSTRE, "_outST.\\1");
 
                         str << "uniform vec2 _outST;" << endl;
-                        lineCount++;
-                    }
-
-                    if (m_usesFragmentPosition)
-                    {
-                        //
-                        //  OUT.st -> _outFragPos.st
-                        //
-
-                        regex outSTRE("\\b" + name
-                                      + "\\s*\\.\\s*([stp]{1,3}|[xyz]{1,3}|["
-                                        "rgb]{1,3})\\b");
-                        glsl = regex_replace(glsl, outSTRE, "_outFragPos.\\1");
-
-                        str << "uniform vec2 _outFragPos;" << endl;
                         lineCount++;
                     }
 

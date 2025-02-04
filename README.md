@@ -30,7 +30,7 @@ following command:
 git submodule update --init --recursive
 ```
 
-### Configuring Git to use the ignore file with `git blame`
+## Configuring Git to use the ignore file with `git blame`
 
 A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`, such as formatting commits. This allows you to use `git blame` without these commits cluttering the Git history. To configure Git to use this file when running `git blame`, use the following command:
 

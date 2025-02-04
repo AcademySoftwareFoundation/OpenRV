@@ -93,7 +93,9 @@ typedef std::vector<DataElement> DataVector;
 
 class VisMainWindow;
 
-class GLView : public QOpenGLWidget, protected QOpenGLFunctions
+class GLView
+    : public QOpenGLWidget
+    , protected QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -126,7 +128,7 @@ public:
     void setComputedRefresh(float);
     void setComputedFPS(float);
 
-  protected:
+protected:
     void initializeGL() override;
     void paintGL() override;
     void resizeGL(int, int) override;

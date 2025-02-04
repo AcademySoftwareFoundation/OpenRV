@@ -15,20 +15,6 @@
 
 namespace Rv
 {
-  public:
-    QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWidget* view);
-    QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
-    virtual ~QTGLVideoDevice();
-    
-    void setWidget(QOpenGLWidget*);
-    QOpenGLWidget* widget() const { return m_view; }
-
-    virtual void makeCurrent() const;
-    const QTTranslator&  translator() const { return *m_translator; }
-    virtual void redraw() const;
-    virtual void redrawImmediately() const;
-
-    void setAbsolutePosition(int x, int y);
 
     //
     //  QTGLVideoDevice
@@ -42,28 +28,22 @@ namespace Rv
     {
     public:
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                        QGLWidget* view);
+                        QOpenGLWidget* view);
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
 
-        void setWidget(QGLWidget*);
+        void setWidget(QOpenGLWidget*);
 
-        QGLWidget* widget() const { return m_view; }
+        QOpenGLWidget* widget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
         const QTTranslator& translator() const { return *m_translator; }
 
-  protected:
-    QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
+        virtual void redraw() const;
+        virtual void redrawImmediately() const;
 
-  protected:
-    int             m_x;
-    int             m_y;
-    float           m_refresh;
-    QOpenGLWidget*  m_view;
-    QTTranslator*   m_translator;
-};
+        void setAbsolutePosition(int x, int y);
 
         //
         //  VideoDevice API
@@ -90,13 +70,13 @@ namespace Rv
         }
 
     protected:
-        QTGLVideoDevice(const std::string& name, QGLWidget* view);
+        QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
 
     protected:
         int m_x;
         int m_y;
         float m_refresh;
-        QGLWidget* m_view;
+        QOpenGLWidget* m_view;
         QTTranslator* m_translator;
     };
 

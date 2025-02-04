@@ -87,15 +87,17 @@ namespace TwkGLF
         TwkMath::Mat44f currentModelview() const;
         void currentViewport(float (&v)[4]) const;
 
-    //----------------------------------------------------------------------
-    // miscellaneous
-    void use() const;
-    unsigned int programId() const { return m_program->programId(); }
-    const GLProgram* glProgram() const { return m_program; }
+        //----------------------------------------------------------------------
+        //
+        // get GL uniforms
+        //
+        void uniformFloat(const char* name, GLfloat* data) const;
+        void uniformInt(const char* name, GLint* data) const;
+        void uniformMatrix(const char* name, GLfloat* data) const;
 
         //----------------------------------------------------------------------
         // miscellaneous
-        void use() const { glUseProgram(m_program->programId()); }
+        void use() const;
 
         unsigned int programId() const { return m_program->programId(); }
 

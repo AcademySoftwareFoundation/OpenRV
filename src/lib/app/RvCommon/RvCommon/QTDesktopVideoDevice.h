@@ -17,25 +17,6 @@
 
 namespace Rv
 {
-  public:
-    QTDesktopVideoDevice(TwkApp::VideoModule*,
-                         const std::string& name, 
-                         int screen,
-                         const QTGLVideoDevice* share);
-
-    virtual ~QTDesktopVideoDevice();
-
-    //  From QTGLVideoDevice
-
-    void setWidget(QOpenGLWidget*);
-    QOpenGLWidget* widget() const { return m_view; }
-
-    virtual void makeCurrent() const;
-    const QTTranslator&  translator() const { return *m_translator; }
-    virtual void redraw() const;
-    virtual void redrawImmediately() const;
-
-    void setAbsolutePosition(int x, int y) { m_x = x; m_y = y; }
 
     //
     //  QTDesktopVideoDevice
@@ -65,9 +46,9 @@ namespace Rv
 
         //  From QTGLVideoDevice
 
-        void setWidget(QGLWidget*);
+        void setWidget(QOpenGLWidget*);
 
-        QGLWidget* widget() const { return m_view; }
+        QOpenGLWidget* widget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
@@ -104,14 +85,14 @@ namespace Rv
 #ifdef PLATFORM_WINDOWS
         virtual ColorProfile colorProfile() const;
 #endif
-  private:
-    int                    m_screen;
-    int                    m_x;
-    int                    m_y;
-    QOpenGLWidget*         m_view;
-    QTTranslator*          m_translator;
-    mutable ColorProfile   m_colorProfile;
-};
+    private:
+        int m_screen;
+        int m_x;
+        int m_y;
+        QOpenGLWidget* m_view;
+        QTTranslator* m_translator;
+        mutable ColorProfile m_colorProfile;
+    };
 
 } // namespace Rv
 

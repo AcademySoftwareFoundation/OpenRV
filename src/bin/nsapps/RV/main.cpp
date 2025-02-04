@@ -525,8 +525,8 @@ int main(int argc, char* argv[])
     fmt.setMajorVersion(2);
     fmt.setMinorVersion(1);
 
-    //fmt.setProfile(QSurfaceFormat::CoreProfile);
-    //fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+    // fmt.setProfile(QSurfaceFormat::CoreProfile);
+    // fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
 
     QSurfaceFormat::setDefaultFormat(fmt);
 
