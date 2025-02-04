@@ -1,15 +1,12 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
-addSymbol( new Function(c, "toInt", toInt, None,
-                        Compiled, QVariant_toInt_int,
-                        Return, "int",
-                        Parameters,
-                        new Param(c, "this", "qt.QVariant"),
-                        End) );
+addSymbol(new Function(c, "toInt", toInt, None, Compiled, QVariant_toInt_int,
+                       Return, "int", Parameters,
+                       new Param(c, "this", "qt.QVariant"), End));
 
 /*
 addSymbol( new Function(c, "toObject", toQObject, None,
@@ -20,4 +17,4 @@ addSymbol( new Function(c, "toObject", toQObject, None,
                         End) );
 */
 
-    // MISSING: toInt (int; QVariant this, "bool *" ok)
+// MISSING: toInt (int; QVariant this, "bool *" ok)

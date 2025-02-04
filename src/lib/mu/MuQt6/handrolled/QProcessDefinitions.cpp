@@ -1,12 +1,11 @@
 //
-// Copyright (C) 2024  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
-bool qt_QProcess_startDetached_bool_string_stringBSB_ESB_(Mu::Thread& NODE_THREAD, 
-                                                          Pointer param_command,
-                                                          Pointer param_arguments)
+bool qt_QProcess_startDetached_bool_string_stringBSB_ESB_(
+    Mu::Thread& NODE_THREAD, Pointer param_command, Pointer param_arguments)
 {
     // Leave the default value for the 3rd and 4th arguments
     //    const QString &workingDirectory = QString()
@@ -19,7 +18,6 @@ bool qt_QProcess_startDetached_bool_string_stringBSB_ESB_(Mu::Thread& NODE_THREA
 
 static NODE_IMPLEMENTATION(_n_startDetached0, bool)
 {
-    NODE_RETURN(qt_QProcess_startDetached_bool_string_stringBSB_ESB_(NODE_THREAD, 
-                                                                     NODE_ARG(0, Pointer),
-                                                                     NODE_ARG(1, Pointer)));
+    NODE_RETURN(qt_QProcess_startDetached_bool_string_stringBSB_ESB_(
+        NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }

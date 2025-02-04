@@ -4,72 +4,87 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/config.h>
 #include <Mu/Object.h>
 #include <Mu/Value.h>
 #include <Mu/VariantType.h>
 #include <Mu/VariantTagType.h>
 
-namespace Mu {
-class Thread;
-
-class VariantInstance : public Object
+namespace Mu
 {
-  public:
-    //
-    //  A VariantInstance requires use of placement new to be created,
-    //  when the type is something dynamic (like a user defined class
-    //  or a tuple type, etc).
-    //
-    //  Use the allocate function
-    //
+    class Thread;
 
-    static VariantInstance* allocate(const VariantTagType* c);
-    static VariantInstance* allocate(Thread& thread, const char* c);
-    static void deallocate(VariantInstance* p);
+    class VariantInstance : public Object
+    {
+    public:
+        //
+        //  A VariantInstance requires use of placement new to be created,
+        //  when the type is something dynamic (like a user defined class
+        //  or a tuple type, etc).
+        //
+        //  Use the allocate function
+        //
 
-    Structure	    structure() { return (unsigned char*)this + sizeof(this); }
-    const Structure structure() const { return (unsigned char*)this + sizeof(this); }
-    const VariantTagType* tagType() const 
-        { return static_cast<const VariantTagType*>(type()); }
-    const VariantType* variantType() const 
-        { return tagType()->variantType(); }
+        static VariantInstance* allocate(const VariantTagType* c);
+        static VariantInstance* allocate(Thread& thread, const char* c);
+        static void deallocate(VariantInstance* p);
 
-    template <class T>
-    T* data() { return reinterpret_cast<T*>(structure()); }
+        Structure structure() { return (unsigned char*)this + sizeof(this); }
 
-    template <class T>
-    const T* data() const { return reinterpret_cast<const T*>(structure()); }
+        const Structure structure() const
+        {
+            return (unsigned char*)this + sizeof(this);
+        }
 
-    //
-    // This function uses the contents of the Structure plus the type
-    // to produce the hash code. This may not always be what you want,
-    // but it is a good default.
-    //
+        const VariantTagType* tagType() const
+        {
+            return static_cast<const VariantTagType*>(type());
+        }
 
-    unsigned long hash() const;
+        const VariantType* variantType() const
+        {
+            return tagType()->variantType();
+        }
 
-    //
-    //  Field access
-    //
+        template <class T> T* data()
+        {
+            return reinterpret_cast<T*>(structure());
+        }
 
-    const Type* fieldType(size_t i) const { return type()->fieldType(i); }
+        template <class T> const T* data() const
+        {
+            return reinterpret_cast<const T*>(structure());
+        }
 
-    ValuePointer field(size_t);
-    const ValuePointer field(size_t) const;
+        //
+        // This function uses the contents of the Structure plus the type
+        // to produce the hash code. This may not always be what you want,
+        // but it is a good default.
+        //
 
-  protected:
-    VariantInstance(const VariantTagType*);
-    VariantInstance(Thread&, const char*);
-    VariantInstance();
-    ~VariantInstance();
+        unsigned long hash() const;
 
-  private:
-    friend class VariantType;
-    friend class VariantTagType;
-};
+        //
+        //  Field access
+        //
+
+        const Type* fieldType(size_t i) const { return type()->fieldType(i); }
+
+        ValuePointer field(size_t);
+        const ValuePointer field(size_t) const;
+
+    protected:
+        VariantInstance(const VariantTagType*);
+        VariantInstance(Thread&, const char*);
+        VariantInstance();
+        ~VariantInstance();
+
+    private:
+        friend class VariantType;
+        friend class VariantTagType;
+    };
 
 } // namespace Mu
 

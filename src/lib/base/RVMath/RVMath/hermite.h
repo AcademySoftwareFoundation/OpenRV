@@ -1,7 +1,7 @@
 //
-// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-// 
-// SPDX-License-Identifier: Apache-2.0 
+// Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #ifndef __base__RVMath__HERMITE
@@ -25,6 +25,6 @@ namespace RVMath
         w[2] = d * s * powSInt;
         w[3] = -d * s2 * powS;
     }
-}
+} // namespace RVMath
 
 #endif
