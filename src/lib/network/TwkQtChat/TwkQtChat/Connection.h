@@ -104,7 +104,7 @@ namespace TwkQtChat
         QString m_expectedContactName;
         QHostAddress m_expectedAddress;
         QTimer m_pingTimer;
-        QTime m_pongTime;
+        QElapsedTimer m_pongTime;
         QByteArray m_buffer;
         ConnectionState m_state;
         DataType m_currentDataType;

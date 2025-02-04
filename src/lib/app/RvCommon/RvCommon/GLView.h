@@ -96,10 +96,7 @@ namespace Rv
         bool m_postFirstNonEmptyRender;
         bool m_stopProcessingEvents;
         void* m_syncThreadData;
-<<<<<<< HEAD
         QOpenGLContext* m_sharedContext;
-=======
->>>>>>> 9d6b1be (Format Open RV codebase (#656))
     };
 
 } // namespace Rv

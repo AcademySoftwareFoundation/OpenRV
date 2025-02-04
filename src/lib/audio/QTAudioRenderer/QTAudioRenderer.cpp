@@ -1407,12 +1407,8 @@ namespace IPCore
                     f.setSampleRate(rate);
                     if (device.isFormatSupported(f))
                     {
-                        f.setSampleRate(rates[i]);
-                        if (info.isFormatSupported(f))
-                        {
-                            formats.push_back(fmt);
-                            break;
-                        }
+                        formats.push_back(fmt);
+                        break;
                     }
                 }
             }
