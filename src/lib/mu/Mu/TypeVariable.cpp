@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <Mu/Class.h>
 #include <Mu/Context.h>
@@ -19,77 +19,64 @@
 #include <iostream>
 #include <string.h>
 
-namespace Mu {
-using namespace std;
-
-TypeVariable::TypeVariable(Context* context, const char *name) 
-    : Type(context, name, VoidRep::rep())
+namespace Mu
 {
-    _isTypeVariable = true;
-}
+    using namespace std;
 
-TypeVariable::~TypeVariable()
-{
-}
-
-Type::MatchResult
-TypeVariable::match(const Type* type, Bindings& bindings) const
-{
-    Bindings::iterator i = bindings.find(this);
-
-    if (i != bindings.end())
+    TypeVariable::TypeVariable(Context* context, const char* name)
+        : Type(context, name, VoidRep::rep())
     {
-        return (*i).second == type ? Match : Conflict;
+        _isTypeVariable = true;
     }
-    else
+
+    TypeVariable::~TypeVariable() {}
+
+    Type::MatchResult TypeVariable::match(const Type* type,
+                                          Bindings& bindings) const
     {
-        bindings[this] = type;
-        return Match;
+        Bindings::iterator i = bindings.find(this);
+
+        if (i != bindings.end())
+        {
+            return (*i).second == type ? Match : Conflict;
+        }
+        else
+        {
+            bindings[this] = type;
+            return Match;
+        }
     }
-}
 
-Object*
-TypeVariable::newObject() const 
-{ 
-    return 0; 
-}
+    Object* TypeVariable::newObject() const { return 0; }
 
-void 
-TypeVariable::outputValue(std::ostream& o, Value& value) const
-{
-    o << "\"" << name() << "\" is a type variable";
-}
-
-Value
-TypeVariable::nodeEval(const Node* n, Thread &t) const
-{
-    //
-    //  An exception *should* be thrown by whatever function is called
-    //  here.
-    //
-
-    (*n->func()._voidFunc)(*n, t);
-    return Value(); 
-}
-
-void
-TypeVariable::nodeEval(void*, const Node*,Thread &t) const
-{
-    return;
-}
-
-const Type*
-TypeVariable::nodeReturnType(const Node*) const
-{
-    if (globalModule())
+    void TypeVariable::outputValue(std::ostream& o, Value& value) const
     {
-        return globalModule()->context()->unresolvedType();
+        o << "\"" << name() << "\" is a type variable";
     }
-    else
-    {
-        return this;
-    }
-}
 
+    Value TypeVariable::nodeEval(const Node* n, Thread& t) const
+    {
+        //
+        //  An exception *should* be thrown by whatever function is called
+        //  here.
+        //
+
+        (*n->func()._voidFunc)(*n, t);
+        return Value();
+    }
+
+    void TypeVariable::nodeEval(void*, const Node*, Thread& t) const { return; }
+
+    const Type* TypeVariable::nodeReturnType(const Node*) const
+    {
+        if (globalModule())
+        {
+            return globalModule()->context()->unresolvedType();
+        }
+        else
+        {
+            return this;
+        }
+    }
 
 } // Namespace  Mu

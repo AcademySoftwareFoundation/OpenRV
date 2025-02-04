@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2006 Tweak Inc. 
+// Copyright (c) 2006 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 // #ifdef _MSC_VER
@@ -12,7 +12,7 @@
 // #include <opencv/cv.h>
 // #endif
 
-//#include <cv.h>
+// #include <cv.h>
 
 #include <TwkFBAux/FBAux.h>
 #include <TwkFB/Operations.h>
@@ -21,8 +21,9 @@
 #include <TwkUtil/Timer.h>
 #include <TwkFB/FrameBuffer.h>
 
-namespace TwkFBAux {
-using namespace std;
+namespace TwkFBAux
+{
+    using namespace std;
 #if 0
 struct OpenCVErrorHandler
 {
@@ -483,218 +484,241 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
 
 #endif
 
-//
-// used both for up and down scaling
-// assume scale is same vertical and horizontal
-//
-// evn if the src has scanline padding, the dst will NOT have padding.
-//
-template<typename T>
-void
-resizeLinear(const FrameBuffer* src, FrameBuffer* dst)
-{
-    float scalew = (float)src->width() / dst->width(); // < 1
-    float scaleh = (float)src->height() / dst->height(); // < 1
-    
-    size_t lineWidth = src->scanlinePaddedSize() / sizeof(T);
-    size_t dstLineWidth = dst->scanlinePaddedSize() / sizeof(T);
-    size_t dstSize = dstLineWidth * dst->height();
-    size_t numChannels = dst->numChannels();
-    size_t srcWidth = src->width();
-    size_t srcHeight = src->height();
-    size_t dstWidth = dst->width();
-    size_t dstHeight = dst->height();
-    
-    T* dstData = dst->pixels<T>();
-    const T* srcData = src->pixels<T>();
-    
-    for (size_t i = 0; i < dstHeight; ++i)
+    //
+    // used both for up and down scaling
+    // assume scale is same vertical and horizontal
+    //
+    // evn if the src has scanline padding, the dst will NOT have padding.
+    //
+    template <typename T>
+    void resizeLinear(const FrameBuffer* src, FrameBuffer* dst)
     {
-        for (size_t j = 0; j < dstWidth; ++j)
-        {
-            float yCenter = i * scaleh;
-            float xCenter = j * scalew;
-            size_t xStartInt = floor(xCenter);
-            size_t xEndInt = min(srcWidth - 1, xStartInt + 1);
-            size_t yStartInt = floor(yCenter);
-            size_t yEndInt = min(srcHeight - 1, yStartInt + 1);
-            
-            float xW = xCenter - xStartInt;
-            float yW = yCenter - yStartInt;
-            
-            const T* startDownLeft = srcData + yStartInt * lineWidth + xStartInt * numChannels;
-            const T* startUpLeft = srcData + yEndInt * lineWidth + xStartInt * numChannels;
-            const T* startDownRight = srcData + yStartInt * lineWidth + xEndInt * numChannels;
-            const T* startUpRight = srcData + yEndInt * lineWidth + xEndInt * numChannels;
-            T* dstLoc = dstData + i * dstLineWidth + j * numChannels;
-    
-            for (size_t n = 0; n < numChannels; ++n)
-            {
-                float down = startDownLeft[n] * (1 - xW) + startDownRight[n] * xW;
-                float up = startUpLeft[n] * (1 - xW) + startUpRight[n] * xW;
-                dstLoc[n] = down * (1 - yW) + up * yW;
-            }
-            
-        }
-    }
-    return;
+        float scalew = (float)src->width() / dst->width();   // < 1
+        float scaleh = (float)src->height() / dst->height(); // < 1
 
-}
-    
-template<typename T>
-void
-resizeArea(const FrameBuffer* src, FrameBuffer* dst)
-{
-        
-    float scalew = (float)src->width() / dst->width(); // > 1
-    float scaleh = (float)src->height() / dst->height(); // > 1
-    
-    size_t lineWidth = src->scanlinePaddedSize() / sizeof(T);
-    size_t dstLineWidth = dst->scanlinePaddedSize() / sizeof(T);
-    size_t dstSize = dstLineWidth * dst->height();
-    size_t numChannels = dst->numChannels();
-    size_t srcWidth = src->width();
-    size_t srcHeight = src->height();
-    size_t dstWidth = dst->width();
-    size_t dstHeight = dst->height();
-    
-    T* dstData = (T*)dst->pixels<T>();
-    const T* srcData = (T*)src->pixels<T>();
-    memset(dstData, 0, dstHeight * dst->scanlinePaddedSize());
-    vector<float> t(numChannels);
-    
-    for (size_t i = 0; i < dstHeight; ++i)
-    {
-        for (size_t j = 0; j < dstWidth; ++j)
+        size_t lineWidth = src->scanlinePaddedSize() / sizeof(T);
+        size_t dstLineWidth = dst->scanlinePaddedSize() / sizeof(T);
+        size_t dstSize = dstLineWidth * dst->height();
+        size_t numChannels = dst->numChannels();
+        size_t srcWidth = src->width();
+        size_t srcHeight = src->height();
+        size_t dstWidth = dst->width();
+        size_t dstHeight = dst->height();
+
+        T* dstData = dst->pixels<T>();
+        const T* srcData = src->pixels<T>();
+
+        for (size_t i = 0; i < dstHeight; ++i)
         {
-            float yStart = i * scaleh;
-            float yEnd = yStart + scaleh;
-            float xStart = j * scalew;
-            float xEnd = xStart + scalew;
-            size_t xStartInt = floor(xStart);
-            size_t xEndInt = ceil(xEnd - 1.0);
-            size_t yStartInt = floor(yStart);
-            size_t yEndInt = ceil(yEnd - 1.0);
-            
-            const T* start = srcData + yStartInt * lineWidth + xStartInt * numChannels;
-            float w = 0;
-            T* dstLoc = dstData + i * dstLineWidth + j * numChannels;
-            for (size_t n = 0; n < numChannels; ++n) t[n] = 0.0;
-            for (size_t k = yStartInt; k <= yEndInt; ++k)
+            for (size_t j = 0; j < dstWidth; ++j)
             {
-                for (size_t m = xStartInt; m <= xEndInt; ++m)
+                float yCenter = i * scaleh;
+                float xCenter = j * scalew;
+                size_t xStartInt = floor(xCenter);
+                size_t xEndInt = min(srcWidth - 1, xStartInt + 1);
+                size_t yStartInt = floor(yCenter);
+                size_t yEndInt = min(srcHeight - 1, yStartInt + 1);
+
+                float xW = xCenter - xStartInt;
+                float yW = yCenter - yStartInt;
+
+                const T* startDownLeft =
+                    srcData + yStartInt * lineWidth + xStartInt * numChannels;
+                const T* startUpLeft =
+                    srcData + yEndInt * lineWidth + xStartInt * numChannels;
+                const T* startDownRight =
+                    srcData + yStartInt * lineWidth + xEndInt * numChannels;
+                const T* startUpRight =
+                    srcData + yEndInt * lineWidth + xEndInt * numChannels;
+                T* dstLoc = dstData + i * dstLineWidth + j * numChannels;
+
+                for (size_t n = 0; n < numChannels; ++n)
                 {
-                    if (k > srcHeight - 1 || m > srcWidth - 1) continue;
-                    float weight = 1.0;
-                    if (m == xStartInt) weight *= m + 1.0 - xStart;
-                    else if (m == xEndInt) weight *= xEnd - m;
-                    if (k == yStartInt) weight *= k + 1.0 - yStart;
-                    else if (k == yEndInt) weight *= yEnd - k;
-                    w += weight;
-                    const T* d = start + (k - yStartInt) * lineWidth + (m - xStartInt) * numChannels;
-                    for (size_t n = 0; n < numChannels; ++n)
-                    {
-                        t[n] += weight * d[n];
-                    }
+                    float down =
+                        startDownLeft[n] * (1 - xW) + startDownRight[n] * xW;
+                    float up = startUpLeft[n] * (1 - xW) + startUpRight[n] * xW;
+                    dstLoc[n] = down * (1 - yW) + up * yW;
                 }
             }
-            for (size_t n = 0; n < numChannels; ++n)
+        }
+        return;
+    }
+
+    template <typename T>
+    void resizeArea(const FrameBuffer* src, FrameBuffer* dst)
+    {
+
+        float scalew = (float)src->width() / dst->width();   // > 1
+        float scaleh = (float)src->height() / dst->height(); // > 1
+
+        size_t lineWidth = src->scanlinePaddedSize() / sizeof(T);
+        size_t dstLineWidth = dst->scanlinePaddedSize() / sizeof(T);
+        size_t dstSize = dstLineWidth * dst->height();
+        size_t numChannels = dst->numChannels();
+        size_t srcWidth = src->width();
+        size_t srcHeight = src->height();
+        size_t dstWidth = dst->width();
+        size_t dstHeight = dst->height();
+
+        T* dstData = (T*)dst->pixels<T>();
+        const T* srcData = (T*)src->pixels<T>();
+        memset(dstData, 0, dstHeight * dst->scanlinePaddedSize());
+        vector<float> t(numChannels);
+
+        for (size_t i = 0; i < dstHeight; ++i)
+        {
+            for (size_t j = 0; j < dstWidth; ++j)
             {
-                dstLoc[n] = t[n] / w;
+                float yStart = i * scaleh;
+                float yEnd = yStart + scaleh;
+                float xStart = j * scalew;
+                float xEnd = xStart + scalew;
+                size_t xStartInt = floor(xStart);
+                size_t xEndInt = ceil(xEnd - 1.0);
+                size_t yStartInt = floor(yStart);
+                size_t yEndInt = ceil(yEnd - 1.0);
+
+                const T* start =
+                    srcData + yStartInt * lineWidth + xStartInt * numChannels;
+                float w = 0;
+                T* dstLoc = dstData + i * dstLineWidth + j * numChannels;
+                for (size_t n = 0; n < numChannels; ++n)
+                    t[n] = 0.0;
+                for (size_t k = yStartInt; k <= yEndInt; ++k)
+                {
+                    for (size_t m = xStartInt; m <= xEndInt; ++m)
+                    {
+                        if (k > srcHeight - 1 || m > srcWidth - 1)
+                            continue;
+                        float weight = 1.0;
+                        if (m == xStartInt)
+                            weight *= m + 1.0 - xStart;
+                        else if (m == xEndInt)
+                            weight *= xEnd - m;
+                        if (k == yStartInt)
+                            weight *= k + 1.0 - yStart;
+                        else if (k == yEndInt)
+                            weight *= yEnd - k;
+                        w += weight;
+                        const T* d = start + (k - yStartInt) * lineWidth
+                                     + (m - xStartInt) * numChannels;
+                        for (size_t n = 0; n < numChannels; ++n)
+                        {
+                            t[n] += weight * d[n];
+                        }
+                    }
+                }
+                for (size_t n = 0; n < numChannels; ++n)
+                {
+                    dstLoc[n] = t[n] / w;
+                }
             }
         }
-    }
-    return;
-    
-}
-
-template<typename T>
-void
-resizeFrameBuffer(const FrameBuffer* src, FrameBuffer* dst)
-{
-    if (src->width() <= dst->width() || src->height() <= dst->height()) resizeLinear<T>(src, dst);
-    else resizeArea<T>(src, dst);
-}
-    
-void
-resize(const FrameBuffer* src, FrameBuffer* dst)
-{
-//    TwkUtil::Timer time1;
-//    time1.start();
-    //assert(src->dataType() == dst->dataType());
-    FrameBuffer* tempFB = 0;
-
-    if (src->dataType() != dst->dataType())
-    {
-        tempFB = copyConvert(src, dst->dataType());
-        src = tempFB;
-    }
-    
-    if (src->nextPlane() && dst->nextPlane())
-    {
-        resize(src->nextPlane(), dst->nextPlane());
-    }
-
-    if (dst->width() == 0 || dst->height() == 0 ||
-        src->width() == 0 || src->height() == 0)
-    {
         return;
     }
 
-    if (src->width() == dst->width() && src->height() == dst->height()) 
+    template <typename T>
+    void resizeFrameBuffer(const FrameBuffer* src, FrameBuffer* dst)
     {
-        copyPlane(src, dst);
-        return;
-    }
-    
-    bool needsConvert = false;
-    //
-    //  Convert fbs to FLOAT for now because this resize function cannot operate on packed data.
-    //
-    if ( src->dataType() == TwkFB::FrameBuffer::PACKED_R10_G10_B10_X2 ||
-        src->dataType() == TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10 ||
-        src->dataType() == TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8 ||
-        src->dataType() == TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8 ||
-        src->dataType() == TwkFB::FrameBuffer::HALF ||
-        src->dataType() == TwkFB::FrameBuffer::DOUBLE)
-    {
-        needsConvert = true;
-    }
-    const FrameBuffer* convertedSrc = needsConvert? copyConvertPlane(src, TwkFB::FrameBuffer::FLOAT): src;
-    FrameBuffer* convertedDst = needsConvert? copyConvertPlane(dst, TwkFB::FrameBuffer::FLOAT): dst;
-    
-    switch (convertedSrc->dataType())
-    {
-      default:
-        case FrameBuffer::UCHAR:   resizeFrameBuffer<unsigned char>(convertedSrc, convertedDst); break;
-        case FrameBuffer::USHORT:  resizeFrameBuffer<unsigned short>(convertedSrc, convertedDst); break;
-        case FrameBuffer::UINT:    resizeFrameBuffer<unsigned int>(convertedSrc, convertedDst); break;
-        case FrameBuffer::FLOAT:   resizeFrameBuffer<float>(convertedSrc, convertedDst); break;
-    }
-    
-    if (needsConvert)
-    {
-        copyPlane (convertedDst, dst);
-        delete convertedSrc;
-        delete convertedDst;
-    }
-    
-    if (src->uncrop())
-    {
-        const double xfactor = double(dst->width()) / double(src->width());
-        const double yfactor = double(dst->height()) / double(src->height());
-
-        dst->setUncrop(int(double(src->uncropWidth()) * xfactor),
-                       int(double(src->uncropHeight()) * yfactor),
-                       int(double(src->uncropX()) * xfactor),
-                       int(double(src->uncropY()) * yfactor));
+        if (src->width() <= dst->width() || src->height() <= dst->height())
+            resizeLinear<T>(src, dst);
+        else
+            resizeArea<T>(src, dst);
     }
 
-    dst->setPixelAspectRatio(src->pixelAspectRatio());
-//    time1.stop();
-//    fprintf(stderr, "time %f \n", time1.elapsed());
+    void resize(const FrameBuffer* src, FrameBuffer* dst)
+    {
+        //    TwkUtil::Timer time1;
+        //    time1.start();
+        // assert(src->dataType() == dst->dataType());
+        FrameBuffer* tempFB = 0;
 
-    if (tempFB) delete tempFB;
-}
+        if (src->dataType() != dst->dataType())
+        {
+            tempFB = copyConvert(src, dst->dataType());
+            src = tempFB;
+        }
 
-} // TwkFB
+        if (src->nextPlane() && dst->nextPlane())
+        {
+            resize(src->nextPlane(), dst->nextPlane());
+        }
+
+        if (dst->width() == 0 || dst->height() == 0 || src->width() == 0
+            || src->height() == 0)
+        {
+            return;
+        }
+
+        if (src->width() == dst->width() && src->height() == dst->height())
+        {
+            copyPlane(src, dst);
+            return;
+        }
+
+        bool needsConvert = false;
+        //
+        //  Convert fbs to FLOAT for now because this resize function cannot
+        //  operate on packed data.
+        //
+        if (src->dataType() == TwkFB::FrameBuffer::PACKED_R10_G10_B10_X2
+            || src->dataType() == TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10
+            || src->dataType() == TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8
+            || src->dataType() == TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
+            || src->dataType() == TwkFB::FrameBuffer::HALF
+            || src->dataType() == TwkFB::FrameBuffer::DOUBLE)
+        {
+            needsConvert = true;
+        }
+        const FrameBuffer* convertedSrc =
+            needsConvert ? copyConvertPlane(src, TwkFB::FrameBuffer::FLOAT)
+                         : src;
+        FrameBuffer* convertedDst =
+            needsConvert ? copyConvertPlane(dst, TwkFB::FrameBuffer::FLOAT)
+                         : dst;
+
+        switch (convertedSrc->dataType())
+        {
+        default:
+        case FrameBuffer::UCHAR:
+            resizeFrameBuffer<unsigned char>(convertedSrc, convertedDst);
+            break;
+        case FrameBuffer::USHORT:
+            resizeFrameBuffer<unsigned short>(convertedSrc, convertedDst);
+            break;
+        case FrameBuffer::UINT:
+            resizeFrameBuffer<unsigned int>(convertedSrc, convertedDst);
+            break;
+        case FrameBuffer::FLOAT:
+            resizeFrameBuffer<float>(convertedSrc, convertedDst);
+            break;
+        }
+
+        if (needsConvert)
+        {
+            copyPlane(convertedDst, dst);
+            delete convertedSrc;
+            delete convertedDst;
+        }
+
+        if (src->uncrop())
+        {
+            const double xfactor = double(dst->width()) / double(src->width());
+            const double yfactor =
+                double(dst->height()) / double(src->height());
+
+            dst->setUncrop(int(double(src->uncropWidth()) * xfactor),
+                           int(double(src->uncropHeight()) * yfactor),
+                           int(double(src->uncropX()) * xfactor),
+                           int(double(src->uncropY()) * yfactor));
+        }
+
+        dst->setPixelAspectRatio(src->pixelAspectRatio());
+        //    time1.stop();
+        //    fprintf(stderr, "time %f \n", time1.elapsed());
+
+        if (tempFB)
+            delete tempFB;
+    }
+
+} // namespace TwkFBAux

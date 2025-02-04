@@ -1,9 +1,9 @@
 //******************************************************************************
 // Copyright (c) 2003 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #ifndef __TwkDeploy__Deploy__h__
 #define __TwkDeploy__Deploy__h__
@@ -26,13 +26,9 @@ std::string TWK_DEPLOY_SHORT_APP_NAME();
 int TWK_DEPLOY_GET_LICENSE_STATE();
 
 // DONT CALL THIS DIRECTLY ANYMORE
-void TWK_DEPLOY_INITIALIZE(int majorVersion,
-                           int minorVersion,
-                           int patchLevel,
-                           int argc,
-                           char** argv,
-                           const char* release_description,
-                           const char* scm_id,
+void TWK_DEPLOY_INITIALIZE(int majorVersion, int minorVersion, int patchLevel,
+                           int argc, char** argv,
+                           const char* release_description, const char* scm_id,
                            const char* date = __DATE__,
                            const char* time = __TIME__);
 void TWK_DEPLOY_SET_HOME(const char* dir);
@@ -55,27 +51,17 @@ void TWK_DEPLOY_FINISH();
 
 struct TWK_DEPLOY_APP_OBJECT
 {
-    TWK_DEPLOY_APP_OBJECT(int majorVersion,
-                          int minorVersion,
-                          int patchLevel,
-                          int argc,
-                          char** argv,
-                          const char* release_description,
-                          const char* scm_id,
+    TWK_DEPLOY_APP_OBJECT(int majorVersion, int minorVersion, int patchLevel,
+                          int argc, char** argv,
+                          const char* release_description, const char* scm_id,
                           const char* date = __DATE__,
                           const char* time = __TIME__)
     {
-        TWK_DEPLOY_INITIALIZE(majorVersion, minorVersion, patchLevel,
-                              argc, argv,
-                              release_description, scm_id,
-                              date, time);
+        TWK_DEPLOY_INITIALIZE(majorVersion, minorVersion, patchLevel, argc,
+                              argv, release_description, scm_id, date, time);
     }
 
-    ~TWK_DEPLOY_APP_OBJECT()
-    {
-        TWK_DEPLOY_FINISH();
-    }
+    ~TWK_DEPLOY_APP_OBJECT() { TWK_DEPLOY_FINISH(); }
 };
-
 
 #endif // __TwkDeploy__Deploy__h__

@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2014 Tweak Software. 
+//  Copyright (c) 2014 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __IPCoreCommands__SetPropertyVector__h__
 #define __IPCoreCommands__SetPropertyVector__h__
@@ -13,95 +13,101 @@
 #include <IPCore/PropertyEditor.h>
 #include <iostream>
 
-namespace IPCore {
-namespace Commands {
-
-//
-//  SetPropertyVector
-//
-//  Create a new node from a type name
-//
-
-template <class T>
-class SetPropertyVector : public TwkApp::Command
+namespace IPCore
 {
-  public:
-    SetPropertyVector(const TwkApp::CommandInfo* i) : TwkApp::Command(i) {}
-    virtual ~SetPropertyVector() {}
-
-    typedef T                          Property;
-    typedef typename T::container_type Container;
-    typedef typename T::value_type     ValueType;
-    typedef std::vector<ValueType>     ValueTypeVector;
-    typedef typename Property::Layout  Layout;
-    typedef std::vector<Container>     ContainerVector;
-    typedef std::vector<std::string>   StringVector;
-    typedef PropertyEditor<T>          Editor;
-
-    void setArgs(IPGraph* graph, 
-                 int frame,
-                 const std::string& propPath,
-                 const Container& value);
-
-    virtual void doit();
-    virtual void undo();
-
-  private:
-    IPGraph*        m_graph;
-    int             m_frame;
-    std::string     m_propPath;
-    Container       m_value;
-    ContainerVector m_oldValues;
-};
-
-template <typename T>
-void 
-SetPropertyVector<T>::setArgs(IPGraph* graph,
-                              int frame,
-                              const std::string& propPath,
-                              const Container& value)
-{
-    m_graph    = graph;
-    m_propPath = propPath;
-    m_frame    = frame;
-    m_value    = value;
-}
-
-template <typename T>
-void 
-SetPropertyVector<T>::doit()
-{
-    Editor edit(*m_graph, m_frame, m_propPath);
-    const typename Editor::PropertyVector& props = edit.propertyVector();
-
-    m_oldValues.resize(props.size());
-
-    for (size_t i = 0; i < props.size(); i++)
+    namespace Commands
     {
-        T* p = props[i];
-        m_oldValues[i] = p->valueContainer();
-    }
-    edit.setValue(m_value);
-}
 
-template <typename T>
-void 
-SetPropertyVector<T>::undo()
-{
-    Editor edit(*m_graph, m_frame, m_propPath);
-    edit.setValue(m_oldValues);
-}
+        //
+        //  SetPropertyVector
+        //
+        //  Create a new node from a type name
+        //
 
-template <typename T>
-class SetPropertyVectorInfo : public TwkApp::CommandInfo
-{
-  public:
-    SetPropertyVectorInfo(const std::string& name): CommandInfo(name) { }
-    virtual ~SetPropertyVectorInfo() {}
-    virtual TwkApp::Command* newCommand() const { return new SetPropertyVector<T>(this); }
-};
+        template <class T> class SetPropertyVector : public TwkApp::Command
+        {
+        public:
+            SetPropertyVector(const TwkApp::CommandInfo* i)
+                : TwkApp::Command(i)
+            {
+            }
 
-} // Commands
-} // IPCore
+            virtual ~SetPropertyVector() {}
+
+            typedef T Property;
+            typedef typename T::container_type Container;
+            typedef typename T::value_type ValueType;
+            typedef std::vector<ValueType> ValueTypeVector;
+            typedef typename Property::Layout Layout;
+            typedef std::vector<Container> ContainerVector;
+            typedef std::vector<std::string> StringVector;
+            typedef PropertyEditor<T> Editor;
+
+            void setArgs(IPGraph* graph, int frame, const std::string& propPath,
+                         const Container& value);
+
+            virtual void doit();
+            virtual void undo();
+
+        private:
+            IPGraph* m_graph;
+            int m_frame;
+            std::string m_propPath;
+            Container m_value;
+            ContainerVector m_oldValues;
+        };
+
+        template <typename T>
+        void SetPropertyVector<T>::setArgs(IPGraph* graph, int frame,
+                                           const std::string& propPath,
+                                           const Container& value)
+        {
+            m_graph = graph;
+            m_propPath = propPath;
+            m_frame = frame;
+            m_value = value;
+        }
+
+        template <typename T> void SetPropertyVector<T>::doit()
+        {
+            Editor edit(*m_graph, m_frame, m_propPath);
+            const typename Editor::PropertyVector& props =
+                edit.propertyVector();
+
+            m_oldValues.resize(props.size());
+
+            for (size_t i = 0; i < props.size(); i++)
+            {
+                T* p = props[i];
+                m_oldValues[i] = p->valueContainer();
+            }
+            edit.setValue(m_value);
+        }
+
+        template <typename T> void SetPropertyVector<T>::undo()
+        {
+            Editor edit(*m_graph, m_frame, m_propPath);
+            edit.setValue(m_oldValues);
+        }
+
+        template <typename T>
+        class SetPropertyVectorInfo : public TwkApp::CommandInfo
+        {
+        public:
+            SetPropertyVectorInfo(const std::string& name)
+                : CommandInfo(name)
+            {
+            }
+
+            virtual ~SetPropertyVectorInfo() {}
+
+            virtual TwkApp::Command* newCommand() const
+            {
+                return new SetPropertyVector<T>(this);
+            }
+        };
+
+    } // namespace Commands
+} // namespace IPCore
 
 #endif // __IPCoreCommands__SetPropertyVector__h__

@@ -4,26 +4,34 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/TypePattern.h>
 
-namespace Mu {
-
-class MatchDynamicArray : public TypePattern
+namespace Mu
 {
-public:
-    MatchDynamicArray(Context* c) : TypePattern(c, "?dyn_array") { }
-    virtual MatchResult match(const Type*, Bindings&) const;
-};
 
-class MatchFixedArray : public TypePattern
-{
-public:
-    MatchFixedArray(Context* c) : TypePattern(c, "?fixed_array") { }
-    virtual MatchResult match(const Type*, Bindings&) const;
-};
+    class MatchDynamicArray : public TypePattern
+    {
+    public:
+        MatchDynamicArray(Context* c)
+            : TypePattern(c, "?dyn_array")
+        {
+        }
 
+        virtual MatchResult match(const Type*, Bindings&) const;
+    };
+
+    class MatchFixedArray : public TypePattern
+    {
+    public:
+        MatchFixedArray(Context* c)
+            : TypePattern(c, "?fixed_array")
+        {
+        }
+
+        virtual MatchResult match(const Type*, Bindings&) const;
+    };
 
 } // namespace Mu
 

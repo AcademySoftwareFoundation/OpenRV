@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2003 Tweak Inc. 
+// Copyright (c) 2003 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 #include <MuTwkApp/MenuItem.h>
 #include <Mu/BaseFunctions.h>
@@ -18,143 +18,135 @@
 #include <string.h>
 #include <string>
 
-namespace TwkApp {
-using namespace Mu;
-using namespace std;
-
-//----------------------------------------------------------------------
-
-
-MenuItem::MenuItem(Context* c, const char* name, Class *super) : Class(c, name, super)
+namespace TwkApp
 {
-}
+    using namespace Mu;
+    using namespace std;
 
-MenuItem::~MenuItem() {}
+    //----------------------------------------------------------------------
 
-void
-MenuItem::load()
-{
-    USING_MU_FUNCTION_SYMBOLS;
+    MenuItem::MenuItem(Context* c, const char* name, Class* super)
+        : Class(c, name, super)
+    {
+    }
 
-    Symbol *s = scope();
-    MuLangContext* context = (MuLangContext*)globalModule()->context();
-    Context* c = context;
+    MenuItem::~MenuItem() {}
 
-    const char* className = "MenuItem";
-    const char* refName   = "MenuItem&";
+    void MenuItem::load()
+    {
+        USING_MU_FUNCTION_SYMBOLS;
 
-    string tname = s->name().c_str();
-    tname += ".";
-    tname += className;
-    //string tname = "widget";
+        Symbol* s = scope();
+        MuLangContext* context = (MuLangContext*)globalModule()->context();
+        Context* c = context;
 
-    string rname = tname + "&";
+        const char* className = "MenuItem";
+        const char* refName = "MenuItem&";
 
-    const char* tn = tname.c_str();
-    const char* rn = rname.c_str();
+        string tname = s->name().c_str();
+        tname += ".";
+        tname += className;
+        // string tname = "widget";
 
-    const char* mi = "MenuItem[]";
-    const char* ft = "(void;Event)";
-    const char* bft = "(int;)";
+        string rname = tname + "&";
 
-    s->addSymbols( new ReferenceType(c, refName, this), 
+        const char* tn = tname.c_str();
+        const char* rn = rname.c_str();
 
-		   new Function(c, className, BaseFunctions::dereference, Cast,
-				Return, tn,
-				Args, rn, End),
+        const char* mi = "MenuItem[]";
+        const char* ft = "(void;Event)";
+        const char* bft = "(int;)";
 
-		   EndArguments);
+        s->addSymbols(new ReferenceType(c, refName, this),
 
-    globalScope()->addSymbols(
+                      new Function(c, className, BaseFunctions::dereference,
+                                   Cast, Return, tn, Args, rn, End),
 
-		   new Function(c, "=", BaseFunctions::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
+                      EndArguments);
 
-                   EndArguments);
+        globalScope()->addSymbols(
 
-    //
-    //  Layout of struct
-    //
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
+                         rn, tn, End),
 
-    context->functionType(ft);
-    context->functionType(bft);
-    context->arrayType(this, 1, 0);
-    
-    addSymbols( new MemberVariable(c, "label", "string"),
-                new MemberVariable(c, "actionHook", ft),
-                new MemberVariable(c, "key", "string"),
-                new MemberVariable(c, "stateHook", bft),
-                new MemberVariable(c, "subMenu", mi),
+            EndArguments);
 
-                new Function(c, "__allocate", BaseFunctions::classAllocate, Function::None,
-                             Function::Return, tn,
-                             Function::End),
+        //
+        //  Layout of struct
+        //
 
-                new Function(c, className, MenuItem::construct, None,
-                             Return, tn, 
-                             Parameters, 
-                             new ParameterVariable(c, "this", tn),
-                             new ParameterVariable(c, "label", "string"),
-                             new ParameterVariable(c, "actionHook", ft),
-                             new ParameterVariable(c, "key", "string", Value(Pointer(0))),
-                             new ParameterVariable(c, "stateHook", bft, Value(Pointer(0))),
-                             new ParameterVariable(c, "subMenu", mi, Value(Pointer(0))),
-                             End),
+        context->functionType(ft);
+        context->functionType(bft);
+        context->arrayType(this, 1, 0);
 
-                new Function(c, className, MenuItem::construct2, None,
-                             Return, tn, 
-                             Parameters, 
-                             new ParameterVariable(c, "this", tn),
-                             new ParameterVariable(c, "label", "string"),
-                             new ParameterVariable(c, "subMenu", mi),
-                             End),
+        addSymbols(
+            new MemberVariable(c, "label", "string"),
+            new MemberVariable(c, "actionHook", ft),
+            new MemberVariable(c, "key", "string"),
+            new MemberVariable(c, "stateHook", bft),
+            new MemberVariable(c, "subMenu", mi),
 
-                EndArguments );
+            new Function(c, "__allocate", BaseFunctions::classAllocate,
+                         Function::None, Function::Return, tn, Function::End),
 
-}
+            new Function(
+                c, className, MenuItem::construct, None, Return, tn, Parameters,
+                new ParameterVariable(c, "this", tn),
+                new ParameterVariable(c, "label", "string"),
+                new ParameterVariable(c, "actionHook", ft),
+                new ParameterVariable(c, "key", "string", Value(Pointer(0))),
+                new ParameterVariable(c, "stateHook", bft, Value(Pointer(0))),
+                new ParameterVariable(c, "subMenu", mi, Value(Pointer(0))),
+                End),
 
+            new Function(c, className, MenuItem::construct2, None, Return, tn,
+                         Parameters, new ParameterVariable(c, "this", tn),
+                         new ParameterVariable(c, "label", "string"),
+                         new ParameterVariable(c, "subMenu", mi), End),
 
-NODE_IMPLEMENTATION(MenuItem::construct, Pointer)
-{
-    Process *p = NODE_THREAD.process();
-    const Class *c = static_cast<const MenuItem*>(NODE_THIS.type());
+            EndArguments);
+    }
 
-    ClassInstance *o          = NODE_ARG_OBJECT(0, ClassInstance);
-    StringType::String* label = NODE_ARG_OBJECT(1, StringType::String);
-    FunctionObject*     fobj  = NODE_ARG_OBJECT(2, FunctionObject);
-    StringType::String* key   = NODE_ARG_OBJECT(3, StringType::String);
-    FunctionObject*     sobj  = NODE_ARG_OBJECT(4, FunctionObject);
-    DynamicArray*       array = NODE_ARG_OBJECT(5, DynamicArray);
+    NODE_IMPLEMENTATION(MenuItem::construct, Pointer)
+    {
+        Process* p = NODE_THREAD.process();
+        const Class* c = static_cast<const MenuItem*>(NODE_THIS.type());
 
-    Struct* s        = o->data<Struct>();
+        ClassInstance* o = NODE_ARG_OBJECT(0, ClassInstance);
+        StringType::String* label = NODE_ARG_OBJECT(1, StringType::String);
+        FunctionObject* fobj = NODE_ARG_OBJECT(2, FunctionObject);
+        StringType::String* key = NODE_ARG_OBJECT(3, StringType::String);
+        FunctionObject* sobj = NODE_ARG_OBJECT(4, FunctionObject);
+        DynamicArray* array = NODE_ARG_OBJECT(5, DynamicArray);
 
-    s->label    = label;
-    s->key      = key;
-    s->actionCB = fobj;
-    s->stateCB  = sobj;
-    s->subMenu  = array;
+        Struct* s = o->data<Struct>();
 
-    NODE_RETURN(Pointer(o));
-}
+        s->label = label;
+        s->key = key;
+        s->actionCB = fobj;
+        s->stateCB = sobj;
+        s->subMenu = array;
 
-NODE_IMPLEMENTATION(MenuItem::construct2, Pointer)
-{
-    Process *p = NODE_THREAD.process();
-    const Class *c = static_cast<const MenuItem*>(NODE_THIS.type());
+        NODE_RETURN(Pointer(o));
+    }
 
-    ClassInstance *o          = NODE_ARG_OBJECT(0, ClassInstance);
-    StringType::String* label = NODE_ARG_OBJECT(1, StringType::String);
-    DynamicArray*       array = NODE_ARG_OBJECT(2, DynamicArray);
-    Struct* s        = o->data<Struct>();
+    NODE_IMPLEMENTATION(MenuItem::construct2, Pointer)
+    {
+        Process* p = NODE_THREAD.process();
+        const Class* c = static_cast<const MenuItem*>(NODE_THIS.type());
 
-    s->label    = label;
-    s->key      = 0;
-    s->actionCB = 0;
-    s->stateCB  = 0;
-    s->subMenu  = array;
+        ClassInstance* o = NODE_ARG_OBJECT(0, ClassInstance);
+        StringType::String* label = NODE_ARG_OBJECT(1, StringType::String);
+        DynamicArray* array = NODE_ARG_OBJECT(2, DynamicArray);
+        Struct* s = o->data<Struct>();
 
-    NODE_RETURN(Pointer(o));
-}
+        s->label = label;
+        s->key = 0;
+        s->actionCB = 0;
+        s->stateCB = 0;
+        s->subMenu = array;
 
-} // TwkApp
+        NODE_RETURN(Pointer(o));
+    }
+
+} // namespace TwkApp

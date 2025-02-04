@@ -1,9 +1,9 @@
 //******************************************************************************
-// Copyright (c) 2005 Tweak Inc. 
+// Copyright (c) 2005 Tweak Inc.
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #pragma once
@@ -17,71 +17,70 @@
 
 #include <memory>
 
-namespace IPCore {
-
-/// Provides 3D and Channel OCIOs for DisplayIPNode and ColorIPNode
-
-///
-/// OCIOIPNode -- use OpenColorIO transform
-///
-
-struct OCIOState;
-
-namespace OCIO = OCIO_NAMESPACE;
-
-class OCIO1DLUT;
-using OCIO1DLUTPtr = std::shared_ptr<OCIO1DLUT>;
-class OCIO3DLUT;
-using OCIO3DLUTPtr = std::shared_ptr<OCIO3DLUT>;
-
-class OCIOIPNode : public IPNode
+namespace IPCore
 {
-  public:
-    //
-    //  Constructors
-    //
 
-    OCIOIPNode(const std::string& name, 
-               const NodeDefinition* def,
-               IPGraph* graph, 
-               GroupIPNode* group=0);
+    /// Provides 3D and Channel OCIOs for DisplayIPNode and ColorIPNode
 
-    virtual ~OCIOIPNode();
-    virtual IPImage* evaluate(const Context& context);
-    std::string stringProp(const std::string&, const std::string&) const;
-    int intProp(const std::string&, int) const;
+    ///
+    /// OCIOIPNode -- use OpenColorIO transform
+    ///
 
-    virtual void readCompleted(const std::string&, unsigned int);
-    virtual void propertyChanged(const Property*);
+    struct OCIOState;
 
-    void updateConfig();
-    bool useRawConfig() const {return m_useRawConfig;}
+    namespace OCIO = OCIO_NAMESPACE;
 
-  protected:
-    void updateContext();
+    class OCIO1DLUT;
+    using OCIO1DLUTPtr = std::shared_ptr<OCIO1DLUT>;
+    class OCIO3DLUT;
+    using OCIO3DLUTPtr = std::shared_ptr<OCIO3DLUT>;
 
-    OCIO::MatrixTransformRcPtr createMatrixTransformXYZToRec709() const;
-    OCIO::MatrixTransformRcPtr getMatrixTransformXYZToRec709();
-    OCIO::MatrixTransformRcPtr getMatrixTransformRec709ToXYZ();
+    class OCIOIPNode : public IPNode
+    {
+    public:
+        //
+        //  Constructors
+        //
 
-  private:
+        OCIOIPNode(const std::string& name, const NodeDefinition* def,
+                   IPGraph* graph, GroupIPNode* group = 0);
 
-    IntProperty*    m_activeProperty{nullptr};
-    StringProperty* m_configDescription{nullptr};
-    StringProperty* m_configWorkingDir{nullptr};
-    std::vector<OCIO1DLUTPtr> m_1DLUTs;
-    std::vector<OCIO3DLUTPtr> m_3DLUTs;
-    OCIOState*      m_state{nullptr};
-    mutable QMutex  m_lock;
-    bool            m_useRawConfig{false};
+        virtual ~OCIOIPNode();
+        virtual IPImage* evaluate(const Context& context);
+        std::string stringProp(const std::string&, const std::string&) const;
+        int intProp(const std::string&, int) const;
 
-    // synlinearize/syndisplay functions
-    StringProperty* m_inTransformURL{nullptr};
-    ByteProperty*   m_inTransformData{nullptr};
-    StringProperty* m_outTransformURL{nullptr};
-    OCIO::GroupTransformRcPtr m_transform;
-    OCIO::MatrixTransformRcPtr m_matrix_xyz_to_rec709;
-    OCIO::MatrixTransformRcPtr m_matrix_rec709_to_xyz;
-};
+        virtual void readCompleted(const std::string&, unsigned int);
+        virtual void propertyChanged(const Property*);
 
-} // IPCore
+        void updateConfig();
+
+        bool useRawConfig() const { return m_useRawConfig; }
+
+    protected:
+        void updateContext();
+
+        OCIO::MatrixTransformRcPtr createMatrixTransformXYZToRec709() const;
+        OCIO::MatrixTransformRcPtr getMatrixTransformXYZToRec709();
+        OCIO::MatrixTransformRcPtr getMatrixTransformRec709ToXYZ();
+
+    private:
+        IntProperty* m_activeProperty{nullptr};
+        StringProperty* m_configDescription{nullptr};
+        StringProperty* m_configWorkingDir{nullptr};
+        std::vector<OCIO1DLUTPtr> m_1DLUTs;
+        std::vector<OCIO3DLUTPtr> m_3DLUTs;
+        OCIOState* m_state{nullptr};
+        mutable QMutex m_lock;
+        bool m_useRawConfig{false};
+
+        // synlinearize/syndisplay functions
+        StringProperty* m_inTransformURL{nullptr};
+        ByteProperty* m_inTransformData{nullptr};
+        StringProperty* m_outTransformURL{nullptr};
+        OCIO::GroupTransformRcPtr m_transform;
+        OCIO::MatrixTransformRcPtr m_matrix_xyz_to_rec709;
+        OCIO::MatrixTransformRcPtr m_matrix_rec709_to_xyz;
+    };
+
+} // namespace IPCore

@@ -34,29 +34,36 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtBonjour/Record.h>
 
 class QSocketNotifier;
+
 class BonjourServiceBrowser : public QObject
 {
     Q_OBJECT
 public:
-    BonjourServiceBrowser(QObject *parent = 0);
+    BonjourServiceBrowser(QObject* parent = 0);
     ~BonjourServiceBrowser();
-    void browseForServiceType(const QString &serviceType);
-    inline QList<BonjourRecord> currentRecords() const { return bonjourRecords; }
+    void browseForServiceType(const QString& serviceType);
+
+    inline QList<BonjourRecord> currentRecords() const
+    {
+        return bonjourRecords;
+    }
+
     inline QString serviceType() const { return browsingType; }
 
 signals:
-    void currentBonjourRecordsChanged(const QList<BonjourRecord> &list);
+    void currentBonjourRecordsChanged(const QList<BonjourRecord>& list);
     void error(DNSServiceErrorType err);
 
 private slots:
     void bonjourSocketReadyRead();
 
 private:
-    static void DNSSD_API bonjourBrowseReply(DNSServiceRef , DNSServiceFlags flags, quint32,
-                                   DNSServiceErrorType errorCode, const char *serviceName,
-                                   const char *regType, const char *replyDomain, void *context);
+    static void DNSSD_API bonjourBrowseReply(
+        DNSServiceRef, DNSServiceFlags flags, quint32,
+        DNSServiceErrorType errorCode, const char* serviceName,
+        const char* regType, const char* replyDomain, void* context);
     DNSServiceRef dnssref;
-    QSocketNotifier *bonjourSocket;
+    QSocketNotifier* bonjourSocket;
     QList<BonjourRecord> bonjourRecords;
     QString browsingType;
 };
