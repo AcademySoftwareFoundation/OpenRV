@@ -475,6 +475,10 @@ namespace Rv
             new Function(c, "presentationMode", presentationMode, None, Return,
                          "bool", End),
 
+            new Function(c, "setPresentationDevice", setPresentationDevice,
+                         None, Return, "void", Parameters,
+                         new Param(c, "name", "string"), End),
+
             new Function(c, "packageListFromSetting", packageListFromSetting,
                          None, Return, "string[]", Parameters,
                          new Param(c, "settingName", "string"), End),
@@ -2258,6 +2262,51 @@ namespace Rv
     NODE_IMPLEMENTATION(presentationMode, bool)
     {
         NODE_RETURN(RvApp()->isInPresentationMode());
+    }
+
+    NODE_IMPLEMENTATION(setPresentationDevice, void)
+    {
+        StringType::String* deviceName = NODE_ARG_OBJECT(0, StringType::String);
+        Rv::Options& opts = Rv::Options::sharedOptions();
+
+        if (!deviceName)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD,
+                                      "Nil setting name.");
+
+        if (VideoDevice* d =
+                RvApp()->findPresentationDevice(deviceName->c_str()))
+        {
+            bool presenting = RvApp()->isInPresentationMode();
+            Session* s = Session::currentSession();
+            Session::CachingMode mode = s->cachingMode();
+
+            if (presenting)
+            {
+                s->setCaching(Session::NeverCache);
+                RvApp()->setPresentationMode(false);
+            }
+
+            RV_QSETTINGS;
+            settings.beginGroup("Video");
+            settings.setValue("presentationDevice",
+                              QString::fromUtf8(deviceName->c_str()));
+            settings.endGroup();
+
+            Rv::RvPreferences::loadSettingsIntoOptions(opts);
+
+            RvApp()->setVideoDeviceStateFromSettings(d);
+
+            if (presenting)
+            {
+                RvApp()->setPresentationMode(true);
+                s->setCaching(mode);
+            }
+        }
+        else
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD,
+                                      "device not found");
+        }
     }
 
     NODE_IMPLEMENTATION(packageListFromSetting, Pointer)
