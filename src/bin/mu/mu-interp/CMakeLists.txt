@@ -60,7 +60,7 @@ ELSEIF(RV_TARGET_WINDOWS)
             MuIO
             MuImage
             MuEncoding
-            MuQt5
+            ${RV_QT_MU_TARGET}
             gc
   )
 ENDIF()

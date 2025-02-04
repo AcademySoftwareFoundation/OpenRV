@@ -42,10 +42,22 @@ namespace Rv
         QStringList list;
         QFileInfo info(file);
 
+#if defined(RV_VFX_CY2023)
         list << "Created"
-             << info.created().toString(Qt::DefaultLocaleShortDate);
+             << info.birthTime().toString(Qt::DefaultLocaleShortDate);
         list << "Modified"
              << info.lastModified().toString(Qt::DefaultLocaleShortDate);
+#else
+        // created() is deprecated.
+        // birthTime() function to get the time the file was created.
+        // metadataChangeTime() to get the time its metadata was last changed.
+        // lastModified() to get the time it was last modified.
+        QLocale locale = QLocale::system();
+        list << "Created"
+             << locale.toString(info.birthTime(), QLocale::ShortFormat);
+        list << "Modified"
+             << locale.toString(info.lastModified(), QLocale::ShortFormat);
+#endif
 
         size_t s = info.size();
 

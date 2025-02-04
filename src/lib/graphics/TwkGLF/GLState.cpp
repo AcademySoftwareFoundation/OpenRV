@@ -17,6 +17,23 @@ namespace TwkGLF
     // Memory management related funcs
     //
 
+    GLState::FixedFunctionPipeline::FixedFunctionPipeline(GLState* s)
+        : state(s)
+        , program(s->activeGLProgram())
+    {
+        glUseProgram(GLuint(0));
+    }
+
+    void GLState::FixedFunctionPipeline::setViewport(int x, int y, int w, int h)
+    {
+        glViewport(x, y, w, h);
+    }
+
+    GLState::FixedFunctionPipeline::~FixedFunctionPipeline()
+    {
+        state->useGLProgram(program);
+    }
+
     GLuint GLState::createGLTexture(size_t s)
     {
         GLuint id;

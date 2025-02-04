@@ -26,7 +26,9 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QMenu>
+#if defined(RV_VFX_CY2023)
 #include <QtWidgets/QDirModel>
+#endif
 
 namespace Rv
 {
@@ -344,7 +346,14 @@ namespace Rv
                 SLOT(fileTypeChanged(int)));
 
         QCompleter* completer = new QCompleter(this);
+#if defined(RV_VFX_CY2023)
         completer->setModel(new QDirModel(completer));
+#else
+        QFileSystemModel* fileSystemModel = new QFileSystemModel(completer);
+        // TODO_QT: Is AllEntries fine here?
+        fileSystemModel->setFilter(QDir::AllEntries);
+        completer->setModel(fileSystemModel);
+#endif
         completer->setCompletionMode(QCompleter::InlineCompletion);
         m_ui.currentPath->setCompleter(completer);
         m_ui.currentPath->setText("");
@@ -463,9 +472,9 @@ namespace Rv
     {
         QFileInfoList list;
 
-        list.push_back(QDir::home().path());
+        list.push_back(QFileInfo(QDir::home().path()));
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_DARWIN)
-        list.push_back(QString("/"));
+        list.push_back(QFileInfo(QString("/")));
         m_drives.insert("/");
 #endif
 
@@ -721,7 +730,8 @@ namespace Rv
         }
         else if (m_viewMode == ColumnView)
         {
-            QModelIndex i = m_columnModel->indexOfPath(absoluteDirPath);
+            QModelIndex i =
+                m_columnModel->indexOfPath(QFileInfo(absoluteDirPath));
 
             if (!i.isValid())
             {
@@ -780,15 +790,16 @@ namespace Rv
                 if (aPathNoSlash.endsWith("/"))
                     aPathNoSlash.chop(1);
 #endif
-                m_ui.pathCombo->addItem(iconForFile(aPath), aPathNoSlash,
-                                        aPath);
+                m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)),
+                                        aPathNoSlash, aPath);
 
                 done = true;
             }
             else
             {
                 DB("    not at root: '" << aPath.toUtf8().data() << "'");
-                m_ui.pathCombo->addItem(iconForFile(aPath), dName, aPath);
+                m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)), dName,
+                                        aPath);
             }
         }
 
@@ -1249,7 +1260,7 @@ namespace Rv
     void RvFileDialog::columnViewTimeout()
     {
         DB("columnViewTimeout file " << m_columnViewFile.toUtf8().data());
-        QModelIndex i = m_columnModel->indexOfPath(m_columnViewFile);
+        QModelIndex i = m_columnModel->indexOfPath(QFileInfo(m_columnViewFile));
         if (i.isValid())
             m_columnView->setCurrentIndex(i);
     }
@@ -1773,7 +1784,7 @@ namespace Rv
 
     void RvFileDialog::sortComboChanged(int index)
     {
-        QDir::SortFlags f = 0;
+        QDir::SortFlags f = QDir::Name;
 
         switch (index)
         {

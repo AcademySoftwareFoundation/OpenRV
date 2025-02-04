@@ -21,11 +21,21 @@ SET(CMAKE_AUTORCC
     ON
 )
 
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  # TODO_QT: Core5Compat is temporary to fix issue with QTextCodec. https://doc.qt.io/qt-6.5/qtcore5compat-module.html
+  SET(_rvcommon_core5compat_component
+      Core5Compat
+  )
+  SET(_rvcommon_core5compat_link_libraries
+      Qt6::Core5Compat
+  )
+ENDIF()
+
 #
 # This find_package statement is also required to find QT's build tools like 'uic' required just below. Keep this line before 'qt5_wrap_ui'
 FIND_PACKAGE(
-  Qt5
-  COMPONENTS Core Gui OpenGL
+  ${RV_QT_PACKAGE_NAME}
+  COMPONENTS Core Gui OpenGL Widgets ${QT6_QOPENGLWIDGET_COMPONENT} ${_rvcommon_core5compat_component}
   REQUIRED
 )
 
@@ -80,6 +90,22 @@ ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)
 
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  FILE(GLOB _ui_sources_extra ui/RvPreferences/Qt6/RvPreferences.ui)
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
+  FILE(GLOB _ui_sources_extra ui/RvPreferences/Qt5/RvPreferences.ui)
+ENDIF()
+
+LIST(APPEND _ui_sources ${_ui_sources_extra})
+
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  # Use Qt6 connections syntax because it generates the wrong QObject::connect for RvConsoleWindow.ui. TODO_QT: Could remove the connections from the UI XML and
+  # add them to RvConsoleWindow.cpp
+  SET(ui_options
+      --connections string
+  )
+ENDIF()
+
 FOREACH(
   ui_source
   ${_ui_sources}
@@ -89,12 +115,23 @@ FOREACH(
   SET(outfile
       ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/ui_${outfile}.h
   )
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${outfile}
-    COMMAND ${Qt5Widgets_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
-    MAIN_DEPENDENCY ${infile}
-    VERBATIM
-  )
+
+  IF(RV_VFX_PLATFORM STREQUAL CY2023)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${Qt5Widgets_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${QT_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ENDIF()
+
   SET_SOURCE_FILES_PROPERTIES(
     ${infile}
     PROPERTIES SKIP_AUTOMOC ON
@@ -129,12 +166,23 @@ FOREACH(
   SET(outfile
       ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_${outfile}.cpp
   )
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${outfile}
-    COMMAND ${Qt5Core_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
-    MAIN_DEPENDENCY ${infile}
-    VERBATIM
-  )
+
+  IF(RV_VFX_PLATFORM STREQUAL CY2023)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${Qt5Core_MOC_EXECUTABLE} -DRV_VFX_CY2023 -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${outfile}
+      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_CY2024 -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile}
+      VERBATIM
+    )
+  ENDIF()
+
   SET_SOURCE_FILES_PROPERTIES(
     ${infile}
     PROPERTIES SKIP_AUTOMOC ON
@@ -156,6 +204,13 @@ ADD_LIBRARY(
   ${_sources} qrc/RvCommon.qrc
 )
 
+# Need that with Qt6 since the code for this target does not support unicode correctly.
+IF(RV_TARGET_WINDOWS
+   AND RV_VFX_PLATFORM STREQUAL CY2024
+)
+  QT_DISABLE_UNICODE_DEFINES(${_target})
+ENDIF()
+
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
@@ -176,13 +231,15 @@ TARGET_LINK_LIBRARIES(
          TwkQtChat
          TwkUtil
          Boost::thread
-         Qt5::Core
-         Qt5::Gui
-         Qt5::Widgets
-         Qt5::OpenGL
+         Qt::Core
+         Qt::Gui
+         Qt::Widgets
+         Qt::OpenGL
+         ${QT6_QOPENGLWIDGET_TARGET}
+         ${_rvcommon_core5compat_link_libraries}
   PRIVATE Python::Python
           IPBaseNodes
-          MuQt5
+          ${RV_QT_MU_TARGET}
           MuPy
           PyTwkApp
           QTAudioRenderer
@@ -214,15 +271,41 @@ IF(RV_TARGET_DARWIN)
   )
 ENDIF()
 
+# https://doc.qt.io/qt-6/extras-changes-qt6.html
+#
+# The Qt X11 Extras module was removed in Qt 6.
+
+# For QX11Info::connection(), use QNativeInterface::QX11Application::connection() instead. For QX11Info::display(), use
+# QNativeInterface::QX11Application::display() instead. For QX11Info::isPlatformX11(), check QNativeInterface::QX11Application existence instead.
+#
+# Clients that still rely on the functionality in QX11Info class can include the private header <QtGui/private/qtx11extras_p.h> as a stopgap solution. To enable
+# private headers use QT += gui-private with qmake, or add a project dependency to Qt::GuiPrivate with CMake.
+
 IF(RV_TARGET_LINUX)
+  IF(RV_VFX_PLATFORM STREQUAL CY2023)
+    SET(_rvcommon_qt_components
+        X11Extras
+    )
+    SET(_rvcommon_link_libraries
+        Qt::X11Extras
+    )
+  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+    SET(_rvcommon_qt_components
+        Gui
+    )
+    SET(_rvcommon_link_libraries
+        Qt::GuiPrivate
+    )
+  ENDIF()
+
   FIND_PACKAGE(
-    Qt5
-    COMPONENTS X11Extras
+    ${RV_QT_PACKAGE_NAME}
+    COMPONENTS ${_rvcommon_qt_components}
     REQUIRED
   )
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE X11 Qt5::X11Extras
+    PRIVATE X11 ${_rvcommon_link_libraries}
   )
 ENDIF()
 
@@ -233,10 +316,16 @@ IF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-IF(RV_TARGET_LINUX OR RV_TARGET_WINDOWS)
-  SET(_rv_icon_path_suffix_ "/../resources/RV.ico")
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  SET(_rv_icon_path_suffix_
+      "/../resources/RV.ico"
+  )
 ELSEIF(RV_TARGET_DARWIN)
-  SET(_rv_icon_path_suffix_ "/../Resources/RV.ico")
+  SET(_rv_icon_path_suffix_
+      "/../Resources/RV.ico"
+  )
 ENDIF()
 
 SET(RV_ICON_PATH_SUFFIX

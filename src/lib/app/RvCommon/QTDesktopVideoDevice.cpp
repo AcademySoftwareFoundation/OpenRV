@@ -15,8 +15,8 @@
 #include <RvCommon/QTDesktopVideoDevice.h>
 #include <TwkGLF/GLFBO.h>
 #include <QtGui/QtGui>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QApplication>
+#include <QScreen>
 
 namespace Rv
 {
@@ -27,14 +27,20 @@ namespace Rv
 
     //----------------------------------------------------------------------
 
-    class ScreenView : public QGLWidget
+    class ScreenView : public QOpenGLWidget
     {
     public:
-        ScreenView(const QGLFormat& fmt, QWidget* parent, QGLWidget* share,
-                   Qt::WindowFlags flags)
-            : QGLWidget(fmt, parent, share, flags)
+        ScreenView(const QSurfaceFormat& fmt, QWidget* parent,
+                   QOpenGLWidget* share, Qt::WindowFlags flags)
+            : QOpenGLWidget(parent, flags)
         {
-            setAutoBufferSwap(false);
+            // NOTE_QT: setAutoBUfferSwap does not exist anymore.
+            // setAutoBufferSwap(false);
+            setFormat(fmt);
+            if (share)
+            {
+                context()->setShareContext(share->context());
+            }
         }
 
         ~ScreenView() {}
@@ -53,8 +59,16 @@ namespace Rv
         , m_x(0)
         , m_y(0)
     {
-        const QDesktopWidget* desktop = qApp->desktop();
-        QRect rect = desktop->screenGeometry(screen);
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        if (screen < 0 || screen >= screens.size())
+        {
+            // Handle invalid screen index.
+            // TODO_QT
+            std::cout << "Screen index is out of range" << std::endl;
+        }
+
+        const QRect rect = screens[screen]->geometry();
+
         ostringstream str;
         str << rect.width() << " x " << rect.height();
         m_videoFormats.push_back(
@@ -64,7 +78,7 @@ namespace Rv
 
     QTDesktopVideoDevice::~QTDesktopVideoDevice() { close(); }
 
-    void QTDesktopVideoDevice::setWidget(QGLWidget* widget)
+    void QTDesktopVideoDevice::setWidget(QOpenGLWidget* widget)
     {
         m_view = widget;
         m_translator = new QTTranslator(this, m_view);
@@ -91,7 +105,7 @@ namespace Rv
         if (m_view && m_view->isVisible())
         {
             ScopedLock lock(m_mutex);
-            m_view->updateGL();
+            m_view->update();
         }
         else
         {
@@ -105,7 +119,8 @@ namespace Rv
         {
             ScopedLock lock(m_mutex);
             makeCurrent();
-            m_view->swapBuffers();
+            // NOTE_QT: swapBuffer is under the context now.
+            m_view->context()->swapBuffers(m_view->context()->surface());
         }
     }
 
@@ -115,14 +130,17 @@ namespace Rv
         //  always make the fullscreen device synced
         //
 
-        QGLFormat fmt = shareDevice()->widget()->format();
+        // NOTE_QT: QSurfaceFormat replace QGLFormat.
+
+        QSurfaceFormat fmt = shareDevice()->widget()->format();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
         ScreenView* s =
             new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
         setWidget(s);
         setViewDevice(new QTGLVideoDevice(0, "local view", s));
 
-        QRect g = QApplication::desktop()->screenGeometry(m_screen);
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        QRect g = screens[m_screen]->geometry();
         widget()->move(g.x(), g.y());
         widget()->setWindowState(Qt::WindowFullScreen);
         widget()->show();
@@ -148,25 +166,29 @@ namespace Rv
 
     VideoDevice::Resolution QTDesktopVideoDevice::resolution() const
     {
-        QRect g = QApplication::desktop()->screenGeometry(m_screen);
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        QRect g = screens[m_screen]->geometry();
         return Resolution(g.width(), g.height(), 1.0, 1.0);
     }
 
     size_t QTDesktopVideoDevice::width() const
     {
-        QRect g = QApplication::desktop()->screenGeometry(m_screen);
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        QRect g = screens[m_screen]->geometry();
         return g.width();
     }
 
     size_t QTDesktopVideoDevice::height() const
     {
-        QRect g = QApplication::desktop()->screenGeometry(m_screen);
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        QRect g = screens[m_screen]->geometry();
         return g.height();
     }
 
     VideoDevice::VideoFormat QTDesktopVideoDevice::format() const
     {
-        QRect g = QApplication::desktop()->screenGeometry(m_screen);
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        QRect g = screens[m_screen]->geometry();
         ostringstream str;
         str << g.width() << " x " << g.height();
         const float pa = 1.0;
@@ -193,9 +215,37 @@ namespace Rv
         //
 
         // Get the context for this screen
-        QDesktopWidget* desktop = QApplication::desktop();
-        WId id = desktop->screen(m_screen)->effectiveWinId();
-        HDC hdc = GetDC(reinterpret_cast<HWND>(id));
+        const QList<QScreen*> screens = QGuiApplication::screens();
+
+        // Ensure the screen index is valid.
+        if (m_screen < 0 || m_screen >= screens.size())
+        {
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        QScreen* targetScreen = screens[m_screen];
+        QWindow* windowOnTargetScreen = nullptr;
+        const QList<QWindow*> windows = QGuiApplication::topLevelWindows();
+
+        // Check all windows to find one on the target screen.
+        for (QWindow* window : windows)
+        {
+            if (window->screen() == targetScreen)
+            {
+                windowOnTargetScreen = window;
+            }
+        }
+
+        if (!windowOnTargetScreen)
+        {
+            // Return empty profile if no window is found on the screen.
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        HWND hwnd = reinterpret_cast<HWND>(windowOnTargetScreen->winId());
+        HDC hdc = GetDC(hwnd);
 
         if (hdc)
         {
@@ -226,7 +276,7 @@ namespace Rv
             }
 
             delete path;
-            ReleaseDC(reinterpret_cast<HWND>(id), hdc);
+            ReleaseDC(hwnd, hdc);
         }
         else
         {

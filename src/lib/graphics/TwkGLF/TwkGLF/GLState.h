@@ -61,19 +61,11 @@ namespace TwkGLF
 
         struct FixedFunctionPipeline
         {
-            FixedFunctionPipeline(GLState* s)
-                : state(s)
-                , program(s->activeGLProgram())
-            {
-                glUseProgram(GLuint(0));
-            }
+            FixedFunctionPipeline(GLState* s);
 
-            void setViewport(int x, int y, int w, int h)
-            {
-                glViewport(x, y, w, h);
-            }
+            void setViewport(int x, int y, int w, int h);
 
-            ~FixedFunctionPipeline() { state->useGLProgram(program); }
+            ~FixedFunctionPipeline();
 
             GLState* state;
             const GLProgram* program;

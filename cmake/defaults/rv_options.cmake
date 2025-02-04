@@ -75,6 +75,7 @@ SET(RV_VFX_PLATFORM
     "${_RV_VFX_PLATFORM}"
     CACHE STRING "Set the VFX platform for installaing external dependencies" FORCE
 )
+
 SET_PROPERTY(
   CACHE RV_VFX_PLATFORM
   PROPERTY STRINGS ${_RV_VFX_PLATFORM}

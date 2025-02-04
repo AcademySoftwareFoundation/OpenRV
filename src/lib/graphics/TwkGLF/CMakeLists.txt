@@ -60,6 +60,12 @@ SET(_shaders
 
 FIND_PACKAGE(OpenGL REQUIRED)
 
+FIND_PACKAGE(
+  ${RV_QT_PACKAGE_NAME}
+  COMPONENTS Core Gui OpenGL Widgets
+  REQUIRED
+)
+
 # Create shaders and add them to sources
 QUOTE_FILES(_cooked_shaders INPUT_LIST ${_shaders} SUFFIX "glsl")
 LIST(APPEND _sources ${_cooked_shaders})
@@ -82,7 +88,18 @@ TARGET_INCLUDE_DIRECTORIES(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-TARGET_LINK_LIBRARIES(${_target} TwkApp TwkFB TwkGLText TwkUtil TwkAudio)
+TARGET_LINK_LIBRARIES(
+  ${_target}
+  TwkApp
+  TwkFB
+  TwkGLText
+  TwkUtil
+  TwkAudio
+  Qt::Core
+  Qt::Gui
+  Qt::Widgets
+  Qt::OpenGL
+)
 
 IF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(${_target} glew)

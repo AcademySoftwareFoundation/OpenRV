@@ -89,7 +89,6 @@ namespace IPCore
                            IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_useRawConfig(false)
-        , m_lock(QMutex::Recursive)
     {
         Property::Info* info = new Property::Info();
         info->setPersistent(false);

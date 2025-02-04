@@ -8,6 +8,7 @@
 #ifndef __TwkQtChat__Connection__h__
 #define __TwkQtChat__Connection__h__
 #include <iostream>
+#include <QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QString>
 #include <QtNetwork/QTcpSocket>
@@ -103,7 +104,7 @@ namespace TwkQtChat
         QString m_expectedContactName;
         QHostAddress m_expectedAddress;
         QTimer m_pingTimer;
-        QTime m_pongTime;
+        QElapsedTimer m_pongTime;
         QByteArray m_buffer;
         ConnectionState m_state;
         DataType m_currentDataType;

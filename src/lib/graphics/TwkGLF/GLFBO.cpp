@@ -11,6 +11,8 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/sgcHopTools.h>
 
+#include <QOpenGLContext>
+
 namespace TwkGLF
 {
     using namespace std;
@@ -30,14 +32,14 @@ namespace TwkGLF
         , m_totalSizeInBytes(0)
         , m_mappedBuffer(0)
     {
-        glGenFramebuffersEXT(1, &m_id);
+        glGenFramebuffers(1, &m_id);
         TWK_GLDEBUG;
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_id);
+        glBindFramebuffer(GL_FRAMEBUFFER_EXT, m_id);
         TWK_GLDEBUG;
     }
 
     GLFBO::GLFBO(const GLVideoDevice* d)
-        : m_id(0)
+        : m_id(QOpenGLContext::currentContext()->defaultFramebufferObject())
         , m_width(0)
         , m_height(0)
         , m_samples(0)

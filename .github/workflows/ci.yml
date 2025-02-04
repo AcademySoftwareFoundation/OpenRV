@@ -22,6 +22,17 @@ on:
 
 env:
   SKIP_DEPS_CACHE: 'false'
+  QT5_MODULES: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+  ROCKY_QT5_ARCHIVES: 'icu qt3d qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwayland qtwebchannel qtwebsockets qtwebview qtx11extras qtxmlpatterns'
+  MACOX_X86_64_QT5_ARCHIVES: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+  WINDOWS_QT5_ARCHIVES: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+
+  ROCKY_QT6_MODULES: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
+  ROCKY_QT6_ARCHIVES: 'icu qtbase qtdeclarative qtsvg qttools qttranslations qtwayland'
+  MACOX_X86_64_QT6_MODULES: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
+  MACOX_X86_64_QT6_ARCHIVES: 'qtbase qtdeclarative qtsvg qttools qttranslations'
+  WINDOWS_QT6_MODULES: 'debug_info qt3d qt5compat qtactiveqt qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
+  WINDOWS_QT6_ARCHIVES: 'd3dcompiler_47 opengl32sw qtbase qtdeclarative qtsvg qttools qttranslations'
 
 jobs:
   rocky-linux:
@@ -41,6 +52,12 @@ jobs:
         - /usr/share/dotnet:/github/home/dotnet
         - /opt/ghc:/github/home/ghc
         - /usr/local/.ghcup:/github/home/.ghcup
+        - /usr/local/graalvm:/github/home/graalvm
+        - /usr/local/share/powershell:/github/home/powershell
+        - /usr/local/share/chromium:/github/home/chromium
+        - /usr/local/lib/node_modules:/github/home/node_modules
+        - /opt/hostedtoolcache/CodeQL:/github/home/CodeQL
+        - /usr/local/share/boost:/github/home/boost
     strategy:
       fail-fast: false
       matrix:
@@ -85,6 +102,48 @@ jobs:
             python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "crb"
+
+          # CY2024
+          - os: "ubuntu-latest"
+            rocky-version: "8"
+            image: "amd64/rockylinux:8"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            cmake-version: "3.29.8"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
+            extra_repo: "powertools"
+          - os: "ubuntu-latest"
+            rocky-version: "9"
+            image: "amd64/rockylinux:9"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            cmake-version: "3.29.8"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
+            extra_repo: "crb"
+          - os: "ubuntu-latest"
+            rocky-version: "8"
+            image: "amd64/rockylinux:8"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            cmake-version: "3.29.8"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
+            extra_repo: "powertools"
+          - os: "ubuntu-latest"
+            rocky-version: "9"
+            image: "amd64/rockylinux:9"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            cmake-version: "3.29.8"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
+            extra_repo: "crb"
     steps:
       - name: Display disk space
         run: |
@@ -98,6 +157,12 @@ jobs:
           rm -rf /github/home/dotnet || true
           rm -rf /github/home/ghc || true
           rm -rf /github/home/.ghcup || true   
+          rm -rf /github/home/graalvm || true
+          rm -rf /github/home/powershell || true
+          rm -rf /github/home/chromium || true
+          rm -rf /github/home/node_modules || true
+          rm -rf /github/home/CodeQL || true
+          rm -rf /github/home/boost || true
 
       - name: Display disk space
         run: |
@@ -108,8 +173,10 @@ jobs:
           dnf install -y epel-release
           dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel
           dnf groupinstall "Development Tools" -y
-          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget
+          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd
+          dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel
           dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
+          dnf clean all
 
       - name: Install other system dependencies
         if: ${{ matrix.rocky-version == '9' }}
@@ -164,6 +231,7 @@ jobs:
           mkdir -p "${{ github.workspace }}/deps"
 
       - name: Install Qt ${{ matrix.qt-version }}
+        if: ${{ matrix.vfx-platform == 'CY2023' }}
         uses: jurplel/install-qt-action@v4
         with:
           version: '${{ matrix.qt-version }}'
@@ -172,8 +240,28 @@ jobs:
           arch: 'gcc_64'
           dir: "${{ github.workspace }}/deps"
           install-deps: 'false'
-          modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
-          archives: 'icu qt3d qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwayland qtwebchannel qtwebsockets qtwebview qtx11extras qtxmlpatterns'
+          modules: ${{ env.QT5_MODULES }}
+          archives: ${{ env.ROCKY_QT5_ARCHIVES }}
+          # Caching only save 2 minutes. Keep the cache for longer operations.
+          cache: false
+          setup-python: 'false'
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.1.*'
+      
+      - name: Install Qt ${{ matrix.qt-version }}
+        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '${{ matrix.qt-version }}'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          dir: "${{ github.workspace }}/deps"
+          install-deps: 'false'
+          modules: ${{ env.ROCKY_QT6_MODULES }}
+          archives: ${{ env.ROCKY_QT6_ARCHIVES }}
           # Caching only save 2 minutes. Keep the cache for longer operations.
           cache: false
           setup-python: 'false'
@@ -190,9 +278,16 @@ jobs:
       # because there is not enough room in the cache (10GB limit) for all platforms.
 
       - name: Configure OpenRV
+        if: ${{ matrix.vfx-platform == 'CY2023' }}
         run: |
           export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ matrix.qt-version}}/gcc_64
           cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+
+      - name: Configure OpenRV
+        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        run: |
+          export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ matrix.qt-version}}/gcc_64
+          cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT6_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
    
       - name: Build OpenRV dependencies
         run: |
@@ -205,6 +300,11 @@ jobs:
       - name: Tests
         run: |
           ctest --test-dir _build -C ${{ matrix.build-type }} --extra-verbose
+
+      - name: Free some spaces for the install steps
+        run: |
+          rm -rf _build/RV_DEPS_*
+          rm -rf _build/_deps
 
       - name: Install OpenRV
         run: |
@@ -235,6 +335,36 @@ jobs:
             qt-version: "5.15.2"
             python-version: "3.10"
             vfx-platform: "CY2023"
+
+          # VFX2024
+          - os: "macos-13"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            vfx-platform: "CY2024"
+          - os: "macos-14"
+            arch-type: "arm64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            vfx-platform: "CY2024"
+          - os: "macos-13"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            vfx-platform: "CY2024"
+          - os: "macos-14"
+            arch-type: "arm64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            vfx-platform: "CY2024"
     steps:
       - name: Check if it is a schedule job
         if: github.event_name == 'schedule'
@@ -272,7 +402,7 @@ jobs:
           mkdir -p "${{ github.workspace }}/deps"
 
       - name: Install Qt ${{ matrix.qt-version }}
-        if: matrix.arch-type == 'x86_64'
+        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
         uses: jurplel/install-qt-action@v4
         with:
           version: '${{ matrix.qt-version }}'
@@ -281,8 +411,8 @@ jobs:
           arch: 'clang_64'
           dir: "${{ github.workspace }}/deps"
           install-deps: 'false'
-          modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
-          archives: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+          modules: ${{ env.QT5_MODULES }}
+          archives: ${{ env.MACOX_X86_64_QT5_ARCHIVES }}
           # Caching only save 2 minutes. Keep the cache for longer operations.
           cache: false
           setup-python: 'false'
@@ -291,8 +421,29 @@ jobs:
           tools-only: 'false'
           aqtversion: '==3.1.*'
 
+      - name: Install Qt ${{ matrix.qt-version }}
+        if: matrix.vfx-platform == 'CY2024'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '${{ matrix.qt-version }}'
+          host: 'mac'
+          target: 'desktop'
+          # clang_64 contains both x86_64 and arm64 for Qt 6.
+          arch: 'clang_64' 
+          dir: "${{ github.workspace }}/deps"
+          install-deps: 'false'
+          modules: ${{ env.MACOX_X86_64_QT6_MODULES }}
+          archives: ${{ env.MACOX_X86_64_QT6_ARCHIVES }}
+          # Caching only save 2 minutes. Keep the cache for longer operations.
+          cache: false
+          setup-python: true
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.1.*'
+
       - name: Patch Qt ${{ matrix.qt-version }}
-        if: matrix.arch-type == 'x86_64'
+        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
         # There is an issue with Clang15 and Qt < 5.15.15.
         run: |
           curl -o file.zip https://codereview.qt-project.org/changes/qt%2Fqtbase~503172/revisions/3/files/mkspecs%2Ffeatures%2Ftoolchain.prf/download
@@ -309,18 +460,28 @@ jobs:
           python3 -m pip install --user --upgrade -r requirements.txt
   
       - name: Install Homebrew dependencies
+        # icu4c is needed for Qt UIC executable / AUTOUIC.
+        # Might be to find another way to install icu4c if the icu4c recipe disappear.
         run: |
-          brew install --quiet --formula cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew icu4c
+          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+          brew install --formula icu4c@74
 
       - name: Set QT_HOME
-        if: matrix.arch-type == 'x86_64'
+        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
+        # With aqt, the universal binaries are under clang_64 and not macos folder.
         run: |
           echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64" >> $GITHUB_ENV
           
       - name: Set QT_HOME
-        if: matrix.arch-type == 'arm64'
+        if: matrix.arch-type == 'arm64' && matrix.vfx-platform == 'CY2023'
+        # The path for QT_HOME is diferent for arm64 CY2023 because we have to build it in the CI.
         run: |
           echo "QT_HOME=${{ github.workspace }}/deps" >> $GITHUB_ENV
+
+      - name: Set QT_HOME
+        if: matrix.vfx-platform == 'CY2024'
+        run: |
+          echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/macos" >> $GITHUB_ENV
 
       - name: Check if the dependencies changed
         if: matrix.build-type == 'Release'
@@ -341,12 +502,18 @@ jobs:
             ./_build/RV_DEPS_*
             ./_build/cmake/dependencies
             ./_build/_deps
-          key: macos-${{ matrix.arch-type }}-dependencies
+          key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
 
       - name: Configure OpenRV
+        if: ${{ matrix.vfx-platform == 'CY2023' }}
         run: |
           cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
-   
+
+      - name: Configure OpenRV
+        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        run: |
+          cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT6_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+
       - name: Build OpenRV dependencies
         if: steps.cmake-dependencies.outputs.cache-hit != 'true'
         run: |
@@ -356,7 +523,7 @@ jobs:
       - name: Build OpenRV main executable
         run: |
           cmake --build _build --config ${{ matrix.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
-
+      
       - name: Tests
         run: |
           ctest --test-dir _build -C ${{ matrix.build-type }} --extra-verbose
@@ -396,6 +563,26 @@ jobs:
             python-version: "3.10"
             cmake-version: "3.29.8"
             vfx-platform: "CY2023"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+
+          # VFX2024
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            python-version: "3.11"
+            cmake-version: "3.29.8"
+            vfx-platform: "CY2024"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            python-version: "3.11"
+            cmake-version: "3.29.8"
+            vfx-platform: "CY2024"
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
 
@@ -482,7 +669,7 @@ jobs:
           
       - name: Set PATH environment variable
         run: |
-          echo "export PATH=\"/c/Program Files/CMake/bin:/c/hostedtoolcache/windows/Python/3.11.9/x64:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin\"" >> ~/.bash_profile
+          echo "export PATH=\"/c/Program Files/CMake/bin:/c/hostedtoolcache/windows/Python/3.10.11/x64:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin\"" >> ~/.bash_profile
         shell: msys2 {0}
 
       - name: Set ACLOCAL_PATH environment variable
@@ -505,6 +692,7 @@ jobs:
         shell: msys2 {0}
 
       - name: Install Qt ${{ matrix.qt-version }}
+        if: ${{ matrix.vfx-platform == 'CY2023' }}
         uses: jurplel/install-qt-action@v4
         with:
           version: '${{ matrix.qt-version }}'
@@ -513,8 +701,28 @@ jobs:
           arch: 'win64_msvc2019_64'
           dir: "c:/"
           install-deps: 'false'
-          modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
-          archives: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+          modules: ${{ env.qt5_modules }}
+          archives: ${{ env.WINDOWS_QT5_ARCHIVES }}
+          # Caching only save 2 minutes. Keep the cache for longer operations.
+          cache: false
+          setup-python: 'false'
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.1.*'
+
+      - name: Install Qt ${{ matrix.qt-version }}
+        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '${{ matrix.qt-version }}'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          dir: "c:/"
+          install-deps: 'false'
+          modules: ${{ env.WINDOWS_QT6_MODULES }}
+          archives: ${{ env.WINDOWS_QT6_ARCHIVES }}
           # Caching only save 2 minutes. Keep the cache for longer operations.
           cache: false
           setup-python: 'false'
@@ -550,9 +758,17 @@ jobs:
           key: windows-dependencies
 
       - name: Configure OpenRV
+        if: ${{ matrix.vfx-platform == 'CY2023' }}
         run: |
           export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
           cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+        shell: msys2 {0}
+
+      - name: Configure OpenRV
+        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        run: |
+          export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
+          cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT6_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
         shell: msys2 {0}
           
       - name: Build OpenRV dependencies

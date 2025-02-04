@@ -9,7 +9,7 @@
 #define __RvCommon__QTGLVideoDevice__h__
 #include <iostream>
 #include <TwkGLF/GLVideoDevice.h>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
 #include <QtWidgets/QWidget>
 #include <RvCommon/QTTranslator.h>
 
@@ -28,13 +28,13 @@ namespace Rv
     {
     public:
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                        QGLWidget* view);
+                        QOpenGLWidget* view);
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
 
-        void setWidget(QGLWidget*);
+        void setWidget(QOpenGLWidget*);
 
-        QGLWidget* widget() const { return m_view; }
+        QOpenGLWidget* widget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
@@ -70,13 +70,13 @@ namespace Rv
         }
 
     protected:
-        QTGLVideoDevice(const std::string& name, QGLWidget* view);
+        QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
 
     protected:
         int m_x;
         int m_y;
         float m_refresh;
-        QGLWidget* m_view;
+        QOpenGLWidget* m_view;
         QTTranslator* m_translator;
     };
 

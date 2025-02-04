@@ -290,7 +290,7 @@ namespace TwkQtChat
             if (m_pingpong)
             {
                 m_pingTimer.start();
-                m_pongTime.start();
+                m_pongTime.restart();
             }
             m_state = ReadyForUse;
 
@@ -315,7 +315,7 @@ namespace TwkQtChat
     void Connection::startPingPong()
     {
         DB("turning on heartbeat");
-        m_pongTime.start();
+        m_pongTime.restart();
         m_pingTimer.start();
         m_pingpong = true;
     }
@@ -549,7 +549,7 @@ namespace TwkQtChat
         if (m_pingpong)
         {
             m_pingTimer.start();
-            m_pongTime.start();
+            m_pongTime.restart();
         }
         m_currentDataType = Undefined;
         m_numBytesForCurrentDataType = 0;

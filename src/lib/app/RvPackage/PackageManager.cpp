@@ -18,6 +18,8 @@
 #include <string_view>
 #include <iostream>
 
+#include <QRegularExpression>
+
 namespace Rv
 {
     using namespace std;
@@ -198,8 +200,8 @@ namespace Rv
     int PackageManager::findPackageIndexByZip(const QString& zipfile)
     {
         QString zipfileCanonical = QFileInfo(zipfile).canonicalFilePath();
-        QString pattern = zipfile + "-.*\\.rvpkg";
-        QRegExp rx(pattern);
+        QString pattern = QRegularExpression::escape(zipfile) + "-.*\\.rvpkg";
+        QRegularExpression rx(pattern);
 
         for (size_t i = 0; i < m_packages.size(); i++)
         {
@@ -207,8 +209,8 @@ namespace Rv
 
             if (info.fileName() == zipfile || info.absoluteFilePath() == zipfile
                 || info.absoluteFilePath() == zipfileCanonical
-                || rx.exactMatch(info.fileName())
-                || rx.exactMatch(info.absoluteFilePath()))
+                || rx.match(info.fileName()).hasMatch()
+                || rx.match(info.absoluteFilePath()).hasMatch())
             {
                 return i;
             }
@@ -372,7 +374,7 @@ namespace Rv
 
         QStringList deps = package.
                                requires
-            .split(" ", QString::SkipEmptyParts);
+            .split(" ", Qt::SkipEmptyParts);
         QStringList missing;
         QStringList notinstalled;
         QFileInfo info(package.file);
@@ -878,9 +880,6 @@ namespace Rv
         profdir.cd("Nodes");
 
         QFileInfo pfile(package.file);
-        QRegExp rvpkgRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkg");
-        QRegExp zipRE("(.*)\\.zip");
-        QRegExp rvpkgsRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkgs");
         QString pname = package.baseName;
 
         if (!supportdir.exists(pname))
@@ -1428,16 +1427,18 @@ namespace Rv
                             });
                     }
 
-                    QRegExp rvpkgRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkg");
-                    QRegExp zipRE("(.*)\\.zip");
+                    QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
+                    QRegularExpression zipRE(R"((.*)\.zip)");
 
-                    if (rvpkgRE.exactMatch(finfo.fileName()))
+                    QRegularExpressionMatch match =
+                        rvpkgRE.match(finfo.fileName());
+                    if (!match.hasMatch())
                     {
-                        pname = rvpkgRE.capturedTexts()[1];
+                        match = zipRE.match(finfo.fileName());
                     }
-                    else if (zipRE.exactMatch(finfo.fileName()))
+                    if (match.hasMatch())
                     {
-                        pname = zipRE.capturedTexts()[1];
+                        pname = match.captured(1);
                     }
 
                     package.baseName = pname;
@@ -1471,7 +1472,7 @@ namespace Rv
             }
             else
             {
-                QStringList parts = line.split(",", QString::KeepEmptyParts);
+                QStringList parts = line.split(",", Qt::KeepEmptyParts);
 
                 if (parts.size() >= 7 && parts[0] != "#")
                 {
@@ -1647,7 +1648,7 @@ namespace Rv
             Package& package = m_packages[i];
             QStringList deps = package.
                                    requires
-                .split(" ", QString::SkipEmptyParts);
+                .split(" ", Qt::SkipEmptyParts);
 
             for (size_t q = 0; q < deps.size(); q++)
             {
@@ -1829,9 +1830,9 @@ namespace Rv
         //  First check that package files exist and have legal names
         //
 
-        QRegExp rvpkgRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkg");
-        QRegExp rvpkgsRE("(.*)-[0-9]+\\.[0-9]+\\.rvpkgs"); // Bundle
-        QRegExp zipRE("(.*)\\.zip");
+        QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
+        QRegularExpression rvpkgsRE(R"(.*)-[0-9]+\.[0-9]+\.rvpkgs)"); // bundle
+        QRegularExpression zipRE(R"((.*)\.zip)");
 
         for (size_t i = 0; i < files.size(); i++)
         {
@@ -1866,9 +1867,9 @@ namespace Rv
                 return false;
             }
 
-            if (!rvpkgRE.exactMatch(info.fileName())
-                && !zipRE.exactMatch(info.fileName())
-                && !rvpkgsRE.exactMatch(info.fileName()))
+            if (!rvpkgRE.match(info.fileName()).hasMatch()
+                && !zipRE.match(info.fileName()).hasMatch()
+                && !rvpkgsRE.match(info.fileName()).hasMatch())
             {
                 QString t("ERROR: Illegal package file name: ");
                 t += info.fileName();

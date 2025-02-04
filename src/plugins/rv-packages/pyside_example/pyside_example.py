@@ -1,15 +1,25 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import os
 
-from PySide2 import QtGui, QtCore, QtWidgets
-from PySide2.QtGui import *
-from PySide2.QtCore import *
-from PySide2.QtWidgets import *
-from PySide2.QtUiTools import QUiLoader
+try:
+    from PySide2 import QtGui, QtCore, QtWidgets
+    from PySide2.QtGui import *
+    from PySide2.QtCore import *
+    from PySide2.QtWidgets import *
+    from PySide2.QtUiTools import QUiLoader
+except ImportError:
+    try:
+        from PySide6 import QtGui, QtCore, QtWidgets
+        from PySide6.QtGui import *
+        from PySide6.QtCore import *
+        from PySide6.QtWidgets import *
+        from PySide6.QtUiTools import QUiLoader
+    except ImportError:
+        pass
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *

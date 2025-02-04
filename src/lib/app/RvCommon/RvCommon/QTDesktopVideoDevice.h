@@ -12,7 +12,7 @@
 #include <TwkGLF/GLVideoDevice.h>
 #include <TwkApp/VideoModule.h>
 #include <QtWidgets/QWidget>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
 #include <RvCommon/QTGLVideoDevice.h>
 
 namespace Rv
@@ -46,9 +46,9 @@ namespace Rv
 
         //  From QTGLVideoDevice
 
-        void setWidget(QGLWidget*);
+        void setWidget(QOpenGLWidget*);
 
-        QGLWidget* widget() const { return m_view; }
+        QOpenGLWidget* widget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
@@ -89,7 +89,7 @@ namespace Rv
         int m_screen;
         int m_x;
         int m_y;
-        QGLWidget* m_view;
+        QOpenGLWidget* m_view;
         QTTranslator* m_translator;
         mutable ColorProfile m_colorProfile;
     };

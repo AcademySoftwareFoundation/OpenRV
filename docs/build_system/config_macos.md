@@ -58,7 +58,7 @@ Make sure Homebrew's binary directory is in your PATH and that `brew` is resolve
 Most of the build requirements can be installed by running the following brew install command:
 
 ```bash
-brew install cmake ninja readline sqlite3 xz zlib tcl-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
+brew install cmake ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
 ```
 
 Make sure `python` resolves in your terminal. In some case, depending on how the python formula is built, there's no `python` symbolic link.

@@ -2691,8 +2691,6 @@ namespace IPCore
             }
             else
             {
-                filename = lookupFilenameInMediaLibrary(filename);
-
                 openMovieTask(filename, SharedMediaPointer());
             }
         }
@@ -2701,18 +2699,6 @@ namespace IPCore
         {
             if (!media.empty())
             {
-                // Lookup the filenames in the media library, save associated
-                // HTTP header and cookies if any, and return the actual
-                // filename to be used for opening the movie in case of
-                // redirection.
-                // Note: This needs to be done in the main thread, NOT in the
-                // worker thread because the media library is python based and
-                // thus should only be executed in the main thread.
-                for (size_t i = 0; i < media.size(); i++)
-                {
-                    media[i] = lookupFilenameInMediaLibrary(media[i]);
-                }
-
                 // Then add a work item to load the actual media movies.
                 m_workItemID = graph()->addWorkItem(
                     [this, sharedMedias, media]()
@@ -2745,6 +2731,102 @@ namespace IPCore
         //  graph using this thread (which is usually some worker thread
         //  in IPGraph).
         //
+        Bundle* bundle = Bundle::mainBundle();
+
+        string file = filename;
+        if (TwkMediaLibrary::isLibraryURL(file))
+        {
+            //
+            //  If this file looks like a library URL try to convert it
+            //  into a local file URL and then a path
+            //
+
+            string local = TwkMediaLibrary::libraryURLtoMediaURL(file);
+            local.erase(0, 7); // assuming "file://" not good
+            file = local;
+        }
+        else if (TwkMediaLibrary::isLibraryMediaURL(file))
+        {
+            //
+            //  URL is a media URL tracked by one of the libraries. Find its
+            //  media node and find out if its streaming.
+            //
+
+            TwkMediaLibrary::NodeVector nodes =
+                TwkMediaLibrary::libraryNodesAssociatedWithURL(file);
+            for (int n = 0; n < nodes.size(); n++)
+            {
+                const TwkMediaLibrary::Node* node = nodes[n];
+                std::string nodeName = node->name();
+
+                if (const TwkMediaLibrary::MediaAPI* api =
+                        TwkMediaLibrary::api_cast<TwkMediaLibrary::MediaAPI>(
+                            node))
+                {
+                    if (api->isStreaming())
+                    {
+                        TwkMediaLibrary::HTTPCookieVector cookies =
+                            api->httpCookies();
+                        if (!cookies.empty())
+                        {
+                            ostringstream cookieStm;
+
+                            for (int c = 0; c < cookies.size(); c++)
+                            {
+                                if (c > 0)
+                                    cookieStm << "\n";
+                                cookieStm << cookies[c].name << "="
+                                          << cookies[c].value;
+
+                                if (!cookies[c].path.empty())
+                                    cookieStm << "; path=" << cookies[c].path;
+                                if (!cookies[c].domain.empty())
+                                    cookieStm << "; domain="
+                                              << cookies[c].domain;
+                            }
+
+                            if (evDebugCookies.getValue())
+                                std::cout << "Cookies:\n"
+                                          << cookieStm.str() << std::endl;
+
+                            m_inparams.push_back(
+                                StringPair("cookies", cookieStm.str()));
+                        }
+
+                        TwkMediaLibrary::HTTPHeaderVector headers =
+                            api->httpHeaders();
+                        if (!headers.empty())
+                        {
+                            ostringstream headersStm;
+
+                            for (size_t h = 0, size = headers.size(); h < size;
+                                 ++h)
+                            {
+                                if (h > 0)
+                                    headersStm << "\r\n";
+                                headersStm << headers[h].name << ": "
+                                           << headers[h].value;
+                            }
+
+                            if (evDebugCookies.getValue())
+                                std::cout << "Headers:\n"
+                                          << headersStm.str() << std::endl;
+
+                            m_inparams.push_back(
+                                StringPair("headers", headersStm.str()));
+                        }
+                    }
+
+                    if (api->isRedirecting())
+                    {
+                        std::string redirection = api->httpRedirection();
+                        std::cout << "INFO: " << nodeName << " is redirecting "
+                                  << file << " to " << redirection << std::endl;
+                        file = redirection;
+                    }
+                }
+            }
+        }
 
         Movie* mov = 0;
         bool failed = false;
@@ -2752,7 +2834,7 @@ namespace IPCore
 
         try
         {
-            mov = openMovie(filename);
+            mov = openMovie(file);
         }
         catch (std::exception& exc)
         {
@@ -2770,14 +2852,14 @@ namespace IPCore
         {
             if (errMsg.tellp() == std::streampos(0))
             {
-                errMsg << "Could not locate \"" << filename
+                errMsg << "Could not locate \"" << file
                        << "\". Relocate source to fix.";
             }
 
             mov = openProxyMovie(errMsg.str(), 0.0, filename, defaultFPS);
 
             ostringstream str;
-            str << name() << ";;" << filename << ";;" << mediaRepName();
+            str << name() << ";;" << file << ";;" << mediaRepName();
             TwkApp::GenericStringEvent event("source-media-unavailable",
                                              graph(), str.str());
 

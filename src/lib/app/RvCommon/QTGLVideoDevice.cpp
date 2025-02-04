@@ -25,7 +25,7 @@ namespace Rv
     using namespace TwkApp;
 
     QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name,
-                                     QGLWidget* view)
+                                     QOpenGLWidget* view)
         : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
         , m_view(view)
         , m_translator(new QTTranslator(this, view))
@@ -45,7 +45,7 @@ namespace Rv
     {
     }
 
-    QTGLVideoDevice::QTGLVideoDevice(const string& name, QGLWidget* view)
+    QTGLVideoDevice::QTGLVideoDevice(const string& name, QOpenGLWidget* view)
         : GLVideoDevice(NULL, name, NoCapabilities)
         , m_view(view)
         , m_translator(new QTTranslator(this, view))
@@ -58,7 +58,7 @@ namespace Rv
 
     QTGLVideoDevice::~QTGLVideoDevice() { delete m_translator; }
 
-    void QTGLVideoDevice::setWidget(QGLWidget* widget)
+    void QTGLVideoDevice::setWidget(QOpenGLWidget* widget)
     {
         m_view = widget;
         m_translator = new QTTranslator(this, m_view);
@@ -66,13 +66,17 @@ namespace Rv
 
     GLVideoDevice* QTGLVideoDevice::newSharedContextWorkerDevice() const
     {
-        QGLWidget* w = new QGLWidget(m_view->parentWidget(), m_view);
-        return new QTGLVideoDevice(name() + "-workerContextDevice", w);
+        // NOTE_QT: QOpenGLWidget does not take a share parameter anymore. Try
+        // to share with setShareContext.
+        QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view->parentWidget());
+        openGLWidget->context()->setShareContext(m_view->context());
+        return new QTGLVideoDevice(name() + "-workerContextDevice",
+                                   openGLWidget);
     }
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        if (m_view->context()->contextHandle() && m_view->context()->isValid())
+        if (m_view->context() && m_view->context()->isValid())
             m_view->makeCurrent();
         if (!isWorkerDevice())
             GLVideoDevice::makeCurrent();
@@ -108,7 +112,7 @@ namespace Rv
                 m_view->setAttribute(Qt::WA_Mapped);
 #endif
 
-                m_view->updateGL();
+                m_view->update();
             }
             else
             {
@@ -172,7 +176,9 @@ namespace Rv
         if (!isWorkerDevice())
         {
             makeCurrent();
-            m_view->swapBuffers();
+            // NOTE_QT: swapBuffers() does not exist in the QOpenGLWidget. It
+            // under the context.
+            m_view->context()->swapBuffers(m_view->context()->surface());
         }
     }
 
