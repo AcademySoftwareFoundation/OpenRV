@@ -43,15 +43,9 @@ SET(_target
 )
 
 SET(_sources
-    qtModule.cpp
-    Bridge.cpp
-    qtUtils.cpp
-    # TODO_QT: Remove if everything works.
-    # Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
-    #qtGlobals.cpp
-    SignalSpy.cpp
-    RvNetworkAccessManager.cpp
-    QtColorTriangleType.cpp
+    qtModule.cpp Bridge.cpp qtUtils.cpp
+    # TODO_QT: Remove if everything works. Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6 qtGlobals.cpp
+    SignalSpy.cpp RvNetworkAccessManager.cpp QtColorTriangleType.cpp
 )
 
 SET(_autotypes
@@ -70,7 +64,9 @@ SET(_autotypes
     Variant
     Url
     UrlQuery
+    Calendar
     DateTime
+    TimeZone
     Time
     Date
     ByteArray

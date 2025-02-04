@@ -36,7 +36,9 @@
 #include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
 #include <MuQt6/QTimeType.h>
+#include <MuQt6/QCalendarType.h>
 #include <MuQt6/QDateType.h>
+#include <MuQt6/QTimeZoneType.h>
 
 namespace Mu
 {
@@ -82,6 +84,18 @@ namespace Mu
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QDateTimeType>(param_this, QDateTime());
+        return param_this;
+    }
+
+    Pointer qt_QDateTime_QDateTime_QDateTime_QDateTime_QDate_QTime_QTimeZone(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_date,
+        Pointer param_time, Pointer param_timeZone)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QDate arg1 = getqtype<QDateType>(param_date);
+        QTime arg2 = getqtype<QTimeType>(param_time);
+        const QTimeZone arg3 = getqtype<QTimeZoneType>(param_timeZone);
+        setqtype<QDateTimeType>(param_this, QDateTime(arg1, arg2, arg3));
         return param_this;
     }
 
@@ -264,6 +278,16 @@ namespace Mu
         setqtype<QDateTimeType>(param_this, arg0);
     }
 
+    void qt_QDateTime_setTimeZone_void_QDateTime_QTimeZone(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toZone)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QDateTime arg0 = getqtype<QDateTimeType>(param_this);
+        const QTimeZone arg1 = getqtype<QTimeZoneType>(param_toZone);
+        arg0.setTimeZone(arg1);
+        setqtype<QDateTimeType>(param_this, arg0);
+    }
+
     void qt_QDateTime_swap_void_QDateTime_QDateTime(Mu::Thread& NODE_THREAD,
                                                     Pointer param_this,
                                                     Pointer param_other)
@@ -283,12 +307,30 @@ namespace Mu
         return makeqtype<QTimeType>(c, arg0.time(), "qt.QTime");
     }
 
+    Pointer
+    qt_QDateTime_timeRepresentation_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD,
+                                                        Pointer param_this)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QDateTime arg0 = getqtype<QDateTimeType>(param_this);
+        return makeqtype<QTimeZoneType>(c, arg0.timeRepresentation(),
+                                        "qt.QTimeZone");
+    }
+
     int qt_QDateTime_timeSpec_int_QDateTime(Mu::Thread& NODE_THREAD,
                                             Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDateTime arg0 = getqtype<QDateTimeType>(param_this);
         return int(arg0.timeSpec());
+    }
+
+    Pointer qt_QDateTime_timeZone_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD,
+                                                      Pointer param_this)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QDateTime arg0 = getqtype<QDateTimeType>(param_this);
+        return makeqtype<QTimeZoneType>(c, arg0.timeZone(), "qt.QTimeZone");
     }
 
     Pointer
@@ -336,6 +378,17 @@ namespace Mu
         return arg0.toSecsSinceEpoch();
     }
 
+    Pointer qt_QDateTime_toString_string_QDateTime_string_QCalendar(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_format,
+        Pointer param_cal)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QDateTime arg0 = getqtype<QDateTimeType>(param_this);
+        const QString arg1 = qstring(param_format);
+        QCalendar arg2 = getqtype<QCalendarType>(param_cal);
+        return makestring(c, arg0.toString(arg1, arg2));
+    }
+
     Pointer qt_QDateTime_toString_string_QDateTime_int(Mu::Thread& NODE_THREAD,
                                                        Pointer param_this,
                                                        int param_format)
@@ -344,6 +397,16 @@ namespace Mu
         QDateTime arg0 = getqtype<QDateTimeType>(param_this);
         Qt::DateFormat arg1 = (Qt::DateFormat)(param_format);
         return makestring(c, arg0.toString(arg1));
+    }
+
+    Pointer qt_QDateTime_toTimeZone_QDateTime_QDateTime_QTimeZone(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_timeZone)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QDateTime arg0 = getqtype<QDateTimeType>(param_this);
+        const QTimeZone arg1 = getqtype<QTimeZoneType>(param_timeZone);
+        return makeqtype<QDateTimeType>(c, arg0.toTimeZone(arg1),
+                                        "qt.QDateTime");
     }
 
     Pointer qt_QDateTime_toUTC_QDateTime_QDateTime(Mu::Thread& NODE_THREAD,
@@ -376,6 +439,16 @@ namespace Mu
                                         "qt.QDateTime");
     }
 
+    Pointer
+    qt_QDateTime_currentDateTime_QDateTime_QTimeZone(Mu::Thread& NODE_THREAD,
+                                                     Pointer param_zone)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QTimeZone arg0 = getqtype<QTimeZoneType>(param_zone);
+        return makeqtype<QDateTimeType>(c, QDateTime::currentDateTime(arg0),
+                                        "qt.QDateTime");
+    }
+
     Pointer qt_QDateTime_currentDateTime_QDateTime(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -402,6 +475,16 @@ namespace Mu
         return QDateTime::currentSecsSinceEpoch();
     }
 
+    Pointer qt_QDateTime_fromMSecsSinceEpoch_QDateTime_int64_QTimeZone(
+        Mu::Thread& NODE_THREAD, int64 param_msecs, Pointer param_timeZone)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        qint64 arg0 = (int64)(param_msecs);
+        const QTimeZone arg1 = getqtype<QTimeZoneType>(param_timeZone);
+        return makeqtype<QDateTimeType>(
+            c, QDateTime::fromMSecsSinceEpoch(arg0, arg1), "qt.QDateTime");
+    }
+
     Pointer
     qt_QDateTime_fromMSecsSinceEpoch_QDateTime_int64(Mu::Thread& NODE_THREAD,
                                                      int64 param_msecs)
@@ -410,6 +493,16 @@ namespace Mu
         qint64 arg0 = (int64)(param_msecs);
         return makeqtype<QDateTimeType>(c, QDateTime::fromMSecsSinceEpoch(arg0),
                                         "qt.QDateTime");
+    }
+
+    Pointer qt_QDateTime_fromSecsSinceEpoch_QDateTime_int64_QTimeZone(
+        Mu::Thread& NODE_THREAD, int64 param_secs, Pointer param_timeZone)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        qint64 arg0 = (int64)(param_secs);
+        const QTimeZone arg1 = getqtype<QTimeZoneType>(param_timeZone);
+        return makeqtype<QDateTimeType>(
+            c, QDateTime::fromSecsSinceEpoch(arg0, arg1), "qt.QDateTime");
     }
 
     Pointer
@@ -432,10 +525,30 @@ namespace Mu
                                         "qt.QDateTime");
     }
 
+    Pointer qt_QDateTime_fromString_QDateTime_string_string_QCalendar(
+        Mu::Thread& NODE_THREAD, Pointer param_string, Pointer param_format,
+        Pointer param_cal)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QString arg0 = qstring(param_string);
+        const QString arg1 = qstring(param_format);
+        QCalendar arg2 = getqtype<QCalendarType>(param_cal);
+        return makeqtype<QDateTimeType>(
+            c, QDateTime::fromString(arg0, arg1, arg2), "qt.QDateTime");
+    }
+
     static NODE_IMPLEMENTATION(_n_QDateTime0, Pointer)
     {
         NODE_RETURN(qt_QDateTime_QDateTime_QDateTime_QDateTime(
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    }
+
+    static NODE_IMPLEMENTATION(_n_QDateTime1, Pointer)
+    {
+        NODE_RETURN(
+            qt_QDateTime_QDateTime_QDateTime_QDateTime_QDate_QTime_QTimeZone(
+                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QDateTime2, Pointer)
@@ -553,6 +666,12 @@ namespace Mu
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
+    static NODE_IMPLEMENTATION(_n_setTimeZone0, void)
+    {
+        qt_QDateTime_setTimeZone_void_QDateTime_QTimeZone(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+    }
+
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
         qt_QDateTime_swap_void_QDateTime_QDateTime(
@@ -565,9 +684,21 @@ namespace Mu
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
+    static NODE_IMPLEMENTATION(_n_timeRepresentation0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_timeRepresentation_QTimeZone_QDateTime(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    }
+
     static NODE_IMPLEMENTATION(_n_timeSpec0, int)
     {
         NODE_RETURN(qt_QDateTime_timeSpec_int_QDateTime(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    }
+
+    static NODE_IMPLEMENTATION(_n_timeZone0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_timeZone_QTimeZone_QDateTime(
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
@@ -601,10 +732,23 @@ namespace Mu
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
+    static NODE_IMPLEMENTATION(_n_toString0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_toString_string_QDateTime_string_QCalendar(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+            NODE_ARG(2, Pointer)));
+    }
+
     static NODE_IMPLEMENTATION(_n_toString1, Pointer)
     {
         NODE_RETURN(qt_QDateTime_toString_string_QDateTime_int(
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+    }
+
+    static NODE_IMPLEMENTATION(_n_toTimeZone0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_toTimeZone_QDateTime_QDateTime_QTimeZone(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toUTC0, Pointer)
@@ -623,6 +767,12 @@ namespace Mu
     {
         NODE_RETURN(qt_QDateTime_operatorMinus_EQ__QDateTime_QDateTime_int(
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+    }
+
+    static NODE_IMPLEMENTATION(_n_currentDateTime0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_currentDateTime_QDateTime_QTimeZone(
+            NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentDateTime1, Pointer)
@@ -645,10 +795,22 @@ namespace Mu
         NODE_RETURN(qt_QDateTime_currentSecsSinceEpoch_int64(NODE_THREAD));
     }
 
+    static NODE_IMPLEMENTATION(_n_fromMSecsSinceEpoch0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_fromMSecsSinceEpoch_QDateTime_int64_QTimeZone(
+            NODE_THREAD, NODE_ARG(0, int64), NODE_ARG(1, Pointer)));
+    }
+
     static NODE_IMPLEMENTATION(_n_fromMSecsSinceEpoch1, Pointer)
     {
         NODE_RETURN(qt_QDateTime_fromMSecsSinceEpoch_QDateTime_int64(
             NODE_THREAD, NODE_ARG(0, int64)));
+    }
+
+    static NODE_IMPLEMENTATION(_n_fromSecsSinceEpoch0, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_fromSecsSinceEpoch_QDateTime_int64_QTimeZone(
+            NODE_THREAD, NODE_ARG(0, int64), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromSecsSinceEpoch1, Pointer)
@@ -661,6 +823,40 @@ namespace Mu
     {
         NODE_RETURN(qt_QDateTime_fromString_QDateTime_string_int(
             NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+    }
+
+    static NODE_IMPLEMENTATION(_n_fromString4, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_fromString_QDateTime_string_string_QCalendar(
+            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+            NODE_ARG(2, Pointer)));
+    }
+
+    //
+    // Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+    //
+    // SPDX-License-Identifier: Apache-2.0
+    //
+
+    Pointer qt_QDateTime_fromString_QDateTime_string_string(
+        Mu::Thread& NODE_THREAD, Pointer param_string, Pointer param_format)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QString arg0 = qstring(param_string);
+        const QString arg1 = qstring(param_format);
+
+        QStringList parts = arg1.split(" ");
+        QDate date = QDate::fromString(parts[0], "yyyy-MM-dd");
+        QTime time = QTime::fromString(parts[1], "hh:mm:ss");
+
+        QDateTime dt(date, time);
+        return makeqtype<QDateTimeType>(c, dt, "qt.QDateTime");
+    }
+
+    static NODE_IMPLEMENTATION(_n_fromString1, Pointer)
+    {
+        NODE_RETURN(qt_QDateTime_fromString_QDateTime_string_string(
+            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QDateTimeType::load()
@@ -705,8 +901,14 @@ namespace Mu
                          qt_QDateTime_QDateTime_QDateTime_QDateTime, Return,
                          "qt.QDateTime", Parameters,
                          new Param(c, "this", "qt.QDateTime"), End),
-            // MISSING: QDateTime (QDateTime; QDateTime this, QDate date, QTime
-            // time, "const QTimeZone &" timeZone)
+            new Function(
+                c, "QDateTime", _n_QDateTime1, None, Compiled,
+                qt_QDateTime_QDateTime_QDateTime_QDateTime_QDate_QTime_QTimeZone,
+                Return, "qt.QDateTime", Parameters,
+                new Param(c, "this", "qt.QDateTime"),
+                new Param(c, "date", "qt.QDate"),
+                new Param(c, "time", "qt.QTime"),
+                new Param(c, "timeZone", "qt.QTimeZone"), End),
             new Function(c, "QDateTime", _n_QDateTime2, None, Compiled,
                          qt_QDateTime_QDateTime_QDateTime_QDateTime_QDate_QTime,
                          Return, "qt.QDateTime", Parameters,
@@ -798,8 +1000,11 @@ namespace Mu
                          "void", Parameters,
                          new Param(c, "this", "qt.QDateTime"),
                          new Param(c, "time", "qt.QTime"), End),
-            // MISSING: setTimeZone (void; QDateTime this, "const QTimeZone &"
-            // toZone)
+            new Function(c, "setTimeZone", _n_setTimeZone0, None, Compiled,
+                         qt_QDateTime_setTimeZone_void_QDateTime_QTimeZone,
+                         Return, "void", Parameters,
+                         new Param(c, "this", "qt.QDateTime"),
+                         new Param(c, "toZone", "qt.QTimeZone"), End),
             new Function(c, "swap", _n_swap0, None, Compiled,
                          qt_QDateTime_swap_void_QDateTime_QDateTime, Return,
                          "void", Parameters,
@@ -808,11 +1013,18 @@ namespace Mu
             new Function(c, "time", _n_time0, None, Compiled,
                          qt_QDateTime_time_QTime_QDateTime, Return, "qt.QTime",
                          Parameters, new Param(c, "this", "qt.QDateTime"), End),
-            // MISSING: timeRepresentation ("QTimeZone"; QDateTime this)
+            new Function(c, "timeRepresentation", _n_timeRepresentation0, None,
+                         Compiled,
+                         qt_QDateTime_timeRepresentation_QTimeZone_QDateTime,
+                         Return, "qt.QTimeZone", Parameters,
+                         new Param(c, "this", "qt.QDateTime"), End),
             new Function(c, "timeSpec", _n_timeSpec0, None, Compiled,
                          qt_QDateTime_timeSpec_int_QDateTime, Return, "int",
                          Parameters, new Param(c, "this", "qt.QDateTime"), End),
-            // MISSING: timeZone ("QTimeZone"; QDateTime this)
+            new Function(c, "timeZone", _n_timeZone0, None, Compiled,
+                         qt_QDateTime_timeZone_QTimeZone_QDateTime, Return,
+                         "qt.QTimeZone", Parameters,
+                         new Param(c, "this", "qt.QDateTime"), End),
             new Function(c, "timeZoneAbbreviation", _n_timeZoneAbbreviation0,
                          None, Compiled,
                          qt_QDateTime_timeZoneAbbreviation_string_QDateTime,
@@ -838,22 +1050,34 @@ namespace Mu
                 c, "toSecsSinceEpoch", _n_toSecsSinceEpoch0, None, Compiled,
                 qt_QDateTime_toSecsSinceEpoch_int64_QDateTime, Return, "int64",
                 Parameters, new Param(c, "this", "qt.QDateTime"), End),
-            // MISSING: toString (string; QDateTime this, string format,
-            // "QCalendar" cal)
+            new Function(
+                c, "toString", _n_toString0, None, Compiled,
+                qt_QDateTime_toString_string_QDateTime_string_QCalendar, Return,
+                "string", Parameters, new Param(c, "this", "qt.QDateTime"),
+                new Param(c, "format", "string"),
+                new Param(c, "cal", "qt.QCalendar"), End),
             new Function(
                 c, "toString", _n_toString1, None, Compiled,
                 qt_QDateTime_toString_string_QDateTime_int, Return, "string",
                 Parameters, new Param(c, "this", "qt.QDateTime"),
                 new Param(c, "format", "int", Value((int)Qt::TextDate)), End),
             // MISSING: toString (string; QDateTime this, "QStringView" format,
-            // "QCalendar" cal) MISSING: toTimeZone (QDateTime; QDateTime this,
-            // "const QTimeZone &" timeZone)
+            // QCalendar cal)
+            new Function(c, "toTimeZone", _n_toTimeZone0, None, Compiled,
+                         qt_QDateTime_toTimeZone_QDateTime_QDateTime_QTimeZone,
+                         Return, "qt.QDateTime", Parameters,
+                         new Param(c, "this", "qt.QDateTime"),
+                         new Param(c, "timeZone", "qt.QTimeZone"), End),
             new Function(c, "toUTC", _n_toUTC0, None, Compiled,
                          qt_QDateTime_toUTC_QDateTime_QDateTime, Return,
                          "qt.QDateTime", Parameters,
                          new Param(c, "this", "qt.QDateTime"), End),
             // static functions
-            // MISSING: currentDateTime (QDateTime; "const QTimeZone &" zone)
+            new Function(c, "currentDateTime", _n_currentDateTime0, None,
+                         Compiled,
+                         qt_QDateTime_currentDateTime_QDateTime_QTimeZone,
+                         Return, "qt.QDateTime", Parameters,
+                         new Param(c, "zone", "qt.QTimeZone"), End),
             new Function(c, "currentDateTime", _n_currentDateTime1, None,
                          Compiled, qt_QDateTime_currentDateTime_QDateTime,
                          Return, "qt.QDateTime", End),
@@ -869,16 +1093,25 @@ namespace Mu
                          qt_QDateTime_currentSecsSinceEpoch_int64, Return,
                          "int64", End),
             // MISSING: fromCFDate (QDateTime; "CFDateRef" date)
-            // MISSING: fromMSecsSinceEpoch (QDateTime; int64 msecs, "const
-            // QTimeZone &" timeZone)
+            new Function(
+                c, "fromMSecsSinceEpoch", _n_fromMSecsSinceEpoch0, None,
+                Compiled,
+                qt_QDateTime_fromMSecsSinceEpoch_QDateTime_int64_QTimeZone,
+                Return, "qt.QDateTime", Parameters,
+                new Param(c, "msecs", "int64"),
+                new Param(c, "timeZone", "qt.QTimeZone"), End),
             new Function(c, "fromMSecsSinceEpoch", _n_fromMSecsSinceEpoch1,
                          None, Compiled,
                          qt_QDateTime_fromMSecsSinceEpoch_QDateTime_int64,
                          Return, "qt.QDateTime", Parameters,
                          new Param(c, "msecs", "int64"), End),
             // MISSING: fromNSDate (QDateTime; "const NSDate *" date)
-            // MISSING: fromSecsSinceEpoch (QDateTime; int64 secs, "const
-            // QTimeZone &" timeZone)
+            new Function(
+                c, "fromSecsSinceEpoch", _n_fromSecsSinceEpoch0, None, Compiled,
+                qt_QDateTime_fromSecsSinceEpoch_QDateTime_int64_QTimeZone,
+                Return, "qt.QDateTime", Parameters,
+                new Param(c, "secs", "int64"),
+                new Param(c, "timeZone", "qt.QTimeZone"), End),
             new Function(
                 c, "fromSecsSinceEpoch", _n_fromSecsSinceEpoch1, None, Compiled,
                 qt_QDateTime_fromSecsSinceEpoch_QDateTime_int64, Return,
@@ -890,10 +1123,16 @@ namespace Mu
                 new Param(c, "format", "int", Value((int)Qt::TextDate)), End),
             // MISSING: fromString (QDateTime; "QStringView" string, flags
             // Qt::DateFormat format) MISSING: fromString (QDateTime;
-            // "QStringView" string, "QStringView" format, "QCalendar" cal)
+            // "QStringView" string, "QStringView" format, QCalendar cal)
             // MISSING: fromString (QDateTime; string string, "QStringView"
-            // format, "QCalendar" cal) MISSING: fromString (QDateTime; string
-            // string, string format, "QCalendar" cal)
+            // format, QCalendar cal)
+            new Function(
+                c, "fromString", _n_fromString4, None, Compiled,
+                qt_QDateTime_fromString_QDateTime_string_string_QCalendar,
+                Return, "qt.QDateTime", Parameters,
+                new Param(c, "string", "string"),
+                new Param(c, "format", "string"),
+                new Param(c, "cal", "qt.QCalendar"), End),
             EndArguments);
         globalScope()->addSymbols(
             new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled,
@@ -909,6 +1148,18 @@ namespace Mu
             // MISSING: = (QDateTime; QDateTime this, QDateTime other)
             EndArguments);
         scope()->addSymbols(EndArguments);
+
+        //
+        // Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+        //
+        // SPDX-License-Identifier: Apache-2.0
+        //
+
+        addSymbol(new Function(c, "fromString", _n_fromString1, None, Compiled,
+                               qt_QDateTime_fromString_QDateTime_string_string,
+                               Return, "qt.QDateTime", Parameters,
+                               new Param(c, "string", "string"),
+                               new Param(c, "format", "string"), End));
     }
 
 } // namespace Mu

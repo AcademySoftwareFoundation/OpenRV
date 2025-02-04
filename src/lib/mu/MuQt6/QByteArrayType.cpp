@@ -599,6 +599,22 @@ namespace Mu
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
+    Pointer qt_QByteArray_append_QByteArray_QByteArray_string(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
+        const QString arg1 = qstring(param_str);
+        return makeqtype<QByteArrayType>(
+            c, arg0.append(arg1.toStdString().c_str()), "qt.QByteArray");
+    }
+
+    static NODE_IMPLEMENTATION(_n_append4, Pointer)
+    {
+        NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_string(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    }
+
     void QByteArrayType::load()
     {
         USING_MU_FUNCTION_SYMBOLS;
@@ -978,10 +994,18 @@ namespace Mu
 
         c->arrayType(c->byteType(), 1, 0);
 
-        addSymbol(new Function(c, "constData", constData, None, Compiled,
-                               QByteArray_constData_QByteArray_byteECB_BSB__,
-                               Return, "byte[]", Parameters,
-                               new Param(c, "this", "qt.QByteArray"), End));
+        addSymbols(
+            new Function(c, "constData", constData, None, Compiled,
+                         QByteArray_constData_QByteArray_byteECB_BSB__, Return,
+                         "byte[]", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), End),
+
+            new Function(c, "append", _n_append4, None, Compiled,
+                         qt_QByteArray_append_QByteArray_QByteArray_string,
+                         Return, "qt.QByteArray", Parameters,
+                         new Param(c, "this", "qt.QByteArray"),
+                         new Param(c, "str", "string"), End),
+            EndArguments);
     }
 
 } // namespace Mu
