@@ -40,3 +40,30 @@ def hook_function(
             commands.setFloatProperty(opacities_property, [1.0 - opacity], True)
 
             commands.setViewNode(stack_group)
+
+        case "difference":
+            offset = in_timeline.difference["offset"]
+            slope = in_timeline.difference["slope"]
+
+            stack_group = argument_map["stack"]
+
+            rv_cdl = commands.newNode("RVLinearize", "linearize")
+
+            cdl_property = f"{rv_cdl}.CDL"
+            effectHook.set_rv_effect_props(
+                cdl_property,
+                {
+                    "active": [1],
+                    "slope": [slope, slope, slope],
+                    "offset": [offset, offset, offset],
+                },
+            )
+
+            blend_modes_property = "tracks_stack.composite.type"
+            if not commands.propertyExists(blend_modes_property):
+                commands.newProperty(blend_modes_property, commands.StringType, 0)
+            commands.setStringProperty(blend_modes_property, ["difference"], True)
+
+            commands.setViewNode(stack_group)
+
+            return rv_cdl
