@@ -6,4 +6,4 @@
 //
 //*****************************************************************************/
 
-int utf8Main( int argc, char* argv[] );
+int utf8Main(int argc, char* argv[]);

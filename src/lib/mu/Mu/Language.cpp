@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <Mu/Class.h>
 #include <Mu/Function.h>
@@ -16,20 +16,18 @@
 #include <iterator>
 #include <vector>
 
-namespace Mu {
-
-using namespace std;
-
-Language::Language(const String &name,
-		   const String &nameSpaceSeparator)
-    : _name(name), 
-      _nsSeparator(nameSpaceSeparator),
-      _verbose(false)
+namespace Mu
 {
-}
 
-Language::~Language()
-{
-}
+    using namespace std;
+
+    Language::Language(const String& name, const String& nameSpaceSeparator)
+        : _name(name)
+        , _nsSeparator(nameSpaceSeparator)
+        , _verbose(false)
+    {
+    }
+
+    Language::~Language() {}
 
 } // namespace Mu

@@ -4,49 +4,49 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 #include <Mu/PrimitiveType.h>
 #include <Mu/PrimitiveObject.h>
 
-namespace Mu {
-
-class NameType : public PrimitiveType
+namespace Mu
 {
-public:
-    NameType(Context*);
-    virtual ~NameType();
 
-    //
-    //	Type API
-    //
+    class NameType : public PrimitiveType
+    {
+    public:
+        NameType(Context*);
+        virtual ~NameType();
 
-    virtual PrimitiveObject* newObject() const;
-    virtual Value nodeEval(const Node*, Thread&) const;
-    virtual void nodeEval(void*, const Node*, Thread&) const;
+        //
+        //	Type API
+        //
 
-    //
-    //	Output the symbol name
-    //	Output the appropriate Value in human readable form
-    //
+        virtual PrimitiveObject* newObject() const;
+        virtual Value nodeEval(const Node*, Thread&) const;
+        virtual void nodeEval(void*, const Node*, Thread&) const;
 
-    virtual void outputValue(std::ostream&, const Value&, bool full=false) const;
-    virtual void outputValueRecursive(std::ostream&,
-                                      const ValuePointer,
-                                      ValueOutputState&) const;
+        //
+        //	Output the symbol name
+        //	Output the appropriate Value in human readable form
+        //
 
-    //
-    //	Load function is called when the symbol is added to the
-    //	context.
-    //
+        virtual void outputValue(std::ostream&, const Value&,
+                                 bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
+                                          ValueOutputState&) const;
 
-    virtual void load();
+        //
+        //	Load function is called when the symbol is added to the
+        //	context.
+        //
 
-    static NODE_DECLARATION(dereference, Pointer);
-    static NODE_DECLARATION(assign, Pointer);
-    static NODE_DECLARATION(to_string, Pointer);
-};
+        virtual void load();
 
+        static NODE_DECLARATION(dereference, Pointer);
+        static NODE_DECLARATION(assign, Pointer);
+        static NODE_DECLARATION(to_string, Pointer);
+    };
 
 } // namespace Mu
 

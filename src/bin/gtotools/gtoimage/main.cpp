@@ -21,46 +21,41 @@ using namespace std;
 
 //----------------------------------------------------------------------
 
-string 
-basename(string path)
+string basename(string path)
 {
-    size_t lastSlash = path.rfind( "/" );
+    size_t lastSlash = path.rfind("/");
 
     if (lastSlash == path.npos)
     {
         return path;
     }
 
-    return path.substr( lastSlash + 1, path.size() );
+    return path.substr(lastSlash + 1, path.size());
 }
 
-
-string
-extension(const std::string& path)
+string extension(const std::string& path)
 {
     string filename(basename(path));
 
-    if (filename.find( "." ) == filename.npos)
+    if (filename.find(".") == filename.npos)
     {
         return string("");
     }
     else
     {
-        return filename.substr( filename.rfind(".") + 1, filename.size() );
+        return filename.substr(filename.rfind(".") + 1, filename.size());
     }
 }
 
-string 
-prefix( string path )
+string prefix(string path)
 {
-    string filename( basename( path ) );
-    if( filename.find( "." ) == filename.npos )
+    string filename(basename(path));
+    if (filename.find(".") == filename.npos)
     {
         return filename;
     }
-    return filename.substr( 0, filename.find( "." ) );
+    return filename.substr(0, filename.find("."));
 }
-
 
 //----------------------------------------------------------------------
 
@@ -74,33 +69,31 @@ struct Image
     size_t size;
     size_t pixelSize;
 
-    float* floatPixel(int x, int y) 
-    { 
-        return floatData + y * w * channels + x * channels; 
+    float* floatPixel(int x, int y)
+    {
+        return floatData + y * w * channels + x * channels;
     }
 
-    short* shortPixel(int x, int y) 
-    { 
-        return shortData + y * w * channels + x * channels; 
+    short* shortPixel(int x, int y)
+    {
+        return shortData + y * w * channels + x * channels;
     }
 
     char* charPixel(int x, int y)
     {
-        return charData + y * w * channels + x * channels; 
+        return charData + y * w * channels + x * channels;
     }
 
     union
     {
         float* floatData;
         short* shortData;
-        char*  charData;
-        void*  voidData;
+        char* charData;
+        void* voidData;
     };
 };
 
-
-Image*
-readTIFF(const std::string& imgFileName)
+Image* readTIFF(const std::string& imgFileName)
 {
     Image* image = new Image;
 
@@ -113,62 +106,62 @@ readTIFF(const std::string& imgFileName)
 
     TIFF* tif = TIFFOpen(imgFileName.c_str(), "r");
 
-    if (!tif) return 0;
-    
-    unsigned short *sampleinfo;
+    if (!tif)
+        return 0;
+
+    unsigned short* sampleinfo;
     unsigned short extrasamples;
     unsigned short bbs;
 
-    TIFFGetField( tif, TIFFTAG_IMAGEWIDTH, &image->w);
-    TIFFGetField( tif, TIFFTAG_IMAGELENGTH, &image->h);
-    TIFFGetField( tif, TIFFTAG_BITSPERSAMPLE, &image->bbs );
+    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &image->w);
+    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &image->h);
+    TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &image->bbs);
 
-    TIFFGetFieldDefaulted( tif, TIFFTAG_EXTRASAMPLES, 
-                           &extrasamples, &sampleinfo );
-	
+    TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples,
+                          &sampleinfo);
+
     image->channels = extrasamples ? 4 : 3;
-    
+
     switch (image->bbs)
     {
-      case 32:
-          image->floatData = new float[image->w * image->h * image->channels];
-          image->type = Float;
+    case 32:
+        image->floatData = new float[image->w * image->h * image->channels];
+        image->type = Float;
 
-          for (int y = 0; y < image->h; ++y)
-          {
-              TIFFReadScanline(tif, image->floatPixel(0, image->h - y - 1), y);
-          }
-          break;
+        for (int y = 0; y < image->h; ++y)
+        {
+            TIFFReadScanline(tif, image->floatPixel(0, image->h - y - 1), y);
+        }
+        break;
 
-      case 16:
-          image->shortData = new short[image->w * image->h * image->channels];
-          image->type = Short;
+    case 16:
+        image->shortData = new short[image->w * image->h * image->channels];
+        image->type = Short;
 
-          for (int y = 0; y < image->h; ++y )
-          {
-              TIFFReadScanline(tif, image->shortPixel(0, image->h - y - 1), y);
-          }
-          break;
+        for (int y = 0; y < image->h; ++y)
+        {
+            TIFFReadScanline(tif, image->shortPixel(0, image->h - y - 1), y);
+        }
+        break;
 
-      case 8:
-          image->charData = new char[image->w * image->h * image->channels];
-          image->type = Byte;
+    case 8:
+        image->charData = new char[image->w * image->h * image->channels];
+        image->type = Byte;
 
-          for (int y = 0; y < image->h; ++y )
-          {
-              TIFFReadScanline( tif, image->charPixel(0, image->h - y - 1), y );
-          }
-          break;
+        for (int y = 0; y < image->h; ++y)
+        {
+            TIFFReadScanline(tif, image->charPixel(0, image->h - y - 1), y);
+        }
+        break;
     }
-    
+
     TIFFClose(tif);
     return image;
 }
 
 //----------------------------------------------------------------------
 
-Object*
-makeImageObject(Image* image, const char* inFile)
+Object* makeImageObject(Image* image, const char* inFile)
 {
     Object* o = new Object(prefix(inFile), GTO_PROTOCOL_IMAGE, 1);
 
@@ -184,8 +177,8 @@ makeImageObject(Image* image, const char* inFile)
     p = new Property("originalEncoding", "filetype", String, 1, 1, true);
     p->stringData[0] = "TIFF";
     c[0]->properties.push_back(p);
-    
-    const char *itype = image->channels == 3 ? "RGB" : "RGBA";
+
+    const char* itype = image->channels == 3 ? "RGB" : "RGBA";
 
     p = new Property(GTO_PROPERTY_TYPE, String, 1, 1, true);
     p->stringData[0] = itype;
@@ -196,7 +189,7 @@ makeImageObject(Image* image, const char* inFile)
     p->int32Data[1] = image->h;
     c[0]->properties.push_back(p);
 
-    p = new Property(GTO_PROPERTY_PIXELS, itype, (Gto::DataType)image->type, 
+    p = new Property(GTO_PROPERTY_PIXELS, itype, (Gto::DataType)image->type,
                      image->w * image->h, image->channels, false);
     p->voidData = image->voidData;
     c[0]->properties.push_back(p);
@@ -204,11 +197,9 @@ makeImageObject(Image* image, const char* inFile)
     return o;
 }
 
-
 //----------------------------------------------------------------------
 
-void
-usage()
+void usage()
 {
     cout << "gtoimage [OPTIONS] INFILE OUTFILE" << endl
          << endl
@@ -217,20 +208,20 @@ usage()
          << "-t         text GTO output" << endl
          << "-nc        uncompressed GTO output" << endl
          << endl;
-    
+
     exit(-1);
 }
 
 //----------------------------------------------------------------------
 
-int utf8Main(int argc, char *argv[])
+int utf8Main(int argc, char* argv[])
 {
-    char* inFile     = 0;
-    char* outFile    = 0;
-    int   nocompress = 0;
-    int   text       = 0;
-    
-    for (int i=1; i < argc; i++)
+    char* inFile = 0;
+    char* outFile = 0;
+    int nocompress = 0;
+    int text = 0;
+
+    for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "-t"))
         {
@@ -242,9 +233,12 @@ int utf8Main(int argc, char *argv[])
         }
         else
         {
-            if (!inFile) inFile = argv[i];
-            else if (!outFile) outFile = argv[i];
-            else usage();
+            if (!inFile)
+                inFile = argv[i];
+            else if (!outFile)
+                outFile = argv[i];
+            else
+                usage();
         }
     }
 
@@ -254,7 +248,7 @@ int utf8Main(int argc, char *argv[])
 
     if (!inFile || !outFile)
     {
-	cerr << "ERROR: no infile or outfile specified.\n" << endl;
+        cerr << "ERROR: no infile or outfile specified.\n" << endl;
         usage();
     }
 
@@ -297,8 +291,10 @@ int utf8Main(int argc, char *argv[])
     {
         RawDataBaseWriter writer;
         Writer::FileType type = Writer::CompressedGTO;
-        if (nocompress) type = Writer::BinaryGTO;
-        if (text) type = Writer::TextGTO;
+        if (nocompress)
+            type = Writer::BinaryGTO;
+        if (text)
+            type = Writer::TextGTO;
 
         if (!writer.write(outFile, *db, type))
         {

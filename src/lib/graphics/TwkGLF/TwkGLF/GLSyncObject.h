@@ -18,41 +18,41 @@
 class GLSyncObject
 {
 public:
-   GLSyncObject();
-   GLSyncObject( GLSyncObject&& rhs );
-   GLSyncObject& operator=(GLSyncObject&&);
-   ~GLSyncObject();
+    GLSyncObject();
+    GLSyncObject(GLSyncObject&& rhs);
+    GLSyncObject& operator=(GLSyncObject&&);
+    ~GLSyncObject();
 
-   GLSyncObject( const GLSyncObject& rhs ) = delete;
-   GLSyncObject& operator=(const GLSyncObject&) = delete;
- 
-   // Set a fence within the GL command stream.
-   void setFence();
+    GLSyncObject(const GLSyncObject& rhs) = delete;
+    GLSyncObject& operator=(const GLSyncObject&) = delete;
 
-   // Remove a fence within the GL command stream.
-   void removeFence();
+    // Set a fence within the GL command stream.
+    void setFence();
 
-   // Wait until all commands before the fence in GL command stream
-   // are executed.
-   void waitFence() const;
+    // Remove a fence within the GL command stream.
+    void removeFence();
 
-   // Check if all commands before the fence in GL command stream
-   // are executed.
-   bool testFence() const;
+    // Wait until all commands before the fence in GL command stream
+    // are executed.
+    void waitFence() const;
 
-   // If fence set, check if all commands before the fence in GL
-   // command stream are executed.
-   bool tryTestFence() const;
+    // Check if all commands before the fence in GL command stream
+    // are executed.
+    bool testFence() const;
 
-   // Set a fence within the GL command stream and wait until all
-   // command before the fence are executed.
-   void wait();
+    // If fence set, check if all commands before the fence in GL
+    // command stream are executed.
+    bool tryTestFence() const;
+
+    // Set a fence within the GL command stream and wait until all
+    // command before the fence are executed.
+    void wait();
 
 public:
-   class Imp;
+    class Imp;
 
 private:
-   Imp * _imp;
+    Imp* _imp;
 };
 
 #endif // __TwkGLF__GLSyncObject__h__

@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <MuIO/ISStreamType.h>
 
@@ -22,99 +22,88 @@
 #include <iostream>
 #include <sstream>
 
-namespace Mu {
-using namespace std;
-
-ISStreamType::ISStream::ISStream(const Class *c) 
-    : IStreamType::IStream(c)
+namespace Mu
 {
-}
+    using namespace std;
 
-ISStreamType::ISStream::~ISStream()
-{
-}
+    ISStreamType::ISStream::ISStream(const Class* c)
+        : IStreamType::IStream(c)
+    {
+    }
 
-//----------------------------------------------------------------------
+    ISStreamType::ISStream::~ISStream() {}
 
-ISStreamType::ISStreamType(Context* c, const char* name, Class *super) 
-    : IStreamType(c, name, super)
-{
-}
+    //----------------------------------------------------------------------
 
-ISStreamType::~ISStreamType() {}
+    ISStreamType::ISStreamType(Context* c, const char* name, Class* super)
+        : IStreamType(c, name, super)
+    {
+    }
 
-Object*
-ISStreamType::newObject() const
-{
-    return new ISStream(this);
-}
+    ISStreamType::~ISStreamType() {}
 
-void
-ISStreamType::deleteObject(Object *obj) const
-{
-    delete static_cast<ISStreamType::ISStream*>(obj);
-}
+    Object* ISStreamType::newObject() const { return new ISStream(this); }
 
+    void ISStreamType::deleteObject(Object* obj) const
+    {
+        delete static_cast<ISStreamType::ISStream*>(obj);
+    }
 
-void
-ISStreamType::load()
-{
-    USING_MU_FUNCTION_SYMBOLS;
+    void ISStreamType::load()
+    {
+        USING_MU_FUNCTION_SYMBOLS;
 
-    Symbol *s = scope();
-    MuLangContext* context = (MuLangContext*)globalModule()->context();
-    Context* c = context;
+        Symbol* s = scope();
+        MuLangContext* context = (MuLangContext*)globalModule()->context();
+        Context* c = context;
 
-    String tname = fullyQualifiedName();
-    String rname = tname + "&";
+        String tname = fullyQualifiedName();
+        String rname = tname + "&";
 
-    const char* tn = tname.c_str();
-    const char* rn = rname.c_str();
-		  
-    s->addSymbols( new ReferenceType(c, "isstream&", this), 
+        const char* tn = tname.c_str();
+        const char* rn = rname.c_str();
 
-		   new Function(c, "isstream", ISStreamType::construct, None,
-				Return, tn,
-				Args, "string", End),
+        s->addSymbols(new ReferenceType(c, "isstream&", this),
 
-		   new Function(c, "isstream", BaseFunctions::dereference, Cast,
-				Return, tn,
-				Args, rn, End),
+                      new Function(c, "isstream", ISStreamType::construct, None,
+                                   Return, tn, Args, "string", End),
 
-		   EndArguments);
+                      new Function(c, "isstream", BaseFunctions::dereference,
+                                   Cast, Return, tn, Args, rn, End),
 
-    globalScope()->addSymbols(
+                      EndArguments);
 
-		   new Function(c, "print", StreamType::print, None,
-				Return, "void", 
-				Args, tn, End),
+        globalScope()->addSymbols(
 
-		   new Function(c, "=", BaseFunctions::assign, AsOp,
-				Return, rn, 
-				Args, rn, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void",
+                         Args, tn, End),
 
-                   EndArguments);
-}
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
+                         rn, tn, End),
 
-NODE_IMPLEMENTATION(ISStreamType::construct, Pointer)
-{
-    const StringType::String* str = NODE_ARG_OBJECT(0, StringType::String);
-    Process *p = NODE_THREAD.process();
-    const Class *c = static_cast<const ISStreamType*>(NODE_THIS.type());
-    ISStreamType::ISStream *o = new ISStreamType::ISStream(c);
+            EndArguments);
+    }
 
-    //
-    //  Make annotation string
-    //
+    NODE_IMPLEMENTATION(ISStreamType::construct, Pointer)
+    {
+        const StringType::String* str = NODE_ARG_OBJECT(0, StringType::String);
+        Process* p = NODE_THREAD.process();
+        const Class* c = static_cast<const ISStreamType*>(NODE_THIS.type());
+        ISStreamType::ISStream* o = new ISStreamType::ISStream(c);
 
-    String an = str->utf8().substr(0, 20);
-    if (str->size() > 20) an += "...";
-    o->setString(an);
+        //
+        //  Make annotation string
+        //
 
-    o->_ios = o->_istream = o->_isstream 
-        = new std::istringstream(str->c_str());
-    NODE_RETURN(Pointer(o));
-}
+        String an = str->utf8().substr(0, 20);
+        if (str->size() > 20)
+            an += "...";
+        o->setString(an);
+
+        o->_ios = o->_istream = o->_isstream =
+            new std::istringstream(str->c_str());
+        NODE_RETURN(Pointer(o));
+    }
 
 } // namespace Mu
 

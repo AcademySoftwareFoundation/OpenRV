@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2014 Tweak Software. 
+//  Copyright (c) 2014 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #ifndef __IPCoreCommands__SetInputs__h__
 #define __IPCoreCommands__SetInputs__h__
@@ -11,47 +11,50 @@
 #include <IPCore/IPGraph.h>
 #include <iostream>
 
-namespace IPCore {
-namespace Commands {
-
-//
-//  SetInputs
-//
-//  Old inputs are stored and new inputs are assigned. This operation
-//  is a toggle so undo() and redo() just call doit().
-//
-
-class SetInputsInfo : public TwkApp::CommandInfo
+namespace IPCore
 {
-  public:
-    typedef TwkApp::Command Command;
+    namespace Commands
+    {
 
-    SetInputsInfo(const std::string& name, TwkApp::CommandInfo::UndoType type);
-    virtual ~SetInputsInfo();
-    virtual Command* newCommand() const;
-};
+        //
+        //  SetInputs
+        //
+        //  Old inputs are stored and new inputs are assigned. This operation
+        //  is a toggle so undo() and redo() just call doit().
+        //
 
-class SetInputs : public TwkApp::Command
-{
-  public:
-    typedef std::vector<std::string> StringVector;
+        class SetInputsInfo : public TwkApp::CommandInfo
+        {
+        public:
+            typedef TwkApp::Command Command;
 
-    SetInputs(const SetInputsInfo*);
-    virtual ~SetInputs();
+            SetInputsInfo(const std::string& name,
+                          TwkApp::CommandInfo::UndoType type);
+            virtual ~SetInputsInfo();
+            virtual Command* newCommand() const;
+        };
 
-    void setArgs(IPGraph* graph, const std::string& name, const StringVector& inputs);
+        class SetInputs : public TwkApp::Command
+        {
+        public:
+            typedef std::vector<std::string> StringVector;
 
-    virtual void doit();
-    virtual void undo();
+            SetInputs(const SetInputsInfo*);
+            virtual ~SetInputs();
 
-  private:
-    IPGraph*     m_graph;
-    std::string  m_name;
-    StringVector m_inputs;
-};
+            void setArgs(IPGraph* graph, const std::string& name,
+                         const StringVector& inputs);
 
+            virtual void doit();
+            virtual void undo();
 
-} // Commands
-} // IPCore
+        private:
+            IPGraph* m_graph;
+            std::string m_name;
+            StringVector m_inputs;
+        };
+
+    } // namespace Commands
+} // namespace IPCore
 
 #endif // __IPCoreCommands__SetInputs__h__
