@@ -1,8 +1,8 @@
 //******************************************************************************
 // Copyright (c) 2001 Tweak Inc. All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //******************************************************************************
 
 #ifndef _TwkImgExrIff_h_
@@ -13,26 +13,26 @@
 
 #include <ImfCompression.h>
 
-namespace TwkImg {
-
-//******************************************************************************
-class ExrIff
+namespace TwkImg
 {
-public:
-    static Img4f *read( const char *fileName );
 
-    static Img4f *read( const char *fileName,
-                        TwkMath::Mat44f &Mcamera,
-                        TwkMath::Mat44f &Mscreen );
+    //******************************************************************************
+    class ExrIff
+    {
+    public:
+        static Img4f* read(const char* fileName);
 
-    static bool write( const Img4f *img, const char *fileName,
-                       Imf::Compression compression = Imf::PIZ_COMPRESSION );
+        static Img4f* read(const char* fileName, TwkMath::Mat44f& Mcamera,
+                           TwkMath::Mat44f& Mscreen);
 
-    static bool write( const Img4f *img, const char *fileName,
-                       const TwkMath::Mat44f &Mcamera,
-                       const TwkMath::Mat44f &Mscreen,
-                       Imf::Compression compression = Imf::PIZ_COMPRESSION );
-};
+        static bool write(const Img4f* img, const char* fileName,
+                          Imf::Compression compression = Imf::PIZ_COMPRESSION);
+
+        static bool write(const Img4f* img, const char* fileName,
+                          const TwkMath::Mat44f& Mcamera,
+                          const TwkMath::Mat44f& Mscreen,
+                          Imf::Compression compression = Imf::PIZ_COMPRESSION);
+    };
 
 } // End namespace TwkImg
 

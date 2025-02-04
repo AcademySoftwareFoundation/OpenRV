@@ -1,9 +1,9 @@
 //
-//  Copyright (c) 2012 Tweak Software. 
+//  Copyright (c) 2012 Tweak Software.
 //  All rights reserved.
-//  
+//
 //  SPDX-License-Identifier: Apache-2.0
-//  
+//
 //
 #include <IPCore/FilterIPInstanceNode.h>
 #include <IPCore/NodeDefinition.h>
@@ -13,93 +13,87 @@
 #include <IPCore/ShaderUtil.h>
 #include <TwkMath/Function.h>
 
-namespace IPCore {
-using namespace std;
-using namespace TwkMath;
-
-FilterIPInstanceNode::FilterIPInstanceNode(const std::string& name,
-                                           const NodeDefinition* def,
-                                           IPGraph* g,
-                                           GroupIPNode* group) 
-    : IPInstanceNode(name, def, g, group)
+namespace IPCore
 {
-    const Shader::Function* F = def->function();
-    assert(F->isFilter());
-}
+    using namespace std;
+    using namespace TwkMath;
 
-FilterIPInstanceNode::~FilterIPInstanceNode()
-{
-}
-
-IPImage*
-FilterIPInstanceNode::evaluate(const Context& context)
-{
-    const Shader::Function* F = definition()->function();
-    if (!isActive()) return IPInstanceNode::evaluate(context);
-
-    IPNodes  nodes = inputs();
-    int ninputs = nodes.size();
-    if (!ninputs) return IPImage::newNoImage(this, "No Input");
-
-    Context c = context;
-
-    //
-    //  NOTE: evaluate() may throw but that's ok (nothing to clean up)
-    //
-
-    IPImage* current = nodes[0]->evaluate(c); 
-
-    if (!current)
+    FilterIPInstanceNode::FilterIPInstanceNode(const std::string& name,
+                                               const NodeDefinition* def,
+                                               IPGraph* g, GroupIPNode* group)
+        : IPInstanceNode(name, def, g, group)
     {
-        TWK_THROW_STREAM(EvaluationFailedExc, 
-                         "FilterIPInstanceNode evaluation failed on node " << nodes[0]->name());
+        const Shader::Function* F = def->function();
+        assert(F->isFilter());
     }
 
-    IPImageVector images(1);
-    IPImageSet modifiedImages;
-    Shader::ExpressionVector inExpressions;
-    images[0] = current;
+    FilterIPInstanceNode::~FilterIPInstanceNode() {}
 
-    convertBlendRenderTypeToIntermediate(images, modifiedImages);
+    IPImage* FilterIPInstanceNode::evaluate(const Context& context)
+    {
+        const Shader::Function* F = definition()->function();
+        if (!isActive())
+            return IPInstanceNode::evaluate(context);
 
-    balanceResourceUsage(IPNode::filterAccumulate,
-                         images,
-                         modifiedImages,
-                         8, 8, 81);
+        IPNodes nodes = inputs();
+        int ninputs = nodes.size();
+        if (!ninputs)
+            return IPImage::newNoImage(this, "No Input");
 
-    IPImage* root  = new IPImage(this, 
-                                 IPImage::MergeRenderType,
-                                 current->width,
-                                 current->height,
-                                 1.0,
-                                 IPImage::IntermediateBuffer,
-                                 IPImage::FloatDataType);
+        Context c = context;
 
-    //
-    //  Copy the transform over to our image and remove the
-    //  existing one
-    //
-        
-    root->transformMatrix    = current->transformMatrix;
-    images[0]->transformMatrix = Matrix();
+        //
+        //  NOTE: evaluate() may throw but that's ok (nothing to clean up)
+        //
 
-    //
-    //  Prep merge
-    //
+        IPImage* current = nodes[0]->evaluate(c);
 
-    assembleMergeExpressions(root, images, modifiedImages, true, inExpressions);
+        if (!current)
+        {
+            TWK_THROW_STREAM(EvaluationFailedExc,
+                             "FilterIPInstanceNode evaluation failed on node "
+                                 << nodes[0]->name());
+        }
 
-    //
-    //  Assemble shaders and add the children
-    //
-        
-    root->mergeExpr   = bind(root, inExpressions, context);
-    root->shaderExpr  = Shader::newSourceRGBA(root);
-    root->appendChild(images[0]);
-    root->recordResourceUsage();
+        IPImageVector images(1);
+        IPImageSet modifiedImages;
+        Shader::ExpressionVector inExpressions;
+        images[0] = current;
 
-    return root;
-}
+        convertBlendRenderTypeToIntermediate(images, modifiedImages);
 
-} // Rv
+        balanceResourceUsage(IPNode::filterAccumulate, images, modifiedImages,
+                             8, 8, 81);
 
+        IPImage* root = new IPImage(
+            this, IPImage::MergeRenderType, current->width, current->height,
+            1.0, IPImage::IntermediateBuffer, IPImage::FloatDataType);
+
+        //
+        //  Copy the transform over to our image and remove the
+        //  existing one
+        //
+
+        root->transformMatrix = current->transformMatrix;
+        images[0]->transformMatrix = Matrix();
+
+        //
+        //  Prep merge
+        //
+
+        assembleMergeExpressions(root, images, modifiedImages, true,
+                                 inExpressions);
+
+        //
+        //  Assemble shaders and add the children
+        //
+
+        root->mergeExpr = bind(root, inExpressions, context);
+        root->shaderExpr = Shader::newSourceRGBA(root);
+        root->appendChild(images[0]);
+        root->recordResourceUsage();
+
+        return root;
+    }
+
+} // namespace IPCore

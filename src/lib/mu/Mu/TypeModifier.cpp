@@ -2,38 +2,32 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <Mu/TypeModifier.h>
 #include <iostream>
 
-namespace Mu {
-
-TypeModifier::TypeModifier(Context* context, const char* name) : Symbol(context, name)
+namespace Mu
 {
-}
 
-TypeModifier::~TypeModifier()
-{
-}
+    TypeModifier::TypeModifier(Context* context, const char* name)
+        : Symbol(context, name)
+    {
+    }
 
-void 
-TypeModifier::outputNode(std::ostream& o,const Node*) const
-{
-    output(o);
-}
+    TypeModifier::~TypeModifier() {}
 
-void
-TypeModifier::output(std::ostream& o) const
-{
-    Symbol::output(o);
-}
+    void TypeModifier::outputNode(std::ostream& o, const Node*) const
+    {
+        output(o);
+    }
 
-const Type*
-TypeModifier::transform(const Type* t, Context*) const
-{
-    return t;
-}
+    void TypeModifier::output(std::ostream& o) const { Symbol::output(o); }
 
-} // Mu
+    const Type* TypeModifier::transform(const Type* t, Context*) const
+    {
+        return t;
+    }
+
+} // namespace Mu

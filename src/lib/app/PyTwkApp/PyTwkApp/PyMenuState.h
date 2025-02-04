@@ -1,9 +1,9 @@
 //
 // Copyright (c) 2011 Tweak Software
 // All rights reserved.
-// 
+//
 // SPDX-License-Identifier: Apache-2.0
-// 
+//
 //
 #ifndef __PyTwkApp__MenuState__h__
 #define __PyTwkApp__MenuState__h__
@@ -12,25 +12,22 @@
 
 namespace TwkApp
 {
-  class PyStateFunc : public Menu::StateFunc
-  {
-   public:
-    PyStateFunc( PyObject* );
-    virtual ~PyStateFunc();
-    virtual int state();
-    virtual Menu::StateFunc* copy() const;
-    virtual bool error() const;
-
-    bool exceptionOccuredLastTime() const
+    class PyStateFunc : public Menu::StateFunc
     {
-      return m_exception;
-    }
+    public:
+        PyStateFunc(PyObject*);
+        virtual ~PyStateFunc();
+        virtual int state();
+        virtual Menu::StateFunc* copy() const;
+        virtual bool error() const;
 
-   private:
-    PyObject* m_func;
-    bool m_exception;
-  };
+        bool exceptionOccuredLastTime() const { return m_exception; }
 
-}  // namespace TwkApp
+    private:
+        PyObject* m_func;
+        bool m_exception;
+    };
 
-#endif  // __PyTwkApp__MenuState__h__
+} // namespace TwkApp
+
+#endif // __PyTwkApp__MenuState__h__

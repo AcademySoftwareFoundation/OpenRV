@@ -2,8 +2,8 @@
 // Copyright (c) 2009, Jim Hourihan
 // All rights reserved.
 //
-// SPDX-License-Identifier: Apache-2.0 
-// 
+// SPDX-License-Identifier: Apache-2.0
+//
 
 #include <Mu/Object.h>
 #include <Mu/Type.h>
@@ -12,44 +12,27 @@
 #include <stl_ext/stl_ext_algo.h>
 #include <iostream>
 
-namespace Mu {
-using namespace std;
-
-Object::ExternalHeap	Object::_externalHeap;
-
-Object::Object(const Type* type)
+namespace Mu
 {
-    _type = type;
-}
+    using namespace std;
 
-Object::Object()
-{
-    _type = 0;
-}
+    Object::ExternalHeap Object::_externalHeap;
 
-Object::~Object()
-{
-    _type = (const Type*)MU_DELETED;
-}
+    Object::Object(const Type* type) { _type = type; }
 
-void		
-Object::typeDelete() 
-{ 
-    type()->deleteObject(this); 
-}
+    Object::Object() { _type = 0; }
 
-void
-Object::retainExternal()
-{
-    _externalHeap[this]++;
-}
+    Object::~Object() { _type = (const Type*)MU_DELETED; }
 
-void
-Object::releaseExternal()
-{
-    _externalHeap[this]--;
-    if (_externalHeap[this] <= 0) _externalHeap.erase(this);
-}
+    void Object::typeDelete() { type()->deleteObject(this); }
+
+    void Object::retainExternal() { _externalHeap[this]++; }
+
+    void Object::releaseExternal()
+    {
+        _externalHeap[this]--;
+        if (_externalHeap[this] <= 0)
+            _externalHeap.erase(this);
+    }
 
 } // namespace Mu
-
