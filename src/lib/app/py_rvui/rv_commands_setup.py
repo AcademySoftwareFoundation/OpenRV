@@ -178,6 +178,7 @@ all_mu_commands = [
     "propertyInfo",
     "setPresentationMode",
     "setPresentationDevice",
+    "loadSettingsIntoOptions",
     "optionsPlay",
     "addSource",
     "addSourceBegin",

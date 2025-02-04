@@ -479,6 +479,9 @@ namespace Rv
                          None, Return, "void", Parameters,
                          new Param(c, "name", "string"), End),
 
+            new Function(c, "loadSettingsIntoOptions", loadSettingsIntoOptions,
+                         None, Return, "void", End),
+
             new Function(c, "packageListFromSetting", packageListFromSetting,
                          None, Return, "string[]", Parameters,
                          new Param(c, "settingName", "string"), End),
@@ -2307,6 +2310,12 @@ namespace Rv
             throwBadArgumentException(NODE_THIS, NODE_THREAD,
                                       "device not found");
         }
+    }
+
+    NODE_IMPLEMENTATION(loadSettingsIntoOptions, void)
+    {
+        Rv::Options& opts = Rv::Options::sharedOptions();
+        Rv::RvPreferences::loadSettingsIntoOptions(opts);
     }
 
     NODE_IMPLEMENTATION(packageListFromSetting, Pointer)
