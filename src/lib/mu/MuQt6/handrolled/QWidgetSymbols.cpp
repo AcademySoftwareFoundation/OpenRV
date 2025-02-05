@@ -26,4 +26,8 @@ addSymbols(
                  Return, "void", Parameters, new Param(c, "this", "qt.QWidget"),
                  new Param(c, "windowFlags", "int"), End),
 
+    new Function(c, "action", _n_action0, None, Compiled,
+                 qt_QWidget_action_QAction_QWidget_int, Return, "qt.QAction",
+                 Parameters, new Param(c, "this", "qt.QWidget"),
+                 new Param(c, "index", "int"), End),
     EndArguments);

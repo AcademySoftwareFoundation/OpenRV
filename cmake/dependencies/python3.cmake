@@ -338,22 +338,29 @@ ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_copy_commands
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR} COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include
+      ${RV_STAGE_INCLUDE_DIR} COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
   )
 
   IF(RV_VFX_CY2024)
-    LIST(APPEND _copy_commands COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/DLLs ${RV_STAGE_ROOT_DIR}/DLLs)
+    LIST(
+      APPEND
+      _copy_commands
+      COMMAND
+      ${CMAKE_COMMAND}
+      -E
+      copy_directory
+      ${_install_dir}/DLLs
+      ${RV_STAGE_ROOT_DIR}/DLLs
+    )
   ENDIF()
 
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name}
-    ${_copy_commands}
+    OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name} ${_copy_commands}
     DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
   )
-  
+
   ADD_CUSTOM_TARGET(
     ${_python3_target}-stage-target ALL
     DEPENDS ${RV_STAGE_BIN_DIR}/${_python3_lib_name}

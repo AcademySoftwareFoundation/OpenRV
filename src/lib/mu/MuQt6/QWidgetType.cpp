@@ -3319,6 +3319,21 @@ namespace Mu
         arg0->setWindowFlags(Qt::WindowFlags(NODE_ARG(0, int)));
     }
 
+    Pointer qt_QWidget_action_QAction_QWidget_int(Mu::Thread& NODE_THREAD,
+                                                  Pointer param_this, int index)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QWidget* arg0 = object<QWidget>(param_this);
+        return makeinstance<QActionType>(c, arg0->actions()[index],
+                                         "qt.QAction");
+    }
+
+    static NODE_IMPLEMENTATION(_n_action0, Pointer)
+    {
+        NODE_RETURN(qt_QWidget_action_QAction_QWidget_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+    }
+
     void QWidgetType::load()
     {
         USING_MU_FUNCTION_SYMBOLS;
@@ -4202,6 +4217,11 @@ namespace Mu
                          "void", Parameters, new Param(c, "this", "qt.QWidget"),
                          new Param(c, "windowFlags", "int"), End),
 
+            new Function(c, "action", _n_action0, None, Compiled,
+                         qt_QWidget_action_QAction_QWidget_int, Return,
+                         "qt.QAction", Parameters,
+                         new Param(c, "this", "qt.QWidget"),
+                         new Param(c, "index", "int"), End),
             EndArguments);
 
         const char* propExclusions[] = {"minimumSizeHint", "sizeHint",
