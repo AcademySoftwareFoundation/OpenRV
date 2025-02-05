@@ -1992,6 +1992,37 @@ namespace Mu
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
+    //
+    // Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+    //
+    // SPDX-License-Identifier: Apache-2.0
+    //
+
+    void qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget,
+        int param_size, int param_orientation)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QMainWindow* arg0 = object<QMainWindow>(param_this);
+        QDockWidget* arg1 = object<QDockWidget>(param_dockwidget);
+        int arg2 = (int)(param_size);
+        Qt::Orientation arg3 = (Qt::Orientation)(param_orientation);
+
+        QList<QDockWidget*> dockWidgets;
+        dockWidgets.append(arg1);
+        QList<int> sizes;
+        sizes.append(arg2);
+
+        arg0->resizeDocks(dockWidgets, sizes, arg3);
+    }
+
+    static NODE_IMPLEMENTATION(_n_resizeDock0, void)
+    {
+        qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+            NODE_ARG(2, int), NODE_ARG(3, int));
+    }
+
     void QMainWindowType::load()
     {
         USING_MU_FUNCTION_SYMBOLS;
@@ -2425,6 +2456,20 @@ namespace Mu
             EndArguments);
         globalScope()->addSymbols(EndArguments);
         scope()->addSymbols(EndArguments);
+
+        //
+        // Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+        //
+        // SPDX-License-Identifier: Apache-2.0
+        //
+
+        addSymbol(new Function(
+            c, "resizeDock", _n_resizeDock0, None, Compiled,
+            qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int,
+            Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
+            new Param(c, "dockwidget", "qt.QDockWidget"),
+            new Param(c, "size", "int"), new Param(c, "orientation", "int"),
+            End));
 
         const char** propExclusions = 0;
 

@@ -1,3 +1,5 @@
+#include <MuQt6/QCalendarType.h>
+#include <MuQt6/QIODeviceBaseType.h>
 #include <MuQt6/QPointerEventType.h>
 #include <MuQt6/QSinglePointEventType.h>
 #include <MuQt6/QStringConverterType.h>
@@ -18,6 +20,7 @@
 #include <MuQt6/QUrlType.h>
 #include <MuQt6/QUrlQueryType.h>
 #include <MuQt6/QDateTimeType.h>
+#include <MuQt6/QTimeZoneType.h>
 #include <MuQt6/QTimeType.h>
 #include <MuQt6/QDateType.h>
 #include <MuQt6/QByteArrayType.h>
@@ -55,7 +58,6 @@
 #include <MuQt6/QWebChannelType.h>
 #include <MuQt6/QPaintEventType.h>
 #include <MuQt6/QIODeviceType.h>
-#include <MuQt6/QIODeviceBaseType.h>
 #include <MuQt6/QCompleterType.h>
 #include <MuQt6/QHelpEventType.h>
 #include <MuQt6/QQuickItemType.h>
