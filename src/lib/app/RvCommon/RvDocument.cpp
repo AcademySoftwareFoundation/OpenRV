@@ -783,7 +783,11 @@ namespace Rv
         {
             delete newGLView;
             newGLView = new GLView(this, view()->context(), this);
+            resetGLPrefs = true;
         }
+
+        m_stackedLayout->addWidget(newGLView);
+        m_stackedLayout->removeWidget(oldGLView);
         m_glView = newGLView;
         m_glView->show();
         m_glView->setFocus(Qt::OtherFocusReason);
