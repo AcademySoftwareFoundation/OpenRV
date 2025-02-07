@@ -37,11 +37,13 @@ ELSEIF(RV_FFMPEG_6)
   )
 
   SET(_download_hash
-      "953b858e5be3ab66232bdbb90e42f50d"
+      "6dfc27fcb6da6f653c6ec025c2cd9b00"
   )
 ELSE()
-  # This shouldn't happen, but it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
-  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
+  # This shouldn't happen, but it could if there are changes the acceptable
+  # versions of FFmpeg in ffmpeg.cmake and this section is not
+  # updated accordingly.
+  message( FATAL_ERROR "The requested version of FFmpeg is not supported." )
 ENDIF()
 
 SET(_download_url
@@ -78,6 +80,7 @@ ELSE()
       ${_install_dir}/lib
   )
 ENDIF()
+
 
 IF(RV_FFMPEG_7)
   IF(RV_TARGET_DARWIN)
@@ -180,8 +183,10 @@ ELSEIF(RV_FFMPEG_6)
     )
   ENDIF()
 ELSE()
-  # This shouldn't happen. But it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
-  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
+  # This shouldn't happen. But it could if there are changes the acceptable
+  # versions of FFmpeg in ffmpeg.cmake and this section is not
+  # updated accordingly.
+  message( FATAL_ERROR "The requested version of FFmpeg is not supported." )
 ENDIF()
 
 SET(_ffmpeg_libs
@@ -256,23 +261,9 @@ SET(${_force_rebuild}
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
 IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   SET(NON_FREE_DECODERS_TO_DISABLE
-      "aac"
-      "aac_at"
-      "aac_fixed"
-      "aac_latm"
       "bink"
       "binkaudio_dct"
       "binkaudio_rdft"
-      "dnxhd"
-      "dvvideo"
-      "prores"
-      "qtrle"
-      "vp9"
-      "vp9_cuvid"
-      "vp9_mediacodec"
-      "vp9_qsv"
-      "vp9_rkmpp"
-      "vp9_v4l2m2m"
   )
 
   FOREACH(
@@ -287,13 +278,6 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   ENDFOREACH()
 
   SET(NON_FREE_ENCODERS_TO_DISABLE
-      "aac"
-      "aac_mf"
-      "dnxhd"
-      "dvvideo"
-      "prores"
-      "qtrle"
-      "vp9_qsv"
       "vp9_vaapi"
   )
   FOREACH(
