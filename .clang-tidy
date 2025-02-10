@@ -1,6 +1,7 @@
 ---
 Checks: >
   bugprone-*,
+  -bugprone-easily-swappable-parameters,
   cert-*,
   clang-diagnostic-*,
   clang-analyzer-*,

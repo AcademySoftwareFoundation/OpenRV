@@ -5,6 +5,11 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
+#include "IPCore/IPImage.h"
+#include "IPCore/ShaderExpression.h"
+#include "IPCore/ShaderFunction.h"
+#include "IPCore/ShaderSymbol.h"
+#include "TwkMath/Vec2.h"
 #include <IPCore/ShaderCommon.h>
 #include <IPCore/ShaderState.h>
 #include <TwkGLF/GL.h>
@@ -115,6 +120,7 @@ extern const char* StereoScanline_glsl;
 extern const char* StereoChecker_glsl;
 extern const char* StereoAnaglyph_glsl;
 extern const char* StereoLumAnaglyph_glsl;
+extern const char* AngularMask_glsl;
 extern const char* Opacity_glsl;
 extern const char* Over2_glsl;
 extern const char* Over3_glsl;
@@ -315,6 +321,7 @@ namespace IPCore
         static Function* Shader_StereoChecker = 0;
         static Function* Shader_StereoAnaglyph = 0;
         static Function* Shader_StereoLumAnaglyph = 0;
+        static Function* Shader_AngularMask = 0;
         static Function* Shader_Opacity = 0;
         static Function* Shader_Over = 0;
         static Function* Shader_Add = 0;
@@ -2598,6 +2605,17 @@ namespace IPCore
             }
 
             return Shader_Opacity;
+        }
+
+        Function* AngularMask()
+        {
+            if (Shader_AngularMask == nullptr)
+            {
+                Shader_AngularMask = new Shader::Function(
+                    "AngularMask", AngularMask_glsl, Shader::Function::Filter);
+            }
+
+            return Shader_AngularMask;
         }
 
         //--
@@ -5648,6 +5666,25 @@ namespace IPCore
             args[i] = new BoundExpression(F->parameters()[i], expr);
             i++;
             args[i] = new BoundFloat(F->parameters()[i], opacity);
+            i++;
+
+            return new Expression(F, args, image);
+        }
+
+        Expression* newAngularMask(const IPImage* image, Expression* expr,
+                                   const TwkMath::Vec2f& pivot,
+                                   const float angleInRadians)
+        {
+            const Function* F = AngularMask();
+            ArgumentVector args(F->parameters().size());
+            size_t i = 0;
+            args[i] = new BoundExpression(F->parameters()[i], expr);
+            i++;
+            args[i] = new BoundVec2f(F->parameters()[i], pivot);
+            i++;
+            args[i] = new BoundFloat(F->parameters()[i], angleInRadians);
+            i++;
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
 
             return new Expression(F, args, image);

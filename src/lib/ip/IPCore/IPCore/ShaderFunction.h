@@ -210,6 +210,8 @@ namespace IPCore
 
             bool usesOutputST() const { return m_usesOutputST; }
 
+            bool usesFragmentPosition() const { return m_usesFragmentPosition; }
+
             void releaseCompiledState() const;
             const Symbol::Type returnType() const;
 
@@ -282,6 +284,7 @@ namespace IPCore
             bool m_inline;
             bool m_usesOutputSize;
             bool m_usesOutputST;
+            bool m_usesFragmentPosition;
             bool m_usesSampling;
 
             friend class Program;

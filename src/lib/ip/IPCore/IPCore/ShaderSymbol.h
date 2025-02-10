@@ -145,6 +145,7 @@ namespace IPCore
                 Coord2DRectType,
                 InputImageType,
                 OutputImageType,
+                FragmentPositionType,
             };
 
             Symbol(Qualifier c, const std::string& name, Type t,
@@ -188,6 +189,11 @@ namespace IPCore
             bool isOutputImage() const { return m_type == OutputImageType; }
 
             bool isInputImage() const { return m_type == InputImageType; }
+
+            [[nodiscard]] bool isFragmentPositon() const
+            {
+                return m_type == FragmentPositionType;
+            }
 
             bool operator==(const Symbol& s) const
             {
