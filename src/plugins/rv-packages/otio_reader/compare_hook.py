@@ -1,6 +1,6 @@
 import effectHook
 import opentimelineio as otio
-from rv import commands
+from rv import commands, extra_commands
 
 
 def hook_function(
@@ -67,3 +67,73 @@ def hook_function(
             commands.setViewNode(stack_group)
 
             return rv_cdl
+        case "angular_mask":
+            angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
+            pivot = in_timeline.angular_mask["pivot"]
+            pivot_x = float(pivot["x"])
+            pivot_y = float(pivot["y"])
+
+            source = argument_map["src"]
+            transform = extra_commands.associatedNode("RVTransform2D", source)
+            if commands.getIntProperty("{}.transform.active".format(transform))[0] != 0:
+                global_translate_vec = otio.schema.V2d(0.0, 0.0)
+                global_scale_vec = otio.schema.V2d(1.0, 1.0)
+
+                if commands.propertyExists(
+                    "{}.otio.global_translate".format(transform)
+                ) and commands.propertyExists("{}.otio.global_scale".format(transform)):
+                    global_translate = commands.getFloatProperty(
+                        "{}.otio.global_translate".format(transform)
+                    )
+                    global_scale = commands.getFloatProperty(
+                        "{}.otio.global_scale".format(transform)
+                    )
+                    global_translate_vec = otio.schema.V2d(
+                        global_translate[0], global_translate[1]
+                    )
+                    global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
+
+                translate = commands.getFloatProperty(
+                    "{}.transform.translate".format(transform),
+                )
+                scale = commands.getFloatProperty(
+                    "{}.transform.scale".format(transform),
+                )
+
+                translate_vec = otio.schema.V2d(translate[0], translate[1])
+                scale_vec = otio.schema.V2d(scale[0], scale[1])
+
+                media_info = commands.sourceMediaInfo(source)
+                height = media_info["height"]
+                aspect_ratio = 1.0 if height == 0 else media_info["width"] / height
+
+                bounds_size = scale_vec / global_scale_vec
+                bounds_center = (
+                    translate_vec + global_translate_vec
+                ) / global_scale_vec
+
+                pivot_x = (pivot_x - bounds_center.x) / bounds_size.x
+                pivot_y = (pivot_y - bounds_center.y) / bounds_size.y
+
+                pivot_x += 0.5 * aspect_ratio
+                pivot_y += 0.5
+
+            stack_group = argument_map["stack"]
+            sequence_group = argument_map["sequence"]
+            sequence = extra_commands.nodesInGroupOfType(sequence_group, "RVSequence")[
+                0
+            ]
+            composite_property = f"{sequence}.composite"
+
+            effectHook.set_rv_effect_props(
+                composite_property,
+                {
+                    "inputAngularMaskActive": [1],
+                    "inputBlendModes": ["over"],
+                    "inputAngularMaskPivotX": [pivot_x],
+                    "inputAngularMaskPivotY": [pivot_y],
+                    "inputAngularMaskAngleInRadians": [angle_in_radians],
+                },
+            )
+
+            commands.setViewNode(stack_group)
