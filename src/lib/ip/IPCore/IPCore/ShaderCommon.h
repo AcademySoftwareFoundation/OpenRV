@@ -7,6 +7,7 @@
 //
 #ifndef __IPCore__ShaderCommon__h__
 #define __IPCore__ShaderCommon__h__
+#include "TwkMath/Vec2.h"
 #include <iostream>
 #include <IPCore/ShaderExpression.h>
 #include <IPCore/IPImage.h>
@@ -252,7 +253,12 @@ namespace IPCore
             const TwkMath::Vec2f& center, const TwkMath::Vec2f& f,
             const TwkMath::Vec2f& cropRatio);
 
-        Expression* newOpacity(const IPImage* image, Expression* expr,  float opacity);
+        Expression* newOpacity(const IPImage* image, Expression* expr,
+                               float opacity);
+
+        Expression* newAngularMask(const IPImage* image, Expression* expr,
+                                   const TwkMath::Vec2f& pivot,
+                                   float angleInRadians);
 
         //
         //  ICC profile shaders

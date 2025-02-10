@@ -205,6 +205,7 @@ namespace IPCore
             std::string m_vertexCode;
             bool m_needOutputSize;
             bool m_needOutputST;
+            bool m_needFragmentPosition;
         };
 
         class ProgramCache
