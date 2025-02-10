@@ -7,6 +7,7 @@
 //******************************************************************************
 
 #include "IPCore/ShaderCommon.h"
+#include "TwkMath/Vec2.h"
 #include <IPBaseNodes/SequenceIPNode.h>
 #include <IPCore/Exception.h>
 #include <IPBaseNodes/RetimeIPNode.h>
@@ -90,10 +91,23 @@ namespace IPCore
         m_inputsOpacities = declareProperty<FloatProperty>(
             "composite.inputOpacities", 1.0f, nullptr, false);
 
+        m_inputsAngularMaskPivotX = declareProperty<FloatProperty>(
+            "composite.inputAngularMaskPivotX", 0.0f, nullptr, false);
+        m_inputsAngularMaskPivotY = declareProperty<FloatProperty>(
+            "composite.inputAngularMaskPivotY", 0.0f, nullptr, false);
+        m_inputsAngularMaskAngleInRadians = declareProperty<FloatProperty>(
+            "composite.inputAngularMaskAngleInRadians", 0.0f, nullptr, false);
+        m_inputsAngularMaskActive =
+            declareProperty<IntProperty>("composite.inputAngularMaskActive", 1);
+
         // since they are per input, make sure the property containers are
         // emptied at creation time
         m_inputsBlendingModes->erase(0, 1);
         m_inputsOpacities->erase(0, 1);
+        m_inputsAngularMaskPivotX->erase(0, 1);
+        m_inputsAngularMaskPivotY->erase(0, 1);
+        m_inputsAngularMaskAngleInRadians->erase(0, 1);
+        m_inputsAngularMaskActive->erase(0, 1);
 
         // By default, the output of this node support reverse-order blending.
         // this is mainly kept for backward compatibility reason.
@@ -382,6 +396,25 @@ namespace IPCore
         {
             child->shaderExpr = Shader::newOpacity(
                 child, child->shaderExpr, (*m_inputsOpacities)[source]);
+        }
+
+        const bool isSourceValid =
+            source >= 0 && source < m_inputsAngularMaskPivotX->size()
+            && source < m_inputsAngularMaskPivotY->size()
+            && source < m_inputsAngularMaskAngleInRadians->size()
+            && source < m_inputsAngularMaskActive->size();
+
+        if (isSourceValid && ((*m_inputsAngularMaskActive)[source] != 0))
+        {
+
+            const float pivotX = (*m_inputsAngularMaskPivotX)[source];
+            const float pivotY = (*m_inputsAngularMaskPivotY)[source];
+            const float angleInRadians =
+                (*m_inputsAngularMaskAngleInRadians)[source];
+
+            child->shaderExpr =
+                Shader::newAngularMask(child, child->shaderExpr,
+                                       Vec2f(pivotX, pivotY), angleInRadians);
         }
 
         root->appendChild(child);

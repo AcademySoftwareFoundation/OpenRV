@@ -146,6 +146,10 @@ namespace IPCore
         StringProperty* m_inputsBlendingModes;
         FloatProperty* m_inputsOpacities;
         IntProperty* m_supportReversedOrderBlending;
+        FloatProperty* m_inputsAngularMaskPivotX;
+        FloatProperty* m_inputsAngularMaskPivotY;
+        FloatProperty* m_inputsAngularMaskAngleInRadians;
+        IntProperty* m_inputsAngularMaskActive;
 
         /// this signal is called before all state change
         VoidSignal m_changingSignal;
