@@ -70,6 +70,7 @@ SET(_autotypes
     Url
     UrlQuery
     DateTime
+    TimeZone
     Time
     Date
     ByteArray
