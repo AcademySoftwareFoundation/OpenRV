@@ -452,6 +452,13 @@ def _create_media(media_ref, trimmed_range, context=None):
                 context,
             )
         ]
+
+    elif isinstance(media_ref, otio.schema.GeneratorReference):
+        if media_ref.generator_kind == "solid":
+            color_parameters = media_ref.parameters.get("color")
+            kind = f"solid,{color_parameters}"
+            return [_create_movieproc(media_range, kind)]
+
     return [_create_movieproc(media_range, "smptebars")]
 
 
