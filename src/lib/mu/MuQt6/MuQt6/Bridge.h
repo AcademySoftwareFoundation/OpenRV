@@ -26,6 +26,10 @@ namespace Mu
                                  const Type* T, Value& v, QString& s,
                                  QVariant& qv);
 
+    QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache,
+                                 QMetaMethod& method, const Type* T, Value& v,
+                                 QString& s, QVariant& qv);
+
 } // namespace Mu
 
 #endif // __MuQt__Bridge__h__

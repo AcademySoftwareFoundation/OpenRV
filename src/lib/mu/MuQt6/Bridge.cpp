@@ -865,6 +865,37 @@ namespace Mu
         return Q_ARG(int, 0);
     }
 
+    QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache,
+                                 QMetaMethod& method, const Type* T, Value& v,
+                                 QString& s, QVariant& qv)
+    {
+        // Special case for QItemSelectionModel::select method.
+        if (method.name().toStdString() == "select")
+        {
+            int parametersCount = method.parameterCount();
+            if (parametersCount > 0)
+            {
+                for (int i = 0; i < parametersCount; i++)
+                {
+                    std::string tName = T->name().c_str();
+                    // Check if the parameter is a
+                    // QItemSelectionModel::SelectionFlags and passed as int.
+                    if (method.parameterTypeName(i).toStdString()
+                            == "QItemSelectionModel::SelectionFlags"
+                        && tName == "int")
+                    {
+                        QItemSelectionModel::SelectionFlags flags =
+                            QItemSelectionModel::SelectionFlags(v._int);
+                        return Q_ARG(QItemSelectionModel::SelectionFlags,
+                                     flags);
+                    }
+                }
+            }
+        }
+
+        return argument(gcCache, T, v, s, qv);
+    }
+
     static NODE_IMPLEMENTATION(invokeMethod0, void)
     {
         if (QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance)))
@@ -972,10 +1003,10 @@ namespace Mu
             QString s1, s2;
             QVariant v1, v2;
 
-            bool result =
-                method.invoke(o, Qt::DirectConnection,
-                              argument(gcCache, F->argType(1), p0, s1, v1),
-                              argument(gcCache, F->argType(2), p1, s2, v2));
+            bool result = method.invoke(
+                o, Qt::DirectConnection,
+                argument(gcCache, method, F->argType(1), p0, s1, v1),
+                argument(gcCache, method, F->argType(2), p1, s2, v2));
 
             if (!result)
             {
