@@ -468,7 +468,8 @@ def _create_sources(item, context=None):
         )
 
         _add_metadata_to_node(media_ref, src)
-        _add_source_bounds(media_ref, src, context)
+        active_src = cmd_args[0] if cmd_args else src
+        _add_source_bounds(media_ref, src, active_src, context)
         extra_commands.setUIName(src, str(media_ref.name or "media"))
 
         return src
@@ -557,9 +558,11 @@ def _create_item(it, context=None):
         context,
         src=active_src,
         source_group=commands.nodeGroup(active_src),
-        switch_group=src_or_switch_group
-        if commands.nodeType(src_or_switch_group) == "RVSwitchGroup"
-        else None,
+        switch_group=(
+            src_or_switch_group
+            if commands.nodeType(src_or_switch_group) == "RVSwitchGroup"
+            else None
+        ),
     ):
         if context.get("transition"):
             _add_transition_timings(it, range_to_read, src_or_switch_group)
@@ -635,7 +638,7 @@ def _get_color_from_name(name, defaultColor="PURPLE"):
     return colors.get(name, colors[defaultColor])
 
 
-def _add_source_bounds(media_ref, src, context=None):
+def _add_source_bounds(media_ref, src, active_src, context=None):
     # for releases < 0.15
     if not hasattr(media_ref, "available_image_bounds"):
         return
@@ -655,11 +658,16 @@ def _add_source_bounds(media_ref, src, context=None):
     # width by the inverse of the aspect ratio
     #
     try:
-        media_info = commands.sourceMediaInfo(src)
+        # Note: When multiple media representation sources are created, we can only retrieve the media_info of a source if it is the active source
+        # That's because multiple media representation in RV is optimized to only load a source when it gets activated.
+        # If the current source is not the active source, we can't get the media_info so we fall back to the active source's media_info as our best guess.
+        media_info = commands.sourceMediaInfo(active_src)
         height = media_info["height"]
         aspect_ratio = media_info["width"] / height
     except Exception:
-        logging.exception("Unable to determine aspect ratio, using default value of 16:9")
+        logging.exception(
+            "Unable to determine aspect ratio, using default value of 16:9"
+        )
         aspect_ratio = 1920 / 1080
 
     translate = bounds.center() * global_scale - global_translate
