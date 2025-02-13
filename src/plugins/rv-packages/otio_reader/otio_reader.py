@@ -687,11 +687,16 @@ def _add_source_bounds(media_ref, src, active_src, context=None):
     # width by the inverse of the aspect ratio
     #
     try:
-        media_info = commands.sourceMediaInfo(src)
+        # Note: When multiple media representation sources are created, we can only retrieve the media_info of a source if it is the active source
+        # That's because multiple media representation in RV is optimized to only load a source when it gets activated.
+        # If the current source is not the active source, we can't get the media_info so we fall back to the active source's media_info as our best guess.
+        media_info = commands.sourceMediaInfo(active_src)
         height = media_info["height"]
         aspect_ratio = media_info["width"] / height
     except Exception:
-        logging.exception("Unable to determine aspect ratio, using default value of 16:9")
+        logging.exception(
+            "Unable to determine aspect ratio, using default value of 16:9"
+        )
         aspect_ratio = 1920 / 1080
 
     translate = bounds.center() * global_scale - global_translate
