@@ -1,8 +1,8 @@
 #! /usr/bin/python
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from __future__ import print_function
 
@@ -319,7 +319,7 @@ class RvCommunicator:
             else:
                 print("ERROR: unknown message type: %s\n" % messType, file=sys.stderr)
 
-        for (event, contents) in self.eventQueue:
+        for event, contents in self.eventQueue:
             if event in self.handlers:
                 self.handlers[event](contents)
 
