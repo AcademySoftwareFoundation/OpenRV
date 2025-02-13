@@ -8,6 +8,18 @@ SET(_target
     "rvnuke"
 )
 
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  SET(RVNUKE_MODE_CURRENT_DATE_STRING
+      "return d.toLocalTime().toString(\"MMM-dd hh:mm:ss\",  qt.QCalendar());\n"
+  )
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
+  SET(RVNUKE_MODE_CURRENT_DATE_STRING
+      "return d.toLocalTime().toString(\"MMM-dd hh:mm:ss\");\n"
+  )
+ENDIF()
+
+CONFIGURE_FILE(rvnuke_mode.mu.in ${CMAKE_CURRENT_SOURCE_DIR}/rvnuke_mode.mu @ONLY)
+
 SET(_sources
     menu.py
     rvNetwork.py

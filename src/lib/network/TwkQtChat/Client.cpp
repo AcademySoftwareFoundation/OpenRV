@@ -226,8 +226,8 @@ namespace TwkQtChat
     {
         connection->setGreetingMessage(m_contactName, m_contactApp);
 
-        connect(connection, SIGNAL(error(QAbstractSocket::SocketError)), this,
-                SLOT(connectionError(QAbstractSocket::SocketError)));
+        connect(connection, SIGNAL(errorOccurred(QAbstractSocket::SocketError)),
+                this, SLOT(connectionError(QAbstractSocket::SocketError)));
         connect(connection, SIGNAL(disconnected()), this, SLOT(disconnected()));
         connect(connection, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
         connect(connection, SIGNAL(requestGreeting()), this,

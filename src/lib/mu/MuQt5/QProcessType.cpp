@@ -1209,6 +1209,24 @@ namespace Mu
         NODE_RETURN(qt_QProcess_systemEnvironment_stringBSB_ESB_(NODE_THREAD));
     }
 
+    bool qt_QProcess_startDetached_bool_string_stringBSB_ESB_(
+        Mu::Thread& NODE_THREAD, Pointer param_command, Pointer param_arguments)
+    {
+        // Leave the default value for the 3rd and 4th arguments
+        //    const QString &workingDirectory = QString()
+        //    qint64 *pid = nullptr
+
+        const QString arg0 = qstring(param_command);
+        const QStringList arg1 = qstringlist(param_arguments);
+        return QProcess::startDetached(arg0, arg1);
+    }
+
+    static NODE_IMPLEMENTATION(_n_startDetached0, bool)
+    {
+        NODE_RETURN(qt_QProcess_startDetached_bool_string_stringBSB_ESB_(
+            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    }
+
     void QProcessType::load()
     {
         USING_MU_FUNCTION_SYMBOLS;
@@ -1536,6 +1554,13 @@ namespace Mu
             EndArguments);
         globalScope()->addSymbols(EndArguments);
         scope()->addSymbols(EndArguments);
+
+        addSymbol(new Function(
+            c, "startDetached", _n_startDetached0, None, Compiled,
+            // qt_QProcess_startDetached_bool_string_stringBSB_ESB_string_int64,
+            qt_QProcess_startDetached_bool_string_stringBSB_ESB_, Return,
+            "bool", Parameters, new Param(c, "command", "string"),
+            new Param(c, "arguments", "string[]"), End));
 
         const char** propExclusions = 0;
 
