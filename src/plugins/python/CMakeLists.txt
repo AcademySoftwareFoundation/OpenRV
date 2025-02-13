@@ -5,3 +5,5 @@
 #
 
 ADD_SUBDIRECTORY(gtoContainer)
+ADD_SUBDIRECTORY(network)
+ADD_SUBDIRECTORY(rvSession)
