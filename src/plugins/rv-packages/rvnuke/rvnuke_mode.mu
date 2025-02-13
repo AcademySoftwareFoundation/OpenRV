@@ -554,7 +554,7 @@ class: RVNukeMode : rvtypes.MinorMode
     method: currentDateString (string; )
     {
         qt.QDateTime d = qt.QDateTime.currentDateTime();
-        return d.toLocalTime().toString("MMM-dd hh:mm:ss");
+        return d.toLocalTime().toString("MMM-dd hh:mm:ss",  qt.QCalendar());
     }
 
     method: getNukeProp (string; string nodeName, string prop)

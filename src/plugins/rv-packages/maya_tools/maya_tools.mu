@@ -295,7 +295,7 @@ class: MayaTools : MinorMode
 
     method: updateMayaSource (void; string ns)
     {
-	let t = qt.QDateTime.currentDateTime().toString("h:mm");
+	let t = qt.QDateTime.currentDateTime().toString("h:mm",  qt.QCalendar());
 
 	extra_commands.setUIName (ns, extra_commands.uiName(ns) + " " + t);
 
