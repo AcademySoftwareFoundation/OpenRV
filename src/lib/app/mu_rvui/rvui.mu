@@ -4196,16 +4196,13 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: cloneRV (void; Event ev)
 {
     let target = tmpSessionCopyName(),
-        rv     = system.getenv ("RV_APP_RV"),
-        cmd    = "\"%s\" \"%s\"" % (rv, target);
+        rv     = system.getenv ("RV_APP_RV");
 
     saveSession(target, true, true);
 
-    // Qt5: qt.QProcess.startDetached (cmd); 
-    // Qt6: qt.QProcess.startDetached (cmd, string[] {""}); 
-
-    // IMPORTANT: SEE src/lib/app/mu_rvui/CMakeLists.txt
-    @MU_QT_QPROCESS_STARTDETACHED@
+    string[] arguments = { "%s" % (target) };
+    // Quotes are not needed for program containing spaces with overloaded version of startDetached.
+    qt.QProcess.startDetached (rv, arguments);
 }
 
 \: cloneSyncedRV (void; Event ev)
@@ -4214,11 +4211,13 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     remoteNetwork(true);
 
     let myPort = myNetworkPort(),
-        rv     = system.getenv ("RV_APP_RV"),
-        cmd = "\"%s\" -network -networkPort %s -networkConnect 127.0.0.1 %s -flags syncPullFirst" % (rv, myPort+1, myPort);
+        rv     = system.getenv ("RV_APP_RV");
 
-    // IMPORTANT: SEE src/lib/app/mu_rvui/CMakeLists.txt
-    @MU_QT_QPROCESS_STARTDETACHED@
+    string[] arguments = { "-network", "-networkPort", "%s" % (myPort+1), "-networkConnect", "127.0.0.1", 
+                           "%s" % (myPort), "-flags", "syncPullFirstfalse" };
+
+    // Quotes are not needed for program containing spaces with overloaded version of startDetached.
+    qt.QProcess.startDetached (rv, arguments);
 }
 
 \: save (void; Event ev)
