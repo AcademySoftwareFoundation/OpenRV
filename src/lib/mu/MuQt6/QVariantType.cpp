@@ -48,6 +48,7 @@
 #include <MuQt6/QRegularExpressionType.h>
 #include <MuQt6/QPointType.h>
 #include <MuQt6/QByteArrayType.h>
+#include <MuQt6/QIconType.h>
 
 namespace Mu
 {
@@ -175,6 +176,15 @@ namespace Mu
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QDateTime arg1 = getqtype<QDateTimeType>(param_val);
+        setqtype<QVariantType>(param_this, QVariant(arg1));
+        return param_this;
+    }
+
+    Pointer qt_QVariant_QVariant_QVariant_QVariant_QIcon(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_val)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QIcon arg1 = getqtype<QIconType>(param_val);
         setqtype<QVariantType>(param_this, QVariant(arg1));
         return param_this;
     }
@@ -510,6 +520,12 @@ namespace Mu
             NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
+    static NODE_IMPLEMENTATION(_n_QVariant80, Pointer)
+    {
+        NODE_RETURN(qt_QVariant_QVariant_QVariant_QVariant_QIcon(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    }
+
     static NODE_IMPLEMENTATION(_n_QVariant27, Pointer)
     {
         NODE_RETURN(qt_QVariant_QVariant_QVariant_QVariant_QRegularExpression(
@@ -827,6 +843,11 @@ namespace Mu
                          Return, "qt.QVariant", Parameters,
                          new Param(c, "this", "qt.QVariant"),
                          new Param(c, "val", "qt.QDateTime"), End),
+            new Function(c, "QVariant", _n_QVariant80, None, Compiled,
+                         qt_QVariant_QVariant_QVariant_QVariant_QIcon, Return,
+                         "qt.QVariant", Parameters,
+                         new Param(c, "this", "qt.QVariant"),
+                         new Param(c, "val", "qt.QIcon"), End),
             // MISSING: QVariant (QVariant; QVariant this, "const QHash<QString,
             // QVariant> &" val) MISSING: QVariant (QVariant; QVariant this,
             // "const QJsonArray &" val) MISSING: QVariant (QVariant; QVariant
