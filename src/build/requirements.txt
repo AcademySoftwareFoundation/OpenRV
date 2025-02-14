@@ -2,7 +2,7 @@
 
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
-OpenTimelineIO==0.16    # License: Other/Proprietary License (Modified Apache 2.0 License)
+OpenTimelineIO          # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL                # License: BSD License (BSD)
 # PyOpenGL_accelerate as issue with native arm64 build on MacOS.
 # Use PyOpenGL_accelerate only on x86_64 platform.
