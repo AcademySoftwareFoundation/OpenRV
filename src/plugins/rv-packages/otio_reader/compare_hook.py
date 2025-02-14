@@ -27,6 +27,8 @@ def hook_function(
 
         case "over_with_opacity":
             opacity = in_timeline.over_with_opacity["opacity"]
+            if not isinstance(opacity, float):
+                opacity = float(opacity)
             stack_group = argument_map["stack"]
 
             blend_modes_property = "CompareTrack_sequence.composite.inputBlendModes"
@@ -37,7 +39,7 @@ def hook_function(
             opacities_property = "CompareTrack_sequence.composite.inputOpacities"
             if not commands.propertyExists(opacities_property):
                 commands.newProperty(opacities_property, commands.FloatType, 0)
-            commands.setFloatProperty(opacities_property, [1.0 - opacity], True)
+            commands.setFloatProperty(opacities_property, [opacity], True)
 
             commands.setViewNode(stack_group)
 
