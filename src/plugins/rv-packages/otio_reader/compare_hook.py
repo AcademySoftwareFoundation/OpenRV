@@ -48,6 +48,7 @@ def hook_function(
             slope = in_timeline.difference["slope"]
 
             stack_group = argument_map["stack"]
+            stack_node = extra_commands.nodesInGroupOfType(stack_group, "RVStack")[0]
 
             rv_cdl = commands.newNode("RVLinearize", "linearize")
 
@@ -61,14 +62,14 @@ def hook_function(
                 },
             )
 
-            blend_modes_property = "tracks_stack.composite.type"
-            if not commands.propertyExists(blend_modes_property):
-                commands.newProperty(blend_modes_property, commands.StringType, 0)
-            commands.setStringProperty(blend_modes_property, ["difference"], True)
+            effectHook.set_rv_effect_props(
+                f"{stack_node}.composite", {"type": ["difference"]}
+            )
 
             commands.setViewNode(stack_group)
 
             return rv_cdl
+
         case "angular_mask":
             angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
             pivot = in_timeline.angular_mask["pivot"]
