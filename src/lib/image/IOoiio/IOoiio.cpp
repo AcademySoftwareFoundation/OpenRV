@@ -64,7 +64,7 @@ namespace TwkFB
         //
         // addType("tif", "TIFF Image", rw, codecs);
         // addType("tiff", "TIFF Image", rw, codecs);
-        addType("j2c", "JPEG-2000 Codestream", r, codecs);
+        // addType("j2c", "JPEG-2000 Codestream", r, codecs);
         addType("j2k", "JPEG-2000 Codestream", r, codecs);
         addType("jpt", "JPT-stream (JPEG 2000, JPIP)", r, codecs);
         addType("jp2", "JPEG-2000 Image", r, codecs);
