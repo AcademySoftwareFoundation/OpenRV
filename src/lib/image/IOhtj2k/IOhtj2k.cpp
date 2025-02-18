@@ -149,7 +149,8 @@ IOhtj2k::readImage(FrameBuffer& fb,
 
     bool nlt_is_signed;
     ojph::ui8 nlt_bit_depth;
-    bool has_nlt = nlt.get_type3_transformation(0, nlt_bit_depth, nlt_is_signed);
+    ojph::ui8 nl_type;
+    bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
     bool is_signed = siz.is_signed(0);
     /* For now we are setting the data type based on the first channel */
     switch(siz.get_bit_depth(0))
