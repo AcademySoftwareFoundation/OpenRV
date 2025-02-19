@@ -91,11 +91,6 @@ namespace Rv
 
     static int sessionCount = 0;
 
-    namespace
-    {
-        bool workAroundActionLeak = false;
-    };
-
     RvDocument::RvDocument()
         : QMainWindow()
         , TwkUtil::Notifier()
@@ -123,19 +118,6 @@ namespace Rv
         , m_displayLink(0)
     {
         DB("RvDocument constructed");
-
-        if (getenv("RV_WORKAROUND_ACTION_LEAK"))
-        {
-            workAroundActionLeak = true;
-        }
-        else
-        {
-#ifdef PLATFORM_DARWIN
-            workAroundActionLeak = true;
-#else
-            workAroundActionLeak = false;
-#endif
-        }
 
 #if !defined(PLATFORM_DARWIN)
         setMenuBar(new QMenuBar(0));
@@ -1721,49 +1703,13 @@ namespace Rv
 
     void RvDocument::purgeMenus()
     {
-        //
-        //  I could not find (in the git trail) any record of why we treat the
-        //  mac differently here, but this difference results in what appears to
-        //  be a memory leak on linux/windows, where the total number of QMenus
-        //  and QActions increases without bound.  The below change eliminates
-        //  the leak and unifies the behavior on all platforms.
-        //
-        // #ifdef PLATFORM_DARWIN
-        //
-
-        if (workAroundActionLeak)
+        if (mb()->actions().size() > 0)
         {
-            QObjectList children = mb()->children(); // copy
-
-            for (int i = 0; i < children.size(); i++)
-            {
-                //  Skip this menu if it is the "RV" menu (mac or not)
-                //
-                if (QMenu* menu = dynamic_cast<QMenu*>(children[i]))
-                {
-#if defined(PLATFORM_DARWIN)
-                    if (menu != RvApp()->macRVMenu() && menu != m_rvMenu)
-#else
-                    if (menu != m_rvMenu)
-#endif
-                    {
-                        delete menu;
-                    }
-                }
-            }
+            QList<QAction*> actionsMinusFirstOne = mb()->actions().mid(1);
+            disconnectActions(actionsMinusFirstOne);
         }
-        // #else
-        else
-        {
-            if (mb()->actions().size() > 0)
-            {
-                QList<QAction*> actionsMinusFirstOne = mb()->actions().mid(1);
-                disconnectActions(actionsMinusFirstOne);
-            }
 
-            mb()->clear();
-        }
-        // #endif
+        mb()->clear();
 
         delete m_mainPopup;
         m_mainPopup = 0;
@@ -1800,22 +1746,17 @@ namespace Rv
         if (m_menuBarDisable)
             shortcuts = false;
 
-#if !defined(PLATFORM_DARWIN)
-        if (!m_rvMenu || !workAroundActionLeak)
-        {
-            m_rvMenu = mb()->addMenu(UI_APPLICATION_NAME);
-            m_rvMenu->addAction(RvApp()->aboutAction());
-            m_rvMenu->addSeparator();
-            m_rvMenu->addAction(RvApp()->prefAction());
-            m_rvMenu->addSeparator();
-            if (RvApp()->networkAction())
-                m_rvMenu->addAction(RvApp()->networkAction());
-            m_rvMenu->addSeparator();
-            m_rvMenu->addAction(RvApp()->quitAction());
-            m_rvMenu->menuAction()->font().setBold(true);
-            m_rvMenu->setObjectName(UI_APPLICATION_NAME " Menu");
-        }
-#endif
+        m_rvMenu = mb()->addMenu(UI_APPLICATION_NAME);
+        m_rvMenu->addAction(RvApp()->aboutAction());
+        m_rvMenu->addSeparator();
+        m_rvMenu->addAction(RvApp()->prefAction());
+        m_rvMenu->addSeparator();
+        if (RvApp()->networkAction())
+            m_rvMenu->addAction(RvApp()->networkAction());
+        m_rvMenu->addSeparator();
+        m_rvMenu->addAction(RvApp()->quitAction());
+        m_rvMenu->menuAction()->font().setBold(true);
+        m_rvMenu->setObjectName(UI_APPLICATION_NAME " Menu");
 
         if (m_mainPopup)
             m_mainPopup->clear();
