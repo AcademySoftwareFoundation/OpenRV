@@ -73,8 +73,8 @@ def hook_function(
         case "angular_mask":
             angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
             pivot = in_timeline.angular_mask["pivot"]
-            pivot_x = float(pivot["x"])
-            pivot_y = float(pivot["y"])
+            pivot_x = (pivot.min.x + pivot.max.x) / 2
+            pivot_y = (pivot.min.y + pivot.max.y) / 2
 
             source = argument_map["src"]
             transform = extra_commands.associatedNode("RVTransform2D", source)
@@ -115,9 +115,15 @@ def hook_function(
                     translate_vec + global_translate_vec
                 ) / global_scale_vec
 
+                # Since pivot coordinates are not local to the source,
+                # we must remove the source transformation from them when
+                # they are applied.
                 pivot_x = (pivot_x - bounds_center.x) / bounds_size.x
                 pivot_y = (pivot_y - bounds_center.y) / bounds_size.y
 
+                # pivot is evaluated in the [0.0],[frameRatio,1.0] coord
+                # system, but we want [0,0] to be in the center so we have to
+                # offset our bounds values.
                 pivot_x += 0.5 * aspect_ratio
                 pivot_y += 0.5
 
