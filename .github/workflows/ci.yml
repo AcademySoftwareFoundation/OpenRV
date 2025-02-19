@@ -665,7 +665,7 @@ jobs:
       - name: Install CMake ${{ matrix.cmake-version }} with chocolatey
         if: steps.windows-cmake-cache.outputs.cache-hit != 'true'
         run: |
-          choco install cmake --version=${{ matrix.cmake-version }}
+          choco install cmake --version=${{ matrix.cmake-version }} --allow-downgrade
           
       - name: Set PATH environment variable
         run: |
