@@ -17,6 +17,8 @@
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
 
+#include <algorithm>
+
 namespace IPCore
 {
     using namespace std;
@@ -99,9 +101,15 @@ namespace IPCore
         float fps = m_sequenceNode->imageRangeInfo().fps;
         if (fps == 0.0 && !newInputs.empty())
         {
-            auto const imageRangeInfo = newInputs[index]->imageRangeInfo();
-            if (!imageRangeInfo.isUndiscovered)
-                fps = imageRangeInfo.fps;
+            // Find the first input that has a discovered imageRangeInfo, and
+            // use it for the fps if any.
+            auto it = std::find_if(
+                newInputs.begin(), newInputs.end(), [](const auto& input)
+                { return !input->imageRangeInfo().isUndiscovered; });
+            if (it != newInputs.end())
+            {
+                fps = (*it)->imageRangeInfo().fps;
+            }
         }
 
         bool retimeInputs = m_retimeToOutput->front() ? true : false;
