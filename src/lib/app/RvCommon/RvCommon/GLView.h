@@ -64,6 +64,8 @@ namespace Rv
 
         void* syncClosure() const { return m_syncThreadData; }
 
+        QImage readPixels(int x, int y, int w, int h);
+
     public slots:
         void eventProcessingTimeout();
 
@@ -72,6 +74,8 @@ namespace Rv
         void resizeGL(int w, int h);
         void paintGL();
         void swapBuffersNoSync();
+        bool validateReadPixels(int x, int y, int w, int h);
+        void debugSaveFramebuffer();
 
     private:
         RvDocument* m_doc;
