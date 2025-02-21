@@ -1790,6 +1790,7 @@ namespace IPCore
         checkInDisplayImage();
 
         m_inc = 1;
+        const auto mode = cachingMode();
         setCaching(NeverCache);
         graph().cache().lock();
         graph().cache().clearAllButFrame(currentFrame(), true);
@@ -1821,6 +1822,9 @@ namespace IPCore
                 graph().connectDisplayGroup(m_controlVideoDevice);
                 graph().setDevice(m_controlVideoDevice, m_outputVideoDevice);
             }
+
+            // Restore caching mode
+            setCaching(mode);
         }
     }
 
