@@ -30,13 +30,17 @@ def hook_function(
             if not isinstance(opacity, float):
                 opacity = float(opacity)
             stack_group = argument_map["stack"]
+            sequence_group = argument_map["sequence"]
+            sequence_node = extra_commands.nodesInGroupOfType(
+                sequence_group, "RVSequence"
+            )[0]
 
-            blend_modes_property = "CompareTrack_sequence.composite.inputBlendModes"
+            blend_modes_property = f"{sequence_node}.composite.inputBlendModes"
             if not commands.propertyExists(blend_modes_property):
                 commands.newProperty(blend_modes_property, commands.StringType, 0)
             commands.setStringProperty(blend_modes_property, ["over"], True)
 
-            opacities_property = "CompareTrack_sequence.composite.inputOpacities"
+            opacities_property = f"{sequence_node}.composite.inputOpacities"
             if not commands.propertyExists(opacities_property):
                 commands.newProperty(opacities_property, commands.FloatType, 0)
             commands.setFloatProperty(opacities_property, [opacity], True)
