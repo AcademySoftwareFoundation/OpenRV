@@ -220,6 +220,9 @@ static void setPlatformSpecificLocale()
     //    ..."no need to try language or region specific CTYPEs, as they
     //        all point back to the same generic UTF-8 CTYPE."
     //
+    // NOTE: Leaving this here for completeness for the curious minded,
+    // but the main.cpp file for macOS is actually src/bin/nsapps/RV/main.cpp
+
     locale = "UTF-8";
 #elif defined(PLATFORM_LINUX)
     // this is valid for Rocky Linux. As per the Qt code, some other Unixes may
