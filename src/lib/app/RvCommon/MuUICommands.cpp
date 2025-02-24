@@ -146,6 +146,11 @@ namespace Rv
         context->listType(context->tupleType(types));
 
         commands->addSymbols(
+            new Function(c, "framebufferPixelValue", framebufferPixelValue,
+                         None, Return, "vector float[4]", Parameters,
+                         new Param(c, "px", "float"),
+                         new Param(c, "py", "float"), End),
+
             new Function(c, "resizeFit", resizeFit, None, Return, "void", End),
 
             new Function(c, "setViewSize", setViewSize, None, Return, "void",
@@ -505,6 +510,47 @@ namespace Rv
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
             EndArguments);
+    }
+
+    NODE_IMPLEMENTATION(framebufferPixelValue, Mu::Vector4f)
+    {
+        Process* p = NODE_THREAD.process();
+        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+        Session* s = Session::currentSession();
+        RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
+        QWidget* w = doc->view();
+
+        GLView* glview = dynamic_cast<GLView*>(w);
+
+        Mu::Vector4f v;
+        v[0] = 0;
+        v[1] = 0;
+        v[2] = 0;
+        v[3] = 0;
+
+        if (glview != NULL)
+        {
+            float x = NODE_ARG(0, float);
+            float y = NODE_ARG(1, float);
+
+            int ix = (int)(x + 0.5f);
+            int iy = (int)(y + 0.5f);
+
+            QImage image = glview->readPixels(ix, iy, 1, 1);
+
+            if ((image.width() > 0) && (image.height() > 0))
+            {
+                QRgb rgba = image.pixel(0, 0);
+                QColor qc(rgba);
+
+                v[0] = qc.redF();
+                v[1] = qc.greenF();
+                v[2] = qc.blueF();
+                v[3] = qc.alphaF();
+            }
+        }
+
+        NODE_RETURN(v);
     }
 
     NODE_IMPLEMENTATION(queryDriverAttribute, Pointer)

@@ -330,10 +330,92 @@ namespace Rv
 #endif
     }
 
+    bool GLView::validateReadPixels(int x, int y, int w, int h)
+    {
+        int r = x + w;
+        int t = y + h;
+
+        // are the extents of the read region out of bounds?
+        if (x < 0 || y < 0 || r > width() || t > height())
+            return false;
+
+        return true;
+    }
+
+    QImage GLView::readPixels(int x, int y, int w, int h)
+    {
+
+        // If out of bounds, return an empty image.
+        if (validateReadPixels(x, y, w, h) == false)
+        {
+            QImage image(0, 0, QImage::Format_RGBA8888);
+            return image;
+        }
+
+        //
+        // Why this method exists, and why saving and restoring the context is
+        // important:
+        //
+        // With the old QGLWidget implement with Qt 5.15.2, the current context
+        // stayed bounded to the main view (eg: the instance of GLView) after
+        // each paint of the GLView. This made it possible This made it possible
+        // to call gl functions (eg: glReadPixels) even when not in the context
+        // of a render call For example, in Mu:
+        //
+        // method: render (void; Event event)
+        //
+        // Now with the new QOpenGL paradigm, after the application is done
+        // rendering, the current OpenGL context is no longer bound to the
+        // context of the GLView, and is instead bound to the context of the
+        // main Qt frame window.
+        //
+        // This caused a problem with some tools, like the dropperSample() tool
+        // of the mu annotation toolset, which blindly called glReadPixels
+        // whenever the mouse was clicked/dragged over the view. Since the
+        // context was no longer bound to the view, but to the qapplication's
+        // main window, glReadPixels would return invalid colors.
+        //
+        // Therefore we implemented this readPixels on the glView, and exposed a
+        // "framebufferPixelValue(x,y)" method which ends up here, allowing us
+        // to perform some save/retore operations of the context before
+        // returning.
+        //
+        // Note that we can't simply make the GLiew's context current without
+        // restoring the old context, since this creates side effects and causes
+        // the glDebug() to complain about invalid states elsewhere.
+        //
+
+        // Save the current context
+        QOpenGLContext* prevContext = QOpenGLContext::currentContext();
+        QSurface* prevSurface = prevContext->surface();
+
+        // Make the current context the one of the GL view
+        makeCurrent();
+
+        QImage image(w, h, QImage::Format_RGBA8888);
+        glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+        // Restore the old context
+        prevContext->makeCurrent(prevSurface);
+
+        return image;
+    }
+
+    void GLView::debugSaveFramebuffer()
+    {
+        // Create a QImage with the same size as the FBO
+        QImage image(width(), height(), QImage::Format_RGBA8888);
+        glReadPixels(0, 0, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE,
+                     image.bits());
+
+        // image.save("/home/<username>>/<orv_folder>/fbo.png");
+    }
+
     void GLView::swapBuffersNoSync()
     {
         glFlush();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER,
+                          context()->defaultFramebufferObject());
         glReadBuffer(GL_BACK);
         glDrawBuffer(GL_FRONT);
         glBlitFramebufferEXT(0, 0, width(), height(), 0, 0, width(), height(),
@@ -423,9 +505,8 @@ namespace Rv
             // Not sure why it is not complaining on Linux or Windows, but this
             // make sure that we are drawing onto the default framebuffer with
             // those OpenGL functions below.
-            glBindFramebuffer(
-                GL_FRAMEBUFFER,
-                QOpenGLContext::currentContext()->defaultFramebufferObject());
+            glBindFramebuffer(GL_FRAMEBUFFER,
+                              context()->defaultFramebufferObject());
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
             TWK_GLDEBUG;
