@@ -67,8 +67,11 @@ def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object
     Returns the top level node created that represents this otio
     timeline.
     """
-    otio_obj = otio.adapters.read_from_string(otio_string)
-    timeline = otio_obj["otio"]
+    try:
+        otio_obj = otio.adapters.read_from_string(otio_string)
+        timeline = otio_obj["otio"]
+    except Exception as e:
+        logging.error(f"Unable to deserialize the OTIO string: {e}")
 
     context = {"sg_url": host_prefix} if host_prefix else None
 
