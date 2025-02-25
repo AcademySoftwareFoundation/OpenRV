@@ -195,6 +195,20 @@ string scarfFile(const string& fileName)
     return buffer.str();
 }
 
+static void setPlatformSpecificLocale()
+{
+    // on MacOS, we now use "UTF-8" as a replacement for the "C" locale.
+    // In principle it should make no difference  to use "C" or "UTF-8", and
+    // on macOS, "UTF-8" is a catch-all, region-agnostic UTF-8 locale
+    // (ex: "UTF-8" is an alias to "en_US.UTF-8" "en_GB.UTF-8" "*.UTF-8", etc)
+
+    // setenv("LANG", "C", 1);    // Qt5
+    // setenv("LC_ALL", "C", 1);  // Qt5
+
+    setenv("LANG", "UTF-8", 1);
+    setenv("LC_ALL", "UTF-8", 1);
+}
+
 //
 //  We happen to know that Mu objects NEVER get stashed in 3rd party
 //  static areas so let's just remove all of them.
@@ -243,8 +257,8 @@ int main(int argc, char* argv[])
     {
         setenv("ORIGINALLOCAL", "en", 1);
     }
-    setenv("LANG", "C", 1);
-    setenv("LC_ALL", "C", 1);
+
+    setPlatformSpecificLocale();
 
     // Qt 5.12.1 specific
     // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
