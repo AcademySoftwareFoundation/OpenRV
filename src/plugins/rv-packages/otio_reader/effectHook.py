@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2025  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import sys
 from rv import commands
@@ -43,7 +43,7 @@ def set_rv_effect_props(node_component, prop_map):
             map of prop names of node_component to their value
     """
     for prop, value in prop_map.items():
-        if value:
+        if value is not None:
             _set_rv_prop("{}.{}".format(node_component, prop), _get_rv_value(value))
 
 
@@ -59,7 +59,7 @@ def add_rv_effect_props(node_component, prop_map):
             map of prop names of node_component to their value
     """
     for prop, value in prop_map.items():
-        if value:
+        if value is not None:
             prop_name = "{}.{}".format(node_component, prop)
             rv_value = _get_rv_value(value)
 
