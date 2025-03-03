@@ -260,6 +260,9 @@ def _create_track(in_seq, context=None):
             "frame": [],
         }
 
+        # RV supports only one frame rate per sequence, so we'll use the rate of the first item in the sequence as our sequence rate
+        seq_rate = None
+
         for thing in items_to_serialize:
             if isinstance(thing, tuple):
                 result = _create_transition(*thing, context=context)
@@ -271,11 +274,14 @@ def _create_track(in_seq, context=None):
                 result = create_rv_node_from_otio(thing, context)
                 edl_item, pre_item = thing, None
 
+            if seq_rate is None:
+                seq_rate = thing.trimmed_range().duration.rate
+
             if result:
                 new_inputs.append(result)
 
-                edl_range = _calculate_edl(edl, edl_time, edl_item, pre_item)
-                edl_time = edl_range.end_time_exclusive()
+                edl_range = _calculate_edl(edl, edl_time, edl_item, seq_rate, pre_item)
+                edl_time = edl_range.end_time_exclusive().rescaled_to(seq_rate)
 
         commands.setNodeInputs(new_seq, new_inputs)
 
@@ -327,7 +333,7 @@ def _get_global_transform(tl) -> dict:
     }
 
 
-def _calculate_edl(edl, edl_time, item, pre_transition_item=None):
+def _calculate_edl(edl, edl_time, item, seq_rate, pre_transition_item=None):
     # EDL values don't make much sense for a transitions, since it has two
     # different sources as inputs. So if we have a transition, we'll just set
     # EDL values to consume the whole transition, and rely on the cut values
@@ -338,7 +344,7 @@ def _calculate_edl(edl, edl_time, item, pre_transition_item=None):
         duration = (item.in_offset + item.out_offset).rescaled_to(rate)
         out_frame = otio.opentime.to_frames(duration, rate)
     else:
-        in_frame, out_frame = _get_in_out_frame(item, item.trimmed_range())
+        in_frame, out_frame = _get_in_out_frame(item, item.trimmed_range(), seq_rate)
         duration = item.trimmed_range().duration
 
     edl["in"].append(in_frame)
@@ -365,7 +371,7 @@ def _set_sequence_edl(sequence, edl_time, edl):
     commands.setIntProperty("{}.mode.autoEDL".format(sequence), [0])
 
 
-def _get_in_out_frame(it, range_to_read):
+def _get_in_out_frame(it, range_to_read, seq_rate=None):
     in_frame = out_frame = None
 
     if hasattr(it, "media_reference") and it.media_reference:
@@ -378,13 +384,12 @@ def _get_in_out_frame(it, range_to_read):
             )
 
     if not in_frame and not out_frame:
-        # because OTIO has no global concept of FPS, the rate of the duration
-        # is used as the rate for the range of the source.
+        rate = seq_rate if seq_rate is not None else range_to_read.duration.rate
         in_frame = otio.opentime.to_frames(
-            range_to_read.start_time, rate=range_to_read.duration.rate
+            range_to_read.start_time.rescaled_to(rate), rate=rate
         )
         out_frame = otio.opentime.to_frames(
-            range_to_read.end_time_inclusive(), rate=range_to_read.duration.rate
+            range_to_read.end_time_inclusive().rescaled_to(rate), rate=rate
         )
     return (in_frame, out_frame)
 
