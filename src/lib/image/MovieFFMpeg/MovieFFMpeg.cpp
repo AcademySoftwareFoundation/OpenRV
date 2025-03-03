@@ -4246,6 +4246,7 @@ namespace TwkMovie
         {
             avStream->time_base.num = m_duration;
             avStream->time_base.den = m_timeScale;
+            avStream->avg_frame_rate = av_d2q(m_info.fps, INT_MAX);
             avCodecContext->time_base.num = m_duration;
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
@@ -4254,6 +4255,7 @@ namespace TwkMovie
             avCodecContext->width = m_info.width;
             avCodecContext->height = m_info.height;
             avCodecContext->color_primaries = AVCOL_PRI_BT709; // 1
+            avCodecContext->framerate = avStream->avg_frame_rate;
             //
             //  XXX should come back to this.  should transfer function also be
             //  something else for mjpeg ?  Maybe need user control.
