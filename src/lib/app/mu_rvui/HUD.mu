@@ -487,6 +487,9 @@ class: ProcessInfo : Widget
         //
         setEventTableBBox(_modeName, "global", vec2f(0,0), vec2f(0,0));
 
+        // create memory space for the (X) button, which we update in render()
+        _buttons = Button[] {{0,0,0,0, nil}};
+
         _x = 40;
         _y = 60;
     }
@@ -585,7 +588,25 @@ class: ProcessInfo : Widget
             rad = th / 2,
             d   = mag(_downPoint - vec2f(pcx + 4 + rad, pcy + rad));
 
-        _buttons = Button[] {{pcx + 4, pcy, rad * 2, rad * 2, killProcess(p,)}};
+
+        // Bugfix: don't recreate the _buttons array, by doNothing
+        // _buttons = Button[] {....};. Instead just update the
+        // content of the boundaries of the button. Otherwise, 
+        // if we recreated the _buttons member, this would dispose
+        // and recreate the array anbd it would be a problem because 
+        // this recreates the memory for the Buttons array and disposes 
+        // of the old memory, and when we handle mouse events (eg: 
+        // click/release or drag/release) in another thread, we 
+        // will likely read old/just-disposed memory. So, we must not 
+        // touch memory space of the Buttons array, we just update its 
+        // x/y/w/h/pid content, member-by-member, which still is not 
+        // 100% ideal, but safe and harmless enough, and we won't crash.
+        _buttons[0]._x = pcx + 4;
+        _buttons[0]._y = pcy;
+        _buttons[0]._w = rad * 2;
+        _buttons[0]._h = rad * 2;
+        _buttons[0]._callback = killProcess(p,);
+
         gltext.writeAt(pcx + 3.0 * rad, pcy, "%-3.1f%%" % pcent);
 
         drawCloseButton(pcx + rad + 4, pcy + rad, rad, 
