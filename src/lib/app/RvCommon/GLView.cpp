@@ -358,10 +358,10 @@ namespace Rv
         //
         // With the old QGLWidget implement with Qt 5.15.2, the current context
         // stayed bounded to the main view (eg: the instance of GLView) after
-        // each paint of the GLView. This made it possible This made it possible
-        // to call gl functions (eg: glReadPixels) even when not in the context
-        // of a render call For example, in Mu:
+        // each paint of the GLView. This made it possible to call gl functions 
+        // (eg: glReadPixels) even when not in the context of a render call.
         //
+        // For example, in Mu:
         // method: render (void; Event event)
         //
         // Now with the new QOpenGL paradigm, after the application is done
@@ -377,7 +377,7 @@ namespace Rv
         //
         // Therefore we implemented this readPixels on the glView, and exposed a
         // "framebufferPixelValue(x,y)" method which ends up here, allowing us
-        // to perform some save/retore operations of the context before
+        // to perform some save/restore operations of the context before
         // returning.
         //
         // Note that we can't simply make the GLiew's context current without
@@ -385,18 +385,11 @@ namespace Rv
         // the glDebug() to complain about invalid states elsewhere.
         //
 
-        // Save the current context
-        QOpenGLContext* prevContext = QOpenGLContext::currentContext();
-        QSurface* prevSurface = prevContext->surface();
-
         // Make the current context the one of the GL view
         makeCurrent();
 
         QImage image(w, h, QImage::Format_RGBA8888);
         glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
-
-        // Restore the old context
-        prevContext->makeCurrent(prevSurface);
 
         return image;
     }
