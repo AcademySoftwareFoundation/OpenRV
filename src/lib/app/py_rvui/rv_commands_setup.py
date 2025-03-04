@@ -175,6 +175,7 @@ all_mu_commands = [
     "ioParameters",
     "propertyInfo",
     "setPresentationMode",
+    "framebufferPixelValue",
     "optionsPlay",
     "addSource",
     "addSourceBegin",
