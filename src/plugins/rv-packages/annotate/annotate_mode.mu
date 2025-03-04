@@ -672,8 +672,7 @@ class: AnnotateMinorMode : MinorMode
             sName  = sourceNameWithoutFrame(pinfo.name),
             ip     = state.pointerPosition;
 
-        float[] pixels;
-        glReadPixels(ip.x, ip.y, 1, 1, GL_RGBA, pixels);
+        let pixels = framebufferPixelValue(ip.x, ip.y);
         let c = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
         _sampleColor += c;
         _sampleCount++;
