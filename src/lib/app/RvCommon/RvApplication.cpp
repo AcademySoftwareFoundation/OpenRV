@@ -1595,7 +1595,7 @@ namespace Rv
         Rv::Session* session = static_cast<Rv::Session*>(doc);
         RvDocument* rvDoc = (RvDocument*)session->opaquePointer();
 
-        if (m_presentationMode)
+            if (m_presentationMode)
         {
             if (VideoDevice* d = findPresentationDevice(opts.presentDevice))
             {
@@ -1628,7 +1628,6 @@ namespace Rv
                                    == QApplication::screens().indexOf(
                                        QApplication::screenAt(
                                            rvDoc->mapToGlobal(QPoint(0, 0)))))
-                            ;
                         {
                             TWK_THROW_EXC_STREAM(
                                 "Cannot open presentation device for the same "
