@@ -59,6 +59,7 @@ namespace IPCore
 
     protected:
         void updateContext();
+        void updateFunction();
 
         OCIO::MatrixTransformRcPtr createMatrixTransformXYZToRec709() const;
         OCIO::MatrixTransformRcPtr getMatrixTransformXYZToRec709();
@@ -71,7 +72,6 @@ namespace IPCore
         std::vector<OCIO1DLUTPtr> m_1DLUTs;
         std::vector<OCIO3DLUTPtr> m_3DLUTs;
         OCIOState* m_state{nullptr};
-        mutable QMutex m_lock;
         bool m_useRawConfig{false};
 
         // synlinearize/syndisplay functions
