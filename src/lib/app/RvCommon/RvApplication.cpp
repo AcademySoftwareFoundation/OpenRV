@@ -1629,7 +1629,7 @@ namespace Rv
                                        QApplication::screenAt(
                                            rvDoc->mapToGlobal(QPoint(0, 0)))))
                         {
-                            TWK_THROW_EXC_STREAM(
+                            TWK_THROW_EXC_STREAM( 
                                 "Cannot open presentation device for the same "
                                 "screen the controller is on");
                         }
