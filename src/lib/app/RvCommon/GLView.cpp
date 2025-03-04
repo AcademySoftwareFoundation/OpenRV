@@ -330,22 +330,12 @@ namespace Rv
 #endif
     }
 
-    void GLView::swapBuffersNoSync()
-    {
-        glFlush();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glReadBuffer(GL_BACK);
-        glDrawBuffer(GL_FRONT);
-        glBlitFramebufferEXT(0, 0, width(), height(), 0, 0, width(), height(),
-                             GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        glDrawBuffer(GL_BACK);
-    }
 
     void GLView::paintGL()
     {
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;
-
+        
         if (!m_postFirstNonEmptyRender && session
             && session->postFirstNonEmptyRender())
         {
@@ -382,7 +372,7 @@ namespace Rv
         if (m_doc && session && m_videoDevice)
         {
             // m_frameBuffer->makeCurrent();
-            m_videoDevice->makeCurrent();
+            m_videoDevice->makeCurrent(); // this just calls void GLtext::setContext(Context c) {}... which calls pthread_get/setspecific(ctx)
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
@@ -416,16 +406,12 @@ namespace Rv
             // Linux, not test on Windows)
             //          The issue I see on MacOS that the background is brown
             //          istead of black with the default background.
-
-            // NOTE_QT: glClear causes an issue on MacOS. We need to call
-            // glBindFramebuffer.
-
-            // Not sure why it is not complaining on Linux or Windows, but this
-            // make sure that we are drawing onto the default framebuffer with
-            // those OpenGL functions below.
-            glBindFramebuffer(
-                GL_FRAMEBUFFER,
-                QOpenGLContext::currentContext()->defaultFramebufferObject());
+            //
+            // NOTE PB: Not sure wy we just can't do the following 5 lines of 
+            // gl code below for all cases, for the "else" statement as well. 
+            // Are the glPush/glPopAttrib, and the glClear of also the depth 
+            // buffer that bad on modern hardware? It would simplify this 
+            // already-complicated function.
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
             TWK_GLDEBUG;
@@ -480,6 +466,37 @@ namespace Rv
         //  what's going on.
         //
 
+        // Note for Qt6 . QOpenGLWidget implementation:
+        // 
+        // With the new QOpenGLWidget (Qt6 branch), all of the rendering of
+        // each widget is done in its own FBOs (aka: off-screen buffers), as
+        // opposed to the old Qt5/QGLWidget branch where the rendering was
+        // done in each GGLWidget's backbuffer (aka: GL_BACK, an on-screen
+        // framebuffer surface).
+        // 
+        // With QOpenGLWidget, it is now the WainWindow's responsibility 
+        // (more technically, the MainWindow's rendering backend, which 
+        // happens to be Qt's OpenGL rendering backend when QOpenGLWidget are
+        // present in the children tree) to gather and composite all of the 
+        // off-screen buffers (regardless of which image type they are, eg: 
+        // cpu-memory images, gpu/opengl images, etc) and finally to call 
+        // swapBuffers to show the final contents of the mainWindow. 
+        //  
+        // As a result, I'm not sure there's a point -- at all -- 
+        // in calling swapBuffers on the GLView anywhere amnymore. From old
+        // comments in the previous version of this tile, it appears that 
+        // calling swapBuffers was done to force a quicker visual update, or 
+        // to minimize visual tearing of some sort. This would have worked 
+        // with the old QGLWidget (becayuse each QGLWidget had its own 
+        // context, and its rendering target was directly the GL_BACK 
+        // framebuffer, but, again, with QOpenGLWidget, the rendering target
+        // is no longer GL_BACK, it is an FBO that is meant to be used at 
+        // the end of the application's drawing / visual update pipeline.
+        // 
+        // I am not sure hwo this would affect (if at all?) the display of 
+        // the rendered buffer on external video devices. This needs to be 
+        // tested extensively.
+
         if (debug)
         {
             Session::ProfilingRecord& trecord =
@@ -489,15 +506,7 @@ namespace Rv
 
             if (session->outputVideoDevice() != videoDevice())
             {
-#ifdef PLATFORM_DARWIN
                 session->outputVideoDevice()->syncBuffers();
-                makeCurrent();
-                context()->swapBuffers(context()->surface());
-#else
-                session->outputVideoDevice()->syncBuffers();
-                makeCurrent();
-                swapBuffersNoSync();
-#endif
             }
             else
             {
@@ -542,19 +551,9 @@ namespace Rv
                 reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData)
                     ->notify();
 
-                // session->outputVideoDevice()->syncBuffers();
-
-                makeCurrent();
-                context()->swapBuffers(context()->surface());
 #else
                 session->outputVideoDevice()->syncBuffers();
-                makeCurrent();
-                swapBuffersNoSync();
 #endif
-            }
-            else
-            {
-                context()->swapBuffers(context()->surface());
             }
         }
 
