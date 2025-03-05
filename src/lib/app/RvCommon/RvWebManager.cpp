@@ -9,7 +9,11 @@
 #include <IPCore/Session.h>
 #include <QtCore/QUrl>
 #include <QtCore/QDir>
+
+#if defined(RV_VFX_CY2023)
 #include <QTextCodec>
+#endif
+
 #include <QtCore/QStandardPaths>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
@@ -156,7 +160,7 @@ namespace Rv
         reply->setReadBufferSize(0); // unlimited
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(replyRead()));
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
                 SLOT(replyError(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
                 SLOT(replySSLErrors(QList<QSslError>)));
@@ -226,7 +230,7 @@ namespace Rv
         reply->setReadBufferSize(0); // unlimited
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(replyRead()));
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
                 SLOT(replyError(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
                 SLOT(replySSLErrors(QList<QSslError>)));
@@ -300,7 +304,7 @@ namespace Rv
         reply->setReadBufferSize(0); // unlimited
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(replyRead()));
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
                 SLOT(replyError(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
                 SLOT(replySSLErrors(QList<QSslError>)));
@@ -366,8 +370,16 @@ namespace Rv
                 //  Text, convert to UTF-8 for Mu
                 //
 
+#if defined(RV_VFX_CY2023)
                 QTextCodec* codec = QTextCodec::codecForHtml(array);
                 QString u = codec->toUnicode(array);
+#else
+                // Assume that the data is utf-8 encoded because about 98-99% of
+                // websites uses utf-8. The second closest is ISO-8859-1
+                // with 1.1%.
+                QStringDecoder decoder(QStringDecoder::Utf8);
+                QString u = decoder.decode(array);
+#endif
                 QByteArray utf8 = u.toUtf8();
                 if (!replyErrorString.isEmpty())
                     utf8 = replyErrorString.toUtf8();
