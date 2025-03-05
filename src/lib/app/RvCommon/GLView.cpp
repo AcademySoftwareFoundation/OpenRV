@@ -407,11 +407,12 @@ namespace Rv
             //          The issue I see on MacOS that the background is brown
             //          istead of black with the default background.
             //
-            // NOTE PB: Not sure wy we just can't do the following 5 lines of 
-            // gl code below for all cases, for the "else" statement as well. 
-            // Are the glPush/glPopAttrib, and the glClear of also the depth 
-            // buffer that bad on modern hardware? It would simplify this 
-            // already-complicated function.
+            // Even on Qt6/QOpenGLWidget, we need to call 
+            // glBindFramebuffer(); it otherwise complains and fails 
+            // on glClear() on macOS
+            glBindFramebuffer(
+                GL_FRAMEBUFFER, 
+                QOpenGLContext::currentContext()->defaultFramebufferObject());
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
             TWK_GLDEBUG;
