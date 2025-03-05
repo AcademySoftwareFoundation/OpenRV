@@ -1595,7 +1595,7 @@ namespace Rv
         Rv::Session* session = static_cast<Rv::Session*>(doc);
         RvDocument* rvDoc = (RvDocument*)session->opaquePointer();
 
-            if (m_presentationMode)
+        if (m_presentationMode)
         {
             if (VideoDevice* d = findPresentationDevice(opts.presentDevice))
             {

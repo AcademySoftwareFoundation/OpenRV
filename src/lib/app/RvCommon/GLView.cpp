@@ -335,7 +335,7 @@ namespace Rv
     {
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;
-        
+
         if (!m_postFirstNonEmptyRender && session
             && session->postFirstNonEmptyRender())
         {
@@ -362,7 +362,7 @@ namespace Rv
     //  and holding them in the display even when rv redraws.  the
     //  effect being that parts of previous displays will be "left
     //  behind" and not updated even when rv plays.  especially when
-    //  going to/from fullscreen. 
+    //  going to/from fullscreen.
     //
 #ifdef PLATFORM_WINDOWS
     SetWindowRgn (this->winId(), 0, false);
@@ -411,7 +411,7 @@ namespace Rv
             // glBindFramebuffer(); it otherwise complains and fails 
             // on glClear() on macOS
             glBindFramebuffer(
-                GL_FRAMEBUFFER, 
+                GL_FRAMEBUFFER,
                 QOpenGLContext::currentContext()->defaultFramebufferObject());
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
