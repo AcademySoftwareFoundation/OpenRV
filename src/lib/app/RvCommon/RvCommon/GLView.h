@@ -71,7 +71,6 @@ namespace Rv
         void initializeGL();
         void resizeGL(int w, int h);
         void paintGL();
-        void swapBuffersNoSync();
 
     private:
         RvDocument* m_doc;
