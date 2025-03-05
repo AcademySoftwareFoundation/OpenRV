@@ -372,7 +372,7 @@ namespace Rv
         if (m_doc && session && m_videoDevice)
         {
             // m_frameBuffer->makeCurrent();
-            m_videoDevice->makeCurrent(); // this just calls void GLtext::setContext(Context c) {}... which calls pthread_get/setspecific(ctx)
+            m_videoDevice->makeCurrent();
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
