@@ -187,6 +187,26 @@ namespace Rv
         m_glView->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
+        // #ifdef PLATFORM_DARWIN
+        //  Under macOS, for Qt6/QOpenGLWidget port,
+        //  the initial display shows incorrect pixel
+        //  scaling due to some sort of effect related
+        //  to high-dpi on mac, until the main view is
+        //  resized by the user. This is a workaround
+        //  on macOS to force this resize;
+        //  Also enabling this on other platforms which
+        //  may have HDPI display with pixel doubling
+        //  enabled.
+        QTimer::singleShot(0, this,
+                           [this]()
+                           {
+                               QSize currentSize = size();
+                               resize(currentSize.width() + 1,
+                                      currentSize.height());
+                               resize(currentSize);
+                           });
+        // #endif
+
         m_resetPolicyTimer = new QTimer(this);
         m_resetPolicyTimer->setSingleShot(true);
         connect(m_resetPolicyTimer, SIGNAL(timeout()), this,
