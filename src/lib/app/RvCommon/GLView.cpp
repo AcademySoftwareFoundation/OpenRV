@@ -362,7 +362,7 @@ namespace Rv
     //  and holding them in the display even when rv redraws.  the
     //  effect being that parts of previous displays will be "left
     //  behind" and not updated even when rv plays.  especially when
-    //  going to/from fullscreen.
+    //  going to/from fullscreen. 
     //
 #ifdef PLATFORM_WINDOWS
     SetWindowRgn (this->winId(), 0, false);
