@@ -94,7 +94,9 @@
 #include <IPCore/ImageRenderer.h>
 #endif
 
+#if defined(RV_VFX_CY2023)
 #include <QTextCodec>
+#endif
 #include <QtWidgets/QtWidgets>
 #include <QtGui/QtGui>
 #include <RvCommon/RvDocument.h>
@@ -338,7 +340,10 @@ int utf8Main(int argc, char* argv[])
 
     setPlatformSpecificLocale();
 
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+    // Refresh the locale using the environment variable set by
+    // setPlatformSpecificLocale.
+    QLocale::setDefault(QLocale::system());
+
     TwkFB::ThreadPool::initialize();
 
     // Qt 5.12.1 specific
