@@ -233,6 +233,7 @@ all_mu_commands = [
     "beginCompoundCommand",
     "setCacheMode",
     "sourcePixelValue",
+    "framebufferPixelValue",   
     "setByteProperty",
     "inc",
     "getCurrentAttributes",

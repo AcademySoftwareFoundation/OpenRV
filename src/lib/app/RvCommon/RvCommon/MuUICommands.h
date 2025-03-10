@@ -89,6 +89,7 @@ namespace Rv
     NODE_DECLARATION(launchTLI, void);
     NODE_DECLARATION(rvioSetup, void);
     NODE_DECLARATION(javascriptMuExport, void);
+    NODE_DECLARATION(framebufferPixelValue, Mu::Vector4f);
 
 } // namespace Rv
 
