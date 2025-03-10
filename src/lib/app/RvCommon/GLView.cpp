@@ -344,7 +344,6 @@ namespace Rv
 
     QImage GLView::readPixels(int x, int y, int w, int h)
     {
-
         // If out of bounds, return an empty image.
         if (validateReadPixels(x, y, w, h) == false)
         {
@@ -352,40 +351,6 @@ namespace Rv
             return image;
         }
 
-        //
-        // Why this method exists, and why saving and restoring the context is
-        // important:
-        //
-        // With the old QGLWidget implement with Qt 5.15.2, the current context
-        // stayed bounded to the main view (eg: the instance of GLView) after
-        // each paint of the GLView. This made it possible to call gl functions 
-        // (eg: glReadPixels) even when not in the context of a render call.
-        //
-        // For example, in Mu:
-        // method: render (void; Event event)
-        //
-        // Now with the new QOpenGL paradigm, after the application is done
-        // rendering, the current OpenGL context is no longer bound to the
-        // context of the GLView, and is instead bound to the context of the
-        // main Qt frame window.
-        //
-        // This caused a problem with some tools, like the dropperSample() tool
-        // of the mu annotation toolset, which blindly called glReadPixels
-        // whenever the mouse was clicked/dragged over the view. Since the
-        // context was no longer bound to the view, but to the qapplication's
-        // main window, glReadPixels would return invalid colors.
-        //
-        // Therefore we implemented this readPixels on the glView, and exposed a
-        // "framebufferPixelValue(x,y)" method which ends up here, allowing us
-        // to perform some save/restore operations of the context before
-        // returning.
-        //
-        // Note that we can't simply make the GLiew's context current without
-        // restoring the old context, since this creates side effects and causes
-        // the glDebug() to complain about invalid states elsewhere.
-        //
-
-        // Make the current context the one of the GL view
         makeCurrent();
 
         QImage image(w, h, QImage::Format_RGBA8888);
@@ -567,10 +532,6 @@ namespace Rv
         // framebuffer, but, again, with QOpenGLWidget, the rendering target
         // is no longer GL_BACK, it is an FBO that is meant to be used at 
         // the end of the application's drawing / visual update pipeline.
-        // 
-        // I am not sure hwo this would affect (if at all?) the display of 
-        // the rendered buffer on external video devices. This needs to be 
-        // tested extensively.
 
         if (debug)
         {
