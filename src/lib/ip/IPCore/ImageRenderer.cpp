@@ -2969,6 +2969,7 @@ namespace IPCore
         // is this needed ? YES this is needed, otherwise fonts wont render
         // right with FTGL
         GLPushAttrib attr1(GL_ALL_ATTRIB_BITS);
+        TWK_GLDEBUG;
         GLPushClientAttrib attr2(GL_CLIENT_ALL_ATTRIB_BITS);
         TWK_GLDEBUG;
 
