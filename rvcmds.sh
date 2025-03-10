@@ -49,17 +49,17 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/gcc_64' | sort -V | tail -n 1)
+    QT_HOME=$(find ~/Qt6/6.5* -type d -maxdepth 4 -path '*/gcc_64' | sort -V | tail -n 1)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/macos' | sort -V | tail -n 1)
+    QT_HOME=$(find ~/Qt6/6.5* -type d -maxdepth 4 -path '*/macos' | sort -V | tail -n 1)
 
     # If no macos installation found, try clang_64
     if [ -z "$QT_HOME" ]; then
-      QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
+      QT_HOME=$(find ~/Qt6/6.5* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
     fi
 
   elif [[ "$OSTYPE" == "msys"* ]]; then
-    QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
+    QT_HOME=$(find c:/Qt6/6.5* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
   fi
 
   # Could not find Qt installation
@@ -102,8 +102,8 @@ RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.
 # ALIASES: Basic commands
 alias rvenv="rvenv_shell"
 alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
-alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvcfgd="rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT6_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL} -DRV_VFX_PLATFORM=CY2024"
+alias rvcfgd="rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT6_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL} -DRV_VFX_PLATFORM=CY2024"
 alias rvbuildt="rvenv && cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuildtd="rvenv && cmake --build ${RV_BUILD_DEBUG} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuild="rvenv && rvbuildt main_executable"
@@ -114,7 +114,8 @@ alias rvinst="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config 
 alias rvinstd="rvenv && cmake --install ${RV_BUILD_DEBUG} --prefix ${RV_INST_DEBUG} --config Debug"
 alias rvclean="rm -rf ${RV_BUILD} && rm -rf .venv"
 alias rvcleand="rm -rf ${RV_BUILD_DEBUG} && rm -rf .venv"
-
+alias rv="${RV_BUILD}/stage/app/bin/rv"
+alias rvd="${RV_BUILD_DEBUG}/stage/app/bin/rv"
 # ALIASES: Config and Build
 
 alias rvmk="rvcfg && rvbuild"
