@@ -73,7 +73,6 @@ namespace Rv
         void initializeGL();
         void resizeGL(int w, int h);
         void paintGL();
-        void swapBuffersNoSync();
         bool validateReadPixels(int x, int y, int w, int h);
         void debugSaveFramebuffer();
 
