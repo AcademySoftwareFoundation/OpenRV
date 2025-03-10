@@ -330,6 +330,45 @@ namespace Rv
 #endif
     }
 
+    bool GLView::validateReadPixels(int x, int y, int w, int h)
+    {
+        int r = x + w;
+        int t = y + h;
+
+        // are the extents of the read region out of bounds?
+        if (x < 0 || y < 0 || r > width() || t > height())
+            return false;
+
+        return true;
+    }
+
+    QImage GLView::readPixels(int x, int y, int w, int h)
+    {
+        // If out of bounds, return an empty image.
+        if (validateReadPixels(x, y, w, h) == false)
+        {
+            QImage image(0, 0, QImage::Format_RGBA8888);
+            return image;
+        }
+
+        makeCurrent();
+
+        QImage image(w, h, QImage::Format_RGBA8888);
+        glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+        return image;
+    }
+
+    void GLView::debugSaveFramebuffer()
+    {
+        // Create a QImage with the same size as the FBO
+        QImage image(width(), height(), QImage::Format_RGBA8888);
+        glReadPixels(0, 0, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE,
+                     image.bits());
+
+        // image.save("/home/<username>>/<orv_folder>/fbo.png");
+    }
+
 
     void GLView::paintGL()
     {
@@ -493,10 +532,6 @@ namespace Rv
         // framebuffer, but, again, with QOpenGLWidget, the rendering target
         // is no longer GL_BACK, it is an FBO that is meant to be used at 
         // the end of the application's drawing / visual update pipeline.
-        // 
-        // I am not sure hwo this would affect (if at all?) the display of 
-        // the rendered buffer on external video devices. This needs to be 
-        // tested extensively.
 
         if (debug)
         {
