@@ -498,8 +498,9 @@ namespace Rv
             // Not sure why it is not complaining on Linux or Windows, but this
             // make sure that we are drawing onto the default framebuffer with
             // those OpenGL functions below.
-            glBindFramebuffer(GL_FRAMEBUFFER,
-                              context()->defaultFramebufferObject());
+            glBindFramebuffer(
+                GL_FRAMEBUFFER,
+                QOpenGLContext::currentContext()->defaultFramebufferObject());
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
             TWK_GLDEBUG;
