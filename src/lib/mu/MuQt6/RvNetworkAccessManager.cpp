@@ -117,7 +117,7 @@ QNetworkReply* RvNetworkAccessManager::createRequest(
     //
     if (printErrors)
     {
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this,
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
                 SLOT(errorReplySlot(QNetworkReply::NetworkError)));
         connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
                 SLOT(sslErrorsReplySlot(QList<QSslError>)));
