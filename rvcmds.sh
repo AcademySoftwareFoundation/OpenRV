@@ -32,7 +32,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   RV_TOOLCHAIN=""
 
 # Windows
-elif [[ "$OSTYPE" == "msys"* ]]; then
+elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Visual Studio 17 2022}"
   WIN_PERL="${WIN_PERL:-c:/Strawberry/perl/bin}"
   CMAKE_WIN_ARCH="${CMAKE_WIN_ARCH:--A x64}"
@@ -40,7 +40,7 @@ elif [[ "$OSTYPE" == "msys"* ]]; then
   RV_TOOLCHAIN="-T v143,version=14.40"
 
 else
-  echo "OS does not seem to be linux, darwin or msys. Exiting."
+  echo "OS does not seem to be linux, darwin or msys/cygwin. Exiting."
   exit 1
 fi
 
@@ -58,7 +58,7 @@ if [ -z "$QT_HOME" ]; then
       QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
     fi
 
-  elif [[ "$OSTYPE" == "msys"* ]]; then
+  elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
     QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
   fi
 
@@ -78,8 +78,8 @@ fi
 rvenv_shell() {
   local activate_path=".venv/bin/activate"
 
-  # Using msys2 as a way to detect if the script is running on Windows.
-  if [[ "$OSTYPE" == "msys"* ]]; then
+  # Using msys2/cygwin as a way to detect if the script is running on Windows.
+  if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
     activate_path=".venv/Scripts/activate"
   fi
 
@@ -135,7 +135,7 @@ echo "RV_BUILD is $RV_BUILD"
 echo "RV_INST is $RV_INST"
 echo "CMAKE_GENERATOR is $CMAKE_GENERATOR"
 echo "QT_HOME is $QT_HOME"
-if [[ "$OSTYPE" == "msys"* ]]; then echo "WIN_PERL is $WIN_PERL"; fi
+if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then echo "WIN_PERL is $WIN_PERL"; fi
 
 echo "To override any of them do unset [name]; export [name]=value; source $SCRIPT"
 echo
