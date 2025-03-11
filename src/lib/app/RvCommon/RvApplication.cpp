@@ -114,8 +114,57 @@ namespace Rv
 
     bool RecursionLock::_recursionLocked = false;
 
-    void myMsgHandlerQT5(QtMsgType t, const QMessageLogContext& context,
-                         const QString& qmsg)
+    bool isSilencedQtMessage(const string& text)
+    {
+        const string silenced[] = {
+            // In Qt6, when KVM or YubiKey or other HID device is plugged in or
+            // out. This error seems fixed with QT 6.6.3
+            string("scroll event from unregistered device"),
+
+            // Another relic of an unneeded warning resulting from the Qt6 port.
+            // This one originates from initializing PyQt, when calling
+            // PyInit_QtConcurrent(), which calls
+            // qRegisterMetaType<QFuture<QString>>(char const*){}
+            // This is just a warning that the registration is already done, so
+            // we can safely ignore it.
+            string("Type conversion already registered from type"
+                   " QFuture<QString> to type QFuture<void>"),
+
+            // Qt warning about KVO observers. Qt have gotten rid of the check
+            // for this error in Qt 6.0. "ERROR: has active key-value observers
+            //(KVO)!
+            //        These will stop working now that the window is recreated,
+            //        and will result in exceptions when the observers are
+            //        removed. Break in QCocoaWindow::recreateWindowIfNeeded to
+            //        debug."
+            string("has active key-value observers (KVO)! These will stop"
+                   " working now that the window is recreated"),
+
+            //  We get these spurious errors from Qt with some tablets.  They
+            //  seem to indicate no real problem and slow down interaction.
+            string("This tablet device is unknown"),
+
+            // Another known warning/error which we can safely ignore.
+            string("Release of profile requested but WebEnginePage still not"
+                   " deleted"),
+
+            // End marker.
+            string("")};
+
+        int i = 0;
+        while (!silenced[i].empty())
+        {
+            if (text.find(silenced[i]) != string::npos)
+                return true;
+
+            i++;
+        }
+
+        return false;
+    }
+
+    void myMsgHandlerQT(QtMsgType t, const QMessageLogContext& context,
+                        const QString& qmsg)
     {
         //
         //  Since printing errors may generate errors, don't allow
@@ -126,6 +175,13 @@ namespace Rv
         RecursionLock l;
 
         string msg = qmsg.toUtf8().constData();
+
+        // We always report Qt debug messages except for known issues.
+        // In which case the following environment variable can be used to
+        // check whether those known messages are still reported or not by
+        // Qt.
+        if (isSilencedQtMessage(msg))
+            return;
 
         // Do not report Java script errors unless requested
         static bool reportQWebEngineJavaScripErrors =
@@ -140,62 +196,31 @@ namespace Rv
         {
         case QtDebugMsg:
         {
-            // We always report Qt debug messages except for known issues.
-            // In which case the following environment variable can be used to
-            // check whether those known messages are still reported or not by
-            // Qt.
             static const bool reportQtDebugMessages =
                 getenv("RV_REPORT_QT_DEBUG_MESSAGES") != nullptr;
 
-            // "DEBUG: Release of profile requested but WebEnginePage still not
-            // deleted. Expect troubles !"
-            const bool knownMessage =
-                (std::string(msg).find("Release of profile requested but "
-                                       "WebEnginePage still not deleted")
-                 != std::string::npos);
-
-            if (!knownMessage || reportQtDebugMessages)
+            if (reportQtDebugMessages)
             {
                 cout << "DEBUG: " << msg << endl;
             }
         }
         break;
         case QtWarningMsg:
-            //
-            //  We get these spurious errors from Qt with some tablets.  They
-            //  seem to indicate no real problem and slow down interaction.
-            //
-            if (std::string(msg).find("This tablet device is unknown")
-                == std::string::npos)
-            {
-                cout << "WARNING: " << msg << endl;
-            }
-            break;
+        {
+            cout << "WARNING: " << msg << endl;
+        }
+        break;
         case QtCriticalMsg:
         case QtFatalMsg:
         {
-            // Qt warning about KVO observers. Qt have gotten rid of the check
-            // for this error in Qt 6.0. "ERROR: has active key-value observers
-            //(KVO)!
-            //        These will stop working now that the window is recreated,
-            //        and will result in exceptions when the observers are
-            //        removed. Break in QCocoaWindow::recreateWindowIfNeeded to
-            //        debug."
-            const bool ignoreError =
-                std::string(msg).find(
-                    "has active key-value observers (KVO)! These will stop "
-                    "working now that the window is recreated")
-                != std::string::npos;
-
-            if (!ignoreError)
-            {
-                cerr << "ERROR: " << msg << endl;
-            }
+            cerr << "ERROR: " << msg << endl;
         }
         break;
         default:
+        {
             cout << "INFO: " << msg << endl;
-            break;
+        }
+        break;
         }
 
         assert(t != QtFatalMsg);
@@ -305,7 +330,7 @@ namespace Rv
             IPCore::QTAudioRenderer::addQTAudioModule<RvApplication>,
             "Platform Audio");
 
-        qInstallMessageHandler(myMsgHandlerQT5);
+        qInstallMessageHandler(myMsgHandlerQT);
         init();
 
         pthread_mutex_init(&m_deleteLock, 0);
