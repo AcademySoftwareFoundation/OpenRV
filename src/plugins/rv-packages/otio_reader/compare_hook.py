@@ -77,8 +77,15 @@ def hook_function(
         case "angular_mask":
             angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
             pivot = in_timeline.angular_mask["pivot"]
-            pivot_x = (pivot.min.x + pivot.max.x) / 2
-            pivot_y = (pivot.min.y + pivot.max.y) / 2
+
+            # If the Compare clip is inside a track (e.g. when joining a session),
+            # pivot is unexpectedly converted to a Box2d
+            if isinstance(pivot, otio.schema.Box2d):
+                pivot_x = (pivot.min.x + pivot.max.x) / 2
+                pivot_y = (pivot.min.y + pivot.max.y) / 2
+            elif isinstance(pivot, otio.schema.V2d):
+                pivot_x = pivot.x
+                pivot_y = pivot.y
 
             source = argument_map["src"]
             transform = extra_commands.associatedNode("RVTransform2D", source)
