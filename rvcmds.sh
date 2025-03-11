@@ -49,29 +49,58 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/gcc_64' | sort -V | tail -n 1)
+    QT_HOME_6=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
+    QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/macos' | sort -V | tail -n 1)
+    QT_HOME_6=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
+    QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
 
     # If no macos installation found, try clang_64
-    if [ -z "$QT_HOME" ]; then
-      QT_HOME=$(find ~/Qt/5.15* -type d -maxdepth 4 -path '*/clang_64' | sort -V | tail -n 1)
+    if [ -z "$QT_HOME_6" ]; then
+      QT_HOME_6=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
     fi
 
-  elif [[ "$OSTYPE" == "msys"* ]]; then
-    QT_HOME=$(find c:/Qt/5.15* -type d -maxdepth 4 -path '*/msvc2019_64' | sort -V | tail -n 1)
+    if [ -z "$QT_HOME_5" ]; then
+      QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
+    fi
+
+  elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
+    QT_HOME_6=$(find c:/Qt*/6.5* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
+    QT_HOME_5=$(find c:/Qt*/5.15* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
   fi
 
   # Could not find Qt installation
-  if [ -z "$QT_HOME" ]; then
+  if [ -z "$QT_HOME_6" ] && [ -z "$QT_HOME_5" ]; then
     echo "Could not find Qt installation. Please set QT_HOME to the correct path in your environment variables."
   else 
-    echo "Found Qt installation at $QT_HOME"
+    if [ -n "$QT_HOME_6" ]; then
+      QT_HOME="$QT_HOME_6"
+      QT_VERSION="6"
+      RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
+      RV_VFX_PLATFORM="CY2024"
+    else
+      QT_HOME="$QT_HOME_5"
+      QT_VERSION="5"
+      RV_DEPS_QT_LOCATION="RV_DEPS_QT5_LOCATION"
+      RV_VFX_PLATFORM="CY2023"
+    fi
+    echo "Found Qt $QT_VERSION installation at $QT_HOME"
+    echo "Note: If you have multiple version of Qt installed, the first one found will be used. The search prioritize Qt 6."
   fi
-
+ 
 # Qt installation path already set
 else 
-  echo "Using Qt installation already set at $QT_HOME"
+  if [[ $QT_HOME == *"6.5"* ]]; then
+    echo "Using Qt 6 installation already set at $QT_HOME"
+    RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
+    RV_VFX_PLATFORM="CY2024"
+  elif [[ $QT_HOME == *"5.15"* ]]; then
+    echo "Using Qt 5 installation already set at $QT_HOME"
+      RV_DEPS_QT_LOCATION="RV_DEPS_QT5_LOCATION"
+      RV_VFX_PLATFORM="CY2023"
+  else
+    echo "Invalid Qt installation path. Please set QT_HOME to the correct path in your environment variables."
+  fi
 fi
 
 # Must be executed in a function as it changes the shell environment
@@ -102,8 +131,8 @@ RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.
 # ALIASES: Basic commands
 alias rvenv="rvenv_shell"
 alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
-alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvcfgd="rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -DRV_DEPS_QT5_LOCATION=${QT_HOME} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvcfgd="rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvbuildt="rvenv && cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuildtd="rvenv && cmake --build ${RV_BUILD_DEBUG} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuild="rvenv && rvbuildt main_executable"
