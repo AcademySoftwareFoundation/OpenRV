@@ -118,12 +118,12 @@ namespace Rv
     {
         const string silenced[] = {
             // In Qt6, when KVM or YubiKey or other HID device is plugged in or
-            // out. This error seems fixed with QT 6.6.3
+            // out. This warning seems fixed with QT 6.6.3
             string("scroll event from unregistered device"),
 
             // Another relic of an unneeded warning resulting from the Qt6 port.
-            // This one originates from initializing PyQt, when calling
-            // PyInit_QtConcurrent(), which calls
+            // This one originates when loading Python which calls
+            // PyInit_QtConcurrent(), which then calls
             // qRegisterMetaType<QFuture<QString>>(char const*){}
             // This is just a warning that the registration is already done, so
             // we can safely ignore it.
@@ -177,9 +177,8 @@ namespace Rv
         string msg = qmsg.toUtf8().constData();
 
         // We always report Qt debug messages except for known issues.
-        // In which case the following environment variable can be used to
-        // check whether those known messages are still reported or not by
-        // Qt.
+        // In which case the following function can be used to check
+        // whether those known messages are still reported or not by Qt.
         if (isSilencedQtMessage(msg))
             return;
 
