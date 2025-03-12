@@ -8,6 +8,7 @@ def hook_function(
 ) -> None:
     """A hook for the compare schema"""
     compare_mode = in_timeline.mode
+    is_swapped = in_timeline.is_swapped
 
     match (compare_mode):
         case "side_by_side":
@@ -29,21 +30,21 @@ def hook_function(
             opacity = in_timeline.over_with_opacity["opacity"]
             if not isinstance(opacity, float):
                 opacity = float(opacity)
+
             stack_group = argument_map["stack"]
             sequence_group = argument_map["sequence"]
             sequence_node = extra_commands.nodesInGroupOfType(
                 sequence_group, "RVSequence"
             )[0]
+            composite_property = f"{sequence_node}.composite"
 
-            blend_modes_property = f"{sequence_node}.composite.inputBlendModes"
-            if not commands.propertyExists(blend_modes_property):
-                commands.newProperty(blend_modes_property, commands.StringType, 0)
-            commands.setStringProperty(blend_modes_property, ["over"], True)
-
-            opacities_property = f"{sequence_node}.composite.inputOpacities"
-            if not commands.propertyExists(opacities_property):
-                commands.newProperty(opacities_property, commands.FloatType, 0)
-            commands.setFloatProperty(opacities_property, [opacity], True)
+            effectHook.add_rv_effect_props(
+                composite_property,
+                {
+                    "inputBlendModes": "over",
+                    "inputOpacities": 1 - opacity if is_swapped else opacity,
+                },
+            )
 
             commands.setViewNode(stack_group)
 
