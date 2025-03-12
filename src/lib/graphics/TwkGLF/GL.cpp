@@ -101,8 +101,7 @@ bool twkGlPrintError(const char* file, const char* function, const int line)
         }
 
         // sorry about explicit if statement -- it just allows to put a
-       breakpoint
-        // on the changedRBO or changedFBO we want.
+        // breakpoint on the changedRBO or changedFBO we want.
         if (changedRBO)
             return changedRBO;
 
