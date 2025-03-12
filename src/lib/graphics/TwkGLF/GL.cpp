@@ -61,7 +61,7 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
-const char* shorterPath(const char* path)
+static const char* shorterPath(const char* path)
 {
     const char* src = strstr(path, "/src/");
     if (src)
