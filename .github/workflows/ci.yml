@@ -755,7 +755,7 @@ jobs:
             ./_build/RV_DEPS_*
             ./_build/cmake/dependencies
             ./_build/_deps
-          key: windows-dependencies
+          key: windows-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
