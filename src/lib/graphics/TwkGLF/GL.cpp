@@ -61,6 +61,56 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
+const char* shorterPath(const char* path)
+{
+    const char* src = strstr(path, "/src/");
+    if (src)
+        return src;
+    return path;
+}
+
+bool twkGlPrintError(const char* file, const char* function, const int line)
+{
+    static GLint lastFBO = -1;
+    static GLint lastRBO = -1;
+
+    if (GLuint err = glGetError())
+    {
+        std::cerr << "GL_ERROR: " << shorterPath(file) << "::" << function
+                  << ":" << line << " [" << TwkGLF::errorString(err) << "]"
+                  << std::endl;
+    }
+
+    GLint currFBO = -1;
+    GLint currRBO = -1;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currFBO);
+    glGetIntegerv(GL_RENDERBUFFER_BINDING, &currRBO);
+
+    bool changedFBO = lastFBO != currFBO;
+    bool changedRBO = lastRBO != currRBO;
+
+    if (changedFBO || changedRBO)
+    {
+        std::cerr << "[FBO " << lastFBO << " to " << currFBO << "] "
+                  << "[RBO " << lastRBO << " to " << currRBO << "] "
+                  << shorterPath(file) << "::" << function << ":" << line
+                  << std::endl;
+
+        lastFBO = currFBO;
+        lastRBO = currRBO;
+    }
+
+    // sorry about explicit if statement -- it just allows to put a breakpoint
+    // on the changedRBO or changedFBO we want.
+    if (changedRBO)
+        return changedRBO;
+
+    if (changedFBO)
+        return changedFBO;
+
+    return false;
+}
+
 bool glSupportsExtension(const char* extstring)
 {
     char* s = (char*)glGetString(GL_EXTENSIONS);    // Get our extension-string
