@@ -9,7 +9,9 @@ globalScope()->addSymbols(
                  print_void_qt_QTextStream_string, Parameters,
                  new Param(c, "textstream", "qt.QTextStream"),
                  new Param(c, "outputString", "string"), End),
+    EndArguments);
 
+addSymbols(
     new Function(c, "QTextStream", _n_QTextStream0, None, Compiled,
                  qt_QTextStream_QTextStream_QTextStream_QTextStream, Return,
                  "qt.QTextStream", Parameters,
