@@ -31,14 +31,17 @@ namespace TwkGLF
         , m_pbo(0)
         , m_totalSizeInBytes(0)
         , m_mappedBuffer(0)
+        , m_ownsFBOHandle(true)
     {
         // NOTE_QT: My thinking was to use
         // QOpenGLContext::currentContext()->defaultFramebufferObject(), but we
         // get
         //          a black screen by using it. Do we need more code?
-        glGenFramebuffers(1, &m_id);
+        glGenFramebuffersEXT(1, &m_id);
+        // cerr << "New GLFBO: " << m_id << std::endl;
+
         TWK_GLDEBUG;
-        glBindFramebuffer(GL_FRAMEBUFFER_EXT, m_id);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_id);
         TWK_GLDEBUG;
     }
 
@@ -56,6 +59,7 @@ namespace TwkGLF
         , m_pbo(0)
         , m_totalSizeInBytes(0)
         , m_mappedBuffer(0)
+        , m_ownsFBOHandle(false)
     {
         const TwkApp::VideoDevice::DataFormat& df =
             d->dataFormatAtIndex(d->currentDataFormat());
@@ -73,11 +77,15 @@ namespace TwkGLF
 
     GLFBO::~GLFBO()
     {
-        if (m_id)
+        if (m_id && m_ownsFBOHandle)
         {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            TWK_GLDEBUG;
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+            TWK_GLDEBUG;
             glDeleteFramebuffersEXT(1, &m_id);
+            // std::cerr << "deleting GLFBO " << m_id << std::endl;
+            TWK_GLDEBUG;
 
             for (size_t i = 0; i < m_attachments.size(); i++)
             {
@@ -88,10 +96,12 @@ namespace TwkGLF
                     if (a.texture)
                     {
                         glDeleteTextures(1, &a.id);
+                        TWK_GLDEBUG;
                     }
                     else
                     {
                         glDeleteRenderbuffersEXT(1, &a.id);
+                        TWK_GLDEBUG;
                     }
                 }
             }
@@ -370,13 +380,16 @@ namespace TwkGLF
 
         GLuint id;
         glGenRenderbuffersEXT(1, &id);
+        TWK_GLDEBUG;
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id);
+        TWK_GLDEBUG;
 
         if (m_samples > 1)
         {
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, m_samples,
                                                 GL_DEPTH24_STENCIL8_EXT,
                                                 m_width, m_height);
+            TWK_GLDEBUG;
         }
         else
         {
@@ -419,10 +432,10 @@ namespace TwkGLF
 
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT,
                                   GL_RENDERBUFFER_EXT, id, 0);
-
+        TWK_GLDEBUG;
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
                                   GL_RENDERBUFFER_EXT, id, 0);
-
+        TWK_GLDEBUG;
         m_attachments.push_back(Attachment(id, GL_STENCIL_ATTACHMENT_EXT, 0,
                                            GL_UNSIGNED_BYTE, false, true, true,
                                            false));
@@ -456,7 +469,7 @@ namespace TwkGLF
         bind();
 
         GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-
+        TWK_GLDEBUG;
         if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
         {
             //
@@ -475,12 +488,15 @@ namespace TwkGLF
         const Attachment* attach = colorTextureAttachment(i);
         assert(attach);
         glBindTexture(colorTarget(i), attach->id);
+        TWK_GLDEBUG;
     }
 
     void GLFBO::unbindColorTexture() const
     {
         glBindTexture(GL_TEXTURE_2D, 0);
+        TWK_GLDEBUG;
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+        TWK_GLDEBUG;
     }
 
     void GLFBO::copyTo(const GLFBO* destinationGLFBO, GLenum mask,
@@ -541,6 +557,7 @@ namespace TwkGLF
 
         glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1,
                              dstY1, mask, filter);
+        TWK_GLDEBUG;
     }
 
     namespace
