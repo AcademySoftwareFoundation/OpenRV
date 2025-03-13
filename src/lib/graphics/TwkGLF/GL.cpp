@@ -61,11 +61,11 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
-static const char* shorterPath(const char* path)
+static std::string_view shorterPath(std::string_view path)
 {
-    const char* src = strstr(path, "/src/");
-    if (src)
-        return src;
+    size_t pos = path.find("/src/");
+    if (pos != std::string_view::npos)
+        return path.substr(pos);
     return path;
 }
 
@@ -76,9 +76,9 @@ bool twkGlPrintError(const char* file, const char* function, const int line)
 
     if (GLuint err = glGetError())
     {
-        std::cerr << "GL_ERROR: " << shorterPath(file) << "::" << function
-                  << ":" << line << " [" << TwkGLF::errorString(err) << "]"
-                  << std::endl;
+        std::cerr << "GL_ERROR: " << shorterPath(file).data()
+                  << "::" << function << ":" << line << " ["
+                  << TwkGLF::errorString(err) << "]" << std::endl;
     }
     /*
         GLint currFBO = -1;
