@@ -350,6 +350,8 @@ namespace Rv
         int fontSize1;
         int fontSize2;
 
+        int ffmpegThreads;
+
         SendExternalEventVector sendEvents;
     };
 
