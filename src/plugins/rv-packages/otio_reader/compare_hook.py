@@ -20,11 +20,27 @@ def hook_function(
                 node for node in all_nodes if commands.nodeType(node) == "RVLayoutGroup"
             ][0]
 
+            if is_swapped:
+                layout_inputs = commands.nodeConnections(layout_node)[0]
+
+                if (
+                    len(layout_inputs) == 2
+                ):  # If we are loading the OTIO Timeline for the first time
+                    layout_inputs[0], layout_inputs[1] = (
+                        layout_inputs[1],
+                        layout_inputs[0],
+                    )
+                    layout_inputs = list(dict.fromkeys(layout_inputs))
+                    commands.setNodeInputs(layout_node, layout_inputs)
+                else:  # If we are only reloading a Compare Clip, swapping should be done in the Live Review plugin directly
+                    pass
+
             if orientation == "horizontal":
                 commands.setStringProperty(f"{layout_node}.layout.mode", ["row"])
             else:
                 commands.setStringProperty(f"{layout_node}.layout.mode", ["column"])
-            # commands.setFloatProperty(f"{layout_node}.layout.spacing", [gap])
+
+            commands.setViewNode(layout_node)
 
         case "over_with_opacity":
             opacity = in_timeline.over_with_opacity["opacity"]
