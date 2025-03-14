@@ -150,6 +150,7 @@ namespace IPCore
         FloatProperty* m_inputsAngularMaskPivotY;
         FloatProperty* m_inputsAngularMaskAngleInRadians;
         IntProperty* m_inputsAngularMaskActive;
+        IntProperty* m_inputsReverseAngularMask;
 
         /// this signal is called before all state change
         VoidSignal m_changingSignal;

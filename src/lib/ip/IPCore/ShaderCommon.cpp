@@ -121,6 +121,7 @@ extern const char* StereoChecker_glsl;
 extern const char* StereoAnaglyph_glsl;
 extern const char* StereoLumAnaglyph_glsl;
 extern const char* AngularMask_glsl;
+extern const char* ReverseAngularMask_glsl;
 extern const char* Opacity_glsl;
 extern const char* Over2_glsl;
 extern const char* Over3_glsl;
@@ -322,6 +323,7 @@ namespace IPCore
         static Function* Shader_StereoAnaglyph = 0;
         static Function* Shader_StereoLumAnaglyph = 0;
         static Function* Shader_AngularMask = 0;
+        static Function* Shader_ReverseAngularMask = 0;
         static Function* Shader_Opacity = 0;
         static Function* Shader_Over = 0;
         static Function* Shader_Add = 0;
@@ -2616,6 +2618,18 @@ namespace IPCore
             }
 
             return Shader_AngularMask;
+        }
+
+        Function* ReverseAngularMask()
+        {
+            if (Shader_ReverseAngularMask == nullptr)
+            {
+                Shader_ReverseAngularMask = new Shader::Function(
+                    "ReverseAngularMask", ReverseAngularMask_glsl,
+                    Shader::Function::Filter);
+            }
+
+            return Shader_ReverseAngularMask;
         }
 
         //--
@@ -5673,9 +5687,11 @@ namespace IPCore
 
         Expression* newAngularMask(const IPImage* image, Expression* expr,
                                    const TwkMath::Vec2f& pivot,
-                                   const float angleInRadians)
+                                   const float angleInRadians,
+                                   bool isReverseAngularMask)
         {
-            const Function* F = AngularMask();
+            const Function* F =
+                isReverseAngularMask ? ReverseAngularMask() : AngularMask();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], expr);

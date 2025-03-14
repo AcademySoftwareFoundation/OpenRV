@@ -127,6 +127,7 @@ SET(_shaders
     StereoAnaglyph
     StereoLumAnaglyph
     AngularMask
+    ReverseAngularMask
     Opacity
     Over2
     Over3
