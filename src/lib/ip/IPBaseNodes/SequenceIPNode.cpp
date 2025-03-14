@@ -99,6 +99,8 @@ namespace IPCore
             "composite.inputAngularMaskAngleInRadians", 0.0f, nullptr, false);
         m_inputsAngularMaskActive =
             declareProperty<IntProperty>("composite.inputAngularMaskActive", 1);
+        m_inputsReverseAngularMask = declareProperty<IntProperty>(
+            "composite.inputReverseAngularMask", 1);
 
         // since they are per input, make sure the property containers are
         // emptied at creation time
@@ -108,6 +110,7 @@ namespace IPCore
         m_inputsAngularMaskPivotY->erase(0, 1);
         m_inputsAngularMaskAngleInRadians->erase(0, 1);
         m_inputsAngularMaskActive->erase(0, 1);
+        m_inputsReverseAngularMask->erase(0, 1);
 
         // By default, the output of this node support reverse-order blending.
         // this is mainly kept for backward compatibility reason.
@@ -402,7 +405,8 @@ namespace IPCore
             source >= 0 && source < m_inputsAngularMaskPivotX->size()
             && source < m_inputsAngularMaskPivotY->size()
             && source < m_inputsAngularMaskAngleInRadians->size()
-            && source < m_inputsAngularMaskActive->size();
+            && source < m_inputsAngularMaskActive->size()
+            && source < m_inputsReverseAngularMask->size();
 
         if (isSourceValid && ((*m_inputsAngularMaskActive)[source] != 0))
         {
@@ -412,9 +416,9 @@ namespace IPCore
             const float angleInRadians =
                 (*m_inputsAngularMaskAngleInRadians)[source];
 
-            child->shaderExpr =
-                Shader::newAngularMask(child, child->shaderExpr,
-                                       Vec2f(pivotX, pivotY), angleInRadians);
+            child->shaderExpr = Shader::newAngularMask(
+                child, child->shaderExpr, Vec2f(pivotX, pivotY), angleInRadians,
+                (*m_inputsReverseAngularMask)[source] != 0);
         }
 
         root->appendChild(child);

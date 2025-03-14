@@ -258,7 +258,8 @@ namespace IPCore
 
         Expression* newAngularMask(const IPImage* image, Expression* expr,
                                    const TwkMath::Vec2f& pivot,
-                                   float angleInRadians);
+                                   float angleInRadians,
+                                   bool isReverseAngularMask);
 
         //
         //  ICC profile shaders
