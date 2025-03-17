@@ -92,6 +92,127 @@ static void init()
 extern void rvLazyBuildThirdPartyCustomization();
 #endif
 
+namespace
+{
+    using namespace boost;
+    using namespace std;
+
+    bool isSilencedQtMessage(const string_view& text)
+    {
+        array<string_view, 5> silenced = {
+            // In Qt6, when KVM or YubiKey or other HID device is plugged in or
+            // out. This warning seems fixed with QT 6.6.3
+            "scroll event from unregistered device"sv,
+
+            // Another relic of an unneeded warning resulting from the Qt6 port.
+            // This one originates when loading Python which calls
+            // PyInit_QtConcurrent(), which then calls
+            // qRegisterMetaType<QFuture<QString>>(char const*){}
+            // This is just a warning that the registration is already done, so
+            // we can safely ignore it.
+            "Type conversion already registered from type"
+            " QFuture<QString> to type QFuture<void>"sv,
+
+            // Qt warning about KVO observers. Qt have gotten rid of the check
+            // for this error in Qt 6.0. "ERROR: has active key-value observers
+            //(KVO)!
+            //        These will stop working now that the window is recreated,
+            //        and will result in exceptions when the observers are
+            //        removed. Break in QCocoaWindow::recreateWindowIfNeeded to
+            //        debug."
+            "has active key-value observers (KVO)! These will stop"
+            " working now that the window is recreated"sv,
+
+            //  We get these spurious errors from Qt with some tablets.  They
+            //  seem to indicate no real problem and slow down interaction.
+            "This tablet device is unknown"sv,
+
+            // Another known warning/error which we can safely ignore.
+            "Release of profile requested but WebEnginePage still not "
+            "deleted"sv};
+
+        return any_of(silenced.begin(), silenced.end(), [text](const auto& msg)
+                      { return text.find(msg) != string::npos; });
+    }
+
+    class RecursionLock
+    {
+    public:
+        RecursionLock() { _recursionLocked = true; };
+
+        ~RecursionLock() { _recursionLocked = false; };
+
+        static bool _recursionLocked;
+
+        static bool locked() { return _recursionLocked; };
+    };
+
+    bool RecursionLock::_recursionLocked = false;
+
+    void myMsgHandlerQT(QtMsgType t, const QMessageLogContext& context,
+                        const QString& qmsg)
+    {
+        //
+        //  Since printing errors may generate errors, don't allow
+        //  recursion.  At worst we might lose some error messages.
+        //
+        if (RecursionLock::locked())
+            return;
+        RecursionLock l;
+
+        string msg = qmsg.toUtf8().constData();
+
+        // We always report Qt debug messages except for known issues.
+        // In which case the following function can be used to check
+        // whether those known messages are still reported or not by Qt.
+        if (isSilencedQtMessage(msg))
+            return;
+
+        // Do not report Java script errors unless requested
+        static bool reportQWebEngineJavaScripErrors =
+            getenv("RV_REPORT_QWEBENGINE_JAVA_SCRIPT_ERRORS") != nullptr;
+        if (context.category && (strncmp(context.category, "js", 2) == 0)
+            && !reportQWebEngineJavaScripErrors)
+        {
+            return;
+        }
+
+        switch (t)
+        {
+        case QtDebugMsg:
+        {
+            static const bool reportQtDebugMessages =
+                getenv("RV_REPORT_QT_DEBUG_MESSAGES") != nullptr;
+
+            if (reportQtDebugMessages)
+            {
+                cout << "DEBUG: " << msg << endl;
+            }
+        }
+        break;
+        case QtWarningMsg:
+        {
+            cout << "WARNING: " << msg << endl;
+        }
+        break;
+        case QtCriticalMsg:
+        case QtFatalMsg:
+        {
+            cerr << "ERROR: " << msg << endl;
+        }
+        break;
+        default:
+        {
+            cout << "INFO: " << msg << endl;
+        }
+        break;
+        }
+
+        assert(t != QtFatalMsg);
+    }
+
+} // namespace
+
 namespace Rv
 {
     using namespace std;
@@ -113,55 +234,6 @@ namespace Rv
     };
 
     bool RecursionLock::_recursionLocked = false;
-
-    bool isSilencedQtMessage(const string& text)
-    {
-        const string silenced[] = {
-            // In Qt6, when KVM or YubiKey or other HID device is plugged in or
-            // out. This warning seems fixed with QT 6.6.3
-            string("scroll event from unregistered device"),
-
-            // Another relic of an unneeded warning resulting from the Qt6 port.
-            // This one originates when loading Python which calls
-            // PyInit_QtConcurrent(), which then calls
-            // qRegisterMetaType<QFuture<QString>>(char const*){}
-            // This is just a warning that the registration is already done, so
-            // we can safely ignore it.
-            string("Type conversion already registered from type"
-                   " QFuture<QString> to type QFuture<void>"),
-
-            // Qt warning about KVO observers. Qt have gotten rid of the check
-            // for this error in Qt 6.0. "ERROR: has active key-value observers
-            //(KVO)!
-            //        These will stop working now that the window is recreated,
-            //        and will result in exceptions when the observers are
-            //        removed. Break in QCocoaWindow::recreateWindowIfNeeded to
-            //        debug."
-            string("has active key-value observers (KVO)! These will stop"
-                   " working now that the window is recreated"),
-
-            //  We get these spurious errors from Qt with some tablets.  They
-            //  seem to indicate no real problem and slow down interaction.
-            string("This tablet device is unknown"),
-
-            // Another known warning/error which we can safely ignore.
-            string("Release of profile requested but WebEnginePage still not"
-                   " deleted"),
-
-            // End marker.
-            string("")};
-
-        int i = 0;
-        while (!silenced[i].empty())
-        {
-            if (text.find(silenced[i]) != string::npos)
-                return true;
-
-            i++;
-        }
-
-        return false;
-    }
 
     void myMsgHandlerQT(QtMsgType t, const QMessageLogContext& context,
                         const QString& qmsg)
