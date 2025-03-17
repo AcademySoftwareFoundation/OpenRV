@@ -97,9 +97,9 @@ namespace
     using namespace boost;
     using namespace std;
 
-    bool isSilencedQtMessage(const string_view& text)
+    bool isSilencedQtMessage(std::string_view text)
     {
-        const array<string_view, 5> silenced = {
+        constexpr array silenced = {
             // In Qt6, when KVM or YubiKey or other HID device is plugged in or
             // out. This warning seems fixed with QT 6.6.3
             "scroll event from unregistered device"sv,
