@@ -99,7 +99,7 @@ namespace
 
     bool isSilencedQtMessage(const string_view& text)
     {
-        array<string_view, 5> silenced = {
+        const array<string_view, 5> silenced = {
             // In Qt6, when KVM or YubiKey or other HID device is plugged in or
             // out. This warning seems fixed with QT 6.6.3
             "scroll event from unregistered device"sv,
@@ -160,7 +160,7 @@ namespace
             return;
         RecursionLock l;
 
-        string msg = qmsg.toUtf8().constData();
+        const string msg = qmsg.toUtf8().constData();
 
         // We always report Qt debug messages except for known issues.
         // In which case the following function can be used to check
