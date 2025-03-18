@@ -12,6 +12,7 @@
 #include <OCIONodes/OCIO3DLUT.h>
 #include <IPCore/SessionIPNode.h>
 #include <IPCore/NodeDefinition.h>
+#include <IPCore/DispTransform2DIPNode.h>
 #include <IPCore/IPGraph.h>
 #include <IPCore/ShaderCommon.h>
 #include <TwkExc/Exception.h>
@@ -115,6 +116,8 @@ namespace IPCore
 
         declareProperty<StringProperty>("ocio_display.display", "");
         declareProperty<StringProperty>("ocio_display.view", "");
+
+        m_dither = declareProperty<IntProperty>("color.dither", 0);
 
         if (func == "synlinearize")
         {
@@ -650,6 +653,8 @@ namespace IPCore
             || !m_state->function)
             return image;
 
+        int dither = propertyValue(m_dither, 0);
+        size_t seed = context.frame + DispTransform2DIPNode::transformHash();
         string ociofunction = stringProp("ocio.function", "color");
 
         //
@@ -729,6 +734,11 @@ namespace IPCore
             }
 
             expr = new Shader::Expression(F, args, image);
+
+            if (ociofunction == "display" && dither > 0)
+            {
+                expr = Shader::newDither(image, expr, dither, seed);
+            }
 
             if (ociofunction == "display" && image->shaderExpr)
             {

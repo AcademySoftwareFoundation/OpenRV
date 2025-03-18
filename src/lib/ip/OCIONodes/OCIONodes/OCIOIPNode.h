@@ -81,6 +81,8 @@ namespace IPCore
         OCIO::GroupTransformRcPtr m_transform;
         OCIO::MatrixTransformRcPtr m_matrix_xyz_to_rec709;
         OCIO::MatrixTransformRcPtr m_matrix_rec709_to_xyz;
+
+        IntProperty* m_dither{nullptr};
     };
 
 } // namespace IPCore
