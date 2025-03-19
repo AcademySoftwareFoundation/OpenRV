@@ -369,7 +369,6 @@ namespace Rv
         // image.save("/home/<username>>/<orv_folder>/fbo.png");
     }
 
-
     void GLView::paintGL()
     {
         IPCore::Session* session = m_doc->session();
@@ -446,12 +445,13 @@ namespace Rv
             //          The issue I see on MacOS that the background is brown
             //          istead of black with the default background.
             //
-            // Even on Qt6/QOpenGLWidget, we need to call 
-            // glBindFramebuffer(); it otherwise complains and fails 
+            // Even on Qt6/QOpenGLWidget, we need to call
+            // glBindFramebuffer(); it otherwise complains and fails
             // on glClear() on macOS
-            glBindFramebuffer(
-                GL_FRAMEBUFFER,
+            glBindFramebufferEXT(
+                GL_FRAMEBUFFER_EXT,
                 QOpenGLContext::currentContext()->defaultFramebufferObject());
+            TWK_GLDEBUG;
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
             TWK_GLDEBUG;
@@ -507,30 +507,30 @@ namespace Rv
         //
 
         // Note for Qt6 . QOpenGLWidget implementation:
-        // 
+        //
         // With the new QOpenGLWidget (Qt6 branch), all of the rendering of
         // each widget is done in its own FBOs (aka: off-screen buffers), as
         // opposed to the old Qt5/QGLWidget branch where the rendering was
         // done in each GGLWidget's backbuffer (aka: GL_BACK, an on-screen
         // framebuffer surface).
-        // 
-        // With QOpenGLWidget, it is now the WainWindow's responsibility 
-        // (more technically, the MainWindow's rendering backend, which 
+        //
+        // With QOpenGLWidget, it is now the WainWindow's responsibility
+        // (more technically, the MainWindow's rendering backend, which
         // happens to be Qt's OpenGL rendering backend when QOpenGLWidget are
-        // present in the children tree) to gather and composite all of the 
-        // off-screen buffers (regardless of which image type they are, eg: 
-        // cpu-memory images, gpu/opengl images, etc) and finally to call 
-        // swapBuffers to show the final contents of the mainWindow. 
-        //  
-        // As a result, I'm not sure there's a point -- at all -- 
+        // present in the children tree) to gather and composite all of the
+        // off-screen buffers (regardless of which image type they are, eg:
+        // cpu-memory images, gpu/opengl images, etc) and finally to call
+        // swapBuffers to show the final contents of the mainWindow.
+        //
+        // As a result, I'm not sure there's a point -- at all --
         // in calling swapBuffers on the GLView anywhere amnymore. From old
-        // comments in the previous version of this tile, it appears that 
-        // calling swapBuffers was done to force a quicker visual update, or 
-        // to minimize visual tearing of some sort. This would have worked 
-        // with the old QGLWidget (becayuse each QGLWidget had its own 
-        // context, and its rendering target was directly the GL_BACK 
+        // comments in the previous version of this tile, it appears that
+        // calling swapBuffers was done to force a quicker visual update, or
+        // to minimize visual tearing of some sort. This would have worked
+        // with the old QGLWidget (becayuse each QGLWidget had its own
+        // context, and its rendering target was directly the GL_BACK
         // framebuffer, but, again, with QOpenGLWidget, the rendering target
-        // is no longer GL_BACK, it is an FBO that is meant to be used at 
+        // is no longer GL_BACK, it is an FBO that is meant to be used at
         // the end of the application's drawing / visual update pipeline.
 
         if (debug)
