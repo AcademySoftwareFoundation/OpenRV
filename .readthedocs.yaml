@@ -11,6 +11,8 @@ python:
     - requirements: docs/requirements.txt
    
 sphinx:
+  # Path to your Sphinx configuration file.
+  configuration: docs/conf.py
   fail_on_warning: false
   
 formats:
