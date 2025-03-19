@@ -82,6 +82,8 @@ namespace IPCore
         OCIO::MatrixTransformRcPtr m_matrix_xyz_to_rec709;
         OCIO::MatrixTransformRcPtr m_matrix_rec709_to_xyz;
 
+        StringProperty* m_channelOrder{nullptr};
+        IntProperty* m_channelFlood{nullptr};
         IntProperty* m_dither{nullptr};
     };
 
