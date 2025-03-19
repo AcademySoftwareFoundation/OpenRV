@@ -33,7 +33,11 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/User.h>
 #include <TwkUtil/Clock.h>
+#ifdef RV_VFX_CY2023
+#include <QTAudioRenderer/QT5AudioRenderer.h>
+#else
 #include <QTAudioRenderer/QTAudioRenderer.h>
+#endif
 #include <iostream>
 #include <iterator>
 #include <thread>
