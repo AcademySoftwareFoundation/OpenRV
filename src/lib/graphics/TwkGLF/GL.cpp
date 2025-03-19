@@ -69,7 +69,8 @@ static std::string_view shorterPath(std::string_view path)
     return path;
 }
 
-bool twkGlPrintError(const char* file, const char* function, const int line)
+bool twkGlPrintError(std::string_view file, std::string_view function,
+                     const int line)
 {
     //    static GLint lastFBO = -1;
     //    static GLint lastRBO = -1;
@@ -77,7 +78,7 @@ bool twkGlPrintError(const char* file, const char* function, const int line)
     if (GLuint err = glGetError())
     {
         std::cerr << "GL_ERROR: " << shorterPath(file).data()
-                  << "::" << function << ":" << line << " ["
+                  << "::" << function.data() << ":" << line << " ["
                   << TwkGLF::errorString(err) << "]" << std::endl;
     }
     /*
