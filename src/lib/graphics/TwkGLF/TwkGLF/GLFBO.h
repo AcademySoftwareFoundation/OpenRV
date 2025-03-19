@@ -305,6 +305,9 @@ namespace TwkGLF
         GLFBO() {}
 
     private:
+        bool m_ownsFBOHandle; // true when GLFBO constructor creates
+                              // the FBO handle, false when inherits
+                              // from another source
         GLuint m_id;
         std::string m_idstr;
 
