@@ -18,6 +18,7 @@
 #include <QtCore/qendian.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
+#include <QSysInfo>
 
 #include <iostream>
 #include <sstream>
@@ -648,17 +649,9 @@ namespace IPCore
                     m_startSample += numSamplesForAbuffer;
                     m_processedSamples += numSamplesForAbuffer;
 
-                    // Detect if the system is little or big endian.
-                    bool isLittleEndian = false;
-
-                    union
-                    {
-                        uint32_t i;
-                        char c[4];
-                    } test = {0x01020304};
-
-                    isLittleEndian = (test.c[0] == 0x04);
-
+                    // Assume that most consumer facing device will be little
+                    // endian. Note that some mainframe or embedded system could
+                    // be big endian.
                     AudioRenderer::transformFloat32ToInt24(
                         m_abuffer.pointer(), data, m_abuffer.sizeInFloats(),
                         true);
