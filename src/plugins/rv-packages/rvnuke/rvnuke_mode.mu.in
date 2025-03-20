@@ -1978,7 +1978,7 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
             let newInitFile = qt.QFile (initPath),
                 newInitStream = qt.QTextStream (newInitFile);
 
-            if (! newInitFile.open (qt.QFile.WriteOnly | qt.QFile.Text | qt.QFile.Truncate))
+            if (! newInitFile.open (qt.QFile.ReadWrite | qt.QFile.Text | qt.QFile.Truncate))
             {
                 let msg = "cannot open init.py '%s' for writing." % initPath;
                 deb (msg);

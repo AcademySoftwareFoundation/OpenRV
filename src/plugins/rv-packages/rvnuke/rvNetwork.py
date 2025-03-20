@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 #! /usr/bin/python
 from __future__ import print_function
@@ -74,9 +74,11 @@ class RvCommunicator:
 
         try:
             greeting = "%s rvController" % self.name
-            self.sock.sendall("NEWGREETING %d %s" % (len(greeting), greeting))
+            self.sock.sendall(
+                b"NEWGREETING %d %s" % (len(greeting), greeting.encode("utf-8"))
+            )
             if self.noPingPong:
-                self.sock.sendall("PINGPONGCONTROL 1 0")
+                self.sock.sendall(b"PINGPONGCONTROL 1 0")
         except socket.error as msg:
             print("ERROR: can't send greeting: %s\n" % msg[1], file=sys.stderr)
             return
@@ -99,7 +101,7 @@ class RvCommunicator:
         """
         For internal use.  Send and arbitrary message.
         """
-        self.sock.sendall("MESSAGE %d %s" % (len(message), message))
+        self.sock.sendall(b"MESSAGE %d %s" % (len(message), message.encode("utf-8")))
 
     def sendEvent(self, eventName, eventContents):
         """
@@ -148,13 +150,13 @@ class RvCommunicator:
 
         except socket.error as msg:
             if (
-                msg[1] != "Resource temporarily unavailable"
-                and msg[1]
+                msg.strerror != "Resource temporarily unavailable"
+                and msg.strerror
                 != "A non-blocking socket operation could not be completed immediately"
-                and msg[0] != 10035
+                and msg.errno != 10035
             ):
                 print("ERROR: peek for messages failed: %s\n" % msg, file=sys.stderr)
-            if msg[0] == 10054 or msg[1] == "Connection reset by peer":
+            if msg.errno == 10054 or msg.strerror == "Connection reset by peer":
                 print("ERROR: remote host closed connection (2)\n", file=sys.stderr)
                 self.sock.close()
                 self.connected = False
@@ -304,7 +306,7 @@ class RvCommunicator:
                     self.eventQueue.append((event, contents))
 
             elif messType == "PING":
-                self.sock.sendall("PONG 1 p")
+                self.sock.sendall(b"PONG 1 p")
 
             elif (
                 messType == "GREETING"
@@ -316,7 +318,7 @@ class RvCommunicator:
             else:
                 print("ERROR: unknown message type: %s\n" % messType, file=sys.stderr)
 
-        for (event, contents) in self.eventQueue:
+        for event, contents in self.eventQueue:
             if event in self.handlers:
                 self.handlers[event](contents)
 
