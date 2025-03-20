@@ -63,7 +63,7 @@ SET(_sources
 )
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources CGDesktopVideoDevice.cpp DisplayLink.cpp)
+  LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp)
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
