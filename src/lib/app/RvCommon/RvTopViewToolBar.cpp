@@ -568,6 +568,7 @@ namespace Rv
             }
 
             monitorMenuUpdate();
+            channelMenuUpdate();
         }
 
         return EventAcceptAndContinue;
