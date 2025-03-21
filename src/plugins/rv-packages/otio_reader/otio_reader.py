@@ -540,7 +540,7 @@ def _create_sources(item, context=None):
 def _get_media_path(target_url: str, context: dict | None = None) -> str:
     context = context or {}
 
-    if "sg_url" in context:
+    if "sg_url" in context and target_url.startswith("/file_serve/version"):
         return context.get("sg_url") + target_url
 
     if not os.path.isabs(target_url):
