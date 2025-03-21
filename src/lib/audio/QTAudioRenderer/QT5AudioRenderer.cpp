@@ -6,7 +6,7 @@
 //
 //
 #include <string>
-#include <QTAudioRenderer/QTAudioRenderer.h>
+#include <QTAudioRenderer/QT5AudioRenderer.h>
 
 #include <IPCore/IPGraph.h>
 #include <TwkAudio/AudioFormats.h>
