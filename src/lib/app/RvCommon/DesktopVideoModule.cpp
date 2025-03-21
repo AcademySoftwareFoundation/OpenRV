@@ -51,7 +51,7 @@ namespace Rv
     */
 
     // force intel code path for this commit
-    static bool isDarwinArm() { return false; }
+    static bool isDarwinArm() { return true; }
 
     DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np,
                                            QTGLVideoDevice* shareDevice)

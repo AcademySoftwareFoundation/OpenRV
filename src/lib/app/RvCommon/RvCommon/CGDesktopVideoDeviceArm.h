@@ -41,6 +41,7 @@ namespace Rv
             int32_t width = 0;
             int32_t height = 0;
             double refreshRate = 0;
+            int32_t videoFormatIndex = -1;
             CGDirectDisplayID cgScreen = 0;
             std::string description;
             bool isGUI = false;
@@ -105,10 +106,15 @@ namespace Rv
         // private helpers
         static std::vector<CGDesktopVideoDeviceArm::Display> getDisplays();
         static CGDisplayModeRef
-        displayModeRefFromIoModeId(CGDesktopVideoDeviceArm::Mode mode);
-        static bool switchToMode(CGDesktopVideoDeviceArm::Mode mode,
+        displayModeRefFromIoModeId(CGDirectDisplayID cgScreen,
+                                   int32_t ioModeId);
+        static bool switchToMode(const CGDesktopVideoDeviceArm::Mode& mode,
                                  QRect& bounds);
         static int32_t qtScreenFromCG(CGDirectDisplayID cgScreen);
+        static CGDesktopVideoDeviceArm::Mode
+        constructModeFromDisplayModeRef(CGDirectDisplayID cgScreen,
+                                        CGDisplayModeRef modeRef);
+
         static std::vector<CGDesktopVideoDeviceArm::Mode>
         getDisplayModes(CGDirectDisplayID screen);
         static QRect cgScreenBounds(CGDirectDisplayID cgScreen);
@@ -126,8 +132,7 @@ namespace Rv
         mutable ColorProfile m_colorProfile;
 
         // Qt OpenGL window and gl functions
-        QOpenGLWindow m_glWindow;
-        QOpenGLFunctions m_gl;
+        QOpenGLWidget m_view;
     };
 
 } // namespace Rv

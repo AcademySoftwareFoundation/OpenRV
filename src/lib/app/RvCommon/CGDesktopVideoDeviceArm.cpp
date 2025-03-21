@@ -25,6 +25,8 @@ namespace Rv
         , m_display(display)
         , m_savedMode(nullptr)
         , m_savedScreen(0)
+        , m_view(nullptr) // create a QOpenGLWidget with no parent (fullscreen
+                          // window)
     {
         createFormats();
     }
@@ -34,88 +36,54 @@ namespace Rv
         m_videoFormats.clear();
         m_videoFormatIndex = -1;
 
+        int32_t currentIoModeId = getCurrentIoModeId(m_display.cgScreen);
+
         for (size_t i = 0; i < m_display.modes.size(); i++)
         {
-            const CGDesktopVideoDeviceArm::Mode& mode = m_display.modes[i];
+            CGDesktopVideoDeviceArm::Mode& mode = m_display.modes[i];
 
             if (mode.ioFlags & kDisplayModeSafetyFlags)
             {
                 m_videoFormats.push_back(DesktopVideoFormat(
                     mode.width, mode.height, 1.0, 1.0, mode.refreshRate,
-                    mode.description, (void*)(size_t)mode.ioModeId));
+                    mode.description, (void*)(&mode)));
+            }
+            else
+            {
+                std::cerr << "DesktopVideoDevice: Screen " << m_display.cgScreen
+                          << " Mode " << mode.ioModeId
+                          << " does not have safety flags" << std::endl;
             }
         }
 
         addDefaultDataFormats();
         sortVideoFormatsByWidth();
 
-        //
-        //  Locate the current mode index and create the IOModeMap going
-        //  from IOKit display mode to video format index
-        //
-
-#ifdef __PB
-        int32_t currentIoModeId = getCurrentIoModeId(m_display.cgScreen);
-
+        // Finally, assign the videoFormatIndex to the modes fo the display
+        // after it is sorted.
         for (size_t i = 0; i < m_videoFormats.size(); i++)
         {
-            int32_t mid = int32_t((size_t)m_videoFormats[i].data);
-            if (mid == currentIoModeId)
+            const DesktopVideoFormat& format = m_videoFormats[i];
+
+            CGDesktopVideoDeviceArm::Mode& mode =
+                *static_cast<CGDesktopVideoDeviceArm::Mode*>(format.data);
+            mode.videoFormatIndex = i;
+
+            if (mode.ioModeId == currentIoModeId)
                 m_videoFormatIndex = i;
-            m_ioModeMap[mid] = i;
         }
-
-        if (m_videoFormatIndex == -1)
-        {
-            //
-            //  We got here because somehow we were unable to find the
-            //  current mode. This doesn't seem to happen anymore but just
-            //  in case the code is still active.
-            //
-
-            if (IPCore::debugPlayback)
-                cout << "INFO: found new video modes" << endl;
-
-            int w = CGDisplayModeGetWidth(currentMode);
-            int h = CGDisplayModeGetHeight(currentMode);
-            ostringstream str;
-            str << w << " x " << h;
-            str.precision(4);
-            str << " " << cvRefHz << "Hz ";
-
-            m_ioModeMap[currentModeID] = m_videoFormats.size();
-
-            m_videoFormats.push_back(
-                DesktopVideoFormat(w, h, 1.0, 1.0, cvRefHz, str.str(),
-                                   (void*)(size_t)currentModeID));
-
-            //
-            //  Then re-sort and re-determine index.
-            //
-
-            sortVideoFormatsByWidth();
-
-            for (size_t i = 0; i < m_videoFormats.size(); i++)
-            {
-                int32_t mid = int32_t((size_t)m_videoFormats[i].data);
-                if (mid == currentModeID)
-                    m_videoFormatIndex = i;
-            }
-        }
-        CFRelease(currentMode);
-#endif
 
 #if 0
-    for (size_t i = 0; i < m_videoFormats.size(); i++)
-    {
-        const DesktopVideoFormat& f = m_videoFormats[i];
+        for (size_t i = 0; i < m_videoFormats.size(); i++)
+        {
+           const DesktopVideoFormat& f = m_videoFormats[i];
 
-        cout << "INFO: format: " << i << " = "
-             << f.width << " x " << f.height
-             << " " << f.hz
-             << " ID=" << (int32_t(size_t(f.data)))
-             << endl;
-    }
+            cout << "INFO: format: " << i << " = "
+                << f.width << " x " << f.height
+                << " " << f.hz
+                << " ID=" << (int32_t(size_t(f.data)))
+               << endl;
+        }
 #endif
     }
 
@@ -160,35 +128,63 @@ namespace Rv
         }
     }
 
+    bool CGDesktopVideoDeviceArm::isOpen() const
+    {
+        return m_viewDevice != nullptr;
+        // could also use m_view.isVisible()
+    }
+
     void CGDesktopVideoDeviceArm::open(const StringVector& args)
     {
-        const DesktopVideoFormat& format = m_videoFormats[m_videoFormatIndex];
+        if (m_videoFormatIndex < 0)
+            return;
 
         QRect bounds;
-#ifdef __PB
-        switchToMode(mode, &bounds);
-#endif
-        // Next match the bounds of the screen to the appropriate QScreen
-        QList<QScreen*> screens = QGuiApplication::screens();
-        for (QScreen* screen : screens)
-        {
-            if (screen->geometry() == bounds)
-            {
-                m_glWindow.setScreen(screen);
-                break;
-            }
-        }
+        const DesktopVideoFormat& format = m_videoFormats[m_videoFormatIndex];
 
-        m_glWindow.setGeometry(bounds);
-        m_glWindow.setVisible(true);
-        m_glWindow.setWindowState(Qt::WindowFullScreen);
-        //  setFlags(Qt::Window | Qt::CustomizeWindowHint |
-        //  Qt::FramelessWindowHint);
+        // Find the mode from the format's data, and switch the screen to that
+        // video mode.
+        const CGDesktopVideoDeviceArm::Mode& mode =
+            *static_cast<const CGDesktopVideoDeviceArm::Mode*>(format.data);
 
-        m_glWindow.showFullScreen();
+        switchToMode(mode, bounds);
 
-        // Old code
+        m_view.setGeometry(
+            bounds); // this will place the window on the correct screen.
+        m_view.setWindowState(Qt::WindowFullScreen);
 
+        // module()
+        TwkApp::VideoModule* m = const_cast<TwkApp::VideoModule*>(module());
+
+        m_viewDevice =
+            new QTGLVideoDevice(m, "AppleSilicon Presentation Device", &m_view);
+        m_viewDevice->makeCurrent();
+
+        m_view.showFullScreen();
+        /*
+                // Next match the bounds of the screen to the appropriate
+           QScreen QList<QScreen*> screens = QGuiApplication::screens(); for
+           (QScreen* screen : screens)
+                {
+                    if (screen->geometry() == bounds)
+                    {
+                        m_glWindow.setScreen(screen);
+                        break;
+                    }
+                }
+
+                m_glWindow.setGeometry(bounds);
+                m_glWindow.setVisible(true);
+                m_glWindow.setWindowState(Qt::WindowFullScreen);
+                //  setFlags(Qt::Window | Qt::CustomizeWindowHint |
+                //  Qt::FramelessWindowHint);
+
+                m_glWindow.showFullScreen();
+
+                //        m_viewDevice = this;
+
+                // Old code
+        */
         /*
 
         const DesktopVideoFormat& format = m_videoFormats[m_videoFormatIndex];
@@ -204,14 +200,19 @@ namespace Rv
         */
     }
 
-    bool CGDesktopVideoDeviceArm::isOpen() const
-    {
-        return m_glWindow.isVisible();
-    }
-
     void CGDesktopVideoDeviceArm::close()
     {
         ScopedLock lock(m_mutex);
+
+        //  unbind() should be called by the renderer::setOutputVideoDevice, but
+        //  just in case, call here too.
+        //
+        unbind();
+
+        // Hide the QT Window, and change the resolution back to the original
+        // mode.
+        m_view.setWindowState(Qt::WindowNoState);
+        m_view.hide();
 
         //  unbind() should be called by the renderer::setOutputVideoDevice, but
         //  just in case, call here too.
@@ -225,23 +226,8 @@ namespace Rv
             m_savedScreen = 0;
         }
 
-        m_glWindow.setVisible(false);
-
-#ifdef __PB
-        unbind();
-#endif
-
-        if (m_savedMode)
-        {
-            CGDisplaySetDisplayMode(m_savedScreen, m_savedMode, NULL);
-            CGDisplayModeRelease(m_savedMode);
-            m_savedMode = nullptr;
-        }
-
-#ifdef __PB
         delete m_viewDevice;
-        m_viewDevice = 0;
-#endif
+        m_viewDevice = nullptr;
     }
 
     VideoDevice::Resolution CGDesktopVideoDeviceArm::resolution() const
@@ -266,44 +252,23 @@ namespace Rv
         CGDisplayModeRef mode = CGDisplayCopyDisplayMode(m_display.cgScreen);
         int32_t ioModeId = CGDisplayModeGetIODisplayModeID(mode);
 
-        // get the ioMode from the display modes.
-        // modernize using lambda
-
-        return VideoFormat();
-#ifdef __PB
         for (int i = 0; i < m_display.modes.size(); i++)
         {
-            if (m_display.modes[i].ioModeId == ioModeId)
-                return m_videoFormats[i];
-        }
-
-        IOModeMap::const_iterator i = m_ioModeMap.find(id);
-
-        if (i != m_ioModeMap.end())
-        {
-            return m_videoFormats[i->second];
-        }
-        else
-        {
-            const_cast<CGDesktopVideoDevice*>(this)->createFormats();
-            i = m_ioModeMap.find(id);
-
-            if (i == m_ioModeMap.end())
-            {
-                cout << "ERROR: unexpected video mode" << endl;
-                return VideoFormat();
-            }
-            else
+            const CGDesktopVideoDeviceArm::Mode& mode = m_display.modes[i];
+            if (mode.ioModeId == ioModeId)
             {
                 if (IPCore::debugPlayback)
                 {
                     cout << "WARNING: recovered from unexpected video mode "
                          << endl;
                 }
-                return m_videoFormats[i->second];
+
+                return m_videoFormats[mode.videoFormatIndex];
             }
         }
-#endif
+
+        cout << "ERROR: unexpected video mode" << endl;
+        return VideoFormat();
     }
 
     VideoDevice::Offset CGDesktopVideoDeviceArm::offset() const
@@ -396,10 +361,10 @@ namespace Rv
         return currentIoModeId;
     }
 
-    CGDisplayModeRef
-    CGDesktopVideoDeviceArm::displayModeRefFromIoModeId(Mode mode)
+    CGDisplayModeRef CGDesktopVideoDeviceArm::displayModeRefFromIoModeId(
+        CGDirectDisplayID cgScreen, int32_t ioModeId)
     {
-        CFArrayRef array = CGDisplayCopyAllDisplayModes(mode.cgScreen, NULL);
+        CFArrayRef array = CGDisplayCopyAllDisplayModes(cgScreen, NULL);
 
         for (CFIndex i = 0, n = CFArrayGetCount(array); i < n; i++)
         {
@@ -407,26 +372,28 @@ namespace Rv
                 (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
             const int32_t id = CGDisplayModeGetIODisplayModeID(cgModeRef);
 
-            if (id == mode.ioModeId)
+            if (id == ioModeId)
             {
                 CFRetain(cgModeRef);
                 return cgModeRef;
             }
         }
-
         CFRelease(array);
 
+        // It turns out it's actually possible on mac (when you have a scaled
+        // display) that the ioModeId is not included in
+        // CGDisplayCopyAllDisplayModes.
+
+        // if all else fails, there's just no display mode.
         return CGDisplayModeRef(0);
     }
 
-    bool
-    CGDesktopVideoDeviceArm::switchToMode(CGDesktopVideoDeviceArm::Mode mode,
-                                          QRect& bounds)
+    bool CGDesktopVideoDeviceArm::switchToMode(
+        const CGDesktopVideoDeviceArm::Mode& mode, QRect& bounds)
     {
-        CGDirectDisplayID cgScreen = mode.cgScreen;
-
         // Set the new display mode.
-        CGDisplayModeRef newDisplayModeRef = displayModeRefFromIoModeId(mode);
+        CGDisplayModeRef newDisplayModeRef =
+            displayModeRefFromIoModeId(mode.cgScreen, mode.ioModeId);
         if (!newDisplayModeRef)
         {
             std::cerr << "Failed to get display modes!" << std::endl;
@@ -469,12 +436,50 @@ namespace Rv
         return -1;
     }
 
+    CGDesktopVideoDeviceArm::Mode
+    CGDesktopVideoDeviceArm::constructModeFromDisplayModeRef(
+        CGDirectDisplayID cgScreen, CGDisplayModeRef modeRef)
+    {
+        CGDesktopVideoDeviceArm::Mode dm;
+
+        dm.ioModeId = (int32_t)CGDisplayModeGetIODisplayModeID(modeRef);
+        dm.ioFlags = (uint32_t)CGDisplayModeGetIOFlags(modeRef);
+        dm.width = (int32_t)CGDisplayModeGetWidth(modeRef);
+        dm.height = (int32_t)CGDisplayModeGetHeight(modeRef);
+        dm.refreshRate = CGDisplayModeGetRefreshRate(modeRef);
+        dm.isGUI = CGDisplayModeIsUsableForDesktopGUI(modeRef);
+        dm.cgScreen = cgScreen;
+
+        // Get the description
+        std::ostringstream ss;
+        // ss << "[id:" << dm.cgScreen << "] ";
+        // ss << "(ioMode:" << dm.ioMode << ") ";
+        ss << dm.width << "x" << dm.height << " ";
+        ss << "@" << dm.refreshRate << " hz";
+        // ss << (dm.isGUI ? " (gui)" : "");
+        ss << ((dm.ioFlags & kDisplayModeStretchedFlag) ? " (stretched)" : "");
+
+        // in the old code we could check pixel color depth. But
+        // thesemethods are now deprecated.
+        // if (depth > 8)
+        //    str << " " << depth << " bits/channel";
+
+        dm.description = ss.str();
+
+        return dm;
+    }
+
     std::vector<CGDesktopVideoDeviceArm::Mode>
-    CGDesktopVideoDeviceArm::getDisplayModes(CGDirectDisplayID screen)
+    CGDesktopVideoDeviceArm::getDisplayModes(CGDirectDisplayID cgScreen)
     {
         std::vector<CGDesktopVideoDeviceArm::Mode> dms;
 
-        CFArrayRef modes = CGDisplayCopyAllDisplayModes(screen, nullptr);
+        CGDisplayModeRef currentModeRef = CGDisplayCopyDisplayMode(cgScreen);
+        int32_t currentIoModeId =
+            CGDisplayModeGetIODisplayModeID(currentModeRef);
+        bool foundCurrentModeId = false;
+
+        CFArrayRef modes = CGDisplayCopyAllDisplayModes(cgScreen, nullptr);
         if (!modes)
         {
             std::cerr << "Failed to get display modes!" << std::endl;
@@ -486,38 +491,30 @@ namespace Rv
         int index = 0;
         for (CFIndex i = 0; i < count; i++, index++)
         {
-            CGDisplayModeRef mode =
+            CGDisplayModeRef modeRef =
                 (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
 
-            Mode dm;
-
-            dm.ioModeId = (int32_t)CGDisplayModeGetIODisplayModeID(mode);
-            dm.ioFlags = (uint32_t)CGDisplayModeGetIOFlags(
-                mode); // this... is... not necessary?
-            dm.width = (int32_t)CGDisplayModeGetWidth(mode);
-            dm.height = (int32_t)CGDisplayModeGetHeight(mode);
-            dm.refreshRate = CGDisplayModeGetRefreshRate(mode);
-            dm.isGUI = CGDisplayModeIsUsableForDesktopGUI(mode);
-            dm.cgScreen = screen;
-
-            // Get the description
-            std::ostringstream ss;
-            //                    ss << "[id:" << dm.cgScreen << "] ";
-            //                    ss << "(ioMode:" << dm.ioMode << ") ";
-            ss << dm.width << "x" << dm.height << " ";
-            ss << "@" << dm.refreshRate << " hz";
-            //                    ss << (dm.isGUI ? " (gui)" : "");
-            ss << ((dm.ioFlags & kDisplayModeStretchedFlag) ? " (stretched)"
-                                                            : "");
-
-            // in the old code we could check pixel color depth. But
-            // thesemethods are now deprecated. if (depth > 8)
-            //    str << " " << depth << " bits/channel";
-
-            dm.description = ss.str();
+            CGDesktopVideoDeviceArm::Mode dm =
+                constructModeFromDisplayModeRef(cgScreen, modeRef);
 
             dms.push_back(dm);
+
+            if (currentIoModeId == dm.ioModeId)
+            {
+                foundCurrentModeId = true;
+            }
         }
+
+        // Did we find the current mode from the screen? It's possible
+        // iwe did not, if macOS uses a scaled display mode.
+        if (foundCurrentModeId == false)
+        {
+            CGDesktopVideoDeviceArm::Mode dm =
+                constructModeFromDisplayModeRef(cgScreen, currentModeRef);
+            dms.push_back(dm);
+        }
+
+        CGDisplayModeRelease(currentModeRef);
 
         CFRelease(modes);
 
