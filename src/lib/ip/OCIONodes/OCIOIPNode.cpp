@@ -362,6 +362,9 @@ namespace IPCore
         boost::hash<string> string_hash;
         string inName = stringProp("ocio.inColorSpace", m_state->linear);
 
+	if (inName.empty())
+	    return;
+
         try
         {
             OCIO::ConstColorSpaceRcPtr srcCS =
@@ -755,6 +758,7 @@ namespace IPCore
     void OCIOIPNode::readCompleted(const string& t, unsigned int v)
     {
         updateContext();
+        updateFunction();
 
         IPNode::readCompleted(t, v);
     }
