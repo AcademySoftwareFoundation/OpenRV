@@ -231,8 +231,7 @@ namespace IPCore
                 || index >= m_edlSourceOut->size() - 1
                 || index >= m_edlGlobalIn->size() - 1 || index < 0)
             {
-                TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                                 "Out-of-bounds EDL data");
+                return -1;
             }
         }
 
@@ -259,6 +258,8 @@ namespace IPCore
         const int globalOffset = m_edlGlobalIn->front();
         int seekFrame = int(samplesToTime(seekSample, sampleRate) * fps + 0.49);
         int index = indexAtFrame(seekFrame + globalOffset);
+        if (index < 0)
+            return -1;
 
         int inputFrame = (*m_edlGlobalIn)[index];
         SampleTime inputStart =
@@ -360,10 +361,12 @@ namespace IPCore
 
         if (source < 0 || source >= ins.size())
         {
-            TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                             "Bad Sequence EDL source number "
-                                 << source << " is not in range [0,"
-                                 << ins.size() - 1 << "]");
+            stringstream msg;
+            msg << "Bad Sequence EDL source number "
+                << source << " is not in range [0,"
+                << ins.size() - 1 << "]";
+
+            return IPImage::newNoImage(this, msg.str());
         }
 
         IPImage* root =
@@ -997,6 +1000,12 @@ namespace IPCore
             //
 
             int index = indexAtSample(readSample, rate, context.fps);
+            if (index < 0)
+            {
+                cerr << "ERROR: no samples read from input node" << endl;
+                break;
+            }
+
             int sourceIndex = (*m_edlSource)[index];
 
             //
