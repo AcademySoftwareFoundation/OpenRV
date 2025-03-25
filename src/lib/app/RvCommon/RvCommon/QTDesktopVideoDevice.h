@@ -82,6 +82,14 @@ namespace Rv
         virtual void syncBuffers() const;
 
         virtual int qtScreen() const { return m_screen; }
+
+        bool useFullScreen() const;
+        QRect screenGeometry() const;
+
+        static std::vector<VideoDevice*>
+        createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                  const QTGLVideoDevice* shareDevice);
+
 #ifdef PLATFORM_WINDOWS
         virtual ColorProfile colorProfile() const;
 #endif

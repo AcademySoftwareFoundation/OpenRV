@@ -18,6 +18,8 @@
 #include <QtWidgets/QApplication>
 #include <QScreen>
 
+#define DEBUG_NO_FULLSCREEN
+
 namespace Rv
 {
 
@@ -36,14 +38,41 @@ namespace Rv
         {
             // NOTE_QT: setAutoBUfferSwap does not exist anymore.
             // setAutoBufferSwap(false);
+
+            m_shared = share;
+
             setFormat(fmt);
-            if (share)
+        }
+
+    protected:
+        void initializeGL() override
+        {
+            TRACE_SCOPE("ScreenView::initializeGL")
+
+            QOpenGLWidget::initializeGL();
+
+            if (m_shared && context() && context()->isValid())
             {
-                context()->setShareContext(share->context());
+                context()->setShareContext(m_shared->context());
             }
         }
 
+        void paintGL() override
+        {
+            TRACE_SCOPE("ScreenView::paintGL")
+
+            TWK_GLDEBUG_CTXNAME("ScreenView");
+
+            TWK_GLDEBUG;
+            //            glClearColor(0, 1, 0, 1);
+            //            glClear(GL_COLOR_BUFFER_BIT);
+            TWK_GLDEBUG;
+        }
+
         ~ScreenView() {}
+
+    private:
+        QOpenGLWidget* m_shared = nullptr;
     };
 
     //----------------------------------------------------------------------
@@ -67,7 +96,7 @@ namespace Rv
             std::cout << "Screen index is out of range" << std::endl;
         }
 
-        const QRect rect = screens[screen]->geometry();
+        const QRect rect = screenGeometry();
 
         ostringstream str;
         str << rect.width() << " x " << rect.height();
@@ -105,22 +134,30 @@ namespace Rv
         if (m_view && m_view->isVisible())
         {
             ScopedLock lock(m_mutex);
+            TWK_GLDEBUG;
             m_view->update();
+            TWK_GLDEBUG;
         }
         else
         {
+            TWK_GLDEBUG;
             redraw();
+            TWK_GLDEBUG;
         }
     }
 
     void QTDesktopVideoDevice::syncBuffers() const
     {
+        TRACE_SCOPE("QTDesktopVideoDevice::syncBuffers");
         if (m_view)
         {
             ScopedLock lock(m_mutex);
+            //            TWK_GLDEBUG;
             makeCurrent();
+            //           TWK_GLDEBUG;
             // NOTE_QT: swapBuffer is under the context now.
             m_view->context()->swapBuffers(m_view->context()->surface());
+            //          TWK_GLDEBUG;
         }
     }
 
@@ -131,19 +168,36 @@ namespace Rv
         //
 
         // NOTE_QT: QSurfaceFormat replace QGLFormat.
+        TWK_GLDEBUG;
 
         QSurfaceFormat fmt = shareDevice()->widget()->format();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
         ScreenView* s =
             new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
         setWidget(s);
-        setViewDevice(new QTGLVideoDevice(0, "local view", s));
+
+        TWK_GLDEBUG;
+
+        auto viewDevice = new QTGLVideoDevice(0, "local view", s);
+        setViewDevice(viewDevice);
+
+        TWK_GLDEBUG;
 
         const QList<QScreen*> screens = QGuiApplication::screens();
-        QRect g = screens[m_screen]->geometry();
+        QRect g = screenGeometry();
         widget()->move(g.x(), g.y());
-        widget()->setWindowState(Qt::WindowFullScreen);
+        widget()->setGeometry(g);
+
+        if (useFullScreen())
+            widget()->setWindowState(Qt::WindowFullScreen);
+        else
+            widget()->setWindowState(Qt::WindowNoState);
+
+        TWK_GLDEBUG;
+
         widget()->show();
+
+        TWK_GLDEBUG;
 
 #ifdef PLATFORM_WINDOWS
         // Work around for QGLWidget::showFullScreen() windows specific issue
@@ -164,31 +218,51 @@ namespace Rv
         m_translator = 0;
     }
 
-    VideoDevice::Resolution QTDesktopVideoDevice::resolution() const
+    bool QTDesktopVideoDevice::useFullScreen() const
+    {
+#ifdef DEBUG_NO_FULLSCREEN
+        return false;
+#else
+        return true;
+#endif
+    }
+
+    QRect QTDesktopVideoDevice::screenGeometry() const
     {
         const QList<QScreen*> screens = QGuiApplication::screens();
         QRect g = screens[m_screen]->geometry();
+
+#ifdef DEBUG_NO_FULLSCREEN
+        // in the no-fullscreen debug mode, use 800x600 resolution in a simple
+        // window.
+        int offset = 30;
+        g = QRect(g.x() + offset, g.y() + offset, 800, 600);
+#endif
+        return g;
+    }
+
+    VideoDevice::Resolution QTDesktopVideoDevice::resolution() const
+    {
+        QRect g = screenGeometry();
+
         return Resolution(g.width(), g.height(), 1.0, 1.0);
     }
 
     size_t QTDesktopVideoDevice::width() const
     {
-        const QList<QScreen*> screens = QGuiApplication::screens();
-        QRect g = screens[m_screen]->geometry();
+        QRect g = screenGeometry();
         return g.width();
     }
 
     size_t QTDesktopVideoDevice::height() const
     {
-        const QList<QScreen*> screens = QGuiApplication::screens();
-        QRect g = screens[m_screen]->geometry();
+        QRect g = screenGeometry();
         return g.height();
     }
 
     VideoDevice::VideoFormat QTDesktopVideoDevice::format() const
     {
-        const QList<QScreen*> screens = QGuiApplication::screens();
-        QRect g = screens[m_screen]->geometry();
+        QRect g = screenGeometry();
         ostringstream str;
         str << g.width() << " x " << g.height();
         const float pa = 1.0;
@@ -287,4 +361,26 @@ namespace Rv
     }
 #endif
 
+    std::vector<VideoDevice*> QTDesktopVideoDevice::createDesktopVideoDevices(
+        TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    {
+        std::vector<VideoDevice*> devices;
+
+        const auto screens = QGuiApplication::screens();
+        for (int screen = 0; screen < screens.size(); screen++)
+        {
+            const QScreen* w = screens[screen];
+            QString name = QString("%1 %2 %3")
+                               .arg(w->manufacturer())
+                               .arg(w->model())
+                               .arg(w->name());
+
+            QTDesktopVideoDevice* sd = new QTDesktopVideoDevice(
+                module, name.toUtf8().constData(), screen, shareDevice);
+
+            devices.push_back(sd);
+        }
+
+        return devices;
+    }
 } // namespace Rv

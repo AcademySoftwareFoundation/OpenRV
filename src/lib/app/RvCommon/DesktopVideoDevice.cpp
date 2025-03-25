@@ -21,6 +21,8 @@
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
 
+#include <QOpenGLContext>
+
 namespace Rv
 {
 
@@ -76,7 +78,8 @@ namespace Rv
     void DesktopVideoDevice::transfer(const GLFBO* fbo) const
     {
         ScopedLock lock(m_mutex);
-        m_viewDevice->makeCurrent();
+
+        TRACE_SCOPE("DesktopVideoDevice::transfer");
 
         GLFBO* local_fbo = m_fboMap[fbo];
 
@@ -88,7 +91,20 @@ namespace Rv
             m_fboMap[fbo] = local_fbo;
         }
 
-        local_fbo->copyTo(m_viewDevice->defaultFBO());
+        // Get the default FBO from the main GUI context before making the
+        // DesktopVideoDevice current.
+        // This didn't matter in QGLWidget because the default app's FBO was 0
+        // but with QOpenGLWidget, it's 1.
+        // If we switch to the context of the window, then we won't be able to
+        // quyery the main FBO handle (Which should be 1)
+        const GLFBO* defaultFBO = m_viewDevice->defaultFBO();
+
+        m_viewDevice->makeCurrent();
+
+        std::cerr << " copyFBO " << local_fbo->fboID() << " to "
+                  << defaultFBO->fboID() << std::endl;
+
+        local_fbo->copyTo(defaultFBO);
         local_fbo->unbind();
     }
 
@@ -219,7 +235,7 @@ namespace Rv
 #if 0
     {
         const GLFBO* fbo = leftFBO;
-        fbo->bind(GL_READ_FRAMEBUFFER_EXT);
+        fbo->bind(GL_READ_FRAMEBUFFER);
 
         TwkFB::FrameBuffer fb(fbo->width(), fbo->height(), 4, TwkFB::FrameBuffer::UCHAR);
         std::vector<const TwkFB::FrameBuffer*> fbs(1);
@@ -240,7 +256,7 @@ namespace Rv
 
     {
         const GLFBO* fbo = rightFBO;
-        fbo->bind(GL_READ_FRAMEBUFFER_EXT);
+        fbo->bind(GL_READ_FRAMEBUFFER);
 
         TwkFB::FrameBuffer fb(fbo->width(), fbo->height(), 4, TwkFB::FrameBuffer::UCHAR);
         std::vector<const TwkFB::FrameBuffer*> fbs(1);

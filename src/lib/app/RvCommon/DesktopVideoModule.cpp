@@ -53,46 +53,38 @@ namespace Rv
     // force intel code path for this commit
     static bool isDarwinArm() { return true; }
 
+    static bool isDarwinIntel() { return true; }
+
+    static bool useQtOnDarwinArm() { return true; }
+
     DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np,
                                            QTGLVideoDevice* shareDevice)
         : VideoModule()
     {
+
 #ifdef PLATFORM_DARWIN
-
-        std::vector<CGDesktopVideoDevice> devices;
-
-        if (isDarwinArm()) // apple silicon M devices
+        if (isDarwinArm()) // Apple Arm
         {
-            m_devices = CGDesktopVideoDeviceArm::createDesktopVideoDevices(
-                this, shareDevice);
+            if (useQtOnDarwinArm())
+            {
+                m_devices = QTDesktopVideoDevice::createDesktopVideoDevices(
+                    this, shareDevice);
+            }
+            else
+            {
+                m_devices = CGDesktopVideoDeviceArm::createDesktopVideoDevices(
+                    this, shareDevice);
+            }
         }
-        else // intel
+        else // Apple intel
         {
             m_devices = CGDesktopVideoDevice::createDesktopVideoDevices(
                 this, shareDevice);
         }
-
 #else
-        // Qt path
-
-        // Move Qt desktop device creation to QtDesktopVideoDevice static
-        // function
+        // On Windows and Linux, use the QT Path always.
         m_devices =
             QtDesktopVideoDevice::createDesktopVideoDevices(this, shareDevice);
-
-        const auto screens = QGuiApplication::screens();
-        for (int screen = 0; screen < screens.size(); screen++)
-        {
-            const QScreen* w = screens[screen];
-            QString name = QString("%1 %2 %3")
-                               .arg(w->manufacturer())
-                               .arg(w->model())
-                               .arg(w->name());
-
-            QTDesktopVideoDevice* sd = new QTDesktopVideoDevice(
-                this, name.toUtf8().constData(), screen, shareDevice);
-            m_devices.push_back(sd);
-        }
 #endif
     }
 

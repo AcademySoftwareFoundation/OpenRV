@@ -371,6 +371,12 @@ namespace Rv
 
     void GLView::paintGL()
     {
+        TWK_GLDEBUG_CTXNAME("GLVIEW");
+
+        TRACE_SCOPE("GLView::paintGL")
+
+        TWK_GLDEBUG;
+
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;
 
@@ -383,6 +389,7 @@ namespace Rv
             {
                 m_doc->resizeToFit(false, false);
                 m_doc->center();
+                TWK_GLDEBUG;
             }
         }
 
@@ -410,7 +417,9 @@ namespace Rv
         if (m_doc && session && m_videoDevice)
         {
             // m_frameBuffer->makeCurrent();
+            TWK_GLDEBUG;
             m_videoDevice->makeCurrent();
+            TWK_GLDEBUG;
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
@@ -420,6 +429,7 @@ namespace Rv
                     TwkApp::ActivityChangeEvent aevent("user-inactive",
                                                        m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
+                    TWK_GLDEBUG;
                     m_userActive = false;
                 }
             }
@@ -431,7 +441,9 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
+            TWK_GLDEBUG;
             session->render();
+            TWK_GLDEBUG;
 
             m_firstPaintCompleted = true;
 
@@ -598,6 +610,8 @@ namespace Rv
         session->postRender();
 
         m_eventProcessingTimer.start();
+
+        TWK_GLDEBUG;
     }
 
     void GLView::eventProcessingTimeout()

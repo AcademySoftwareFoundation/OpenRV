@@ -12,6 +12,18 @@
 #include <TwkUtil/sgcHopTools.h>
 
 #include <QOpenGLContext>
+/// #define NDEBUG
+
+#define FBO_MSG(msg)                                                 \
+    {                                                                \
+        std::cerr << "   GLFBO: " << m_id << " : " << msg            \
+                  << (m_ownsFBOHandle ? "" : " (Ext)") << std::endl; \
+        TWK_GLDEBUG;                                                 \
+    }
+
+// #define FBO_MSG(msg)
+
+#define glf QOpenGLContext::currentContext()->functions()
 
 namespace TwkGLF
 {
@@ -33,20 +45,22 @@ namespace TwkGLF
         , m_mappedBuffer(0)
         , m_ownsFBOHandle(true)
     {
+        TWK_GLDEBUG;
+
         // NOTE_QT: My thinking was to use
         // QOpenGLContext::currentContext()->defaultFramebufferObject(), but we
         // get
         //          a black screen by using it. Do we need more code?
         glGenFramebuffersEXT(1, &m_id);
-        // cerr << "New GLFBO: " << m_id << std::endl;
 
         TWK_GLDEBUG;
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_id);
+        FBO_MSG("new fbo");
         TWK_GLDEBUG;
     }
 
     GLFBO::GLFBO(const GLVideoDevice* d)
-        : m_id(QOpenGLContext::currentContext()->defaultFramebufferObject())
+        : m_id(0)
         , m_width(0)
         , m_height(0)
         , m_samples(0)
@@ -61,6 +75,17 @@ namespace TwkGLF
         , m_mappedBuffer(0)
         , m_ownsFBOHandle(false)
     {
+        m_id = QOpenGLContext::currentContext()->defaultFramebufferObject();
+
+        TWK_GLDEBUG;
+
+        FBO_MSG("using external");
+
+        if (m_id == 0)
+        {
+            FBO_MSG("USING EXT FBO 0");
+        }
+
         const TwkApp::VideoDevice::DataFormat& df =
             d->dataFormatAtIndex(d->currentDataFormat());
         m_colorFormat = TwkGLF::internalFormatFromDataFormat(df.iformat);
@@ -311,6 +336,7 @@ namespace TwkGLF
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
                                   GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
                                   target, id, 0);
+        TWK_GLDEBUG;
 
         m_attachments.push_back(
             Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target,
@@ -338,14 +364,26 @@ namespace TwkGLF
 
         GLuint id;
         glGenTextures(1, &id);
+        TWK_GLDEBUG;
+
         glBindTexture(target, id);
+        TWK_GLDEBUG;
+
         glTexParameterf(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_PRIORITY, 1.0f);
+        TWK_GLDEBUG;
+
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
                         minFilter);
+        TWK_GLDEBUG;
+
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
                         magFilter);
+
+        TWK_GLDEBUG;
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, clamping);
+
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, clamping);
+        TWK_GLDEBUG;
 
         // rectangle textures can't have mipmaps
         // glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP,
@@ -449,6 +487,8 @@ namespace TwkGLF
 
     void GLFBO::bind(GLenum kind) const
     {
+        FBO_MSG("binding");
+
         waitForExternalReadback();
         glBindFramebufferEXT(kind, m_id);
         TWK_GLDEBUG;
