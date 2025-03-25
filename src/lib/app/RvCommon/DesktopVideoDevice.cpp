@@ -83,27 +83,32 @@ namespace Rv
 
         GLFBO* local_fbo = m_fboMap[fbo];
 
+        m_viewDevice->makeCurrent();
+
+        // Grab the default FBO or in the case of QT, the FBO of the screen
+        // view) it's possible we end up here before the view (widget's first
+        // paint where the fbo is not yet created, if that happens we return and
+        // try later.
+        const GLFBO* defaultFBO = m_viewDevice->defaultFBO();
+        if (defaultFBO->fboID() == 0)
+        {
+            delete defaultFBO;
+            return;
+        }
+
         if (!local_fbo)
         {
+            // Create a GLFBO in the context of the viewDevice's context.
             local_fbo = new GLFBO(fbo->width(), fbo->height(),
                                   fbo->primaryColorFormat());
             local_fbo->attachColorTexture(fbo->colorTarget(0), fbo->colorID(0));
             m_fboMap[fbo] = local_fbo;
         }
 
-        // Get the default FBO from the main GUI context before making the
-        // DesktopVideoDevice current.
-        // This didn't matter in QGLWidget because the default app's FBO was 0
-        // but with QOpenGLWidget, it's 1.
-        // If we switch to the context of the window, then we won't be able to
-        // quyery the main FBO handle (Which should be 1)
-        const GLFBO* defaultFBO = m_viewDevice->defaultFBO();
-
-        m_viewDevice->makeCurrent();
-
         std::cerr << " copyFBO " << local_fbo->fboID() << " to "
                   << defaultFBO->fboID() << std::endl;
 
+        // Copy the FBO (first time = black) into the FBO of the QOpenGLWidget.
         local_fbo->copyTo(defaultFBO);
         local_fbo->unbind();
     }

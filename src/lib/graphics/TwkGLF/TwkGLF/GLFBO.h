@@ -129,7 +129,7 @@ namespace TwkGLF
               size_t multiSampleSize = 0, // 0 == 1
               void* data = 0);
 
-        GLFBO(const GLVideoDevice*);
+        GLFBO(const GLVideoDevice*, GLuint fboId);
 
         ~GLFBO();
 

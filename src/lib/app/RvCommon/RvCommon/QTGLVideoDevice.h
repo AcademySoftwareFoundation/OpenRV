@@ -64,6 +64,9 @@ namespace Rv
 
         virtual void syncBuffers() const;
 
+        virtual const TwkGLF::GLFBO* defaultFBO() const;
+        virtual TwkGLF::GLFBO* defaultFBO();
+
         bool isWorkerDevice() const
         {
             return Capabilities(capabilities()) == NoCapabilities;

@@ -569,39 +569,7 @@ namespace Rv
         {
             if (session->outputVideoDevice() != videoDevice())
             {
-
-#ifdef PLATFORM_DARWIN
-                if (!m_syncThreadData)
-                {
-                    m_syncThreadData =
-                        new SyncBufferThreadData(session->outputVideoDevice());
-                    m_swapThread = boost::thread(ThreadTrampoline(this));
-                }
-                else
-                {
-                    SyncBufferThreadData* sb =
-                        reinterpret_cast<SyncBufferThreadData*>(
-                            m_syncThreadData);
-
-                    if (sb->device() != session->outputVideoDevice())
-                    {
-                        //
-                        //  This is questionable without shutting down and
-                        //  restarting the sync thread, but the worst case
-                        //  seems to be an extra swap on the closed (not
-                        //  visible) device
-                        //
-
-                        sb->setDevice(session->outputVideoDevice());
-                    }
-                }
-
-                reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData)
-                    ->notify();
-
-#else
                 session->outputVideoDevice()->syncBuffers();
-#endif
             }
         }
 

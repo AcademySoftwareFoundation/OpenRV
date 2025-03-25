@@ -59,8 +59,8 @@ namespace TwkGLF
         TWK_GLDEBUG;
     }
 
-    GLFBO::GLFBO(const GLVideoDevice* d)
-        : m_id(0)
+    GLFBO::GLFBO(const GLVideoDevice* d, GLuint fboID)
+        : m_id(fboID)
         , m_width(0)
         , m_height(0)
         , m_samples(0)
@@ -75,7 +75,11 @@ namespace TwkGLF
         , m_mappedBuffer(0)
         , m_ownsFBOHandle(false)
     {
-        m_id = QOpenGLContext::currentContext()->defaultFramebufferObject();
+
+        if (fboID == 0)
+        {
+            m_id = QOpenGLContext::currentContext()->defaultFramebufferObject();
+        }
 
         TWK_GLDEBUG;
 

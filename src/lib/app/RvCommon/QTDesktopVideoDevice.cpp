@@ -29,59 +29,52 @@ namespace Rv
 
     //----------------------------------------------------------------------
 
-    class ScreenView : public QOpenGLWidget
+    QTDesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt,
+                                                 QWidget* parent,
+                                                 QOpenGLWidget* glViewShare,
+                                                 Qt::WindowFlags flags)
+        : QOpenGLWidget(parent, flags)
     {
-    public:
-        ScreenView(const QSurfaceFormat& fmt, QWidget* parent,
-                   QOpenGLWidget* share, Qt::WindowFlags flags)
-            : QOpenGLWidget(parent, flags)
+        m_glViewShare = glViewShare;
+
+        setFormat(fmt);
+    }
+
+    void QTDesktopVideoDevice::ScreenView::initializeGL()
+    {
+        TRACE_SCOPE("ScreenView::initializeGL")
+
+        QOpenGLWidget::initializeGL();
+
+        if (m_glViewShare && context() && context()->isValid())
         {
-            // NOTE_QT: setAutoBUfferSwap does not exist anymore.
-            // setAutoBufferSwap(false);
-
-            m_shared = share;
-
-            setFormat(fmt);
+            context()->setShareContext(m_glViewShare->context());
         }
+    }
 
-    protected:
-        void initializeGL() override
-        {
-            TRACE_SCOPE("ScreenView::initializeGL")
+    void QTDesktopVideoDevice::ScreenView::paintGL()
+    {
+        TRACE_SCOPE("ScreenView::paintGL")
 
-            QOpenGLWidget::initializeGL();
+        TWK_GLDEBUG_CTXNAME("ScreenView");
 
-            if (m_shared && context() && context()->isValid())
-            {
-                context()->setShareContext(m_shared->context());
-            }
-        }
+        TWK_GLDEBUG;
 
-        void paintGL() override
-        {
-            TRACE_SCOPE("ScreenView::paintGL")
-
-            TWK_GLDEBUG_CTXNAME("ScreenView");
-
-            TWK_GLDEBUG;
-            //            glClearColor(0, 1, 0, 1);
-            //            glClear(GL_COLOR_BUFFER_BIT);
-            TWK_GLDEBUG;
-        }
-
-        ~ScreenView() {}
-
-    private:
-        QOpenGLWidget* m_shared = nullptr;
-    };
+        std::cerr
+            << "SCREENVIEW FBO "
+            << QOpenGLContext::currentContext()->defaultFramebufferObject()
+            << "WFBO:" << defaultFramebufferObject() << std::endl;
+        //            glClearColor(0, 1, 0, 1);
+        //            glClear(GL_COLOR_BUFFER_BIT);
+        TWK_GLDEBUG;
+    }
 
     //----------------------------------------------------------------------
 
-    QTDesktopVideoDevice::QTDesktopVideoDevice(VideoModule* m,
-                                               const std::string& name,
-                                               int screen,
-                                               const QTGLVideoDevice* share)
-        : DesktopVideoDevice(m, name, share)
+    QTDesktopVideoDevice::QTDesktopVideoDevice(
+        VideoModule* m, const std::string& name, int screen,
+        const QTGLVideoDevice* glViewShared)
+        : DesktopVideoDevice(m, name, glViewShared)
         , m_screen(screen)
         , m_translator(0)
         , m_view(0)
@@ -146,20 +139,7 @@ namespace Rv
         }
     }
 
-    void QTDesktopVideoDevice::syncBuffers() const
-    {
-        TRACE_SCOPE("QTDesktopVideoDevice::syncBuffers");
-        if (m_view)
-        {
-            ScopedLock lock(m_mutex);
-            //            TWK_GLDEBUG;
-            makeCurrent();
-            //           TWK_GLDEBUG;
-            // NOTE_QT: swapBuffer is under the context now.
-            m_view->context()->swapBuffers(m_view->context()->surface());
-            //          TWK_GLDEBUG;
-        }
-    }
+    void QTDesktopVideoDevice::syncBuffers() const { redrawImmediately(); }
 
     void QTDesktopVideoDevice::open(const StringVector& args)
     {

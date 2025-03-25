@@ -77,9 +77,30 @@ namespace Rv
     void QTGLVideoDevice::makeCurrent() const
     {
         if (m_view->context() && m_view->context()->isValid())
+        {
             m_view->makeCurrent();
+
+            GLint widgetFBO = m_view->defaultFramebufferObject();
+            if (widgetFBO != 0)
+                glBindFramebuffer(GL_FRAMEBUFFER_EXT, widgetFBO);
+        }
+
         if (!isWorkerDevice())
             GLVideoDevice::makeCurrent();
+    }
+
+    GLFBO* QTGLVideoDevice::defaultFBO()
+    {
+        if (!m_fbo)
+            m_fbo = new GLFBO(this, m_view->defaultFramebufferObject());
+        return m_fbo;
+    }
+
+    const GLFBO* QTGLVideoDevice::defaultFBO() const
+    {
+        if (!m_fbo)
+            m_fbo = new GLFBO(this, m_view->defaultFramebufferObject());
+        return m_fbo;
     }
 
     void QTGLVideoDevice::redraw() const
@@ -177,6 +198,7 @@ namespace Rv
         {
             makeCurrent();
             m_view->context()->swapBuffers(m_view->context()->surface());
+            // PB: Yuck
         }
     }
 

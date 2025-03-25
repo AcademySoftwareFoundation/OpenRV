@@ -38,6 +38,21 @@ namespace Rv
 
     class QTDesktopVideoDevice : public DesktopVideoDevice
     {
+        class ScreenView : public QOpenGLWidget
+        {
+        public:
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent,
+                       QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
+
+            void initializeGL() override;
+            void paintGL() override;
+
+        private:
+            QOpenGLWidget* m_glViewShare =
+                nullptr; // a pointer to the  GLView (rv's main view) to share
+                         // resources.
+        };
+
     public:
         QTDesktopVideoDevice(TwkApp::VideoModule*, const std::string& name,
                              int screen, const QTGLVideoDevice* share);
