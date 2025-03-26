@@ -24,6 +24,7 @@
 #include <math.h>
 #include <algorithm>
 #include <array>
+#include <string_view>
 #include <stdlib.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
@@ -619,6 +620,7 @@ namespace TwkMovie
 
     namespace
     {
+        constexpr int rv_seek_frame_offset = 1;
 
         //----------------------------------------------------------------------
         //
@@ -631,49 +633,16 @@ namespace TwkMovie
         //  actually support. But just in case ....
         //
 
-        const char* slowRandomAccessCodecsArray[] = {"3iv2",
-                                                     "3ivd",
-                                                     "ap41",
-                                                     "avc1",
-                                                     "div1",
-                                                     "div2",
-                                                     "div3",
-                                                     "div4",
-                                                     "div5",
-                                                     "div6",
-                                                     "divx",
-                                                     "dnxhd",
-                                                     "dx50",
-                                                     "h263",
-                                                     "h264",
-                                                     "i263",
-                                                     "iv31",
-                                                     "iv32",
-                                                     "m4s2",
-                                                     "mp42",
-                                                     "mp43",
-                                                     "mp4s",
-                                                     "mp4v",
-                                                     "mpeg4",
-                                                     "mpg1",
-                                                     "mpg3",
-                                                     "mpg4",
-                                                     "pim1",
-                                                     "s263",
-                                                     "svq1",
-                                                     "svq3",
-                                                     "u263",
-                                                     "vc1",
-                                                     "vc1_vdpau",
-                                                     "vc1image",
-                                                     "viv1",
-                                                     "wmv3",
-                                                     "wmv3_vdpau",
-                                                     "wmv3image",
-                                                     "xith",
-                                                     "xvid",
-                                                     "libdav1d",
-                                                     0};
+        constexpr std::array<std::string_view, 43> slowRandomAccessCodecs = {
+            "3iv2",     "3ivd",  "ap41",    "avc1",       "div1",
+            "div2",     "div3",  "div4",    "div5",       "div6",
+            "divx",     "dnxhd", "dx50",    "h263",       "h264",
+            "i263",     "iv31",  "iv32",    "m4s2",       "mp42",
+            "mp43",     "mp4s",  "mp4v",    "mpeg4",      "mpg1",
+            "mpg3",     "mpg4",  "pim1",    "png",        "s263",
+            "svq1",     "svq3",  "u263",    "vc1",        "vc1_vdpau",
+            "vc1image", "viv1",  "wmv3",    "wmv3_vdpau", "wmv3image",
+            "xith",     "xvid",  "libdav1d"};
 
         const char* supportedEncodingCodecsArray[] = {
             "dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo", 0};
@@ -753,15 +722,17 @@ namespace TwkMovie
         bool codecHasSlowAccess(string name)
         {
             boost::algorithm::to_lower(name);
-            for (const char** p = slowRandomAccessCodecsArray; *p; p++)
+            for (const std::string_view& codec : slowRandomAccessCodecs)
             {
-                if (*p == name)
+                std::cout << "Comparing " << codec << " with " << name
+                          << std::endl;
+                if (codec == name)
                 {
                     return true;
                 }
             }
             return false;
-        };
+        }
 
         bool isMP4format(AVFormatContext* avFormatContext)
         {
@@ -3347,11 +3318,11 @@ namespace TwkMovie
         m_timingDetails->startTimer("seek");
 #endif
 
-        // To make seeking a bit more robust, step back 3 frames from the
-        // intended frame. This is because FFmpeg internally seeks with the dts
-        // timestamp and not the pts timestamp, so we need to have a bit of a
-        // buffer.
-        const int64_t seekTarget = int64_t((inframe - 3) * frameDur);
+        // Before FFmpeg 6, the offset was 1 frame. Let's keep that assumption
+        // for now. Note: FFmpeg internally seeks with the dts timestamp and not
+        // the pts timestamp. We need to have a bit of a buffer.
+        const int64_t seekTarget =
+            int64_t((inframe - rv_seek_frame_offset) * frameDur);
 
         DBL(DB_VIDEO, "seekTarget: " << seekTarget
                                      << " last: " << track->lastDecodedVideo
@@ -3359,10 +3330,13 @@ namespace TwkMovie
 
         avcodec_send_packet(track->avCodecContext, nullptr);
 
-        int ret = 0;
-        while (ret != AVERROR_EOF)
-            ret =
-                avcodec_receive_frame(track->avCodecContext, track->videoFrame);
+        int ret;
+        while ((ret = avcodec_receive_frame(track->avCodecContext,
+                                            track->videoFrame))
+               != AVERROR_EOF)
+        {
+            // Discard received frames until the end of the stream is reached
+        }
 
         avcodec_flush_buffers(track->avCodecContext);
         if (av_seek_frame(m_avFormatContext, track->number, seekTarget,
@@ -3477,7 +3451,7 @@ namespace TwkMovie
     {
         // The goal timestamp is the same as the seek target adjusted
         // for pts vs dts.
-        const int64_t goalTS = (inframe - 1) * frameDur;
+        const int64_t goalTS = (inframe - rv_seek_frame_offset) * frameDur;
 
         // If it is the first time we try to decode the stream, we need
         // to start by reading a packet.
