@@ -44,6 +44,7 @@ namespace TwkMovie
     class AudioTrack;
     class VideoTrack;
     class ContextPool;
+    class HardwareContext;
 
     //
     //  class MovieFFMpegIO
@@ -179,7 +180,8 @@ namespace TwkMovie
         void initializeVideo(int height, int width);
         void initializeAudio();
         bool openAVFormat();
-        bool openAVCodec(int index, AVCodecContext** avCodecContext);
+        bool openAVCodec(int index, AVCodecContext** avCodecContext,
+                         HardwareContext* hardwareContext = nullptr);
         void findStreamInfo();
 
         //

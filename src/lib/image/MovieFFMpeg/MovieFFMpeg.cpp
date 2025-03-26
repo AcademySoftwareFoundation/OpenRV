@@ -264,6 +264,12 @@ namespace TwkMovie
         AVCodecContext* avCodecContext;
     };
 
+    struct HardwareContext
+    {
+        AVPixelFormat pixelFormat;
+        AVBufferRef* deviceContext;
+    };
+
     struct VideoTrack
     {
         VideoTrack()
@@ -276,6 +282,7 @@ namespace TwkMovie
             , rotate(false)
             , colrType("")
             , avCodecContext(0)
+            , hardwareContext({AV_PIX_FMT_NONE, nullptr})
         {
             videoFrame = av_frame_alloc();
             videoPacket = av_packet_alloc();
@@ -332,6 +339,7 @@ namespace TwkMovie
         AVFrame* outPicture;
         string colrType;
         AVCodecContext* avCodecContext;
+        struct HardwareContext hardwareContext;
     };
 
     //
@@ -656,9 +664,6 @@ namespace TwkMovie
             "duration", // We ignore it here, since its explicitly added
                         // elsewhere.
             0};
-
-        AVPixelFormat hardwarePixelFormat = AV_PIX_FMT_NONE;
-        AVBufferRef* hardwareDeviceContext = nullptr;
 
         //----------------------------------------------------------------------
         //
@@ -997,6 +1002,15 @@ namespace TwkMovie
         int hardwareDecoderInit(AVCodecContext* codecContext,
                                 const AVHWDeviceType deviceType)
         {
+            HardwareContext* hardwareContext =
+                static_cast<HardwareContext*>(codecContext->opaque);
+            if (hardwareContext == nullptr)
+            {
+                return -1;
+            }
+
+            AVBufferRef* hardwareDeviceContext = hardwareContext->deviceContext;
+
             const int result = av_hwdevice_ctx_create(
                 &hardwareDeviceContext, deviceType, nullptr, nullptr, 0);
 
@@ -1012,20 +1026,28 @@ namespace TwkMovie
             return result;
         }
 
-        AVPixelFormat getHardwareFormat(AVCodecContext* /*codecContext*/,
+        AVPixelFormat getHardwareFormat(AVCodecContext* codecContext,
                                         const AVPixelFormat* pixelFormats)
         {
-            const enum AVPixelFormat* pixelFormat = nullptr;
-
-            for (pixelFormat = pixelFormats; *pixelFormat != -1; pixelFormat++)
+            HardwareContext* hardwareContext =
+                static_cast<HardwareContext*>(codecContext->opaque);
+            if (hardwareContext != nullptr)
             {
-                if (*pixelFormat == hardwarePixelFormat)
-                {
-                    return *pixelFormat;
-                }
-            }
+                const enum AVPixelFormat* pixelFormat = nullptr;
+                AVPixelFormat hardwarePixelFormat =
+                    hardwareContext->pixelFormat;
 
-            std::cerr << "ERROR: Failed to get hardware surface format.\n";
+                for (pixelFormat = pixelFormats; *pixelFormat != -1;
+                     pixelFormat++)
+                {
+                    if (*pixelFormat == hardwarePixelFormat)
+                    {
+                        return *pixelFormat;
+                    }
+                }
+                std::cerr << "ERROR: Failed to get hardware surface format.\n";
+            }
+            std::cerr << "ERROR: Failed to get hardware context.\n";
             return AV_PIX_FMT_NONE;
         }
 
@@ -1088,7 +1110,6 @@ namespace TwkMovie
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
-                av_buffer_unref(&hardwareDeviceContext);
             }
             ContextPool::flushContext(this, track->number);
             delete track;
@@ -1101,7 +1122,6 @@ namespace TwkMovie
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
-                av_buffer_unref(&hardwareDeviceContext);
             }
             ContextPool::flushContext(this, track->number);
             delete track;
@@ -1307,7 +1327,8 @@ namespace TwkMovie
     }
 
     bool MovieFFMpegReader::openAVCodec(int index,
-                                        AVCodecContext** avCodecContext)
+                                        AVCodecContext** avCodecContext,
+                                        HardwareContext* hardwareContext)
     {
         // Make sure the format is opened
         if (m_avFormatContext == nullptr)
@@ -1354,7 +1375,7 @@ namespace TwkMovie
             if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
                 && config->device_type == deviceType)
             {
-                hardwarePixelFormat = config->pix_fmt;
+                hardwareContext->pixelFormat = config->pix_fmt;
             }
             break;
         }
@@ -1369,6 +1390,7 @@ namespace TwkMovie
             avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
             break;
         }
+
         if (avCodec == nullptr)
         {
             std::cerr << "ERROR: MovieFFMpeg: Unsupported codec_id '"
@@ -1399,6 +1421,7 @@ namespace TwkMovie
 
         if (avStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
         {
+            (*avCodecContext)->opaque = hardwareContext;
             (*avCodecContext)->get_format = getHardwareFormat;
 
             if (hardwareDecoderInit(*avCodecContext, deviceType) < 0)
@@ -2246,7 +2269,8 @@ namespace TwkMovie
                 {
                     ContextPool::Reservation reserve(this, i);
                     VideoTrack* track = new VideoTrack;
-                    if (openAVCodec(i, &track->avCodecContext))
+                    if (openAVCodec(i, &track->avCodecContext,
+                                    &track->hardwareContext))
                     {
                         track->number = i;
 
@@ -3730,6 +3754,9 @@ namespace TwkMovie
         softwareFrame = av_frame_alloc();
         AVFrame* tempFrame = nullptr;
         int result = 0;
+        HardwareContext* hardwareContext =
+            static_cast<HardwareContext*>(track->avCodecContext->opaque);
+        AVPixelFormat hardwarePixelFormat = hardwareContext->pixelFormat;
 
         if (track->videoFrame->format == hardwarePixelFormat)
         {
@@ -3991,7 +4018,8 @@ namespace TwkMovie
         {
             VideoTrack* track = m_videoTracks[i];
             ContextPool::Reservation reserve(this, track->number);
-            track->isOpen = openAVCodec(track->number, &track->avCodecContext);
+            track->isOpen = openAVCodec(track->number, &track->avCodecContext,
+                                        &track->hardwareContext);
             if (!track->isOpen)
             {
                 cout << "ERROR: Unable to read from audio stream: "
@@ -5797,14 +5825,13 @@ namespace TwkMovie
         {
             AudioTrack* track = m_audioTracks[i];
             avcodec_free_context(&track->avCodecContext);
-            av_buffer_unref(&hardwareDeviceContext);
             delete track;
         }
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
             avcodec_free_context(&track->avCodecContext);
-            av_buffer_unref(&hardwareDeviceContext);
+            av_buffer_unref(&track->hardwareContext.deviceContext);
             delete track;
         }
         if (m_audioSamples)
@@ -5813,10 +5840,6 @@ namespace TwkMovie
         {
             avformat_close_input(&m_avFormatContext);
             avformat_free_context(m_avFormatContext);
-        }
-        if (hardwareDeviceContext)
-        {
-            av_buffer_unref(&hardwareDeviceContext);
         }
 
         return true;
