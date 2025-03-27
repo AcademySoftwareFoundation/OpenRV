@@ -530,10 +530,7 @@ namespace IPCore
 
                 if (!m_transform)
                 {
-                    QMutexLocker lock(&this->m_lock);
-                    if (!m_transform)
-                    {
-                        m_transform = OCIO::GroupTransform::Create();
+                    m_transform = OCIO::GroupTransform::Create();
 
                     // RV's working space is currently assumed to be 709
                     // linear like the original EXR spec. In the display
