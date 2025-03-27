@@ -36,9 +36,7 @@ def hook_function(
             frame_component = f"{paint_node}.frame:{frame}"
 
             # Set properties on the paint component of the RVPaint node
-            effectHook.set_rv_effect_props(
-                paint_component, {"nextId": stroke_id + 1, "show": layer.visible}
-            )
+            effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id + 1})
 
             # Add and set properties on the pen component of the RVPaint node
             effectHook.add_rv_effect_props(
