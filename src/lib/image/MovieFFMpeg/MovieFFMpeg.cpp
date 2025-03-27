@@ -1,6 +1,6 @@
 //******************************************************************************
-// Copyright (c) 2012 Tweak Inc.
-// All rights reserved.
+//
+// Copyright (C) 2025 Autodesk, Inc. All Rights Reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -1350,35 +1350,6 @@ namespace TwkMovie
         // Find the decoder for the av stream
         switch (avStream->codecpar->codec_id)
         {
-        case AV_CODEC_ID_PRORES:
-        {
-            deviceType = av_hwdevice_find_type_by_name("videotoolbox");
-            if (deviceType == AV_HWDEVICE_TYPE_NONE)
-            {
-                std::cerr << "ERROR: Device type" << deviceType
-                          << "is not supported.\n";
-                return false;
-            }
-
-            avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
-
-            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
-            if (config == nullptr)
-            {
-                std::cerr << "ERROR: Decoder " << avCodec->name
-                          << " does not support device type "
-                          << av_hwdevice_get_type_name(deviceType) << '\n';
-                return false;
-            }
-            // Check if the hardware device context flag is set and the device
-            // type matches
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
-                && config->device_type == deviceType)
-            {
-                hardwareContext->pixelFormat = config->pix_fmt;
-            }
-            break;
-        }
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_H265:
             // we want to read SPS and PPS NALs at the beginning of H.264 and
@@ -1419,8 +1390,33 @@ namespace TwkMovie
             return false;
         }
 
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
         if (avStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
         {
+            deviceType = av_hwdevice_find_type_by_name("videotoolbox");
+            if (deviceType == AV_HWDEVICE_TYPE_NONE)
+            {
+                std::cerr << "ERROR: Device type" << deviceType
+                          << "is not supported.\n";
+                return false;
+            }
+
+            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
+            if (config == nullptr)
+            {
+                std::cerr << "ERROR: Decoder " << avCodec->name
+                          << " does not support device type "
+                          << av_hwdevice_get_type_name(deviceType) << '\n';
+                return false;
+            }
+            // Check if the hardware device context flag is set and the device
+            // type matches
+            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
+                && config->device_type == deviceType)
+            {
+                hardwareContext->pixelFormat = config->pix_fmt;
+            }
+
             (*avCodecContext)->opaque = hardwareContext;
             (*avCodecContext)->get_format = getHardwareFormat;
 
@@ -1429,6 +1425,7 @@ namespace TwkMovie
                 return false;
             }
         }
+#endif
 
         // Open the codec
         (*avCodecContext)->thread_count = m_io->codecThreads();
@@ -3754,21 +3751,26 @@ namespace TwkMovie
         softwareFrame = av_frame_alloc();
         AVFrame* tempFrame = nullptr;
         int result = 0;
+
         HardwareContext* hardwareContext =
             static_cast<HardwareContext*>(track->avCodecContext->opaque);
-        AVPixelFormat hardwarePixelFormat = hardwareContext->pixelFormat;
 
-        if (track->videoFrame->format == hardwarePixelFormat)
+        if (hardwareContext != nullptr)
         {
-            // retrieve data from GPU to CPU
-            result =
-                av_hwframe_transfer_data(softwareFrame, track->videoFrame, 0);
-            if (result < 0)
+            AVPixelFormat hardwarePixelFormat = hardwareContext->pixelFormat;
+
+            if (track->videoFrame->format == hardwarePixelFormat)
             {
-                std::cerr
-                    << "ERROR: Failed to transfer data to system memory\n";
+                // retrieve data from GPU to CPU
+                result = av_hwframe_transfer_data(softwareFrame,
+                                                  track->videoFrame, 0);
+                if (result < 0)
+                {
+                    std::cerr
+                        << "ERROR: Failed to transfer data to system memory\n";
+                }
+                tempFrame = softwareFrame;
             }
-            tempFrame = softwareFrame;
         }
         else
         {

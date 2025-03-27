@@ -235,9 +235,6 @@ GET_PROPERTY(
 )
 
 # Make a list of common FFmpeg config options
-IF(RV_TARGET_DARWIN)
-  LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-videotoolbox")
-ENDIF()
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-shared")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-static")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-iconv")
@@ -261,6 +258,18 @@ ENDIF()
 SET(${_force_rebuild}
     FALSE
 )
+
+IF(RV_TARGET_APPLE_ARM64)
+  SET(RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE
+      ON
+  )
+ELSE()
+  SET(RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE
+      OFF
+  )
+ENDIF()
+
+OPTION(RV_FFMPEG_USE_VIDEOTOOLBOX "FFmpeg laveraging the VideoToolbox framework" ${RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE})
 
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
