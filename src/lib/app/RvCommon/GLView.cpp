@@ -151,7 +151,6 @@ namespace Rv
 
         setObjectName((m_doc->session()) ? m_doc->session()->name().c_str()
                                          : "no session");
-        // m_frameBuffer = new QTFrameBuffer( this );
 
         m_activityTimer.start();
         setMouseTracking(true);

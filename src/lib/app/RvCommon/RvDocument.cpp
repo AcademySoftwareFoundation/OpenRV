@@ -15,7 +15,6 @@
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
-// #include <RvCommon/QTFrameBuffer.h>
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvCommon/RvNetworkDialog.h>
@@ -183,7 +182,6 @@ namespace Rv
 
         setCentralWidget(m_viewContainerWidget);
 
-        // QTFrameBuffer* fb = m_glView->frameBuffer(
         m_glView->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
