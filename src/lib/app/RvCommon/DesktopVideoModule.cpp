@@ -6,7 +6,7 @@
 //
 //
 #include <RvCommon/DesktopVideoModule.h>
-#include <RvCommon/QTDesktopVideoDevice.h>
+#include <RvCommon/DesktopVideoDevice.h>
 #include <RvCommon/GLView.h>
 #include <IPCore/ImageRenderer.h>
 #include <stl_ext/string_algo.h>
@@ -15,8 +15,8 @@
 #include <boost/algorithm/string.hpp>
 
 #ifdef PLATFORM_DARWIN
-#include <RvCommon/CGDesktopVideoDevice.h>
-#include <RvCommon/CGDesktopVideoDeviceArm.h>
+// #include <RvCommon/CGDesktopVideoDevice.h>
+// #include <RvCommon/CGDesktopVideoDeviceArm.h>
 #endif
 
 #include <QtWidgets/QApplication>
@@ -67,18 +67,18 @@ namespace Rv
         {
             if (useQtOnDarwinArm())
             {
-                m_devices = QTDesktopVideoDevice::createDesktopVideoDevices(
+                m_devices = DesktopVideoDevice::createDesktopVideoDevices(
                     this, shareDevice);
             }
             else
             {
-                m_devices = CGDesktopVideoDeviceArm::createDesktopVideoDevices(
+                m_devices = DesktopVideoDevice::createDesktopVideoDevices(
                     this, shareDevice);
             }
         }
         else // Apple intel
         {
-            m_devices = CGDesktopVideoDevice::createDesktopVideoDevices(
+            m_devices = DesktopVideoDevice::createDesktopVideoDevices(
                 this, shareDevice);
         }
 #else
@@ -103,7 +103,7 @@ namespace Rv
     {
         TwkApp::VideoDevice* device = 0;
 
-#if defined(PLATFORM_DARWIN)
+#if defined(PLATFORM_DARWIN) && 0
 
         const int maxDisplays = 64;
         CGDirectDisplayID displays[maxDisplays];
@@ -161,5 +161,4 @@ namespace Rv
 
         return device;
     }
-
 } // namespace Rv

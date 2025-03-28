@@ -38,7 +38,6 @@ SET(_sources
     MediaFileTypes.cpp
     DesktopVideoDevice.cpp
     DesktopVideoModule.cpp
-    QTDesktopVideoDevice.cpp
     MuUICommands.cpp
     PyUICommands.cpp
     RvFileDialog.cpp
@@ -62,8 +61,10 @@ SET(_sources
     RvJavaScriptObject.cpp
 )
 
+# IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
+
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp)
+  LIST(APPEND _sources DisplayLink.cpp)
 ENDIF()
 
 IF(RV_TARGET_DARWIN)

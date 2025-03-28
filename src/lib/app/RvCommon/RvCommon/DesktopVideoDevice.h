@@ -13,8 +13,12 @@
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkApp/VideoModule.h>
-#include <RvCommon/QTGLVideoDevice.h>
 #include <boost/thread/mutex.hpp>
+
+#include <RvCommon/QTGLVideoDevice.h>
+#include <QtWidgets/QWidget>
+#include <QOpenGLWidget>
+#include <QGuiApplication>
 
 namespace Rv
 {
@@ -38,6 +42,22 @@ namespace Rv
 
     class DesktopVideoDevice : public TwkGLF::GLBindableVideoDevice
     {
+    public:
+        class ScreenView : public QOpenGLWidget
+        {
+        public:
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent,
+                       QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
+
+            void initializeGL() override;
+            void paintGL() override;
+
+        private:
+            QOpenGLWidget* m_glViewShare =
+                nullptr; // a pointer to the  GLView (rv's main view) to share
+                         // resources.
+        };
+
     public:
         //
         //  Types
@@ -107,14 +127,12 @@ namespace Rv
         //
 
         DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                           const QTGLVideoDevice* share);
+                           int qtscreen, const QTGLVideoDevice* glViewShared);
 
         virtual ~DesktopVideoDevice();
 
         virtual void redraw() const;
         virtual void redrawImmediately() const;
-
-        virtual int qtScreen() const { return -1; }
 
         const QTGLVideoDevice* shareDevice() const { return m_share; }
 
@@ -181,6 +199,45 @@ namespace Rv
         virtual void setSyncSource(size_t);
         virtual size_t currentSyncSource() const;
 
+        // imported
+
+        //  From QTGLVideoDevice
+
+        void setWidget(QOpenGLWidget*);
+
+        QOpenGLWidget* widget() const { return m_view; }
+
+        virtual void makeCurrent() const;
+
+        const QTTranslator& translator() const { return *m_translator; }
+
+        //
+        //  VideoDevice API
+        //
+
+        virtual Resolution resolution() const;
+        virtual Offset offset() const;
+        virtual Timing timing() const;
+        virtual VideoFormat format() const;
+
+        virtual size_t width() const;
+        virtual size_t height() const;
+
+        virtual void open(const StringVector&);
+        virtual void close();
+        virtual bool isOpen() const;
+
+        virtual void syncBuffers() const;
+
+        virtual int qtScreen() const { return m_screen; }
+
+        bool useFullScreen() const;
+        QRect screenGeometry() const;
+
+        static std::vector<VideoDevice*>
+        createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                  const QTGLVideoDevice* shareDevice);
+
     protected:
         void addDefaultDataFormats(size_t bits = 8);
         void sortVideoFormatsByWidth();
@@ -197,14 +254,24 @@ namespace Rv
     private:
         void addDataFormatAtDepth(size_t depth, DesktopStereoMode m);
 
+#ifdef PLATFORM_WINDOWS
+        virtual ColorProfile colorProfile() const;
+#endif
+
     protected:
         const QTGLVideoDevice* m_share;
         const TwkGLF::GLVideoDevice* m_viewDevice;
+        QOpenGLWidget* m_view;
         DesktopStereoMode m_stereoMode;
         mutable FBOMap m_fboMap;
         TwkGLF::GLState* m_glGlobalState;
         DesktopVideoFormats m_videoFormats;
         DesktopDataFormats m_dataFormats;
+
+        int m_screen;
+        QTTranslator* m_translator;
+        mutable ColorProfile m_colorProfile;
+
         size_t m_videoFormatIndex;
         size_t m_dataFormatIndex;
         bool m_vsync;

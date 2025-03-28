@@ -475,7 +475,7 @@ namespace Rv
         //  happening. We only want DisplayLink with actual playback
         //
 
-#ifdef PLATFORM_DARWIN
+#if defined(PLATFORM_DARWIN) && 0
         if (CGDesktopVideoDevice* cgdevice =
                 dynamic_cast<CGDesktopVideoDevice*>(
                     m_glView->videoDevice()->physicalDevice()))
@@ -488,7 +488,7 @@ namespace Rv
 
     void RvDocument::playStopSlot(const std::string&)
     {
-#ifdef PLATFORM_DARWIN
+#if defined(PLATFORM_DARWIN) && 0
         if (m_displayLink)
             m_displayLink->stop();
 #endif
