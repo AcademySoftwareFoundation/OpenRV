@@ -14,6 +14,7 @@
 #include <TwkAudio/Audio.h>
 #include <TwkAudio/Interlace.h>
 #include <TwkFB/FastMemcpy.h>
+#include <TwkFB/FastConversion.h>
 #include <TwkUtil/EnvVar.h>
 #include <TwkUtil/Timer.h>
 #include <TwkUtil/PathConform.h>
@@ -636,17 +637,54 @@ namespace TwkMovie
         //  Put anything we know about in here: some of these we don't
         //  actually support. But just in case ....
         //
-
-        constexpr std::array<std::string_view, 43> slowRandomAccessCodecs = {
-            "3iv2",     "3ivd",  "ap41",    "avc1",       "div1",
-            "div2",     "div3",  "div4",    "div5",       "div6",
-            "divx",     "dnxhd", "dx50",    "h263",       "h264",
-            "i263",     "iv31",  "iv32",    "m4s2",       "mp42",
-            "mp43",     "mp4s",  "mp4v",    "mpeg4",      "mpg1",
-            "mpg3",     "mpg4",  "pim1",    "png",        "s263",
-            "svq1",     "svq3",  "u263",    "vc1",        "vc1_vdpau",
-            "vc1image", "viv1",  "wmv3",    "wmv3_vdpau", "wmv3image",
-            "xith",     "xvid",  "libdav1d"};
+        constexpr std::array slowRandomAccessCodecs = {"3iv2"sv,
+                                                       "3ivd"sv,
+                                                       "ap41"sv,
+                                                       "avc1"sv,
+                                                       "div1"sv,
+                                                       "div2"sv,
+                                                       "div3"sv,
+                                                       "div4"sv,
+                                                       "div5"sv,
+                                                       "div6"sv,
+                                                       "divx"sv,
+                                                       "dnxhd"sv,
+                                                       "dx50"sv,
+                                                       "h263"sv,
+                                                       "h264"sv,
+                                                       "i263"sv,
+                                                       "iv31"sv,
+                                                       "iv32"sv,
+                                                       "m4s2"sv,
+                                                       "mp42"sv,
+                                                       "mp43"sv,
+                                                       "mp4s"sv,
+                                                       "mp4v"sv,
+                                                       "mpeg4"sv,
+                                                       "mpg1"sv,
+                                                       "mpg3"sv,
+                                                       "mpg4"sv,
+                                                       "pim1"sv,
+                                                       "png"sv,
+                                                       "s263"sv,
+                                                       "svq1"sv,
+                                                       "svq3"sv,
+                                                       "u263"sv,
+                                                       "vc1"sv,
+                                                       "vc1_vdpau"sv,
+                                                       "vc1image"sv,
+                                                       "viv1"sv,
+                                                       "wmv3"sv,
+                                                       "wmv3_vdpau"sv,
+                                                       "wmv3image"sv,
+                                                       "xith"sv,
+                                                       "xvid"sv,
+                                                       "libdav1d"sv
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+                                                       ,
+                                                       "prores"sv
+#endif
+        };
 
         const char* supportedEncodingCodecsArray[] = {
             "dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo", 0};
@@ -726,16 +764,9 @@ namespace TwkMovie
         bool codecHasSlowAccess(string name)
         {
             boost::algorithm::to_lower(name);
-            for (const std::string_view& codec : slowRandomAccessCodecs)
-            {
-                std::cout << "Comparing " << codec << " with " << name
-                          << std::endl;
-                if (codec == name)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return std::any_of(
+                slowRandomAccessCodecs.begin(), slowRandomAccessCodecs.end(),
+                [name](const auto& codec) { return codec == name; });
         }
 
         bool isMP4format(AVFormatContext* avFormatContext)
@@ -2870,6 +2901,100 @@ namespace TwkMovie
         return false;
     }
 
+    void MovieFFMpegReader::copyFrame(const AVFrame* srcFrame,
+                                      AVFrame* dstFrame, int width, int height,
+                                      bool convertFormat,
+                                      SwsContext*& imgConvertContext)
+    {
+        HOP_PROF("copyFrame()");
+
+        // Simply copy the data if no format conversion required
+        if (!convertFormat)
+        {
+            av_image_copy(static_cast<uint8_t* const*>(dstFrame->data),
+                          static_cast<const int*>(dstFrame->linesize),
+                          const_cast<const uint8_t**>(srcFrame->data),
+                          static_cast<const int*>(srcFrame->linesize),
+                          static_cast<AVPixelFormat>(srcFrame->format), width,
+                          height);
+
+            return;
+        }
+
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+        // FFmpeg sws_scale() function is not optimized for the following
+        // conversions which are used when decoding ProRes 422 and ProRes 4444
+        // videos on Apple Silicon via VideoToolbox:
+        // AV_PIX_FMT_P210LE -> AV_PIX_FMT_YUV422P16LE
+        // AV_PIX_FMT_P416LE -> AV_PIX_FMT_YUV444P16LE
+        // Latest benchmarks for a UHD image conversion via sws_scale() on
+        // ARM64 was 30 ms and 46 ms respectively for the two conversions.
+        // Whereas it was 3 ms and 2 ms with the following custom functions.
+        bool isProRes422 = srcFrame->format == AV_PIX_FMT_P210LE
+                           && dstFrame->format == AV_PIX_FMT_YUV422P16LE;
+        bool isProRes4444 = srcFrame->format == AV_PIX_FMT_P416LE
+                            && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
+
+        if ((isProRes422 || isProRes4444))
+        {
+            const uint16_t* srcY =
+                reinterpret_cast<const uint16_t*>(srcFrame->data[0]);
+            const uint16_t* srcCbCr =
+                reinterpret_cast<const uint16_t*>(srcFrame->data[1]);
+
+            const size_t srcStrideY = srcFrame->linesize[0];
+            const size_t srcStrideCbCr = srcFrame->linesize[1];
+
+            uint16_t* dstY = reinterpret_cast<uint16_t*>(dstFrame->data[0]);
+            uint16_t* dstCb = reinterpret_cast<uint16_t*>(dstFrame->data[1]);
+            uint16_t* dstCr = reinterpret_cast<uint16_t*>(dstFrame->data[2]);
+
+            const size_t dstStrideY = dstFrame->linesize[0];
+            const size_t dstStrideCb = dstFrame->linesize[1];
+            const size_t dstStrideCr = dstFrame->linesize[2];
+
+            if (isProRes422)
+            {
+                planarP210_to_planarYUV422P16(
+                    width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
+                    dstY, dstCb, dstCr, dstStrideY, dstStrideCb, dstStrideCr);
+
+                return;
+            }
+
+            if (isProRes4444)
+            {
+                planarP416_to_planarYUV444P16(
+                    width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
+                    dstY, dstCb, dstCr, dstStrideY, dstStrideCb, dstStrideCr);
+
+                return;
+            }
+        }
+#endif
+
+        // Reuse or allocate a new image conversion context
+        // Note: If track->imgConvertContext is NULL, sws_getCachedContext
+        // just calls sws_getContext() to get a new context. Otherwise, it
+        // checks if the parameters are the ones already saved in context.
+        // If that is the case, it returns the current context. Otherwise,
+        // it frees context and gets a new context with the new parameters.
+        imgConvertContext = sws_getCachedContext(
+            imgConvertContext, width, height,
+            static_cast<AVPixelFormat>(srcFrame->format), width, height,
+            static_cast<AVPixelFormat>(dstFrame->format), SWS_BICUBIC, 0, 0, 0);
+        if (imgConvertContext == nullptr)
+        {
+            throw std::runtime_error("Can't initialize conversion context");
+        }
+
+        sws_scale(imgConvertContext,
+                  static_cast<const uint8_t* const*>(srcFrame->data),
+                  static_cast<const int*>(srcFrame->linesize), 0 /*srcSliceY*/,
+                  height, static_cast<uint8_t* const*>(dstFrame->data),
+                  static_cast<const int*>(dstFrame->linesize));
+    }
+
     ChannelsVector MovieFFMpegReader::idAudioChannels(AVChannelLayout layout,
                                                       int numChannels)
     {
@@ -3745,11 +3870,8 @@ namespace TwkMovie
         // outFrame          - AVFrame linked to output FrameBuffer to copy into
         //
 
-        AVFrame* outFrame = nullptr;
         AVFrame* softwareFrame = nullptr;
-        outFrame = av_frame_alloc();
-        softwareFrame = av_frame_alloc();
-        AVFrame* tempFrame = nullptr;
+        AVFrame* videoFrame = nullptr;
         int result = 0;
 
         HardwareContext* hardwareContext =
@@ -3762,6 +3884,7 @@ namespace TwkMovie
             if (track->videoFrame->format == hardwarePixelFormat)
             {
                 // retrieve data from GPU to CPU
+                softwareFrame = av_frame_alloc();
                 result = av_hwframe_transfer_data(softwareFrame,
                                                   track->videoFrame, 0);
                 if (result < 0)
@@ -3769,12 +3892,12 @@ namespace TwkMovie
                     std::cerr
                         << "ERROR: Failed to transfer data to system memory\n";
                 }
-                tempFrame = softwareFrame;
+                videoFrame = softwareFrame;
             }
         }
         else
         {
-            tempFrame = track->videoFrame;
+            videoFrame = track->videoFrame;
         }
 
         //
@@ -3785,7 +3908,9 @@ namespace TwkMovie
         // needs conversion.
         //
 
+        AVFrame* outFrame = av_frame_alloc();
         AVPixelFormat nativeFormat = videoCodecContext->sw_pix_fmt;
+        outFrame->format = nativeFormat;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         int numPlanes = 0;
@@ -3798,7 +3923,7 @@ namespace TwkMovie
         FrameBuffer::StringVector chans(3);
         FrameBuffer* out = 0;
         av_image_fill_arrays(outFrame->data, outFrame->linesize, nullptr,
-                             nativeFormat, width, height, 1);
+                             nativeFormat, width, height, 1 /*align*/);
 
         // Note: We're about to use offset_plus1 here to derive the RGB channel
         // ordering. Here is the definition of offset_plus1 according to the
@@ -3845,6 +3970,7 @@ namespace TwkMovie
             break;
         default:
             nativeFormat = getBestRVFormat(nativeFormat);
+            outFrame->format = nativeFormat;
             if (isPlanar && !isRGB)
             {
                 convertFormat = (bitSize != 8);
@@ -3877,39 +4003,18 @@ namespace TwkMovie
             outFrame->data[p] = fb->pixels<unsigned char>();
         }
 
-        if (convertFormat)
-        {
-            DBL(DB_VIDEO, "Converting video format");
+#if DB_TIMING & DB_LEVEL
+        m_timingDetails->startTimer("copyFrame");
+#endif
 
-            // Reuse or allocate a new image conversion context
-            AVPixelFormat original = videoCodecContext->sw_pix_fmt;
-            AVPixelFormat conv = getBestRVFormat(original);
-            HOP_PROF("sws_getCachedContext()");
-            // Note: If track->imgConvertContext is NULL, sws_getCachedContext
-            // just calls sws_getContext() to get a new context. Otherwise, it
-            // checks if the parameters are the ones already saved in context.
-            // If that is the case, it returns the current context. Otherwise,
-            // it frees context and gets a new context with the new parameters.
-            track->imgConvertContext = sws_getCachedContext(
-                track->imgConvertContext, width, height,
-                static_cast<AVPixelFormat>(tempFrame->format), width, height,
-                conv, SWS_BICUBIC, 0, 0, 0);
-            if (track->imgConvertContext == 0)
-            {
-                TWK_THROW_EXC_STREAM("Can't initialize conversion context!");
-            }
+        // Copy decoded video frame to output frame
+        copyFrame(videoFrame, outFrame, width, height, convertFormat,
+                  track->imgConvertContext);
 
-            HOP_PROF("sws_scale()");
-            sws_scale(track->imgConvertContext, tempFrame->data,
-                      tempFrame->linesize, 0, height, outFrame->data,
-                      outFrame->linesize);
-        }
-        else
-        {
-            av_image_copy(outFrame->data, outFrame->linesize,
-                          track->videoFrame->data, track->videoFrame->linesize,
-                          videoCodecContext->pix_fmt, width, height);
-        }
+#if DB_TIMING & DB_LEVEL
+        double duration = m_timingDetails->pauseTimer("copyFrame");
+        DBL(DB_TIMING, "frame: " << inframe << " copyFrame: " << duration);
+#endif
 
         // Clean up
         av_frame_free(&outFrame);
