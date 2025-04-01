@@ -370,8 +370,6 @@ namespace Rv
 
     void GLView::paintGL()
     {
-        TWK_GLDEBUG_CTXNAME("GLVIEW");
-
         TWK_GLDEBUG;
 
         IPCore::Session* session = m_doc->session();

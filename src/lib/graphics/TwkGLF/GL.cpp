@@ -15,28 +15,9 @@ using namespace std;
 namespace
 {
 
-    static std::string_view shorterPath(std::string_view path)
-    {
-        const bool veryshort = true;
+    // #define TRACK_GL_CONTEXT
 
-        if (veryshort)
-        {
-            size_t pos = path.rfind('/');
-            if (pos != std::string_view::npos)
-            {
-                std::string_view result = path.substr(pos + 1);
-                return result;
-            }
-        }
-        else
-        {
-            size_t pos = path.find("/src/");
-            if (pos != std::string_view::npos)
-                return path.substr(pos);
-        }
-
-        return path;
-    }
+#ifdef TRACK_GL_CONTEXT
 
 #define DECLARE_VAR(typ, var, def) \
     typ m_prev##var = def;         \
@@ -161,6 +142,32 @@ namespace
         QOpenGLContext* m_currContext = nullptr;
     };
 
+    static GLMultiContextStateTracker s_multiTracker;
+#endif // TRACK_GL_CONTEXT
+
+    static std::string_view shorterPath(std::string_view path)
+    {
+        const bool veryshort = true;
+
+        if (veryshort)
+        {
+            size_t pos = path.rfind('/');
+            if (pos != std::string_view::npos)
+            {
+                std::string_view result = path.substr(pos + 1);
+                return result;
+            }
+        }
+        else
+        {
+            size_t pos = path.find("/src/");
+            if (pos != std::string_view::npos)
+                return path.substr(pos);
+        }
+
+        return path;
+    }
+
     struct token_string
     {
         GLuint Token;
@@ -210,13 +217,6 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
-static GLMultiContextStateTracker s_multiTracker;
-
-void twkGlSetContextName(std::string_view name)
-{
-    s_multiTracker.setCurrentContextName(name);
-}
-
 bool twkGlPrintError(std::string_view file, std::string_view function,
                      const int line, const std::string_view msg)
 {
@@ -229,7 +229,10 @@ bool twkGlPrintError(std::string_view file, std::string_view function,
 
     // Track OpenGL context updates.
     // Enable the line below to track what's going on with current contexts and
-    // current FBOs. s_multiTracker.update(file, function, line);
+    // current FBOs.
+#ifdef TRACK_GL_CONTEXT
+    s_multiTracker.update(file, function, line);
+#endif
 }
 
 bool glSupportsExtension(const char* extstring)

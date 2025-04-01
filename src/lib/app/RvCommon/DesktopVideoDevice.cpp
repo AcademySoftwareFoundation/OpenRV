@@ -152,9 +152,6 @@ namespace Rv
         // and height() on the videodevice, which in turn queries the view.
         const GLFBO* svDestFbo = m_viewDevice->defaultFBO();
 
-        std::cerr << " copyFBO " << svSourceFbo->fboID() << " to "
-                  << svDestFbo->fboID() << std::endl;
-
         // Copy the FBO (first time = black) into the FBO of the QOpenGLWidget.
         svSourceFbo->copyTo(svDestFbo);
 
