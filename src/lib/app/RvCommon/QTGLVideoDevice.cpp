@@ -194,7 +194,6 @@ namespace Rv
         {
             makeCurrent();
             m_view->context()->swapBuffers(m_view->context()->surface());
-            // PB: Yuck
         }
     }
 

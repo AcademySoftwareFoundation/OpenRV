@@ -114,8 +114,6 @@ namespace Rv
 
         //        sourceFbo->debugSaveFramebuffer();
 
-        TRACE_SCOPE("DesktopVideoDevice::transfer");
-
         // viewDevice->fboID will eventuall retrieve the ScreenView's FBO id.
         // But if was never shown/painted yet, then it will be 0.
         // If that's the case then nothing to do for now. Let's defer this to
@@ -886,8 +884,6 @@ namespace Rv
 
     void DesktopVideoDevice::ScreenView::initializeGL()
     {
-        TRACE_SCOPE("ScreenView::initializeGL")
-
         QOpenGLWidget::initializeGL();
 
         if (m_glViewShare && context() && context()->isValid())

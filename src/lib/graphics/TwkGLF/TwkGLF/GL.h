@@ -100,19 +100,11 @@ struct GLPushMatrix
 //
 
 #ifdef NDEBUG
+
 #define TWK_GLDEBUG ;
 #define TWK_GLDEBUG_CTXNAME(name) ;
+#define TRACE_SCOPE(m) ;
 #else
-bool twkGlPrintError(std::string_view file, std::string_view function,
-                     const int line, std::string_view msg);
-void twkGlSetContextName(std::string_view);
-
-#define TWK_GLDEBUG twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
-#define TWK_GLDEBUG_MSG(msg) \
-    twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, msg);
-#define TWK_GLDEBUG_CTXNAME(name) twkGlSetContextName(name);
-#endif
-
 class TraceScope
 {
 public:
@@ -129,6 +121,17 @@ public:
 };
 
 #define TRACE_SCOPE(m) TraceScope __ts(m);
+
+bool twkGlPrintError(std::string_view file, std::string_view function,
+                     const int line, std::string_view msg);
+void twkGlSetContextName(std::string_view);
+
+#define TWK_GLDEBUG twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
+#define TWK_GLDEBUG_MSG(msg) \
+    twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, msg);
+#define TWK_GLDEBUG_CTXNAME(name) twkGlSetContextName(name);
+#define TRACE_SCOPE(m) TraceScope __ts(m);
+#endif
 
 //----------------------------------------------------------------------
 //

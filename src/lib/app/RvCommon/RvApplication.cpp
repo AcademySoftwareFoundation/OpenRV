@@ -1738,8 +1738,6 @@ namespace Rv
                         TWK_GLDEBUG;
                         d->open(vargs);
                         TWK_GLDEBUG;
-                        rvDoc->view()->videoDevice()->makeCurrent();
-                        TWK_GLDEBUG;
                     }
 
                     try

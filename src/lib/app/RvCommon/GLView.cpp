@@ -372,8 +372,6 @@ namespace Rv
     {
         TWK_GLDEBUG_CTXNAME("GLVIEW");
 
-        TRACE_SCOPE("GLView::paintGL")
-
         TWK_GLDEBUG;
 
         IPCore::Session* session = m_doc->session();

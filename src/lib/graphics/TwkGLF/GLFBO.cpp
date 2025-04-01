@@ -13,20 +13,8 @@
 
 #include <QOpenGLContext>
 #include <QImage>
+
 /// #define NDEBUG
-
-/*
-#define FBO_MSG(msg)                                                 \
-    {                                                                \
-        std::cerr << "   GLFBO: " << fboID() << " : " << msg            \
-                  << (m_ownsFBOHandle ? "" : " (Ext)") << std::endl; \
-        TWK_GLDEBUG;                                                 \
-    }
-*/
-
-#define FBO_MSG(msg)
-
-#define glf QOpenGLContext::currentContext()->functions()
 
 namespace TwkGLF
 {
@@ -54,7 +42,6 @@ namespace TwkGLF
 
         TWK_GLDEBUG;
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_id);
-        FBO_MSG("new fbo");
         TWK_GLDEBUG;
     }
 
@@ -85,8 +72,6 @@ namespace TwkGLF
         //
 
         TWK_GLDEBUG;
-
-        FBO_MSG("using external");
 
         const TwkApp::VideoDevice::DataFormat& df =
             d->dataFormatAtIndex(d->currentDataFormat());
@@ -500,8 +485,6 @@ namespace TwkGLF
 
     void GLFBO::bind(GLenum kind) const
     {
-        FBO_MSG("binding");
-
         waitForExternalReadback();
         glBindFramebufferEXT(kind, fboID());
         TWK_GLDEBUG;
