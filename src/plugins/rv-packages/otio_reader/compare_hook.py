@@ -12,35 +12,9 @@ def hook_function(
 
     match (compare_mode):
         case "side_by_side":
-            orientation = in_timeline.side_by_side["orientation"]
-            gap = in_timeline.side_by_side["gap"]
-
-            all_nodes = commands.nodes()
-            layout_node = [
-                node for node in all_nodes if commands.nodeType(node) == "RVLayoutGroup"
-            ][0]
-
-            if is_swapped:
-                layout_inputs = commands.nodeConnections(layout_node)[0]
-
-                if (
-                    len(layout_inputs) == 2
-                ):  # If we are loading the OTIO Timeline for the first time
-                    layout_inputs[0], layout_inputs[1] = (
-                        layout_inputs[1],
-                        layout_inputs[0],
-                    )
-                    layout_inputs = list(dict.fromkeys(layout_inputs))
-                    commands.setNodeInputs(layout_node, layout_inputs)
-                else:  # If we are only reloading a Compare Clip, swapping should be done in the Live Review plugin directly
-                    pass
-
-            if orientation == "horizontal":
-                commands.setStringProperty(f"{layout_node}.layout.mode", ["row"])
-            else:
-                commands.setStringProperty(f"{layout_node}.layout.mode", ["column"])
-
-            commands.setViewNode(layout_node)
+            # Only the bounds need to be handled for this mode, and this is done in
+            # the Live Review plugin, so nothing to do here
+            pass
 
         case "over_with_opacity":
             opacity = in_timeline.over_with_opacity["opacity"]
@@ -61,8 +35,6 @@ def hook_function(
                     "inputOpacities": 1 - opacity if is_swapped else opacity,
                 },
             )
-
-            commands.setViewNode(stack_group)
 
         case "difference":
             offset = in_timeline.difference["offset"]
@@ -95,14 +67,8 @@ def hook_function(
             angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
             pivot = in_timeline.angular_mask["pivot"]
 
-            # If the Compare clip is inside a track (e.g. when joining a session),
-            # pivot is unexpectedly converted to a Box2d
-            if isinstance(pivot, otio.schema.Box2d):
-                pivot_x = (pivot.min.x + pivot.max.x) / 2
-                pivot_y = (pivot.min.y + pivot.max.y) / 2
-            elif isinstance(pivot, otio.schema.V2d):
-                pivot_x = pivot.x
-                pivot_y = pivot.y
+            pivot_x = pivot.x
+            pivot_y = pivot.y
 
             source = argument_map["src"]
             transform = extra_commands.associatedNode("RVTransform2D", source)
@@ -173,5 +139,3 @@ def hook_function(
                     "inputReverseAngularMask": [is_swapped],
                 },
             )
-
-            commands.setViewNode(stack_group)
