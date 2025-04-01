@@ -549,6 +549,11 @@ jobs:
             ./_build/_deps
           key: windows-dependencies
 
+      - name: Check CMake Version
+        run: |
+          cmake --version
+        shell: msys2 {0}
+
       - name: Configure OpenRV
         run: |
           export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
