@@ -108,7 +108,7 @@ You must install Python 3.10 using the official Python installer. The latest ver
 On the [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
 the correct version will be **Windows installer (64-bit)**.
 
-### 3.2 VFX Reference Platform 2023
+### 3.2 VFX Reference Platform 2024
 Same as VFX 2023 but download and install the latest [Python 3.11 with binaries](https://www.python.org/downloads/release/python-3119/).
 
 ### 3.3 Installation
