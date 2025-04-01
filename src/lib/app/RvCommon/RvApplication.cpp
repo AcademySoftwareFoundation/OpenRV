@@ -1734,13 +1734,13 @@ namespace Rv
                         algorithm::split(vargs, optionArgs,
                                          is_any_of(string(" \t\n\r")),
                                          token_compress_on);
-                        d->open(vargs);
-                    }
 
-#ifdef PLATFORM_DARWIN
-                    // cout << "INFO: disabling double buffer in controller" <<
-                    // endl; rvDoc->setDoubleBuffer(false);
-#endif
+                        TWK_GLDEBUG;
+                        d->open(vargs);
+                        TWK_GLDEBUG;
+                        rvDoc->view()->videoDevice()->makeCurrent();
+                        TWK_GLDEBUG;
+                    }
 
                     try
                     {

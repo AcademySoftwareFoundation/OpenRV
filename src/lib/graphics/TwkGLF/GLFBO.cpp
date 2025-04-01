@@ -12,16 +12,19 @@
 #include <TwkUtil/sgcHopTools.h>
 
 #include <QOpenGLContext>
+#include <QImage>
 /// #define NDEBUG
 
+/*
 #define FBO_MSG(msg)                                                 \
     {                                                                \
-        std::cerr << "   GLFBO: " << m_id << " : " << msg            \
+        std::cerr << "   GLFBO: " << fboID() << " : " << msg            \
                   << (m_ownsFBOHandle ? "" : " (Ext)") << std::endl; \
         TWK_GLDEBUG;                                                 \
     }
+*/
 
-// #define FBO_MSG(msg)
+#define FBO_MSG(msg)
 
 #define glf QOpenGLContext::currentContext()->functions()
 
@@ -47,10 +50,6 @@ namespace TwkGLF
     {
         TWK_GLDEBUG;
 
-        // NOTE_QT: My thinking was to use
-        // QOpenGLContext::currentContext()->defaultFramebufferObject(), but we
-        // get
-        //          a black screen by using it. Do we need more code?
         glGenFramebuffersEXT(1, &m_id);
 
         TWK_GLDEBUG;
@@ -59,8 +58,8 @@ namespace TwkGLF
         TWK_GLDEBUG;
     }
 
-    GLFBO::GLFBO(const GLVideoDevice* d, GLuint fboID)
-        : m_id(fboID)
+    GLFBO::GLFBO(const GLVideoDevice* d)
+        : m_id(0)
         , m_width(0)
         , m_height(0)
         , m_samples(0)
@@ -75,20 +74,19 @@ namespace TwkGLF
         , m_mappedBuffer(0)
         , m_ownsFBOHandle(false)
     {
-
-        if (fboID == 0)
-        {
-            m_id = QOpenGLContext::currentContext()->defaultFramebufferObject();
-        }
+        //
+        // using this constructor, m_id is 0 and we use fboID to query the
+        // actual ID of the fbo bound to the device/screen/widget.
+        //
+        // Same situations with the following functions:
+        //     width(), height() and samples() which are delegated to the
+        //     attached
+        // videodevice/view, so thats why the data members are also set to 0.
+        //
 
         TWK_GLDEBUG;
 
         FBO_MSG("using external");
-
-        if (m_id == 0)
-        {
-            FBO_MSG("USING EXT FBO 0");
-        }
 
         const TwkApp::VideoDevice::DataFormat& df =
             d->dataFormatAtIndex(d->currentDataFormat());
@@ -151,6 +149,17 @@ namespace TwkGLF
         ostringstream o;
         o << "fbo" << m_id;
         return o.str();
+    }
+
+    GLuint GLFBO::fboID() const
+    {
+        if (m_id && m_ownsFBOHandle)
+            return m_id;
+
+        if (m_device)
+            return m_device->fboID();
+
+        return m_id; // aka should be 0
     }
 
     size_t GLFBO::width() const
@@ -494,7 +503,7 @@ namespace TwkGLF
         FBO_MSG("binding");
 
         waitForExternalReadback();
-        glBindFramebufferEXT(kind, m_id);
+        glBindFramebufferEXT(kind, fboID());
         TWK_GLDEBUG;
     }
 
@@ -541,6 +550,19 @@ namespace TwkGLF
         TWK_GLDEBUG;
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
         TWK_GLDEBUG;
+    }
+
+    void GLFBO::debugSaveFramebuffer() const
+    {
+        size_t w = width();
+        size_t h = height();
+        QImage image(w, h, QImage::Format_RGBA8888);
+
+        bind(GL_READ_FRAMEBUFFER);
+
+        glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+        // image.save("/Users/pbergeron/fbo.png");
     }
 
     void GLFBO::copyTo(const GLFBO* destinationGLFBO, GLenum mask,

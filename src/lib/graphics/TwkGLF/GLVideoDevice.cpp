@@ -104,14 +104,14 @@ namespace TwkGLF
     GLFBO* GLVideoDevice::defaultFBO()
     {
         if (!m_fbo)
-            m_fbo = new GLFBO(this, 0);
+            m_fbo = new GLFBO(this);
         return m_fbo;
     }
 
     const GLFBO* GLVideoDevice::defaultFBO() const
     {
         if (!m_fbo)
-            m_fbo = new GLFBO(this, 0);
+            m_fbo = new GLFBO(this);
         return m_fbo;
     }
 

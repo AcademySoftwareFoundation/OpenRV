@@ -53,9 +53,7 @@ namespace Rv
             void paintGL() override;
 
         private:
-            QOpenGLWidget* m_glViewShare =
-                nullptr; // a pointer to the  GLView (rv's main view) to share
-                         // resources.
+            QOpenGLWidget* m_glViewShare = nullptr;
         };
 
     public:
@@ -163,9 +161,6 @@ namespace Rv
         virtual bool isDualStereo() const;
 
         // virtual bool willBlockOnTransfer() const;
-        virtual void bind(const TwkGLF::GLVideoDevice*) const;
-        virtual void bind2(const TwkGLF::GLVideoDevice*,
-                           const TwkGLF::GLVideoDevice*) const;
         virtual void transfer(const TwkGLF::GLFBO*) const;
         virtual void transfer2(const TwkGLF::GLFBO*,
                                const TwkGLF::GLFBO*) const;
@@ -203,9 +198,9 @@ namespace Rv
 
         //  From QTGLVideoDevice
 
-        void setWidget(QOpenGLWidget*);
+        void setViewWidget(QOpenGLWidget*);
 
-        QOpenGLWidget* widget() const { return m_view; }
+        QOpenGLWidget* viewWidget() const { return m_view; }
 
         virtual void makeCurrent() const;
 

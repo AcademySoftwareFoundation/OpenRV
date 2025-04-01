@@ -228,7 +228,8 @@ bool twkGlPrintError(std::string_view file, std::string_view function,
     }
 
     // Track OpenGL context updates.
-    s_multiTracker.update(file, function, line);
+    // Enable the line below to track what's going on with current contexts and
+    // current FBOs. s_multiTracker.update(file, function, line);
 }
 
 bool glSupportsExtension(const char* extstring)

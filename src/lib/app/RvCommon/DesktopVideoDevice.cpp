@@ -26,6 +26,8 @@
 
 #include <QOpenGLContext>
 
+// #define DEBUG_NO_FULLSCREEN
+
 namespace Rv
 {
 
@@ -36,7 +38,7 @@ namespace Rv
     DesktopVideoDevice::DesktopVideoDevice(VideoModule* m,
                                            const std::string& name, int screen,
                                            const QTGLVideoDevice* glViewShared)
-        : GLBindableVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
+        : GLBindableVideoDevice(m, name, ImageOutput | NormalizedCoordinates)
         , m_viewDevice(0)
         , m_share(glViewShared)
         , m_stereoMode(Mono)
@@ -106,102 +108,98 @@ namespace Rv
         ScopedLock lock(m_mutex);
     }
 
-    void DesktopVideoDevice::bind(const TwkGLF::GLVideoDevice* d) const
+    void DesktopVideoDevice::transfer(const GLFBO* sourceFbo) const
     {
         ScopedLock lock(m_mutex);
-        if (d)
-            d->makeCurrent();
-    }
 
-    void DesktopVideoDevice::bind2(const GLVideoDevice* d,
-                                   const GLVideoDevice* d2) const
-    {
-        ScopedLock lock(m_mutex);
-        if (d)
-            d->makeCurrent();
-    }
-
-    void DesktopVideoDevice::transfer(const GLFBO* fbo) const
-    {
-        ScopedLock lock(m_mutex);
+        //        sourceFbo->debugSaveFramebuffer();
 
         TRACE_SCOPE("DesktopVideoDevice::transfer");
 
-        GLFBO* local_fbo = m_fboMap[fbo];
-
-        m_viewDevice->makeCurrent();
-
-        // Grab the default FBO or in the case of QT, the FBO of the screen
-        // view) it's possible we end up here before the view (widget's first
-        // paint where the fbo is not yet created, if that happens we return and
-        // try later.
-        const GLFBO* defaultFBO = m_viewDevice->defaultFBO();
-        if (defaultFBO->fboID() == 0)
-        {
-            delete defaultFBO;
+        // viewDevice->fboID will eventuall retrieve the ScreenView's FBO id.
+        // But if was never shown/painted yet, then it will be 0.
+        // If that's the case then nothing to do for now. Let's defer this to
+        // later.
+        GLint svFboId = m_viewDevice->fboID();
+        if (svFboId == 0)
             return;
-        }
 
-        if (!local_fbo)
+        // Switch to the ScreenView's OpenGL context.
+        m_viewDevice->makeCurrent(); // calls screenview's makeCurrent, sets the
+                                     // font current, etc etc.
+
+        // Next, because we can't blit from FBOs belonging to different
+        // contexts, check to see if we already have an clone of the source FBO
+        // associated to the view's context.
+        GLFBO* svSourceFbo = m_fboMap[sourceFbo];
+        if (!svSourceFbo)
         {
-            // Create a GLFBO in the context of the viewDevice's context.
-            local_fbo = new GLFBO(fbo->width(), fbo->height(),
-                                  fbo->primaryColorFormat());
-            local_fbo->attachColorTexture(fbo->colorTarget(0), fbo->colorID(0));
-            m_fboMap[fbo] = local_fbo;
+            // We don't yet have a clone of the source FBO living in the context
+            // of the ScreenView. Therefore, we now create this new clone FBO
+            // with the dimensions/format as the source.
+            // Afterwards, associate the source FBO's color attachment to the
+            // clone's color attachment, because color attachments *can* be
+            // shared for the blit operation
+            svSourceFbo = new GLFBO(sourceFbo->width(), sourceFbo->height(),
+                                    sourceFbo->primaryColorFormat());
+
+            svSourceFbo->attachColorTexture(
+                sourceFbo->colorTarget(0),
+                sourceFbo->colorID(0)); // PB: What's colorId ?
+            m_fboMap[sourceFbo] = svSourceFbo;
         }
 
-        std::cerr << " copyFBO " << local_fbo->fboID() << " to "
-                  << defaultFBO->fboID() << std::endl;
+        // Finally, create a temporary GLFBO with the ID of the ScreenView's FBO
+        // so that we can blit to it.  BTW, the copyTo() call queries width()
+        // and height() on the videodevice, which in turn queries the view.
+        const GLFBO* svDestFbo = m_viewDevice->defaultFBO();
+
+        std::cerr << " copyFBO " << svSourceFbo->fboID() << " to "
+                  << svDestFbo->fboID() << std::endl;
 
         // Copy the FBO (first time = black) into the FBO of the QOpenGLWidget.
-        local_fbo->copyTo(defaultFBO);
-        local_fbo->unbind();
+        svSourceFbo->copyTo(svDestFbo);
+
+        // Note: do not delete svDestFBO because it's an internal data member of
+        // m_viewDevice
+
+        // Note: Upon existing from here, the caller will restore the correct
+        // current context.
     }
 
     void DesktopVideoDevice::open(const StringVector& args)
     {
-        //
-        //  always make the fullscreen device synced
-        //
-
-        // NOTE_QT: QSurfaceFormat replace QGLFormat.
         TWK_GLDEBUG;
 
         QSurfaceFormat fmt = shareDevice()->widget()->format();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
-        ScreenView* s =
+
+        ScreenView* vw =
             new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
-        setWidget(s);
+        setViewWidget(vw);
 
-        TWK_GLDEBUG;
-
-        auto viewDevice = new QTGLVideoDevice(0, "local view", s);
-        setViewDevice(viewDevice);
-
-        TWK_GLDEBUG;
+        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
+        setViewDevice(vd);
 
         const QList<QScreen*> screens = QGuiApplication::screens();
         QRect g = screenGeometry();
-        widget()->move(g.x(), g.y());
-        widget()->setGeometry(g);
+        viewWidget()->move(g.x(), g.y());
+        viewWidget()->setGeometry(g);
 
         if (useFullScreen())
-            widget()->setWindowState(Qt::WindowFullScreen);
+            viewWidget()->setWindowState(Qt::WindowFullScreen);
         else
-            widget()->setWindowState(Qt::WindowNoState);
+            viewWidget()->setWindowState(Qt::WindowNoState);
 
         TWK_GLDEBUG;
 
-        widget()->show();
+        viewWidget()->setGeometry(g);
+
+        viewWidget()->show();
+        //        QCoreApplication::processEvents(); // force the window to
+        //        show. m_share->makeCurrent();
 
         TWK_GLDEBUG;
-
-#ifdef PLATFORM_WINDOWS
-        // Work around for QGLWidget::showFullScreen() windows specific issue
-        // introduced in Qt 5.15.3
-        widget()->setGeometry(g);
-#endif
     }
 
     void DesktopVideoDevice::close()
@@ -214,7 +212,7 @@ namespace Rv
         m_translator = 0;
     }
 
-    void DesktopVideoDevice::setWidget(QOpenGLWidget* widget)
+    void DesktopVideoDevice::setViewWidget(QOpenGLWidget* widget)
     {
         m_view = widget;
         m_translator = new QTTranslator(this, m_view);
@@ -878,8 +876,12 @@ namespace Rv
         : QOpenGLWidget(parent, flags)
     {
         m_glViewShare = glViewShare;
-
         setFormat(fmt);
+
+        // Important: set PartialUpdate, because otherwise
+        // before every call to paintGL Qt will call glClear(),
+        // thereby erasing the FBO we just transferred pixels to.
+        setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     }
 
     void DesktopVideoDevice::ScreenView::initializeGL()
@@ -896,19 +898,8 @@ namespace Rv
 
     void DesktopVideoDevice::ScreenView::paintGL()
     {
-        TRACE_SCOPE("ScreenView::paintGL")
-
-        TWK_GLDEBUG_CTXNAME("ScreenView");
-
-        TWK_GLDEBUG;
-
-        std::cerr
-            << "SCREENVIEW FBO "
-            << QOpenGLContext::currentContext()->defaultFramebufferObject()
-            << "WFBO:" << defaultFramebufferObject() << std::endl;
-        //            glClearColor(0, 1, 0, 1);
-        //            glClear(GL_COLOR_BUFFER_BIT);
-        TWK_GLDEBUG;
+        // This method is explicitely empty because this widget's FBO is
+        // written to by the transfer/transfer2() method
     }
 
     //----------------------------------------------------------------------
@@ -933,7 +924,7 @@ namespace Rv
         // in the no-fullscreen debug mode, use 800x600 resolution in a simple
         // window.
         int offset = 30;
-        g = QRect(g.x() + offset, g.y() + offset, 800, 600);
+        g = QRect(g.x() + offset, g.y() + offset, 1024, 768);
 #endif
         return g;
     }
