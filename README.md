@@ -140,6 +140,20 @@ Example:
 rvcfg -DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE="aac;hevc" -DRV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE="aac"
 ```
 
+##### Apple ProRes on Apple Silicon
+
+On Apple Silicon machines, Open RV supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default but can be controlled using the `-DRV_FFMPEG_USE_VIDEOTOOLBOX` option. Set this option to `ON` to enable or `OFF` to disable VideoToolbox hardware decoding.
+
+To enable decoding of ProRes media files, you must also specify the following option during the configuration step:
+
+```bash
+-DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE="prores"
+```
+
+Note that you should always have `-DRV_FFMPEG_USE_VIDEOTOOLBOX` enabled when decoding Apple ProRes videos on Apple Silicon machines. Failure to do so will result in performance issues and is not compliant with Apple's licensing requirements.
+
+**Important:** Before enabling ProRes decoding, you are required to obtain a proper license agreement from Apple by contacting [ProRes@apple.com](mailto:ProRes@apple.com).
+
 #### Manually
 
 ##### Windows
