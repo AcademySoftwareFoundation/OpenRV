@@ -247,6 +247,13 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
 ENDIF()
 
+# Change the condition to TRUE to be able to debug into FFmpeg.
+IF(FALSE)
+  LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-optimizations")
+  LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-debug=3")
+  LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-stripping")
+ENDIF()
+
 # Controls the EXTERNALPROJECT_ADD/BUILD_ALWAYS option
 SET(${_force_rebuild}
     FALSE
