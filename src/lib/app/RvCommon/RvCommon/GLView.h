@@ -20,7 +20,6 @@
 namespace Rv
 {
     class RvDocument;
-    class QTFrameBuffer;
     class QTGLVideoDevice;
 
     class GLView
@@ -45,7 +44,6 @@ namespace Rv
 
         void absolutePosition(int& x, int& y) const;
 
-        // QTFrameBuffer* frameBuffer() const { return m_frameBuffer; }
         QTGLVideoDevice* videoDevice() const { return m_videoDevice; }
 
         void stopProcessingEvents();
@@ -78,7 +76,6 @@ namespace Rv
 
     private:
         RvDocument* m_doc;
-        // QTFrameBuffer*   m_frameBuffer;
         boost::thread m_swapThread;
         QTGLVideoDevice* m_videoDevice;
         unsigned int m_lastKey;

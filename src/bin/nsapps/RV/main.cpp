@@ -275,6 +275,11 @@ int main(int argc, char* argv[])
     // removed if GLView is changed to inherit from QOpenGLWidget.
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
+    // Also use this attribute (this was also set for Windows and Linux 2 years
+    // ago) This is required for to use the Qt path for Desktop Presentation
+    // Device.
+    QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
+
     const bool noHighDPISupport = getenv("RV_QT_HDPI_SUPPORT") == nullptr;
     if (noHighDPISupport)
     {
@@ -410,7 +415,6 @@ int main(int argc, char* argv[])
     arguments.emplace_back(enableOverlayScrollbar);
     argc = static_cast<int>(arguments.size());
     argv = &arguments[0];
-    ;
 
     //
     //  Initialze IMF library for multi-threading

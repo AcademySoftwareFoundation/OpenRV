@@ -7,7 +7,11 @@
 //
 #include <RvCommon/CGDesktopVideoDevice.h>
 #include <OpenGL/OpenGL.h>
+#include <IOKit/IOKitLib.h>
 #include <IOKit/graphics/IOGraphicsLib.h>
+#include <IOKit/graphics/IOFramebufferShared.h>
+#include <IOKit/graphics/IOGraphicsInterface.h>
+
 #include <QuartzCore/CVDisplayLink.h>
 #include <IPCore/Session.h>
 
@@ -21,6 +25,12 @@ namespace Rv
 
     namespace
     {
+        static void KeyArrayCallback(const void* key, const void* value,
+                                     void* context)
+        {
+            CFMutableArrayRef langKeys = (CFMutableArrayRef)context;
+            CFArrayAppendValue(langKeys, key);
+        }
 
         string tostring(CFStringRef s)
         {
@@ -536,6 +546,93 @@ namespace Rv
         }
 
         return m_colorProfile;
+    }
+
+    std::vector<VideoDevice*> CGDesktopVideoDevice::createDesktopVideoDevices(
+        TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    {
+        std::vector<VideoDevice*> devices;
+
+        // this used to be in DesktopVideoModule.cpp but moved here
+        CGDirectDisplayID idArray[20];
+        uint32_t idNum;
+        CGGetOnlineDisplayList(20, idArray, &idNum);
+        // CGDirectDisplayID mainID = CGMainDisplayID();
+
+        for (size_t i = 0; i < idNum; i++)
+        {
+            CGDirectDisplayID aID = idArray[i];
+
+            CFStringRef localName = NULL;
+            io_connect_t displayPort = CGDisplayIOServicePort(aID);
+            CFDictionaryRef dict =
+                (CFDictionaryRef)IODisplayCreateInfoDictionary(
+                    displayPort, kIODisplayOnlyPreferredName);
+            CFDictionaryRef names = (CFDictionaryRef)CFDictionaryGetValue(
+                dict, CFSTR(kDisplayProductName));
+
+            if (names)
+            {
+                CFArrayRef langKeys = CFArrayCreateMutable(
+                    kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+                CFDictionaryApplyFunction(names, KeyArrayCallback,
+                                          (void*)langKeys);
+                CFArrayRef orderLangKeys =
+                    CFBundleCopyPreferredLocalizationsFromArray(langKeys);
+                CFRelease(langKeys);
+
+                if (orderLangKeys && CFArrayGetCount(orderLangKeys))
+                {
+                    CFStringRef langKey =
+                        (CFStringRef)CFArrayGetValueAtIndex(orderLangKeys, 0);
+                    localName =
+                        (CFStringRef)CFDictionaryGetValue(names, langKey);
+                    CFRetain(localName);
+                }
+
+                CFRelease(orderLangKeys);
+            }
+
+            //
+            //  Above process seems to fail to find the display name on some mac
+            //  minis, so invent a name if we didn't find one.
+            //
+
+            ostringstream nameStr;
+            const char* nameP = 0;
+            vector<char> localBuffer;
+
+            if (localName == NULL)
+            {
+                nameStr << "Display " << (i + 1);
+                nameP = nameStr.str().c_str();
+            }
+            else
+            {
+                localBuffer =
+                    vector<char>(CFStringGetLength(localName) * 4 + 1);
+
+                CFStringGetCString(localName, &localBuffer.front(),
+                                   localBuffer.size(), kCFStringEncodingUTF8);
+
+                nameP = &localBuffer.front();
+            }
+
+            //
+            //  In use of 'i' below, we're relying on the order of the devices
+            //  here being the same as in the objc [NSScreen screens] call, but
+            //  that
+            //  seems to be true.  The [NSScreen screens] call is used in Qt
+            //  core\ code to define Qt screens.
+            //
+            CGDesktopVideoDevice* sd =
+                new CGDesktopVideoDevice(module, nameP, aID, i, shareDevice);
+            devices.push_back(sd);
+
+            CFRelease(dict);
+        }
+
+        return devices;
     }
 
 } // namespace Rv

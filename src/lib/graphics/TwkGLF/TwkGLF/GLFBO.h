@@ -146,8 +146,6 @@ namespace TwkGLF
 
         void setData(void* d) { m_data = d; }
 
-        bool isDefaultFBO() const { return m_device != 0; }
-
         State state() const;
 
         const AttachmentVector& attachments() const { return m_attachments; }
@@ -162,7 +160,7 @@ namespace TwkGLF
         GLuint primaryColorTarget() const;
         GLuint primaryColorType() const;
 
-        GLuint fboID() const { return m_id; }
+        GLuint fboID() const;
 
         //
         //  Color Attachments. You can create one here which can be referred to
@@ -300,6 +298,7 @@ namespace TwkGLF
         size_t totalSizeInBytes() const { return m_totalSizeInBytes; }
 
         std::string identifier() const;
+        void debugSaveFramebuffer() const;
 
     protected:
         GLFBO() {}
