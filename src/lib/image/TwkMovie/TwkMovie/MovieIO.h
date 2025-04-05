@@ -11,7 +11,13 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
+#include <list>
 #include <algorithm>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
 #include <TwkMovie/Movie.h>
@@ -319,6 +325,61 @@ namespace TwkMovie
     class TWKMOVIE_EXPORT GenericIO
     {
     public:
+        class TWKMOVIE_EXPORT Preloader
+        {
+        public:
+            class TWKMOVIE_EXPORT Reader
+            {
+            public:
+                enum Status
+                {
+                    PENDING,
+                    LOADING,
+                    LOADED,
+                    LOADERROR
+                };
+
+                Reader(std::string_view fn);
+
+            public:
+                std::string m_filename;
+                Status m_status;
+                bool m_priority;
+                std::thread m_thread;
+                MovieReader* m_movieReader;
+            };
+
+        public:
+            Preloader();
+            ~Preloader();
+
+            void addReaders(const std::vector<std::string>& filenames);
+            MovieReader* getReader(const std::string_view filename);
+
+        private:
+            void finalizeCompletedThreads();
+            bool hasPendingReaders();
+
+            MovieReader* open(const std::string_view filename);
+            void workerThreadFunc();
+            void loaderThreadFunc(std::shared_ptr<Reader> reader);
+
+        private:
+            const size_t MAX_THREADS;
+            std::list<std::shared_ptr<Reader>>
+                m_readers; // container of movies to preload.
+
+            std::mutex
+                m_mutex; // mutex to control access to the m_readers variable.
+            std::condition_variable
+                m_cv; // condition variable for inter-thread notifications.
+            std::thread m_workerThread; // the main worker thread that waits for
+                                        // files to be added
+            int m_threadCount;          // number of actively loading readers
+            bool m_stopWorker; // control variable to exit the worker thread.
+        };
+
+    public:
         //
         //  Types
         //
@@ -467,6 +528,7 @@ namespace TwkMovie
         static Plugins* m_plugins;
         static bool m_loadedAll;
         static bool m_dnxhdDecodingAllowed;
+        static Preloader m_preloader;
     };
 
 } // namespace TwkMovie

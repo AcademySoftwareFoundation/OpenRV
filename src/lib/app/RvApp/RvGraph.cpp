@@ -49,6 +49,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include <QtCore/QObject>
 
@@ -272,6 +273,28 @@ namespace Rv
         return IPGraph::sparseContainer(node);
     }
 
+    void RvGraph::addSourceBegin()
+    {
+        int newFastAddSourceEnabled = ++m_fastAddSourceEnabled;
+
+        m_fastAddSourceChangedSignal(true, newFastAddSourceEnabled);
+    }
+
+    void RvGraph::addSourceEnd()
+    {
+        int newFastAddSourceEnabled = --m_fastAddSourceEnabled;
+
+        if (newFastAddSourceEnabled == 0)
+            connectNewSourcesToDefaultViews();
+
+        m_fastAddSourceChangedSignal(false, newFastAddSourceEnabled);
+    }
+
+    bool RvGraph::isFastAddSourceEnabled() const
+    {
+        return m_fastAddSourceEnabled > 0;
+    }
+
     SourceIPNode*
     RvGraph::addSource(const std::string& nodeType, const std::string& nodeName,
                        const std::string& mediaRepName,
@@ -286,6 +309,9 @@ namespace Rv
             std::string(std::string("RvGraph::addSource(nodeType=") + nodeType
                         + std::string(") ") + nodeName)
                 .c_str());
+
+        //        std::cerr << "Adding source " << nodeName << " / " <<
+        //        mediaRepName << std::endl;
 
         //
         //  Build the IP tree for this source. Make sure that the

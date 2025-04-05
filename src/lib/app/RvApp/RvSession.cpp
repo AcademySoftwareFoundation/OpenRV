@@ -334,6 +334,8 @@ namespace Rv
     {
         Session::render();
 
+        rvgraph().addSourceBegin();
+
         try
         {
             continueLoading();
@@ -346,6 +348,8 @@ namespace Rv
         {
             cerr << "ERROR: Unknown Exception" << endl;
         }
+
+        rvgraph().addSourceEnd();
     }
 
     void RvSession::applyRvSessionSpecificOptions()
