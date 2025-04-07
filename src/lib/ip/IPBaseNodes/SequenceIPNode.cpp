@@ -99,8 +99,8 @@ namespace IPCore
             "composite.inputAngularMaskAngleInRadians", 0.0f, nullptr, false);
         m_inputsAngularMaskActive =
             declareProperty<IntProperty>("composite.inputAngularMaskActive", 1);
-        m_inputsReverseAngularMask = declareProperty<IntProperty>(
-            "composite.inputReverseAngularMask", 1);
+        m_inputsReverseAngularMask =
+            declareProperty<IntProperty>("composite.swapAngularMaskInput", 1);
 
         // since they are per input, make sure the property containers are
         // emptied at creation time
