@@ -532,11 +532,11 @@ Information about how to create a working EDL can be found in the User's Manual.
 | mode.autoEDL | int | 1 | If non-0, automatically concatenate new sources to the existing EDL, otherwise do not modify the EDL |
 | composite.inputBlendModes | string | N | The compositing operation to perform per input. Possible blend modes are "over", "add", "difference", "-difference", and "replace" |
 | composite.inputOpacities | float | N | Per-input opacity to apply to the compositing operation |
+| composite.inputAngularMaskActive | int | 1 | If non-0, the angular mask is active. A value of 0 turns it off |
 | composite.inputAngularMaskPivotX | float | 1 | Value of the angular mask x-axis pivot |
 | composite.inputAngularMaskPivotY | float | 1 | Value of the angular mask y-axis pivot |
 | composite.inputAngularMaskAngleInRadians | float | 1 | Value of the angle used for the angular mask, in radians |
-| composite.inputAngularMaskActive | int | 1 | If non-0, the angular mask is active. A value of 0 turns it off |
-| composite.inputReverseAngularMask | int | 1 | If non-0, the reverse angular mask is active. A value of 0 turns it off |
+| composite.swapAngularMaskInputs | int | 1 | If non-0, the angular mask inputs are swapped. A value of 0 turns it off |
 
 ## RVSequenceGroup
 
