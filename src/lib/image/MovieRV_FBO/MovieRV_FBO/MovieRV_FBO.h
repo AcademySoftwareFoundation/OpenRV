@@ -66,11 +66,10 @@ namespace TwkFB
         //
         //  MovieReader API
         //
+        virtual void preloadOpen(const std::string& filename);
 
-        virtual void
-        open(const std::string& filename,
-             const TwkMovie::MovieInfo& as = TwkMovie::MovieInfo(),
-             const Movie::ReadRequest& request = Movie::ReadRequest());
+        virtual void postPreloadOpen(const TwkMovie::MovieInfo& info,
+                                     const Movie::ReadRequest& request);
 
         void open(Rv::RvSession*, const TwkMovie::MovieInfo& as,
                   TwkAudio::ChannelsVector audioChannels,

@@ -419,8 +419,16 @@ namespace TwkMovie
         return Message::parseMessage("app    ", &cout, m_buffer);
     }
 
-    void MovieSideCar::open(const string& filename, const MovieInfo& info,
-                            const Movie::ReadRequest& request)
+    void MovieSideCar::preloadOpen(const std::string& filename)
+    {
+        // there's lots of interprocess communication going on during the open
+        // process. let's not get into it, in separate threads, using the
+        // preloader for now. So just save the filename,
+        m_filename = filename;
+    }
+
+    void MovieSideCar::postPreloadOpen(const MovieInfo& as,
+                                       const Movie::ReadRequest& request)
     {
         Lock lock(m_mutex);
 
@@ -430,8 +438,6 @@ namespace TwkMovie
 
         ostringstream cname;
         ostringstream rname;
-
-        m_filename = filename;
 
         //
         //  Need to make semi-unique names for the queues.
@@ -536,7 +542,7 @@ namespace TwkMovie
         //  open it.
         //
 
-        sendCommand(Message::OpenForRead(), filename);
+        sendCommand(Message::OpenForRead(), m_filename);
 
         msg = waitForResponse();
         response = msg.first;

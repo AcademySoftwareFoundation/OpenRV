@@ -1191,10 +1191,23 @@ namespace TwkMovie
         return mov;
     }
 
-    void MovieFFMpegReader::open(const string& filename, const MovieInfo& info,
-                                 const Movie::ReadRequest& request)
+    void MovieFFMpegReader::preloadOpen(const std::string& filename)
     {
         m_filename = filename;
+
+        if (m_cloning)
+            return;
+
+        if (m_avFormatContext == 0)
+        {
+            openAVFormat(); // sets m_avFormatContext
+            findStreamInfo();
+        }
+    }
+
+    void MovieFFMpegReader::postPreloadOpen(const MovieInfo& info,
+                                            const ReadRequest& request)
+    {
         m_info = info;
         m_request = request;
 
@@ -2048,8 +2061,6 @@ namespace TwkMovie
 
     void MovieFFMpegReader::initializeAll()
     {
-        openAVFormat();
-
         //
         // For some formats the streams are not partially located at all. In
         // that case we need to find them first.

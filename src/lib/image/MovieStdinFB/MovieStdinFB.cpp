@@ -57,8 +57,14 @@ namespace TwkMovie
         mov->cacheFrames();
     }
 
-    void MovieStdinFB::open(const string& filename, const MovieInfo& info,
-                            const Movie::ReadRequest& request)
+    void MovieStdinFB::postPreloadOpen(const MovieInfo& info,
+                                       const Movie::ReadRequest& request)
+    {
+        // request and info were unused in open().
+        // Thus all of the work can be done in preloadOpen.
+    }
+
+    void MovieStdinFB::preloadOpen(const std::string& filename)
     {
         size_t len = filename.size();
 

@@ -67,12 +67,35 @@ def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object
     Returns the top level node created that represents this otio
     timeline.
     """
+
+    print(">>>> read_otio_string() start")
+    commands.startTimer()
     otio_obj = otio.adapters.read_from_string(otio_string)
     timeline = otio_obj["otio"]
+    commands.stopTimer()
+    print(
+        "   read_otio_string: adapters.read_from_string() "
+        + str(commands.elapsedTime())
+    )
 
     context = {"sg_url": host_prefix} if host_prefix else None
 
-    return create_rv_node_from_otio(timeline, context), timeline.global_start_time
+    commands.startTimer()
+    commands.addSourceBegin()
+    ret = create_rv_node_from_otio(timeline, context), timeline.global_start_time
+    commands.stopTimer()
+    print(
+        "   read_otio_string: root create_rv_node_from_otio() "
+        + str(commands.elapsedTime())
+    )
+
+    commands.startTimer()
+    commands.addSourceEnd()
+    commands.stopTimer()
+    print("   read_otio_string: addSourceEnd()" + str(commands.elapsedTime()))
+    print(">>>> read_otio_string() end")
+
+    return ret
 
 
 def read_otio_file(otio_file):
@@ -83,9 +106,29 @@ def read_otio_file(otio_file):
     Returns the top level node created that represents this otio
     timeline.
     """
+    print(">>>> read_otio_file() begin\n")
+    commands.startTimer()
+    commands.addSourceBegin()
     input_otio = otio.adapters.read_from_file(otio_file)
+    commands.stopTimer()
+    print("   read_otio_file: adapters.read_from_file() " + str(commands.elapsedTime()))
+
     context = {"otio_file": otio_file}
-    return create_rv_node_from_otio(input_otio, context)
+
+    commands.startTimer()
+    ret = create_rv_node_from_otio(input_otio, context)
+    commands.stopTimer()
+    print(
+        "   read_otio_file: root create_rv_node_from_otio() "
+        + str(commands.elapsedTime())
+    )
+
+    commands.startTime()
+    commands.addSourceEnd()
+    commands.stopTimer()
+    print("   read_otio_file end " + str(commands.elapsedTime()))
+
+    return ret
 
 
 def _run_hook(hook_name, otio_obj, context={}, optional=True):
@@ -108,6 +151,8 @@ def create_rv_node_from_otio(otio_obj, context=None):
         otio.schema.Transition: _create_transition,
         otio.schema.SerializableCollection: _create_collection,
     }
+
+    print(">>> create_rv_node_from_otio")
 
     if type(otio_obj) in WRITE_TYPE_MAP:
         process_schema = _run_hook(

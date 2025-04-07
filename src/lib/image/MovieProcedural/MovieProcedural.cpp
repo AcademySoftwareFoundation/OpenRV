@@ -54,11 +54,16 @@ namespace TwkMovie
 
     MovieProcedural::~MovieProcedural() {}
 
-    void MovieProcedural::open(const string& filename, const MovieInfo& info,
-                               const Movie::ReadRequest& request)
+    void MovieProcedural::preloadOpen(const std::string& filename)
     {
         m_filename = filename;
-        string description = basename(filename.substr(0, filename.size() - 10));
+    }
+
+    void MovieProcedural::postPreloadOpen(const MovieInfo& info,
+                                          const Movie::ReadRequest& request)
+    {
+        string description =
+            basename(m_filename.substr(0, m_filename.size() - 10));
 
         vector<string> tokens;
         algorithm::split(tokens, description, is_any_of(string(",")),

@@ -3006,7 +3006,7 @@ namespace IPCore
         }
 
         //
-        //  Look up a cach file for this in the MediaMetadata cache
+        //  Look up a cache file for this in the MediaMetadata cache
         //
 
         if (bundle->hasCacheItem("MediaMetadata", cacheItemString))

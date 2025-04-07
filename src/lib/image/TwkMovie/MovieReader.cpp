@@ -16,6 +16,13 @@ namespace TwkMovie
     {
     }
 
+    void MovieReader::open(const std::string& filename, const MovieInfo& info,
+                           const Movie::ReadRequest& request)
+    {
+        preloadOpen(filename);
+        postPreloadOpen(info, request);
+    }
+
     MovieReader::~MovieReader() {}
 
     Movie* MovieReader::clone() const { return 0; }

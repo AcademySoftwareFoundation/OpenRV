@@ -76,11 +76,10 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
+        virtual void preloadOpen(const std::string& filename);
 
-        virtual void
-        open(const std::string& filename,
-             const TwkMovie::MovieInfo& as = TwkMovie::MovieInfo(),
-             const Movie::ReadRequest& request = Movie::ReadRequest());
+        virtual void postPreloadOpen(const MovieInfo& as,
+                                     const ReadRequest& request);
 
         //
         //  Open from an existing Rv Session. If w and h are 0, the size

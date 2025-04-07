@@ -29,6 +29,12 @@
 #define strcasecmp _stricmp
 #endif
 
+// my daughter dared me to leave this comment here saying
+// the code reviewers will never spot it.
+//
+// "The unhappy potato wuz here!!! I will take revenge for
+//  my falled bretherens that were slayed into fries"
+
 namespace TwkMovie
 {
 
@@ -336,7 +342,8 @@ namespace TwkMovie
                     PENDING,
                     LOADING,
                     LOADED,
-                    LOADERROR
+                    LOADERROR,
+                    REMOVE
                 };
 
                 Reader(std::string_view fn);
@@ -353,14 +360,18 @@ namespace TwkMovie
             Preloader();
             ~Preloader();
 
+            void init();
+            void shutdown();
+
             void addReaders(const std::vector<std::string>& filenames);
-            MovieReader* getReader(const std::string_view filename);
+            MovieReader* getReader(const std::string_view filename,
+                                   const MovieInfo& mi,
+                                   Movie::ReadRequest& request);
 
         private:
             void finalizeCompletedThreads();
             bool hasPendingReaders();
 
-            MovieReader* open(const std::string_view filename);
             void workerThreadFunc();
             void loaderThreadFunc(std::shared_ptr<Reader> reader);
 
@@ -429,11 +440,21 @@ namespace TwkMovie
                                             const MovieInfo& mi,
                                             Movie::ReadRequest& request,
                                             bool tryBruteForce = true);
+
+        ///
+        ///  Same as above, except meant to be used by the loading
+        ///  thread func of the Preloader.
+        ///
+
+        static MovieReader* preloadOpenMovieReader(const std::string& filename,
+                                                   bool tryBruteForce = true);
         ///
         ///  Find appropriate plugin (based on extension) & write image
         ///  file.  If format is specified, it is used INSTEAD of filename
         ///  extension. Throws exception on error
         ///
+
+        static Preloader& getPreloader();
 
         static MovieWriter* movieWriter(const std::string& filename);
 

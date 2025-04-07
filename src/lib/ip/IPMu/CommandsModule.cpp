@@ -3908,7 +3908,7 @@ namespace IPMu
 
         IPNode* node = 0;
 
-        if (node = s->graph().findNode(name->c_str()))
+        if ((node = s->graph().findNode(name->c_str())))
         {
         }
         else
