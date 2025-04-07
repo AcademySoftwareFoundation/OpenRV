@@ -7,11 +7,10 @@
 //
 #ifndef __IPCore__ShaderCommon__h__
 #define __IPCore__ShaderCommon__h__
-#include "TwkMath/Vec2.h"
-#include <iostream>
 #include <IPCore/ShaderExpression.h>
 #include <IPCore/IPImage.h>
 #include <TwkMath/Mat44.h>
+#include <TwkMath/Vec2.h>
 
 namespace IPCore
 {

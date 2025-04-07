@@ -5,16 +5,15 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
-#include "IPCore/ShaderSymbol.h"
 #include <IPCore/ShaderProgram.h>
+#include <IPCore/ShaderSymbol.h>
 #include <IPCore/ShaderState.h>
 #include <IPCore/IPImage.h>
 #include <TwkGLF/GL.h>
 #include <TwkUtil/Timer.h>
-#include <assert.h>
+#include <cassert>
 #include <set>
 #include <sstream>
-#include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/functional/hash.hpp>
