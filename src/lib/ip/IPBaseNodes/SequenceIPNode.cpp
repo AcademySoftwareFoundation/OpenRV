@@ -6,8 +6,6 @@
 //
 //******************************************************************************
 
-#include "IPCore/ShaderCommon.h"
-#include "TwkMath/Vec2.h"
 #include <IPBaseNodes/SequenceIPNode.h>
 #include <IPCore/Exception.h>
 #include <IPBaseNodes/RetimeIPNode.h>
@@ -15,6 +13,8 @@
 #include <IPCore/IPGraph.h>
 #include <IPCore/ShaderUtil.h>
 #include <IPCore/GroupIPNode.h>
+#include <IPCore/ShaderCommon.h>
+#include <TwkMath/Vec2.h>
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/Operations.h>
 #include <iostream>
