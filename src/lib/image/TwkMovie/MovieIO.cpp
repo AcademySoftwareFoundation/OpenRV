@@ -795,8 +795,7 @@ namespace TwkMovie
                                      << basename(pio->pathToPlugin()) << endl;
                             }
 
-                            io = loadFromProxy(i);
-                            if (io)
+                            if ((io = loadFromProxy(i)))
                             {
                                 return io;
                             }
@@ -847,8 +846,7 @@ namespace TwkMovie
                                      << basename(pio->pathToPlugin()) << endl;
                             }
 
-                            io = loadFromProxy(i);
-                            if (io)
+                            if ((io = loadFromProxy(i)))
                             {
                                 ioSet.insert(io);
                             }
