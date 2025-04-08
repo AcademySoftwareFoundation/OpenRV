@@ -54,9 +54,11 @@ namespace TwkMovie
 
     MovieProcedural::~MovieProcedural() {}
 
-    void MovieProcedural::preloadOpen(const std::string& filename)
+    void MovieProcedural::preloadOpen(const std::string& filename,
+                                      const ReadRequest& request)
     {
         m_filename = filename;
+        m_request = request;
     }
 
     void MovieProcedural::postPreloadOpen(const MovieInfo& info,

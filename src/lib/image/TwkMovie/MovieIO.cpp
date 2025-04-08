@@ -59,7 +59,7 @@ namespace TwkMovie
     }
 
     GenericIO::Preloader::Preloader()
-        : MAX_THREADS(32)
+        : MAX_THREADS(64)
         , m_stopWorker(false)
         , m_threadCount(0)
     {
@@ -102,7 +102,8 @@ namespace TwkMovie
         for (auto& reader : m_readers)
         {
             if (reader->m_status == Reader::Status::LOADED
-                || reader->m_status == Reader::Status::LOADERROR)
+                || reader->m_status == Reader::Status::LOADERROR
+                || reader->m_status == Reader::Status::REMOVE)
             {
                 if (reader->m_thread.joinable())
                 {
@@ -124,16 +125,15 @@ namespace TwkMovie
         m_readers.erase(range, m_readers.end());
     }
 
-    void
-    GenericIO::Preloader::addReaders(const std::vector<std::string>& filenames)
+    void GenericIO::Preloader::addReader(const std::string_view filename,
+                                         const Movie::ReadRequest& request)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        bool added = false;
-        for (const auto& filename : filenames)
-        {
-            auto newReader = std::make_shared<Preloader::Reader>(filename);
-            m_readers.push_back(newReader);
-        }
+
+        auto newReader = std::make_shared<Preloader::Reader>(filename);
+        newReader->m_request = request;
+
+        m_readers.push_back(newReader);
 
         // Wke up the worker thread in order to process the
         // newly added readers.
@@ -222,7 +222,8 @@ namespace TwkMovie
             m_cv.notify_all();
 
             // Call the
-            movieReader->postPreloadOpen(info, request);
+            if (movieReader)
+                movieReader->postPreloadOpen(info, request);
 
             return movieReader;
         }
@@ -298,8 +299,8 @@ namespace TwkMovie
     {
         try
         {
-            reader->m_movieReader =
-                GenericIO::preloadOpenMovieReader(reader->m_filename, true);
+            reader->m_movieReader = GenericIO::preloadOpenMovieReader(
+                reader->m_filename, reader->m_request, true);
 
             if (reader->m_movieReader != nullptr)
                 reader->m_status = Reader::Status::LOADED;
@@ -998,7 +999,8 @@ namespace TwkMovie
         }
 
         MovieReader* preloadTryOpen(const MovieIO* io,
-                                    const std::string& filename)
+                                    const std::string& filename,
+                                    const Movie::ReadRequest& request)
         {
             //  cerr << "tryOpen '" << filename << "' with '" << io->about() <<
             //  "'" << endl;
@@ -1009,7 +1011,7 @@ namespace TwkMovie
                 try
                 {
                     io->setMovieAttributesOn(m);
-                    m->preloadOpen(filename);
+                    m->preloadOpen(filename, request);
                 }
                 catch (std::exception& exc)
                 {
@@ -1095,8 +1097,10 @@ namespace TwkMovie
 
     }; // namespace
 
-    MovieReader* GenericIO::preloadOpenMovieReader(const std::string& filename,
-                                                   bool tryBruteForce)
+    MovieReader*
+    GenericIO::preloadOpenMovieReader(const std::string& filename,
+                                      const Movie::ReadRequest& request,
+                                      bool tryBruteForce)
     {
         //
         // This method is really similar to openMoviePlayer, except that
@@ -1124,7 +1128,7 @@ namespace TwkMovie
             for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
                  ++mio)
             {
-                if ((m = preloadTryOpen(*mio, filename)))
+                if ((m = preloadTryOpen(*mio, filename, request)))
                     return m;
             }
         }
@@ -1134,7 +1138,7 @@ namespace TwkMovie
             for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
                  ++mio)
             {
-                if ((m = preloadTryOpen(*mio, filename)))
+                if ((m = preloadTryOpen(*mio, filename, request)))
                     return m;
             }
         }
@@ -1145,7 +1149,7 @@ namespace TwkMovie
                 || ((io = findByBruteForce(filename, image)))
                 || ((io = findByBruteForce(filename, audio))))
             {
-                if ((m = preloadTryOpen(io, filename)))
+                if ((m = preloadTryOpen(io, filename, request)))
                     return m;
             }
         }

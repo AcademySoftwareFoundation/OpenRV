@@ -88,7 +88,8 @@ namespace TwkMovie
         /// deals with the info and request (sync). The open() method, which is
         /// meant be called in sync mode, simply calls both in order.
         ///
-        virtual void preloadOpen(const std::string& filename) = 0;
+        virtual void preloadOpen(const std::string& filename,
+                                 const ReadRequest& request) = 0;
         virtual void
         postPreloadOpen(const MovieInfo& info = MovieInfo(),
                         const ReadRequest& request = ReadRequest()) = 0;

@@ -61,6 +61,7 @@
 #include <TwkMath/Iostream.h>
 #include <TwkMath/Math.h>
 #include <TwkMovie/Movie.h>
+#include <TwkMovie/MovieIO.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/FrameUtils.h>
 #include <TwkUtil/PathConform.h>
@@ -68,6 +69,7 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/Clock.h>
 #include <TwkUtil/EnvVar.h>
+#include <TwkMediaLibrary/Library.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -471,6 +473,8 @@ namespace Rv
         , m_tag(tg)
         , m_rexc("")
     {
+        std::vector<std::string> preloaderFiles;
+
         m_nPreexistingSources = m_session->sources().size();
 
         for (int q = 0; q < m_sav.size(); q++)
@@ -499,6 +503,22 @@ namespace Rv
                 {
                     string fullname = filename + "/" + "emptyDirectory";
                     inputPatterns.push_back(fullname);
+                }
+                else // not a directory, so it's a movie, add to preloader.
+                {
+                    // get the cookies and headers and updated media filename.
+                    std::deque<std::pair<std::string, std::string>>
+                        params; // cookies and headers
+
+                    std::string file =
+                        TwkMediaLibrary::lookupFilenameInMediaLibrary(filename,
+                                                                      params);
+
+                    Movie::ReadRequest request;
+                    std::copy(params.begin(), params.end(),
+                              back_inserter(request.parameters));
+
+                    GenericIO::getPreloader().addReader(file, request);
                 }
             }
 
@@ -2418,14 +2438,15 @@ namespace Rv
 
     void RvSession::postInitialize()
     {
-        if (Function* F = sessionFunction("initialize"))
+        Function* F;
+        if ((F = sessionFunction("initialize")))
         {
             makeActive();
             Context::ArgumentVector v;
             TypedValue tv =
                 TwkApp::muContext()->evalFunction(TwkApp::muProcess(), F, v);
 
-            if (m_data = (Object*)tv._value._Pointer)
+            if ((m_data = (Object*)tv._value._Pointer))
             {
                 m_data->retainExternal();
             }

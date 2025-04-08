@@ -139,9 +139,11 @@ namespace TwkMovie
         return success;
     }
 
-    void MovieFB::preloadOpen(const std::string& filename)
+    void MovieFB::preloadOpen(const std::string& filename,
+                              const ReadRequest& request)
     {
         m_filename = filename;
+        m_request = request;
     }
 
     void MovieFB::postPreloadOpen(const MovieInfo& info,

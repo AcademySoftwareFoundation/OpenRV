@@ -66,7 +66,8 @@ namespace TwkFB
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename);
+        virtual void preloadOpen(const std::string& filename,
+                                 const ReadRequest& request);
 
         virtual void postPreloadOpen(const TwkMovie::MovieInfo& info,
                                      const Movie::ReadRequest& request);

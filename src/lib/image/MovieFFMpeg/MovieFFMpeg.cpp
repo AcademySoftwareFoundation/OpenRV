@@ -1191,9 +1191,11 @@ namespace TwkMovie
         return mov;
     }
 
-    void MovieFFMpegReader::preloadOpen(const std::string& filename)
+    void MovieFFMpegReader::preloadOpen(const std::string& filename,
+                                        const ReadRequest& request)
     {
         m_filename = filename;
+        m_request = request;
 
         if (m_cloning)
             return;
@@ -1201,7 +1203,9 @@ namespace TwkMovie
         if (m_avFormatContext == 0)
         {
             openAVFormat(); // sets m_avFormatContext
-            findStreamInfo();
+            //            findStreamInfo(); // findStreamInfo is not thread
+            //            safe. damnit.
+            // https://stackoverflow.com/questions/15366441/ffmpeg-which-functions-are-multithreading-safe
         }
     }
 
@@ -2055,8 +2059,10 @@ namespace TwkMovie
 
         m_avFormatContext->probesize = TWK_AVFORMAT_PROBESIZE;
         if (avformat_find_stream_info(m_avFormatContext, 0) < 0)
+        {
             TWK_THROW_EXC_STREAM(
                 "Failed to open stream for reading: " << m_filename);
+        }
     }
 
     void MovieFFMpegReader::initializeAll()
@@ -4261,7 +4267,8 @@ namespace TwkMovie
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
             avCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
-            avCodecContext->thread_count = m_request.threads;
+            avCodecContext->thread_count =
+                m_request.threads; // never seems to be set anywhere?
             avCodecContext->width = m_info.width;
             avCodecContext->height = m_info.height;
             avCodecContext->color_primaries = AVCOL_PRI_BT709; // 1

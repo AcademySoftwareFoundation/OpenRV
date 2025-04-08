@@ -353,6 +353,7 @@ namespace TwkMovie
                 Status m_status;
                 bool m_priority;
                 std::thread m_thread;
+                Movie::ReadRequest m_request;
                 MovieReader* m_movieReader;
             };
 
@@ -363,7 +364,8 @@ namespace TwkMovie
             void init();
             void shutdown();
 
-            void addReaders(const std::vector<std::string>& filenames);
+            void addReader(const std::string_view filename,
+                           const Movie::ReadRequest& request);
             MovieReader* getReader(const std::string_view filename,
                                    const MovieInfo& mi,
                                    Movie::ReadRequest& request);
@@ -446,8 +448,10 @@ namespace TwkMovie
         ///  thread func of the Preloader.
         ///
 
-        static MovieReader* preloadOpenMovieReader(const std::string& filename,
-                                                   bool tryBruteForce = true);
+        static MovieReader*
+        preloadOpenMovieReader(const std::string& filename,
+                               const Movie::ReadRequest& request,
+                               bool tryBruteForce = true);
         ///
         ///  Find appropriate plugin (based on extension) & write image
         ///  file.  If format is specified, it is used INSTEAD of filename

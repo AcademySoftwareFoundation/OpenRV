@@ -419,12 +419,14 @@ namespace TwkMovie
         return Message::parseMessage("app    ", &cout, m_buffer);
     }
 
-    void MovieSideCar::preloadOpen(const std::string& filename)
+    void MovieSideCar::preloadOpen(const std::string& filename,
+                                   const ReadRequest& request)
     {
         // there's lots of interprocess communication going on during the open
         // process. let's not get into it, in separate threads, using the
         // preloader for now. So just save the filename,
         m_filename = filename;
+        m_request = request;
     }
 
     void MovieSideCar::postPreloadOpen(const MovieInfo& as,

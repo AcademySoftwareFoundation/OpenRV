@@ -113,7 +113,8 @@ namespace TwkFB
         TwkGLF::UninitPBOPools();
     }
 
-    void MovieRV::preloadOpen(const std::string& /*unused*/)
+    void MovieRV::preloadOpen(const std::string& /*unused*/,
+                              const ReadRequest& /*unused*/)
     {
         // nothing works for this
     }
