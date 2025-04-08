@@ -30,7 +30,7 @@ following command:
 git submodule update --init --recursive
 ```
 
-## Configuring Git to use the ignore file with `git blame`
+### Configuring Git to use the ignore file with `git blame`
 
 A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`, such as formatting commits. This allows you to use `git blame` without these commits cluttering the Git history. To configure Git to use this file when running `git blame`, use the following command:
 
@@ -64,11 +64,30 @@ the MACOSX_DEPLOYMENT_TARGET environment variable.
 
 ### Contributor setup
 
-This repository uses a pre-commit to execute formatting before a commit. To install the pre-commit hooks:
+This repository uses the `pre-commit` tool to execute formatting hooks before a commit. To install the pre-commit hooks, ensure that the packages in `requirements.txt` are installed, and then run the following command:
 
-```shell
+```bash
 pre-commit install
 ```
+
+#### Clang-tidy
+
+It is highly suggested to enable clang-tidy locally to lint the C++ code you plan to contribute to the project. A `.clang-tidy` configuration file is present at the root of the project to help standardize linting rules. While it is recommended to use clangd (which integrates clang-tidy), you can refer to the list of other well-known clang-tidy integrations [here](https://clang.llvm.org/extra/clang-tidy/Integrations.html). For more details on how to install everything you need for your IDE, please follow the steps outlined [here](https://clangd.llvm.org/installation).
+
+1. Install clangd with your package manager
+2. Install the clangd extension in your IDE
+    > **Note:** For VSCode users, after installing [vscode-clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd), you need to disable [Microsoft C/C++ extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) IntelliSense by adding `"C_Cpp.intelliSenseEngine": "disabled"` to your `settings.json`.
+3. Generate a `compile_commands.json` file with CMake during the [configure step](#configure)
+
+     ```shell
+    rvcfg -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+    ```
+
+4. Create a symlink to the `compile_commands.json` file in the root directory of the project so that `clangd` can locate it:
+
+    ```shell
+    ln -s _build/compile_commands.json compile_commands.json
+    ```
 
 ### Cleanup
 
