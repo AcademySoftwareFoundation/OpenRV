@@ -259,6 +259,18 @@ SET(${_force_rebuild}
     FALSE
 )
 
+IF(RV_TARGET_APPLE_ARM64)
+  SET(RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE
+      ON
+  )
+ELSE()
+  SET(RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE
+      OFF
+  )
+ENDIF()
+
+OPTION(RV_FFMPEG_USE_VIDEOTOOLBOX "FFmpeg laveraging the VideoToolbox framework" ${RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE})
+
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
 IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
