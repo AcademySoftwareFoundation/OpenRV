@@ -616,7 +616,7 @@ namespace Rv
             readSource(file, sargs, true, addLayer, m_loadState->tag(),
                        m_loadState->merge());
 
-            cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
+            // cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
         }
         catch (TwkExc::Exception& exc)
         {
@@ -4068,6 +4068,12 @@ namespace Rv
 
     void RvSession::findProperty(PropertyVector& props, const std::string& name)
     {
+        if (m_propertyCache.exists(name))
+        {
+            m_propertyCache.get(name, props);
+            return;
+        }
+
         StringVector parts;
         algorithm::split(parts, name, is_any_of(string(".")));
 
@@ -4085,6 +4091,16 @@ namespace Rv
         else
         {
             graph().findProperty(m_frame, props, name);
+        }
+
+        if (!props.empty())
+        {
+            m_propertyCache.set(name, props);
+        }
+        else
+        {
+            // std::cerr << "Property " << name << " doesn't exist" <<
+            // std::endl;
         }
     }
 

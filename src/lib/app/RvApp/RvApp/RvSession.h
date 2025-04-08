@@ -15,6 +15,8 @@
 #include <Mu/Value.h>
 #include <RvApp/Options.h>
 
+#include <unordered_map>
+
 namespace Mu
 {
     class CallEnvironment;
@@ -42,6 +44,51 @@ namespace Rv
 
     class RvSession : public IPCore::Session
     {
+    private:
+        class PropertyCache
+        {
+            //
+            // this cache is a prototype to eliminate post-loading
+            // time when loading playlists due to too many calls to
+            // findProperty() of the same name
+            // We save a bunch of seconds, but, it may be a bit unsafe.
+            // We didn't explore the consequences of this yet,
+            // so it's disabled by default.
+            //
+        public:
+            PropertyCache() {}
+
+            bool exists(const std::string& propName)
+            {
+                if (!m_enabled)
+                    return false;
+
+                return (m_propsCache.find(propName) != m_propsCache.end());
+            }
+
+            void get(const std::string& propName, PropertyVector& props)
+            {
+                if (!m_enabled)
+                    return;
+
+                props = m_propsCache[propName];
+            }
+
+            void set(const std::string& propName, const PropertyVector& props)
+            {
+                if (!m_enabled)
+                    return;
+
+                m_propsCache[propName] = props;
+            }
+
+            void clear() { m_propsCache.clear(); }
+
+        private:
+            std::unordered_map<std::string, PropertyVector> m_propsCache;
+            bool m_enabled = false;
+        };
+
     public:
         //
         //  Types
@@ -381,6 +428,8 @@ namespace Rv
         void onGraphNodeWillRemove(IPCore::IPNode* node);
 
     private:
+        PropertyCache m_propertyCache;
+
         Mu::Object* m_data;
         void* m_pydata;
         bool m_loadingError;
