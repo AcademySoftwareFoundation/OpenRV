@@ -2,12 +2,11 @@
 
 This chapter has a section for each type of node in RV's image processing graph. The properties and descriptions listed here are the default properties. Any top level node that can be seen in the session manager can have the “name” property of the “ui” component set in order to control how the node is listed.
 
-### RVCache
+## RVCache
 
 The RVCache node has no external properties.
 
-### RVCacheLUT and RVLookLUT
-
+## RVCacheLUT and RVLookLUT
 
 The RVCacheLUT is applied in software before the image is cached and before any software resolution and bit depth changes. The RVLookLUT is applied just before the display LUT but is per-source.
 
@@ -26,8 +25,7 @@ The RVCacheLUT is applied in software before the image is cached and before any 
 | lut:output.lut | float or half | div 3 | The resampled output LUT |
 | lut:output.prelut | float or half | div 3 | The resampled output pre-LUT |
 
-### RVCDL
-
+## RVCDL
 
 This node can be used to load CDL properties from CCC, CC, and CDL files on disk.
 
@@ -42,8 +40,7 @@ This node can be used to load CDL properties from CCC, CC, and CDL files on disk
 | node.saturation | float | 1 | Color Decision List saturation control |
 | node.noClamp | int | 1 | Set to 1 to remove clamping from CDL equations |
 
-### RVChannelMap
-
+## RVChannelMap
 
 This node can be used to remap channels that may have been labeled incorrectly.
 
@@ -51,8 +48,7 @@ This node can be used to remap channels that may have been labeled incorrectly.
 | --- | --- | --- | --- |
 | format.channels | string | >= 0 | An array of channel names. If the property is empty the image will pass though the node unchanged. Otherwise, only those channels appearing in the property array will be output. The channel order will be the same as the order in the property. |
 
-### RVColor
-
+## RVColor
 
 The color node has a large number of color controls. This node is usually evaluated on the GPU, except when normalize is 1. The CDL is applied after linearization and linear color changes.
 
@@ -79,8 +75,7 @@ The color node has a large number of color controls. This node is usually evalua
 | luminanceLUT:output.size | int | 1 | Output Luminance lut size |
 | luminanceLUT:output.lut | float | div 3 | Output resampled luminance LUT |
 
-### RVDispTransform2D
-
+## RVDispTransform2D
 
 This node is used to do any scaling or translating of the corresponding view group.
 
@@ -89,8 +84,7 @@ This node is used to do any scaling or translating of the corresponding view gro
 | transform.translate | float[2] | 1 | Viewing translation |
 | transform.scale | float[2] | 1 | Viewing scale |
 
-### RVDisplayColor
-
+## RVDisplayColor
 
 This node is used by default by any display group as part of its color management pipeline.
 
@@ -117,13 +111,11 @@ This node is used by default by any display group as part of its color managemen
 | lut:output.lut | float or half | div 3 | The resampled output LUT |
 | lut:output.prelut | float or half | div 3 | The resampled output pre-LUT |
 
-### RVDisplayGroup and RVOutputGroup
-
+## RVDisplayGroup and RVOutputGroup
 
 The display group provides per device display conditioning. The output group is the analogous node group for RVIO. The display groups are never saved in the session, but there is only one output group and it is saved for RVIO. There are no user external properties at this time.
 
-### RVDisplayStereo
-
+## RVDisplayStereo
 
 This node governs how to handle stereo playback including controlling the placement of stereo sources.
 
@@ -138,8 +130,7 @@ This node governs how to handle stereo playback including controlling the placem
 | stereo.swap | int | 1 | If set to 1 treat left eye as right and right eye as left. |
 | stereo.type | string | 1 | Stereo mode in use. For example: left, right, pair, mirror, scanline, anaglyph, checker... (default is off) |
 
-### RVFileSource
-
+## RVFileSource
 
 The source node controls file I/O and organize the source media into layers (in the RV sense). It has basic controls needed to mix the layers together.
 
@@ -160,8 +151,7 @@ The source node controls file I/O and organize the source media into layers (in 
 | request.stereoViews | string | 0 or 2 | If there are values in this property, they will be passed to the image reader when in stereo viewing mode as requested view names for the left and right eyes. |
 | attributes.key | string, int, or float | 1 | This optional container of properties will get automatically included in the metadata associated with the source. The key can be any string and will be displayed as the metadata item name when displayed in the Image Info. The value of the property will be displayed as the value of the metadata. |
 
-### RVFolderGroup
-
+## RVFolderGroup
 
 The folder group contains either a SwitchGroup or LayoutGroup which determines how it is displayed.
 
@@ -170,8 +160,7 @@ The folder group contains either a SwitchGroup or LayoutGroup which determines h
 | ui.name | string | 1 | This is a user specified name which appears in the user interface. |
 | mode.viewType | string | 1 | Either “switch” or “layout”. Determines how the folder is displayed. |
 
-### RVFormat
-
+## RVFormat
 
 This node is used to alter geometry or color depth of an image source. It is part of an RVSourceGroup.
 
@@ -197,8 +186,7 @@ This node is used to alter geometry or color depth of an image source. It is par
 | color.allowFloatingPoint | int | 1 | If non-0 floating point images will be allowed on the GPU otherwise, the image will be converted to integer of the same bit depth (or the maximum bit depth). |
 |  |  |  |  |
 
-### RVImageSource
-
+## RVImageSource
 
 The RV image source is subset of what RV can handle from an external file (basically just EXR). Image sources can have multiple views each of which have multiple layers. However, all views must have the same layers. Image sources cannot have layers within layers, orphaned channels, empty views, missing views, or other weirdnesses that EXR can have.
 
@@ -229,8 +217,7 @@ The RV image source is subset of what RV can handle from an external file (basic
 | request.stereoViews | string | 0 or 2 | If there are values in this property, they will be passed to the image reader when in stereo viewing mode as requested view names for the left and right eyes. |
 | attributes.key | string, int, or float | 1 | This optional container of properties will get automatically included in the metadata associated with the source. The key can be any string and will be displayed as the metadata item name when displayed in the Image Info. The value of the property will be displayed as the value of the metadata. |
 
-### RVLayoutGroup
-
+## RVLayoutGroup
 
 The source group contains a single chain of nodes the leaf of which is an RVFileSource or RVImageSource. It has a single property.
 
@@ -243,8 +230,7 @@ The source group contains a single chain of nodes the leaf of which is an RVFile
 | layout.gridRows | int | 1 | When in grid mode constrain grid to this many rows. If this is set to 0, then the number of rows will be determined by gridColumns. This value is ignored when gridColumns is non-zero. |
 | timing.retimeInputs | int | 1 | Retime all inputs to the output fps if 1 otherwise play back their frames one at a time at the output fps. |
 
-### RVLensWarp
-
+## RVLensWarp
 
 This node handles the pixel aspect ratio of a source group. The lens warp node can also be used to perform radial and/or tangential distortion on a frame. It implements the [Brown's distortion model](http://en.wikipedia.org/wiki/Distortion_%28optics%29) (similar to [that adopted by OpenCV](http://opencv.willowgarage.com/documentation/camera_calibration_and_3d_reconstruction.html) or Adobe Lens Camera Profile model) and 3DE4's Anamorphic Degree6 model. This node can be used to perform operations like lens distortion or artistic lens warp effects.
 
@@ -285,15 +271,16 @@ This node handles the pixel aspect ratio of a source group. The lens warp node c
 
 Example use case: Using OpenCV to determine lens distort parameters for RVLensWarp node based on GoPro footage. First capture some footage of a checkboard with your GoPro. Then you can use OpenCV camera calibration approach on this footage to solve for k1,k2,k3,p1 and p2. In OpenCV these numbers are reported back as follows. For example our 1920x1440 Hero3 Black GoPro solve returned:
 
-```
+```text
     fx=829.122253 0.000000 cx=969.551819
     0.000000 fy=829.122253 cy=687.480774
     0.000000 0.000000 1.000000
     k1=-0.198361 k2=0.028252 p1=0.000092 p2=-0.000073 
 ```
+
 The OpenCV camera calibration solve output numbers are then translated/normalized to the RVLensWarpode property values as follows:
 
-```
+```text
     warp.model = "opencv"
     warp.k1 = k1
     warp.k2 = k2
@@ -303,9 +290,10 @@ The OpenCV camera calibration solve output numbers are then translated/normalize
     warp.fx = fx/1920
     warp.fy = fy/1920 
 ```
+
 e.g. mu code:
 
-```
+```text
     set("#RVLensWarp.warp.model", "opencv");
     set("#RVLensWarp.warp.k1", -0.198361);
     set("#RVLensWarp.warp.k2", 0.028252);
@@ -315,9 +303,10 @@ e.g. mu code:
     set("#RVLensWarp.warp.fx", 0.43185);
     set("#RVLensWarp.warp.fy", 0.43185); 
 ```
+
 Example use case: Using Adobe LCP (Lens Camera Profile) distort parameters for RVLensWarp node. Adobe LCP files can be located in '/Library/Application Support/Adobe/CameraRaw/LensProfiles/1.0' under OSX. Adobe LCP file parameters maps to the RVLensWarp node properties as follows:
 
-```
+```text
     warp.model = "adobe"
     warp.k1 = stCamera:RadialDistortParam1
     warp.k2 = stCamera:RadialDistortParam2
@@ -329,8 +318,7 @@ Example use case: Using Adobe LCP (Lens Camera Profile) distort parameters for R
     warp.fy = stCamera:FocalLengthY 
 ```
 
-### RVLinearize
-
+## RVLinearize
 
 The linearize node has a large number of color controls. The CDL is applied before linearization occurs.
 
@@ -362,7 +350,7 @@ The linearize node has a large number of color controls. The CDL is applied befo
 | lut:output.size | int | 1 or 3 | The resampled LUT output size. |
 | lut:output.lut | float or half | div 3 | The resampled output LUT. |
 
-### OCIO (OpenColorIO), OCIOFile, OCIOLook, and OCIODisplay
+## OCIO (OpenColorIO), OCIOFile, OCIOLook, and OCIODisplay
 
 OpenColorIO nodes can be used in place of existing RV LUT pipelines. Properties in RVColorPipelineGroup, RVLinearizePipelineGroup, RVLookPipelineGroup, and RVDisplayPipelineGroup determine whether or not the OCIO nodes are used. All OCIO nodes have the same properties and function, but their location in the color pipeline is determined by their type. The exception is the generic OCIO node which can be created by the user and used in any context.
 
@@ -377,7 +365,7 @@ For more information, see [Chapter 11 - OpenColorIO](.././rv-user-manual/rv-user
 | ocio.inSpace | string | 1 | Name of OCIO input colorspace |
 | ocio_context. *name* | string | 1 | Name/Value pairs for OCIO context |
 
-### RVOverlay
+## RVOverlay
 
 Overlay nodes can be used with any source. They can be used to draw arbitrary rectangles and text over the source but beneath any annotations. Overlay nodes can hold any number of 3 types of components: **rect** components describe a rectangle to be rendered, **text** components describe a string (or an array of strings, one per frame) to be rendered, and **window** components describe a matted region to be indicated either by coloring the region outside the window, or by outlining it. The coordiates of the corners of the window may be animated by specifying one number per frame.In the below the “ **id** ” in the component name can be any string, but must be different for each component of the same type.
 
@@ -431,8 +419,7 @@ Overlay nodes can be used with any source. They can be used to draw arbitrary re
 | window: *id.windowLRx* | float | N | Lower right window corner (x coord). |
 | window: *id.windowLRy* | float | N | Lower right window corner (y coord). |
 
-### RVPaint
-
+## RVPaint
 
 Paint nodes are used primarily to store per frame annotations. Below *id* is the value of nextID at the time the paint command property was created, *frame* is the frame on which the annotation will appear, *user* is the username of the user who created the property.
 
@@ -443,6 +430,8 @@ Paint nodes are used primarily to store per frame annotations. Below *id* is the
 | paint.show | int | 1 | If 1 display any paint strokes and text entries. If 0 do not. |
 | paint.exclude | string | N | (unused) |
 | paint.include | string | N | (unused) |
+| frame: *frame* .order | string | N | Order stack for annotations |
+| frame: *frame* .redo | string | N | Redo stack for annotations |
 | pen: *id* : *frame* : *user* .color | float[4] | 1 | The color of the pen stroke |
 | pen: *id* : *frame* : *user* .width | float | 1 | The width of the pen stroke |
 | pen: *id* : *frame* : *user* .brush | string | 1 | Brush style of “gauss” or “circle” for soft or hard lines respectively |
@@ -463,8 +452,7 @@ Paint nodes are used primarily to store per frame annotations. Below *id* is the
 | text: *id* : *frame* : *user* .origin | string | 1 | The origin of the text box. The position property will store the location of the origin, but the origin can be on any corner of the text box or centered in between. The valid possible values for origin are top-left, top-center, top-right, center-left, center-center, center-right, bottom-left, bottom-center, bottom-right, and the empty string (which is the default for backwards compatibility). |
 | text: *id* : *frame* : *user* .debug | int | 1 | (unused) |
 
-### RVPrimaryConvert
-
+## RVPrimaryConvert
 
 The primary convert node can be used to perform primary colorspace conversion with illuminant adaptation on a frame that has been linearized. The input and output colorspace primaries are specified in terms of input and output chromaticities for red, green, blue and white points. Illuminant adaptation is implemented using the Bradford transform where the input and output illuminant are specified in terms of their white points. Illuminant adaptation is optional. Default values are set for D65 Rec709.
 
@@ -483,8 +471,7 @@ The primary convert node can be used to perform primary colorspace conversion wi
 | outChromaticities.blue | float[2] | 1 | Output chromaticities blue point. (default [0.1500 0.0600]) |
 | outChromaticities.white | float[2] | 1 | Output chromaticities white point. (default [0.3127 0.3290]) |
 
-### PipelineGroup, RVDisplayPipelineGroup, RVColorPipelineGroup, RVLinearizePipelineGroup, RVLookPipelineGroup and RVViewPipelineGroup
-
+## PipelineGroup, RVDisplayPipelineGroup, RVColorPipelineGroup, RVLinearizePipelineGroup, RVLookPipelineGroup and RVViewPipelineGroup
 
 The PipelineGroup node and the RV specific pipeline nodes are group nodes that manages a pipeline of single input nodes. There is a single property on the node which determines the structure of the pipeline. The only difference between the various pipeline node types is the default value of the property.
 
@@ -501,8 +488,7 @@ The PipelineGroup node and the RV specific pipeline nodes are group nodes that m
 | RVViewPipelineGroup | No Default Pipeline |
 | RVDisplayPipelineGroup | RVDisplayColor |
 
-### RVRetime
-
+## RVRetime
 
 Retime nodes are in many of the group nodes to handle any necessary time changes to match playback between sources and views with different native frame rates. You can also use them for “artistic retiming” of two varieties.The properties in the “warp” component (see below) implement a key-framed “speed warping” variety of retiming, where the keys describe the speed (as a multiplicative factor of the target frame rate - so 1.0 implies no difference, 0.5 implies half-speed, and 2.0 implies double-speed) at a given input frame. Or you can provide an explicit map of output frames from input frames with the properties in the “explicit” component (see below). Note that the warping will still make use of what it can of the “standard” retiming properties (in particular the output fps and the visual scale), but if you use explicit retiming, none of the standard properties will have any effect. The “precedence” of the retiming types depends on the active flags: if “explicit.active” is non-zero, the other properties will have no effect., and if there is no explicit retiming, warping will be active if “warp.active” is true. Please note that neither speed warping nor explicit mapping does any retiming of the input audio.
 
@@ -520,8 +506,7 @@ Retime nodes are in many of the group nodes to handle any necessary time changes
 | explicit.firstOutputFrame | int | 1 | The output frame range provided by the Retime node will start with this frame. The last frame provided will be determined by the length of the array in the “inputFrames” property. |
 | explicit.inputFrames | int | N | Each element in this array corresponds to an output frame, and the value of each element is the input frame number that will be used to provide the corresponding output frame. |
 
-### RVRetimeGroup
-
+## RVRetimeGroup
 
 The RetimeGroup is mostly just a holder for a Retime node. It has a single property.
 
@@ -529,8 +514,7 @@ The RetimeGroup is mostly just a holder for a Retime node. It has a single prope
 | --- | --- | --- | --- |
 | ui.name | string | 1 | This is a user specified name which appears in the user interface. |
 
-### RVSequence
-
+## RVSequence
 
 Information about how to create a working EDL can be found in the User's Manual. All of the properties in the edl component should be the same size.
 
@@ -546,9 +530,15 @@ Information about how to create a working EDL can be found in the User's Manual.
 | output.autoSize | int | 1 | Figure out a good size automatically from the input sizes if 1. Otherwise use output.size. |
 | mode.useCutInfo | int | 1 | Use cut information on the inputs to determine EDL timing. |
 | mode.autoEDL | int | 1 | If non-0, automatically concatenate new sources to the existing EDL, otherwise do not modify the EDL |
+| composite.inputBlendModes | string | N | The compositing operation to perform per input. Possible blend modes are "over", "add", "difference", "-difference", and "replace" |
+| composite.inputOpacities | float | N | Per-input opacity to apply to the compositing operation |
+| composite.inputAngularMaskActive | int | 1 | If non-0, the angular mask is active. A value of 0 turns it off |
+| composite.inputAngularMaskPivotX | float | 1 | Value of the angular mask x-axis pivot |
+| composite.inputAngularMaskPivotY | float | 1 | Value of the angular mask y-axis pivot |
+| composite.inputAngularMaskAngleInRadians | float | 1 | Value of the angle used for the angular mask, in radians |
+| composite.swapAngularMaskInputs | int | 1 | If non-0, the angular mask inputs are swapped. A value of 0 turns it off |
 
-### RVSequenceGroup
-
+## RVSequenceGroup
 
 The sequence group contains a chain of nodes for each of its inputs. The input chains are connected to a single RVSequence node which controls timing and switching between the inputs.
 
@@ -557,8 +547,7 @@ The sequence group contains a chain of nodes for each of its inputs. The input c
 | ui.name | string | 1 | This is a user specified name which appears in the user interface. |
 | timing.retimeInputs | int | 1 | Retime all inputs to the output fps if 1 otherwise play back their frames one at a time at the output fps. |
 
-### RVSession
-
+## RVSession
 
 The session node is a great place to store centrally located information to easily access from any other node or location. Almost like a global grab bag.
 
@@ -570,8 +559,7 @@ The session node is a great place to store centrally located information to easi
 | matte.opacity | float | 1 | Centralized setting for the opacity of the matte used in all sources. 0 == clear 1 == opaque. |
 | matte.show | int | 1 | Centralized setting to turn on or off the matte used in all sources. 0 == OFF 1 == ON. |
 
-### RVSoundTrack
-
+## RVSoundTrack
 
 Used to construct the audio waveform textures.
 
@@ -582,8 +570,7 @@ Used to construct the audio waveform textures.
 | audio.offset | float | 1 | Globl audio offset in seconds |
 | audio.mute | int | 1 | If non-0 audio is muted |
 
-### RVSourceGroup
-
+## RVSourceGroup
 
 The source group contains a single chain of nodes the leaf of which is an RVFileSource or RVImageSource. It has a single property.
 
@@ -591,8 +578,7 @@ The source group contains a single chain of nodes the leaf of which is an RVFile
 | --- | --- | --- | --- |
 | ui.name | string | 1 | This is a user specified name which appears in the user interface. |
 
-### RVSourceStereo
-
+## RVSourceStereo
 
 The source stereo nodes are used to control independent eye transformations.
 
@@ -606,8 +592,7 @@ The source stereo nodes are used to control independent eye transformations.
 | rightTransform.rotate | float | 1 | Right eye rotation in degrees |
 | rightTransform.translate | float[2] | 1 | independent 2D translation applied only to right eye (on top of offsets) |
 
-### RVStack
-
+## RVStack
 
 The stack node is part of a stack group and handles control for settings like compositing each layer as well as output playback timing.
 
@@ -622,8 +607,7 @@ The stack node is part of a stack group and handles control for settings like co
 | mode.strictFrameRanges | int | 1 | If 1 match the timeline frames to the source frames instead of retiming to frame 1. |
 | mode.alignStartFrames | int | 1 | If 1 offset all inputs so they start at same frame as the first input. |
 
-### RVStackGroup
-
+## RVStackGroup
 
 The stack group contains a chain of nodes for each of its inputs. The input chains are connected to a single RVStack node which controls compositing of the inputs as well as basic timing offsets.
 
@@ -632,8 +616,7 @@ The stack group contains a chain of nodes for each of its inputs. The input chai
 | ui.name | string | 1 | This is a user specified name which appears in the user interface. |
 | timing.retimeInputs | int | 1 | Retime all inputs to the output fps if 1 otherwise play back their frames one at a time at the output fps. |
 
-### RVSwitch
-
+## RVSwitch
 
 The switch node is part of a switch group and handles control for output playback timing.
 
@@ -646,8 +629,7 @@ The switch node is part of a switch group and handles control for output playbac
 | mode.useCutInfo | int | 1 | Use cut information on the inputs to determine EDL timing. |
 | mode.alignStartFrames | int | 1 | If 1 offset all inputs so they start at same frame as the first input. |
 
-### RVSwitchGroup
-
+## RVSwitchGroup
 
 The switch group changes it behavior depending on which of its inputs is “active”. It contains a single Switch node to which all of its inputs are connected.
 
@@ -655,8 +637,7 @@ The switch group changes it behavior depending on which of its inputs is “acti
 | --- | --- | --- | --- |
 | ui.name | string | 1 | This is a user specified name which appears in the user interface. |
 
-### RVTransform2D
-
+## RVTransform2D
 
 The 2D transform node controls the image transformations. This node is usually evaluated on the GPU.
 
@@ -670,7 +651,6 @@ The 2D transform node controls the image transformations. This node is usually e
 | transform.scale | float[2] | 1 | Scale in X and Y dimensions in NDC space |
 | stencil.visibleBox | float | 4 | Four floats indicating the left, right, top, and bottom in NDC space of a stencil box. |
 
-### RVViewGroup
-
+## RVViewGroup
 
 The RVViewGroup node has no external properties.
