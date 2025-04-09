@@ -7,9 +7,14 @@
 //
 #include <IPCore/ShaderCommon.h>
 #include <IPCore/ShaderState.h>
+#include <IPCore/ShaderExpression.h>
+#include <IPCore/ShaderFunction.h>
+#include <IPCore/ShaderSymbol.h>
+#include <IPCore/IPImage.h>
 #include <TwkGLF/GL.h>
 #include <TwkFB/Operations.h>
 #include <TwkMath/MatrixColor.h>
+#include <TwkMath/Vec2.h>
 #include <boost/thread/mutex.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -115,6 +120,9 @@ extern const char* StereoScanline_glsl;
 extern const char* StereoChecker_glsl;
 extern const char* StereoAnaglyph_glsl;
 extern const char* StereoLumAnaglyph_glsl;
+extern const char* AngularMask_glsl;
+extern const char* ReverseAngularMask_glsl;
+extern const char* Opacity_glsl;
 extern const char* Over2_glsl;
 extern const char* Over3_glsl;
 extern const char* Over4_glsl;
@@ -314,6 +322,9 @@ namespace IPCore
         static Function* Shader_StereoChecker = 0;
         static Function* Shader_StereoAnaglyph = 0;
         static Function* Shader_StereoLumAnaglyph = 0;
+        static Function* Shader_AngularMask = 0;
+        static Function* Shader_ReverseAngularMask = 0;
+        static Function* Shader_Opacity = 0;
         static Function* Shader_Over = 0;
         static Function* Shader_Add = 0;
         static Function* Shader_Difference = 0;
@@ -2585,6 +2596,40 @@ namespace IPCore
             }
 
             return Shader_LensWarp3DE4AnamorphicDegree6;
+        }
+
+        Function* Opacity()
+        {
+            if (Shader_Opacity == nullptr)
+            {
+                Shader_Opacity = new Shader::Function("Opacity", Opacity_glsl,
+                                                      Shader::Function::Color);
+            }
+
+            return Shader_Opacity;
+        }
+
+        Function* AngularMask()
+        {
+            if (Shader_AngularMask == nullptr)
+            {
+                Shader_AngularMask = new Shader::Function(
+                    "AngularMask", AngularMask_glsl, Shader::Function::Filter);
+            }
+
+            return Shader_AngularMask;
+        }
+
+        Function* ReverseAngularMask()
+        {
+            if (Shader_ReverseAngularMask == nullptr)
+            {
+                Shader_ReverseAngularMask = new Shader::Function(
+                    "ReverseAngularMask", ReverseAngularMask_glsl,
+                    Shader::Function::Filter);
+            }
+
+            return Shader_ReverseAngularMask;
         }
 
         //--
@@ -5619,6 +5664,41 @@ namespace IPCore
             args[i] = new BoundExpression(F->parameters()[i], expr);
             i++;
             args[i] = new BoundSpecial(F->parameters()[i]);
+            i++;
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
+            i++;
+
+            return new Expression(F, args, image);
+        }
+
+        Expression* newOpacity(const IPImage* image, Expression* expr,
+                               const float opacity)
+        {
+            const Function* F = Opacity();
+            ArgumentVector args(F->parameters().size());
+            size_t i = 0;
+            args[i] = new BoundExpression(F->parameters()[i], expr);
+            i++;
+            args[i] = new BoundFloat(F->parameters()[i], opacity);
+            i++;
+
+            return new Expression(F, args, image);
+        }
+
+        Expression* newAngularMask(const IPImage* image, Expression* expr,
+                                   const TwkMath::Vec2f& pivot,
+                                   const float angleInRadians,
+                                   bool isReverseAngularMask)
+        {
+            const Function* F =
+                isReverseAngularMask ? ReverseAngularMask() : AngularMask();
+            ArgumentVector args(F->parameters().size());
+            size_t i = 0;
+            args[i] = new BoundExpression(F->parameters()[i], expr);
+            i++;
+            args[i] = new BoundVec2f(F->parameters()[i], pivot);
+            i++;
+            args[i] = new BoundFloat(F->parameters()[i], angleInRadians);
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
