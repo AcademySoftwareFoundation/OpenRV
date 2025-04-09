@@ -11,10 +11,10 @@
 try:
     from PySide2 import QtCore, QtGui, QtWidgets
 except ImportError:
-  try:
-    from PySide6 import QtCore, QtGui, QtWidgets
-  except ImportError:
-    pass
+    try:
+        from PySide6 import QtCore, QtGui, QtWidgets
+    except ImportError:
+        pass
 
 from rv import rvtypes, qtutils
 from rv import commands as rvc
@@ -355,7 +355,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         reps_and_source_nodes = {}
         for switch_node in switch_nodes:
             reps_and_nodes = rvc.sourceMediaRepsAndNodes(switch_node)
-            for (rep, source_node) in reps_and_nodes:
+            for rep, source_node in reps_and_nodes:
                 if rep in reps_and_source_nodes.keys():
                     reps_and_source_nodes[rep].append(source_node)
                 else:
@@ -393,7 +393,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
             return
 
         # Menu title.
-        title = QtWidgets.QAction("Media Playback", menu)
+        title = QtGui.QAction("Media Playback", menu)
         title.setEnabled(False)
         menu.addAction(title)
         menu.addSeparator()
