@@ -51,7 +51,7 @@ jobs:
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "5.15.2"
-            cmake-version: "3.29.8"
+            cmake-version: "3.31.6"
             python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "powertools"
@@ -61,7 +61,7 @@ jobs:
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "5.15.2"
-            cmake-version: "3.29.8"
+            cmake-version: "3.31.6"
             python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "crb"
@@ -71,7 +71,7 @@ jobs:
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "5.15.2"
-            cmake-version: "3.29.8"
+            cmake-version: "3.31.6"
             python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "powertools"
@@ -81,7 +81,7 @@ jobs:
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "5.15.2"
-            cmake-version: "3.29.8"
+            cmake-version: "3.31.6"
             python-version: "3.10"
             vfx-platform: "CY2023"
             extra_repo: "crb"
@@ -229,12 +229,14 @@ jobs:
             build-type: "Release"
             qt-version: "5.15.2"
             python-version: "3.10"
+            cmake-version: "3.31.6"
             vfx-platform: "CY2023"
           - os: "macos-13"
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "5.15.2"
             python-version: "3.10"
+            cmake-version: "3.31.6"
             vfx-platform: "CY2023"
     steps:
       - name: Check if it is a schedule job
@@ -267,7 +269,12 @@ jobs:
       - name: Add repository as safe directory
         run: |
           git config --global --add safe.directory /__w/OpenRV/OpenRV
-          
+
+      - name: Install cmake
+        uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2
+        with:
+          cmake-version: "${{ matrix.cmake-version }}"
+
       - name: Prepare Qt folder
         run: |
           mkdir -p "${{ github.workspace }}/deps"
@@ -387,7 +394,7 @@ jobs:
             build-type: "Release"
             qt-version: "5.15.2"
             python-version: "3.10"
-            cmake-version: "3.29.8"
+            cmake-version: "3.31.6"
             vfx-platform: "CY2023"
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
@@ -396,7 +403,7 @@ jobs:
             build-type: "Debug"
             qt-version: "5.15.2"
             python-version: "3.10"
-            cmake-version: "3.29.8"
+            cmake-version: "3.31.6"
             vfx-platform: "CY2023"
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
