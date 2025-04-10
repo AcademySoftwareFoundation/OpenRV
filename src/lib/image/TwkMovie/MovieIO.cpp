@@ -59,7 +59,7 @@ namespace TwkMovie
     }
 
     GenericIO::Preloader::Preloader()
-        : MAX_THREADS(64)
+        : MAX_THREADS(32)
         , m_stopWorker(false)
         , m_threadCount(0)
     {
@@ -128,6 +128,9 @@ namespace TwkMovie
     void GenericIO::Preloader::addReader(const std::string_view filename,
                                          const Movie::ReadRequest& request)
     {
+        if (preloader_disabled)
+            return;
+
         std::unique_lock<std::mutex> lock(m_mutex);
 
         auto newReader = std::make_shared<Preloader::Reader>(filename);

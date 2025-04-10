@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import os
 import sys
@@ -62,6 +62,7 @@ all_mu_commands = [
     "narrowToRange",
     "isTimerRunning",
     "setMargins",
+    "startPreloadiongMovie",
     "addSources",
     "updateLUT",
     "narrowedFrameStart",
@@ -160,6 +161,7 @@ all_mu_commands = [
     "narrowedFrameEnd",
     "contentAspect",
     "sourcesAtFrame",
+    "nextUIName",
     "propertyExists",
     "getFiltering",
     "theTime",
@@ -233,7 +235,7 @@ all_mu_commands = [
     "beginCompoundCommand",
     "setCacheMode",
     "sourcePixelValue",
-    "framebufferPixelValue",   
+    "framebufferPixelValue",
     "setByteProperty",
     "inc",
     "getCurrentAttributes",
@@ -305,7 +307,7 @@ all_mu_commands = [
     "sourceMediaReps",
     "sourceMediaRepSwitchNode",
     "sourceMediaRepSourceNode",
-    "sourceMediaRepsAndNodes"
+    "sourceMediaRepsAndNodes",
 ]
 
 

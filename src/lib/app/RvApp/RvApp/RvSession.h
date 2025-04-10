@@ -45,50 +45,6 @@ namespace Rv
     class RvSession : public IPCore::Session
     {
     private:
-        class PropertyCache
-        {
-            //
-            // this cache is a prototype to eliminate post-loading
-            // time when loading playlists due to too many calls to
-            // findProperty() of the same name
-            // We save a bunch of seconds, but, it may be a bit unsafe.
-            // We didn't explore the consequences of this yet,
-            // so it's disabled by default.
-            //
-        public:
-            PropertyCache() {}
-
-            bool exists(const std::string& propName)
-            {
-                if (!m_enabled)
-                    return false;
-
-                return (m_propsCache.find(propName) != m_propsCache.end());
-            }
-
-            void get(const std::string& propName, PropertyVector& props)
-            {
-                if (!m_enabled)
-                    return;
-
-                props = m_propsCache[propName];
-            }
-
-            void set(const std::string& propName, const PropertyVector& props)
-            {
-                if (!m_enabled)
-                    return;
-
-                m_propsCache[propName] = props;
-            }
-
-            void clear() { m_propsCache.clear(); }
-
-        private:
-            std::unordered_map<std::string, PropertyVector> m_propsCache;
-            bool m_enabled = false;
-        };
-
     public:
         //
         //  Types
@@ -173,6 +129,11 @@ namespace Rv
         void setUserHasSetViewSize(bool v) { m_userHasSetViewSize = v; };
 
         bool userHasSetViewSize() { return m_userHasSetViewSize; };
+
+        // Entry point for the media preloader. Used implicitly by addSources
+        // Used explicitly by otio reader
+        // Exposed to users via a Mu & Python command
+        void startPreloadingMovie(const std::string& filename);
 
         //
         //  Source material.  Some methods add a bunch of media paths as a
@@ -370,7 +331,6 @@ namespace Rv
         //
         //  Override
         //
-
         virtual void findProperty(PropertyVector& props,
                                   const std::string& name);
         virtual void findCurrentNodesByTypeName(NodeVector& nodes,
@@ -428,7 +388,7 @@ namespace Rv
         void onGraphNodeWillRemove(IPCore::IPNode* node);
 
     private:
-        PropertyCache m_propertyCache;
+        UINameCache m_uiNameCache;
 
         Mu::Object* m_data;
         void* m_pydata;

@@ -1333,6 +1333,14 @@ namespace Rv
         NODE_RETURN(nodeName);
     }
 
+    NODE_IMPLEMENTATION(startPreloadingMovie, void)
+    {
+        RvSession* s = RvSession::currentRvSession();
+        StringType::String* filename = NODE_ARG_OBJECT(0, StringType::String);
+
+        s->startPreloadingMovie(filename.c_str());
+    }
+
     NODE_IMPLEMENTATION(addSources, void)
     {
         RvSession* s = RvSession::currentRvSession();
@@ -2118,6 +2126,10 @@ namespace Rv
 
             new Function(c, "addSourceEnd", addSourceEnd, None, Return, "void",
                          End),
+
+            new Function(c, "startPreloadingMovie", startPreloadingMovie, None,
+                         Return, "void", Parameters,
+                         new Param(c, "fileName", "string"), End),
 
             new Function(c, "addSources", addSources, None, Return, "void",
                          Parameters, new Param(c, "fileNames", "string[]"),

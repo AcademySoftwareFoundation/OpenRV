@@ -473,8 +473,6 @@ namespace Rv
         , m_tag(tg)
         , m_rexc("")
     {
-        std::vector<std::string> preloaderFiles;
-
         m_nPreexistingSources = m_session->sources().size();
 
         for (int q = 0; q < m_sav.size(); q++)
@@ -506,19 +504,7 @@ namespace Rv
                 }
                 else // not a directory, so it's a movie, add to preloader.
                 {
-                    // get the cookies and headers and updated media filename.
-                    std::deque<std::pair<std::string, std::string>>
-                        params; // cookies and headers
-
-                    std::string file =
-                        TwkMediaLibrary::lookupFilenameInMediaLibrary(filename,
-                                                                      params);
-
-                    Movie::ReadRequest request;
-                    std::copy(params.begin(), params.end(),
-                              back_inserter(request.parameters));
-
-                    GenericIO::getPreloader().addReader(file, request);
+                    m_session->startPreloadingMovie(filename);
                 }
             }
 
@@ -556,6 +542,23 @@ namespace Rv
         }
 
         ++m_loadCount;
+    }
+
+    void RvSession::startPeloadingMovie(const std::string filename)
+    {
+        // get the cookies and headers and updated media filename.
+        std::deque<std::pair<std::string, std::string>> params;
+
+        std::string file =
+            TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, params);
+
+        // build a ReadRequest with the cookies and headers
+        Movie::ReadRequest request;
+        std::copy(params.begin(), params.end(),
+                  back_inserter(request.parameters));
+
+        // push a reader to be scheduled
+        GenericIO::getPreloader().addReader(file, request);
     }
 
     int RvSession::loadCount()
@@ -4068,12 +4071,6 @@ namespace Rv
 
     void RvSession::findProperty(PropertyVector& props, const std::string& name)
     {
-        if (m_propertyCache.exists(name))
-        {
-            m_propertyCache.get(name, props);
-            return;
-        }
-
         StringVector parts;
         algorithm::split(parts, name, is_any_of(string(".")));
 
@@ -4091,16 +4088,6 @@ namespace Rv
         else
         {
             graph().findProperty(m_frame, props, name);
-        }
-
-        if (!props.empty())
-        {
-            m_propertyCache.set(name, props);
-        }
-        else
-        {
-            // std::cerr << "Property " << name << " doesn't exist" <<
-            // std::endl;
         }
     }
 
