@@ -64,6 +64,8 @@ namespace Rv
 
         virtual void syncBuffers() const;
 
+        virtual GLuint fboID() const;
+
         bool isWorkerDevice() const
         {
             return Capabilities(capabilities()) == NoCapabilities;
