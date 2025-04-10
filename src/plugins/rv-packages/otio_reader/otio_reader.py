@@ -68,32 +68,17 @@ def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object
     timeline.
     """
 
-    print(">>>> read_otio_string() start")
-    commands.startTimer()
+    print(">>> READ_OTIO_STRING called. host_prefix = {}".format(host_prefix))
+
     otio_obj = otio.adapters.read_from_string(otio_string)
     timeline = otio_obj["otio"]
-    commands.stopTimer()
-    print(
-        "   read_otio_string: adapters.read_from_string() "
-        + str(commands.elapsedTime())
-    )
-
     context = {"sg_url": host_prefix} if host_prefix else None
 
-    commands.startTimer()
+    print(context)
+
     commands.addSourceBegin()
     ret = create_rv_node_from_otio(timeline, context), timeline.global_start_time
-    commands.stopTimer()
-    print(
-        "   read_otio_string: root create_rv_node_from_otio() "
-        + str(commands.elapsedTime())
-    )
-
-    commands.startTimer()
     commands.addSourceEnd()
-    commands.stopTimer()
-    print("   read_otio_string: addSourceEnd()" + str(commands.elapsedTime()))
-    print(">>>> read_otio_string() end")
 
     return ret
 
@@ -106,27 +91,14 @@ def read_otio_file(otio_file):
     Returns the top level node created that represents this otio
     timeline.
     """
-    print(">>>> read_otio_file() begin\n")
-    commands.startTimer()
-    commands.addSourceBegin()
-    input_otio = otio.adapters.read_from_file(otio_file)
-    commands.stopTimer()
-    print("   read_otio_file: adapters.read_from_file() " + str(commands.elapsedTime()))
+    print(">>> READ_OTIO_FILE called")
 
+    input_otio = otio.adapters.read_from_file(otio_file)
     context = {"otio_file": otio_file}
 
-    commands.startTimer()
+    commands.addSourceBegin()
     ret = create_rv_node_from_otio(input_otio, context)
-    commands.stopTimer()
-    print(
-        "   read_otio_file: root create_rv_node_from_otio() "
-        + str(commands.elapsedTime())
-    )
-
-    commands.startTime()
     commands.addSourceEnd()
-    commands.stopTimer()
-    print("   read_otio_file end " + str(commands.elapsedTime()))
 
     return ret
 
@@ -151,8 +123,6 @@ def create_rv_node_from_otio(otio_obj, context=None):
         otio.schema.Transition: _create_transition,
         otio.schema.SerializableCollection: _create_collection,
     }
-
-    print(">>> create_rv_node_from_otio")
 
     if type(otio_obj) in WRITE_TYPE_MAP:
         process_schema = _run_hook(
@@ -343,13 +313,21 @@ def _create_track(in_seq, context=None):
     return new_seq
 
 
-def _get_global_transform(tl) -> dict:
+def _get_global_transform(tl, context) -> dict:
     # since there's no global scale in otio, calculate the minimum box size
     # that can contain all clips
     def find_display_bounds(tl):
         display_bounds = None
         for clip in tl.find_clips():
             try:
+                # get active clip and start prelodaing the movie in the background
+                if isinstance(clip.media_reference, otio.schema.ExternalReference):
+                    media_path = _get_media_path(
+                        str(clip.media_reference.target_url), context
+                    )
+                    # print("PRELOADING MOVIE: {}".format(media_path))
+                    commands.startPreloadingMovie(media_path)
+
                 bounds = clip.media_reference.available_image_bounds
                 if bounds:
                     if display_bounds:
@@ -441,7 +419,9 @@ def _get_in_out_frame(it, range_to_read, seq_rate=None):
 
 def _create_timeline(tl, context=None):
     with set_context(
-        context, global_start_time=tl.global_start_time, **_get_global_transform(tl)
+        context,
+        global_start_time=tl.global_start_time,
+        **_get_global_transform(tl, context)
     ):
         stack = create_rv_node_from_otio(tl.tracks, context)
 

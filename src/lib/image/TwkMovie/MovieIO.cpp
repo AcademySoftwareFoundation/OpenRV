@@ -128,9 +128,6 @@ namespace TwkMovie
     void GenericIO::Preloader::addReader(const std::string_view filename,
                                          const Movie::ReadRequest& request)
     {
-        if (preloader_disabled)
-            return;
-
         std::unique_lock<std::mutex> lock(m_mutex);
 
         auto newReader = std::make_shared<Preloader::Reader>(filename);
@@ -224,9 +221,16 @@ namespace TwkMovie
             // from the list by the worker thread.
             m_cv.notify_all();
 
-            // Call the
+            // if movieReader is null, it's because there was a read error.
             if (movieReader)
+            {
                 movieReader->postPreloadOpen(info, request);
+            }
+            else
+            {
+                std::cerr << "PRELOADER READ ERROR: " << reader->m_filename
+                          << std::endl;
+            }
 
             return movieReader;
         }

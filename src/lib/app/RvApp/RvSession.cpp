@@ -336,8 +336,6 @@ namespace Rv
     {
         Session::render();
 
-        rvgraph().addSourceBegin();
-
         try
         {
             continueLoading();
@@ -350,8 +348,6 @@ namespace Rv
         {
             cerr << "ERROR: Unknown Exception" << endl;
         }
-
-        rvgraph().addSourceEnd();
     }
 
     void RvSession::applyRvSessionSpecificOptions()
@@ -544,7 +540,7 @@ namespace Rv
         ++m_loadCount;
     }
 
-    void RvSession::startPeloadingMovie(const std::string filename)
+    void RvSession::startPreloadingMovie(const std::string& filename)
     {
         // get the cookies and headers and updated media filename.
         std::deque<std::pair<std::string, std::string>> params;
@@ -614,12 +610,26 @@ namespace Rv
         int oldFrame = currentFrame();
 
         SourceIPNode* node = 0;
+
+        bool onlyOne = true;
         try
         {
-            readSource(file, sargs, true, addLayer, m_loadState->tag(),
-                       m_loadState->merge());
+            while (m_loadState->isLoading())
+            {
+                string pattern;
+                Options::SourceArgs sargs;
+                bool addLayer = false;
 
-            // cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
+                m_loadState->nextPattern(pattern, sargs, addLayer);
+                const char* file = pattern.c_str();
+                readSource(file, sargs, true, addLayer, m_loadState->tag(),
+                           m_loadState->merge());
+
+                // cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
+
+                if (onlyOne)
+                    break;
+            }
         }
         catch (TwkExc::Exception& exc)
         {

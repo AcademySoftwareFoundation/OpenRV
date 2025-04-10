@@ -1338,7 +1338,7 @@ namespace Rv
         RvSession* s = RvSession::currentRvSession();
         StringType::String* filename = NODE_ARG_OBJECT(0, StringType::String);
 
-        s->startPreloadingMovie(filename.c_str());
+        s->startPreloadingMovie(filename->c_str());
     }
 
     NODE_IMPLEMENTATION(addSources, void)
