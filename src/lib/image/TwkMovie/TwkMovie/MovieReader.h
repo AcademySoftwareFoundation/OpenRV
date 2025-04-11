@@ -48,52 +48,88 @@ namespace TwkMovie
 
         const std::string& filename() const { return m_filename; }
 
+        /// New preloading methods for MovieReader's public API.
+        ///
+        /// To support accelerated loading of your media (helps when
+        /// loading long playlists and timelines), RV now
+        /// supports parallel preloading of media (on disk & online)
+        /// by opening up to 32 simultaneous threads that open
+        /// movie files at the same time.
+        ///
+        /// Indeed, since creating the RV graph is done in the main thread,
+        /// opening files one-by-one from an online source (querying the
+        /// web session's http cookies and headers, opening an http request,
+        /// sending the http request, waiting for the http response, and
+        /// downloading the requests's data) we end up cumulating an
+        /// enormous amount of time spent waiting for each file's I/O to
+        /// complete, with RV being completely idle during this time.
+        /// With a large playlist, really adds up.
+        ///
+        /// To eliminate the waiting time, we instead try to open all files
+        /// at the same time (parallelizing the waiting time instead of
+        /// serializing it) such that by the time FileSourceIPNode::openMovie
+        /// is called, the I/O will have already completed and openMovie()
+        /// will completely much more quickly.
+        ///
+        /// RV's MovieReader::open() method used to take a 3 parametrs:
+        /// filename, movieinfo, and read request. At preload time, we
+        /// know the filename, we can construct a default read request
+        /// (with the web session's cookies) but we don't have any movieInfo
+        /// nor do we know what other metadata RV might but in the read request
+        ///
+        /// Thus, we've broken down the open() process into 2 parts:
+        ///
+        /// (1) the generic part, which just makes a disk or web request for
+        ///     the movie's first chunk of data (eg: movie header?)
+        ///
+        /// (2) the non-generic part, which consumes the other metadata from
+        ///     the first part, and fixes-up whatever needs to be done
+        ///     when FileSourceIPNode is ready to call its openMovie() method
+        ///
+        /// preloadOpen(filename, readrequest)
+        ///      runs:       : in the background, called by the preloader
+        ///      filename    : the name of the file.
+        ///      readrequest : the read request, containing http headers
+        ///                    and cookies. This read request is created
+        ///                    by the preloader and contains minimal
+        ///                    information.
+        ///
+        /// postPreloadOpen(movieinfo, readrequest)
+        ///      runs        : in the main thread, called by FileSourceIPNode
+        ///      movieinfo   : movie's general info, like before.
+        ///      readrequest : the read request, containing htto headers
+        ///                    and cookies, but possibly other information.
+        ///                    This one is created by FileSourceIPNode
+        ///
+        /// As a result of the read requests being possibly different,
+        /// we encourage you to save to update your read request
+        /// in postPreloadOpen.
+        ///
+        /// Migrating your open() method is actually quite easy.
+        /// It usually simply involves putting the first lines of code
+        /// into preloadOpen(), and leave the rest in postPreloadOpen().
+        ///
+        /// In fact, it can be as simple as only saving the filename in
+        /// preloadOpen() (see MovieSideCar) or a bit more complex
+        /// (see MovieFFMpegReader)
+        ///
+        /// Note: open() must still exist, but please do not override it
+        ///       in your derived classes. It must exist because if the
+        ///       preloader was not invoked for some reason, then open()
+        ///       will be called instead, but open() now simply calls
+        ///       preloadOpen() and postPrelodaOpen().
+        ///
+
+        virtual void preloadOpen(const std::string& filename,
+                                 const ReadRequest& request);
+
+        virtual void
+        postPreloadOpen(const MovieInfo& info = MovieInfo(),
+                        const ReadRequest& request = ReadRequest());
+
         ///
         ///  Open may throw.
         ///
-
-        /// Explanation for preloadOpen(), postPreloadOpen(), and open()
-        ///
-        /// It used to be that in FileSourceIPNode called
-        /// GenericIO::openMovieReader(), which in turn would eventually end up
-        /// calling the correct:
-        ///
-        ///    MovieReader::open(filename, info, request).
-        ///
-        /// For each derived class of MovieReader, this call performed the
-        /// opening of the data file (the I/O part) and afterwards did the work
-        /// related to placing the media in the timeline and fixing up
-        /// reading/streaming options (eg: realing with the Info/Request
-        /// parameters).
-        ///
-        /// Unfortunately, this was all done synchronsly. So when we loaded a
-        /// playlist which had tens, or even several hundreds of clips to open,
-        /// this caused a huge amount of wait time due synchonous waiting on the
-        /// "file open" I/O, especially when the I/O was over the network, and
-        /// even worse if it was done over the internet.
-        //
-        /// In GenerioIO::openMovieReader(), we introduced a Preloader class,
-        /// which, upon receiving a timeline or a list of clips to open, is
-        /// meant to start multithreaded preload of the media, thereby greatly
-        /// reducing the I/O wait time because it's mostly all done in parallel.
-        /// Unfortunately, when we received a list of clips, we don't have
-        /// timeline information (eg: we don't have the Info and Request
-        /// information), so we can't do that part in parallel. What we can do
-        /// however is open the media asynchronously, and then, fixup the
-        /// timeline information synchronously when the FileSourceIPNode asks
-        /// for the reader.
-        ///
-        /// For this reason, we added the method preloadOpen(), which is called
-        /// by the preloader (async), and then we call postPreloadOpen(), which
-        /// deals with the info and request (sync). The open() method, which is
-        /// meant be called in sync mode, simply calls both in order.
-        ///
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request) = 0;
-        virtual void
-        postPreloadOpen(const MovieInfo& info = MovieInfo(),
-                        const ReadRequest& request = ReadRequest()) = 0;
-
         virtual void open(const std::string& filename,
                           const MovieInfo& info = MovieInfo(),
                           const ReadRequest& request = ReadRequest());

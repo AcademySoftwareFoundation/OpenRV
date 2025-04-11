@@ -434,6 +434,8 @@ namespace TwkMovie
     {
         Lock lock(m_mutex);
 
+        m_request = request;
+
         //
         //  Start by creating the queues
         //

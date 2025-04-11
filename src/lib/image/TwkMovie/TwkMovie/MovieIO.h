@@ -346,7 +346,19 @@ namespace TwkMovie
                     REMOVE
                 };
 
-                Reader(std::string_view fn);
+                Reader(std::string_view fn, const Movie::ReadRequest& request);
+                void setStatus(Status status);
+                void setPriority(bool priority);
+                void setNotEnoughThreads();
+                void clearFilename();
+
+                const std::string& filename() const;
+                const Movie::ReadRequest& request() const;
+                bool isPriority() const;
+                bool isPending() const;
+                bool isLoading() const;
+                bool isFinishedLoading() const;
+                bool isRemove() const;
 
             public:
                 std::string m_filename;
@@ -371,25 +383,42 @@ namespace TwkMovie
                                    Movie::ReadRequest& request);
 
         private:
-            void finalizeCompletedThreads();
+            void finalizeCompletedThreadsAndAdjustMaxThreads();
+            void waitForFinishedLoading(std::shared_ptr<Reader> reader);
+
             bool hasPendingReaders();
 
-            void workerThreadFunc();
+            void schedulerThreadFunc();
             void loaderThreadFunc(std::shared_ptr<Reader> reader);
 
         private:
-            const size_t MAX_THREADS;
-            std::list<std::shared_ptr<Reader>>
-                m_readers; // container of movies to preload.
+            int m_maxThreads;
+            // container of movies to preload.
+            std::list<std::shared_ptr<Reader>> m_readers;
 
-            std::mutex
-                m_mutex; // mutex to control access to the m_readers variable.
-            std::condition_variable
-                m_cv; // condition variable for inter-thread notifications.
-            std::thread m_workerThread; // the main worker thread that waits for
-                                        // files to be added
-            int m_threadCount;          // number of actively loading readers
-            bool m_stopWorker; // control variable to exit the worker thread.
+            // mutex to control access to the m_readers variable.
+            std::mutex m_schedulerThread_mutex;
+            std::mutex m_mainThread_mutex;
+
+            // condition variable for inter-thread notifications.
+            std::condition_variable m_schedulerThread_cv;
+            std::condition_variable m_mainThread_cv;
+
+            // the main worker thread that schedules readers
+            std::thread m_schedulerThread;
+
+            // number of actively loading readers, and the
+            // ceiling thread count. The ceiling thread count
+            // may exceed MAX_THREADS if somehow all readers
+            // get prioritized.
+            int m_threadCount;        // currently running readers
+            int m_ceilingThreadCount; // ceiling running readers
+            int m_completedCount;     // done reading count
+            int m_notReadyCount;      // count we had to wait to complete
+            int m_getCount;           // number of times getReader was called
+
+            // control variable to exit the scheduler thread
+            bool m_exitRequested;
         };
 
     public:

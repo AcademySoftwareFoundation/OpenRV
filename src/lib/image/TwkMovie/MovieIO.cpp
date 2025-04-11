@@ -51,17 +51,70 @@ namespace TwkMovie
     //
     // GenericIO::Preloader implementation
     //
-    GenericIO::Preloader::Reader::Reader(std::string_view filename)
+    GenericIO::Preloader::Reader::Reader(std::string_view filename,
+                                         const Movie::ReadRequest& request)
     {
         m_filename = filename;
         m_status = Status::PENDING;
+        m_request = request;
         m_priority = false;
     }
 
+    void GenericIO::Preloader::Reader::clearFilename()
+    {
+        m_filename = "**** filename cleared ****";
+    }
+
+    const std::string& GenericIO::Preloader::Reader::filename() const
+    {
+        return m_filename;
+    }
+
+    const Movie::ReadRequest& GenericIO::Preloader::Reader::request() const
+    {
+        return m_request;
+    }
+
+    void GenericIO::Preloader::Reader::setPriority(bool priority)
+    {
+        m_priority = priority;
+    }
+
+    bool GenericIO::Preloader::Reader::isPriority() const { return m_priority; }
+
+    void GenericIO::Preloader::Reader::setStatus(Status status)
+    {
+        m_status = status;
+    }
+
+    bool GenericIO::Preloader::Reader::isRemove() const
+    {
+        return (m_status == Status::REMOVE);
+    }
+
+    bool GenericIO::Preloader::Reader::isPending() const
+    {
+        return (m_status == Status::PENDING);
+    }
+
+    bool GenericIO::Preloader::Reader::isLoading() const
+    {
+        return (m_status == Status::LOADING);
+    }
+
+    bool GenericIO::Preloader::Reader::isFinishedLoading() const
+    {
+        return (m_status == Status::LOADED) || (m_status == Status::LOADERROR);
+    }
+
     GenericIO::Preloader::Preloader()
-        : MAX_THREADS(32)
-        , m_stopWorker(false)
+        : m_maxThreads(32)
+        , m_exitRequested(false)
         , m_threadCount(0)
+        , m_ceilingThreadCount(0)
+        , m_completedCount(0)
+        , m_notReadyCount(0)
+        , m_getCount(0)
     {
     }
 
@@ -69,23 +122,23 @@ namespace TwkMovie
 
     void GenericIO::Preloader::init()
     {
-        m_workerThread = std::thread(&Preloader::workerThreadFunc, this);
+        m_schedulerThread = std::thread(&Preloader::schedulerThreadFunc, this);
     }
 
     void GenericIO::Preloader::shutdown()
     {
         {
             // lock in this local scope
-            std::unique_lock<std::mutex> lock(m_mutex);
-            m_stopWorker = true;
-            m_cv.notify_all();
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+            m_exitRequested = true;
+            m_schedulerThread_cv.notify_all();
             // unlock at local scope
         }
 
-        // wait for the worker thread to exit
-        if (m_workerThread.joinable())
+        // wait for the scheduler thread to exit
+        if (m_schedulerThread.joinable())
         {
-            m_workerThread.join();
+            m_schedulerThread.join();
         }
 
         // wait for reader threads to complete if any ongoing.
@@ -96,20 +149,28 @@ namespace TwkMovie
         }
     }
 
-    void GenericIO::Preloader::finalizeCompletedThreads()
+    void GenericIO::Preloader::finalizeCompletedThreadsAndAdjustMaxThreads()
     {
+        bool update = false;
+
         // Finalize completed threads.
         for (auto& reader : m_readers)
         {
-            if (reader->m_status == Reader::Status::LOADED
-                || reader->m_status == Reader::Status::LOADERROR
-                || reader->m_status == Reader::Status::REMOVE)
+            if (reader->isPriority())
+            {
+                m_maxThreads += m_maxThreads / 4;
+                reader->setPriority(false);
+            }
+
+            if (reader->isFinishedLoading() || reader->isRemove())
             {
                 if (reader->m_thread.joinable())
                 {
                     reader->m_thread.join();
                     reader->m_thread = std::thread();
                     m_threadCount--;
+                    m_completedCount++;
+                    update = true;
                 }
             }
         }
@@ -117,109 +178,138 @@ namespace TwkMovie
         // Finally, remove from the list any readers that have been fetched
         // from the getReader method and that have been marked for removal.
 
-        auto range = std::remove_if(
-            m_readers.begin(), m_readers.end(),
-            [](const std::shared_ptr<Reader>& reader)
-            { return reader->m_status == Reader::Status::REMOVE; });
+        auto range =
+            std::remove_if(m_readers.begin(), m_readers.end(),
+                           [&update](const std::shared_ptr<Reader>& reader)
+                           {
+                               bool remove = reader->isRemove();
+                               if (remove)
+                                   update = true;
+                               return remove;
+                           });
 
         m_readers.erase(range, m_readers.end());
+
+        if (update)
+            std::cerr << "PRELOADER STATS DONE(" << m_completedCount << ") GET("
+                      << m_getCount << ") NR(" << m_notReadyCount << ") TCNT("
+                      << m_threadCount << ") TCEIL(" << m_ceilingThreadCount
+                      << ")" << std::endl;
     }
 
     void GenericIO::Preloader::addReader(const std::string_view filename,
                                          const Movie::ReadRequest& request)
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
-        auto newReader = std::make_shared<Preloader::Reader>(filename);
-        newReader->m_request = request;
+        std::cerr << "PRELODER ADD " << filename << std::endl;
+
+        auto newReader = std::make_shared<Preloader::Reader>(filename, request);
 
         m_readers.push_back(newReader);
 
-        // Wke up the worker thread in order to process the
+        // Wake up the scheduler thread in order to process the
         // newly added readers.
-        m_cv.notify_all();
+        m_schedulerThread_cv.notify_all();
     }
 
     bool GenericIO::Preloader::hasPendingReaders()
     {
-        auto it = std::find_if(
-            m_readers.begin(), m_readers.end(), [](const auto& reader)
-            { return reader->m_status == Reader::Status::PENDING; });
+        for (auto reader : m_readers)
+        {
+            if (reader->isPending())
+            {
+                if (m_threadCount < m_maxThreads)
+                    return true;
+            }
+        }
 
-        return it != m_readers.end();
+        return false;
+    }
+
+    void
+    GenericIO::Preloader::waitForFinishedLoading(std::shared_ptr<Reader> reader)
+    {
+        // no need to create the lock and wait if it's already ready
+        if (reader->isFinishedLoading())
+            return;
+
+        std::unique_lock<std::mutex> lock(m_mainThread_mutex);
+        m_mainThread_cv.wait(lock,
+                             [&reader] { return reader->isFinishedLoading(); });
     }
 
     MovieReader* GenericIO::Preloader::getReader(std::string_view filename,
                                                  const MovieInfo& info,
                                                  Movie::ReadRequest& request)
     {
-        bool wakeWorkerThread = false;
+        m_getCount++;
 
-        std::list<std::shared_ptr<Reader>>::iterator it;
+        std::cerr << "PRELOADER GET " << filename << std::endl;
 
-        // Enter local scope with lock
-        std::unique_lock<std::mutex> lock(m_mutex);
+        // There's no need to lock the scheduler mutex when accessing m_readers
+        // because the only way m_readers's internal structure would change or
+        // would otherwise be updaed (causing a crash or whatnot) is through a
+        // push_back() (done in addReader() in the main thread -- in which case
+        // we do lock) or in the scheduler thread itself doing cleanup (in which
+        // case m_readers is also locked is also locked). But the only way
+        // the scheduler would do such cleanup is if a reader's status changes
+        // to Status::REMOVE which is set by this function, so we control when
+        // such cleanup would occur in the scheduler thread.
+        //
 
         //
         // Check to see if we have a reader with the corresponding filename in
         // the queue. (Also check to make sure we don't get an iterator to a
-        // reader that is scheduled to be deleted (eg: Status::REVMOVE)
+        // reader that is scheduled to be deleted (eg: Status::REMOVE)
+        // It's safe to do this without a lock.
         //
-        it = std::find_if(m_readers.begin(), m_readers.end(),
-                          [&filename](const auto& reader)
-                          {
-                              return (reader->m_filename == filename)
-                                     && (reader->m_status
-                                         != Reader::Status::REMOVE);
-                          });
+        std::list<std::shared_ptr<Reader>>::iterator it =
+            std::find_if(m_readers.begin(), m_readers.end(),
+                         [&filename](const auto& reader)
+                         {
+                             return (reader->filename() == filename)
+                                    && (!reader->isRemove());
+                         });
 
         if (it != m_readers.end())
         {
-            auto reader = *it;
+            auto reader = *it; // get the shared_ptr<Reader> here.
 
             //
             // is the reader still pending? if so that means we're asking for
-            // the reader even before the worker thread has had a chance to
-            // schedule it. Maybe the max thread cound is reached, or the worker
-            // therad has not had a chance to wake up -- either way, escalate
-            // the priority and wake up the worker thread so that it can
-            // schedule the reader now.
+            // the reader even before the scheduler thread has had a chance to
+            // schedule it. Maybe the max thread cound is reached, or the
+            // scheduler thread has not had a chance to wake up -- either way,
+            // escalate the priority and wake up the scheduler thread so that it
+            // can schedule the reader now.
             //
-            if (reader->m_status == Reader::Status::PENDING)
+            if (reader->isPending() || reader->isLoading())
             {
-                // if so, prioritize the file and wake up the worker thread
-                // so that it can schedule the reader.
-                reader->m_priority = true;
-                m_cv.notify_all();
+                // if so, we don't have enough threads and our maxThreads
+                reader->setPriority(true);
+                m_notReadyCount++;
+
+                // Wake up the scheduler thread so that it may
+                // schedule this reader.
+                m_schedulerThread_cv.notify_all();
+                waitForFinishedLoading(reader);
             }
 
-            // Pause while we're waiting for this reader to be finished loading.
-            // It'll eventually be picked up by the worker thread
-            // and start loading, and eventually the reader thread will complete
-            // and notify m_cv when it's done. It's possible we get notified
-            // multiple times here, so we wait until the one we're looking for
-            // has indeed completed.
-            m_cv.wait(lock,
-                      [&reader]
-                      {
-                          return (reader->m_status == Reader::Status::LOADED)
-                                 || (reader->m_status
-                                     == Reader::Status::LOADERROR);
-                      });
+            // Wait for the reader to be finished loading.
 
-            // We're no longer pending or loading, we must be finished.
-            // (successfully or not).
-            // If unsuccessfull, m_movieReader is null, else it's something.
             MovieReader* movieReader = reader->m_movieReader;
 
-            // set the filename so that this reader is no longer findable.
-            reader->m_filename = "**** awaiting removal from list ****";
-            reader->m_status = Reader::Status::REMOVE;
+            // We're essentially done with this reader now.
+            // We can set its filename to a non-filename, and set its status to
+            // be removed, and then wake up the scheduler thread so that
+            // it may perform some cleanup operations such as closing out
+            // (joining) the thread and so that the reader may be removed from
+            // he list.
+            reader->clearFilename();
+            reader->setStatus(Reader::Status::REMOVE);
 
-            // Wake up the worker thread to ensure the completed reader's thread
-            // is cleaned up properly (joined), and that this reader is removed
-            // from the list by the worker thread.
-            m_cv.notify_all();
+            m_schedulerThread_cv.notify_all();
 
             // if movieReader is null, it's because there was a read error.
             if (movieReader)
@@ -228,7 +318,7 @@ namespace TwkMovie
             }
             else
             {
-                std::cerr << "PRELOADER READ ERROR: " << reader->m_filename
+                std::cerr << "PRELOADER READ ERROR: " << reader->filename()
                           << std::endl;
             }
 
@@ -238,28 +328,29 @@ namespace TwkMovie
         return nullptr;
     }
 
-    void GenericIO::Preloader::workerThreadFunc()
+    void GenericIO::Preloader::schedulerThreadFunc()
     {
         while (true)
         {
-            std::unique_lock<std::mutex> lock(m_mutex);
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
             // unblock the wait if we have something to do.
-            m_cv.wait(lock,
-                      [this]
-                      {
-                          // clean up any completed reader thread states after
-                          // they have completed (successfully or not)
-                          finalizeCompletedThreads();
+            m_schedulerThread_cv.wait(
+                lock,
+                [this]
+                {
+                    // clean up any completed reader thread states after
+                    // they have completed (successfully or not)
+                    finalizeCompletedThreadsAndAdjustMaxThreads();
 
-                          // resume execution if quitting or if anything to
-                          // schedule
-                          return m_stopWorker || hasPendingReaders();
-                      });
+                    // resume execution if quitting or if anything to
+                    // schedule
+                    return m_exitRequested || hasPendingReaders();
+                });
 
-            // if asked to stop, exit the worker thread (done by
+            // if asked to stop, exit the scheduler thread (done by
             // GenericIO::shutdown)
-            if (m_stopWorker)
+            if (m_exitRequested)
                 return;
 
             // Next, check if we need to schedule anything new.
@@ -274,27 +365,33 @@ namespace TwkMovie
             {
                 for (auto& reader : m_readers)
                 {
-                    // don't consider threads that have been handled.
-                    if (reader->m_status != Reader::Status::PENDING)
+                    // don't consider readers that have been handled
+                    // or are in the process of being handled by a
+                    // loading thread
+                    if (!reader->isPending())
                         continue;
 
                     // filter for 1st pass (only consider priority readers)
-                    if ((i == 0) && !reader->m_priority)
+                    if ((i == 0) && !reader->isPriority())
                         continue;
 
-                    // filter for 2nd pass (ojly consider non-priority readers)
-                    if ((i == 1) && reader->m_priority)
+                    // filter for 2nd pass (only consider non-priority readers)
+                    if ((i == 1) && reader->isPriority())
                         continue;
 
                     // if we're doing the 2nd pass (non-priority readers) and
                     // we're at the limit of concurrent threads, don't schedule
-                    // any more until the number comes down
-                    if ((i == 1) && (m_threadCount >= MAX_THREADS))
+                    // any more until the number of threads comes down
+                    if ((i == 1) && (m_threadCount >= m_maxThreads))
                         continue;
 
                     // we have confirmed we can schedule a new reader thread.
-                    reader->m_status = Reader::Status::LOADING;
+                    reader->setStatus(Reader::Status::LOADING);
                     m_threadCount++;
+                    if (m_ceilingThreadCount < m_threadCount)
+                        m_ceilingThreadCount = m_threadCount;
+
+                    // Start the loader thread
                     reader->m_thread =
                         std::thread(&Preloader::loaderThreadFunc, this, reader);
                 }
@@ -307,23 +404,25 @@ namespace TwkMovie
         try
         {
             reader->m_movieReader = GenericIO::preloadOpenMovieReader(
-                reader->m_filename, reader->m_request, true);
+                reader->filename(), reader->request(), true);
 
             if (reader->m_movieReader != nullptr)
-                reader->m_status = Reader::Status::LOADED;
+                reader->setStatus(Reader::Status::LOADED);
             else
-                reader->m_status = Reader::Status::LOADERROR;
+                reader->setStatus(Reader::Status::LOADERROR);
         }
         catch (...)
         {
-            reader->m_status = Reader::Status::LOADERROR;
+            reader->setStatus(Reader::Status::LOADERROR);
         }
 
-        // Notify other threads that we've completed.
-        // This will wake up the worker thread to schedule new readers
-        // and will wake up getFile() so that it can check for
-        // completion if it's waiting for this thread to finish
-        m_cv.notify_all();
+        // Wake up scheduler thread because we want it to schedule
+        // a new thread if there's a pending thread.
+        m_schedulerThread_cv.notify_all();
+
+        // Wake up main thread because the main thread might
+        // be waiting for this reader to complete in getReader().
+        m_mainThread_cv.notify_all();
     }
 
     //
