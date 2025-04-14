@@ -359,6 +359,7 @@ namespace TwkMovie
                 bool isLoading() const;
                 bool isFinishedLoading() const;
                 bool isRemove() const;
+                void load();
 
             public:
                 std::string m_filename;
@@ -392,7 +393,6 @@ namespace TwkMovie
             void loaderThreadFunc(std::shared_ptr<Reader> reader);
 
         private:
-            int m_maxThreads;
             // container of movies to preload.
             std::list<std::shared_ptr<Reader>> m_readers;
 
@@ -411,7 +411,9 @@ namespace TwkMovie
             // ceiling thread count. The ceiling thread count
             // may exceed MAX_THREADS if somehow all readers
             // get prioritized.
-            int m_threadCount;        // currently running readers
+            int m_maxThreads;  // max allowable threads, unless the load is
+                               // lagging.
+            int m_threadCount; // currently running readers
             int m_ceilingThreadCount; // ceiling running readers
             int m_completedCount;     // done reading count
             int m_notReadyCount;      // count we had to wait to complete

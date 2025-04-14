@@ -107,6 +107,24 @@ namespace TwkMovie
         return (m_status == Status::LOADED) || (m_status == Status::LOADERROR);
     }
 
+    void GenericIO::Preloader::Reader::load()
+    {
+        try
+        {
+            m_movieReader =
+                GenericIO::preloadOpenMovieReader(filename(), request(), true);
+
+            if (m_movieReader != nullptr)
+                setStatus(Reader::Status::LOADED);
+            else
+                setStatus(Reader::Status::LOADERROR);
+        }
+        catch (...)
+        {
+            setStatus(Reader::Status::LOADERROR);
+        }
+    }
+
     GenericIO::Preloader::Preloader()
         : m_maxThreads(32)
         , m_exitRequested(false)
@@ -158,7 +176,11 @@ namespace TwkMovie
         {
             if (reader->isPriority())
             {
-                m_maxThreads += m_maxThreads / 4;
+                /* Bump up max threads up to some higher upper limit?
+                m_maxThreads += 4;
+                if (m_maxThreads > 48)
+                    m_maxThreads = 48;
+                */
                 reader->setPriority(false);
             }
 
@@ -190,11 +212,13 @@ namespace TwkMovie
 
         m_readers.erase(range, m_readers.end());
 
+        /*
         if (update)
             std::cerr << "PRELOADER STATS DONE(" << m_completedCount << ") GET("
                       << m_getCount << ") NR(" << m_notReadyCount << ") TCNT("
                       << m_threadCount << ") TCEIL(" << m_ceilingThreadCount
                       << ")" << std::endl;
+        */
     }
 
     void GenericIO::Preloader::addReader(const std::string_view filename,
@@ -202,7 +226,7 @@ namespace TwkMovie
     {
         std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
-        std::cerr << "PRELODER ADD " << filename << std::endl;
+        //        std::cerr << "PRELOADER ADD " << filename << std::endl;
 
         auto newReader = std::make_shared<Preloader::Reader>(filename, request);
 
@@ -245,7 +269,7 @@ namespace TwkMovie
     {
         m_getCount++;
 
-        std::cerr << "PRELOADER GET " << filename << std::endl;
+        //        std::cerr << "PRELOADER GET " << filename << std::endl;
 
         // There's no need to lock the scheduler mutex when accessing m_readers
         // because the only way m_readers's internal structure would change or
@@ -401,26 +425,15 @@ namespace TwkMovie
 
     void GenericIO::Preloader::loaderThreadFunc(std::shared_ptr<Reader> reader)
     {
-        try
-        {
-            reader->m_movieReader = GenericIO::preloadOpenMovieReader(
-                reader->filename(), reader->request(), true);
 
-            if (reader->m_movieReader != nullptr)
-                reader->setStatus(Reader::Status::LOADED);
-            else
-                reader->setStatus(Reader::Status::LOADERROR);
-        }
-        catch (...)
-        {
-            reader->setStatus(Reader::Status::LOADERROR);
-        }
+        // execute the load function of the reader in this thread
+        reader->load();
 
         // Wake up scheduler thread because we want it to schedule
-        // a new thread if there's a pending thread.
+        // a new thread if there are pending readers.
         m_schedulerThread_cv.notify_all();
 
-        // Wake up main thread because the main thread might
+        // Wake up main thread, because the main thread might
         // be waiting for this reader to complete in getReader().
         m_mainThread_cv.notify_all();
     }

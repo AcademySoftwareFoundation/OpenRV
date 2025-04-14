@@ -604,8 +604,7 @@ namespace Rv
         Options::SourceArgs sargs;
         bool addLayer = false;
 
-        m_loadState->nextPattern(pattern, sargs, addLayer);
-        const char* file = pattern.c_str();
+        const char* file = "";
 
         int oldFrame = currentFrame();
 
