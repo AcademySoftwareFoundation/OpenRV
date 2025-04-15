@@ -10,18 +10,15 @@ def hook_function(
     compare_mode = in_timeline.mode
     is_swapped = in_timeline.is_swapped
 
-    match (compare_mode):
+    match (compare_mode.lower()):
         case "side_by_side":
             # Only the bounds need to be handled for this mode, and this is done in
             # the Live Review plugin, so nothing to do here
             pass
 
         case "over_with_opacity":
-            opacity = in_timeline.over_with_opacity["opacity"]
-            if not isinstance(opacity, float):
-                opacity = float(opacity)
+            opacity = float(in_timeline.over_with_opacity["opacity"])
 
-            stack_group = argument_map["stack"]
             sequence_group = argument_map["sequence"]
             sequence_node = extra_commands.nodesInGroupOfType(
                 sequence_group, "RVSequence"
@@ -37,31 +34,7 @@ def hook_function(
             )
 
         case "difference":
-            offset = in_timeline.difference["offset"]
-            slope = in_timeline.difference["slope"]
-
-            stack_group = argument_map["stack"]
-            stack_node = extra_commands.nodesInGroupOfType(stack_group, "RVStack")[0]
-
-            rv_cdl = commands.newNode("RVLinearize", "linearize")
-
-            cdl_property = f"{rv_cdl}.CDL"
-            effectHook.set_rv_effect_props(
-                cdl_property,
-                {
-                    "active": [1],
-                    "slope": [slope, slope, slope],
-                    "offset": [offset, offset, offset],
-                },
-            )
-
-            effectHook.set_rv_effect_props(
-                f"{stack_node}.composite", {"type": ["difference"]}
-            )
-
-            commands.setViewNode(stack_group)
-
-            return rv_cdl
+            pass
 
         case "angular_mask":
             angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
@@ -72,18 +45,18 @@ def hook_function(
 
             source = argument_map["src"]
             transform = extra_commands.associatedNode("RVTransform2D", source)
-            if commands.getIntProperty("{}.transform.active".format(transform))[0] != 0:
+            if commands.getIntProperty(f"{transform}.transform.active")[0] != 0:
                 global_translate_vec = otio.schema.V2d(0.0, 0.0)
                 global_scale_vec = otio.schema.V2d(1.0, 1.0)
 
                 if commands.propertyExists(
-                    "{}.otio.global_translate".format(transform)
-                ) and commands.propertyExists("{}.otio.global_scale".format(transform)):
+                    f"{transform}.otio.global_translate"
+                ) and commands.propertyExists(f"{transform}.otio.global_scale"):
                     global_translate = commands.getFloatProperty(
-                        "{}.otio.global_translate".format(transform)
+                        f"{transform}.otio.global_translate"
                     )
                     global_scale = commands.getFloatProperty(
-                        "{}.otio.global_scale".format(transform)
+                        f"{transform}.otio.global_scale"
                     )
                     global_translate_vec = otio.schema.V2d(
                         global_translate[0], global_translate[1]
@@ -91,10 +64,10 @@ def hook_function(
                     global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
 
                 translate = commands.getFloatProperty(
-                    "{}.transform.translate".format(transform),
+                    f"{transform}.transform.translate",
                 )
                 scale = commands.getFloatProperty(
-                    "{}.transform.scale".format(transform),
+                    f"{transform}.transform.scale",
                 )
 
                 translate_vec = otio.schema.V2d(translate[0], translate[1])
@@ -121,7 +94,6 @@ def hook_function(
                 pivot_x += 0.5 * aspect_ratio
                 pivot_y += 0.5
 
-            stack_group = argument_map["stack"]
             sequence_group = argument_map["sequence"]
             sequence = extra_commands.nodesInGroupOfType(sequence_group, "RVSequence")[
                 0
