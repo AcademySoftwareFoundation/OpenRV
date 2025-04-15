@@ -44,7 +44,6 @@ namespace Rv
 
     class RvSession : public IPCore::Session
     {
-    private:
     public:
         //
         //  Types
