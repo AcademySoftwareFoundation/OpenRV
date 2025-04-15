@@ -62,7 +62,7 @@ all_mu_commands = [
     "narrowToRange",
     "isTimerRunning",
     "setMargins",
-    "startPreloadingMovie",
+    "startPreloadingMedia",
     "addSources",
     "updateLUT",
     "narrowedFrameStart",

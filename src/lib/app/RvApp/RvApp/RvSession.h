@@ -133,7 +133,7 @@ namespace Rv
         // Entry point for the media preloader. Used implicitly by addSources
         // Used explicitly by otio reader
         // Exposed to users via a Mu & Python command
-        void startPreloadingMovie(const std::string& filename);
+        void startPreloadingMedia(const std::string& filename);
 
         //
         //  Source material.  Some methods add a bunch of media paths as a

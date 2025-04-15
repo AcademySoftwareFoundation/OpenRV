@@ -326,7 +326,7 @@ def _get_global_transform(tl, context) -> dict:
                         str(clip.media_reference.target_url), context
                     )
                     # print("PRELOADING MOVIE: {}".format(media_path))
-                    commands.startPreloadingMovie(media_path)
+                    commands.startPreloadingMedia(media_path)
 
                 bounds = clip.media_reference.available_image_bounds
                 if bounds:

@@ -500,7 +500,7 @@ namespace Rv
                 }
                 else // not a directory, so it's a movie, add to preloader.
                 {
-                    m_session->startPreloadingMovie(filename);
+                    m_session->startPreloadingMedia(filename);
                 }
             }
 
@@ -540,7 +540,7 @@ namespace Rv
         ++m_loadCount;
     }
 
-    void RvSession::startPreloadingMovie(const std::string& filename)
+    void RvSession::startPreloadingMedia(const std::string& filename)
     {
         // get the cookies and headers and updated media filename.
         std::deque<std::pair<std::string, std::string>> params;

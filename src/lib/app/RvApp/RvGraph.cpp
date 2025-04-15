@@ -310,9 +310,6 @@ namespace Rv
                         + std::string(") ") + nodeName)
                 .c_str());
 
-        //        std::cerr << "Adding source " << nodeName << " / " <<
-        //        mediaRepName << std::endl;
-
         //
         //  Build the IP tree for this source. Make sure that the
         //  caching/evaluation thread is suspended before doing
