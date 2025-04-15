@@ -282,9 +282,9 @@ namespace IPCore
             std::string m_hashString;
             ResourceUsage m_resourceUsage;
             bool m_inline;
-            bool m_usesOutputSize;
-            bool m_usesOutputST;
-            bool m_usesFragmentPosition;
+            bool m_usesOutputSize{false};
+            bool m_usesOutputST{false};
+            bool m_usesFragmentPosition{false};
             bool m_usesSampling;
 
             friend class Program;

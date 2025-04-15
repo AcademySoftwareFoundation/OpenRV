@@ -33,9 +33,6 @@ namespace IPCore::Shader
     Program::Program(Expression* expr)
         : m_expr(expr)
         , m_main(nullptr)
-        , m_needOutputSize(false)
-        , m_needOutputST(false)
-        , m_needFragmentPosition(false)
         , m_totalST(0)
     {
         m_localFunctions.emplace_back("main", "", expr);

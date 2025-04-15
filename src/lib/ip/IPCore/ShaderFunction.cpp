@@ -162,12 +162,9 @@ namespace IPCore
             , m_type(type)
             , m_parameters(params)
             , m_globals(globals)
-            , m_state(0)
+            , m_state(nullptr)
             , m_doc(doc)
             , m_hash(0)
-            , m_usesOutputSize(false)
-            , m_usesOutputST(false)
-            , m_usesFragmentPosition(false)
             , m_inline(type == Filter || type == MorphologicalFilter)
         {
             initGLSLVersion();
@@ -187,12 +184,9 @@ namespace IPCore
                            size_t numFetchesApprox, const string& doc)
             : m_name(name)
             , m_type(type)
-            , m_state(0)
+            , m_state(nullptr)
             , m_doc(doc)
             , m_hash(0)
-            , m_usesOutputSize(false)
-            , m_usesOutputST(false)
-            , m_usesFragmentPosition(false)
             , m_inline(type == Filter || type == MorphologicalFilter)
         {
             initGLSLVersion();
