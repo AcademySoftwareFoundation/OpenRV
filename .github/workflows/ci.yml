@@ -180,7 +180,7 @@ jobs:
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
         
       - name: Install Python dependencies
         run: |
@@ -297,7 +297,7 @@ jobs:
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
 
       - name: Patch Qt ${{ matrix.qt-version }}
         if: matrix.arch-type == 'x86_64'
@@ -530,7 +530,7 @@ jobs:
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
 
       - name: Install Python dependencies
         run: |
