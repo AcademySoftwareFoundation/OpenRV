@@ -164,7 +164,11 @@ jobs:
           mkdir -p "${{ github.workspace }}/deps"
 
       - name: Install Qt ${{ matrix.qt-version }}
-        uses: jurplel/install-qt-action@v4
+        # uses: jurplel/install-qt-action@v4 (the original, but older)
+        uses: jdpurcell/install-qt-action@062a85c2e9d5b22d2ffbc0172bcb451eea924ffe # the fork
+        env:
+          # **NOTE** This should probably be changed once download.qt.io connectivity issues are fixed.
+          AQT_CONFIG: ${{ github.workspace }}/.github/configurations/aqt-settings.ini
         with:
           version: '${{ matrix.qt-version }}'
           host: 'linux'
@@ -270,10 +274,16 @@ jobs:
       - name: Prepare Qt folder
         run: |
           mkdir -p "${{ github.workspace }}/deps"
+          ls -al ${{ github.workspace }}
+          ls -al ${{ github.workspace }}/.github/configurations
 
       - name: Install Qt ${{ matrix.qt-version }}
         if: matrix.arch-type == 'x86_64'
-        uses: jurplel/install-qt-action@v4
+        # uses: jurplel/install-qt-action@v4 (the original, but older)
+        uses: jdpurcell/install-qt-action@062a85c2e9d5b22d2ffbc0172bcb451eea924ffe # the fork
+        env:
+          # **NOTE** This should probably be changed once download.qt.io connectivity issues are fixed.
+          AQT_CONFIG: ${{ github.workspace }}/.github/configurations/aqt-settings.ini
         with:
           version: '${{ matrix.qt-version }}'
           host: 'mac'
@@ -505,7 +515,11 @@ jobs:
         shell: msys2 {0}
 
       - name: Install Qt ${{ matrix.qt-version }}
-        uses: jurplel/install-qt-action@v4
+        # uses: jurplel/install-qt-action@v4 (the original, but older)
+        uses: jdpurcell/install-qt-action@062a85c2e9d5b22d2ffbc0172bcb451eea924ffe # the fork
+        env:
+          # **NOTE** This should probably be changed once download.qt.io connectivity issues are fixed.
+          AQT_CONFIG: ${{ github.workspace }}/.github/configurations/aqt-settings.ini
         with:
           version: '${{ matrix.qt-version }}'
           host: 'windows'
