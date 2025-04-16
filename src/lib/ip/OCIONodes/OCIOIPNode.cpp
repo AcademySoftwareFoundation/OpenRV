@@ -581,14 +581,7 @@ namespace IPCore
 
             string shaderCacheID = gpuProcessor->getCacheID();
 
-            if (gpuProcessor->isNoOp())
-            {
-                if (m_state->function)
-                    m_state->function->retire();
-                m_state->function = 0;
-                m_state->shaderID = shaderCacheID = "";
-            }
-            else if (m_state->shaderID != shaderCacheID)
+            if (m_state->shaderID != shaderCacheID)
             {
                 if (m_state->function)
                 {
