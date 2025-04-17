@@ -126,6 +126,9 @@ SET(_shaders
     StereoChecker
     StereoAnaglyph
     StereoLumAnaglyph
+    AngularMask
+    ReverseAngularMask
+    Opacity
     Over2
     Over3
     Over4
@@ -259,9 +262,7 @@ ELSEIF(RV_TARGET_DARWIN)
     PUBLIC OpenCL::OpenCL
   )
 ELSE()
-  TARGET_LINK_LIBRARIES(
-    ${_target}
-  )
+  TARGET_LINK_LIBRARIES(${_target})
 ENDIF()
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
