@@ -123,37 +123,77 @@ namespace IPCore::Shader
                 }
                 else
                 {
-                    const BoundExpression* Bexpr =
-                        dynamic_cast<const BoundExpression*>(B);
+                    m_bindingMap[B] = NameBinding(B, S->name(), true);
+                }
+            }
+            else
+            {
+                const BoundExpression* Bexpr =
+                    dynamic_cast<const BoundExpression*>(B);
 
-                    if (source && S->type() == Symbol::Coord2DRectType)
-                    {
-                        //
-                        //  Record both the gl_TexCoord number and a mapping
-                        //  back to the source function expression. The mapping
-                        //  back is required in order to e.g. find the sampler
-                        //  for a givin inputImage.
-                        //
+                if (source && S->type() == Symbol::Coord2DRectType)
+                {
+                    //
+                    //  Record both the gl_TexCoord number and a mapping
+                    //  back to the source function expression. The mapping
+                    //  back is required in order to e.g. find the sampler
+                    //  for a givin inputImage.
+                    //
 
-                        // DO WE NEED THIS CODE? I THINK THIS CAN BE DONE
-                        // USING THE STORED GRAPHID INSTEAD OF THESE MAPS
+                    // DO WE NEED THIS CODE? I THINK THIS CAN BE DONE
+                    // USING THE STORED GRAPHID INSTEAD OF THESE MAPS
 
-                        m_outputSTSet.insert(
-                            expr->graphID()); // Not needed at all AFAIK
-                        m_coordBindingMap[B] = m_totalST;
-                        m_invSourceBindingMap[m_totalST] = expr;
-                        m_totalST++;
-                    }
+                    m_outputSTSet.insert(
+                        expr->graphID()); // Not needed at all AFAIK
+                    m_coordBindingMap[B] = m_totalST;
+                    m_invSourceBindingMap[m_totalST] = expr;
+                    m_totalST++;
+                }
 
-                    m_localFunctions[localFunctionIndex].bsymbols.push_back(B);
+                m_localFunctions[localFunctionIndex].bsymbols.push_back(B);
 
-                    ostringstream n;
+                ostringstream n;
 
-                    m_nameCountMap[S->name()]++;
-                    n << S->name() << "_" << m_nameCountMap[S->name()];
+                m_nameCountMap[S->name()]++;
+                n << S->name() << "_" << m_nameCountMap[S->name()];
 
-                    m_bindingMap[B] =
-                        NameBinding(B, n.str(), (Bexpr ? false : true));
+                m_bindingMap[B] =
+                    NameBinding(B, n.str(), (Bexpr ? false : true));
+            }
+        }
+    }
+
+    Program::~Program()
+    {
+        delete m_expr;
+        delete m_main;
+        releaseCompiledState();
+    }
+
+    string Program::recursiveOutputExpr(const Expression* expr,
+                                        bool outputOffset)
+    {
+        //
+        //  NOTE: this function has a bit of an "unnatural" structure to
+        //  it. The NameBindings are a flat list in traversal order, so
+        //  this function has to traverse in a similar fashion.
+        //
+
+        const ArgumentVector& exprArgs = expr->arguments();
+        const Function* F = expr->function();
+        const SymbolVector& symbols = F->parameters();
+
+        vector<string> rargs;
+
+        for (size_t i = 0; i < exprArgs.size(); i++)
+        {
+            if (const BoundExpression* B =
+                    dynamic_cast<const BoundExpression*>(exprArgs[i]))
+            {
+                if (B->symbol()->type() != Symbol::InputImageType)
+                {
+                    Expression* Fap = B->value();
+                    rargs.push_back(recursiveOutputExpr(Fap, outputOffset));
                 }
             }
         }
@@ -214,105 +254,53 @@ namespace IPCore::Shader
             }
 
             for (size_t i = 0; i < assignments.size(); i++)
+                cout << assignments[i].textureUnit << " / "
+                     << assignments[i].coordinateSet << " -> "
+                     << assignments[i].idhash << " (" << assignments[i].graphID
+                     << ")" << endl;
+
+            cout << "---- bind ----" << endl;
+        }
+
+        size_t nameCount = 0;
+        bind2(nameCount, boundExpr, m_expr, assignments, windowSize);
+
+        //
+        //  Bind known values that come from TextureUnitAssignments or
+        //  output device.
+        //
+
+        if (m_needOutputSize)
+        {
+            unsigned int location = uniformLocation("_windowSize");
+            glUniform2fv(location, 1, &(windowSize[0]));
+
+            if (Shader::debuggingType() == Shader::AllDebugInfo)
             {
-                const ImageAndCoordinateUnit& icu = assignments[i];
-
-                if (icu.outputSize)
-                {
-                    string name = "Size" + icu.graphID;
-                    int location = uniformLocation(name);
-
-                    if (location >= 0)
-                    {
-                        glUniform2f(location, icu.uncropWidth,
-                                    icu.uncropHeight);
-
-                        if (Shader::debuggingType() == Shader::AllDebugInfo)
-                        {
-                            cout << "INFO: binding variable vec2 " << name
-                                 << " at " << location
-                                 << " :: value = " << icu.uncropWidth << ", "
-                                 << icu.uncropHeight << endl;
-                        }
-                    }
-                    else
-                    {
-                        cout << "ERROR: failed to bind " << name << endl;
-                    }
-                }
+                cout << "INFO: binding variable vec2 _windowSize at "
+                     << location << " :: value = " << windowSize[0] << ", "
+                     << windowSize[1] << endl;
             }
         }
 
-        void Program::bind2(size_t& nameCount, const Expression* boundExpr,
-                            const Expression* unboundExpr,
-                            const TextureUnitAssignments& assignments,
-                            const TwkMath::Vec2f& windowSize) const
+        for (size_t i = 0; i < assignments.size(); i++)
         {
-            const ArgumentVector& boundArgs = boundExpr->arguments();
-            const ArgumentVector& unboundArgs = unboundExpr->arguments();
-            const Function* F = boundExpr->function();
-            const size_t nargs = boundArgs.size();
+            const ImageAndCoordinateUnit& icu = assignments[i];
 
-            for (size_t i = 0; i < nargs; i++)
+            if (icu.outputSize)
             {
-                if (BoundExpression* be =
-                        dynamic_cast<BoundExpression*>(boundArgs[i]))
+                string name = "Size" + icu.graphID;
+                int location = uniformLocation(name);
+
+                if (location >= 0)
                 {
-                    BoundExpression* rbe =
-                        dynamic_cast<BoundExpression*>(unboundArgs[i]);
-                    bind2(nameCount, be->value(), rbe->value(), assignments,
-                          windowSize);
-                }
-            }
+                    glUniform2f(location, icu.uncropWidth, icu.uncropHeight);
 
-            for (size_t q = 0; q < nargs; q++)
-            {
-                BoundSymbol* b = boundArgs[q];
-                BoundSymbol* rb = unboundArgs[q];
-                const Symbol* S = b->symbol();
-
-                if (BoundExpression* be = dynamic_cast<BoundExpression*>(b))
-                {
-                    nameCount++;
-                    continue;
-                }
-
-                // const Program::NameBinding& nb = nameBindings()[nameCount++];
-                BindingMap::const_iterator bi = m_bindingMap.find(rb);
-                const Program::NameBinding& nb = (*bi).second;
-
-                const string& name = nb.name;
-                assert(nb.bsymbol->symbol() == S);
-                GLint location = -1;
-                location = uniformLocation(name);
-
-                void* vp = b->valuePointer();
-
-                if (location == -1)
-                    continue; // not assignable
-
-                if (Shader::debuggingType() == Shader::AllDebugInfo)
-                {
-                    cout << "INFO: binding variable " << S->glslTypeName()
-                         << " " << name << " at " << location << " :: value = ";
-
-                    b->output(cout);
-                    cout << endl;
-                }
-
-                switch (S->type())
-                {
-                case Symbol::FloatType:
-                    if (S->isSpecial() && S->name() == "time")
+                    if (Shader::debuggingType() == Shader::AllDebugInfo)
                     {
-                        //
-                        // NOTE: this is *wall clock* time. Its pretty much
-                        // the only value which can be assigned during bind
-                        // time.
-                        //
-
-                        GLfloat elapsed = shaderClock.elapsed();
-                        glUniform1fv(location, 1, &elapsed);
+                        cout << "INFO: binding variable vec2 " << name << " at "
+                             << location << " :: value = " << icu.uncropWidth
+                             << ", " << icu.uncropHeight << endl;
                     }
                     else
                     {
@@ -492,6 +480,9 @@ namespace IPCore::Shader
                     m_invSourceBindingMap[m_totalST] = expr;
                     m_totalST++;
                 }
+            }
+        }
+    }
 
                 m_localFunctions[localFunctionIndex].bsymbols.push_back(B);
 
