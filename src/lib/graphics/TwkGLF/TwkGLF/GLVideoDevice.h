@@ -84,7 +84,10 @@ namespace TwkGLF
         virtual GLFBO* defaultFBO(); // GLVideoDevice owns it
         virtual const GLFBO* defaultFBO() const;
 
-        virtual int defaultFBOIndex() const { return 0; }
+        virtual GLuint fboID() const
+        {
+            return 0;
+        } // this is meant to be overridden in derived classes.
 
         virtual void setDefaultFBOIndex(int i) {}
 

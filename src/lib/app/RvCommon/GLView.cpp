@@ -151,7 +151,6 @@ namespace Rv
 
         setObjectName((m_doc->session()) ? m_doc->session()->name().c_str()
                                          : "no session");
-        // m_frameBuffer = new QTFrameBuffer( this );
 
         m_activityTimer.start();
         setMouseTracking(true);
@@ -371,6 +370,8 @@ namespace Rv
 
     void GLView::paintGL()
     {
+        TWK_GLDEBUG;
+
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;
 
@@ -383,6 +384,7 @@ namespace Rv
             {
                 m_doc->resizeToFit(false, false);
                 m_doc->center();
+                TWK_GLDEBUG;
             }
         }
 
@@ -410,7 +412,9 @@ namespace Rv
         if (m_doc && session && m_videoDevice)
         {
             // m_frameBuffer->makeCurrent();
+            TWK_GLDEBUG;
             m_videoDevice->makeCurrent();
+            TWK_GLDEBUG;
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
@@ -420,6 +424,7 @@ namespace Rv
                     TwkApp::ActivityChangeEvent aevent("user-inactive",
                                                        m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
+                    TWK_GLDEBUG;
                     m_userActive = false;
                 }
             }
@@ -431,7 +436,9 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
+            TWK_GLDEBUG;
             session->render();
+            TWK_GLDEBUG;
 
             m_firstPaintCompleted = true;
 
@@ -557,39 +564,7 @@ namespace Rv
         {
             if (session->outputVideoDevice() != videoDevice())
             {
-
-#ifdef PLATFORM_DARWIN
-                if (!m_syncThreadData)
-                {
-                    m_syncThreadData =
-                        new SyncBufferThreadData(session->outputVideoDevice());
-                    m_swapThread = boost::thread(ThreadTrampoline(this));
-                }
-                else
-                {
-                    SyncBufferThreadData* sb =
-                        reinterpret_cast<SyncBufferThreadData*>(
-                            m_syncThreadData);
-
-                    if (sb->device() != session->outputVideoDevice())
-                    {
-                        //
-                        //  This is questionable without shutting down and
-                        //  restarting the sync thread, but the worst case
-                        //  seems to be an extra swap on the closed (not
-                        //  visible) device
-                        //
-
-                        sb->setDevice(session->outputVideoDevice());
-                    }
-                }
-
-                reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData)
-                    ->notify();
-
-#else
                 session->outputVideoDevice()->syncBuffers();
-#endif
             }
         }
 
@@ -598,6 +573,8 @@ namespace Rv
         session->postRender();
 
         m_eventProcessingTimer.start();
+
+        TWK_GLDEBUG;
     }
 
     void GLView::eventProcessingTimeout()
