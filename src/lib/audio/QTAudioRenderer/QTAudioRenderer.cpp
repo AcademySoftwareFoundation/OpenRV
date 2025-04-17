@@ -462,9 +462,7 @@ namespace IPCore
         const AudioRenderer::DeviceState& state = deviceState();
 
         if (data && (m_audioRenderer.isPlaying())
-            && (maxLenInBytes >= m_bytesPerSample)
-            && ((m_audioOutput->state() == QAudio::ActiveState)
-                || (m_audioOutput->state() == QAudio::IdleState)))
+            && (maxLenInBytes >= m_bytesPerSample))
         {
             const int bufferSize = m_audioOutput->bufferSize();
 
@@ -782,8 +780,7 @@ namespace IPCore
 
     qint64 QTAudioIODevice::bytesAvailable() const
     {
-
-        return QIODevice::bytesAvailable();
+        return m_thread.audioOutput()->bufferSize() + QIODevice::bytesAvailable();
     }
 
     //----------------------------------------------------------------------
@@ -1055,13 +1052,15 @@ namespace IPCore
 
         if (AudioRenderer::debug)
         {
+            int periodSize = (int)bufferSize() / m_format.bytesPerFrame();
             TwkUtil::Log("QTAudioOutput")
                 << "play session:setup: startSample =" << m_thread.startSample()
                 << " shift=" << s->shift()
                 << " isPlaying=" << (int)s->isPlaying()
                 << " isScrubbingAudio=" << (int)s->isScrubbingAudio()
                 << " audioOutput state=" << (int)state()
-                << " audioOutput bufferSize=" << (int)bufferSize();
+                << " audioOutput bufferSize=" << (int)bufferSize()
+                << " audioOutput periodSize=" << (int)(periodSize);
         }
     }
 

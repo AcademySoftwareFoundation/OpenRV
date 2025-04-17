@@ -248,7 +248,7 @@ jobs:
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
       
       - name: Install Qt ${{ matrix.qt-version }}
         if: ${{ matrix.vfx-platform == 'CY2024' }}
@@ -453,7 +453,7 @@ jobs:
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
 
       - name: Patch Qt ${{ matrix.qt-version }}
         if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
@@ -724,7 +724,7 @@ jobs:
           tools: 'tools_qtcreator'
           set-env: 'true'
           tools-only: 'false'
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
 
       - name: Install Qt ${{ matrix.qt-version }}
         if: ${{ matrix.vfx-platform == 'CY2024' }}
