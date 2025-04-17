@@ -146,6 +146,8 @@ namespace IPCore
             return m_lastDeviceLatency;
         }
 
+        QTAudioOutput* audioOutput() const { return m_audioOutput; }
+
     protected:
         virtual void run();
 
