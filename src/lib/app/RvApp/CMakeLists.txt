@@ -52,6 +52,7 @@ TARGET_LINK_LIBRARIES(
           PyTwkApp
           TwkApp
           TwkContainer
+          TwkMediaLibrary
           TwkDeploy
           TwkFB
           TwkMath

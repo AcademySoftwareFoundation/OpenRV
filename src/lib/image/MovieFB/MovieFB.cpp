@@ -139,13 +139,19 @@ namespace TwkMovie
         return success;
     }
 
-    void MovieFB::open(const string& filename, const MovieInfo& info,
-                       const Movie::ReadRequest& request)
+    void MovieFB::preloadOpen(const std::string& filename,
+                              const ReadRequest& request)
     {
         m_filename = filename;
-        m_imagePattern = pathConform(filename);
+        m_request = request;
+    }
+
+    void MovieFB::postPreloadOpen(const MovieInfo& info,
+                                  const ReadRequest& request)
+    {
+        m_imagePattern = pathConform(m_filename);
         m_info = info;
-        m_filehash = stl_ext::hash(filename);
+        m_filehash = stl_ext::hash(m_filename);
 
         updateFrameInfo();
 
@@ -160,7 +166,7 @@ namespace TwkMovie
         // 5. any frame, searched in order if NONE of the above frames succeeded
         //
 
-        ExistingFileList existingFiles = existingFilesInSequence(filename);
+        ExistingFileList existingFiles = existingFilesInSequence(m_filename);
 
         int successFrame = -1;
         bool infoSuccess = false;
@@ -880,8 +886,9 @@ namespace TwkMovie
         string fname = firstFileInPattern(filename);
         string ext = extension(fname);
 
-        if (const FrameBufferIO* io =
-                TwkFB::GenericIO::findByExtension(extension(filename)))
+        const FrameBufferIO* io;
+
+        if ((io = TwkFB::GenericIO::findByExtension(extension(filename))))
         {
             try
             {
@@ -889,7 +896,7 @@ namespace TwkMovie
             }
             catch (...)
             {
-                if (io = TwkFB::GenericIO::findByBruteForce(fname))
+                if ((io = TwkFB::GenericIO::findByBruteForce(fname)))
                 {
                     io->getImageInfo(filename, minfo);
                 }
@@ -902,8 +909,7 @@ namespace TwkMovie
         }
         else
         {
-            if (const FrameBufferIO* io =
-                    TwkFB::GenericIO::findByBruteForce(fname))
+            if ((io = TwkFB::GenericIO::findByBruteForce(fname)))
             {
                 io->getImageInfo(fname, minfo);
             }

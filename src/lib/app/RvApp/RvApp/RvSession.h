@@ -15,6 +15,8 @@
 #include <Mu/Value.h>
 #include <RvApp/Options.h>
 
+#include <unordered_map>
+
 namespace Mu
 {
     class CallEnvironment;
@@ -126,6 +128,11 @@ namespace Rv
         void setUserHasSetViewSize(bool v) { m_userHasSetViewSize = v; };
 
         bool userHasSetViewSize() { return m_userHasSetViewSize; };
+
+        // Entry point for the media preloader. Used implicitly by addSources
+        // Used explicitly by otio reader
+        // Exposed to users via a Mu & Python command
+        void startPreloadingMedia(const std::string& filename);
 
         //
         //  Source material.  Some methods add a bunch of media paths as a
@@ -323,7 +330,6 @@ namespace Rv
         //
         //  Override
         //
-
         virtual void findProperty(PropertyVector& props,
                                   const std::string& name);
         virtual void findCurrentNodesByTypeName(NodeVector& nodes,
@@ -381,6 +387,8 @@ namespace Rv
         void onGraphNodeWillRemove(IPCore::IPNode* node);
 
     private:
+        UINameCache m_uiNameCache;
+
         Mu::Object* m_data;
         void* m_pydata;
         bool m_loadingError;

@@ -3869,6 +3869,24 @@ namespace IPMu
         NODE_RETURN(obj);
     }
 
+    NODE_IMPLEMENTATION(nextUIName, Pointer)
+    {
+        Mu::StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
+        const Mu::StringType* stype =
+            static_cast<const StringType*>(name->type());
+        const Mu::Class* type = static_cast<const Class*>(NODE_THIS.type());
+
+        if (!name)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD,
+                                      "nil property name");
+
+        Session::PropertyVector props;
+        Session* session = Session::currentSession();
+        std::string newName = session->nextUIName(name->c_str());
+
+        return stype->allocate(newName);
+    }
+
     NODE_IMPLEMENTATION(propertyExists, bool)
     {
         Mu::StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -3908,7 +3926,7 @@ namespace IPMu
 
         IPNode* node = 0;
 
-        if (node = s->graph().findNode(name->c_str()))
+        if ((node = s->graph().findNode(name->c_str())))
         {
         }
         else
@@ -6283,6 +6301,9 @@ namespace IPMu
             new Function(c, "propertyInfo", propertyInfo, None, Return,
                          "PropertyInfo", Parameters,
                          new Param(c, "propertyName", "string"), End),
+
+            new Function(c, "nextUIName", nextUIName, None, Return, "string",
+                         Parameters, new Param(c, "uiName", "string"), End),
 
             new Function(c, "propertyExists", propertyExists, None, Return,
                          "bool", Parameters,

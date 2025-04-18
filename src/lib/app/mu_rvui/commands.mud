@@ -745,6 +745,15 @@ For example a single stereo source might look like string[]
 {"[", "left.mov", "right.mov", "+rs", "1001", "]" }
 """
 
+
+startPreloadingMedia """
+When called with a media name (eg: a movie filename or url for mp4 media), 
+will queue the filename to a background thread where the file will start 
+preloading in anticipation of a later call to FileSourceIPNode::openMovie.  
+With a single file, this makes no difference, but when loading playlists, 
+the time benefits can become significant.
+"""
+
 addSourceVerbose """
 Similar to addSource(), but returns the name of the source node created.
 """

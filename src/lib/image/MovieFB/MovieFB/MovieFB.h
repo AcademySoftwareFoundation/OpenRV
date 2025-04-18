@@ -92,10 +92,11 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
+        virtual void preloadOpen(const std::string& filename,
+                                 const ReadRequest& request);
 
-        virtual void
-        open(const std::string& filename, const MovieInfo& as = MovieInfo(),
-             const Movie::ReadRequest& request = Movie::ReadRequest());
+        virtual void postPreloadOpen(const MovieInfo& as,
+                                     const ReadRequest& request);
 
         //
         //  Movie API

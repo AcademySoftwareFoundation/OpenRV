@@ -48,9 +48,12 @@ namespace TwkMovie
         //
 
         virtual MovieReader* clone() const;
-        virtual void
-        open(const std::string& filename, const MovieInfo& as = MovieInfo(),
-             const Movie::ReadRequest& request = Movie::ReadRequest());
+
+        virtual void preloadOpen(const std::string& filename,
+                                 const ReadRequest& request);
+
+        virtual void postPreloadOpen(const MovieInfo& as,
+                                     const ReadRequest& request);
 
         //
         //  Movie API
