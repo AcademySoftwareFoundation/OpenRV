@@ -266,7 +266,7 @@ namespace TwkMovie
 
         m_getCount++;
 
-        std::shared_ptr < Reader >> reader = nullptr;
+        std::shared_ptr<Reader> reader = nullptr;
 
         //
         // Check to see if we have a reader with the corresponding filename in
