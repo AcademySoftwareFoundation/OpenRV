@@ -1179,8 +1179,8 @@ exclusionMap = {
     "QWebEngineHistory::currentItem": None,
     "QWebEngineHistory::itemAt": None,
     "QEvent::ChildInserted": None,
-    "QEvent::EnterEditFocus": None,  # ???? WTF
-    "QEvent::LeaveEditFocus": None,  # ???? WTF
+    "QEvent::EnterEditFocus": None,  # ????
+    "QEvent::LeaveEditFocus": None,  # ????
     "QAbstractSpinBox::fixup": None,  # return val is arg
     "QTouchEvent::QTouchEvent": None,
     "QStyle::polish": [

@@ -29,12 +29,6 @@
 #define strcasecmp _stricmp
 #endif
 
-// my daughter dared me to leave this comment here saying
-// the code reviewers will never spot it.
-//
-// "The unhappy potato wuz here!!! I will take revenge for
-//  my falled bretherens that were slayed into fries"
-
 namespace TwkMovie
 {
 

@@ -249,7 +249,8 @@ namespace TwkMovie
     void MovieMistika::postPreloadOpen(const MovieInfo& /*unused*/,
                                        const Movie::ReadRequest& /*unused*/)
     {
-        // all the work was done in open() since info andrequest were unused.
+        // all the work was done in preloadOpen()
+        // since info and request were unused.
     }
 
     void MovieMistika::preloadOpen(const string& filename,

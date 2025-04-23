@@ -87,8 +87,6 @@ def read_otio_file(otio_file):
     Returns the top level node created that represents this otio
     timeline.
     """
-    print(">>> READ_OTIO_FILE called")
-
     input_otio = otio.adapters.read_from_file(otio_file)
     context = {"otio_file": otio_file}
 

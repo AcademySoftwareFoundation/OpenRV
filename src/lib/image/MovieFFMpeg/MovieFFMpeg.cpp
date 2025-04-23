@@ -1203,8 +1203,7 @@ namespace TwkMovie
         if (m_avFormatContext == 0)
         {
             openAVFormat(); // sets m_avFormatContext
-            //            findStreamInfo(); // findStreamInfo is not thread
-            //            safe. damnit.
+            // findStreamInfo(); // commented bc it is not thread safe... :(
             // https://stackoverflow.com/questions/15366441/ffmpeg-which-functions-are-multithreading-safe
         }
     }
@@ -4268,7 +4267,7 @@ namespace TwkMovie
             avCodecContext->codec_id = avCodec->id;
             avCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
             avCodecContext->thread_count =
-                m_request.threads; // never seems to be set anywhere?
+                m_request.threads; // 0; and never seems to changed anywhere?
             avCodecContext->width = m_info.width;
             avCodecContext->height = m_info.height;
             avCodecContext->color_primaries = AVCOL_PRI_BT709; // 1
