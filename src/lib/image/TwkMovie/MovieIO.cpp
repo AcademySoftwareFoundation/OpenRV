@@ -167,7 +167,7 @@ namespace TwkMovie
         }
     }
 
-    void GenericIO::Preloader::finalizeCompletedThreadsAndAdjustMaxThreads()
+    void GenericIO::Preloader::finalizeCompletedThreads()
     {
         bool update = false;
 
@@ -176,11 +176,6 @@ namespace TwkMovie
         {
             if (reader->isPriority())
             {
-                /* Bump up max threads up to some higher upper limit?
-                m_maxThreads += 4;
-                if (m_maxThreads > 48)
-                    m_maxThreads = 48;
-                */
                 reader->setPriority(false);
             }
 
@@ -267,39 +262,38 @@ namespace TwkMovie
                                                  const MovieInfo& info,
                                                  Movie::ReadRequest& request)
     {
-        m_getCount++;
-
         //        std::cerr << "PRELOADER GET " << filename << std::endl;
 
-        // There's no need to lock the scheduler mutex when accessing m_readers
-        // because the only way m_readers's internal structure would change or
-        // would otherwise be updaed (causing a crash or whatnot) is through a
-        // push_back() (done in addReader() in the main thread -- in which case
-        // we do lock) or in the scheduler thread itself doing cleanup (in which
-        // case m_readers is also locked is also locked). But the only way
-        // the scheduler would do such cleanup is if a reader's status changes
-        // to Status::REMOVE which is set by this function, so we control when
-        // such cleanup would occur in the scheduler thread.
-        //
+        m_getCount++;
+
+        std::shared_ptr < Reader >> reader = nullptr;
 
         //
         // Check to see if we have a reader with the corresponding filename in
         // the queue. (Also check to make sure we don't get an iterator to a
         // reader that is scheduled to be deleted (eg: Status::REMOVE)
-        // It's safe to do this without a lock.
         //
-        std::list<std::shared_ptr<Reader>>::iterator it =
-            std::find_if(m_readers.begin(), m_readers.end(),
-                         [&filename](const auto& reader)
-                         {
-                             return (reader->filename() == filename)
-                                    && (!reader->isRemove());
-                         });
-
-        if (it != m_readers.end())
+        // Do this while locking a limited scope to search in m_Readers.
+        // In principle, locking here is un-necessary, but we're doing it
+        // to be safer.
+        //
         {
-            auto reader = *it; // get the shared_ptr<Reader> here.
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
+            std::list<std::shared_ptr<Reader>>::iterator it =
+                std::find_if(m_readers.begin(), m_readers.end(),
+                             [&filename](const auto& reader)
+                             {
+                                 return (reader->filename() == filename)
+                                        && (!reader->isRemove());
+                             });
+
+            if (it != m_readers.end())
+                reader = *it;
+        }
+
+        if (reader)
+        {
             //
             // is the reader still pending? if so that means we're asking for
             // the reader even before the scheduler thread has had a chance to
@@ -329,10 +323,13 @@ namespace TwkMovie
             // be removed, and then wake up the scheduler thread so that
             // it may perform some cleanup operations such as closing out
             // (joining) the thread and so that the reader may be removed from
-            // he list.
+            // the list.
             reader->clearFilename();
             reader->setStatus(Reader::Status::REMOVE);
 
+            // Wake up the scheduler thread so that it may remove
+            // the Reader from the list (from here, it's no longer safe to
+            // access the "reader" variable)
             m_schedulerThread_cv.notify_all();
 
             // if movieReader is null, it's because there was a read error.
@@ -359,18 +356,19 @@ namespace TwkMovie
             std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
             // unblock the wait if we have something to do.
-            m_schedulerThread_cv.wait(
-                lock,
-                [this]
-                {
-                    // clean up any completed reader thread states after
-                    // they have completed (successfully or not)
-                    finalizeCompletedThreadsAndAdjustMaxThreads();
+            m_schedulerThread_cv.wait(lock,
+                                      [this]
+                                      {
+                                          // clean up any completed reader
+                                          // thread states after they have
+                                          // completed (successfully or not)
+                                          finalizeCompletedThreads();
 
-                    // resume execution if quitting or if anything to
-                    // schedule
-                    return m_exitRequested || hasPendingReaders();
-                });
+                                          // resume execution if quitting or if
+                                          // anything to schedule
+                                          return m_exitRequested
+                                                 || hasPendingReaders();
+                                      });
 
             // if asked to stop, exit the scheduler thread (done by
             // GenericIO::shutdown)
