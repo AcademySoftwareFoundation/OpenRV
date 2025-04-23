@@ -657,6 +657,15 @@ class: AnnotateMinorMode : MinorMode
     method: eraserPush (void; Event event)
     {
         updateCurrentNode();
+
+        // Save the current draw mode so we can restore it when we are done 
+        // erasing as long as it is not the eraser mode itself which could
+        // happen when pushing the eraser more than once
+        if (_currentDrawMode.name != _currentDrawMode.eraserMode.name)
+        {
+            _currentDrawMode.eraserMode.penMode = _currentDrawMode;
+        }
+
         _currentDrawMode = _currentDrawMode.eraserMode;
         updateDrawModeUI();
         push(event);
