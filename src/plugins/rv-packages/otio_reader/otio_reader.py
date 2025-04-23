@@ -68,13 +68,9 @@ def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object
     timeline.
     """
 
-    print(">>> READ_OTIO_STRING called. host_prefix = {}".format(host_prefix))
-
     otio_obj = otio.adapters.read_from_string(otio_string)
     timeline = otio_obj["otio"]
     context = {"sg_url": host_prefix} if host_prefix else None
-
-    print(context)
 
     commands.addSourceBegin()
     ret = create_rv_node_from_otio(timeline, context), timeline.global_start_time
