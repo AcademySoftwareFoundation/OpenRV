@@ -375,7 +375,9 @@ def _set_sequence_edl(sequence, edl_time, edl):
     # edl.in/out are terminated by 0. edl.frame is terminated by last frame + 1.
     edl["in"].append(0)
     edl["out"].append(0)
-    edl["frame"].append(edl_time.to_frames() + 1)
+    # Note that the edl_time is already exclusive so we don't need to add 1 here
+    # For reference: _create_track() - edl_time = edl_range.end_time_exclusive()
+    edl["frame"].append(edl_time.to_frames())
 
     # This effectively forces each cut to use the otio trimmed_range, regardless
     # of effects or other modifications to a sources timing.
@@ -473,6 +475,15 @@ def _create_media(media_ref, trimmed_range, context=None):
 
 
 def _create_sources(item, context=None):
+    def rename_media_rep(media_rep_name):
+        media_rep_name_replacement = {
+            "mp4": "Streaming",
+            "original_media": "Original",
+            "path_to_movie": "Movie",
+            "path_to_frames": "Frames",
+        }
+        return media_rep_name_replacement.get(media_rep_name, media_rep_name)
+
     def add_media(media_ref, active_key, cmd, *cmd_args):
         media = _create_media(media_ref, item.trimmed_range(), context)
 
@@ -512,7 +523,9 @@ def _create_sources(item, context=None):
     )
     if hasattr(item, "media_reference") and item.media_reference:
         active_source = add_media(
-            item.media_reference, active_key, commands.addSourceVerbose
+            item.media_reference,
+            rename_media_rep(active_key),
+            commands.addSourceVerbose,
         )
 
     source_group = commands.nodeGroup(active_source)
@@ -520,7 +533,11 @@ def _create_sources(item, context=None):
         for key, media_ref in item.media_references().items():
             if key != active_key:
                 add_media(
-                    media_ref, None, commands.addSourceMediaRep, active_source, key
+                    media_ref,
+                    None,
+                    commands.addSourceMediaRep,
+                    active_source,
+                    rename_media_rep(key),
                 )
 
         switch_group = commands.nodeConnections(source_group)[1][0]
@@ -535,7 +552,7 @@ def _create_sources(item, context=None):
 def _get_media_path(target_url: str, context: dict | None = None) -> str:
     context = context or {}
 
-    if "sg_url" in context:
+    if "sg_url" in context and target_url.startswith("/file_serve/version"):
         return context.get("sg_url") + target_url
 
     if not os.path.isabs(target_url):

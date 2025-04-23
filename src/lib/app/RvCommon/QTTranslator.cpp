@@ -1084,39 +1084,27 @@ namespace Rv
         const int ytilt = event->yTilt();
         const int z = event->z();
 
-        TabletEvent::TabletKind kind;
-        TabletEvent::TabletDevice device;
-
         string n;
-
-        // NOTE_QT: There is no equivalent to QTabletEvent::FourDMouse. Might
-        // need custom class or use generic mouse type.
 
 #if defined(RV_VFX_CY2023)
         switch (event->deviceType())
         {
         case QTabletEvent::NoDevice:
-            device = TabletEvent::NoTableDevice;
             n = "generic-tablet-device-";
             break;
         case QTabletEvent::Puck:
-            device = TabletEvent::PuckDevice;
             n = "puck-";
             break;
         case QTabletEvent::Stylus:
-            device = TabletEvent::StylusDevice;
             n = "stylus-";
             break;
         case QTabletEvent::Airbrush:
-            device = TabletEvent::AirBrushDevice;
             n = "airbrush-";
             break;
         case QTabletEvent::FourDMouse:
-            device = TabletEvent::FourDMouseDevice;
             n = "mouse4D-";
             break;
         case QTabletEvent::RotationStylus:
-            device = TabletEvent::RotationStylusDevice;
             n = "rotating-stylus-";
             break;
         default:
@@ -1126,70 +1114,73 @@ namespace Rv
         switch (event->pointerType())
         {
         case QTabletEvent::UnknownPointer:
-            kind = TabletEvent::UnknownTabletKind;
             break;
         case QTabletEvent::Pen:
-            kind = TabletEvent::PenKind;
             n += "pen-";
             break;
         case QTabletEvent::Cursor:
-            kind = TabletEvent::CursorKind;
             n += "cursor-";
             break;
         case QTabletEvent::Eraser:
-            kind = TabletEvent::EraserKind;
             n += "eraser-";
             break;
         }
 #else
+
+        // Note: In Qt6, QTabletEvent::FourDMouse and QTabletEvent::RotationStylus have been removed
+        // and replaced with QInputDevice::DeviceType::Puck and QInputDevice::DeviceType::Stylus respectively.
+
         switch (event->deviceType())
         {
         case QInputDevice::DeviceType::Unknown:
-            device = TabletEvent::NoTableDevice;
             n = "generic-tablet-device-";
             break;
-        case QInputDevice::DeviceType::Puck:
-            device = TabletEvent::PuckDevice;
-            n = "puck-";
+        case QInputDevice::DeviceType::Mouse:
+            n = "mouse-";
+            break;
+        case QInputDevice::DeviceType::TouchScreen:
+            n = "touchscreen-";
+            break;
+        case QInputDevice::DeviceType::TouchPad:
+            n = "touchpad-";
             break;
         case QInputDevice::DeviceType::Stylus:
-            device = TabletEvent::StylusDevice;
             n = "stylus-";
             break;
         case QInputDevice::DeviceType::Airbrush:
-            device = TabletEvent::AirBrushDevice;
             n = "airbrush-";
             break;
-            // TODO_QT: FourDMouse is not available anymore.
-            //   case QInputDevice::DeviceType::Mouse:
-            //       device = TabletEvent::FourDMouseDevice;
-            //       n = "mouse4D-";
-            //       break;
-            // TODO_QT: RotationStylus is not available anymore.
-            //   case QTabletEvent::RotationStylus:
-            //       device = TabletEvent::RotationStylusDevice;
-            //       n = "rotating-stylus-";
-            //       break;
+        case QInputDevice::DeviceType::Puck:
+            n = "puck-";
+            break;
+        case QInputDevice::DeviceType::Keyboard:
+            n = "keyboard-";
+            break;
+        case QInputDevice::DeviceType::AllDevices:
         default:
             break;
         }
 
         switch (event->pointerType())
         {
-        case QPointingDevice::PointerType::Unknown:
-            kind = TabletEvent::UnknownTabletKind;
+        case QPointingDevice::PointerType::Generic:
+            n += "generic-";
+            break;
+        case QPointingDevice::PointerType::Finger:
+            n += "finger-";
             break;
         case QPointingDevice::PointerType::Pen:
-            kind = TabletEvent::PenKind;
             n += "pen-";
             break;
+        case QPointingDevice::PointerType::Eraser:
+            n += "eraser-";
+            break;
         case QPointingDevice::PointerType::Cursor:
-            kind = TabletEvent::CursorKind;
             n += "cursor-";
             break;
-        case QPointingDevice::PointerType::Eraser:
-            kind = TabletEvent::EraserKind;
-            n += "eraser-";
+        case QPointingDevice::PointerType::Unknown:
+        case QPointingDevice::PointerType::AllPointerTypes:
+        default:
             break;
         }
 #endif
@@ -1228,8 +1219,7 @@ namespace Rv
         }
 
         TabletEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height,
-                      // m_lastx, m_lasty,
-                      m_pushx, m_pushy, buttons(), kind, device, gx, gy,
+                      m_pushx, m_pushy, buttons(), gx, gy,
                       pressure, tpressure, rot, xtilt, ytilt, z);
 
         sendEvent(e);

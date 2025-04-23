@@ -27,6 +27,7 @@ class AVOutputFormat;
 class AVPacket;
 class AVRational;
 class AVStream;
+class SwsContext;
 
 //
 // TwkMovie Forward Declaration Placeholders
@@ -44,6 +45,7 @@ namespace TwkMovie
     class AudioTrack;
     class VideoTrack;
     class ContextPool;
+    class HardwareContext;
 
     //
     //  class MovieFFMpegIO
@@ -181,7 +183,8 @@ namespace TwkMovie
         void initializeVideo(int height, int width);
         void initializeAudio();
         bool openAVFormat();
-        bool openAVCodec(int index, AVCodecContext** avCodecContext);
+        bool openAVCodec(int index, AVCodecContext** avCodecContext,
+                         HardwareContext* hardwareContext = nullptr);
         void findStreamInfo();
 
         //
@@ -258,6 +261,12 @@ namespace TwkMovie
 
         // check if the input format is jpeg_pipe or png_pipe
         bool isImageFormat(const char* iformat);
+
+        // Copy the source frame to the destination frame and convert image
+        // format if requested
+        static void copyFrame(const AVFrame* srcFrame, AVFrame* dstFrame,
+                              int width, int height, bool convertFormat,
+                              SwsContext*& imgConvertContext);
 
         //
         // Data Members

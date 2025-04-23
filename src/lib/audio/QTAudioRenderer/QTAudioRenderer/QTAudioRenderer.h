@@ -17,16 +17,9 @@
 #include <QtCore/QIODevice>
 
 #include <QtMultimedia/QAudioFormat>
-#if defined(RV_VFX_CY2023)
-// Qt5
-#include <QtMultimedia/QAudioOutput>
-#include <QtMultimedia/QAudioDeviceInfo>
-#else
-// Qt6+
 #include <QtMultimedia/QAudioDevice>
 #include <QtMultimedia/QAudioSink>
 #include <QtMultimedia/QMediaDevices>
-#endif
 
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
@@ -36,11 +29,7 @@
 namespace IPCore
 {
 
-#ifdef RV_VFX_CY2023
-    using SampleFormat = QAudioFormat::SampleType;
-#else
     using SampleFormat = QAudioFormat::SampleFormat;
-#endif
 
     class QTAudioThread;
     class QTAudioRenderer;
@@ -67,22 +56,13 @@ namespace IPCore
         QTAudioThread& m_thread;
     };
 
-#if defined(RV_VFX_CY2023)
-    class QTAudioOutput : public QAudioOutput
-#else
     class QTAudioOutput : public QAudioSink
-#endif
     {
         Q_OBJECT
 
     public:
-#if defined(RV_VFX_CY2023)
-        QTAudioOutput(QAudioDeviceInfo& audioDevice,
-#else
-        QTAudioOutput(QAudioDevice& audioDevice,
-#endif
-                      QAudioFormat& audioFormat, QTAudioIODevice& ioDevice,
-                      QTAudioThread& audioThread);
+        QTAudioOutput(QAudioDevice& audioDevice, QAudioFormat& audioFormat,
+                      QTAudioIODevice& ioDevice, QTAudioThread& audioThread);
         ~QTAudioOutput();
 
     public slots:
@@ -101,11 +81,7 @@ namespace IPCore
         std::string toString(QAudio::State state);
 
     private:
-#if defined(RV_VFX_CY2023)
-        QAudioDeviceInfo& m_device;
-#else
         QAudioDevice& m_device;
-#endif
         QAudioFormat& m_format;
         QTAudioIODevice& m_ioDevice;
         QTAudioThread& m_thread;
@@ -169,6 +145,8 @@ namespace IPCore
         {
             return m_lastDeviceLatency;
         }
+
+        QTAudioOutput* audioOutput() const { return m_audioOutput; }
 
     protected:
         virtual void run();
@@ -247,17 +225,10 @@ namespace IPCore
         static IPCore::AudioRenderer::Module addQTAudioModule();
 
         TwkAudio::Format getTwkAudioFormat() const;
-#if defined(RV_VFX_CY2023)
-        TwkAudio::Format convertToTwkAudioFormat(int fmtSize,
-                                                 SampleFormat fmtType) const;
-#else
         TwkAudio::Format convertToTwkAudioFormat(SampleFormat fmtType) const;
-#endif
 
-#if defined(RV_VFX_CY2024)
         QAudioFormat::SampleFormat
         convertToQtAudioFormat(TwkAudio::Format fmtType) const;
-#endif
 
         void setSampleSizeAndType(Layout twkLayout, Format twkFormat,
                                   QAudioFormat& qformat) const;
@@ -265,11 +236,7 @@ namespace IPCore
         friend class QTAudioThread;
 
     private:
-#if defined(RV_VFX_CY2023)
-        bool supportsRequiredChannels(const QAudioDeviceInfo& info) const;
-#else
         bool supportsRequiredChannels(const QAudioDevice& info) const;
-#endif
 
         void init();
 
@@ -279,13 +246,8 @@ namespace IPCore
         QObject* m_parent;
         QTAudioThread* m_thread;
         QAudioFormat m_format;
-#if defined(RV_VFX_CY2023)
-        QAudioDeviceInfo m_device;
-        QList<QAudioDeviceInfo> m_deviceList;
-#else
         QAudioDevice m_device;
         QList<QAudioDevice> m_deviceList;
-#endif
         std::string m_codec;
     };
 

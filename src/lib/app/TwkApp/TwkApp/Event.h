@@ -693,34 +693,14 @@ namespace TwkApp
     class TabletEvent : public PointerEvent
     {
     public:
-        enum TabletKind
-        {
-            UnknownTabletKind,
-            PenKind,
-            CursorKind,
-            EraserKind
-        };
-
-        enum TabletDevice
-        {
-            NoTableDevice,
-            PuckDevice,
-            StylusDevice,
-            AirBrushDevice,
-            FourDMouseDevice,
-            RotationStylusDevice
-        };
 
         TabletEvent(const std::string& name, const EventNode* sender,
                     unsigned int modifiers, int x, int y, int w, int h, int ox,
-                    int oy, unsigned int buttonStates, TabletKind kind,
-                    TabletDevice device, double gx, double gy, double pres,
+                    int oy, unsigned int buttonStates, double gx, double gy, double pres,
                     double tpres, double rot, int xtilt, int ytilt, int z = 0,
                     void* data = 0)
             : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy,
                            buttonStates, data)
-            , _kind(kind)
-            , _device(device)
             , _xFloat(gx)
             , _yFloat(gy)
             , _pressure(pres)
@@ -749,8 +729,6 @@ namespace TwkApp
         int z() const { return _z; }
 
     private:
-        TabletKind _kind;
-        TabletDevice _device;
         double _xFloat;
         double _yFloat;
         double _pressure;
