@@ -1773,6 +1773,8 @@ namespace IPCore
             m_renderer->clearState();
         clearHistory();
 
+        m_uiNameCache.clear();
+
         //
         //  Give code a chance to react to the viewnode changing away
         //  from the current, and to the defaultSequence.  If we do this

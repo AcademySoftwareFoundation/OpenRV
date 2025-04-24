@@ -10,6 +10,7 @@
 #include <iostream>
 #include <set>
 #include <deque>
+#include <utility>
 #include <map>
 #include <boost/signals2.hpp>
 #include <boost/any.hpp>
@@ -939,6 +940,9 @@ namespace TwkMediaLibrary
     URLVector libraryURLsOfMedia(const URL&);
     NodeVector libraryNodesAssociatedWithURL(const URL&);
     URLVector libraryURLsAssociatedWithURL(const URL&);
+    std::string lookupFilenameInMediaLibrary(
+        const std::string& filename,
+        std::deque<std::pair<std::string, std::string>>& params);
 
     inline bool isPropertyListType(PropertyType t)
     {

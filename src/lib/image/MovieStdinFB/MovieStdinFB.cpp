@@ -57,8 +57,15 @@ namespace TwkMovie
         mov->cacheFrames();
     }
 
-    void MovieStdinFB::open(const string& filename, const MovieInfo& info,
-                            const Movie::ReadRequest& request)
+    void MovieStdinFB::postPreloadOpen(const MovieInfo& info,
+                                       const Movie::ReadRequest& request)
+    {
+        // request and info were unused in open().
+        // Thus all of the work can be done in preloadOpen.
+    }
+
+    void MovieStdinFB::preloadOpen(const std::string& filename,
+                                   const ReadRequest& request)
     {
         size_t len = filename.size();
 
@@ -69,6 +76,8 @@ namespace TwkMovie
         }
 
         m_filename = basename(filename.substr(0, filename.size() - 8));
+        m_request = request;
+
         vector<string> tokens;
         stl_ext::tokenize(tokens, m_filename, ",");
 

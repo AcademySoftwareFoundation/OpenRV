@@ -40,6 +40,73 @@ namespace IPCore
 
     class Session : public TwkApp::Document
     {
+    protected:
+        class UINameCache
+        {
+            //
+            // this "dupe name" cache is a little helper to find the next
+            // unique ui name for a given string.
+            // For example, if we look for "MyName", and it doesn't exist,
+            // "MyName" will be returned and its associated cunter will be
+            // set to 2. If any "MyName" exists, then its counter is increased
+            // and "MyName {counter}" is returned.
+            // This ensures that dupe checking is O(log(N)) by checking in the
+            // map, as opposed to O(N) as before using the old dupe check code,
+            // leading to a total of O(N^2) name checking.  When we have very
+            // few items for which we want to set a ui name, N^2 isn't a problem
+            // but it very quickly does become a problem when N becomes
+            // relatively large and checking property names in the graph is
+            // relatively costly.
+            //
+            // Differences with previous approach, of always looking for the
+            // names in the graph, checking for dupes, include:
+            //
+            // 1- If there's a hole in the dupes, the hole won't be "filled":
+            //   eg: if "Toto [1..6, 8..10]" exist (but not 7) then "Toto 7"
+            //   won't be considered, we immediately checked for availability,
+            //   and the next name will be "Toto 11"
+            //
+            // 2- If the node in the graph is set to a value with a number, then
+            //    the name with the number will be used as the root name.
+            //      in -> "Toto"   out -> "Toto", "Toto 2", "Toto 3", "Toto 4"
+            //      ... in -> "Bob 5"  out -> "Bob 5", "Bob 5 1", "Bob 5 2",
+            //      "Bob 5 3" ...
+            //
+            // 3- There's a "possible-but-unlikely" conflict if someone manually
+            //    creates a ui name with a number, with the same root as other
+            //    nodes, and that there's another node with the same root and
+            //    same counter. eg: "Toto [1..10]" exist (with the root "Toto"),
+            //    but someone sets the name to "Toto 5" as the root, causing a
+            //    conflict with a name in case (2), which would go undetected.
+            //    A workaround for this is to prevent doing this explicitely via
+            //    the UI.
+            //
+        public:
+            UINameCache() {}
+
+            std::string nextUIName(const std::string& name)
+            {
+                std::string newName = name;
+
+                // increase the dupe cache counter.
+                int counter = m_names[name];
+                counter++;
+                m_names[name] = counter;
+
+                if (counter > 1)
+                {
+                    newName = name + " " + std::to_string(counter);
+                }
+
+                return newName;
+            }
+
+            void clear() { m_names.clear(); }
+
+        private:
+            std::unordered_map<std::string, int> m_names;
+        };
+
     public:
         //
         //  Types
@@ -853,6 +920,11 @@ namespace IPCore
 
         void makeCurrentSession() { m_currentSession = this; }
 
+        std::string nextUIName(const std::string& name)
+        {
+            return m_uiNameCache.nextUIName(name);
+        }
+
         //
         //  Access to IP graph
         //
@@ -1128,6 +1200,7 @@ namespace IPCore
             double elapsed) const; // also applies to RV_AVPLAYBACK_VERSION=0
 
     protected:
+        UINameCache m_uiNameCache;
         bool m_waitForUploadThreadPrefetch;
         IPGraph* m_graph;
         std::string m_name;

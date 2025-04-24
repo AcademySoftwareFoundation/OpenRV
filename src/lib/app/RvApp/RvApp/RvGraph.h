@@ -76,27 +76,9 @@ namespace Rv
 
         // Scope of the fast add source mechanism which postpones the default
         // views' inputs connection until all the new sources have been added
-        void addSourceBegin()
-        {
-            int newFastAddSourceEnabled = ++m_fastAddSourceEnabled;
-
-            m_fastAddSourceChangedSignal(true, newFastAddSourceEnabled);
-        }
-
-        void addSourceEnd()
-        {
-            int newFastAddSourceEnabled = --m_fastAddSourceEnabled;
-
-            if (newFastAddSourceEnabled == 0)
-                connectNewSourcesToDefaultViews();
-
-            m_fastAddSourceChangedSignal(false, newFastAddSourceEnabled);
-        }
-
-        bool isFastAddSourceEnabled() const
-        {
-            return m_fastAddSourceEnabled > 0;
-        }
+        void addSourceBegin();
+        void addSourceEnd();
+        bool isFastAddSourceEnabled() const;
 
         // gives access to the signal call when fastAddSourceEnabled changed
         //
