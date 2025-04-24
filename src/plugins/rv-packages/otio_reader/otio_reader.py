@@ -60,25 +60,6 @@ class NoNodeFromHook(otio.exceptions.OTIOError):
     pass
 
 
-def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object | None:
-    """
-    Main entry point to expand a given otio string into the current RV session.
-
-    Returns the top level node created that represents this otio
-    timeline.
-    """
-
-    otio_obj = otio.adapters.read_from_string(otio_string)
-    timeline = otio_obj["otio"]
-    context = {"sg_url": host_prefix} if host_prefix else None
-
-    commands.addSourceBegin()
-    ret = create_rv_node_from_otio(timeline, context), timeline.global_start_time
-    commands.addSourceEnd()
-
-    return ret
-
-
 def read_otio_file(otio_file):
     """
     Main entry point to expand a given otio (or file otio can read)
@@ -471,6 +452,13 @@ def _create_media(media_ref, trimmed_range, context=None):
                 context,
             )
         ]
+
+    elif isinstance(media_ref, otio.schema.GeneratorReference):
+        if media_ref.generator_kind == "solid":
+            color_parameters = media_ref.parameters.get("color")
+            kind = f"solid,{color_parameters}"
+            return [_create_movieproc(media_range, kind)]
+
     return [_create_movieproc(media_range, "smptebars")]
 
 
