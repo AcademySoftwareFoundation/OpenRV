@@ -2880,103 +2880,8 @@ namespace IPCore
     string
     FileSourceIPNode::lookupFilenameInMediaLibrary(const string& filename)
     {
-        string file(filename);
-
-        if (TwkMediaLibrary::isLibraryURL(file))
-        {
-            //
-            //  If this file looks like a library URL try to convert it
-            //  into a local file URL and then a path
-            //
-
-            file = TwkMediaLibrary::libraryURLtoMediaURL(file);
-            file.erase(0, 7); // assuming "file://" not good
-            return file;
-        }
-
-        if (TwkMediaLibrary::isLibraryMediaURL(file))
-        {
-            //
-            //  URL is a media URL tracked by one of the libraries. Find its
-            //  media node and find out if its streaming.
-            //
-
-            TwkMediaLibrary::NodeVector nodes =
-                TwkMediaLibrary::libraryNodesAssociatedWithURL(file);
-            for (int n = 0; n < nodes.size(); n++)
-            {
-                const TwkMediaLibrary::Node* node = nodes[n];
-                std::string nodeName = node->name();
-
-                if (const TwkMediaLibrary::MediaAPI* api =
-                        TwkMediaLibrary::api_cast<TwkMediaLibrary::MediaAPI>(
-                            node))
-                {
-                    if (api->isStreaming())
-                    {
-                        TwkMediaLibrary::HTTPCookieVector cookies =
-                            api->httpCookies();
-                        if (!cookies.empty())
-                        {
-                            ostringstream cookieStm;
-
-                            for (int c = 0; c < cookies.size(); c++)
-                            {
-                                if (c > 0)
-                                    cookieStm << "\n";
-                                cookieStm << cookies[c].name << "="
-                                          << cookies[c].value;
-
-                                if (!cookies[c].path.empty())
-                                    cookieStm << "; path=" << cookies[c].path;
-                                if (!cookies[c].domain.empty())
-                                    cookieStm << "; domain="
-                                              << cookies[c].domain;
-                            }
-
-                            if (evDebugCookies.getValue())
-                                std::cout << "Cookies:\n"
-                                          << cookieStm.str() << std::endl;
-
-                            m_inparams.push_back(
-                                StringPair("cookies", cookieStm.str()));
-                        }
-
-                        TwkMediaLibrary::HTTPHeaderVector headers =
-                            api->httpHeaders();
-                        if (!headers.empty())
-                        {
-                            ostringstream headersStm;
-
-                            for (size_t h = 0, size = headers.size(); h < size;
-                                 ++h)
-                            {
-                                if (h > 0)
-                                    headersStm << "\r\n";
-                                headersStm << headers[h].name << ": "
-                                           << headers[h].value;
-                            }
-
-                            if (evDebugCookies.getValue())
-                                std::cout << "Headers:\n"
-                                          << headersStm.str() << std::endl;
-
-                            m_inparams.push_back(
-                                StringPair("headers", headersStm.str()));
-                        }
-                    }
-
-                    if (api->isRedirecting())
-                    {
-                        std::string redirection = api->httpRedirection();
-                        std::cout << "INFO: " << nodeName << " is redirecting "
-                                  << file << " to " << redirection << std::endl;
-                        file = redirection;
-                    }
-                }
-            }
-        }
-
+        string file =
+            TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, m_inparams);
         return file;
     }
 
@@ -3006,7 +2911,7 @@ namespace IPCore
         }
 
         //
-        //  Look up a cach file for this in the MediaMetadata cache
+        //  Look up a cache file for this in the MediaMetadata cache
         //
 
         if (bundle->hasCacheItem("MediaMetadata", cacheItemString))
