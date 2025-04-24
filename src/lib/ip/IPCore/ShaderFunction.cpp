@@ -10,6 +10,7 @@
 #include <IPCore/ShaderSymbol.h>
 #include <IPCore/IPImage.h>
 #include <TwkUtil/Timer.h>
+#include <array>
 #include <cassert>
 #include <sstream>
 #include <iomanip>
@@ -42,29 +43,30 @@ namespace IPCore
             Symbol::Type type;
         };
 
-        const SymbolTypeAssociation symbolTypeAssociations[] = {
-            {"float", Symbol::FloatType},
-            {"vec2", Symbol::Vec2fType},
-            {"vec3", Symbol::Vec3fType},
-            {"vec4", Symbol::Vec4fType},
-            {"int", Symbol::IntType},
-            {"ivec2", Symbol::Vec2iType},
-            {"ivec3", Symbol::Vec3iType},
-            {"ivec4", Symbol::Vec4iType},
-            {"bool", Symbol::IntType},
-            {"bvec2", Symbol::Vec2bType},
-            {"bvec3", Symbol::Vec3bType},
-            {"bvec4", Symbol::Vec4bType},
-            {"mat4", Symbol::Matrix4fType},
-            {"mat3", Symbol::Matrix3fType},
-            {"mat2", Symbol::Matrix2fType},
-            {"sampler1D", Symbol::Sampler1DType},
-            {"sampler2D", Symbol::Sampler2DType},
-            {"sampler2DRect", Symbol::Sampler2DRectType},
-            {"sampler3D", Symbol::Sampler3DType},
-            {"inputImage", Symbol::InputImageType},
-            {"outputImage", Symbol::OutputImageType},
-            {0, Symbol::VoidType}};
+        const std::array<SymbolTypeAssociation, 23> symbolTypeAssociations = {
+            {{"float", Symbol::FloatType},
+             {"vec2", Symbol::Vec2fType},
+             {"vec3", Symbol::Vec3fType},
+             {"vec4", Symbol::Vec4fType},
+             {"int", Symbol::IntType},
+             {"ivec2", Symbol::Vec2iType},
+             {"ivec3", Symbol::Vec3iType},
+             {"ivec4", Symbol::Vec4iType},
+             {"bool", Symbol::IntType},
+             {"bvec2", Symbol::Vec2bType},
+             {"bvec3", Symbol::Vec3bType},
+             {"bvec4", Symbol::Vec4bType},
+             {"mat4", Symbol::Matrix4fType},
+             {"mat3", Symbol::Matrix3fType},
+             {"mat2", Symbol::Matrix2fType},
+             {"sampler1D", Symbol::Sampler1DType},
+             {"sampler2D", Symbol::Sampler2DType},
+             {"sampler2DRect", Symbol::Sampler2DRectType},
+             {"sampler3D", Symbol::Sampler3DType},
+             {"inputImage", Symbol::InputImageType},
+             {"outputImage", Symbol::OutputImageType},
+             {"fragmentPosition", Symbol::FragmentPositionType},
+             {nullptr, Symbol::VoidType}}};
 
         namespace
         {
@@ -161,11 +163,9 @@ namespace IPCore
             , m_type(type)
             , m_parameters(params)
             , m_globals(globals)
-            , m_state(0)
+            , m_state(nullptr)
             , m_doc(doc)
             , m_hash(0)
-            , m_usesOutputSize(false)
-            , m_usesOutputST(false)
             , m_inline(type == Filter || type == MorphologicalFilter)
         {
             initGLSLVersion();
@@ -185,11 +185,9 @@ namespace IPCore
                            size_t numFetchesApprox, const string& doc)
             : m_name(name)
             , m_type(type)
-            , m_state(0)
+            , m_state(nullptr)
             , m_doc(doc)
             , m_hash(0)
-            , m_usesOutputSize(false)
-            , m_usesOutputST(false)
             , m_inline(type == Filter || type == MorphologicalFilter)
         {
             initGLSLVersion();
@@ -511,7 +509,8 @@ namespace IPCore
 
                     pp.special = (name == "time" && ptype == "float")
                                  || (name == "_offset" && ptype == "vec2")
-                                 || ptype == "outputImage";
+                                 || ptype == "outputImage"
+                                 || ptype == "fragmentPosition";
                     pp.name = name;
                     pp.type = ptype;
                     pp.requiresInline = false;
@@ -551,11 +550,10 @@ namespace IPCore
                         regex usesSTRE("\\b" + name
                                        + "\\s*\\.\\s*([stpq]{1,4}|[xyzw]{1,4}|["
                                          "rgba]{1,4})\\b");
-                        regex usesSamplingRE("\\b" + name
-                                             + "\\s*\\(\\s*[^\\)]");
-                        regex usesLookupRE("\\b" + name + "\\s*\\(\\s*\\)");
+                        regex usesSamplingRE("\\b" + name + R"(\s*\(\s*[^\)])");
+                        regex usesLookupRE("\\b" + name + R"(\s*\(\s*\))");
                         regex usesSizeRE("\\b" + name
-                                         + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
+                                         + R"(\s*\.\s*size\s*\(\s*\))");
 
                         pp.usesST = regex_search(m_sourceCode, sm, usesSTRE);
                         pp.usesSampling =
@@ -568,11 +566,15 @@ namespace IPCore
                             pp.usesSampling || pp.usesST || pp.usesSize;
 
                         if (pp.usesSampling)
+                        {
                             usesSampling = true;
+                        }
                     }
 
                     if (pp.requiresInline)
+                    {
                         m_inline = true;
+                    }
 
                     parsedParameters.push_back(pp);
                 }
@@ -733,8 +735,76 @@ namespace IPCore
                             re = regex(",\\s*const\\s+in\\s+outputImage\\s+"
                                        + p.name + "\\b");
                         }
-
                         m_sourceCode = regex_replace(m_sourceCode, re, "");
+                    }
+
+                    else if (p.type == "fragmentPosition")
+                    {
+                        if (!p.q_in || !p.q_const)
+                        {
+                            //  Do not allow fragmentPosition type to be an out
+                            //  or non-constant. Force it to be and then notify
+                            //  user (shader writer)
+                            //
+                            //  NOTE: It's ok to throw here. Throwing here will
+                            //  unwind past the Function constructor and back
+                            //  to whoever tried to make then function. This
+                            //  is expected behavior.
+
+                            throw std::runtime_error(
+                                "inputImage argument '" + p.name
+                                + "' must have qualifier 'const in'");
+                        }
+
+                        //  NOTE: "fragmentPosition" is a special type that
+                        //  shader writers need to be aware of. Remove
+                        //  "fragmentPosition foo" from parameter list because
+                        //  we don't need it. replace foo.size with _windowSize,
+                        //  foo.ABC (where ABC is any legal swizzle op for a
+                        //  vec3) with _fragPosition.
+
+                        boost::smatch stringMatch;
+                        boost::regex regexFunction(
+                            "\\b(" + p.name
+                            + ")\\s*\\.\\s*([stp]{1,3}|[xyz]{1,3}|[rgb]{"
+                              "1,3})\\b");
+
+                        //  Look for occurence of foo.size or swizzle and
+                        //  replace with corresponding symbols.
+
+                        if (boost::regex_search(m_sourceCode, stringMatch,
+                                                regexFunction))
+                        {
+                            m_usesFragmentPosition = true;
+
+                            //  Swap in whatever swizzle the user might have
+                            //  done on the outputImage coords when
+                            //  substituting in fragCoord.
+
+                            m_sourceCode = boost::regex_replace(
+                                m_sourceCode, regexFunction,
+                                "_fragPosition.\\2");
+                            m_inline = true;
+                        }
+
+                        //  remove this parameter
+
+                        boost::regex regex;
+
+                        if (i == 0)
+                        {
+                            regex = boost::regex(
+                                R"(\s*const\s+in\s+fragmentPosition\s+)"
+                                + p.name + "\\s*,");
+                        }
+                        else
+                        {
+                            regex = boost::regex(
+                                R"(,\s*const\s+in\s+fragmentPosition\s+)"
+                                + p.name + "\\b");
+                        }
+
+                        m_sourceCode = regex_replace(m_sourceCode, regex, "");
                     }
                     else
                     {
@@ -766,30 +836,38 @@ namespace IPCore
                         Symbol::Type stype = Symbol::VoidType;
                         unsigned int qualifier = Symbol::Uniform;
 
-                        for (const SymbolTypeAssociation* a =
-                                 symbolTypeAssociations;
-                             a->glslName; a++)
+                        for (const auto& association : symbolTypeAssociations)
                         {
-                            if (p.type == a->glslName)
+                            if (p.type == association.glslName)
                             {
-                                stype = a->type;
+                                stype = association.type;
 
                                 if (p.q_out && p.q_in)
+                                {
                                     qualifier = Symbol::ParameterInOut;
+                                }
                                 else if (p.q_in && p.q_const)
+                                {
                                     qualifier = Symbol::ParameterConstIn;
+                                }
                                 else if (p.q_in && !p.q_const)
+                                {
                                     qualifier = Symbol::ParameterIn;
+                                }
                                 else if (p.q_out)
+                                {
                                     qualifier = Symbol::ParameterOut;
+                                }
 
                                 if (p.special)
+                                {
                                     qualifier |= Symbol::Special;
+                                }
 
-                                Symbol* s =
-                                    new Symbol((Symbol::Qualifier)qualifier,
-                                               p.name, stype);
-                                m_parameters.push_back(s);
+                                auto symbol = std::make_unique<Symbol>(
+                                    static_cast<Symbol::Qualifier>(qualifier),
+                                    p.name, stype);
+                                m_parameters.push_back(symbol.release());
                                 break; // in case of typo in
                                        // symbolTypeAssociations
                             }
@@ -1052,16 +1130,23 @@ namespace IPCore
 
             bool first = true;
 
-            for (size_t q = 0; q < symbols.size(); q++)
+            for (const auto* symbol : symbols)
             {
-                if (symbols[q]->type() == Symbol::InputImageType
-                    || symbols[q]->type() == Symbol::OutputImageType)
+                // those symbols get passed from the vertex shader to the
+                // fragment shader using the "in"/"out" storage qualifiers, so
+                // we don't have to include them in the function's prototype.
+                if (symbol->type() == Symbol::InputImageType
+                    || symbol->type() == Symbol::OutputImageType
+                    || symbol->type() == Symbol::FragmentPositionType)
+                {
                     continue;
+                }
+
                 if (!first)
                     code << ", ";
                 first = false;
-                code << symbols[q]->glslQualifierName() << " "
-                     << symbols[q]->glslTypeName();
+                code << symbol->glslQualifierName() << " "
+                     << symbol->glslTypeName();
             }
 
             code << ")";
@@ -1636,6 +1721,21 @@ namespace IPCore
                         glsl = regex_replace(glsl, outSTRE, "_outST.\\1");
 
                         str << "uniform vec2 _outST;" << endl;
+                        lineCount++;
+                    }
+
+                    if (m_usesFragmentPosition)
+                    {
+                        //
+                        //  OUT.st -> _outFragPos.st
+                        //
+
+                        regex outSTRE("\\b" + name
+                                      + "\\s*\\.\\s*([stp]{1,3}|[xyz]{1,3}|["
+                                        "rgb]{1,3})\\b");
+                        glsl = regex_replace(glsl, outSTRE, "_outFragPos.\\1");
+
+                        str << "uniform vec2 _outFragPos;" << endl;
                         lineCount++;
                     }
 

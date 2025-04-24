@@ -60,21 +60,6 @@ class NoNodeFromHook(otio.exceptions.OTIOError):
     pass
 
 
-def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object | None:
-    """
-    Main entry point to expand a given otio string into the current RV session.
-
-    Returns the top level node created that represents this otio
-    timeline.
-    """
-    otio_obj = otio.adapters.read_from_string(otio_string)
-    timeline = otio_obj["otio"]
-
-    context = {"sg_url": host_prefix} if host_prefix else None
-
-    return create_rv_node_from_otio(timeline, context), timeline.global_start_time
-
-
 def read_otio_file(otio_file):
     """
     Main entry point to expand a given otio (or file otio can read)
