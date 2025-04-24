@@ -111,7 +111,8 @@ namespace TwkMovie
         return m;
     }
 
-    void MovieRV::preloadOpen(const std::string& filename)
+    void MovieRV::preloadOpen(const std::string& filename,
+                              const ReadRequest& request)
     {
         // nothing works for this
     }
