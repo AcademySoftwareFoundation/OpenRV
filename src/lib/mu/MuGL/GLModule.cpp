@@ -1607,7 +1607,7 @@ namespace Mu
         values->resize(16);
         for (int i = 0; i < 16; ++i)
         {
-            /* AJG - wtf mf? */
+            /* AJG - ????? */
             values->element<float>(i) = 0;
         }
 

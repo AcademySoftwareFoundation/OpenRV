@@ -809,7 +809,12 @@ Return list of node names in the given group, with type equal to the given type.
         node  = if group eq nil then innode else group,
         name  = "%s.ui.name" % node;
 
-    return if propertyExists(name) then getStringProperty(name).front() else node;
+    let prop = getStringProperty(name);
+
+    if (!prop.empty())
+        return prop.front();
+    
+    return node;
 }
 
 
@@ -826,34 +831,44 @@ Set the user interface name of a node. May modify the name to make it unqiue.
 
 \: setUIName (void; string node, string val)
 {
-    string newName = val;
-    bool dupcheck = true;
+    bool useNextUIName = true;
+    string newName;
 
-    while (dupcheck)
+    if (!useNextUIName)
     {
-        dupcheck = false;
+        newName = val;
+        bool dupcheck = true;
 
-        for_each (n; viewNodes())
+        while (dupcheck)
         {
-            if (uiName(n) == newName && n != node)
-            {
-                let re = regex("(.*)([0-9]+)$");
-                
-                if (re.match(newName))
-                {
-                    let m = re.smatch(newName);
-                    newName = "%s%d" % (m[1], int(m[2]) + 1);
-                }
-                else
-                {
-                    newName += "2";
-                }
+            dupcheck = false;
 
-                dupcheck = true;
-                break;
+            for_each (n; viewNodes())
+            {
+                if (uiName(n) == newName && n != node)
+                {
+                    let re = regex("(.*)([0-9]+)$");
+                
+                    if (re.match(newName))
+                    {
+                        let m = re.smatch(newName);
+                        newName = "%s%d" % (m[1], int(m[2]) + 1);
+                    }
+                    else
+                    {
+                        newName += "2";
+                    }
+
+                    dupcheck = true;
+                    break;
+                }
             }
-        }
-    };
+        };
+    }
+    else // useNextUIName = true
+    {
+        newName = nextUIName(val);
+    }
 
     let name = "%s.ui.name" % node;
     if (!propertyExists(name)) newProperty(name, StringType, 1);

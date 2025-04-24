@@ -1248,10 +1248,26 @@ namespace TwkMovie
         return mov;
     }
 
-    void MovieFFMpegReader::open(const string& filename, const MovieInfo& info,
-                                 const Movie::ReadRequest& request)
+    void MovieFFMpegReader::preloadOpen(const std::string& filename,
+                                        const ReadRequest& request)
     {
         m_filename = filename;
+        m_request = request;
+
+        if (m_cloning)
+            return;
+
+        if (m_avFormatContext == 0)
+        {
+            openAVFormat(); // sets m_avFormatContext
+            // findStreamInfo(); // commented bc it is not thread safe... :(
+            // https://stackoverflow.com/questions/15366441/ffmpeg-which-functions-are-multithreading-safe
+        }
+    }
+
+    void MovieFFMpegReader::postPreloadOpen(const MovieInfo& info,
+                                            const ReadRequest& request)
+    {
         m_info = info;
         m_request = request;
 
@@ -2147,14 +2163,14 @@ namespace TwkMovie
 
         m_avFormatContext->probesize = TWK_AVFORMAT_PROBESIZE;
         if (avformat_find_stream_info(m_avFormatContext, 0) < 0)
+        {
             TWK_THROW_EXC_STREAM(
                 "Failed to open stream for reading: " << m_filename);
+        }
     }
 
     void MovieFFMpegReader::initializeAll()
     {
-        openAVFormat();
-
         //
         // For some formats the streams are not partially located at all. In
         // that case we need to find them first.
@@ -4462,7 +4478,8 @@ namespace TwkMovie
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
             avCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
-            avCodecContext->thread_count = m_request.threads;
+            avCodecContext->thread_count =
+                m_request.threads; // 0; and never seems to changed anywhere?
             avCodecContext->width = m_info.width;
             avCodecContext->height = m_info.height;
             avCodecContext->color_primaries = AVCOL_PRI_BT709; // 1
