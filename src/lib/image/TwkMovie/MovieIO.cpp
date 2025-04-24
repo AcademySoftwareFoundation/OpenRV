@@ -48,6 +48,397 @@ namespace TwkMovie
                                             "Read",          "Write",
                                             "AudioRead",     "AudioWrite"};
 
+    //
+    // GenericIO::Preloader implementation
+    //
+    GenericIO::Preloader::Reader::Reader(std::string_view filename,
+                                         const Movie::ReadRequest& request)
+    {
+        m_filename = filename;
+        m_status = Status::PENDING;
+        m_request = request;
+        m_priority = false;
+    }
+
+    void GenericIO::Preloader::Reader::clearFilename()
+    {
+        m_filename = "**** filename cleared ****";
+    }
+
+    const std::string& GenericIO::Preloader::Reader::filename() const
+    {
+        return m_filename;
+    }
+
+    const Movie::ReadRequest& GenericIO::Preloader::Reader::request() const
+    {
+        return m_request;
+    }
+
+    void GenericIO::Preloader::Reader::setPriority(bool priority)
+    {
+        m_priority = priority;
+    }
+
+    bool GenericIO::Preloader::Reader::isPriority() const { return m_priority; }
+
+    void GenericIO::Preloader::Reader::setStatus(Status status)
+    {
+        m_status = status;
+    }
+
+    bool GenericIO::Preloader::Reader::isRemove() const
+    {
+        return (m_status == Status::REMOVE);
+    }
+
+    bool GenericIO::Preloader::Reader::isPending() const
+    {
+        return (m_status == Status::PENDING);
+    }
+
+    bool GenericIO::Preloader::Reader::isLoading() const
+    {
+        return (m_status == Status::LOADING);
+    }
+
+    bool GenericIO::Preloader::Reader::isFinishedLoading() const
+    {
+        return (m_status == Status::LOADED) || (m_status == Status::LOADERROR);
+    }
+
+    void GenericIO::Preloader::Reader::load()
+    {
+        try
+        {
+            m_movieReader =
+                GenericIO::preloadOpenMovieReader(filename(), request(), true);
+
+            if (m_movieReader != nullptr)
+                setStatus(Reader::Status::LOADED);
+            else
+                setStatus(Reader::Status::LOADERROR);
+        }
+        catch (...)
+        {
+            setStatus(Reader::Status::LOADERROR);
+        }
+    }
+
+    GenericIO::Preloader::Preloader()
+        : m_maxThreads(32)
+        , m_exitRequested(false)
+        , m_threadCount(0)
+        , m_ceilingThreadCount(0)
+        , m_completedCount(0)
+        , m_notReadyCount(0)
+        , m_getCount(0)
+    {
+    }
+
+    GenericIO::Preloader::~Preloader() {}
+
+    void GenericIO::Preloader::init()
+    {
+        m_schedulerThread = std::thread(&Preloader::schedulerThreadFunc, this);
+    }
+
+    void GenericIO::Preloader::shutdown()
+    {
+        {
+            // lock in this local scope
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+            m_exitRequested = true;
+            m_schedulerThread_cv.notify_all();
+            // unlock at local scope
+        }
+
+        // wait for the scheduler thread to exit
+        if (m_schedulerThread.joinable())
+        {
+            m_schedulerThread.join();
+        }
+
+        // wait for reader threads to complete if any ongoing.
+        for (auto& reader : m_readers)
+        {
+            if (reader->m_thread.joinable())
+                reader->m_thread.join();
+        }
+    }
+
+    void GenericIO::Preloader::finalizeCompletedThreads()
+    {
+        bool update = false;
+
+        // Finalize completed threads.
+        for (auto& reader : m_readers)
+        {
+            if (reader->isPriority())
+            {
+                reader->setPriority(false);
+            }
+
+            if (reader->isFinishedLoading() || reader->isRemove())
+            {
+                if (reader->m_thread.joinable())
+                {
+                    reader->m_thread.join();
+                    reader->m_thread = std::thread();
+                    m_threadCount--;
+                    m_completedCount++;
+                    update = true;
+                }
+            }
+        }
+
+        // Finally, remove from the list any readers that have been fetched
+        // from the getReader method and that have been marked for removal.
+
+        auto range =
+            std::remove_if(m_readers.begin(), m_readers.end(),
+                           [&update](const std::shared_ptr<Reader>& reader)
+                           {
+                               bool remove = reader->isRemove();
+                               if (remove)
+                                   update = true;
+                               return remove;
+                           });
+
+        m_readers.erase(range, m_readers.end());
+
+        /*
+        if (update)
+            std::cerr << "PRELOADER STATS DONE(" << m_completedCount << ") GET("
+                      << m_getCount << ") NR(" << m_notReadyCount << ") TCNT("
+                      << m_threadCount << ") TCEIL(" << m_ceilingThreadCount
+                      << ")" << std::endl;
+        */
+    }
+
+    void GenericIO::Preloader::addReader(const std::string_view filename,
+                                         const Movie::ReadRequest& request)
+    {
+        std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+
+        //        std::cerr << "PRELOADER ADD " << filename << std::endl;
+
+        auto newReader = std::make_shared<Preloader::Reader>(filename, request);
+
+        m_readers.push_back(newReader);
+
+        // Wake up the scheduler thread in order to process the
+        // newly added readers.
+        m_schedulerThread_cv.notify_all();
+    }
+
+    bool GenericIO::Preloader::hasPendingReaders()
+    {
+        for (auto reader : m_readers)
+        {
+            if (reader->isPending())
+            {
+                if (m_threadCount < m_maxThreads)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    void
+    GenericIO::Preloader::waitForFinishedLoading(std::shared_ptr<Reader> reader)
+    {
+        // no need to create the lock and wait if it's already ready
+        if (reader->isFinishedLoading())
+            return;
+
+        std::unique_lock<std::mutex> lock(m_mainThread_mutex);
+        m_mainThread_cv.wait(lock,
+                             [&reader] { return reader->isFinishedLoading(); });
+    }
+
+    MovieReader* GenericIO::Preloader::getReader(std::string_view filename,
+                                                 const MovieInfo& info,
+                                                 Movie::ReadRequest& request)
+    {
+        //        std::cerr << "PRELOADER GET " << filename << std::endl;
+
+        m_getCount++;
+
+        std::shared_ptr<Reader> reader = nullptr;
+
+        //
+        // Check to see if we have a reader with the corresponding filename in
+        // the queue. (Also check to make sure we don't get an iterator to a
+        // reader that is scheduled to be deleted (eg: Status::REMOVE)
+        //
+        // Do this while locking a limited scope to search in m_Readers.
+        // In principle, locking here is un-necessary, but we're doing it
+        // to be safer.
+        //
+        {
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+
+            std::list<std::shared_ptr<Reader>>::iterator it =
+                std::find_if(m_readers.begin(), m_readers.end(),
+                             [&filename](const auto& reader)
+                             {
+                                 return (reader->filename() == filename)
+                                        && (!reader->isRemove());
+                             });
+
+            if (it != m_readers.end())
+                reader = *it;
+        }
+
+        if (reader)
+        {
+            //
+            // is the reader still pending? if so that means we're asking for
+            // the reader even before the scheduler thread has had a chance to
+            // schedule it. Maybe the max thread cound is reached, or the
+            // scheduler thread has not had a chance to wake up -- either way,
+            // escalate the priority and wake up the scheduler thread so that it
+            // can schedule the reader now.
+            //
+            if (reader->isPending() || reader->isLoading())
+            {
+                // if so, we don't have enough threads and our maxThreads
+                reader->setPriority(true);
+                m_notReadyCount++;
+
+                // Wake up the scheduler thread so that it may
+                // schedule this reader.
+                m_schedulerThread_cv.notify_all();
+                waitForFinishedLoading(reader);
+            }
+
+            // Wait for the reader to be finished loading.
+
+            MovieReader* movieReader = reader->m_movieReader;
+
+            // We're essentially done with this reader now.
+            // We can set its filename to a non-filename, and set its status to
+            // be removed, and then wake up the scheduler thread so that
+            // it may perform some cleanup operations such as closing out
+            // (joining) the thread and so that the reader may be removed from
+            // the list.
+            reader->clearFilename();
+            reader->setStatus(Reader::Status::REMOVE);
+
+            // Wake up the scheduler thread so that it may remove
+            // the Reader from the list (from here, it's no longer safe to
+            // access the "reader" variable)
+            m_schedulerThread_cv.notify_all();
+
+            // if movieReader is null, it's because there was a read error.
+            if (movieReader)
+            {
+                movieReader->postPreloadOpen(info, request);
+            }
+            else
+            {
+                std::cerr << "PRELOADER READ ERROR: " << reader->filename()
+                          << std::endl;
+            }
+
+            return movieReader;
+        }
+
+        return nullptr;
+    }
+
+    void GenericIO::Preloader::schedulerThreadFunc()
+    {
+        while (true)
+        {
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+
+            // unblock the wait if we have something to do.
+            m_schedulerThread_cv.wait(lock,
+                                      [this]
+                                      {
+                                          // clean up any completed reader
+                                          // thread states after they have
+                                          // completed (successfully or not)
+                                          finalizeCompletedThreads();
+
+                                          // resume execution if quitting or if
+                                          // anything to schedule
+                                          return m_exitRequested
+                                                 || hasPendingReaders();
+                                      });
+
+            // if asked to stop, exit the scheduler thread (done by
+            // GenericIO::shutdown)
+            if (m_exitRequested)
+                return;
+
+            // Next, check if we need to schedule anything new.
+
+            // Do two passes scanning readers to see if any should be scheduled.
+            //
+            // First pass: find priority readers and schedule them regqardless
+            // if we're maxed out. (this will just add +1 thread) Second pass:
+            // find non-priority readers and schedule them if room.
+            //
+            for (int i = 0; i < 2; i++)
+            {
+                for (auto& reader : m_readers)
+                {
+                    // don't consider readers that have been handled
+                    // or are in the process of being handled by a
+                    // loading thread
+                    if (!reader->isPending())
+                        continue;
+
+                    // filter for 1st pass (only consider priority readers)
+                    if ((i == 0) && !reader->isPriority())
+                        continue;
+
+                    // filter for 2nd pass (only consider non-priority readers)
+                    if ((i == 1) && reader->isPriority())
+                        continue;
+
+                    // if we're doing the 2nd pass (non-priority readers) and
+                    // we're at the limit of concurrent threads, don't schedule
+                    // any more until the number of threads comes down
+                    if ((i == 1) && (m_threadCount >= m_maxThreads))
+                        continue;
+
+                    // we have confirmed we can schedule a new reader thread.
+                    reader->setStatus(Reader::Status::LOADING);
+                    m_threadCount++;
+                    if (m_ceilingThreadCount < m_threadCount)
+                        m_ceilingThreadCount = m_threadCount;
+
+                    // Start the loader thread
+                    reader->m_thread =
+                        std::thread(&Preloader::loaderThreadFunc, this, reader);
+                }
+            }
+        }
+    }
+
+    void GenericIO::Preloader::loaderThreadFunc(std::shared_ptr<Reader> reader)
+    {
+
+        // execute the load function of the reader in this thread
+        reader->load();
+
+        // Wake up scheduler thread because we want it to schedule
+        // a new thread if there are pending readers.
+        m_schedulerThread_cv.notify_all();
+
+        // Wake up main thread, because the main thread might
+        // be waiting for this reader to complete in getReader().
+        m_mainThread_cv.notify_all();
+    }
+
+    //
+    // MovieIO implementation
+    //
     std::string MovieIO::MovieTypeInfo::capabilitiesAsString() const
     {
         ostringstream str;
@@ -236,15 +627,20 @@ namespace TwkMovie
     GenericIO::Plugins* GenericIO::m_plugins = 0;
     bool GenericIO::m_loadedAll = false;
     bool GenericIO::m_dnxhdDecodingAllowed = true;
+    GenericIO::Preloader GenericIO::m_preloader;
 
     void GenericIO::init()
     {
         if (!m_plugins)
             m_plugins = new Plugins();
+
+        m_preloader.init();
     }
 
     void GenericIO::shutdown()
     {
+        m_preloader.shutdown();
+
         if (m_plugins)
         {
             for (Plugins::iterator i = plugins().begin(); i != plugins().end();
@@ -517,7 +913,7 @@ namespace TwkMovie
                                      << basename(pio->pathToPlugin()) << endl;
                             }
 
-                            if (io = loadFromProxy(i))
+                            if ((io = loadFromProxy(i)))
                             {
                                 return io;
                             }
@@ -568,7 +964,7 @@ namespace TwkMovie
                                      << basename(pio->pathToPlugin()) << endl;
                             }
 
-                            if (io = loadFromProxy(i))
+                            if ((io = loadFromProxy(i)))
                             {
                                 ioSet.insert(io);
                             }
@@ -651,29 +1047,29 @@ namespace TwkMovie
         MovieReader* m = 0;
         const MovieIO* io = 0;
 
-        if (io = findByExtension(ext, image | audio))
+        if ((io = findByExtension(ext, image | audio)))
         {
             m = io->movieReader();
         }
-        else if (io = findByExtension(ext, image))
+        else if ((io = findByExtension(ext, image)))
         {
             m = io->movieReader();
         }
-        else if (io = findByExtension(ext, audio))
+        else if ((io = findByExtension(ext, audio)))
         {
             m = io->movieReader();
         }
         else if (tryBruteForce)
         {
-            if (io = findByBruteForce(filename, image | audio))
+            if ((io = findByBruteForce(filename, image | audio)))
             {
                 m = io->movieReader();
             }
-            else if (io = findByBruteForce(filename, image))
+            else if ((io = findByBruteForce(filename, image)))
             {
                 m = io->movieReader();
             }
-            else if (io = findByBruteForce(filename, audio))
+            else if ((io = findByBruteForce(filename, audio)))
             {
                 m = io->movieReader();
             }
@@ -719,6 +1115,55 @@ namespace TwkMovie
             return true;
         }
 
+        MovieReader* preloadTryOpen(const MovieIO* io,
+                                    const std::string& filename,
+                                    const Movie::ReadRequest& request)
+        {
+            //  cerr << "tryOpen '" << filename << "' with '" << io->about() <<
+            //  "'" << endl;
+
+            MovieReader* m = io->movieReader();
+            if (m)
+            {
+                try
+                {
+                    io->setMovieAttributesOn(m);
+                    m->preloadOpen(filename, request);
+                }
+                catch (std::exception& exc)
+                {
+                    checkFDLimitOK(filename);
+                    //  XXX should delete, but need to robustify plugins first
+                    //  XXX This leaks "m".
+                    // delete m;
+                    m = 0;
+                    if (TwkMovie_GenericIO_debug)
+                    {
+                        cerr << "WARNING: " << io->identifier()
+                             << " failed to open " << filename << ": "
+                             << exc.what() << endl;
+                    }
+                }
+                catch (...)
+                {
+                    checkFDLimitOK(filename);
+                    // XXX This leaks "m"
+                    // delete m;
+                    m = 0;
+                    if (TwkMovie_GenericIO_debug)
+                    {
+                        cerr << "WARNING: " << io->identifier()
+                             << " failed to open " << filename << endl;
+                    }
+                }
+            }
+            else
+            {
+                checkFDLimitOK(filename);
+            }
+            return m;
+        }
+
         MovieReader* tryOpen(const MovieIO* io, const std::string& filename,
                              const MovieInfo& mi, Movie::ReadRequest request)
         {
@@ -737,6 +1182,7 @@ namespace TwkMovie
                 {
                     checkFDLimitOK(filename);
                     //  XXX should delete, but need to robustify plugins first
+                    //  XXX This leaks "m".
                     // delete m;
                     m = 0;
                     if (TwkMovie_GenericIO_debug)
@@ -749,6 +1195,7 @@ namespace TwkMovie
                 catch (...)
                 {
                     checkFDLimitOK(filename);
+                    // XXX This leaks "m"
                     // delete m;
                     m = 0;
                     if (TwkMovie_GenericIO_debug)
@@ -767,11 +1214,22 @@ namespace TwkMovie
 
     }; // namespace
 
-    MovieReader* GenericIO::openMovieReader(const std::string& filename,
-                                            const MovieInfo& mi,
-                                            Movie::ReadRequest& request,
-                                            bool tryBruteForce)
+    MovieReader*
+    GenericIO::preloadOpenMovieReader(const std::string& filename,
+                                      const Movie::ReadRequest& request,
+                                      bool tryBruteForce)
     {
+        //
+        // This method is really similar to openMoviePlayer, except that
+        // the preloadTryOpen() method does not use MovieInfo and Request.
+        // This method is meant to be called from the loading thread func
+        // of the Preloader, not from the main thread. When the main thread
+        // tries to get a movie reader, it needs to call openMovieReader,
+        // and it's that method that will check if there's something in the
+        // preload queue. If there's nothing in the preload queue,
+        // openMovieReader() will open the file in sync mode
+        // just as before.
+        //
         unsigned int image = MovieIO::MovieRead;
         unsigned int audio = MovieIO::MovieReadAudio;
         string ext = extension(filename);
@@ -787,8 +1245,68 @@ namespace TwkMovie
             for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
                  ++mio)
             {
+                if ((m = preloadTryOpen(*mio, filename, request)))
+                    return m;
+            }
+        }
+        else if (TwkUtil::pathIsURL(filename)
+                 && findAllByExtension("mov", image | audio, ioSet))
+        {
+            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
+                 ++mio)
+            {
+                if ((m = preloadTryOpen(*mio, filename, request)))
+                    return m;
+            }
+        }
+        else if (tryBruteForce)
+        {
+            const MovieIO* io;
+            if (((io = findByBruteForce(filename, image | audio)))
+                || ((io = findByBruteForce(filename, image)))
+                || ((io = findByBruteForce(filename, audio))))
+            {
+                if ((m = preloadTryOpen(io, filename, request)))
+                    return m;
+            }
+        }
+
+        TWK_THROW_EXC_STREAM("unsupported media type.");
+    }
+
+    GenericIO::Preloader& GenericIO::getPreloader() { return m_preloader; }
+
+    MovieReader* GenericIO::openMovieReader(const std::string& filename,
+                                            const MovieInfo& mi,
+                                            Movie::ReadRequest& request,
+                                            bool tryBruteForce)
+    {
+        MovieReader* m = 0;
+
+        // First query the preloader if there's a preloaded file waiting
+        // If yes, the fetch it from the preloader.
+        // Otherwise, open as usual.
+        if ((m = getPreloader().getReader(filename, mi, request)))
+        {
+            return m;
+        }
+
+        unsigned int image = MovieIO::MovieRead;
+        unsigned int audio = MovieIO::MovieReadAudio;
+        string ext = extension(filename);
+        if (ext == "")
+            ext = basename(filename); // Try filename if there is no ext
+
+        MovieIOSet ioSet;
+        if (findAllByExtension(ext, image | audio, ioSet)
+            || findAllByExtension(ext, image, ioSet)
+            || findAllByExtension(ext, audio, ioSet))
+        {
+            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
+                 ++mio)
+            {
                 MovieInfo infoCopy = mi;
-                if (m = tryOpen(*mio, filename, infoCopy, request))
+                if ((m = tryOpen(*mio, filename, infoCopy, request)))
                     return m;
             }
         }
@@ -799,7 +1317,7 @@ namespace TwkMovie
                  ++mio)
             {
                 MovieInfo infoCopy = mi;
-                if (m = tryOpen(*mio, filename, infoCopy, request))
+                if ((m = tryOpen(*mio, filename, infoCopy, request)))
                     return m;
             }
         }
@@ -810,7 +1328,7 @@ namespace TwkMovie
                 || (io = findByBruteForce(filename, image))
                 || (io = findByBruteForce(filename, audio)))
             {
-                if (m = tryOpen(io, filename, mi, request))
+                if ((m = tryOpen(io, filename, mi, request)))
                     return m;
             }
         }

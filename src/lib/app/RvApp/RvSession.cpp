@@ -61,6 +61,7 @@
 #include <TwkMath/Iostream.h>
 #include <TwkMath/Math.h>
 #include <TwkMovie/Movie.h>
+#include <TwkMovie/MovieIO.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/FrameUtils.h>
 #include <TwkUtil/PathConform.h>
@@ -68,6 +69,7 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/Clock.h>
 #include <TwkUtil/EnvVar.h>
+#include <TwkMediaLibrary/Library.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -496,6 +498,10 @@ namespace Rv
                     string fullname = filename + "/" + "emptyDirectory";
                     inputPatterns.push_back(fullname);
                 }
+                else // not a directory, so it's a movie, add to preloader.
+                {
+                    m_session->startPreloadingMedia(filename);
+                }
             }
 
             m_perSourcePatterns.push_back(inputPatterns);
@@ -532,6 +538,23 @@ namespace Rv
         }
 
         ++m_loadCount;
+    }
+
+    void RvSession::startPreloadingMedia(const std::string& filename)
+    {
+        // get the cookies and headers and updated media filename.
+        std::deque<std::pair<std::string, std::string>> params;
+
+        std::string file =
+            TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, params);
+
+        // build a ReadRequest with the cookies and headers
+        Movie::ReadRequest request;
+        std::copy(params.begin(), params.end(),
+                  back_inserter(request.parameters));
+
+        // push a reader to be scheduled
+        GenericIO::getPreloader().addReader(file, request);
     }
 
     int RvSession::loadCount()
@@ -581,18 +604,31 @@ namespace Rv
         Options::SourceArgs sargs;
         bool addLayer = false;
 
-        m_loadState->nextPattern(pattern, sargs, addLayer);
-        const char* file = pattern.c_str();
+        const char* file = "";
 
         int oldFrame = currentFrame();
 
         SourceIPNode* node = 0;
+
+        bool onlyOne = true;
         try
         {
-            readSource(file, sargs, true, addLayer, m_loadState->tag(),
-                       m_loadState->merge());
+            while (m_loadState->isLoading())
+            {
+                string pattern;
+                Options::SourceArgs sargs;
+                bool addLayer = false;
 
-            cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
+                m_loadState->nextPattern(pattern, sargs, addLayer);
+                const char* file = pattern.c_str();
+                readSource(file, sargs, true, addLayer, m_loadState->tag(),
+                           m_loadState->merge());
+
+                // cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
+
+                if (onlyOne)
+                    break;
+            }
         }
         catch (TwkExc::Exception& exc)
         {
@@ -2414,14 +2450,15 @@ namespace Rv
 
     void RvSession::postInitialize()
     {
-        if (Function* F = sessionFunction("initialize"))
+        Function* F;
+        if ((F = sessionFunction("initialize")))
         {
             makeActive();
             Context::ArgumentVector v;
             TypedValue tv =
                 TwkApp::muContext()->evalFunction(TwkApp::muProcess(), F, v);
 
-            if (m_data = (Object*)tv._value._Pointer)
+            if ((m_data = (Object*)tv._value._Pointer))
             {
                 m_data->retainExternal();
             }

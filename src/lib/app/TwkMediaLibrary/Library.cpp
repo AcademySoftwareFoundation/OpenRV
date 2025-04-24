@@ -893,4 +893,108 @@ namespace TwkMediaLibrary
         return false;
     }
 
+    std::string lookupFilenameInMediaLibrary(
+        const std::string& filename,
+        std::deque<std::pair<std::string, std::string>>& params)
+    {
+        std::string file(filename);
+
+        if (isLibraryURL(file))
+        {
+            //
+            //  If this file looks like a library URL try to convert it
+            //  into a local file URL and then a path
+            //
+
+            file = libraryURLtoMediaURL(file);
+            file.erase(0, 7); // assuming "file://" not good
+            return file;
+        }
+
+        if (isLibraryMediaURL(file))
+        {
+            //
+            //  URL is a media URL tracked by one of the libraries. Find its
+            //  media node and find out if its streaming.
+            //
+
+            NodeVector nodes = libraryNodesAssociatedWithURL(file);
+            for (int n = 0; n < nodes.size(); n++)
+            {
+                const Node* node = nodes[n];
+                std::string nodeName = node->name();
+
+                if (const MediaAPI* api = api_cast<MediaAPI>(node))
+                {
+                    if (api->isStreaming())
+                    {
+                        HTTPCookieVector cookies = api->httpCookies();
+                        if (!cookies.empty())
+                        {
+                            ostringstream cookieStm;
+
+                            for (int c = 0; c < cookies.size(); c++)
+                            {
+                                if (c > 0)
+                                    cookieStm << "\n";
+                                cookieStm << cookies[c].name << "="
+                                          << cookies[c].value;
+
+                                if (!cookies[c].path.empty())
+                                    cookieStm << "; path=" << cookies[c].path;
+                                if (!cookies[c].domain.empty())
+                                    cookieStm << "; domain="
+                                              << cookies[c].domain;
+                            }
+
+                            /*
+                                                        if
+                               (evDebugCookies.getValue()) std::cout <<
+                               "Cookies:\n"
+                                                                      <<
+                               cookieStm.str() << std::endl;
+                            */
+                            params.push_back(
+                                StringPair("cookies", cookieStm.str()));
+                        }
+
+                        HTTPHeaderVector headers = api->httpHeaders();
+                        if (!headers.empty())
+                        {
+                            ostringstream headersStm;
+
+                            for (size_t h = 0, size = headers.size(); h < size;
+                                 ++h)
+                            {
+                                if (h > 0)
+                                    headersStm << "\r\n";
+                                headersStm << headers[h].name << ": "
+                                           << headers[h].value;
+                            }
+                            /*
+                                                        if
+                               (evDebugCookies.getValue()) std::cout <<
+                               "Headers:\n"
+                                                                      <<
+                               headersStm.str() << std::endl;
+                            */
+                            params.push_back(
+                                StringPair("headers", headersStm.str()));
+                        }
+                    }
+
+                    if (api->isRedirecting())
+                    {
+                        std::string redirection = api->httpRedirection();
+                        std::cout << "INFO: " << nodeName << " is redirecting "
+                                  << file << " to " << redirection << std::endl;
+                        file = redirection;
+                    }
+                }
+            }
+        }
+
+        return file;
+    }
+
 } // namespace TwkMediaLibrary
