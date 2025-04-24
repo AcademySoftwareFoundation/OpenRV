@@ -49,6 +49,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 #include <QtCore/QObject>
 
@@ -270,6 +271,28 @@ namespace Rv
             return node->shallowCopy();
         }
         return IPGraph::sparseContainer(node);
+    }
+
+    void RvGraph::addSourceBegin()
+    {
+        int newFastAddSourceEnabled = ++m_fastAddSourceEnabled;
+
+        m_fastAddSourceChangedSignal(true, newFastAddSourceEnabled);
+    }
+
+    void RvGraph::addSourceEnd()
+    {
+        int newFastAddSourceEnabled = --m_fastAddSourceEnabled;
+
+        if (newFastAddSourceEnabled == 0)
+            connectNewSourcesToDefaultViews();
+
+        m_fastAddSourceChangedSignal(false, newFastAddSourceEnabled);
+    }
+
+    bool RvGraph::isFastAddSourceEnabled() const
+    {
+        return m_fastAddSourceEnabled > 0;
     }
 
     SourceIPNode*
