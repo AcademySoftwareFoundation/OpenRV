@@ -104,14 +104,20 @@ namespace TwkMovie
 
         if (m_session)
         {
-            m->open(m_session->fileName(), m_info);
+            ReadRequest request;
+            m->open(m_session->fileName(), m_info, request);
         }
 
         return m;
     }
 
-    void MovieRV::open(const string& filename, const TwkMovie::MovieInfo& info,
-                       const Movie::ReadRequest& request)
+    void MovieRV::preloadOpen(const std::string& filename)
+    {
+        // nothing works for this
+    }
+
+    void MovieRV::postPreloadOpen(const MovieInfo& as,
+                                  const ReadRequest& request)
     {
         // nothing works for this
     }
