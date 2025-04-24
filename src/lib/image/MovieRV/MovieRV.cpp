@@ -104,8 +104,11 @@ namespace TwkMovie
 
         if (m_session)
         {
-            ReadRequest request;
-            m->open(m_session->fileName(), m_info, request);
+            // this does nothing, beacuse the old "open" function contained...
+            // nothing.
+
+            // ReadRequest request;
+            // m->open(m_session->fileName(), m_info, request);
         }
 
         return m;
