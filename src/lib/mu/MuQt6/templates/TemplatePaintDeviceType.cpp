@@ -36,9 +36,7 @@
 #include <Mu/Value.h>
 #include <MuLang/MuLangContext.h>
 #include <MuLang/StringType.h>
-{
-    % % handRolledInclude % %
-}
+{%%handRolledInclude%%}
 
 namespace Mu
 {
@@ -90,12 +88,8 @@ namespace Mu
         NODE_RETURN($T_$T_QLayoutItem(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    {
-        % % definitions % %
-    }
-    {
-        % % handRolledDefinitions % %
-    }
+    {%%definitions%%}
+    {%%handRolledDefinitions%%}
 
     void $TType::load()
     {
@@ -131,12 +125,8 @@ namespace Mu
 
             EndArguments);
 
-        {
-            % % addSymbols % %
-        }
-        {
-            % % addHandRolledSymbols % %
-        }
+        {%%addSymbols%%}
+        {%%addHandRolledSymbols%%}
     }
 
 } // namespace Mu
