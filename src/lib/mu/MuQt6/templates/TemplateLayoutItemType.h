@@ -26,16 +26,12 @@
 
 namespace Mu
 {
-    {
-        % % muqtForwardDeclaration % %
-    }
+    {%%muqtForwardDeclaration%%}
 
     class $TType : public Class
     {
     public:
-        {
-            % % typeDeclarations % %
-        }
+        {%%typeDeclarations%%}
         typedef MuQt_$T MuQtType;
         typedef $T QtType;
 
@@ -46,9 +42,7 @@ namespace Mu
         $TType(Context* context, const char* name, Class* superClass = 0);
         virtual ~$TType();
 
-        {
-            % % isInheritableFunc % %
-        }
+        {%%isInheritableFunc%%}
         static inline ClassInstance* cachedInstance(const MuQtType*);
 
         //
@@ -57,17 +51,11 @@ namespace Mu
 
         virtual void load();
 
-        {
-            % % virtualArray % %
-        }
+        {%%virtualArray%%}
     };
 
-    {
-        % % nativeMuQtClass % %
-    }
-    {
-        % % cachedInstanceFunc % %
-    }
+    {%%nativeMuQtClass%%}
+    {%%cachedInstanceFunc%%}
 
 } // namespace Mu
 
