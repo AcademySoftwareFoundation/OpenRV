@@ -225,6 +225,7 @@ bool twkGlPrintError(std::string_view file, std::string_view function,
         std::cerr << "GL_ERROR: " << shorterPath(file).data()
                   << "::" << function.data() << ":" << line << " ["
                   << TwkGLF::errorString(err) << "]" << std::endl;
+        return false;
     }
 
     // Track OpenGL context updates.
@@ -233,6 +234,8 @@ bool twkGlPrintError(std::string_view file, std::string_view function,
 #ifdef TRACK_GL_CONTEXT
     s_multiTracker.update(file, function, line);
 #endif
+
+    return true;
 }
 
 bool glSupportsExtension(const char* extstring)
