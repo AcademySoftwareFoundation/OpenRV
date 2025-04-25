@@ -60,21 +60,6 @@ class NoNodeFromHook(otio.exceptions.OTIOError):
     pass
 
 
-def read_otio_string(otio_string: str, host_prefix: str | None = None) -> object | None:
-    """
-    Main entry point to expand a given otio string into the current RV session.
-
-    Returns the top level node created that represents this otio
-    timeline.
-    """
-    otio_obj = otio.adapters.read_from_string(otio_string)
-    timeline = otio_obj["otio"]
-
-    context = {"sg_url": host_prefix} if host_prefix else None
-
-    return create_rv_node_from_otio(timeline, context), timeline.global_start_time
-
-
 def read_otio_file(otio_file):
     """
     Main entry point to expand a given otio (or file otio can read)
@@ -85,7 +70,12 @@ def read_otio_file(otio_file):
     """
     input_otio = otio.adapters.read_from_file(otio_file)
     context = {"otio_file": otio_file}
-    return create_rv_node_from_otio(input_otio, context)
+
+    commands.addSourceBegin()
+    ret = create_rv_node_from_otio(input_otio, context)
+    commands.addSourceEnd()
+
+    return ret
 
 
 def _run_hook(hook_name, otio_obj, context={}, optional=True):
@@ -298,13 +288,21 @@ def _create_track(in_seq, context=None):
     return new_seq
 
 
-def _get_global_transform(tl) -> dict:
+def _get_global_transform(tl, context) -> dict:
     # since there's no global scale in otio, calculate the minimum box size
     # that can contain all clips
     def find_display_bounds(tl):
         display_bounds = None
         for clip in tl.find_clips():
             try:
+                # get active clip and start prelodaing the movie in the background
+                if isinstance(clip.media_reference, otio.schema.ExternalReference):
+                    media_path = _get_media_path(
+                        str(clip.media_reference.target_url), context
+                    )
+                    # print("PRELOADING MOVIE: {}".format(media_path))
+                    commands.startPreloadingMedia(media_path)
+
                 bounds = clip.media_reference.available_image_bounds
                 if bounds:
                     if display_bounds:
@@ -398,7 +396,9 @@ def _get_in_out_frame(it, range_to_read, seq_rate=None):
 
 def _create_timeline(tl, context=None):
     with set_context(
-        context, global_start_time=tl.global_start_time, **_get_global_transform(tl)
+        context,
+        global_start_time=tl.global_start_time,
+        **_get_global_transform(tl, context)
     ):
         stack = create_rv_node_from_otio(tl.tracks, context)
 
@@ -452,6 +452,13 @@ def _create_media(media_ref, trimmed_range, context=None):
                 context,
             )
         ]
+
+    elif isinstance(media_ref, otio.schema.GeneratorReference):
+        if media_ref.generator_kind == "solid":
+            color_parameters = media_ref.parameters.get("color")
+            kind = f"solid,{color_parameters}"
+            return [_create_movieproc(media_range, kind)]
+
     return [_create_movieproc(media_range, "smptebars")]
 
 

@@ -1081,10 +1081,10 @@ namespace IPCore
                 }
 
                 //
-                // WTF.  Code that calls this add() thinks we only
+                // Err? Code that calls this add() thinks we only
                 // return false if we didn't add the fb to the cache.
                 // but we did add it, even if the cache is full.  so
-                // return true goddamnit.
+                // return true.
                 //
                 // return notfull;
                 checkMetadata();

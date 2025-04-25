@@ -657,6 +657,15 @@ class: AnnotateMinorMode : MinorMode
     method: eraserPush (void; Event event)
     {
         updateCurrentNode();
+
+        // Save the current draw mode so we can restore it when we are done 
+        // erasing as long as it is not the eraser mode itself which could
+        // happen when pushing the eraser more than once
+        if (_currentDrawMode.name != _currentDrawMode.eraserMode.name)
+        {
+            _currentDrawMode.eraserMode.penMode = _currentDrawMode;
+        }
+
         _currentDrawMode = _currentDrawMode.eraserMode;
         updateDrawModeUI();
         push(event);
@@ -1204,8 +1213,34 @@ class: AnnotateMinorMode : MinorMode
             let u = getStringProperty(upropName),
                 r = getStringProperty(rpropName);
 
-            u.push_back(r.back());
-            r.resize(r.size()-1);
+            int startIndex = -1;
+            int endIndex = -1;
+
+            for (int i = 0; i < r.size(); i++)
+            {
+                if (r[i] == "start")
+                {
+                    startIndex = i;
+                }
+                if (r[i] == "end")
+                {
+                    endIndex = i;
+                }
+            }
+
+            if (r.size() >= 3 && startIndex != -1 && endIndex != -1)
+            {
+                for (int i = startIndex + 1; i < endIndex; i++)
+                {
+                    u.push_back(r[i]);
+                }
+                r.erase(startIndex, endIndex - startIndex + 1);
+            }
+            else
+            {
+                u.push_back(r.back());
+                r.resize(r.size() - 1);
+            }
 
             setStringProperty(upropName, u, true);
             setStringProperty(rpropName, r, true);
@@ -1225,9 +1260,14 @@ class: AnnotateMinorMode : MinorMode
             let u = getStringProperty(upropName),
                 r = getStringProperty(rpropName);
 
-            for (int i = u.size()-1; i >= 0; i--)
-                r.push_back(u[i]);
-            u.clear();
+            if (u.size() > 0)
+            {
+                r.push_back("start");
+                for (int i = 0; i < u.size(); i++)
+                    r.push_back(u[i]);
+                r.push_back("end");
+                u.clear();
+            }
 
             setStringProperty(upropName, u, true);
             setStringProperty(rpropName, r, true);

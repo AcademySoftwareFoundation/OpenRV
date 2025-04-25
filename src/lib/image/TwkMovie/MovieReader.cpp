@@ -16,6 +16,27 @@ namespace TwkMovie
     {
     }
 
+    void MovieReader::preloadOpen(const std::string& filename,
+                                  const Movie::ReadRequest& request)
+    {
+        std::cerr << "ERROR: preloadOpen must be implemented" << std::endl;
+        throw std::runtime_error("preloadOpen must be implemented");
+    }
+
+    void MovieReader::postPreloadOpen(const MovieInfo& info,
+                                      const Movie::ReadRequest& request)
+    {
+        std::cerr << "ERROR: postPreloadOpen must be implemented" << std::endl;
+        throw std::runtime_error("postPreloadOpen must be implemented");
+    }
+
+    void MovieReader::open(const std::string& filename, const MovieInfo& info,
+                           const Movie::ReadRequest& request)
+    {
+        preloadOpen(filename, request);
+        postPreloadOpen(info, request);
+    }
+
     MovieReader::~MovieReader() {}
 
     Movie* MovieReader::clone() const { return 0; }

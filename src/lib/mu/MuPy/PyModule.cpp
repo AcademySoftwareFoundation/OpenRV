@@ -80,7 +80,7 @@ namespace Mu
         if (!externalConverters)
         {
             //
-            //  DLL shite requires we don't have a static constructor
+            //  DLL constraint requires we don't have a static constructor
             //  *sigh*
             //
 

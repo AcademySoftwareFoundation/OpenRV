@@ -1,6 +1,6 @@
 //******************************************************************************
-// Copyright (c) 2012 Tweak Inc.
-// All rights reserved.
+//
+// Copyright (C) 2025 Autodesk, Inc. All Rights Reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -14,6 +14,7 @@
 #include <TwkAudio/Audio.h>
 #include <TwkAudio/Interlace.h>
 #include <TwkFB/FastMemcpy.h>
+#include <TwkFB/FastConversion.h>
 #include <TwkUtil/EnvVar.h>
 #include <TwkUtil/Timer.h>
 #include <TwkUtil/PathConform.h>
@@ -21,11 +22,9 @@
 #include <TwkUtil/sgcHop.h>
 #include <iostream>
 #include <iomanip>
-#include <math.h>
 #include <algorithm>
 #include <array>
 #include <string_view>
-#include <stdlib.h>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
 #include <string>
@@ -38,7 +37,6 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/algorithm/string.hpp>
 #include <mp4v2Utils/mp4v2Utils.h>
-#include <string>
 #include <cstring>
 
 extern "C"
@@ -51,7 +49,6 @@ extern "C"
 #include <libavutil/timecode.h>
 #include <libavutil/display.h>
 #include <libswscale/swscale.h>
-    // #include <libavcodec/ass_split.h>
 }
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming,
@@ -268,6 +265,12 @@ namespace TwkMovie
         AVCodecContext* avCodecContext;
     };
 
+    struct HardwareContext
+    {
+        AVPixelFormat pixelFormat;
+        AVBufferRef* deviceContext;
+    };
+
     struct VideoTrack
     {
         VideoTrack()
@@ -280,6 +283,7 @@ namespace TwkMovie
             , rotate(false)
             , colrType("")
             , avCodecContext(0)
+            , hardwareContext({AV_PIX_FMT_NONE, nullptr})
         {
             videoFrame = av_frame_alloc();
             videoPacket = av_packet_alloc();
@@ -336,6 +340,7 @@ namespace TwkMovie
         AVFrame* outPicture;
         string colrType;
         AVCodecContext* avCodecContext;
+        struct HardwareContext hardwareContext;
     };
 
     //
@@ -632,17 +637,54 @@ namespace TwkMovie
         //  Put anything we know about in here: some of these we don't
         //  actually support. But just in case ....
         //
-
-        constexpr std::array<std::string_view, 43> slowRandomAccessCodecs = {
-            "3iv2",     "3ivd",  "ap41",    "avc1",       "div1",
-            "div2",     "div3",  "div4",    "div5",       "div6",
-            "divx",     "dnxhd", "dx50",    "h263",       "h264",
-            "i263",     "iv31",  "iv32",    "m4s2",       "mp42",
-            "mp43",     "mp4s",  "mp4v",    "mpeg4",      "mpg1",
-            "mpg3",     "mpg4",  "pim1",    "png",        "s263",
-            "svq1",     "svq3",  "u263",    "vc1",        "vc1_vdpau",
-            "vc1image", "viv1",  "wmv3",    "wmv3_vdpau", "wmv3image",
-            "xith",     "xvid",  "libdav1d"};
+        constexpr std::array slowRandomAccessCodecs = {"3iv2"sv,
+                                                       "3ivd"sv,
+                                                       "ap41"sv,
+                                                       "avc1"sv,
+                                                       "div1"sv,
+                                                       "div2"sv,
+                                                       "div3"sv,
+                                                       "div4"sv,
+                                                       "div5"sv,
+                                                       "div6"sv,
+                                                       "divx"sv,
+                                                       "dnxhd"sv,
+                                                       "dx50"sv,
+                                                       "h263"sv,
+                                                       "h264"sv,
+                                                       "i263"sv,
+                                                       "iv31"sv,
+                                                       "iv32"sv,
+                                                       "m4s2"sv,
+                                                       "mp42"sv,
+                                                       "mp43"sv,
+                                                       "mp4s"sv,
+                                                       "mp4v"sv,
+                                                       "mpeg4"sv,
+                                                       "mpg1"sv,
+                                                       "mpg3"sv,
+                                                       "mpg4"sv,
+                                                       "pim1"sv,
+                                                       "png"sv,
+                                                       "s263"sv,
+                                                       "svq1"sv,
+                                                       "svq3"sv,
+                                                       "u263"sv,
+                                                       "vc1"sv,
+                                                       "vc1_vdpau"sv,
+                                                       "vc1image"sv,
+                                                       "viv1"sv,
+                                                       "wmv3"sv,
+                                                       "wmv3_vdpau"sv,
+                                                       "wmv3image"sv,
+                                                       "xith"sv,
+                                                       "xvid"sv,
+                                                       "libdav1d"sv
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+                                                       ,
+                                                       "prores"sv
+#endif
+        };
 
         const char* supportedEncodingCodecsArray[] = {
             "dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo", 0};
@@ -722,16 +764,9 @@ namespace TwkMovie
         bool codecHasSlowAccess(string name)
         {
             boost::algorithm::to_lower(name);
-            for (const std::string_view& codec : slowRandomAccessCodecs)
-            {
-                std::cout << "Comparing " << codec << " with " << name
-                          << std::endl;
-                if (codec == name)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return std::any_of(
+                slowRandomAccessCodecs.begin(), slowRandomAccessCodecs.end(),
+                [name](const auto& codec) { return codec == name; });
         }
 
         bool isMP4format(AVFormatContext* avFormatContext)
@@ -995,6 +1030,58 @@ namespace TwkMovie
             }
         }
 
+        int hardwareDecoderInit(AVCodecContext* codecContext,
+                                const AVHWDeviceType deviceType)
+        {
+            HardwareContext* hardwareContext =
+                static_cast<HardwareContext*>(codecContext->opaque);
+            if (hardwareContext == nullptr)
+            {
+                return -1;
+            }
+
+            AVBufferRef* hardwareDeviceContext = hardwareContext->deviceContext;
+
+            const int result = av_hwdevice_ctx_create(
+                &hardwareDeviceContext, deviceType, nullptr, nullptr, 0);
+
+            if (result < 0)
+            {
+                std::cerr << "ERROR: Failed to create specified hardware "
+                             "device type.\n";
+                return result;
+            }
+
+            codecContext->hw_device_ctx = av_buffer_ref(hardwareDeviceContext);
+
+            return result;
+        }
+
+        AVPixelFormat getHardwareFormat(AVCodecContext* codecContext,
+                                        const AVPixelFormat* pixelFormats)
+        {
+            HardwareContext* hardwareContext =
+                static_cast<HardwareContext*>(codecContext->opaque);
+            if (hardwareContext != nullptr)
+            {
+                const enum AVPixelFormat* pixelFormat = nullptr;
+                AVPixelFormat hardwarePixelFormat =
+                    hardwareContext->pixelFormat;
+
+                for (pixelFormat = pixelFormats; *pixelFormat != -1;
+                     pixelFormat++)
+                {
+                    if (*pixelFormat == hardwarePixelFormat)
+                    {
+                        return *pixelFormat;
+                    }
+                }
+                std::cerr << "ERROR: Failed to get hardware surface format.\n";
+            }
+            std::cerr << "ERROR: Failed to get hardware context.\n";
+            return AV_PIX_FMT_NONE;
+        }
+
     } // namespace
 
     //----------------------------------------------------------------------
@@ -1162,10 +1249,26 @@ namespace TwkMovie
         return mov;
     }
 
-    void MovieFFMpegReader::open(const string& filename, const MovieInfo& info,
-                                 const Movie::ReadRequest& request)
+    void MovieFFMpegReader::preloadOpen(const std::string& filename,
+                                        const ReadRequest& request)
     {
         m_filename = filename;
+        m_request = request;
+
+        if (m_cloning)
+            return;
+
+        if (m_avFormatContext == 0)
+        {
+            openAVFormat(); // sets m_avFormatContext
+            // findStreamInfo(); // commented bc it is not thread safe... :(
+            // https://stackoverflow.com/questions/15366441/ffmpeg-which-functions-are-multithreading-safe
+        }
+    }
+
+    void MovieFFMpegReader::postPreloadOpen(const MovieInfo& info,
+                                            const ReadRequest& request)
+    {
         m_info = info;
         m_request = request;
 
@@ -1271,10 +1374,11 @@ namespace TwkMovie
     }
 
     bool MovieFFMpegReader::openAVCodec(int index,
-                                        AVCodecContext** avCodecContext)
+                                        AVCodecContext** avCodecContext,
+                                        HardwareContext* hardwareContext)
     {
         // Make sure the format is opened
-        if (m_avFormatContext == 0)
+        if (m_avFormatContext == nullptr)
         {
             openAVFormat();
             findStreamInfo();
@@ -1282,11 +1386,15 @@ namespace TwkMovie
 
         // Get the codec context
         AVStream* avStream = m_avFormatContext->streams[index];
-        if (*avCodecContext && avcodec_is_open(*avCodecContext))
+        if (*avCodecContext != nullptr && avcodec_is_open(*avCodecContext) != 0)
+        {
             return true;
+        }
+
+        const AVCodec* avCodec = nullptr;
+        AVHWDeviceType deviceType = AV_HWDEVICE_TYPE_NONE;
 
         // Find the decoder for the av stream
-        const AVCodec* avCodec = 0;
         switch (avStream->codecpar->codec_id)
         {
         case AV_CODEC_ID_H264:
@@ -1300,40 +1408,78 @@ namespace TwkMovie
             avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
             break;
         }
-        if (avCodec == 0)
+
+        if (avCodec == nullptr)
         {
-            cout << "ERROR: MovieFFMpeg: Unsupported codec_id '"
-                 << avStream->codecpar->codec_id << "' in " << m_filename
-                 << endl;
+            std::cerr << "ERROR: MovieFFMpeg: Unsupported codec_id '"
+                      << avStream->codecpar->codec_id << "' in " << m_filename
+                      << '\n';
             return false;
         }
 
         *avCodecContext = avcodec_alloc_context3(avCodec);
-        if (!*avCodecContext)
+        if (*avCodecContext == nullptr)
         {
-            cout << "ERROR: MovieFFMpeg: Failed to allocate codec context '"
-                 << avCodec->name << "' for " << m_filename << endl;
+            std::cerr
+                << "ERROR: MovieFFMpeg: Failed to allocate codec context '"
+                << avCodec->name << "' for " << m_filename << '\n';
             return false;
-            ;
         }
 
         // Copy codec parameters from input stream to output codec context
         if (avcodec_parameters_to_context(*avCodecContext, avStream->codecpar)
             < 0)
         {
-            cout << "ERROR: MovieFFMpeg: Failed to copy '" << avCodec->name
-                 << "' codec parameters to decoder context for " << m_filename
-                 << endl;
+            std::cerr << "ERROR: MovieFFMpeg: Failed to copy '" << avCodec->name
+                      << "' codec parameters to decoder context for "
+                      << m_filename << '\n';
             avcodec_free_context(avCodecContext);
             return false;
         }
 
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+        if (avStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
+        {
+            deviceType = av_hwdevice_find_type_by_name("videotoolbox");
+            if (deviceType == AV_HWDEVICE_TYPE_NONE)
+            {
+                std::cerr << "ERROR: Device type" << deviceType
+                          << "is not supported.\n";
+                return false;
+            }
+
+            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
+            if (config == nullptr)
+            {
+                std::cerr << "ERROR: Decoder " << avCodec->name
+                          << " does not support device type "
+                          << av_hwdevice_get_type_name(deviceType) << '\n';
+                return false;
+            }
+            // Check if the hardware device context flag is set and the device
+            // type matches
+            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
+                && config->device_type == deviceType)
+            {
+                hardwareContext->pixelFormat = config->pix_fmt;
+            }
+
+            (*avCodecContext)->opaque = hardwareContext;
+            (*avCodecContext)->get_format = getHardwareFormat;
+
+            if (hardwareDecoderInit(*avCodecContext, deviceType) < 0)
+            {
+                return false;
+            }
+        }
+#endif
+
         // Open the codec
         (*avCodecContext)->thread_count = m_io->codecThreads();
-        if (avcodec_open2(*avCodecContext, avCodec, 0) < 0)
+        if (avcodec_open2(*avCodecContext, avCodec, nullptr) < 0)
         {
-            cout << "ERROR: MovieFFMpeg: Failed to open codec '"
-                 << avCodec->name << "' for " << m_filename << endl;
+            std::cerr << "ERROR: MovieFFMpeg: Failed to open codec '"
+                      << avCodec->name << "' for " << m_filename << '\n';
             avcodec_free_context(avCodecContext);
             return false;
         }
@@ -1341,12 +1487,12 @@ namespace TwkMovie
         // Check if this is a valid Video Pixel Format
         if ((*avCodecContext)->codec_type == AVMEDIA_TYPE_VIDEO)
         {
-            AVPixelFormat nativeFormat = (*avCodecContext)->pix_fmt;
+            const AVPixelFormat nativeFormat = (*avCodecContext)->pix_fmt;
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-            if (desc == NULL)
+            if (desc == nullptr)
             {
-                cout << "ERROR: MovieFFMpeg: Invalid pixel format! "
-                     << m_filename << endl;
+                std::cerr << "ERROR: MovieFFMpeg: Invalid pixel format! "
+                          << m_filename << '\n';
                 avcodec_free_context(avCodecContext);
                 return false;
             }
@@ -1357,21 +1503,26 @@ namespace TwkMovie
         //  previous state
         //
 
-        VideoTrack* vTrack;
-        AudioTrack* aTrack;
-        trackFromStreamIndex(index, vTrack, aTrack);
+        VideoTrack* videoTrack = nullptr;
+        AudioTrack* audioTrack = nullptr;
+        trackFromStreamIndex(index, videoTrack, audioTrack);
 
-        if (vTrack)
-            vTrack->lastDecodedVideo = -1;
-        if (aTrack)
-            aTrack->lastDecodedAudio = AV_NOPTS_VALUE;
+        if (videoTrack != nullptr)
+        {
+            videoTrack->lastDecodedVideo = -1;
+        }
+
+        if (audioTrack != nullptr)
+        {
+            audioTrack->lastDecodedAudio = AV_NOPTS_VALUE;
+        }
 
         // Make sure to only use allowed codecs
         if (!m_io->codecIsAllowed((*avCodecContext)->codec->name, true))
         {
-            cout << "ERROR: MovieFFMpeg: Unallowed codec '"
-                 << (*avCodecContext)->codec->name << "' in " << m_filename
-                 << endl;
+            std::cerr << "ERROR: MovieFFMpeg: Unallowed codec '"
+                      << (*avCodecContext)->codec->name << "' in " << m_filename
+                      << '\n';
             avcodec_free_context(avCodecContext);
             return false;
         }
@@ -2013,14 +2164,14 @@ namespace TwkMovie
 
         m_avFormatContext->probesize = TWK_AVFORMAT_PROBESIZE;
         if (avformat_find_stream_info(m_avFormatContext, 0) < 0)
+        {
             TWK_THROW_EXC_STREAM(
                 "Failed to open stream for reading: " << m_filename);
+        }
     }
 
     void MovieFFMpegReader::initializeAll()
     {
-        openAVFormat();
-
         //
         // For some formats the streams are not partially located at all. In
         // that case we need to find them first.
@@ -2162,7 +2313,8 @@ namespace TwkMovie
                 {
                     ContextPool::Reservation reserve(this, i);
                     VideoTrack* track = new VideoTrack;
-                    if (openAVCodec(i, &track->avCodecContext))
+                    if (openAVCodec(i, &track->avCodecContext,
+                                    &track->hardwareContext))
                     {
                         track->number = i;
 
@@ -2763,6 +2915,100 @@ namespace TwkMovie
             return true;
         }
         return false;
+    }
+
+    void MovieFFMpegReader::copyFrame(const AVFrame* srcFrame,
+                                      AVFrame* dstFrame, int width, int height,
+                                      bool convertFormat,
+                                      SwsContext*& imgConvertContext)
+    {
+        HOP_PROF("copyFrame()");
+
+        // Simply copy the data if no format conversion required
+        if (!convertFormat)
+        {
+            av_image_copy(static_cast<uint8_t* const*>(dstFrame->data),
+                          static_cast<const int*>(dstFrame->linesize),
+                          const_cast<const uint8_t**>(srcFrame->data),
+                          static_cast<const int*>(srcFrame->linesize),
+                          static_cast<AVPixelFormat>(srcFrame->format), width,
+                          height);
+
+            return;
+        }
+
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+        // FFmpeg sws_scale() function is not optimized for the following
+        // conversions which are used when decoding ProRes 422 and ProRes 4444
+        // videos on Apple Silicon via VideoToolbox:
+        // AV_PIX_FMT_P210LE -> AV_PIX_FMT_YUV422P16LE
+        // AV_PIX_FMT_P416LE -> AV_PIX_FMT_YUV444P16LE
+        // Latest benchmarks for a UHD image conversion via sws_scale() on
+        // ARM64 was 30 ms and 46 ms respectively for the two conversions.
+        // Whereas it was 3 ms and 2 ms with the following custom functions.
+        bool isProRes422 = srcFrame->format == AV_PIX_FMT_P210LE
+                           && dstFrame->format == AV_PIX_FMT_YUV422P16LE;
+        bool isProRes4444 = srcFrame->format == AV_PIX_FMT_P416LE
+                            && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
+
+        if ((isProRes422 || isProRes4444))
+        {
+            const uint16_t* srcY =
+                reinterpret_cast<const uint16_t*>(srcFrame->data[0]);
+            const uint16_t* srcCbCr =
+                reinterpret_cast<const uint16_t*>(srcFrame->data[1]);
+
+            const size_t srcStrideY = srcFrame->linesize[0];
+            const size_t srcStrideCbCr = srcFrame->linesize[1];
+
+            uint16_t* dstY = reinterpret_cast<uint16_t*>(dstFrame->data[0]);
+            uint16_t* dstCb = reinterpret_cast<uint16_t*>(dstFrame->data[1]);
+            uint16_t* dstCr = reinterpret_cast<uint16_t*>(dstFrame->data[2]);
+
+            const size_t dstStrideY = dstFrame->linesize[0];
+            const size_t dstStrideCb = dstFrame->linesize[1];
+            const size_t dstStrideCr = dstFrame->linesize[2];
+
+            if (isProRes422)
+            {
+                planarP210_to_planarYUV422P16(
+                    width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
+                    dstY, dstCb, dstCr, dstStrideY, dstStrideCb, dstStrideCr);
+
+                return;
+            }
+
+            if (isProRes4444)
+            {
+                planarP416_to_planarYUV444P16(
+                    width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
+                    dstY, dstCb, dstCr, dstStrideY, dstStrideCb, dstStrideCr);
+
+                return;
+            }
+        }
+#endif
+
+        // Reuse or allocate a new image conversion context
+        // Note: If track->imgConvertContext is NULL, sws_getCachedContext
+        // just calls sws_getContext() to get a new context. Otherwise, it
+        // checks if the parameters are the ones already saved in context.
+        // If that is the case, it returns the current context. Otherwise,
+        // it frees context and gets a new context with the new parameters.
+        imgConvertContext = sws_getCachedContext(
+            imgConvertContext, width, height,
+            static_cast<AVPixelFormat>(srcFrame->format), width, height,
+            static_cast<AVPixelFormat>(dstFrame->format), SWS_BICUBIC, 0, 0, 0);
+        if (imgConvertContext == nullptr)
+        {
+            throw std::runtime_error("Can't initialize conversion context");
+        }
+
+        sws_scale(imgConvertContext,
+                  static_cast<const uint8_t* const*>(srcFrame->data),
+                  static_cast<const int*>(srcFrame->linesize), 0 /*srcSliceY*/,
+                  height, static_cast<uint8_t* const*>(dstFrame->data),
+                  static_cast<const int*>(dstFrame->linesize));
     }
 
     ChannelsVector MovieFFMpegReader::idAudioChannels(AVChannelLayout layout,
@@ -3640,8 +3886,35 @@ namespace TwkMovie
         // outFrame          - AVFrame linked to output FrameBuffer to copy into
         //
 
-        AVFrame* outFrame = 0;
-        outFrame = av_frame_alloc();
+        AVFrame* softwareFrame = nullptr;
+        AVFrame* videoFrame = nullptr;
+        int result = 0;
+
+        HardwareContext* hardwareContext =
+            static_cast<HardwareContext*>(track->avCodecContext->opaque);
+
+        if (hardwareContext != nullptr)
+        {
+            AVPixelFormat hardwarePixelFormat = hardwareContext->pixelFormat;
+
+            if (track->videoFrame->format == hardwarePixelFormat)
+            {
+                // retrieve data from GPU to CPU
+                softwareFrame = av_frame_alloc();
+                result = av_hwframe_transfer_data(softwareFrame,
+                                                  track->videoFrame, 0);
+                if (result < 0)
+                {
+                    std::cerr
+                        << "ERROR: Failed to transfer data to system memory\n";
+                }
+                videoFrame = softwareFrame;
+            }
+        }
+        else
+        {
+            videoFrame = track->videoFrame;
+        }
 
         //
         // Determine the native pixel format and make an effort to reconfigure
@@ -3651,7 +3924,9 @@ namespace TwkMovie
         // needs conversion.
         //
 
-        AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
+        AVFrame* outFrame = av_frame_alloc();
+        AVPixelFormat nativeFormat = videoCodecContext->sw_pix_fmt;
+        outFrame->format = nativeFormat;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         int numPlanes = 0;
@@ -3663,8 +3938,8 @@ namespace TwkMovie
             (bitSize > 8) ? FrameBuffer::USHORT : FrameBuffer::UCHAR;
         FrameBuffer::StringVector chans(3);
         FrameBuffer* out = 0;
-        av_image_fill_arrays(outFrame->data, outFrame->linesize, 0,
-                             nativeFormat, width, height, 1);
+        av_image_fill_arrays(outFrame->data, outFrame->linesize, nullptr,
+                             nativeFormat, width, height, 1 /*align*/);
 
         // Note: We're about to use offset_plus1 here to derive the RGB channel
         // ordering. Here is the definition of offset_plus1 according to the
@@ -3711,6 +3986,7 @@ namespace TwkMovie
             break;
         default:
             nativeFormat = getBestRVFormat(nativeFormat);
+            outFrame->format = nativeFormat;
             if (isPlanar && !isRGB)
             {
                 convertFormat = (bitSize != 8);
@@ -3743,41 +4019,22 @@ namespace TwkMovie
             outFrame->data[p] = fb->pixels<unsigned char>();
         }
 
-        if (convertFormat)
-        {
-            DBL(DB_VIDEO, "Converting video format");
+#if DB_TIMING & DB_LEVEL
+        m_timingDetails->startTimer("copyFrame");
+#endif
 
-            // Reuse or allocate a new image conversion context
-            AVPixelFormat original = videoCodecContext->pix_fmt;
-            AVPixelFormat conv = getBestRVFormat(original);
-            HOP_PROF("sws_getCachedContext()");
-            // Note: If track->imgConvertContext is NULL, sws_getCachedContext
-            // just calls sws_getContext() to get a new context. Otherwise, it
-            // checks if the parameters are the ones already saved in context.
-            // If that is the case, it returns the current context. Otherwise,
-            // it frees context and gets a new context with the new parameters.
-            track->imgConvertContext = sws_getCachedContext(
-                track->imgConvertContext, width, height, original, width,
-                height, conv, SWS_BICUBIC, 0, 0, 0);
-            if (track->imgConvertContext == 0)
-            {
-                TWK_THROW_EXC_STREAM("Can't initialize conversion context!");
-            }
+        // Copy decoded video frame to output frame
+        copyFrame(videoFrame, outFrame, width, height, convertFormat,
+                  track->imgConvertContext);
 
-            HOP_PROF("sws_scale()");
-            sws_scale(track->imgConvertContext, track->videoFrame->data,
-                      track->videoFrame->linesize, 0, height, outFrame->data,
-                      outFrame->linesize);
-        }
-        else
-        {
-            av_image_copy(outFrame->data, outFrame->linesize,
-                          track->videoFrame->data, track->videoFrame->linesize,
-                          videoCodecContext->pix_fmt, width, height);
-        }
+#if DB_TIMING & DB_LEVEL
+        double duration = m_timingDetails->pauseTimer("copyFrame");
+        DBL(DB_TIMING, "frame: " << inframe << " copyFrame: " << duration);
+#endif
 
         // Clean up
         av_frame_free(&outFrame);
+        av_frame_free(&softwareFrame);
 
         //
         // XXX For now we will handle any rotation in software. Eventually we
@@ -3884,7 +4141,8 @@ namespace TwkMovie
         {
             VideoTrack* track = m_videoTracks[i];
             ContextPool::Reservation reserve(this, track->number);
-            track->isOpen = openAVCodec(track->number, &track->avCodecContext);
+            track->isOpen = openAVCodec(track->number, &track->avCodecContext,
+                                        &track->hardwareContext);
             if (!track->isOpen)
             {
                 cout << "ERROR: Unable to read from audio stream: "
@@ -4224,7 +4482,8 @@ namespace TwkMovie
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
             avCodecContext->codec_type = AVMEDIA_TYPE_VIDEO;
-            avCodecContext->thread_count = m_request.threads;
+            avCodecContext->thread_count =
+                m_request.threads; // 0; and never seems to changed anywhere?
             avCodecContext->width = m_info.width;
             avCodecContext->height = m_info.height;
             avCodecContext->color_primaries = AVCOL_PRI_BT709; // 1
@@ -5696,6 +5955,7 @@ namespace TwkMovie
         {
             VideoTrack* track = m_videoTracks[i];
             avcodec_free_context(&track->avCodecContext);
+            av_buffer_unref(&track->hardwareContext.deviceContext);
             delete track;
         }
         if (m_audioSamples)

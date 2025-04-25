@@ -246,10 +246,19 @@ namespace TwkMovie
         return mov;
     }
 
-    void MovieMistika::open(const string& filename, const MovieInfo& info,
-                            const Movie::ReadRequest& request)
+    void MovieMistika::postPreloadOpen(const MovieInfo& /*unused*/,
+                                       const Movie::ReadRequest& /*unused*/)
+    {
+        // all the work was done in preloadOpen()
+        // since info and request were unused.
+    }
+
+    void MovieMistika::preloadOpen(const string& filename,
+                                   const ReadRequest& request)
     {
         m_filename = filename;
+        m_request = request;
+
         FILE* file = TwkUtil::fopen(m_filename.c_str(), "r");
         if (!file)
         {
