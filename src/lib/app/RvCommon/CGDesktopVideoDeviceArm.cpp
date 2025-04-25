@@ -1,15 +1,17 @@
 //
-//  Copyright (c) 2011 Tweak Software.
-//  All rights reserved.
+// Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
 //
-//  SPDX-License-Identifier: Apache-2.0
-//
+// SPDX-License-Identifier: Apache-2.0
 //
 #include <RvCommon/CGDesktopVideoDeviceArm.h>
 #include <OpenGL/OpenGL.h>
 #include <IOKit/graphics/IOGraphicsLib.h>
 #include <QuartzCore/CVDisplayLink.h>
 #include <IPCore/Session.h>
+
+// NOTE: This file is not used yet and is WIP but should be part
+// of the codebase. It's meant to be a resource to implement screen
+// resolution enumeration and switching.
 
 namespace Rv
 {

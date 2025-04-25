@@ -56,9 +56,7 @@ namespace Rv
         const QList<QScreen*> screens = QGuiApplication::screens();
         if (screen < 0 || screen >= screens.size())
         {
-            // Handle invalid screen index.
-            // TODO_QT
-            std::cout << "Screen index is out of range" << std::endl;
+            m_screen = 0;
         }
 
         const QRect rect = screenGeometry();
@@ -176,7 +174,6 @@ namespace Rv
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
         setViewDevice(vd);
 
-        const QList<QScreen*> screens = QGuiApplication::screens();
         QRect g = screenGeometry();
         viewWidget()->move(g.x(), g.y());
         viewWidget()->setGeometry(g);

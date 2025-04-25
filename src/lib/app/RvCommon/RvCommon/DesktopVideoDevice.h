@@ -27,16 +27,27 @@ namespace Rv
     //  DesktopVideoDevice
     //
     //  This is the base class for desktop video devices. Currently there
-    //  are three:
+    //  is one, but we mean to have three:
     //
-    //      QTDesktopVideoDevice:   generic Qt only device uses QScreen
-    //      CGDesktopVideoDevice:   OS X CoreGraphics video device
+    //      DesktopVideoDevice:
+    //           Generic Qt only device uses QScreen.
+    //           Works for all platforms but cannot enumerate
+    //           screens and resolutions, and effectuate a
+    //           resolution switch (eg: not supported by Qt)
     //
-    //  The QTDesktopVideoDevice is the fallback on windows and linux when
-    //  the NVIDIA driver is not present. On the mac it always uses
-    //  CGDesktopVideoDevice.
+    //      MacDesktopVideoDevice:
+    //      LinuxDesktopVideoDevice:
+    //      WindowsDesktopVideoDevice:
+    //           Not implemented yet (pushed to later) but they
+    //           are meant to use the native OS system calls to
+    //           effectuate resolution changes.
     //
-    //  This class implements the GL guts shared by all of the above and
+    //           This only ever worked for mac, but when moving to
+    //           QOpenGLWidget (Qt6) we had to temporarily remove this
+    //           support when we made the Mac use the Qt path.
+    //           Workaround: change resolution in OS settings first.
+    //
+    //  This class implements the GL guts shared by the above and
     //  holds on to the static data structs for formats, etc.
     //
 
