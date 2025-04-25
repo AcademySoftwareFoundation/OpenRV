@@ -64,6 +64,7 @@ namespace Rv
 
     //----------------------------------------------------------------------
 
+#if defined(RV_VFX_CY2024)
 #ifdef PLATFORM_WINDOWS
     // On Windows, there is an issue with the default delegate for QTreeView and the option to alternate 
     // the background color of the rows. The issue is that the background is painted on top of the icon, 
@@ -107,6 +108,7 @@ namespace Rv
             }
     };
 #endif 
+#endif
 
     RvFileDialog::RvFileDialog(QWidget* parent, FileTypeTraits* traits,
                                Role role, Qt::WindowFlags flags,
@@ -290,8 +292,10 @@ namespace Rv
         m_detailFileModel->setShowHiddenFiles(showHiddenFiles);
         m_columnModel->setShowHiddenFiles(showHiddenFiles);
 
+#if defined(RV_VFX_CY2024)
 #ifdef PLATFORM_WINDOWS
         m_detailTree->setItemDelegate(new RvFileDelegate(m_detailTree));
+#endif
 #endif
 
         m_ui.viewStack->addWidget(m_columnView);
