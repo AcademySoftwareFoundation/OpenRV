@@ -134,8 +134,7 @@ namespace Rv
 
         // Search for an icon based on the MIME type. (e.g. for a PNG, it would
         // be image-png)
-        QString iconName = mime.iconName();
-        QIcon icon = QIcon::fromTheme(iconName);
+        QIcon icon = QIcon::fromTheme(mime.iconName());
         if (!icon.isNull())
         {
             return icon;
@@ -143,8 +142,7 @@ namespace Rv
 
         // Search for an icon based on the MIME generic type. (e.g. for a PNG,
         // it would be image-x-generic)
-        QString genericIconName = mime.genericIconName();
-        icon = QIcon::fromTheme(genericIconName);
+        icon = QIcon::fromTheme(mime.genericIconName());
         if (!icon.isNull())
         {
             return icon;
