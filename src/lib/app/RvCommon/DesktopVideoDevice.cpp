@@ -25,6 +25,7 @@
 #include <TwkFB/IO.h>
 
 #include <QOpenGLContext>
+#include <QScreen>
 
 // #define DEBUG_NO_FULLSCREEN
 
