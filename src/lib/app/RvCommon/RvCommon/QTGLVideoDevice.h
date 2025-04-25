@@ -10,6 +10,7 @@
 #include <iostream>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLWidget>
+#include <QWindow>
 #include <QtWidgets/QWidget>
 #include <RvCommon/QTTranslator.h>
 

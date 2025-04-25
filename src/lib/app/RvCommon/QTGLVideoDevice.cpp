@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #endif
+#include <TwkGLF/GL.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <RvCommon/GLView.h>
 #include <TwkGLF/GLFBO.h>
@@ -83,7 +84,7 @@ namespace Rv
 
             GLint widgetFBO = m_view->defaultFramebufferObject();
             if (widgetFBO != 0)
-                glBindFramebuffer(GL_FRAMEBUFFER_EXT, widgetFBO);
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, widgetFBO);
             TWK_GLDEBUG;
         }
 
