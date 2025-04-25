@@ -21,6 +21,9 @@
 #include <TwkUtil/PathConform.h>
 #include <iostream>
 #include <stl_ext/string_algo.h>
+#if defined(RV_VFX_CY2024)
+#include <QStyledItemDelegate>
+#endif
 #include <QtCore/QDir>
 #include <QtCore/QSet>
 #include <QtGui/QtGui>
@@ -60,6 +63,50 @@ namespace Rv
     //----------------------------------------------------------------------
 
     //----------------------------------------------------------------------
+
+#ifdef PLATFORM_WINDOWS
+    // On Windows, there is an issue with the default delegate for QTreeView and the option to alternate 
+    // the background color of the rows. The issue is that the background is painted on top of the icon, 
+    // which is not the expected behavior. The workaround is to use a custom deletegate to make sure 
+    // that the background of the row is painted BEFORE the icon.
+    class RvFileDelegate : public QStyledItemDelegate
+    {
+        public:
+            using QStyledItemDelegate::QStyledItemDelegate;
+
+            void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+            {
+                QStyleOptionViewItem opt = option;
+                initStyleOption(&opt, index);
+
+                QStyle* style = opt.widget ? opt.widget->style() : QApplication::style();
+
+                // The first thing to paint is the background.
+                style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
+
+                // Draw the highlight if the item is selected.
+                if (opt.state & QStyle::State_Selected)
+                {
+                    painter->fillRect(opt.rect, opt.palette.highlight());
+                }
+                
+                // After the background, the icon should be painted.
+                QVariant decoration = index.data(Qt::DecorationRole);
+                QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &opt, opt.widget);
+                if (decoration.canConvert<QIcon>())
+                {
+                    QIcon icon = qvariant_cast<QIcon>(decoration);
+                    icon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Normal, QIcon::On);
+                }
+
+                // Once the background and icon are painted, we can draw the text.
+                QString text = index.data(Qt::DisplayRole).toString();
+                QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &opt, opt.widget);
+                painter->setPen(opt.palette.color((opt.state & QStyle::State_Selected) ? QPalette::HighlightedText : QPalette::Text));
+                painter->drawText(textRect, opt.displayAlignment, text);
+            }
+    };
+#endif 
 
     RvFileDialog::RvFileDialog(QWidget* parent, FileTypeTraits* traits,
                                Role role, Qt::WindowFlags flags,
@@ -242,6 +289,10 @@ namespace Rv
         m_detailMediaModel->setShowHiddenFiles(showHiddenFiles);
         m_detailFileModel->setShowHiddenFiles(showHiddenFiles);
         m_columnModel->setShowHiddenFiles(showHiddenFiles);
+
+#ifdef PLATFORM_WINDOWS
+        m_detailTree->setItemDelegate(new RvFileDelegate(m_detailTree));
+#endif
 
         m_ui.viewStack->addWidget(m_columnView);
         m_ui.viewStack->addWidget(m_detailTree);
