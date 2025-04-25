@@ -483,7 +483,10 @@ namespace IPCore
 
                 if (!m_transform)
                 {
-                    if (!sp->empty())
+                    m_transform = OCIO::GroupTransform::Create();
+
+                    // Is the input transform specified via a data array ?
+                    if (inTransformURL.empty())
                     {
                         // We need to provide a unique name to OCIOv2,
                         // otherwise it might use a potentially incorrect
