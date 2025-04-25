@@ -36,9 +36,7 @@
 #include <Mu/Value.h>
 #include <MuLang/MuLangContext.h>
 #include <MuLang/StringType.h>
-{
-    % % handRolledInclude % %
-}
+{%%handRolledInclude%%}
 
 namespace Mu
 {

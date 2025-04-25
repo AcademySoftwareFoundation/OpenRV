@@ -37,9 +37,7 @@
 #include <QtSvg/QtSvg>
 #include <QSvgWidget>
 #include <QtNetwork/QtNetwork>
-{
-    % % handRolledInclude % %
-}
+{%%handRolledInclude%%}
 
 namespace Mu
 {
