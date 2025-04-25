@@ -88,12 +88,8 @@ namespace Mu
         NODE_RETURN($T_$T_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    {
-        % % definitions % %
-    }
-    {
-        % % handRolledDefinitions % %
-    }
+    {%%definitions%%}
+    {%%handRolledDefinitions%%}
 
     void $TType::load()
     {
@@ -129,14 +125,10 @@ namespace Mu
 
             EndArguments);
 
-        {
-            % % addSymbols % %
-        }
-        {
-            % % addHandRolledSymbols % %
-        }
+        {%%addSymbols%%}
+        {%%addHandRolledSymbols%%}
 
-        { % % propExclusions % % }
+        {%%propExclusions%%}
 
         populate(this, $T::staticMetaObject, propExclusions);
     }

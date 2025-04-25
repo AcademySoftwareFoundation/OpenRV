@@ -46,12 +46,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    {
-        % % definitions % %
-    }
-    {
-        % % handRolledDefinitions % %
-    }
+    {%%definitions%%}
+    {%%handRolledDefinitions%%}
 
     void qtModule::loadGlobals()
     {
@@ -59,15 +55,9 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(context());
         Module* global = globalModule();
 
-        {
-            % % addSymbolsEnums % %
-        }
-        {
-            % % addSymbols % %
-        }
-        {
-            % % addHandRolledSymbols % %
-        }
+        {%%addSymbolsEnums%%}
+        {%%addSymbols%%}
+        {%%addHandRolledSymbols%%}
     }
 
 } // namespace Mu

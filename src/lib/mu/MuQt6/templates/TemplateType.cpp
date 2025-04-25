@@ -74,12 +74,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    {
-        % % definitions % %
-    }
-    {
-        % % handRolledDefinitions % %
-    }
+    {%%definitions%%}
+    {%%handRolledDefinitions%%}
 
     void $TType::load()
     {
@@ -108,15 +104,9 @@ namespace Mu
 
             EndArguments);
 
-        {
-            % % addSymbolsEnums % %
-        }
-        {
-            % % addSymbols % %
-        }
-        {
-            % % addHandRolledSymbols % %
-        }
+        {%%addSymbolsEnums%%}
+        {%%addSymbols%%}
+        {%%addHandRolledSymbols%%}
     }
 
 } // namespace Mu
