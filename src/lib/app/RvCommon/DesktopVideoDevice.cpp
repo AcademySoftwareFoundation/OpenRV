@@ -8,6 +8,9 @@
 #ifdef PLATFORM_WINDOWS
 #include <GL/glew.h>
 #include <GL/wglew.h>
+#include <Wingdi.h>
+#include <Shlwapi.h>
+#include <lcms2.h>
 #endif
 
 #include <RvCommon/DesktopVideoDevice.h>
@@ -21,6 +24,11 @@
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
 
+#include <QOpenGLContext>
+#include <QScreen>
+
+// #define DEBUG_NO_FULLSCREEN
+
 namespace Rv
 {
 
@@ -29,28 +37,69 @@ namespace Rv
     using namespace TwkApp;
 
     DesktopVideoDevice::DesktopVideoDevice(VideoModule* m,
-                                           const std::string& name,
-                                           const QTGLVideoDevice* share)
-        : GLBindableVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
+                                           const std::string& name, int screen,
+                                           const QTGLVideoDevice* glViewShared)
+        : GLBindableVideoDevice(m, name, ImageOutput | NormalizedCoordinates)
         , m_viewDevice(0)
-        , m_share(share)
+        , m_share(glViewShared)
         , m_stereoMode(Mono)
         , m_vsync(true)
         , m_videoFormatIndex(0)
         , m_dataFormatIndex(0)
         , m_syncing(false)
+        , m_screen(screen)
+        , m_translator(0)
+        , m_view(0)
     {
         m_glGlobalState = new GLState();
         m_glGlobalState->useGLProgram(textureRectGLProgram());
+
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        if (screen < 0 || screen >= screens.size())
+        {
+            m_screen = 0;
+        }
+
+        const QRect rect = screenGeometry();
+
+        ostringstream str;
+        str << rect.width() << " x " << rect.height();
+        m_videoFormats.push_back(
+            VideoFormat(rect.width(), rect.height(), 1.0, 1.0, 0.0, str.str()));
+        addDefaultDataFormats();
     }
 
-    DesktopVideoDevice::~DesktopVideoDevice() { delete m_glGlobalState; }
+    DesktopVideoDevice::~DesktopVideoDevice()
+    {
+        close();
+        delete m_glGlobalState;
+    }
 
-    void DesktopVideoDevice::redraw() const { ScopedLock lock(m_mutex); }
+    void DesktopVideoDevice::redraw() const
+    {
+        if (m_view)
+        {
+            ScopedLock lock(m_mutex);
+            QSize s = m_view->size();
+            m_view->update();
+        }
+    }
 
     void DesktopVideoDevice::redrawImmediately() const
     {
-        ScopedLock lock(m_mutex);
+        if (m_view && m_view->isVisible())
+        {
+            ScopedLock lock(m_mutex);
+            TWK_GLDEBUG;
+            m_view->update();
+            TWK_GLDEBUG;
+        }
+        else
+        {
+            TWK_GLDEBUG;
+            redraw();
+            TWK_GLDEBUG;
+        }
     }
 
     void DesktopVideoDevice::blockUntilSyncComplete() const
@@ -58,38 +107,114 @@ namespace Rv
         ScopedLock lock(m_mutex);
     }
 
-    void DesktopVideoDevice::bind(const TwkGLF::GLVideoDevice* d) const
+    void DesktopVideoDevice::transfer(const GLFBO* sourceFbo) const
     {
         ScopedLock lock(m_mutex);
-        if (d)
-            d->makeCurrent();
-    }
 
-    void DesktopVideoDevice::bind2(const GLVideoDevice* d,
-                                   const GLVideoDevice* d2) const
-    {
-        ScopedLock lock(m_mutex);
-        if (d)
-            d->makeCurrent();
-    }
+        //        sourceFbo->debugSaveFramebuffer();
 
-    void DesktopVideoDevice::transfer(const GLFBO* fbo) const
-    {
-        ScopedLock lock(m_mutex);
-        m_viewDevice->makeCurrent();
+        // viewDevice->fboID will eventuall retrieve the ScreenView's FBO id.
+        // But if was never shown/painted yet, then it will be 0.
+        // If that's the case then nothing to do for now. Let's defer this to
+        // later.
+        GLint svFboId = m_viewDevice->fboID();
+        if (svFboId == 0)
+            return;
 
-        GLFBO* local_fbo = m_fboMap[fbo];
+        // Switch to the ScreenView's OpenGL context.
+        m_viewDevice->makeCurrent(); // calls screenview's makeCurrent, sets the
+                                     // font current, etc etc.
 
-        if (!local_fbo)
+        // Next, because we can't blit from FBOs belonging to different
+        // contexts, check to see if we already have an clone of the source FBO
+        // associated to the view's context.
+        GLFBO* svSourceFbo = m_fboMap[sourceFbo];
+        if (!svSourceFbo)
         {
-            local_fbo = new GLFBO(fbo->width(), fbo->height(),
-                                  fbo->primaryColorFormat());
-            local_fbo->attachColorTexture(fbo->colorTarget(0), fbo->colorID(0));
-            m_fboMap[fbo] = local_fbo;
+            // We don't yet have a clone of the source FBO living in the context
+            // of the ScreenView. Therefore, we now create this new clone FBO
+            // with the dimensions/format as the source.
+            // Afterwards, associate the source FBO's color attachment to the
+            // clone's color attachment, because color attachments *can* be
+            // shared for the blit operation
+            svSourceFbo = new GLFBO(sourceFbo->width(), sourceFbo->height(),
+                                    sourceFbo->primaryColorFormat());
+
+            svSourceFbo->attachColorTexture(
+                sourceFbo->colorTarget(0),
+                sourceFbo->colorID(0)); // PB: What's colorId ?
+            m_fboMap[sourceFbo] = svSourceFbo;
         }
 
-        local_fbo->copyTo(m_viewDevice->defaultFBO());
-        local_fbo->unbind();
+        // Finally, create a temporary GLFBO with the ID of the ScreenView's FBO
+        // so that we can blit to it.  BTW, the copyTo() call queries width()
+        // and height() on the videodevice, which in turn queries the view.
+        const GLFBO* svDestFbo = m_viewDevice->defaultFBO();
+
+        // Copy the FBO (first time = black) into the FBO of the QOpenGLWidget.
+        svSourceFbo->copyTo(svDestFbo);
+
+        // Note: do not delete svDestFBO because it's an internal data member of
+        // m_viewDevice
+
+        // Note: Upon existing from here, the caller will restore the correct
+        // current context.
+    }
+
+    void DesktopVideoDevice::open(const StringVector& args)
+    {
+        TWK_GLDEBUG;
+
+        QSurfaceFormat fmt = shareDevice()->widget()->format();
+        fmt.setSwapInterval(m_vsync ? 1 : 0);
+
+        ScreenView* vw =
+            new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
+        setViewWidget(vw);
+
+        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
+        setViewDevice(vd);
+
+        QRect g = screenGeometry();
+        viewWidget()->move(g.x(), g.y());
+        viewWidget()->setGeometry(g);
+
+        if (useFullScreen())
+            viewWidget()->setWindowState(Qt::WindowFullScreen);
+        else
+            viewWidget()->setWindowState(Qt::WindowNoState);
+
+        TWK_GLDEBUG;
+
+        viewWidget()->setGeometry(g);
+
+        viewWidget()->show();
+        //        QCoreApplication::processEvents(); // force the window to
+        //        show. m_share->makeCurrent();
+
+        TWK_GLDEBUG;
+    }
+
+    void DesktopVideoDevice::close()
+    {
+        delete m_view;
+        delete m_viewDevice;
+        delete m_translator;
+        m_view = 0;
+        m_viewDevice = 0;
+        m_translator = 0;
+    }
+
+    void DesktopVideoDevice::setViewWidget(QOpenGLWidget* widget)
+    {
+        m_view = widget;
+        m_translator = new QTTranslator(this, m_view);
+    }
+
+    void DesktopVideoDevice::makeCurrent() const
+    {
+        if (m_view)
+            m_view->makeCurrent();
     }
 
     void DesktopVideoDevice::setupModelviewAndProjection(
@@ -219,7 +344,7 @@ namespace Rv
 #if 0
     {
         const GLFBO* fbo = leftFBO;
-        fbo->bind(GL_READ_FRAMEBUFFER_EXT);
+        fbo->bind(GL_READ_FRAMEBUFFER);
 
         TwkFB::FrameBuffer fb(fbo->width(), fbo->height(), 4, TwkFB::FrameBuffer::UCHAR);
         std::vector<const TwkFB::FrameBuffer*> fbs(1);
@@ -240,7 +365,7 @@ namespace Rv
 
     {
         const GLFBO* fbo = rightFBO;
-        fbo->bind(GL_READ_FRAMEBUFFER_EXT);
+        fbo->bind(GL_READ_FRAMEBUFFER);
 
         TwkFB::FrameBuffer fb(fbo->width(), fbo->height(), 4, TwkFB::FrameBuffer::UCHAR);
         std::vector<const TwkFB::FrameBuffer*> fbs(1);
@@ -735,6 +860,209 @@ namespace Rv
     void DesktopVideoDevice::sortVideoFormatsByWidth()
     {
         sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort);
+    }
+
+    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt,
+                                               QWidget* parent,
+                                               QOpenGLWidget* glViewShare,
+                                               Qt::WindowFlags flags)
+        : QOpenGLWidget(parent, flags)
+    {
+        m_glViewShare = glViewShare;
+        setFormat(fmt);
+
+        // Important: set PartialUpdate, because otherwise
+        // before every call to paintGL Qt will call glClear(),
+        // thereby erasing the FBO we just transferred pixels to.
+        setUpdateBehavior(QOpenGLWidget::PartialUpdate);
+    }
+
+    void DesktopVideoDevice::ScreenView::initializeGL()
+    {
+        QOpenGLWidget::initializeGL();
+
+        if (m_glViewShare && context() && context()->isValid())
+        {
+            context()->setShareContext(m_glViewShare->context());
+        }
+    }
+
+    void DesktopVideoDevice::ScreenView::paintGL()
+    {
+        // This method is explicitely empty because this widget's FBO is
+        // written to by the transfer/transfer2() method
+    }
+
+    //----------------------------------------------------------------------
+
+    bool DesktopVideoDevice::isOpen() const { return m_view != 0; }
+
+    bool DesktopVideoDevice::useFullScreen() const
+    {
+#ifdef DEBUG_NO_FULLSCREEN
+        return false;
+#else
+        return true;
+#endif
+    }
+
+    QRect DesktopVideoDevice::screenGeometry() const
+    {
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        QRect g = screens[m_screen]->geometry();
+
+#ifdef DEBUG_NO_FULLSCREEN
+        // in the no-fullscreen debug mode, use 800x600 resolution in a simple
+        // window.
+        int offset = 30;
+        g = QRect(g.x() + offset, g.y() + offset, 1024, 768);
+#endif
+        return g;
+    }
+
+    VideoDevice::Resolution DesktopVideoDevice::resolution() const
+    {
+        QRect g = screenGeometry();
+
+        return Resolution(g.width(), g.height(), 1.0, 1.0);
+    }
+
+    size_t DesktopVideoDevice::width() const
+    {
+        QRect g = screenGeometry();
+        return g.width();
+    }
+
+    size_t DesktopVideoDevice::height() const
+    {
+        QRect g = screenGeometry();
+        return g.height();
+    }
+
+    VideoDevice::VideoFormat DesktopVideoDevice::format() const
+    {
+        QRect g = screenGeometry();
+        ostringstream str;
+        str << g.width() << " x " << g.height();
+        const float pa = 1.0;
+        const float ps = 1.0;
+        const float rate = 60.0;
+        return VideoFormat(g.width(), g.height(), pa, ps, rate, str.str());
+    }
+
+    VideoDevice::Offset DesktopVideoDevice::offset() const
+    {
+        return Offset(0, 0);
+    }
+
+    VideoDevice::Timing DesktopVideoDevice::timing() const { return format(); }
+
+#ifdef PLATFORM_WINDOWS
+    TwkApp::VideoDevice::ColorProfile DesktopVideoDevice::colorProfile() const
+    {
+        //
+        // XXX The following steps are not Unicode safe
+        //
+
+        // Get the context for this screen
+        const QList<QScreen*> screens = QGuiApplication::screens();
+
+        // Ensure the screen index is valid.
+        if (m_screen < 0 || m_screen >= screens.size())
+        {
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        QScreen* targetScreen = screens[m_screen];
+        QWindow* windowOnTargetScreen = nullptr;
+        const QList<QWindow*> windows = QGuiApplication::topLevelWindows();
+
+        // Check all windows to find one on the target screen.
+        for (QWindow* window : windows)
+        {
+            if (window->screen() == targetScreen)
+            {
+                windowOnTargetScreen = window;
+            }
+        }
+
+        if (!windowOnTargetScreen)
+        {
+            // Return empty profile if no window is found on the screen.
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        HWND hwnd = reinterpret_cast<HWND>(windowOnTargetScreen->winId());
+        HDC hdc = GetDC(hwnd);
+
+        if (hdc)
+        {
+            // Look for the profile path
+            unsigned long pathLen;
+            GetICMProfile(hdc, &pathLen, NULL);
+            char* path = new char[pathLen];
+
+            if (GetICMProfile(hdc, &pathLen, path))
+            {
+                // If we found a profile lets set the type,
+                // url, and description
+
+                m_colorProfile.type = ICCProfile;
+
+                unsigned long maxLen = 2084;
+                char* url = new char[maxLen];
+                UrlCreateFromPath(path, url, &maxLen, NULL);
+                m_colorProfile.url = url;
+
+                char desc[256];
+                cmsHPROFILE profile = cmsOpenProfileFromFile(path, "r");
+                cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US",
+                                       desc, 256);
+                m_colorProfile.description = desc;
+
+                delete url;
+            }
+
+            delete path;
+            ReleaseDC(hwnd, hdc);
+        }
+        else
+        {
+            m_colorProfile = ColorProfile();
+        }
+
+        return m_colorProfile;
+    }
+#endif
+
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(
+        TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    {
+        std::vector<VideoDevice*> devices;
+
+        const auto screens = QGuiApplication::screens();
+        for (int screen = 0; screen < screens.size(); screen++)
+        {
+            const QScreen* w = screens[screen];
+            QString name = QString("%1 %2 %3")
+                               .arg(w->manufacturer())
+                               .arg(w->model())
+                               .arg(w->name());
+
+            DesktopVideoDevice* sd = new DesktopVideoDevice(
+                module, name.toUtf8().constData(), screen, shareDevice);
+
+            devices.push_back(sd);
+        }
+
+        return devices;
+    }
+
+    void DesktopVideoDevice::syncBuffers() const
+    {
+        redrawImmediately(); //?
     }
 
 } // namespace Rv

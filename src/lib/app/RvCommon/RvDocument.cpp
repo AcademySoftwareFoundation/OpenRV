@@ -15,7 +15,6 @@
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
-// #include <RvCommon/QTFrameBuffer.h>
 #include <RvCommon/QTUtils.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvCommon/RvNetworkDialog.h>
@@ -183,7 +182,6 @@ namespace Rv
 
         setCentralWidget(m_viewContainerWidget);
 
-        // QTFrameBuffer* fb = m_glView->frameBuffer(
         m_glView->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
@@ -477,7 +475,7 @@ namespace Rv
         //  happening. We only want DisplayLink with actual playback
         //
 
-#ifdef PLATFORM_DARWIN
+#if defined(PLATFORM_DARWIN) && 0
         if (CGDesktopVideoDevice* cgdevice =
                 dynamic_cast<CGDesktopVideoDevice*>(
                     m_glView->videoDevice()->physicalDevice()))
@@ -490,7 +488,7 @@ namespace Rv
 
     void RvDocument::playStopSlot(const std::string&)
     {
-#ifdef PLATFORM_DARWIN
+#if defined(PLATFORM_DARWIN) && 0
         if (m_displayLink)
             m_displayLink->stop();
 #endif
