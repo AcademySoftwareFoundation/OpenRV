@@ -10,6 +10,7 @@
 #include <iostream>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLWidget>
+#include <QWindow>
 #include <QtWidgets/QWidget>
 #include <RvCommon/QTTranslator.h>
 
@@ -63,6 +64,8 @@ namespace Rv
         virtual bool isOpen() const;
 
         virtual void syncBuffers() const;
+
+        virtual GLuint fboID() const;
 
         bool isWorkerDevice() const
         {

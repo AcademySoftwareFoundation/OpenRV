@@ -36,6 +36,11 @@ namespace TwkGLF
             m_fbo = m_fbos[i];
         }
 
+        virtual GLuint fboID() const
+        { // meant to be overriden
+            return 0;
+        }
+
         //
         //  GLVideoDevice API
         //
