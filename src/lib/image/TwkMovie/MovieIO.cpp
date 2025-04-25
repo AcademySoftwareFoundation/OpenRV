@@ -109,14 +109,7 @@ namespace TwkMovie
 
     void GenericIO::Preloader::Reader::load()
     {
-        unsigned int image = MovieIO::MovieRead;
-        unsigned int audio = MovieIO::MovieReadAudio;
-        string ext = extension(filename);
-
-        MovieReader* m = 0;
-        const MovieIO* io = 0;
-
-        if (io = findByExtension(ext, image | audio))
+        try
         {
             m_movieReader =
                 GenericIO::preloadOpenMovieReader(filename(), request(), true);
