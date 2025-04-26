@@ -6,21 +6,13 @@
 //
 //
 #include <RvCommon/DesktopVideoModule.h>
-#include <RvCommon/QTDesktopVideoDevice.h>
+#include <RvCommon/DesktopVideoDevice.h>
 #include <RvCommon/GLView.h>
 #include <IPCore/ImageRenderer.h>
 #include <stl_ext/string_algo.h>
 #include <QtGui/QtGui>
 #include <map>
 #include <boost/algorithm/string.hpp>
-
-#ifdef PLATFORM_DARWIN
-#include <RvCommon/CGDesktopVideoDevice.h>
-#include <IOKit/IOKitLib.h>
-#include <IOKit/graphics/IOGraphicsLib.h>
-#include <IOKit/graphics/IOFramebufferShared.h>
-#include <IOKit/graphics/IOGraphicsInterface.h>
-#endif
 
 #include <QtWidgets/QApplication>
 #include <QScreen>
@@ -32,123 +24,19 @@ namespace Rv
 
     //----------------------------------------------------------------------
 
-#ifdef PLATFORM_DARWIN
-    static void KeyArrayCallback(const void* key, const void* value,
-                                 void* context)
-    {
-        CFMutableArrayRef langKeys = (CFMutableArrayRef)context;
-        CFArrayAppendValue(langKeys, key);
-    }
-#endif
+    // force intel code path for this commit
+    static bool isDarwinArm() { return true; }
+
+    static bool isDarwinIntel() { return true; }
+
+    static bool useQtOnDarwinArm() { return true; }
 
     DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np,
                                            QTGLVideoDevice* shareDevice)
         : VideoModule()
     {
-        bool useQt = true;
-
-#ifdef PLATFORM_DARWIN
-        useQt = false;
-
-        //
-        //  Use the CoreGraphics devices
-        //
-
-        CGDirectDisplayID idArray[20];
-        uint32_t idNum;
-        CGGetOnlineDisplayList(20, idArray, &idNum);
-        // CGDirectDisplayID mainID = CGMainDisplayID();
-
-        for (size_t i = 0; i < idNum; i++)
-        {
-            CGDirectDisplayID aID = idArray[i];
-
-            CFStringRef localName = NULL;
-            io_connect_t displayPort = CGDisplayIOServicePort(aID);
-            CFDictionaryRef dict =
-                (CFDictionaryRef)IODisplayCreateInfoDictionary(
-                    displayPort, kIODisplayOnlyPreferredName);
-            CFDictionaryRef names = (CFDictionaryRef)CFDictionaryGetValue(
-                dict, CFSTR(kDisplayProductName));
-
-            if (names)
-            {
-                CFArrayRef langKeys = CFArrayCreateMutable(
-                    kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
-                CFDictionaryApplyFunction(names, KeyArrayCallback,
-                                          (void*)langKeys);
-                CFArrayRef orderLangKeys =
-                    CFBundleCopyPreferredLocalizationsFromArray(langKeys);
-                CFRelease(langKeys);
-
-                if (orderLangKeys && CFArrayGetCount(orderLangKeys))
-                {
-                    CFStringRef langKey =
-                        (CFStringRef)CFArrayGetValueAtIndex(orderLangKeys, 0);
-                    localName =
-                        (CFStringRef)CFDictionaryGetValue(names, langKey);
-                    CFRetain(localName);
-                }
-
-                CFRelease(orderLangKeys);
-            }
-
-            //
-            //  Above process seems to fail to find the display name on some mac
-            //  minis, so invent a name if we didn't find one.
-            //
-
-            ostringstream nameStr;
-            const char* nameP = 0;
-            vector<char> localBuffer;
-
-            if (localName == NULL)
-            {
-                nameStr << "CG Display " << (i + 1);
-                nameP = nameStr.str().c_str();
-            }
-            else
-            {
-                localBuffer =
-                    vector<char>(CFStringGetLength(localName) * 4 + 1);
-
-                CFStringGetCString(localName, &localBuffer.front(),
-                                   localBuffer.size(), kCFStringEncodingUTF8);
-
-                nameP = &localBuffer.front();
-            }
-
-            //
-            //  In use of 'i' below, we're relying on the order of the devices
-            //  here being the same as in the objc [NSScreen screens] call, but
-            //  that
-            //  seems to be true.  The [NSScreen screens] call is used in Qt
-            //  core\ code to define Qt screens.
-            //
-            CGDesktopVideoDevice* sd =
-                new CGDesktopVideoDevice(this, nameP, aID, i, shareDevice);
-            m_devices.push_back(sd);
-
-            CFRelease(dict);
-        }
-#endif
-
-        if (useQt)
-        {
-            const auto screens = QGuiApplication::screens();
-            for (int screen = 0; screen < screens.size(); screen++)
-            {
-                const QScreen* w = screens[screen];
-                QString name = QString("%1 %2 %3")
-                                   .arg(w->manufacturer())
-                                   .arg(w->model())
-                                   .arg(w->name());
-
-                QTDesktopVideoDevice* sd = new QTDesktopVideoDevice(
-                    this, name.toUtf8().constData(), screen, shareDevice);
-                m_devices.push_back(sd);
-            }
-        }
+        m_devices =
+            DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice);
     }
 
     DesktopVideoModule::~DesktopVideoModule() {}
@@ -166,34 +54,6 @@ namespace Rv
     {
         TwkApp::VideoDevice* device = 0;
 
-#if defined(PLATFORM_DARWIN)
-
-        const int maxDisplays = 64;
-        CGDirectDisplayID displays[maxDisplays];
-        CGDisplayCount displayCount;
-        const CGPoint cgPoint = CGPointMake(x, y);
-        const CGDisplayErr err = CGGetDisplaysWithPoint(
-            cgPoint, maxDisplays, displays, &displayCount);
-
-        if (err != kCGErrorSuccess)
-            cerr << "ERROR: CGGetDisplaysWithPoint returns " << err << endl;
-        else if (displayCount > 0)
-        {
-            for (int i = 0; i < m_devices.size(); ++i)
-            {
-                CGDesktopVideoDevice* d =
-                    dynamic_cast<CGDesktopVideoDevice*>(m_devices[i]);
-
-                if (d && d->cgDisplay() == displays[0])
-                {
-                    device = d;
-                    break;
-                }
-            }
-        }
-
-#else // PLATFORM_LINUX or PLATFORM_WINDOWS
-
         const QList<QScreen*> screens = QGuiApplication::screens();
         for (int screen = 0; screen < screens.size(); ++screen)
         {
@@ -204,7 +64,7 @@ namespace Rv
                 {
                     //
                     //  These devices may be NVDesktopVideoDevices or
-                    //  QTDeskTopVideoDevices.
+                    //  DeskTopVideoDevices.
                     //
                     TwkApp::VideoDevice* d = m_devices[i];
 
@@ -220,9 +80,7 @@ namespace Rv
                 }
             }
         }
-#endif
 
         return device;
     }
-
 } // namespace Rv
