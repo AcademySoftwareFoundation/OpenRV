@@ -103,8 +103,10 @@ struct GLPushMatrix
 #define TWK_GLDEBUG ;
 #else
 bool twkGlPrintError(std::string_view file, std::string_view function,
-                     const int line);
-#define TWK_GLDEBUG twkGlPrintError(__FILE__, __FUNCTION__, __LINE__);
+                     const int line, std::string_view msg);
+#define TWK_GLDEBUG twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
+#define TWK_GLDEBUG_MSG(msg) \
+    twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, msg);
 #endif
 
 //----------------------------------------------------------------------

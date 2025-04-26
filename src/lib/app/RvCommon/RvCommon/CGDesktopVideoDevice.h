@@ -16,6 +16,7 @@
 
 namespace Rv
 {
+    class QTGLVideoDevice;
 
     //
     //  CGDesktopVideoDevice
@@ -63,6 +64,11 @@ namespace Rv
         virtual ColorProfile colorProfile() const;
 
         void createFormats();
+
+    public:
+        static std::vector<VideoDevice*>
+        createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                  const QTGLVideoDevice* shareDevice);
 
     private:
         CGDirectDisplayID m_cgScreen;

@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 #endif
+#include <TwkGLF/GL.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <RvCommon/GLView.h>
 #include <TwkGLF/GLFBO.h>
@@ -77,9 +78,26 @@ namespace Rv
     void QTGLVideoDevice::makeCurrent() const
     {
         if (m_view->context() && m_view->context()->isValid())
+        {
             m_view->makeCurrent();
+            TWK_GLDEBUG;
+
+            GLint widgetFBO = m_view->defaultFramebufferObject();
+            if (widgetFBO != 0)
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, widgetFBO);
+            TWK_GLDEBUG;
+        }
+
         if (!isWorkerDevice())
             GLVideoDevice::makeCurrent();
+    }
+
+    GLuint QTGLVideoDevice::fboID() const
+    {
+        if (m_view)
+            return m_view->defaultFramebufferObject();
+
+        return 0;
     }
 
     void QTGLVideoDevice::redraw() const
