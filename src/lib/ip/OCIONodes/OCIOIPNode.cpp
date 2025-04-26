@@ -162,7 +162,7 @@ namespace IPCore
                 // Note: 1.2 is currently the lowest available value in OCIO
                 GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_2;
             }
-            else if (ociofunction == "look")
+            else
             {
                 GPULanguage = OCIO::GPU_LANGUAGE_GLSL_1_3;
             }
@@ -265,12 +265,6 @@ namespace IPCore
                                                        sp->front().c_str());
                     }
                 }
-
-                processor = m_state->config->getProcessor(
-                    m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
-
-                size_t hashValue = string_hash(name());
-                shaderName << "OCIO_sl_" << name() << "_" << hex << hashValue;
             }
         }
     }
@@ -638,12 +632,6 @@ namespace IPCore
                          << shaderDesc->getFunctionName() << "':" << endl
                          << glsl << endl;
                 }
-
-                processor = m_state->config->getProcessor(
-                    m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
-
-                size_t hashValue = string_hash(outTransformURL);
-                shaderName << "OCIO_sd_" << name() << "_" << hex << hashValue;
             }
         }
         catch (std::exception& exc)

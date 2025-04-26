@@ -729,18 +729,15 @@ def install_python_vfx2024() -> None:
         shutil.rmtree(OUTPUT_DIR)
 
     if platform.system() == "Windows":
-        # include
-        src_dir = os.path.join(SOURCE_DIR, "Include")
-        dst_dir = os.path.join(OUTPUT_DIR, "include")
-        shutil.copytree(src_dir, dst_dir)
-        src_file = os.path.join(SOURCE_DIR, "PC", "pyconfig.h")
-        dst_file = os.path.join(dst_dir, "pyconfig.h")
-        shutil.copyfile(src_file, dst_file)
+        build_path = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
+        parent = os.path.dirname(SOURCE_DIR)
 
-        # lib
-        src_dir = os.path.join(SOURCE_DIR, "Lib")
-        dst_dir = os.path.join(OUTPUT_DIR, "lib")
-        shutil.copytree(src_dir, dst_dir)
+        # Using the python that OpenRV built to execute the script because it seems
+        # like it need to be the same dot release. (e.g. run the script with 3.11 to install a 3.11)
+        python_executable = "python"
+        if VARIANT == "Debug":
+            python_executable = "python_d"
+        python_executable = os.path.join(build_path, python_executable)
 
         install_args = [
             python_executable,
@@ -781,7 +778,8 @@ def install_python_vfx2024() -> None:
             src_python_exe = "python_d.exe"
         else:
             src_python_exe = "python.exe"
-        src_file = os.path.join(src_dir, src_python_exe)
+
+        src_file = os.path.join(OUTPUT_DIR, src_python_exe)
         dst_file = os.path.join(dst_dir, "python3.exe")
         print(f"Copy {src_file} to {dst_file}")
 

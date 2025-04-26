@@ -256,7 +256,7 @@ int utf8Main(int argc, char* argv[])
         qunsetenv("QT_SCALE_FACTOR");
         qunsetenv("QT_SCREEN_SCALE_FACTORS");
         qunsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");
-        qunsetenv("QT_ENABLE_HIGHDPI_SCALING");
+        qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
         qunsetenv("QT_SCALE_FACTOR_ROUNDING_POLICY");
         qunsetenv("QT_DEVICE_PIXEL_RATIO");
     }

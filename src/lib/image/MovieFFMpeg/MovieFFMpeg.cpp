@@ -625,6 +625,7 @@ namespace TwkMovie
 
     namespace
     {
+        constexpr int rv_seek_frame_offset = 1;
 
         //----------------------------------------------------------------------
         //
@@ -3563,11 +3564,11 @@ namespace TwkMovie
         m_timingDetails->startTimer("seek");
 #endif
 
-        // To make seeking a bit more robust, step back 3 frames from the
-        // intended frame. This is because FFmpeg internally seeks with the dts
-        // timestamp and not the pts timestamp, so we need to have a bit of a
-        // buffer.
-        const int64_t seekTarget = int64_t((inframe - 3) * frameDur);
+        // Before FFmpeg 6, the offset was 1 frame. Let's keep that assumption
+        // for now. Note: FFmpeg internally seeks with the dts timestamp and not
+        // the pts timestamp. We need to have a bit of a buffer.
+        const int64_t seekTarget =
+            int64_t((inframe - rv_seek_frame_offset) * frameDur);
 
         DBL(DB_VIDEO, "seekTarget: " << seekTarget
                                      << " last: " << track->lastDecodedVideo
@@ -3575,10 +3576,13 @@ namespace TwkMovie
 
         avcodec_send_packet(track->avCodecContext, nullptr);
 
-        int ret = 0;
-        while (ret != AVERROR_EOF)
-            ret =
-                avcodec_receive_frame(track->avCodecContext, track->videoFrame);
+        int ret;
+        while ((ret = avcodec_receive_frame(track->avCodecContext,
+                                            track->videoFrame))
+               != AVERROR_EOF)
+        {
+            // Discard received frames until the end of the stream is reached
+        }
 
         avcodec_flush_buffers(track->avCodecContext);
         if (av_seek_frame(m_avFormatContext, track->number, seekTarget,
@@ -3693,7 +3697,7 @@ namespace TwkMovie
     {
         // The goal timestamp is the same as the seek target adjusted
         // for pts vs dts.
-        const int64_t goalTS = (inframe - 1) * frameDur;
+        const int64_t goalTS = (inframe - rv_seek_frame_offset) * frameDur;
 
         // If it is the first time we try to decode the stream, we need
         // to start by reading a packet.
