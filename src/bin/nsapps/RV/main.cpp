@@ -286,7 +286,7 @@ int main(int argc, char* argv[])
         unsetenv("QT_SCALE_FACTOR");
         unsetenv("QT_SCREEN_SCALE_FACTORS");
         unsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");
-        unsetenv("QT_ENABLE_HIGHDPI_SCALING");
+        qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
         unsetenv("QT_SCALE_FACTOR_ROUNDING_POLICY");
         unsetenv("QT_DEVICE_PIXEL_RATIO");
     }
