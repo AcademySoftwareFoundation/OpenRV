@@ -126,7 +126,44 @@ namespace IPCore::Shader
                     m_bindingMap[B] = NameBinding(B, S->name(), true);
                 }
             }
-            else
+        }
+
+        //
+        //  collect the names for this function
+        //
+
+        m_functions.insert(F);
+
+        if (F->usesOutputSize())
+        {
+            m_needOutputSize = true;
+        }
+        if (F->usesOutputST())
+        {
+            m_needOutputST = true;
+        }
+        if (F->usesFragmentPosition())
+        {
+            m_needFragmentPosition = true;
+        }
+
+        //
+        //  If this is an inline function give it a unique suffix
+        //
+
+        if (inlined)
+        {
+            ostringstream str;
+            str << "_" << m_inlineMap.size();
+            m_inlineMap[expr] = str.str();
+        }
+
+        for (size_t q = 0; q < exprArgs.size(); q++)
+        {
+            const BoundSymbol* B = exprArgs[q];
+            const Symbol* S = B->symbol();
+
+            if (S->isSpecial())
             {
                 const BoundExpression* Bexpr =
                     dynamic_cast<const BoundExpression*>(B);
