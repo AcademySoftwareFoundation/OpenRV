@@ -92,14 +92,18 @@
 #else
 #include <TwkGLFFBO/FBOVideoDevice.h>
 #include <IPCore/ImageRenderer.h>
-#include <QtOpenGL/QGLContext>
 #endif
 
+#if defined(RV_VFX_CY2023)
+#include <QTextCodec>
+#endif
 #include <QtWidgets/QtWidgets>
 #include <QtGui/QtGui>
 #include <RvCommon/RvDocument.h>
 
-#include <QtGlobal>
+// TODO_QT: Remove if everything works.
+// Assuming it is not needed: qtGlobals.cpp stopped being generated since Qt 4.6
+// #include <QtGlobal>
 
 extern const char* rv_linux_dark;
 
@@ -192,6 +196,54 @@ TwkApp::QTBundle bundle(EXECUTABLE_SHORT_NAME, MAJOR_VERSION, MINOR_VERSION,
 extern "C" int XInitThreads();
 #endif
 
+//
+// This function is an attempt to prevent QCoreApplication::initLocale() method
+// to complain that an invalid locale is currently set.
+//
+// Before this bugfix, RV's init code explicitely set the current locale to "C".
+// At the same time, this locale is now explicitely unsupported by Qt6, and
+// instead will instead switch to "C.UTF-8" under Linux, or "UTF-8" under Darwin
+// (macOS)
+//
+// For more information about how Qt initializes the locale, look at
+// initLocale() in the file:
+//
+// QT_HOME/Qt6.x.x/Src/qtbase/src/corelib/kernel/qcoreapplication.cpp
+//
+static void setPlatformSpecificLocale()
+{
+    std::string locale = "";
+
+#if defined(PLATFORM_DARWIN)
+    // In Darwin, "C.UTF-8" isn't directly supported, but we can use any
+    // "<region>.UTF-8" locale.  However, as per Qt's initLocale() method
+    // for in macOS, there is...
+    //
+    //    ..."no need to try language or region specific CTYPEs, as they
+    //        all point back to the same generic UTF-8 CTYPE."
+    //
+    // NOTE: Leaving this here for completeness for the curious minded,
+    // but the main.cpp file for macOS is actually src/bin/nsapps/RV/main.cpp
+
+    locale = "UTF-8";
+#elif defined(PLATFORM_LINUX)
+    // this is valid for Rocky Linux. As per the Qt code, some other Unixes may
+    // also support "C.utf-8" as an alias to C.UTF-8", but for Rocky Linux there
+    // is no need.
+    locale = "C.UTF-8";
+#elif defined(WIN32)
+    // Under Windows, it seems Qt does not try to enfore switching to "C.UTF-8",
+    // (as this function only seems to be compiled for unix-variants).
+    // Therefore, we leave it as the "C" locale.
+    locale = "C";
+#endif
+
+    setEnvVar("LANG", locale);
+    setEnvVar("LC_ALL", locale);
+    // cout << "Set locale to " << locale.c_str() << endl; // for debugging at
+    // console
+}
+
 int utf8Main(int argc, char* argv[])
 {
 #ifdef PLATFORM_LINUX
@@ -204,7 +256,7 @@ int utf8Main(int argc, char* argv[])
         qunsetenv("QT_SCALE_FACTOR");
         qunsetenv("QT_SCREEN_SCALE_FACTORS");
         qunsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");
-        qunsetenv("QT_ENABLE_HIGHDPI_SCALING");
+        qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
         qunsetenv("QT_SCALE_FACTOR_ROUNDING_POLICY");
         qunsetenv("QT_DEVICE_PIXEL_RATIO");
     }
@@ -285,9 +337,13 @@ int utf8Main(int argc, char* argv[])
     {
         setEnvVar("ORIGINALLOCAL", "en");
     }
-    setEnvVar("LANG", "C");
-    setEnvVar("LC_ALL", "C");
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+    setPlatformSpecificLocale();
+
+    // Refresh the locale using the environment variable set by
+    // setPlatformSpecificLocale.
+    QLocale::setDefault(QLocale::system());
+
     TwkFB::ThreadPool::initialize();
 
     // Qt 5.12.1 specific

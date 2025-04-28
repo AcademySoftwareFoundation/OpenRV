@@ -101,7 +101,11 @@ namespace Rv
         void audioDeviceChanged(int index);
         void audioChannelsChanged(int index);
         void audioFormatChanged(int index);
+#if defined(RV_VFX_CY2023)
         void audioRateChanged(int index);
+#else
+        void audioRateChanged();
+#endif
         void audioHoldOpenChanged(int);
         void audioVideoSyncChanged(int);
         void audioPreRollChanged(int);

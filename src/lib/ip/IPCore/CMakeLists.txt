@@ -8,7 +8,7 @@ INCLUDE(cxx_defaults)
 INCLUDE(rv_quote_file)
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Widgets
   REQUIRED
 )
@@ -215,6 +215,13 @@ ADD_LIBRARY(
   ${_target} STATIC
   ${_sources}
 )
+
+# Need that with Qt6 since the code for this target does not support unicode correctly.
+IF(RV_TARGET_WINDOWS
+   AND RV_VFX_PLATFORM STREQUAL CY2024
+)
+  QT_DISABLE_UNICODE_DEFINES(${_target})
+ENDIF()
 
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}

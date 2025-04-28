@@ -123,6 +123,8 @@ namespace Rv
         void playStartSlot(const std::string&);
         void playStopSlot(const std::string&);
 
+        void initializeSession();
+
     protected:
         // Overrides for TwkUtil::Notifier
         virtual bool receive(Notifier*, Notifier*, MessageId, MessageData*);

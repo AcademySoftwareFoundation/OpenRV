@@ -33,7 +33,11 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/User.h>
 #include <TwkUtil/Clock.h>
+#ifdef RV_VFX_CY2023
+#include <QTAudioRenderer/QT5AudioRenderer.h>
+#else
 #include <QTAudioRenderer/QTAudioRenderer.h>
+#endif
 #include <iostream>
 #include <iterator>
 #include <thread>
@@ -48,7 +52,6 @@
 #include <QtCore/qlogging.h>
 #include <QtCore/QStandardPaths>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QTextEdit>
 
@@ -93,6 +96,127 @@ static void init()
 extern void rvLazyBuildThirdPartyCustomization();
 #endif
 
+namespace
+{
+    using namespace boost;
+    using namespace std;
+
+    bool isSilencedQtMessage(std::string_view text)
+    {
+        constexpr array silenced = {
+            // In Qt6, when KVM or YubiKey or other HID device is plugged in or
+            // out. This warning seems fixed with QT 6.6.3
+            "scroll event from unregistered device"sv,
+
+            // Another relic of an unneeded warning resulting from the Qt6 port.
+            // This one originates when loading Python which calls
+            // PyInit_QtConcurrent(), which then calls
+            // qRegisterMetaType<QFuture<QString>>(char const*){}
+            // This is just a warning that the registration is already done, so
+            // we can safely ignore it.
+            "Type conversion already registered from type"
+            " QFuture<QString> to type QFuture<void>"sv,
+
+            // Qt warning about KVO observers. Qt have gotten rid of the check
+            // for this error in Qt 6.0. "ERROR: has active key-value observers
+            //(KVO)!
+            //        These will stop working now that the window is recreated,
+            //        and will result in exceptions when the observers are
+            //        removed. Break in QCocoaWindow::recreateWindowIfNeeded to
+            //        debug."
+            "has active key-value observers (KVO)! These will stop"
+            " working now that the window is recreated"sv,
+
+            //  We get these spurious errors from Qt with some tablets.  They
+            //  seem to indicate no real problem and slow down interaction.
+            "This tablet device is unknown"sv,
+
+            // Another known warning/error which we can safely ignore.
+            "Release of profile requested but WebEnginePage still not "
+            "deleted"sv};
+
+        return any_of(silenced.begin(), silenced.end(), [text](const auto& msg)
+                      { return text.find(msg) != string::npos; });
+    }
+
+    class RecursionLock
+    {
+    public:
+        RecursionLock() { _recursionLocked = true; };
+
+        ~RecursionLock() { _recursionLocked = false; };
+
+        static bool _recursionLocked;
+
+        static bool locked() { return _recursionLocked; };
+    };
+
+    bool RecursionLock::_recursionLocked = false;
+
+    void myMsgHandlerQT(QtMsgType t, const QMessageLogContext& context,
+                        const QString& qmsg)
+    {
+        //
+        //  Since printing errors may generate errors, don't allow
+        //  recursion.  At worst we might lose some error messages.
+        //
+        if (RecursionLock::locked())
+            return;
+        RecursionLock l;
+
+        const string msg = qmsg.toUtf8().constData();
+
+        // We always report Qt debug messages except for known issues.
+        // In which case the following function can be used to check
+        // whether those known messages are still reported or not by Qt.
+        if (isSilencedQtMessage(msg))
+            return;
+
+        // Do not report Java script errors unless requested
+        static bool reportQWebEngineJavaScripErrors =
+            getenv("RV_REPORT_QWEBENGINE_JAVA_SCRIPT_ERRORS") != nullptr;
+        if (context.category && (strncmp(context.category, "js", 2) == 0)
+            && !reportQWebEngineJavaScripErrors)
+        {
+            return;
+        }
+
+        switch (t)
+        {
+        case QtDebugMsg:
+        {
+            static const bool reportQtDebugMessages =
+                getenv("RV_REPORT_QT_DEBUG_MESSAGES") != nullptr;
+
+            if (reportQtDebugMessages)
+            {
+                cout << "DEBUG: " << msg << endl;
+            }
+        }
+        break;
+        case QtWarningMsg:
+        {
+            cout << "WARNING: " << msg << endl;
+        }
+        break;
+        case QtCriticalMsg:
+        case QtFatalMsg:
+        {
+            cerr << "ERROR: " << msg << endl;
+        }
+        break;
+        default:
+        {
+            cout << "INFO: " << msg << endl;
+        }
+        break;
+        }
+
+        assert(t != QtFatalMsg);
+    }
+
+} // namespace
+
 namespace Rv
 {
     using namespace std;
@@ -115,8 +239,8 @@ namespace Rv
 
     bool RecursionLock::_recursionLocked = false;
 
-    void myMsgHandlerQT5(QtMsgType t, const QMessageLogContext& context,
-                         const QString& qmsg)
+    void myMsgHandlerQT(QtMsgType t, const QMessageLogContext& context,
+                        const QString& qmsg)
     {
         //
         //  Since printing errors may generate errors, don't allow
@@ -127,6 +251,12 @@ namespace Rv
         RecursionLock l;
 
         string msg = qmsg.toUtf8().constData();
+
+        // We always report Qt debug messages except for known issues.
+        // In which case the following function can be used to check
+        // whether those known messages are still reported or not by Qt.
+        if (isSilencedQtMessage(msg))
+            return;
 
         // Do not report Java script errors unless requested
         static bool reportQWebEngineJavaScripErrors =
@@ -141,62 +271,31 @@ namespace Rv
         {
         case QtDebugMsg:
         {
-            // We always report Qt debug messages except for known issues.
-            // In which case the following environment variable can be used to
-            // check whether those known messages are still reported or not by
-            // Qt.
             static const bool reportQtDebugMessages =
                 getenv("RV_REPORT_QT_DEBUG_MESSAGES") != nullptr;
 
-            // "DEBUG: Release of profile requested but WebEnginePage still not
-            // deleted. Expect troubles !"
-            const bool knownMessage =
-                (std::string(msg).find("Release of profile requested but "
-                                       "WebEnginePage still not deleted")
-                 != std::string::npos);
-
-            if (!knownMessage || reportQtDebugMessages)
+            if (reportQtDebugMessages)
             {
                 cout << "DEBUG: " << msg << endl;
             }
         }
         break;
         case QtWarningMsg:
-            //
-            //  We get these spurious errors from Qt with some tablets.  They
-            //  seem to indicate no real problem and slow down interaction.
-            //
-            if (std::string(msg).find("This tablet device is unknown")
-                == std::string::npos)
-            {
-                cout << "WARNING: " << msg << endl;
-            }
-            break;
+        {
+            cout << "WARNING: " << msg << endl;
+        }
+        break;
         case QtCriticalMsg:
         case QtFatalMsg:
         {
-            // Qt warning about KVO observers. Qt have gotten rid of the check
-            // for this error in Qt 6.0. "ERROR: has active key-value observers
-            //(KVO)!
-            //        These will stop working now that the window is recreated,
-            //        and will result in exceptions when the observers are
-            //        removed. Break in QCocoaWindow::recreateWindowIfNeeded to
-            //        debug."
-            const bool ignoreError =
-                std::string(msg).find(
-                    "has active key-value observers (KVO)! These will stop "
-                    "working now that the window is recreated")
-                != std::string::npos;
-
-            if (!ignoreError)
-            {
-                cerr << "ERROR: " << msg << endl;
-            }
+            cerr << "ERROR: " << msg << endl;
         }
         break;
         default:
+        {
             cout << "INFO: " << msg << endl;
-            break;
+        }
+        break;
         }
 
         assert(t != QtFatalMsg);
@@ -306,7 +405,7 @@ namespace Rv
             IPCore::QTAudioRenderer::addQTAudioModule<RvApplication>,
             "Platform Audio");
 
-        qInstallMessageHandler(myMsgHandlerQT5);
+        qInstallMessageHandler(myMsgHandlerQT);
         init();
 
         pthread_mutex_init(&m_deleteLock, 0);
@@ -641,6 +740,13 @@ namespace Rv
     {
         DB("RvApplication::newSessionFromFiles()");
         Rv::RvDocument* doc = new Rv::RvDocument;
+
+        doc->show();
+
+#ifndef PLATFORM_LINUX
+        doc->raise();
+#endif
+
         // doc->ensurePolished();
         Rv::RvSession* s = doc->session();
 
@@ -668,18 +774,51 @@ namespace Rv
             doc->center();
         }
 
+        QList<QScreen*> screens = QGuiApplication::screens();
+        QScreen* primaryScreen = QGuiApplication::primaryScreen();
+
+        auto isVirtualDesktop = [&screens, primaryScreen]() -> bool
+        {
+            // Not a virtual desktop if there is only one screen.
+            if (screens.size() <= 1)
+                return false;
+
+            QRect totalGeometry;
+            for (const auto& screen : screens)
+            {
+                totalGeometry = totalGeometry.united(screen->geometry());
+            }
+
+            return totalGeometry != primaryScreen->geometry();
+        };
+
+        auto getScreenFromPoint = [&screens](const QPoint& point) -> int
+        {
+            for (int i = 0; i < screens.size(); ++i)
+            {
+                if (screens[i]->geometry().contains(point))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        };
+
         //
         //  Allow command line placement
         //
 
         if (opts.x != -1 || opts.y != -1)
         {
-            if (opts.screen != -1
-                && QApplication::desktop()->isVirtualDesktop())
+            if (opts.screen != -1 && isVirtualDesktop())
             {
-                QRect r = QApplication::desktop()->screenGeometry(opts.screen);
-                opts.x += r.x();
-                opts.y += r.y();
+                if (opts.screen < screens.size())
+                {
+                    QRect r = screens[opts.screen]->geometry();
+                    opts.x += r.x();
+                    opts.y += r.y();
+                }
             }
 
             if (opts.width != -1 && opts.height != -1)
@@ -692,26 +831,24 @@ namespace Rv
             }
         }
 
-        int screen = QApplication::desktop()->screenNumber(QCursor::pos());
+        int screen = getScreenFromPoint(QCursor::pos());
         if (opts.screen != -1)
             screen = opts.screen;
 
         int oldX = doc->pos().x();
         int oldY = doc->pos().y();
 
-        int oldScreen =
-            QApplication::desktop()->screenNumber(QPoint(oldX, oldY));
+        int oldScreen = getScreenFromPoint(QPoint(oldX, oldY));
 
-        if (screen != -1 && QApplication::desktop()->isVirtualDesktop()
-            && screen != oldScreen)
+        if (screen != -1 && isVirtualDesktop() && screen != oldScreen)
         //
         //  The application is going to come up on the wrong screen, so figure
         //  out our our relative position on the current screen, and move to the
         //  same relative position on the correct screen.
         //
         {
-            QRect rnew = QApplication::desktop()->screenGeometry(screen);
-            QRect rold = QApplication::desktop()->screenGeometry(oldScreen);
+            QRect rnew = QGuiApplication::screens().at(screen)->geometry();
+            QRect rold = QGuiApplication::screens().at(oldScreen)->geometry();
 
             int xoff = oldX - rold.x();
             int yoff = oldY - rold.y();
@@ -728,12 +865,6 @@ namespace Rv
                 doc->setGeometry(opts.x, opts.y, opts.width, opts.height);
             }
         }
-
-        doc->show();
-
-#ifndef PLATFORM_LINUX
-        doc->raise();
-#endif
 
         if (videoModules().empty())
         {
@@ -1594,8 +1725,9 @@ namespace Rv
 
                         if (dd
                             && dd->qtScreen()
-                                   == qApp->desktop()
-                                          ->QDesktopWidget::screenNumber(rvDoc))
+                                   == QApplication::screens().indexOf(
+                                       QApplication::screenAt(
+                                           rvDoc->mapToGlobal(QPoint(0, 0)))))
                         {
                             TWK_THROW_EXC_STREAM(
                                 "Cannot open presentation device for the same "
@@ -1606,13 +1738,11 @@ namespace Rv
                         algorithm::split(vargs, optionArgs,
                                          is_any_of(string(" \t\n\r")),
                                          token_compress_on);
-                        d->open(vargs);
-                    }
 
-#ifdef PLATFORM_DARWIN
-                    // cout << "INFO: disabling double buffer in controller" <<
-                    // endl; rvDoc->setDoubleBuffer(false);
-#endif
+                        TWK_GLDEBUG;
+                        d->open(vargs);
+                        TWK_GLDEBUG;
+                    }
 
                     try
                     {

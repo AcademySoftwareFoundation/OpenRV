@@ -10,6 +10,7 @@
 #include <IPCore/ShaderSymbol.h>
 #include <IPCore/IPImage.h>
 #include <TwkUtil/Timer.h>
+#include <array>
 #include <cassert>
 #include <sstream>
 #include <iomanip>

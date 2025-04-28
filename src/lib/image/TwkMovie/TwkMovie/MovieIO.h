@@ -11,7 +11,13 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
+#include <list>
 #include <algorithm>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
 #include <TwkMovie/Movie.h>
@@ -319,6 +325,99 @@ namespace TwkMovie
     class TWKMOVIE_EXPORT GenericIO
     {
     public:
+        class TWKMOVIE_EXPORT Preloader
+        {
+        public:
+            class TWKMOVIE_EXPORT Reader
+            {
+            public:
+                enum Status
+                {
+                    PENDING,
+                    LOADING,
+                    LOADED,
+                    LOADERROR,
+                    REMOVE
+                };
+
+                Reader(std::string_view fn, const Movie::ReadRequest& request);
+                void setStatus(Status status);
+                void setPriority(bool priority);
+                void setNotEnoughThreads();
+                void clearFilename();
+
+                const std::string& filename() const;
+                const Movie::ReadRequest& request() const;
+                bool isPriority() const;
+                bool isPending() const;
+                bool isLoading() const;
+                bool isFinishedLoading() const;
+                bool isRemove() const;
+                void load();
+
+            public:
+                std::string m_filename;
+                Status m_status;
+                bool m_priority;
+                std::thread m_thread;
+                Movie::ReadRequest m_request;
+                MovieReader* m_movieReader;
+            };
+
+        public:
+            Preloader();
+            ~Preloader();
+
+            void init();
+            void shutdown();
+
+            void addReader(const std::string_view filename,
+                           const Movie::ReadRequest& request);
+            MovieReader* getReader(const std::string_view filename,
+                                   const MovieInfo& mi,
+                                   Movie::ReadRequest& request);
+
+        private:
+            void finalizeCompletedThreads();
+            void waitForFinishedLoading(std::shared_ptr<Reader> reader);
+
+            bool hasPendingReaders();
+
+            void schedulerThreadFunc();
+            void loaderThreadFunc(std::shared_ptr<Reader> reader);
+
+        private:
+            // container of movies to preload.
+            std::list<std::shared_ptr<Reader>> m_readers;
+
+            // mutex to control access to the m_readers variable.
+            std::mutex m_schedulerThread_mutex;
+            std::mutex m_mainThread_mutex;
+
+            // condition variable for inter-thread notifications.
+            std::condition_variable m_schedulerThread_cv;
+            std::condition_variable m_mainThread_cv;
+
+            // the main worker thread that schedules readers
+            std::thread m_schedulerThread;
+
+            // number of actively loading readers, and the
+            // ceiling thread count. The ceiling thread count
+            // may exceed m_maxThreads if somehow all readers
+            // get prioritized.
+            int m_maxThreads;  // max allowable threads, unless the load is
+                               // lagging.
+            int m_threadCount; // currently running readers
+            int m_ceilingThreadCount; // ceiling running readers
+            int m_completedCount;     // done reading count
+            int m_notReadyCount;      // count we had to wait to complete
+            int m_getCount;           // number of times getReader was called
+
+            // control variable to exit the scheduler thread
+            bool m_exitRequested;
+        };
+
+    public:
         //
         //  Types
         //
@@ -368,11 +467,23 @@ namespace TwkMovie
                                             const MovieInfo& mi,
                                             Movie::ReadRequest& request,
                                             bool tryBruteForce = true);
+
+        ///
+        ///  Same as above, except meant to be used by the loading
+        ///  thread func of the Preloader.
+        ///
+
+        static MovieReader*
+        preloadOpenMovieReader(const std::string& filename,
+                               const Movie::ReadRequest& request,
+                               bool tryBruteForce = true);
         ///
         ///  Find appropriate plugin (based on extension) & write image
         ///  file.  If format is specified, it is used INSTEAD of filename
         ///  extension. Throws exception on error
         ///
+
+        static Preloader& getPreloader();
 
         static MovieWriter* movieWriter(const std::string& filename);
 
@@ -467,6 +578,7 @@ namespace TwkMovie
         static Plugins* m_plugins;
         static bool m_loadedAll;
         static bool m_dnxhdDecodingAllowed;
+        static Preloader m_preloader;
     };
 
 } // namespace TwkMovie

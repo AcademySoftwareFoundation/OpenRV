@@ -8,6 +8,21 @@ SET(_target
     "mu_rvui"
 )
 
+IF(RV_VFX_PLATFORM STREQUAL CY2024)
+  SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
+      "let screen = qt.QApplication.screenAt(mainWin.mapToGlobal(qt.QPoint(0, 0)));\n \
+        let usedRect = screen.availableGeometry();\n"
+  )
+ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
+  SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
+      "let usedRect = qt.QApplication.desktop().availableGeometry(mainWin);\n"
+  )
+ENDIF()
+SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
+    "${MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY}"
+)
+CONFIGURE_FILE(window_mode.mu.in ${CMAKE_CURRENT_SOURCE_DIR}/window_mode.mu @ONLY)
+
 SET(_mumodules
     rvui.mu
     glyph.mu

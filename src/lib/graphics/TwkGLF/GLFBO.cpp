@@ -11,6 +11,11 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/sgcHopTools.h>
 
+#include <QOpenGLContext>
+#include <QImage>
+
+/// #define NDEBUG
+
 namespace TwkGLF
 {
     using namespace std;
@@ -29,8 +34,12 @@ namespace TwkGLF
         , m_pbo(0)
         , m_totalSizeInBytes(0)
         , m_mappedBuffer(0)
+        , m_ownsFBOHandle(true)
     {
+        TWK_GLDEBUG;
+
         glGenFramebuffersEXT(1, &m_id);
+
         TWK_GLDEBUG;
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_id);
         TWK_GLDEBUG;
@@ -50,7 +59,20 @@ namespace TwkGLF
         , m_pbo(0)
         , m_totalSizeInBytes(0)
         , m_mappedBuffer(0)
+        , m_ownsFBOHandle(false)
     {
+        //
+        // using this constructor, m_id is 0 and we use fboID to query the
+        // actual ID of the fbo bound to the device/screen/widget.
+        //
+        // Same situations with the following functions:
+        //     width(), height() and samples() which are delegated to the
+        //     attached
+        // videodevice/view, so thats why the data members are also set to 0.
+        //
+
+        TWK_GLDEBUG;
+
         const TwkApp::VideoDevice::DataFormat& df =
             d->dataFormatAtIndex(d->currentDataFormat());
         m_colorFormat = TwkGLF::internalFormatFromDataFormat(df.iformat);
@@ -67,11 +89,15 @@ namespace TwkGLF
 
     GLFBO::~GLFBO()
     {
-        if (m_id)
+        if (m_id && m_ownsFBOHandle)
         {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            TWK_GLDEBUG;
             glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+            TWK_GLDEBUG;
             glDeleteFramebuffersEXT(1, &m_id);
+            // std::cerr << "deleting GLFBO " << m_id << std::endl;
+            TWK_GLDEBUG;
 
             for (size_t i = 0; i < m_attachments.size(); i++)
             {
@@ -82,10 +108,12 @@ namespace TwkGLF
                     if (a.texture)
                     {
                         glDeleteTextures(1, &a.id);
+                        TWK_GLDEBUG;
                     }
                     else
                     {
                         glDeleteRenderbuffersEXT(1, &a.id);
+                        TWK_GLDEBUG;
                     }
                 }
             }
@@ -106,6 +134,17 @@ namespace TwkGLF
         ostringstream o;
         o << "fbo" << m_id;
         return o.str();
+    }
+
+    GLuint GLFBO::fboID() const
+    {
+        if (m_id && m_ownsFBOHandle)
+            return m_id;
+
+        if (m_device)
+            return m_device->fboID();
+
+        return m_id; // aka should be 0
     }
 
     size_t GLFBO::width() const
@@ -295,6 +334,7 @@ namespace TwkGLF
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
                                   GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
                                   target, id, 0);
+        TWK_GLDEBUG;
 
         m_attachments.push_back(
             Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target,
@@ -322,14 +362,26 @@ namespace TwkGLF
 
         GLuint id;
         glGenTextures(1, &id);
+        TWK_GLDEBUG;
+
         glBindTexture(target, id);
+        TWK_GLDEBUG;
+
         glTexParameterf(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_PRIORITY, 1.0f);
+        TWK_GLDEBUG;
+
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
                         minFilter);
+        TWK_GLDEBUG;
+
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
                         magFilter);
+
+        TWK_GLDEBUG;
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, clamping);
+
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, clamping);
+        TWK_GLDEBUG;
 
         // rectangle textures can't have mipmaps
         // glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP,
@@ -364,13 +416,16 @@ namespace TwkGLF
 
         GLuint id;
         glGenRenderbuffersEXT(1, &id);
+        TWK_GLDEBUG;
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id);
+        TWK_GLDEBUG;
 
         if (m_samples > 1)
         {
             glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, m_samples,
                                                 GL_DEPTH24_STENCIL8_EXT,
                                                 m_width, m_height);
+            TWK_GLDEBUG;
         }
         else
         {
@@ -413,10 +468,10 @@ namespace TwkGLF
 
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT,
                                   GL_RENDERBUFFER_EXT, id, 0);
-
+        TWK_GLDEBUG;
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
                                   GL_RENDERBUFFER_EXT, id, 0);
-
+        TWK_GLDEBUG;
         m_attachments.push_back(Attachment(id, GL_STENCIL_ATTACHMENT_EXT, 0,
                                            GL_UNSIGNED_BYTE, false, true, true,
                                            false));
@@ -431,7 +486,7 @@ namespace TwkGLF
     void GLFBO::bind(GLenum kind) const
     {
         waitForExternalReadback();
-        glBindFramebufferEXT(kind, m_id);
+        glBindFramebufferEXT(kind, fboID());
         TWK_GLDEBUG;
     }
 
@@ -450,7 +505,7 @@ namespace TwkGLF
         bind();
 
         GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-
+        TWK_GLDEBUG;
         if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
         {
             //
@@ -469,12 +524,28 @@ namespace TwkGLF
         const Attachment* attach = colorTextureAttachment(i);
         assert(attach);
         glBindTexture(colorTarget(i), attach->id);
+        TWK_GLDEBUG;
     }
 
     void GLFBO::unbindColorTexture() const
     {
         glBindTexture(GL_TEXTURE_2D, 0);
+        TWK_GLDEBUG;
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+        TWK_GLDEBUG;
+    }
+
+    void GLFBO::debugSaveFramebuffer() const
+    {
+        size_t w = width();
+        size_t h = height();
+        QImage image(w, h, QImage::Format_RGBA8888);
+
+        bind(GL_READ_FRAMEBUFFER);
+
+        glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+        // image.save("/Users/pbergeron/fbo.png");
     }
 
     void GLFBO::copyTo(const GLFBO* destinationGLFBO, GLenum mask,
@@ -535,6 +606,7 @@ namespace TwkGLF
 
         glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1,
                              dstY1, mask, filter);
+        TWK_GLDEBUG;
     }
 
     namespace

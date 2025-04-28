@@ -7,6 +7,7 @@
 //
 #ifndef __RvCommon__GLSLSyntaxHighlighter__h__
 #define __RvCommon__GLSLSyntaxHighlighter__h__
+#include <QRegularExpression>
 #include <QtGui/QSyntaxHighlighter>
 #include <QtCore/QHash>
 #include <QtGui/QTextCharFormat>
@@ -24,7 +25,7 @@ namespace Rv
     public:
         struct HighlightingRule
         {
-            QRegExp pattern;
+            QRegularExpression pattern;
             QTextCharFormat format;
         };
 
@@ -35,8 +36,8 @@ namespace Rv
 
     private:
         QVector<HighlightingRule> m_highlightingRules;
-        QRegExp m_commentStartExpression;
-        QRegExp m_commentEndExpression;
+        QRegularExpression m_commentStartExpression;
+        QRegularExpression m_commentEndExpression;
         QTextCharFormat m_typeFormat;
         QTextCharFormat m_keywordFormat;
         QTextCharFormat m_builtInFormat;

@@ -68,7 +68,9 @@ namespace IPCore
         if (const StringProperty* p = property<StringProperty>(name))
         {
             if (!p->empty() && p->front() != "")
+            {
                 return p->front();
+            }
         }
 
         return defaultValue;
@@ -79,7 +81,9 @@ namespace IPCore
         if (const IntProperty* p = property<IntProperty>(name))
         {
             if (!p->empty())
+            {
                 return p->front();
+            }
         }
 
         return defaultValue;
@@ -139,7 +143,9 @@ namespace IPCore
         m_state = new OCIOState;
 
         if (!getenv("OCIO_LOGGING_LEVEL"))
+        {
             OCIO::SetLoggingLevel(OCIO::LOGGING_LEVEL_WARNING);
+        }
 
         if (GPULanguage == GPU_LANGUAGE_UNKNOWN)
         {
@@ -168,7 +174,9 @@ namespace IPCore
     OCIOIPNode::~OCIOIPNode()
     {
         if (m_state->function)
+        {
             m_state->function->retire();
+        }
         delete m_state;
     }
 
@@ -330,6 +338,8 @@ namespace IPCore
         return matrix_xyz_to_rec709;
     }
 
+    // Note: Ensure that the m_lock mutex is locked prior to calling this
+    // function
     OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformXYZToRec709()
     {
         if (!m_matrix_xyz_to_rec709)
@@ -340,13 +350,14 @@ namespace IPCore
         return m_matrix_xyz_to_rec709;
     }
 
+    // Note: Ensure that the m_lock mutex is locked prior to calling this
+    // function
     OCIO::MatrixTransformRcPtr OCIOIPNode::getMatrixTransformRec709ToXYZ()
     {
         if (!m_matrix_rec709_to_xyz)
         {
             m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
-            m_matrix_rec709_to_xyz->setDirection(
-                OCIO::TRANSFORM_DIR_INVERSE);
+            m_matrix_rec709_to_xyz->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
         }
 
         return m_matrix_rec709_to_xyz;
@@ -362,8 +373,8 @@ namespace IPCore
         boost::hash<string> string_hash;
         string inName = stringProp("ocio.inColorSpace", m_state->linear);
 
-	if (inName.empty())
-	    return;
+        if (inName.empty())
+            return;
 
         try
         {
@@ -378,7 +389,8 @@ namespace IPCore
                 //  Emulate the nuke OCIOColor node
                 //
 
-                string outName = stringProp("ocio_color.outColorSpace", m_state->linear);
+                string outName =
+                    stringProp("ocio_color.outColorSpace", m_state->linear);
                 OCIO::ConstColorSpaceRcPtr dstCS =
                     m_state->config->getColorSpace(outName.c_str());
                 processor = m_state->config->getProcessor(m_state->context,
@@ -441,7 +453,8 @@ namespace IPCore
 
                 OCIO::DisplayViewTransformRcPtr transform =
                     OCIO::DisplayViewTransform::Create();
-                string display = stringProp("ocio_display.display", m_state->display);
+                string display =
+                    stringProp("ocio_display.display", m_state->display);
                 string view = stringProp("ocio_display.view", m_state->view);
 
                 transform->setSrc(inName.c_str());
@@ -481,8 +494,7 @@ namespace IPCore
                         // cache.
                         static int uniqueCounter = 0;
                         inTransformURL =
-                            name() + "." + std::to_string(uniqueCounter++)
-                            + "."
+                            name() + "." + std::to_string(uniqueCounter++) + "."
                             + ConfigIOProxy::USE_IN_TRANSFORM_DATA_PROPERTY;
                     }
 
@@ -572,7 +584,9 @@ namespace IPCore
             if (m_state->shaderID != shaderCacheID)
             {
                 if (m_state->function)
+                {
                     m_state->function->retire();
+                }
 
                 string glsl(shaderDesc->getShaderText());
 
@@ -605,7 +619,7 @@ namespace IPCore
 
                 m_state->function = new Shader::Function(
                     shaderDesc->getFunctionName(), glsl,
-                    Shader::Function::Color, numTextures+num3DTextures);
+                    Shader::Function::Color, numTextures + num3DTextures);
                 m_state->shaderID = shaderCacheID;
 
                 if (Shader::debuggingType() != Shader::NoDebugInfo)
@@ -731,7 +745,9 @@ namespace IPCore
         if (Component* context = component("ocio_context"))
         {
             if (context->hasProperty(p))
+            {
                 updateContext();
+            }
         }
 
         // synlinearize/syndisplay functions:

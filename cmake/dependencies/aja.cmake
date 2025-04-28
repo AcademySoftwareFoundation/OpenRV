@@ -34,18 +34,24 @@ SET(_aja_include_dir
 )
 
 IF(RHEL_VERBOSE)
-SET(_mbedtls_lib_dir
-    ${_build_dir}/ajantv2/mbedtls-install/lib64
-)
+  SET(_mbedtls_lib_dir
+      ${_build_dir}/ajantv2/mbedtls-install/lib64
+  )
 ELSE()
-SET(_mbedtls_lib_dir
-    ${_build_dir}/ajantv2/mbedtls-install/lib
-)
+  SET(_mbedtls_lib_dir
+      ${_build_dir}/ajantv2/mbedtls-install/lib
+  )
 ENDIF()
 
-SET(_mbedtls_lib ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedtls${CMAKE_STATIC_LIBRARY_SUFFIX})
-SET(_mbedx509_lib ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedx509${CMAKE_STATIC_LIBRARY_SUFFIX})
-SET(_mbedcrypto_lib ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedcrypto${CMAKE_STATIC_LIBRARY_SUFFIX})
+SET(_mbedtls_lib
+    ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedtls${CMAKE_STATIC_LIBRARY_SUFFIX}
+)
+SET(_mbedx509_lib
+    ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedx509${CMAKE_STATIC_LIBRARY_SUFFIX}
+)
+SET(_mbedcrypto_lib
+    ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedcrypto${CMAKE_STATIC_LIBRARY_SUFFIX}
+)
 
 LIST(APPEND _byproducts ${_mbedtls_lib} ${_mbedx509_lib} ${_mbedcrypto_lib})
 
@@ -65,20 +71,13 @@ ELSEIF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-LIST(APPEND
-  _configure_options
-  "-DAJANTV2_DISABLE_DEMOS=ON"
-  "-DAJANTV2_DISABLE_TOOLS=ON"
-  "-DAJANTV2_DISABLE_TESTS=ON"
-  "-DAJANTV2_BUILD_SHARED=ON"
-)
+LIST(APPEND _configure_options "-DAJANTV2_DISABLE_DEMOS=ON" "-DAJANTV2_DISABLE_TOOLS=ON" "-DAJANTV2_DISABLE_TESTS=ON" "-DAJANTV2_BUILD_SHARED=ON")
 
 # In Debug, the MSVC runtime library needs to be set to MultiThreadedDebug. Otherwise, it will be set to MultiThreaded.
-IF(RV_TARGET_WINDOWS AND CMAKE_BUILD_TYPE MATCHES "^Debug$")
-  LIST(APPEND
-  _configure_options
-  "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug"
-  )
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
+  LIST(APPEND _configure_options "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug")
 ENDIF()
 
 EXTERNALPROJECT_ADD(
@@ -126,8 +125,8 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 TARGET_LINK_LIBRARIES(
-  aja::ntv2 INTERFACE
-  ${_mbedtls_lib} ${_mbedx509_lib} ${_mbedcrypto_lib}
+  aja::ntv2
+  INTERFACE ${_mbedtls_lib} ${_mbedx509_lib} ${_mbedcrypto_lib}
 )
 
 IF(RV_TARGET_DARWIN)

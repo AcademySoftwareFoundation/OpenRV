@@ -23,7 +23,7 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 FIND_PACKAGE(
-  Qt5
+  ${RV_QT_PACKAGE_NAME}
   COMPONENTS Core
   REQUIRED
 )
@@ -45,7 +45,7 @@ TARGET_LINK_LIBRARIES(
           stl_ext
           Boost::headers
           yaml_cpp
-          Qt5::Core
+          Qt::Core
           PyTwkApp
 )
 

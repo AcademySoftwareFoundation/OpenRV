@@ -15,6 +15,7 @@
 #include <RvCommon/GLView.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <TwkGLF/GLFence.h>
+#include <RvCommon/InitGL.h>
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
 #include <iostream>
@@ -120,12 +121,11 @@ namespace Rv
 
     } // namespace
 
-    GLView::GLView(QWidget* parent, const QGLWidget* share, RvDocument* doc,
-                   bool strereo, bool vsync, bool doubleBuffer, int red,
-                   int green, int blue, int alpha, bool noResize)
-        : QGLWidget(GLView::rvGLFormat(strereo, vsync, doubleBuffer, red, green,
-                                       blue, alpha),
-                    parent, share)
+    GLView::GLView(QWidget* parent, QOpenGLContext* sharedContext,
+                   RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer,
+                   int red, int green, int blue, int alpha, bool noResize)
+        : QOpenGLWidget(parent)
+        , m_sharedContext(sharedContext)
         , m_doc(doc)
         , m_red(red)
         , m_green(green)
@@ -142,23 +142,24 @@ namespace Rv
         , m_stopProcessingEvents(false)
         , m_syncThreadData(0)
     {
-        setObjectName((m_doc->session()) ? m_doc->session()->name().c_str()
-                                         : "no session");
-        // m_frameBuffer = new QTFrameBuffer( this );
+        setFormat(
+            rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
+
         ostringstream str;
         str << UI_APPLICATION_NAME " Main Window" << "/" << m_doc;
         m_videoDevice = new QTGLVideoDevice(0, str.str(), this);
+
+        setObjectName((m_doc->session()) ? m_doc->session()->name().c_str()
+                                         : "no session");
+
         m_activityTimer.start();
         setMouseTracking(true);
         setAcceptDrops(true);
         setFocusPolicy(Qt::StrongFocus);
-        setAutoBufferSwap(false);
 
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this,
                 SLOT(eventProcessingTimeout()));
-
-        QGLFormat f = format();
     }
 
     GLView::~GLView()
@@ -195,18 +196,30 @@ namespace Rv
         y = gp.y();
     }
 
-    QGLFormat GLView::rvGLFormat(bool stereo, bool vsync, bool doubleBuffer,
-                                 int red, int green, int blue, int alpha)
+    QSurfaceFormat GLView::rvGLFormat(bool stereo, bool vsync,
+                                      bool doubleBuffer, int red, int green,
+                                      int blue, int alpha)
     {
         const Rv::Options& opts = Rv::Options::sharedOptions();
 
-        QGLFormat fmt;
-        fmt.setDepthBufferSize(0);
-        fmt.setDoubleBuffer(doubleBuffer);
+        // NOTE_QT6: QGLFormat into QSurfaceFormat
+        // NOTE_QT6: setStencil, setDepth does not exist anymore. Trying to use
+        // setDepthBufferSize and setStencilBufferSize.
+        QSurfaceFormat fmt;
+        fmt.setDepthBufferSize(24);
+        fmt.setSwapBehavior(doubleBuffer ? QSurfaceFormat::DoubleBuffer
+                                         : QSurfaceFormat::SingleBuffer);
         fmt.setStencilBufferSize(8);
-        fmt.setStencil(true);
-        fmt.setDepth(false);
         fmt.setStereo(stereo);
+
+        fmt.setRenderableType(QSurfaceFormat::OpenGL);
+
+        // NOTE_QT: Set to version 2.1 for now.
+        fmt.setMajorVersion(2);
+        fmt.setMinorVersion(1);
+
+        // fmt.setProfile(QSurfaceFormat::CoreProfile);
+        // fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
 
         //
         //  The default value for these buffer sizes is -1, but it is
@@ -221,7 +234,6 @@ namespace Rv
             fmt.setBlueBufferSize(blue);
         if (alpha >= 0)
         {
-            fmt.setAlpha(alpha != 0);
             fmt.setAlphaBufferSize(alpha);
         }
 
@@ -236,9 +248,31 @@ namespace Rv
         //  At this point the format is known. Can't do this in the constructor
         //
 
-        if (isValid())
+        // QUESTION_QT6: Should we use isValid from QOpenGLWidget or directly
+        // using from QOpenGLContext? NOTE_QT6: Returns true if the widget and
+        // OpenGL resources, like the context, have been successfully
+        // initialized.
+        //           Note that the return value is always false until the widget
+        //           is shown.
+        // NOTE_QT6: QOpenGLContext: Returns if this context is valid, i.e. has
+        // been successfully created.
+        if (context()->isValid())
         {
-            QGLFormat f = context()->format();
+            initializeGLExtensions();
+            initializeOpenGLFunctions();
+
+            if (m_sharedContext)
+            {
+                context()->setShareContext(m_sharedContext);
+            }
+
+            if (m_doc)
+            {
+                m_doc->initializeSession();
+            }
+
+            // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
+            QSurfaceFormat f = context()->format();
 
 #ifndef PLATFORM_DARWIN
             //
@@ -275,8 +309,7 @@ namespace Rv
                 // box.exec();
             }
 #endif
-
-            if (!f.stencil())
+            if (f.stencilBufferSize() == 0)
             {
                 cout << "WARNING: no stencil buffer available" << endl;
             }
@@ -296,19 +329,49 @@ namespace Rv
 #endif
     }
 
-    void GLView::swapBuffersNoSync()
+    bool GLView::validateReadPixels(int x, int y, int w, int h)
     {
-        glFlush();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glReadBuffer(GL_BACK);
-        glDrawBuffer(GL_FRONT);
-        glBlitFramebufferEXT(0, 0, width(), height(), 0, 0, width(), height(),
-                             GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        glDrawBuffer(GL_BACK);
+        int r = x + w;
+        int t = y + h;
+
+        // are the extents of the read region out of bounds?
+        if (x < 0 || y < 0 || r > width() || t > height())
+            return false;
+
+        return true;
+    }
+
+    QImage GLView::readPixels(int x, int y, int w, int h)
+    {
+        // If out of bounds, return an empty image.
+        if (validateReadPixels(x, y, w, h) == false)
+        {
+            QImage image(0, 0, QImage::Format_RGBA8888);
+            return image;
+        }
+
+        makeCurrent();
+
+        QImage image(w, h, QImage::Format_RGBA8888);
+        glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+        return image;
+    }
+
+    void GLView::debugSaveFramebuffer()
+    {
+        // Create a QImage with the same size as the FBO
+        QImage image(width(), height(), QImage::Format_RGBA8888);
+        glReadPixels(0, 0, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE,
+                     image.bits());
+
+        // image.save("/home/<username>>/<orv_folder>/fbo.png");
     }
 
     void GLView::paintGL()
     {
+        TWK_GLDEBUG;
+
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;
 
@@ -321,6 +384,7 @@ namespace Rv
             {
                 m_doc->resizeToFit(false, false);
                 m_doc->center();
+                TWK_GLDEBUG;
             }
         }
 
@@ -348,7 +412,9 @@ namespace Rv
         if (m_doc && session && m_videoDevice)
         {
             // m_frameBuffer->makeCurrent();
+            TWK_GLDEBUG;
             m_videoDevice->makeCurrent();
+            TWK_GLDEBUG;
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
@@ -358,6 +424,7 @@ namespace Rv
                     TwkApp::ActivityChangeEvent aevent("user-inactive",
                                                        m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
+                    TWK_GLDEBUG;
                     m_userActive = false;
                 }
             }
@@ -369,13 +436,30 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
+            TWK_GLDEBUG;
             session->render();
+            TWK_GLDEBUG;
+
             m_firstPaintCompleted = true;
 
             // Starting with Qt 5.12.1, the resulting texture is later
             // composited over white which creates undesirable artifacts. As a
             // work around, we set the resulting alpha channel to 1 to make sure
             // that the resulting texture is fully opaque.
+
+            // NOTE_QT: That code seems to fix an issue on MacOS only. (Not on
+            // Linux, not test on Windows)
+            //          The issue I see on MacOS that the background is brown
+            //          istead of black with the default background.
+            //
+            // Even on Qt6/QOpenGLWidget, we need to call
+            // glBindFramebuffer(); it otherwise complains and fails
+            // on glClear() on macOS
+            glBindFramebufferEXT(
+                GL_FRAMEBUFFER_EXT,
+                QOpenGLContext::currentContext()->defaultFramebufferObject());
+            TWK_GLDEBUG;
+
             glPushAttrib(GL_COLOR_BUFFER_BIT);
             TWK_GLDEBUG;
             glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
@@ -429,6 +513,33 @@ namespace Rv
         //  what's going on.
         //
 
+        // Note for Qt6 . QOpenGLWidget implementation:
+        //
+        // With the new QOpenGLWidget (Qt6 branch), all of the rendering of
+        // each widget is done in its own FBOs (aka: off-screen buffers), as
+        // opposed to the old Qt5/QGLWidget branch where the rendering was
+        // done in each GGLWidget's backbuffer (aka: GL_BACK, an on-screen
+        // framebuffer surface).
+        //
+        // With QOpenGLWidget, it is now the WainWindow's responsibility
+        // (more technically, the MainWindow's rendering backend, which
+        // happens to be Qt's OpenGL rendering backend when QOpenGLWidget are
+        // present in the children tree) to gather and composite all of the
+        // off-screen buffers (regardless of which image type they are, eg:
+        // cpu-memory images, gpu/opengl images, etc) and finally to call
+        // swapBuffers to show the final contents of the mainWindow.
+        //
+        // As a result, I'm not sure there's a point -- at all --
+        // in calling swapBuffers on the GLView anywhere amnymore. From old
+        // comments in the previous version of this tile, it appears that
+        // calling swapBuffers was done to force a quicker visual update, or
+        // to minimize visual tearing of some sort. This would have worked
+        // with the old QGLWidget (becayuse each QGLWidget had its own
+        // context, and its rendering target was directly the GL_BACK
+        // framebuffer, but, again, with QOpenGLWidget, the rendering target
+        // is no longer GL_BACK, it is an FBO that is meant to be used at
+        // the end of the application's drawing / visual update pipeline.
+
         if (debug)
         {
             Session::ProfilingRecord& trecord =
@@ -438,19 +549,12 @@ namespace Rv
 
             if (session->outputVideoDevice() != videoDevice())
             {
-#ifdef PLATFORM_DARWIN
                 session->outputVideoDevice()->syncBuffers();
-                makeCurrent();
-                swapBuffers();
-#else
-                session->outputVideoDevice()->syncBuffers();
-                makeCurrent();
-                swapBuffersNoSync();
-#endif
             }
             else
             {
-                swapBuffers();
+                m_videoDevice->widget()->context()->swapBuffers(
+                    m_videoDevice->widget()->context()->surface());
             }
 
             trecord.swapEnd = session->profilingElapsedTime();
@@ -460,49 +564,7 @@ namespace Rv
         {
             if (session->outputVideoDevice() != videoDevice())
             {
-
-#ifdef PLATFORM_DARWIN
-                if (!m_syncThreadData)
-                {
-                    m_syncThreadData =
-                        new SyncBufferThreadData(session->outputVideoDevice());
-                    m_swapThread = boost::thread(ThreadTrampoline(this));
-                }
-                else
-                {
-                    SyncBufferThreadData* sb =
-                        reinterpret_cast<SyncBufferThreadData*>(
-                            m_syncThreadData);
-
-                    if (sb->device() != session->outputVideoDevice())
-                    {
-                        //
-                        //  This is questionable without shutting down and
-                        //  restarting the sync thread, but the worst case
-                        //  seems to be an extra swap on the closed (not
-                        //  visible) device
-                        //
-
-                        sb->setDevice(session->outputVideoDevice());
-                    }
-                }
-
-                reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData)
-                    ->notify();
-
-                // session->outputVideoDevice()->syncBuffers();
-
-                makeCurrent();
-                swapBuffers();
-#else
                 session->outputVideoDevice()->syncBuffers();
-                makeCurrent();
-                swapBuffersNoSync();
-#endif
-            }
-            else
-            {
-                swapBuffers();
             }
         }
 
@@ -511,6 +573,8 @@ namespace Rv
         session->postRender();
 
         m_eventProcessingTimer.start();
+
+        TWK_GLDEBUG;
     }
 
     void GLView::eventProcessingTimeout()
@@ -520,6 +584,8 @@ namespace Rv
 
     bool GLView::event(QEvent* event)
     {
+        // qDebug() << "Event type: " << event->type();
+
         bool keyevent = false;
         Rv::Session* session = m_doc->session();
 
@@ -667,7 +733,7 @@ namespace Rv
                     session->userGenericEvent("view-resized", contents.str());
                 }
             }
-            return QGLWidget::event(event);
+            return QOpenGLWidget::event(event);
         }
 
         if (session && session->outputVideoDevice()
@@ -740,7 +806,7 @@ namespace Rv
         }
         else
         {
-            bool result = QGLWidget::event(event);
+            bool result = QOpenGLWidget::event(event);
 
             return result;
         }

@@ -20,10 +20,6 @@ namespace Rv
     //  This instantiates whichever video devices it can based on the
     //  platform and availability.
     //
-    //  DARWIN: uses CGDesktopVideoDevice
-    //  LINUX: uses QTDesktopVideoDevice
-    //  WINDOWS: uses QTDesktopVideoDevice
-    //
 
     class QTGLVideoDevice;
 

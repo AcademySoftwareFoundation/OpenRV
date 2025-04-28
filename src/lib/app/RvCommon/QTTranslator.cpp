@@ -80,7 +80,7 @@ namespace Rv
         return m;
     }
 
-    void QTTranslator::resetModifiers() const { m_modifiers = 0; }
+    void QTTranslator::resetModifiers() const { m_modifiers = Qt::NoModifier; }
 
     Qt::MouseButtons QTTranslator::qbuttons(unsigned int b) const
     {
@@ -89,7 +89,7 @@ namespace Rv
         if (b & 0x1 << 0)
             q |= Qt::LeftButton;
         if (b & 0x1 << 1)
-            q |= Qt::MidButton;
+            q |= Qt::MiddleButton;
         if (b & 0x1 << 2)
             q |= Qt::RightButton;
         return q;
@@ -669,7 +669,8 @@ namespace Rv
                                  event->buttons());
 
         n += "wheel";
-        if (event->delta() < 0)
+        // use pixelDelta() or angleDelta() instead of delta() (deprecated)
+        if (event->angleDelta().y() < 0)
             n += "down";
         else
             n += "up";
@@ -716,11 +717,17 @@ namespace Rv
         string n;
 
         bool b1 = event->buttons() & Qt::LeftButton;
-        bool b2 = event->buttons() & Qt::MidButton;
+        bool b2 = event->buttons() & Qt::MiddleButton;
         bool b3 = event->buttons() & Qt::RightButton;
 
+#if defined(RV_VFX_CY2023)
         m_x = (m_xscale * event->x()) + m_xoffset;
         m_y = (m_yscale * (m_widget->height() - event->y())) + m_yoffset;
+#else
+        m_x = (m_xscale * event->position().x()) + m_xoffset;
+        m_y = (m_yscale * (m_widget->height() - event->position().y()))
+              + m_yoffset;
+#endif
 
         if (type == QEvent::MouseMove && !buttons())
         {
@@ -992,9 +999,16 @@ namespace Rv
 
                 for (int i = 0; i < seqs.size(); i++)
                 {
+#if defined(RV_VFX_CY2023)
                     DragDropEvent e(ename, m_node, type, DragDropEvent::File,
                                     seqs[i], 0, devent->pos().x(),
                                     h - devent->pos().y() - 1, w, h);
+#else
+                    DragDropEvent e(
+                        ename, m_node, type, DragDropEvent::File, seqs[i], 0,
+                        devent->position().toPoint().x(),
+                        h - devent->position().toPoint().y() - 1, w, h);
+#endif
 
                     sendEvent(e);
                     if (e.handled)
@@ -1003,9 +1017,16 @@ namespace Rv
 
                 for (int i = 0; i < nonfiles.size(); i++)
                 {
+#if defined(RV_VFX_CY2023)
                     DragDropEvent e(ename, m_node, type, DragDropEvent::URL,
                                     nonfiles[i], 0, devent->pos().x(),
                                     h - devent->pos().y() - 1, w, h);
+#else
+                    DragDropEvent e(
+                        ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0,
+                        devent->position().toPoint().x(),
+                        h - devent->position().toPoint().y() - 1, w, h);
+#endif
 
                     sendEvent(e);
                     if (e.handled)
@@ -1014,10 +1035,17 @@ namespace Rv
             }
             else if (devent->mimeData()->hasText())
             {
+#if defined(RV_VFX_CY2023)
                 DragDropEvent e(ename, m_node, type, DragDropEvent::Text,
                                 devent->mimeData()->text().toUtf8().constData(),
                                 0, devent->pos().x(), h - devent->pos().y() - 1,
                                 w, h);
+#else
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text,
+                                devent->mimeData()->text().toUtf8().constData(),
+                                0, devent->position().toPoint().x(),
+                                h - devent->position().toPoint().y() - 1, w, h);
+#endif
 
                 sendEvent(e);
                 if (e.handled)
@@ -1040,9 +1068,15 @@ namespace Rv
         double xoff = p.x();
         double yoff = p.y();
 
+#if defined(RV_VFX_CY2023)
         const double gx = event->hiResGlobalX() - xoff;
         const double gy =
             double(m_widget->height()) - (event->hiResGlobalY() - yoff);
+#else
+        const double gx = event->globalPosition().x() - xoff;
+        const double gy =
+            double(m_widget->height()) - (event->globalPosition().y() - yoff);
+#endif
         const double pressure = event->pressure();
         const double tpressure = event->tangentialPressure();
         const double rot = event->rotation();
@@ -1050,35 +1084,27 @@ namespace Rv
         const int ytilt = event->yTilt();
         const int z = event->z();
 
-        TabletEvent::TabletKind kind;
-        TabletEvent::TabletDevice device;
-
         string n;
 
-        switch (event->device())
+#if defined(RV_VFX_CY2023)
+        switch (event->deviceType())
         {
         case QTabletEvent::NoDevice:
-            device = TabletEvent::NoTableDevice;
             n = "generic-tablet-device-";
             break;
         case QTabletEvent::Puck:
-            device = TabletEvent::PuckDevice;
             n = "puck-";
             break;
         case QTabletEvent::Stylus:
-            device = TabletEvent::StylusDevice;
             n = "stylus-";
             break;
         case QTabletEvent::Airbrush:
-            device = TabletEvent::AirBrushDevice;
             n = "airbrush-";
             break;
         case QTabletEvent::FourDMouse:
-            device = TabletEvent::FourDMouseDevice;
             n = "mouse4D-";
             break;
         case QTabletEvent::RotationStylus:
-            device = TabletEvent::RotationStylusDevice;
             n = "rotating-stylus-";
             break;
         default:
@@ -1088,21 +1114,76 @@ namespace Rv
         switch (event->pointerType())
         {
         case QTabletEvent::UnknownPointer:
-            kind = TabletEvent::UnknownTabletKind;
             break;
         case QTabletEvent::Pen:
-            kind = TabletEvent::PenKind;
             n += "pen-";
             break;
         case QTabletEvent::Cursor:
-            kind = TabletEvent::CursorKind;
             n += "cursor-";
             break;
         case QTabletEvent::Eraser:
-            kind = TabletEvent::EraserKind;
             n += "eraser-";
             break;
         }
+#else
+
+        // Note: In Qt6, QTabletEvent::FourDMouse and QTabletEvent::RotationStylus have been removed
+        // and replaced with QInputDevice::DeviceType::Puck and QInputDevice::DeviceType::Stylus respectively.
+
+        switch (event->deviceType())
+        {
+        case QInputDevice::DeviceType::Unknown:
+            n = "generic-tablet-device-";
+            break;
+        case QInputDevice::DeviceType::Mouse:
+            n = "mouse-";
+            break;
+        case QInputDevice::DeviceType::TouchScreen:
+            n = "touchscreen-";
+            break;
+        case QInputDevice::DeviceType::TouchPad:
+            n = "touchpad-";
+            break;
+        case QInputDevice::DeviceType::Stylus:
+            n = "stylus-";
+            break;
+        case QInputDevice::DeviceType::Airbrush:
+            n = "airbrush-";
+            break;
+        case QInputDevice::DeviceType::Puck:
+            n = "puck-";
+            break;
+        case QInputDevice::DeviceType::Keyboard:
+            n = "keyboard-";
+            break;
+        case QInputDevice::DeviceType::AllDevices:
+        default:
+            break;
+        }
+
+        switch (event->pointerType())
+        {
+        case QPointingDevice::PointerType::Generic:
+            n += "generic-";
+            break;
+        case QPointingDevice::PointerType::Finger:
+            n += "finger-";
+            break;
+        case QPointingDevice::PointerType::Pen:
+            n += "pen-";
+            break;
+        case QPointingDevice::PointerType::Eraser:
+            n += "eraser-";
+            break;
+        case QPointingDevice::PointerType::Cursor:
+            n += "cursor-";
+            break;
+        case QPointingDevice::PointerType::Unknown:
+        case QPointingDevice::PointerType::AllPointerTypes:
+        default:
+            break;
+        }
+#endif
 
         bool b1 = m_b1;
         bool b2 = m_b2;
@@ -1138,8 +1219,7 @@ namespace Rv
         }
 
         TabletEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height,
-                      // m_lastx, m_lasty,
-                      m_pushx, m_pushy, buttons(), kind, device, gx, gy,
+                      m_pushx, m_pushy, buttons(), gx, gy,
                       pressure, tpressure, rot, xtilt, ytilt, z);
 
         sendEvent(e);

@@ -10,8 +10,164 @@
 using namespace TwkMath;
 using namespace std;
 
+#include <QOpenGLContext>
+
 namespace
 {
+
+    // #define TRACK_GL_CONTEXT
+
+#ifdef TRACK_GL_CONTEXT
+
+#define DECLARE_VAR(typ, var, def) \
+    typ m_prev##var = def;         \
+    typ m_curr##var = def;
+
+#define PRINT_VAR(var)                                                       \
+    std::cerr << "[" << #var << ": " << m_prev##var << " to " << m_curr##var \
+              << "] ";
+
+#define UPDATEVAR_VAL(var, val)     \
+    m_prev##var = m_curr##var;      \
+    m_curr##var = val;              \
+    if (m_prev##var != m_curr##var) \
+    {                               \
+        changed = true;             \
+    }
+
+#define UPDATEVAR_GLGET(var, ident)     \
+    m_prev##var = m_curr##var;          \
+    glGetIntegerv(ident, &m_curr##var); \
+    if (m_prev##var != m_curr##var)     \
+    {                                   \
+        changed = true;                 \
+    }
+
+    class GLContextStateTracker
+    {
+    public:
+        GLContextStateTracker()
+        {
+            m_ctx = QOpenGLContext::currentContext();
+            m_name = "????";
+
+            std::cerr << "-------> [NEW CONTEXT: " << name() << "]"
+                      << std::endl;
+        }
+
+        void update(std::string_view file, std::string_view function, int line)
+        {
+            bool changed = false;
+            QOpenGLContext* context = QOpenGLContext::currentContext();
+
+            UPDATEVAR_VAL(QT_FBO, context->defaultFramebufferObject());
+            UPDATEVAR_GLGET(GL_FBO, GL_FRAMEBUFFER_BINDING);
+            UPDATEVAR_GLGET(GL_RBO, GL_RENDERBUFFER_BINDING);
+
+            if (changed)
+            {
+                std::cerr << "   [QT_CTX: " << name() << "] ";
+
+                PRINT_VAR(QT_FBO);
+                PRINT_VAR(GL_FBO);
+                PRINT_VAR(GL_RBO);
+
+                bool printDetails = true;
+                if (printDetails)
+                    std::cerr << " " << shorterPath(file).data() << " "
+                              << function.data() << "@" << line;
+
+                std::cerr << std::endl;
+            }
+        }
+
+        void setName(std::string_view name) { m_name = name; }
+
+        std::string name() const
+        {
+            std::ostringstream ss;
+            ss << (void*)(m_ctx) << "/" << m_name.c_str();
+
+            std::string s = ss.str();
+            return s;
+        }
+
+    protected:
+        DECLARE_VAR(int32_t, QT_FBO, -1);
+        DECLARE_VAR(int32_t, GL_FBO, -1);
+        DECLARE_VAR(int32_t, GL_RBO, -1);
+
+        std::string m_name = "";
+        void* m_ctx = nullptr;
+    };
+
+    class GLMultiContextStateTracker
+    {
+    public:
+        GLMultiContextStateTracker() {}
+
+        void setCurrentContextName(std::string_view name)
+        {
+            GLContextStateTracker& tracker =
+                m_trackers[QOpenGLContext::currentContext()];
+            tracker.setName(name);
+        }
+
+        void update(std::string_view file, std::string_view function, int line)
+        {
+            m_prevContext = m_currContext;
+            m_currContext = QOpenGLContext::currentContext();
+
+            if (m_prevContext == nullptr)
+                m_prevContext = m_currContext;
+
+            if (m_currContext != m_prevContext)
+            {
+                const GLContextStateTracker& t0 = m_trackers[m_prevContext];
+                const GLContextStateTracker& t1 = m_trackers[m_currContext];
+
+                std::cerr << "@@ [QT_CTX: " << t0.name() << " to " << t1.name()
+                          << "]" << std::endl;
+            }
+
+            if (m_currContext)
+            {
+                m_trackers[m_currContext].update(file, function, line);
+            }
+        }
+
+    protected:
+        std::map<QOpenGLContext*, GLContextStateTracker> m_trackers;
+        QOpenGLContext* m_prevContext = nullptr;
+        QOpenGLContext* m_currContext = nullptr;
+    };
+
+    static GLMultiContextStateTracker s_multiTracker;
+#endif // TRACK_GL_CONTEXT
+
+    static std::string_view shorterPath(std::string_view path)
+    {
+        const bool veryshort = true;
+
+        if (veryshort)
+        {
+            size_t pos = path.rfind('/');
+            if (pos != std::string_view::npos)
+            {
+                std::string_view result = path.substr(pos + 1);
+                return result;
+            }
+        }
+        else
+        {
+            size_t pos = path.find("/src/");
+            if (pos != std::string_view::npos)
+                return path.substr(pos);
+        }
+
+        return path;
+    }
+
     struct token_string
     {
         GLuint Token;
@@ -60,6 +216,27 @@ namespace TwkGLF
     }
 
 } // namespace TwkGLF
+
+bool twkGlPrintError(std::string_view file, std::string_view function,
+                     const int line, const std::string_view msg)
+{
+    if (GLuint err = glGetError())
+    {
+        std::cerr << "GL_ERROR: " << shorterPath(file).data()
+                  << "::" << function.data() << ":" << line << " ["
+                  << TwkGLF::errorString(err) << "]" << std::endl;
+        return false;
+    }
+
+    // Track OpenGL context updates.
+    // Enable the line below to track what's going on with current contexts and
+    // current FBOs.
+#ifdef TRACK_GL_CONTEXT
+    s_multiTracker.update(file, function, line);
+#endif
+
+    return true;
+}
 
 bool glSupportsExtension(const char* extstring)
 {

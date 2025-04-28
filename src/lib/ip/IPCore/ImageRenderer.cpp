@@ -1330,15 +1330,21 @@ namespace IPCore
         }
 
         context.targetFBO->bind();
+        TWK_GLDEBUG;
 
         GLPushAttrib attr1(GL_ALL_ATTRIB_BITS);
+        TWK_GLDEBUG;
 #ifdef PLATFORM_DARWIN
         GLPushClientAttrib attr2(GL_CLIENT_ALL_ATTRIB_BITS);
+        TWK_GLDEBUG;
 #endif
 
         glDisable(GL_LIGHTING);
+        TWK_GLDEBUG;
         glDisable(GL_DEPTH_TEST);
+        TWK_GLDEBUG;
         glDisable(GL_BLEND);
+        TWK_GLDEBUG;
 
         setupBlendMode(context);
     }
@@ -1397,6 +1403,7 @@ namespace IPCore
 
         if (m_outputDevice.glDevice)
             m_outputDevice.glDevice->makeCurrent();
+        TWK_GLDEBUG;
 
         if (d)
             m_imageFBOManager.clearAllFences();
@@ -1447,12 +1454,13 @@ namespace IPCore
             }
 
             m_outputDevice.clearFBOs();
+            TWK_GLDEBUG;
         }
 
         if (device.glDevice)
         {
             device.glDevice->makeCurrent();
-
+            TWK_GLDEBUG;
             //
             //  Initilaize a bunch of low level shaders
             //
@@ -1500,6 +1508,7 @@ namespace IPCore
                 if (m_outputDevice.glDevice)
                     m_outputDevice.glDevice->makeCurrent();
                 m_outputDevice.clearFBOs();
+                TWK_GLDEBUG;
 
                 if (m_outputDevice.glBindableDevice)
                 {
@@ -2969,6 +2978,7 @@ namespace IPCore
         // is this needed ? YES this is needed, otherwise fonts wont render
         // right with FTGL
         GLPushAttrib attr1(GL_ALL_ATTRIB_BITS);
+        TWK_GLDEBUG;
         GLPushClientAttrib attr2(GL_CLIENT_ALL_ATTRIB_BITS);
         TWK_GLDEBUG;
 

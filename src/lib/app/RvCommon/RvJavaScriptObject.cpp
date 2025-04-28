@@ -8,11 +8,11 @@
 #include <RvCommon/RvJavaScriptObject.h>
 #include <RvCommon/RvDocument.h>
 #include <TwkQtCoreUtil/QtConvert.h>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtWebEngineWidgets/QWebEngineProfile>
-#include <QtWebEngineWidgets/QWebEngineScript>
-#include <QtWebEngineWidgets/QWebEngineScriptCollection>
-#include <QtWebChannel/QWebChannel>
+#include <QWebEnginePage>
+#include <QWebEngineProfile>
+#include <QWebEngineScript>
+#include <QWebEngineScriptCollection>
+#include <QWebChannel>
 
 namespace Rv
 {
@@ -115,19 +115,19 @@ namespace Rv
 
     void RvJavaScriptObject::bindToRegex(const QString& name)
     {
-        QRegExp re(name);
+        QRegularExpression re(name);
         if (!m_eventNames.contains(re))
             m_eventNames.push_back(re);
     }
 
     void RvJavaScriptObject::unbindRegex(const QString& name)
     {
-        m_eventNames.removeOne(QRegExp(name));
+        m_eventNames.removeOne(QRegularExpression(name));
     }
 
     bool RvJavaScriptObject::hasBinding(const QString& name)
     {
-        return m_eventNames.contains(QRegExp(name));
+        return m_eventNames.contains(QRegularExpression(name));
     }
 
     EventNode::Result
@@ -137,7 +137,7 @@ namespace Rv
 
         for (size_t i = 0; i < m_eventNames.size(); i++)
         {
-            if (m_eventNames[i].indexIn(name) != -1)
+            if (m_eventNames[i].match(name).hasMatch())
             {
                 if (const GenericStringEvent* ge =
                         dynamic_cast<const GenericStringEvent*>(&event))

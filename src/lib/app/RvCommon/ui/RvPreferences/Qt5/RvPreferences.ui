@@ -1,0 +1,3495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RvPreferences</class>
+ <widget class="QDialog" name="RvPreferences">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>837</width>
+    <height>606</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_6">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="generalTab">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_21">
+       <property name="topMargin">
+        <number>25</number>
+       </property>
+       <item>
+        <spacer name="horizontalSpacer_34">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>90</width>
+           <height>17</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <layout class="QFormLayout" name="formLayout_9">
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>Font Size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="fontSizeSpinBox">
+             <property name="minimum">
+              <number>10</number>
+             </property>
+             <property name="value">
+              <number>12</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>Session Manager Font Size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="fontSize2SpinBox">
+             <property name="minimum">
+              <number>5</number>
+             </property>
+             <property name="value">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_29">
+             <property name="text">
+              <string>Default Playback Mode</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_23">
+             <item>
+              <widget class="QComboBox" name="playbackModeCombo">
+               <item>
+                <property name="text">
+                 <string>Context Dependant</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Play All Frames</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Realtime</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_23">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>Default Stereo Mode</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_24">
+             <item>
+              <widget class="QComboBox" name="stereoModeCombo">
+               <item>
+                <property name="text">
+                 <string>No Stereo</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Anaglyph</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Side-by-Side</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Side-by-Side Mirrored</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Left Only</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Right Only</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>DLP Stereo</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>LCD Scanline</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>OpenGL Hardware</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_24">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_47">
+             <property name="text">
+              <string>Default FPS</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_25">
+             <item>
+              <widget class="QLineEdit" name="fpsEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>50</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>24</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_25">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_62">
+             <property name="text">
+              <string>Network Hostname/Address</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_26">
+             <item>
+              <widget class="QLineEdit" name="networkHostEdit">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_26">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_68">
+             <property name="text">
+              <string>Startup Screen</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_37">
+             <item>
+              <widget class="QComboBox" name="startupScreenCombo"/>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_43">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="playOnStartupToggle">
+             <property name="text">
+              <string>Play on Start Up</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="reuseSessionToggle">
+             <property name="text">
+              <string>Handle URLS in Current Session</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="fullscreenOnStartupToggle">
+             <property name="text">
+              <string>Start in Fullscreen Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="networkToggle">
+             <property name="text">
+              <string>Activate Network on Startup</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="noMenuBarToggle">
+             <property name="text">
+              <string>Hide Menu Bar by Default</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="autoRetimeToggle">
+             <property name="text">
+              <string>Auto-Retime Mismatched FPS Media</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QCheckBox" name="desktopAwareToggle">
+             <property name="text">
+              <string>Desktop Aware</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="stylusAsMouseToggle">
+             <property name="text">
+              <string>Treat Stylus Events as Mouse Events</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QCheckBox" name="clickToPlayEnableToggle">
+             <property name="text">
+              <string>Click in View to Play</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QCheckBox" name="startupResizeToggle">
+             <property name="text">
+              <string>Fit Window to First Media Loaded</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QCheckBox" name="scrubEnableToggle">
+             <property name="text">
+              <string>Mouse Scrub in View</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QCheckBox" name="useCrashReporterToggle">
+             <property name="text">
+              <string>Use Crash Reporter</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>533</width>
+             <height>13</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_35">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>90</width>
+           <height>17</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="cachingTab">
+      <attribute name="title">
+       <string>Caching</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_34">
+       <property name="topMargin">
+        <number>25</number>
+       </property>
+       <item>
+        <spacer name="horizontalSpacer_36">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="formLayout_10">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+         </property>
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_37">
+           <property name="text">
+            <string>Default Cache Mode</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <item>
+            <widget class="QComboBox" name="cacheModeCombo">
+             <item>
+              <property name="text">
+               <string>No Caching</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Region Cache</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Look-Ahead Cache</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_14">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_92">
+           <property name="text">
+            <string>Look-Ahead Cache Size </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_57">
+           <item>
+            <widget class="QLineEdit" name="lookAheadCacheSize64Edit">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>.25</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_91">
+             <property name="text">
+              <string>GB</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_61">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_95">
+           <property name="text">
+            <string>Region Cache Max Size </string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_59">
+           <item>
+            <widget class="QLineEdit" name="regionCacheSize64Edit">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_94">
+             <property name="text">
+              <string>GB</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_63">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_50">
+           <property name="text">
+            <string>Max Look-Ahead Wait Time</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLineEdit" name="bufferWaitEdit">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>5</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_49">
+             <property name="text">
+              <string>seconds</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_48">
+           <property name="text">
+            <string>Reader Threads</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLineEdit" name="rthreadEdit">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>12312312</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>1</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>(Requires Restart)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_51">
+           <property name="text">
+            <string>Portion Of Look-Ahead Cache Behind Playhead</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLineEdit" name="lookBehindFracEdit">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>25</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>%</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="catcheFramesOutsideRegionLabel">
+           <property name="text">
+            <string>Cache Frames Outside In/Out Region</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="cacheOutsideRegionToggle"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_37">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="renderingTab">
+      <attribute name="title">
+       <string>Rendering</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_35">
+       <property name="topMargin">
+        <number>25</number>
+       </property>
+       <item>
+        <spacer name="horizontalSpacer_38">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>94</width>
+           <height>17</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <item>
+          <layout class="QFormLayout" name="formLayout_7">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+           </property>
+           <property name="labelAlignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_27"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_43">
+             <property name="text">
+              <string>Default Software Resampling Method</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_28">
+             <item>
+              <widget class="QComboBox" name="resampleMethodCombo">
+               <item>
+                <property name="text">
+                 <string>Area</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Bicubic</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Linear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Nearest Neighbor</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_28">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="defaultHardwareTextureFilterLabel">
+             <property name="text">
+              <string>Default Hardware Texture Filter</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_40">
+             <property name="text">
+              <string>Maximum Image Bit Depth</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_29">
+             <item>
+              <widget class="QComboBox" name="bitDepthCombo">
+               <item>
+                <property name="text">
+                 <string>32 Bits/Channel</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16 Bits/Channel</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>8 Bits/Channel</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_29">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_45">
+             <property name="text">
+              <string>Display Output Format</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_30">
+             <item>
+              <widget class="QComboBox" name="displayOutputCombo">
+               <item>
+                <property name="text">
+                 <string>OpenGL Default Format</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>OpenGL 32 RGBA 8 bits/ch</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>OpenGL 32 RGB+A 10+2 bits/ch</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_30">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_44">
+             <property name="text">
+              <string> Default Background Pattern</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_31">
+             <item>
+              <widget class="QComboBox" name="bgPatternCombo">
+               <item>
+                <property name="text">
+                 <string>Solid Black</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Solid 18% Grey</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Solid 50% Grey</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Solid White</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Checker</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Cross-Hatch</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_31">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_45">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_46">
+               <item>
+                <widget class="QComboBox" name="imageFilterCombo">
+                 <item>
+                  <property name="text">
+                   <string>Linear</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Nearest Neighbor</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_49">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QFrame" name="frame">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QCheckBox" name="swapScanlinesToggle">
+              <property name="text">
+               <string>Swap Scanlines for Stereo</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="allowFloatToggle">
+              <property name="text">
+               <string>Allow Floating Point</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="newGLSLlutInterpToggle">
+              <property name="text">
+               <string>GLSL 3D LUT Interpolation</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="prefetchToggle">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Prefetch Images</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="tristate">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="appleClientStorageToggle">
+              <property name="text">
+               <string>Apple Client Storage</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="useThreadedUploadToggle">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Multithread GPU Uploads</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="tristate">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="displayVideoSyncButton">
+              <property name="text">
+               <string>Video Sync</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_39">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>93</width>
+           <height>17</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="videoTab">
+      <attribute name="title">
+       <string>Video</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_38">
+       <item>
+        <spacer name="horizontalSpacer_40">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="formLayout_8">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <property name="labelAlignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="verticalSpacing">
+          <number>6</number>
+         </property>
+         <item row="0" column="0">
+          <spacer name="verticalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>15</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_63">
+           <property name="text">
+            <string>Output Module</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="videoModuleCombo"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_15">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="moduleProfileCombo">
+             <property name="profileCombo" stdset="0">
+              <string>true</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_69">
+           <property name="text">
+            <string>Output Device</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_16">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="videoDeviceCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_16">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="deviceProfileCombo">
+             <property name="profileCombo" stdset="0">
+              <string>true</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <spacer name="verticalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_64">
+           <property name="text">
+            <string>Output Video Format</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="videoFormatCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_17">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="formatProfileCombo">
+             <property name="profileCombo" stdset="0">
+              <string>true</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_65">
+           <property name="text">
+            <string>Output Data Format</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_18">
+           <item>
+            <widget class="QComboBox" name="dataFormatCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_18">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_66">
+           <property name="text">
+            <string>Sync Method</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_19">
+           <item>
+            <widget class="QComboBox" name="syncMethodCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_19">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_67">
+           <property name="text">
+            <string>Sync Source</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
+           <item>
+            <widget class="QComboBox" name="syncSourceCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_20">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_10_1">
+           <property name="text">
+            <string>4K/8K Transport</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_10_1">
+           <item>
+            <widget class="QComboBox" name="video4KTransportCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_10_1">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="11" column="0">
+          <spacer name="verticalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>15</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="11" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_40">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <spacer name="horizontalSpacer_45">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="label_71">
+           <property name="text">
+            <string>Audio Format</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_36">
+           <item>
+            <widget class="QComboBox" name="videoAudioFormatCombo">
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_42">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="13" column="1">
+          <spacer name="verticalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>10</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="14" column="1">
+          <widget class="QCheckBox" name="presentationCheckBox">
+           <property name="text">
+            <string>Use as Presentation Device</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="1">
+          <widget class="QCheckBox" name="videoAudioDeviceCheckBox">
+           <property name="text">
+            <string>Output Audio to this Device</string>
+           </property>
+          </widget>
+         </item>
+         <item row="16" column="1">
+          <widget class="QCheckBox" name="videoSwapStereoEyesCheckBox">
+           <property name="text">
+            <string>Swap Eyes for Stereo to this Device</string>
+           </property>
+          </widget>
+         </item>
+         <item row="17" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_41">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="configureVideoLatencyButton">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Configure Latency...</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
+             <property name="latencyButton" stdset="0">
+              <string>true</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_47">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="17" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_42">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>8</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="useVideoLatencyCheckBox">
+             <property name="text">
+              <string>Incorporate Video Latency into Audio Offset</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="19" column="0">
+          <widget class="QLabel" name="label_19">
+           <property name="text">
+            <string>Additional Options</string>
+           </property>
+          </widget>
+         </item>
+         <item row="19" column="1">
+          <widget class="QTextEdit" name="additionalOptionsEdit"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="1">
+          <widget class="QLabel" name="videoModuleSDKLabel">
+           <property name="text">
+            <string>SDK Version</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_41">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="audioTab">
+      <attribute name="title">
+       <string>Audio</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_39">
+       <item>
+        <spacer name="horizontalSpacer_32">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <item>
+          <layout class="QFormLayout" name="formLayout_13">
+           <property name="labelAlignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_60">
+             <property name="text">
+              <string>Output Module</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QComboBox" name="audioModuleCombo"/>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_59">
+             <property name="text">
+              <string>Output Device</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QComboBox" name="audioDeviceCombo"/>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_9">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Output Format and Rate</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QComboBox" name="audioDeviceLayoutCombo"/>
+             </item>
+             <item>
+              <widget class="QComboBox" name="audioDeviceFormatCombo"/>
+             </item>
+             <item>
+              <widget class="QComboBox" name="audioDeviceRateWidget"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_61">
+               <property name="text">
+                <string>Hz</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>13</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="formLayout_14">
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_57">
+             <property name="text">
+              <string>Initial Volume</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <widget class="QSlider" name="volumeSlider">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="invertedAppearance">
+                <bool>false</bool>
+               </property>
+               <property name="invertedControls">
+                <bool>false</bool>
+               </property>
+               <property name="tickPosition">
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_58">
+               <property name="text">
+                <string>max</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_10">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_70">
+             <property name="text">
+              <string>Global Audio Offset</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_32">
+             <item>
+              <widget class="QLineEdit" name="audioGlobalOffsetEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_72">
+               <property name="text">
+                <string>seconds</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_44">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_73">
+             <property name="text">
+              <string>Device Latency</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_33">
+             <item>
+              <widget class="QLineEdit" name="audioDeviceLatencyEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_74">
+               <property name="text">
+                <string>milliseconds</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_46">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>13</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="formLayout_15">
+           <property name="labelAlignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_55">
+             <property name="text">
+              <string>Device Packet Size</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QLineEdit" name="audioDevicePacketEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_56">
+               <property name="text">
+                <string>samples</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_11">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_53">
+             <property name="text">
+              <string>Cache Packet Size</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QLineEdit" name="audioCachePacketEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>512</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_54">
+               <property name="text">
+                <string>samples</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_12">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_52">
+             <property name="text">
+              <string>Min/Max Buffer Size in Seconds</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <item>
+              <widget class="QLineEdit" name="audioCacheMinEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>.25</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="audioCacheMaxEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>80</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>.5</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_13">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="leftMargin">
+            <number>100</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="audioHoldOpenToggle">
+             <property name="text">
+              <string>Keep Audio Device Open When Not Playing</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="audioHardwareLockToggle">
+             <property name="text">
+              <string>Hardware Audio and Video Synchronization</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="audioScrubAtLaunchToggle">
+             <property name="text">
+              <string>Scrubbing On By Default (Cache all Audio)</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="audioPreRollToggle">
+             <property name="text">
+              <string>Fast Loopback+PreRoll Audio on Device Open (Platform Audio only)</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>13</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_33">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="formatsTab">
+      <attribute name="title">
+       <string>Formats</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <item>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>750</width>
+            <height>1143</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="title">
+              <string>OpenEXR</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_12">
+              <property name="topMargin">
+               <number>6</number>
+              </property>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_11">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <item>
+                 <widget class="QCheckBox" name="exrInheritToggle">
+                  <property name="text">
+                   <string>Guess Channel Inheritance</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="exrRGBAToggle">
+                  <property name="text">
+                   <string>Always Read as RGBA (for non-multipart files only)</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="exrPlanar3ChannelToggle">
+                  <property name="text">
+                   <string>Read 3-Channel Images into Planar (Single-Channel) Textures</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="exrNoOneChannelToggle">
+                  <property name="text">
+                   <string>Use Alternate Representation For Pre-G80 Nvidia GPUs (-exrNoOneChannel)</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="exrReadWindowIsDisplayWindowToggle">
+                  <property name="text">
+                   <string>Read Window is Display Window</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QFormLayout" name="formLayout_4">
+                <property name="fieldGrowthPolicy">
+                 <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+                </property>
+                <property name="formAlignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_18">
+                  <property name="text">
+                   <string>Read Window</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="exrReadWindowCombo">
+                  <property name="maximumSize">
+                   <size>
+                    <width>600</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Data Window</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Display Window</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Union of Data and Display Windows</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Data Window Inside of Display Window</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>I/O Method</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="exrIOMethodCombo">
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Standard</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Buffered</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Unbuffered</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Memory Map</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Asynchronous Buffered</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Asynchronous Unbuffered</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>Asyn I/O Chunk Size in Bytes</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLineEdit" name="exrChunkSizeEdit">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>60</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>61440</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="exrMaxInFlightLabel">
+                  <property name="text">
+                   <string>Max Asyn Requests</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLineEdit" name="exrMaxInFlightEdit">
+                  <property name="maximumSize">
+                   <size>
+                    <width>60</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>32</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="exrAutoThreadsToggle">
+                <property name="text">
+                 <string>Automatic Threads</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+                <property name="tristate">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QFormLayout" name="formLayout_11">
+                <property name="formAlignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="exrThreadsLabel">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Reader/Decoder Threads</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="exrNumThreadsEdit">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_5">
+             <property name="title">
+              <string>DPX</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <layout class="QFormLayout" name="formLayout_2">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QCheckBox" name="dpxChromaToggle">
+                <property name="text">
+                 <string>Use File Primaries</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>10 Bit Display Bit Depth</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="dpxDisplayPixelCombo">
+                <item>
+                 <property name="text">
+                  <string>8 Bits/Channel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8 Bits/Channel + Alpha</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8 Bits/Channel Planar</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10 Bits/Channel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10 Bits/Channel Reversed</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>16 Bits/Channel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>16 Bits/Channel + Alpha</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>16 Bits/Channel Planar</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>I/O Method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="dpxIOMethodCombo">
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Standard</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Unbuffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Memory Map</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Unbuffered</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Async I/O Chunk Size in Bytes</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="dpxChunkSizeEdit">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>61440</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="dpxMaxInFlightEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="dpxMaxInFlightLabel">
+                <property name="text">
+                 <string>Max Async Requests</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_8">
+             <property name="title">
+              <string>TARGA (TGA)</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <layout class="QFormLayout" name="formLayout_5">
+              <property name="labelAlignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="tgaChunkSizeEdit">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>61440</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_15">
+                <property name="text">
+                 <string>Async I/O Chunk Size in Bytes</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="tgaMaxInFlightLabel">
+                <property name="text">
+                 <string>Max Async Requests</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>I/O Method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="tgaIOMethodCombo">
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Standard</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Unbuffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Memory Map</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Unbuffered</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="tgaMaxInFlightEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_9">
+             <property name="title">
+              <string>TIFF</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <layout class="QFormLayout" name="formLayout_6">
+              <property name="labelAlignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="tifChunkSizeEdit">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>61440</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>Async I/O Chunk Size in Bytes</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="tifMaxInFlightLabel">
+                <property name="text">
+                 <string>Max Async Requests</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>I/O Method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="tifIOMethodCombo">
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Standard</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Unbuffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Memory Map</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Unbuffered</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="tifMaxInFlightEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_4">
+             <property name="title">
+              <string>Cineon</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+             <layout class="QFormLayout" name="formLayout">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+              </property>
+              <property name="rowWrapPolicy">
+               <enum>QFormLayout::DontWrapRows</enum>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QCheckBox" name="cinChromaToggle">
+                <property name="text">
+                 <string>Use File Primaries</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>10 Bit Display Bit Depth</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="cinDisplayPixelCombo">
+                <item>
+                 <property name="text">
+                  <string>8 Bits/Channel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8 Bits/Channel + Alpha</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>8 Bits/Channel Planar</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10 Bits/Channel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>10 Bits/Channel Reversed</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>16 Bits/Channel</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>16 Bits/Channel + Alpha</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>16 Bits/Channel Planar</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>I/O Method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="cinIOMethodCombo">
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Standard</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Unbuffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Memory Map</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Unbuffered</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Async I/O Chunk Size in Bytes</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="cinChunkSizeEdit">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>61440</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="cinMaxInFlightEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="cinMaxInFlightLabel">
+                <property name="text">
+                 <string>Max Async Requests</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_6">
+             <property name="title">
+              <string>JPEG</string>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
+             </property>
+             <layout class="QFormLayout" name="formLayout_3">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <item row="0" column="0" colspan="2">
+               <widget class="QCheckBox" name="jpegRGBAToggle">
+                <property name="text">
+                 <string>Always Read as RGBA</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>I/O Method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="jpegIOMethodCombo">
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Standard</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Unbuffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Memory Map</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Buffered</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Asynchronous Unbuffered</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Async I/O Chunk Size in Bytes</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="jpegChunkSizeEdit">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>61440</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="jpegMaxInFlightLabel">
+                <property name="text">
+                 <string>Max Async Requests</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="jpegMaxInFlightEdit">
+                <property name="maximumSize">
+                 <size>
+                  <width>60</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>32</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="packagesTab">
+      <attribute name="title">
+       <string>Packages</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QSplitter" name="splitter">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QTreeView" name="extTreeView"/>
+         <widget class="QTextBrowser" name="extTextBrowser">
+          <property name="openExternalLinks">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="extAddButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string> Add Packages... </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="extRemoveButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string> Remove Package </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>293</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="extShowHiddenToggle">
+            <property name="text">
+             <string>Show Hidden Packages</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>playbackModeCombo</tabstop>
+  <tabstop>stereoModeCombo</tabstop>
+  <tabstop>fpsEdit</tabstop>
+  <tabstop>networkHostEdit</tabstop>
+  <tabstop>startupScreenCombo</tabstop>
+  <tabstop>playOnStartupToggle</tabstop>
+  <tabstop>fullscreenOnStartupToggle</tabstop>
+  <tabstop>noMenuBarToggle</tabstop>
+  <tabstop>desktopAwareToggle</tabstop>
+  <tabstop>clickToPlayEnableToggle</tabstop>
+  <tabstop>scrubEnableToggle</tabstop>
+  <tabstop>reuseSessionToggle</tabstop>
+  <tabstop>networkToggle</tabstop>
+  <tabstop>autoRetimeToggle</tabstop>
+  <tabstop>stylusAsMouseToggle</tabstop>
+  <tabstop>startupResizeToggle</tabstop>
+  <tabstop>cacheModeCombo</tabstop>
+  <tabstop>lookAheadCacheSize64Edit</tabstop>
+  <tabstop>regionCacheSize64Edit</tabstop>
+  <tabstop>bufferWaitEdit</tabstop>
+  <tabstop>rthreadEdit</tabstop>
+  <tabstop>lookBehindFracEdit</tabstop>
+  <tabstop>resampleMethodCombo</tabstop>
+  <tabstop>bitDepthCombo</tabstop>
+  <tabstop>displayOutputCombo</tabstop>
+  <tabstop>bgPatternCombo</tabstop>
+  <tabstop>allowFloatToggle</tabstop>
+  <tabstop>prefetchToggle</tabstop>
+  <tabstop>useThreadedUploadToggle</tabstop>
+  <tabstop>displayVideoSyncButton</tabstop>
+  <tabstop>videoModuleCombo</tabstop>
+  <tabstop>videoDeviceCombo</tabstop>
+  <tabstop>videoFormatCombo</tabstop>
+  <tabstop>dataFormatCombo</tabstop>
+  <tabstop>syncMethodCombo</tabstop>
+  <tabstop>syncSourceCombo</tabstop>
+  <tabstop>videoAudioFormatCombo</tabstop>
+  <tabstop>presentationCheckBox</tabstop>
+  <tabstop>videoAudioDeviceCheckBox</tabstop>
+  <tabstop>configureVideoLatencyButton</tabstop>
+  <tabstop>useVideoLatencyCheckBox</tabstop>
+  <tabstop>audioModuleCombo</tabstop>
+  <tabstop>audioDeviceCombo</tabstop>
+  <tabstop>audioDeviceLayoutCombo</tabstop>
+  <tabstop>audioDeviceFormatCombo</tabstop>
+  <tabstop>audioDeviceRateWidget</tabstop>
+  <tabstop>volumeSlider</tabstop>
+  <tabstop>audioGlobalOffsetEdit</tabstop>
+  <tabstop>audioDevicePacketEdit</tabstop>
+  <tabstop>audioCachePacketEdit</tabstop>
+  <tabstop>audioCacheMinEdit</tabstop>
+  <tabstop>audioCacheMaxEdit</tabstop>
+  <tabstop>audioHoldOpenToggle</tabstop>
+  <tabstop>audioHardwareLockToggle</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>exrInheritToggle</tabstop>
+  <tabstop>exrRGBAToggle</tabstop>
+  <tabstop>exrNoOneChannelToggle</tabstop>
+  <tabstop>exrReadWindowCombo</tabstop>
+  <tabstop>exrIOMethodCombo</tabstop>
+  <tabstop>exrChunkSizeEdit</tabstop>
+  <tabstop>exrMaxInFlightEdit</tabstop>
+  <tabstop>exrAutoThreadsToggle</tabstop>
+  <tabstop>exrNumThreadsEdit</tabstop>
+  <tabstop>dpxChromaToggle</tabstop>
+  <tabstop>dpxDisplayPixelCombo</tabstop>
+  <tabstop>dpxIOMethodCombo</tabstop>
+  <tabstop>dpxChunkSizeEdit</tabstop>
+  <tabstop>dpxMaxInFlightEdit</tabstop>
+  <tabstop>tgaIOMethodCombo</tabstop>
+  <tabstop>tgaChunkSizeEdit</tabstop>
+  <tabstop>tgaMaxInFlightEdit</tabstop>
+  <tabstop>tifIOMethodCombo</tabstop>
+  <tabstop>tifChunkSizeEdit</tabstop>
+  <tabstop>tifMaxInFlightEdit</tabstop>
+  <tabstop>cinChromaToggle</tabstop>
+  <tabstop>cinDisplayPixelCombo</tabstop>
+  <tabstop>cinIOMethodCombo</tabstop>
+  <tabstop>cinChunkSizeEdit</tabstop>
+  <tabstop>cinMaxInFlightEdit</tabstop>
+  <tabstop>jpegRGBAToggle</tabstop>
+  <tabstop>jpegIOMethodCombo</tabstop>
+  <tabstop>jpegChunkSizeEdit</tabstop>
+  <tabstop>jpegMaxInFlightEdit</tabstop>
+  <tabstop>extTreeView</tabstop>
+  <tabstop>extTextBrowser</tabstop>
+  <tabstop>extAddButton</tabstop>
+  <tabstop>extRemoveButton</tabstop>
+  <tabstop>extShowHiddenToggle</tabstop>
+  <tabstop>tabWidget</tabstop>
+ </tabstops>
+ <resources>
+  <include location="RvCommon.qrc"/>
+ </resources>
+ <connections/>
+</ui>

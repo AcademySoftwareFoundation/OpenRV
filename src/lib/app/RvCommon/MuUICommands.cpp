@@ -42,11 +42,19 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>
 
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/QNetworkAccessManagerType.h>
 #include <MuQt5/QTabWidgetType.h>
 #include <MuQt5/QToolBarType.h>
 #include <MuQt5/qtUtils.h>
 #include <MuQt5/QUrlType.h>
+#else
+#include <MuQt6/QNetworkAccessManagerType.h>
+#include <MuQt6/QTabWidgetType.h>
+#include <MuQt6/QToolBarType.h>
+#include <MuQt6/qtUtils.h>
+#include <MuQt6/QUrlType.h>
+#endif
 
 #include <TwkQtCoreUtil/QtConvert.h>
 #include <RvApp/Options.h>
@@ -74,12 +82,21 @@
 //  Related to MainWindow UI
 //  May want to move into separate module/library later on
 //----------------------------------------------------------------------
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/qtModule.h>
 #include <MuQt5/QActionType.h>
 #include <MuQt5/QWidgetType.h>
 #include <MuQt5/QObjectType.h>
 #include <MuQt5/QMainWindowType.h>
 #include <MuQt5/QWebEnginePageType.h>
+#else
+#include <MuQt6/qtModule.h>
+#include <MuQt6/QActionType.h>
+#include <MuQt6/QWidgetType.h>
+#include <MuQt6/QObjectType.h>
+#include <MuQt6/QMainWindowType.h>
+#include <MuQt6/QWebEnginePageType.h>
+#endif
 
 #include <RvCommon/RvJavaScriptObject.h>
 
@@ -129,6 +146,11 @@ namespace Rv
         context->listType(context->tupleType(types));
 
         commands->addSymbols(
+            new Function(c, "framebufferPixelValue", framebufferPixelValue,
+                         None, Return, "vector float[4]", Parameters,
+                         new Param(c, "px", "float"),
+                         new Param(c, "py", "float"), End),
+
             new Function(c, "resizeFit", resizeFit, None, Return, "void", End),
 
             new Function(c, "setViewSize", setViewSize, None, Return, "void",
@@ -488,6 +510,47 @@ namespace Rv
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
             EndArguments);
+    }
+
+    NODE_IMPLEMENTATION(framebufferPixelValue, Mu::Vector4f)
+    {
+        Process* p = NODE_THREAD.process();
+        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+        Session* s = Session::currentSession();
+        RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
+        QWidget* w = doc->view();
+
+        GLView* glview = dynamic_cast<GLView*>(w);
+
+        Mu::Vector4f v;
+        v[0] = 0;
+        v[1] = 0;
+        v[2] = 0;
+        v[3] = 0;
+
+        if (glview != NULL)
+        {
+            float x = NODE_ARG(0, float);
+            float y = NODE_ARG(1, float);
+
+            int ix = (int)(x + 0.5f);
+            int iy = (int)(y + 0.5f);
+
+            QImage image = glview->readPixels(ix, iy, 1, 1);
+
+            if ((image.width() > 0) && (image.height() > 0))
+            {
+                QRgb rgba = image.pixel(0, 0);
+                QColor qc(rgba);
+
+                v[0] = qc.redF();
+                v[1] = qc.greenF();
+                v[2] = qc.blueF();
+                v[3] = qc.alphaF();
+            }
+        }
+
+        NODE_RETURN(v);
     }
 
     NODE_IMPLEMENTATION(queryDriverAttribute, Pointer)

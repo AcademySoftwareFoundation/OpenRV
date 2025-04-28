@@ -1,9 +1,11 @@
-//
-// Copyright (c) 2009, Jim Hourihan
+//*****************************************************************************
+// Copyright (c) 2019 Autodesk, Inc.
 // All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
+//*****************************************************************************
+
 #ifndef __MuQt5__QDateTimeType__h__
 #define __MuQt5__QDateTimeType__h__
 #include <iostream>

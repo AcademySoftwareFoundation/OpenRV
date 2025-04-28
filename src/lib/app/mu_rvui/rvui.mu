@@ -4196,11 +4196,13 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: cloneRV (void; Event ev)
 {
     let target = tmpSessionCopyName(),
-        rv     = system.getenv ("RV_APP_RV"),
-        cmd    = "\"%s\" \"%s\"" % (rv, target);
+        rv     = system.getenv ("RV_APP_RV");
 
     saveSession(target, true, true);
-    qt.QProcess.startDetached (cmd);
+
+    string[] arguments = { "%s" % (target) };
+    // Quotes are not needed for program containing spaces with overloaded version of startDetached.
+    qt.QProcess.startDetached (rv, arguments);
 }
 
 \: cloneSyncedRV (void; Event ev)
@@ -4209,10 +4211,13 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     remoteNetwork(true);
 
     let myPort = myNetworkPort(),
-        rv     = system.getenv ("RV_APP_RV"),
-        cmd = "\"%s\" -network -networkPort %s -networkConnect 127.0.0.1 %s -flags syncPullFirst" % (rv, myPort+1, myPort);
+        rv     = system.getenv ("RV_APP_RV");
 
-    qt.QProcess.startDetached (cmd);
+    string[] arguments = { "-network", "-networkPort", "%s" % (myPort+1), "-networkConnect", "127.0.0.1", 
+                           "%s" % (myPort), "-flags", "syncPullFirstfalse" };
+
+    // Quotes are not needed for program containing spaces with overloaded version of startDetached.
+    qt.QProcess.startDetached (rv, arguments);
 }
 
 \: save (void; Event ev)

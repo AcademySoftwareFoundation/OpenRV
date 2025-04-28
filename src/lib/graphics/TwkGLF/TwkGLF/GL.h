@@ -102,16 +102,11 @@ struct GLPushMatrix
 #ifdef NDEBUG
 #define TWK_GLDEBUG ;
 #else
-// #define TWK_ABORT abort()
-#define TWK_ABORT
-#define TWK_GLDEBUG                                                \
-    if (GLuint err = glGetError())                                 \
-    {                                                              \
-        std::cerr << "GL_ERROR: in " << __FILE__ << ", function "  \
-                  << __FUNCTION__ << ", line " << __LINE__ << ": " \
-                  << TwkGLF::errorString(err) << std::endl;        \
-        TWK_ABORT;                                                 \
-    }
+bool twkGlPrintError(std::string_view file, std::string_view function,
+                     const int line, std::string_view msg);
+#define TWK_GLDEBUG twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
+#define TWK_GLDEBUG_MSG(msg) \
+    twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, msg);
 #endif
 
 //----------------------------------------------------------------------

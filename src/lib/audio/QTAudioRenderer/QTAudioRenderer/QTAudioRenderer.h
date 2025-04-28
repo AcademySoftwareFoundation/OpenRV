@@ -15,9 +15,12 @@
 #include <TwkUtil/Clock.h>
 
 #include <QtCore/QIODevice>
-#include <QtMultimedia/QAudioOutput>
+
 #include <QtMultimedia/QAudioFormat>
-#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QAudioDevice>
+#include <QtMultimedia/QAudioSink>
+#include <QtMultimedia/QMediaDevices>
+
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
 
@@ -25,6 +28,8 @@
 
 namespace IPCore
 {
+
+    using SampleFormat = QAudioFormat::SampleFormat;
 
     class QTAudioThread;
     class QTAudioRenderer;
@@ -51,14 +56,13 @@ namespace IPCore
         QTAudioThread& m_thread;
     };
 
-    class QTAudioOutput : public QAudioOutput
+    class QTAudioOutput : public QAudioSink
     {
         Q_OBJECT
 
     public:
-        QTAudioOutput(QAudioDeviceInfo& audioDeviceInfo,
-                      QAudioFormat& audioFormat, QTAudioIODevice& ioDevice,
-                      QTAudioThread& audioThread);
+        QTAudioOutput(QAudioDevice& audioDevice, QAudioFormat& audioFormat,
+                      QTAudioIODevice& ioDevice, QTAudioThread& audioThread);
         ~QTAudioOutput();
 
     public slots:
@@ -77,7 +81,7 @@ namespace IPCore
         std::string toString(QAudio::State state);
 
     private:
-        QAudioDeviceInfo& m_device;
+        QAudioDevice& m_device;
         QAudioFormat& m_format;
         QTAudioIODevice& m_ioDevice;
         QTAudioThread& m_thread;
@@ -141,6 +145,8 @@ namespace IPCore
         {
             return m_lastDeviceLatency;
         }
+
+        QTAudioOutput* audioOutput() const { return m_audioOutput; }
 
     protected:
         virtual void run();
@@ -219,9 +225,10 @@ namespace IPCore
         static IPCore::AudioRenderer::Module addQTAudioModule();
 
         TwkAudio::Format getTwkAudioFormat() const;
-        TwkAudio::Format
-        convertToTwkAudioFormat(int fmtSize,
-                                QAudioFormat::SampleType fmtType) const;
+        TwkAudio::Format convertToTwkAudioFormat(SampleFormat fmtType) const;
+
+        QAudioFormat::SampleFormat
+        convertToQtAudioFormat(TwkAudio::Format fmtType) const;
 
         void setSampleSizeAndType(Layout twkLayout, Format twkFormat,
                                   QAudioFormat& qformat) const;
@@ -229,7 +236,7 @@ namespace IPCore
         friend class QTAudioThread;
 
     private:
-        bool supportsRequiredChannels(const QAudioDeviceInfo& info) const;
+        bool supportsRequiredChannels(const QAudioDevice& info) const;
 
         void init();
 
@@ -239,8 +246,8 @@ namespace IPCore
         QObject* m_parent;
         QTAudioThread* m_thread;
         QAudioFormat m_format;
-        QAudioDeviceInfo m_device;
-        QList<QAudioDeviceInfo> m_deviceList;
+        QAudioDevice m_device;
+        QList<QAudioDevice> m_deviceList;
         std::string m_codec;
     };
 

@@ -195,6 +195,20 @@ string scarfFile(const string& fileName)
     return buffer.str();
 }
 
+static void setPlatformSpecificLocale()
+{
+    // on MacOS, we now use "UTF-8" as a replacement for the "C" locale.
+    // In principle it should make no difference  to use "C" or "UTF-8", and
+    // on macOS, "UTF-8" is a catch-all, region-agnostic UTF-8 locale
+    // (ex: "UTF-8" is an alias to "en_US.UTF-8" "en_GB.UTF-8" "*.UTF-8", etc)
+
+    // setenv("LANG", "C", 1);    // Qt5
+    // setenv("LC_ALL", "C", 1);  // Qt5
+
+    setenv("LANG", "UTF-8", 1);
+    setenv("LC_ALL", "UTF-8", 1);
+}
+
 //
 //  We happen to know that Mu objects NEVER get stashed in 3rd party
 //  static areas so let's just remove all of them.
@@ -243,8 +257,8 @@ int main(int argc, char* argv[])
     {
         setenv("ORIGINALLOCAL", "en", 1);
     }
-    setenv("LANG", "C", 1);
-    setenv("LC_ALL", "C", 1);
+
+    setPlatformSpecificLocale();
 
     // Qt 5.12.1 specific
     // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
@@ -261,13 +275,18 @@ int main(int argc, char* argv[])
     // removed if GLView is changed to inherit from QOpenGLWidget.
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
+    // Also use this attribute (this was also set for Windows and Linux 2 years
+    // ago) This is required for to use the Qt path for Desktop Presentation
+    // Device.
+    QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
+
     const bool noHighDPISupport = getenv("RV_QT_HDPI_SUPPORT") == nullptr;
     if (noHighDPISupport)
     {
         unsetenv("QT_SCALE_FACTOR");
         unsetenv("QT_SCREEN_SCALE_FACTORS");
         unsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");
-        unsetenv("QT_ENABLE_HIGHDPI_SCALING");
+        qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
         unsetenv("QT_SCALE_FACTOR_ROUNDING_POLICY");
         unsetenv("QT_DEVICE_PIXEL_RATIO");
     }
@@ -396,7 +415,6 @@ int main(int argc, char* argv[])
     arguments.emplace_back(enableOverlayScrollbar);
     argc = static_cast<int>(arguments.size());
     argv = &arguments[0];
-    ;
 
     //
     //  Initialze IMF library for multi-threading
@@ -517,6 +535,18 @@ int main(int argc, char* argv[])
     //
     //  Application
     //
+
+    QSurfaceFormat fmt;
+    fmt.setRenderableType(QSurfaceFormat::OpenGL);
+
+    // NOTE_QT: Set to version 2.1 for now.
+    fmt.setMajorVersion(2);
+    fmt.setMinorVersion(1);
+
+    // fmt.setProfile(QSurfaceFormat::CoreProfile);
+    // fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+    QSurfaceFormat::setDefaultFormat(fmt);
 
     QApplication* app = new QApplication(argc, argv);
 

@@ -10,7 +10,12 @@
 #include <Mu/Node.h>
 #include <Mu/Function.h>
 #include <MuLang/MuLangContext.h>
+
+#if defined(RV_VFX_CY2023)
 #include <MuQt5/qtModule.h>
+#else
+#include <MuQt6/qtModule.h>
+#endif
 
 #ifdef WIN32
 #include <windows.h>

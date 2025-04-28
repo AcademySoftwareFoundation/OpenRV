@@ -14,11 +14,11 @@
 #include <TwkUtil/Log.h>
 #include <TwkUtil/ThreadName.h>
 
-#include <QtMultimedia/QAudioDeviceInfo>
 #include <QtCore/qmath.h>
 #include <QtCore/qendian.h>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
+#include <QSysInfo>
 
 #include <iostream>
 #include <sstream>
@@ -58,6 +58,19 @@ namespace IPCore
 
     static ENVVAR_BOOL(evApplyWasapiFix, "RV_AUDIO_APPLY_WASAPI_FIX", true);
 
+    // Utility function that returns the Sample size.
+    int sampleSize(const QAudioFormat& format)
+    {
+        return format.bytesPerSample();
+    }
+
+    // NOTE_QT: In theory, this should be called sampleFormat for Qt6. Keep it
+    // as is for now.
+    SampleFormat sampleType(const QAudioFormat& format)
+    {
+        return format.sampleFormat();
+    }
+
     //----------------------------------------------------------------------
     //      QTAudioThread
     //
@@ -92,7 +105,7 @@ namespace IPCore
         // Cache some format related variables so we dont have to
         // precompute them each time.
         m_bytesPerSample = audioRenderer.m_format.channelCount()
-                           * audioRenderer.m_format.sampleSize() / 8;
+                           * sampleSize(audioRenderer.m_format);
 
         m_preRollMode = m_audioRenderer.m_parameters.preRoll;
 
@@ -363,7 +376,7 @@ namespace IPCore
         // Create the QAudioOutput and QIO devices
 
         m_bytesPerSample = m_audioRenderer.m_format.channelCount()
-                           * m_audioRenderer.m_format.sampleSize() / 8;
+                           * sampleSize(m_audioRenderer.m_format);
 
         if (m_ioDevice = new QTAudioIODevice(*this))
         {
@@ -449,12 +462,15 @@ namespace IPCore
         const AudioRenderer::DeviceState& state = deviceState();
 
         if (data && (m_audioRenderer.isPlaying())
-            && (maxLenInBytes >= m_bytesPerSample)
-            && ((m_audioOutput->state() == QAudio::ActiveState)
-                || (m_audioOutput->state() == QAudio::IdleState)))
+            && (maxLenInBytes >= m_bytesPerSample))
         {
             const int bufferSize = m_audioOutput->bufferSize();
-            const int periodSize = m_audioOutput->periodSize();
+
+            // Calculate the period size based on the buffer size and bytes per
+            // frame. (This calculation changed with Qt 6)
+            const int periodSize =
+                bufferSize / m_audioRenderer.m_format.bytesPerFrame();
+
 #ifdef PLATFORM_DARWIN
             const bool doPreRoll = false;
 #else
@@ -625,15 +641,21 @@ namespace IPCore
                     break;
 
                 case TwkAudio::Int24Format:
+                {
                     bytesWrittenToDevice =
                         m_abuffer.sizeInFloats() * sizeof(char) * 3;
                     m_startSample += numSamplesForAbuffer;
                     m_processedSamples += numSamplesForAbuffer;
+
+                    // Assume that most consumer facing device will be little
+                    // endian. Note that some mainframe or embedded system could
+                    // be big endian.
                     AudioRenderer::transformFloat32ToInt24(
                         m_abuffer.pointer(), data, m_abuffer.sizeInFloats(),
-                        (m_audioRenderer.m_format.byteOrder()
-                         == QAudioFormat::LittleEndian));
+                        true);
+
                     break;
+                }
 
                 case TwkAudio::Int16Format:
                     bytesWrittenToDevice =
@@ -758,8 +780,7 @@ namespace IPCore
 
     qint64 QTAudioIODevice::bytesAvailable() const
     {
-
-        return QIODevice::bytesAvailable();
+        return m_thread.audioOutput()->bufferSize() + QIODevice::bytesAvailable();
     }
 
     //----------------------------------------------------------------------
@@ -768,12 +789,12 @@ namespace IPCore
     //      This is the Qt audio output class that lives
     //      with the audio thread.
     //----------------------------------------------------------------------
-    QTAudioOutput::QTAudioOutput(QAudioDeviceInfo& audioDeviceInfo,
+    QTAudioOutput::QTAudioOutput(QAudioDevice& audioDevice,
                                  QAudioFormat& audioFormat,
                                  QTAudioIODevice& ioDevice,
                                  QTAudioThread& audioThread)
-        : QAudioOutput(audioDeviceInfo, audioFormat)
-        , m_device(audioDeviceInfo)
+        : QAudioSink(audioDevice, audioFormat)
+        , m_device(audioDevice)
         , m_format(audioFormat)
         , m_ioDevice(ioDevice)
         , m_thread(audioThread){QTAUDIO_DEBUG("QTAudioOutput")}
@@ -924,7 +945,7 @@ namespace IPCore
 #ifdef PLATFORM_DARWIN
             setBufferSize(calcAudioBufferSize(
                 m_format.channelCount(), m_format.sampleRate(),
-                m_format.sampleSize() / 8, bufferSize()));
+                sampleSize(m_format), bufferSize()));
 #endif
 
 #ifdef PLATFORM_WINDOWS
@@ -943,12 +964,21 @@ namespace IPCore
             // mechanism that will unblock our clients without introducing an RV
             // preference that would have polluted the RV preferences
             // unnecessarily.
-            const bool audioDeviceIsWASAPI = m_device.realm() == "wasapi";
+
+            // Device id may contain backend information (e.g. wasapi or waveout
+            // for WinMM).
+            const QString deviceId = m_device.description();
+            // Description may contain useful information.
+            const QString deviceName = m_device.description();
+            const bool audioDeviceIsWASAPI =
+                deviceId.contains("wasapi", Qt::CaseInsensitive)
+                || deviceName.contains("wasapi", Qt::CaseInsensitive);
+
             if (audioDeviceIsWASAPI && evApplyWasapiFix.getValue())
             {
                 setBufferSize(calcAudioBufferSize(m_format.channelCount(),
                                                   m_format.sampleRate(),
-                                                  m_format.sampleSize() / 8,
+                                                  sampleSize(m_format),
                                                   bufferSize())
                               / 10);
             }
@@ -956,7 +986,7 @@ namespace IPCore
             {
                 setBufferSize(calcAudioBufferSize(
                     m_format.channelCount(), m_format.sampleRate(),
-                    m_format.sampleSize() / 8, bufferSize()));
+                    sampleSize(m_format), bufferSize()));
             }
 #endif
         }
@@ -1022,6 +1052,7 @@ namespace IPCore
 
         if (AudioRenderer::debug)
         {
+            int periodSize = (int)bufferSize() / m_format.bytesPerFrame();
             TwkUtil::Log("QTAudioOutput")
                 << "play session:setup: startSample =" << m_thread.startSample()
                 << " shift=" << s->shift()
@@ -1029,7 +1060,7 @@ namespace IPCore
                 << " isScrubbingAudio=" << (int)s->isScrubbingAudio()
                 << " audioOutput state=" << (int)state()
                 << " audioOutput bufferSize=" << (int)bufferSize()
-                << " audioOutput periodSize=" << (int)periodSize();
+                << " audioOutput periodSize=" << (int)(periodSize);
         }
     }
 
@@ -1060,138 +1091,151 @@ namespace IPCore
 
     TwkAudio::Format QTAudioRenderer::getTwkAudioFormat() const
     {
-        return convertToTwkAudioFormat(m_format.sampleSize(),
-                                       m_format.sampleType());
+        return convertToTwkAudioFormat(sampleType(m_format));
     }
 
-    TwkAudio::Format QTAudioRenderer::convertToTwkAudioFormat(
-        int fmtSize, QAudioFormat::SampleType fmtType) const
+    TwkAudio::Format
+    QTAudioRenderer::convertToTwkAudioFormat(SampleFormat fmtType) const
     {
-        switch (fmtSize)
+        // Qt5
+        // QAudioFormat::Unknown	    0	Not Set
+        // QAudioFormat::SignedInt	    1	Samples are signed integers
+        // QAudioFormat::UnSignedInt	2	Samples are unsigned intergers
+        // QAudioFormat::Float	        3	Samples are floats
+
+        // Qt6
+        // QAudioFormat::Unknown	    0	Not Set
+        // QAudioFormat::UInt8	        1	Samples are 8 bit unsigned
+        // integers QAudioFormat::Int16	        2	Samples are 16 bit
+        // signed integers QAudioFormat::Int32	        3	Samples are 32
+        // bit signed integers QAudioFormat::Float	        4	Samples
+        // are floatse
+
+        // Keeping the fmtSize parameters for now, but it is not needed because
+        // QAudioFormat::SampleFormat tell us the size and the type.
+
+        switch (fmtType)
         {
-        case 8:
-            switch (fmtType)
-            {
-            case QAudioFormat::SignedInt:
-                return TwkAudio::Int8Format;
-                break;
-
-            default:
-                break;
-            }
-
+        case QAudioFormat::UInt8:
+            // skip for now
             break;
-
-        case 16:
-            switch (fmtType)
-            {
-            case QAudioFormat::SignedInt:
-                return TwkAudio::Int16Format;
-                break;
-
-            default:
-                break;
-            }
-
-            break;
-
-        case 24:
-            switch (fmtType)
-            {
-            case QAudioFormat::SignedInt:
-                return TwkAudio::Int24Format;
-                break;
-
-            default:
-                break;
-            }
-
-            break;
-
-        case 32:
-            switch (fmtType)
-            {
-            case QAudioFormat::SignedInt:
-                return TwkAudio::Int32Format;
-                break;
-
-            case QAudioFormat::Float:
-                return TwkAudio::Float32Format;
-                break;
-
-            default:
-                break;
-            }
-
-            break;
-
-        case 64:
+        case QAudioFormat::Int16:
+            return TwkAudio::Int16Format;
+        case QAudioFormat::Int32:
+            return TwkAudio::Int32Format;
+        case QAudioFormat::Float:
+            return TwkAudio::Float32Format;
+        default:
             break;
         }
 
         return TwkAudio::UnknownFormat;
     }
 
+    QAudioFormat::SampleFormat
+    QTAudioRenderer::convertToQtAudioFormat(TwkAudio::Format fmtType) const
+    {
+        switch (fmtType)
+        {
+        case TwkAudio::Format::Float32Format:
+            return QAudioFormat::Float;
+            break;
+        case TwkAudio::Format::Int32Format:
+            return QAudioFormat::Int32;
+            break;
+        case TwkAudio::Format::Int24Format:
+            // skip for now
+            break;
+        case TwkAudio::Format::Int16Format:
+            return QAudioFormat::Int16;
+            break;
+        case TwkAudio::Format::Int8Format:
+            // skip for now
+            break;
+        case TwkAudio::Format::UInt32_SMPTE272M_20Format: // 20 bit NVidia ANC
+                                                          // output
+            // skip for now
+            break;
+        case TwkAudio::Format::UInt32_SMPTE299M_24Format: // 24 bit NVidia ANC
+                                                          // output
+            // skip for now
+            break;
+        case TwkAudio::Format::UnknownFormat:
+            break;
+        }
+
+        return QAudioFormat::Unknown;
+    }
+
     void QTAudioRenderer::availableLayouts(const Device& d,
                                            LayoutsVector& layouts)
     {
-        const QAudioDeviceInfo& info = m_deviceList[d.index];
-        const QList<int> channelCounts = info.supportedChannelCounts();
+        const QAudioDevice& device = m_deviceList[d.index];
 
         layouts.clear();
 
-        for (QList<int>::const_iterator ci = channelCounts.begin();
-             ci != channelCounts.end(); ci++)
+        QAudioFormat testFormat;
+        // Set valid value to the parameters that we are not testing.
+        testFormat.setSampleRate(AudioRenderer::defaultParameters().rate);
+        testFormat.setSampleFormat(
+            convertToQtAudioFormat(AudioRenderer::defaultParameters().format));
+
+        for (int channelCount = device.minimumChannelCount();
+             channelCount <= device.maximumChannelCount(); ++channelCount)
         {
-            LayoutsVector l = TwkAudio::channelLayouts(*ci);
-            for (int i = 0; i < l.size(); i++)
-                layouts.push_back(l[i]);
+            testFormat.setChannelCount(channelCount);
+            if (device.isFormatSupported(testFormat))
+            {
+                LayoutsVector l = TwkAudio::channelLayouts(channelCount);
+                for (int i = 0; i < l.size(); i++)
+                {
+                    if (l[i] != TwkAudio::UnknownLayout)
+                    {
+                        layouts.push_back(l[i]);
+                    }
+                }
+            }
         }
     }
 
     void QTAudioRenderer::availableFormats(const Device& d,
                                            FormatVector& formats)
     {
-        const QAudioDeviceInfo& info = m_deviceList[d.index];
-        const QList<int> sizes = info.supportedSampleSizes();
-        const QList<QAudioFormat::SampleType> types =
-            info.supportedSampleTypes();
-        const QList<int> rates = info.supportedSampleRates();
+        const QAudioDevice& device = m_deviceList[d.index];
+        const QList<SampleFormat> types = device.supportedSampleFormats();
         const int channelCount = TwkAudio::channelsCount(d.layout);
 
         formats.clear();
 
-        for (QList<int>::const_iterator ci = sizes.begin(); ci != sizes.end();
-             ci++)
+        for (SampleFormat type : types)
         {
-            for (QList<QAudioFormat::SampleType>::const_iterator cj =
-                     types.begin();
-                 cj != types.end(); cj++)
+            TwkAudio::Format fmt = convertToTwkAudioFormat(type);
+            if (fmt != TwkAudio::UnknownFormat)
             {
-                TwkAudio::Format fmt = convertToTwkAudioFormat(*ci, *cj);
+                QAudioFormat f;
+                f.setChannelCount(channelCount);
+                f.setSampleFormat(type);
 
-                if (fmt != TwkAudio::UnknownFormat)
+                // NOTE_QT:
+                // Cannot set codec - Look at QMediaFormat maybe
+                // Cannot set byte order - Qt will always expect and use samples
+                // in the endianness of the host platform. Cannot set custom
+                // sample size - more rigid with popular size (unit8, int16,
+                // int32, float) Size and type replaced by SampleFormat.
+                f.setSampleFormat(type);
+
+                // Checks for supported sample rates within the device's range.
+                // Checks every 100Hz.
+                // TODO_QT: This can be optimized or improved for faster
+                // detection.
+                for (int rate = device.minimumSampleRate();
+                     rate <= device.maximumSampleRate(); rate += 100)
                 {
-                    QAudioFormat f;
-
-                    f.setChannelCount(channelCount);
-                    f.setCodec(QString(m_codec.c_str()));
-                    f.setByteOrder(QAudioFormat::LittleEndian);
-                    f.setSampleSize(*ci);
-                    f.setSampleType(*cj);
-
-                    // Now we check that a supported format
-                    // has a supported rate.
-                    // Oddly on linux a supported format can
-                    // have no rate thats supported!
-                    for (size_t i = 0; i < rates.size(); i++)
+                    f.setSampleRate(rate);
+                    if (device.isFormatSupported(f))
                     {
-                        f.setSampleRate(rates[i]);
-                        if (info.isFormatSupported(f))
-                        {
-                            formats.push_back(fmt);
-                            break;
-                        }
+                        formats.push_back(fmt);
+                        break;
                     }
                 }
             }
@@ -1201,6 +1245,7 @@ namespace IPCore
     //
     // Sets the sample size and type in qformat for a given twkFormat.
     //
+    // TODO_QT: The name is not optimal for Qt6, but could be fine.
     void QTAudioRenderer::setSampleSizeAndType(Layout twkLayout,
                                                Format twkFormat,
                                                QAudioFormat& qformat) const
@@ -1210,29 +1255,25 @@ namespace IPCore
         switch (twkFormat)
         {
         case TwkAudio::Float32Format:
-            qformat.setSampleSize(32);
-            qformat.setSampleType(QAudioFormat::Float);
+            qformat.setSampleFormat(QAudioFormat::Float);
             break;
 
         case TwkAudio::Int32Format:
-            qformat.setSampleSize(32);
-            qformat.setSampleType(QAudioFormat::SignedInt);
+            qformat.setSampleFormat(QAudioFormat::Int32);
             break;
 
-        case TwkAudio::Int24Format:
-            qformat.setSampleSize(24);
-            qformat.setSampleType(QAudioFormat::SignedInt);
-            break;
+            // case TwkAudio::Int24Format:
+            //     // Qt6 does not have a direct equivalent for 24-bit audio.
+            //     qformat.setSampleFormat(QAudioFormat::Int32);
+            //     break;
 
         case TwkAudio::Int16Format:
-            qformat.setSampleSize(16);
-            qformat.setSampleType(QAudioFormat::SignedInt);
+            qformat.setSampleFormat(QAudioFormat::Int16);
             break;
 
-        case TwkAudio::Int8Format:
-            qformat.setSampleSize(8);
-            qformat.setSampleType(QAudioFormat::SignedInt);
-            break;
+            // case TwkAudio::Int8Format:
+            //     // Qt6 does not have a direct equivalent for signed 8-bit
+            //     audio. qformat.setSampleFormat(QAudioFormat::UInt8); break;
 
         default:
             cout << "AUDIO: format unknown" << endl;
@@ -1246,55 +1287,51 @@ namespace IPCore
         QAudioFormat f;
 
         f.setChannelCount(TwkAudio::channelsCount(d.layout));
-        f.setCodec(QString(m_codec.c_str()));
-        f.setByteOrder(QAudioFormat::LittleEndian);
-
         setSampleSizeAndType(d.layout, format, f);
-
-        const QAudioDeviceInfo& info = m_deviceList[d.index];
-        QList<int> rates = info.supportedSampleRates();
-
-        sort(rates.begin(), rates.end());
+        const QAudioDevice& device = m_deviceList[d.index];
 
         audiorates.clear();
 
-        for (size_t i = 0; i < rates.size(); i++)
-        {
-            f.setSampleRate(rates[i]);
-            if (info.isFormatSupported(f))
-                audiorates.push_back(rates[i]);
-        }
+        // Floating point exception are trowned when the sample rate is under
+        // TWEAK_AUDIO_MIN_SAMPLE_RATE and above TWEAK_AUDIO_MAX_SAMPLE_RATE
+        // even if Qt returns value outside of those contants for the device.
+        int deviceMin = device.minimumSampleRate();
+        int deviceMax = device.maximumSampleRate();
+        if (deviceMin < TWEAK_AUDIO_MIN_SAMPLE_RATE)
+            deviceMin = TWEAK_AUDIO_MIN_SAMPLE_RATE;
+        if (deviceMax > TWEAK_AUDIO_MAX_SAMPLE_RATE)
+            deviceMax = TWEAK_AUDIO_MAX_SAMPLE_RATE;
+
+        audiorates.push_back(deviceMin);
+        audiorates.push_back(deviceMax);
     }
 
     //
     // Check that the device supports the number
     // of channels as specified by m_parameters.layout.
     //
-    bool QTAudioRenderer::supportsRequiredChannels(
-        const QAudioDeviceInfo& info) const
+    bool
+    QTAudioRenderer::supportsRequiredChannels(const QAudioDevice& device) const
     {
 #ifdef PLATFORM_LINUX
         if (AudioRenderer::debug)
         {
-            const QList<int> channels = info.supportedChannelCounts();
-            for (QList<int>::const_iterator ci = channels.begin();
-                 ci != channels.end(); ci++)
-                TwkUtil::Log("AUDIO") << info.deviceName().toStdString()
-                                      << " supports channel count = " << (*ci);
+            TwkUtil::Log("AUDIO")
+                << device.description().toStdString() << " supports minimum "
+                << device.minimumChannelCount() << " to maximum "
+                << device.maximumChannelCount() << " channels";
         }
 
         // Its possible e.g. Linux that some devices hv no channel count info
         // so we assume its supported... hence we always return true.
         return true;
 #else
-        const QList<int> channels = info.supportedChannelCounts();
-
         if (AudioRenderer::debug)
         {
-            for (QList<int>::const_iterator ci = channels.begin();
-                 ci != channels.end(); ci++)
-                TwkUtil::Log("Audio") << info.deviceName().toStdString()
-                                      << " supports channel count = " << (*ci);
+            TwkUtil::Log("AUDIO")
+                << device.description().toStdString() << " supports minimum "
+                << device.minimumChannelCount() << " to maximum "
+                << device.maximumChannelCount() << " channels";
         }
 
         //
@@ -1303,37 +1340,14 @@ namespace IPCore
         //  available in the input sources
         //
 
-        return (!channels.empty());
+        return (device.maximumChannelCount() > 0);
+
 #endif
     }
 
     void QTAudioRenderer::initDeviceList()
     {
-        if (m_deviceList.empty())
-        {
-            //
-            //  This appears to be a bug with Linux (on centos6.5).
-            //  Basically the size returned by availbleDevices() is different
-            //  the first time you call it compared to all subsequent times.
-            //  So this logic between keeps calling availableDevices() until
-            //  its size doesnt change; we limit this to five attempts.
-            //
-            int noOfAttempts = 5;
-            int noOfDevices = 0;
-            int prev_noOfDevices = 0;
-
-            do
-            {
-                prev_noOfDevices = noOfDevices;
-                noOfDevices =
-                    QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)
-                        .size();
-                --noOfAttempts;
-            } while (prev_noOfDevices != noOfDevices && noOfAttempts);
-
-            m_deviceList << QAudioDeviceInfo::availableDevices(
-                QAudio::AudioOutput);
-        }
+        m_deviceList << QMediaDevices::audioOutputs();
     }
 
     //  The purpose of init() is to
@@ -1359,14 +1373,14 @@ namespace IPCore
 
         if (m_parameters.device == "Default" || m_parameters.device.empty())
         {
-            const QAudioDeviceInfo& defaultInfo =
-                QAudioDeviceInfo::defaultOutputDevice();
-
+            const QAudioDevice& defaultDevice =
+                QMediaDevices::defaultAudioOutput();
             bool validDevice = false;
 
             for (size_t i = 0; i < m_deviceList.size(); ++i)
             {
-                if (m_deviceList[i].deviceName() == defaultInfo.deviceName())
+                if (m_deviceList[i].description()
+                    == defaultDevice.description())
                 {
                     validDevice = true;
                     break;
@@ -1375,9 +1389,9 @@ namespace IPCore
 
             // Check that the defaultOutputDevice does support the required
             // number of channels.
-            if (validDevice && supportsRequiredChannels(defaultInfo))
+            if (validDevice && supportsRequiredChannels(defaultDevice))
             {
-                m_parameters.device = defaultInfo.deviceName().toStdString();
+                m_parameters.device = defaultDevice.description().toStdString();
                 if (AudioRenderer::debug)
                 {
                     TwkUtil::Log("AUDIO")
@@ -1388,24 +1402,19 @@ namespace IPCore
 
                 qformat.setSampleRate((int)m_parameters.rate);
                 qformat.setChannelCount(channelCount);
-                qformat.setCodec(QString(m_codec.c_str()));
-                qformat.setByteOrder(QAudioFormat::LittleEndian);
-                // qformat.setByteOrder(QAudioFormat::BigEndian);
 
                 setSampleSizeAndType(m_parameters.layout, m_parameters.format,
                                      qformat);
-
                 //
                 // If the default device does not support the format
                 // defined by m_parameters; we change to the
                 // preferredFormat() of the default device.
-                if (!defaultInfo.isFormatSupported(qformat))
+                if (!defaultDevice.isFormatSupported(qformat))
                 {
                     const QAudioFormat defaultFormat =
-                        defaultInfo.preferredFormat();
-
-                    m_parameters.format = convertToTwkAudioFormat(
-                        defaultFormat.sampleSize(), defaultFormat.sampleType());
+                        defaultDevice.preferredFormat();
+                    m_parameters.format =
+                        convertToTwkAudioFormat(sampleType(defaultFormat));
                 }
             }
         }
@@ -1413,14 +1422,14 @@ namespace IPCore
         m_outputDevices.clear();
         for (size_t i = 0; i < m_deviceList.size(); ++i)
         {
-            const QAudioDeviceInfo& info = m_deviceList[i];
+            const QAudioDevice& device = m_deviceList[i];
 
-            if (info.isNull() || !supportsRequiredChannels(info))
+            if (device.isNull() || !supportsRequiredChannels(device))
                 continue;
 
-            const QAudioFormat defaultFormat = info.preferredFormat();
+            const QAudioFormat defaultFormat = device.preferredFormat();
 
-            std::string deviceName = info.deviceName().toStdString();
+            std::string deviceName = device.description().toStdString();
 
             // On Windows, a QAudioDevice can be listed twice with the same name
             // This is due to the fact that both Qt audio plugins, wasapi and
@@ -1432,7 +1441,7 @@ namespace IPCore
             // name.
             while (findDeviceByName(deviceName) != -1)
             {
-                deviceName += "_" + info.realm().toStdString();
+                deviceName += "_" + device.description().toStdString();
             }
 
             Device d(deviceName);
@@ -1451,14 +1460,14 @@ namespace IPCore
                 // Instead we pick the first device that supports the channel
                 // count we need.
                 m_parameters.device = d.name;
-                m_parameters.format = convertToTwkAudioFormat(
-                    defaultFormat.sampleSize(), defaultFormat.sampleType());
+                m_parameters.format =
+                    convertToTwkAudioFormat(sampleType(defaultFormat));
             }
 
             if (m_parameters.device == d.name)
             {
                 d.isDefaultDevice = true;
-                m_device = info;
+                m_device = device;
             }
             else
             {
@@ -1469,10 +1478,11 @@ namespace IPCore
             {
                 cout << "AUDIO: device=" << d.name << " with channelsCount = "
                      << TwkAudio::channelsCount(d.layout)
-                     << " defaultSampleSize=" << (int)defaultFormat.sampleSize()
-                     << " defaultSampleType=" << (int)defaultFormat.sampleType()
-                     << " defaultSampleByteOrder="
-                     << (int)defaultFormat.byteOrder()
+                     << " defaultSampleFormat="
+                     << (int)sampleType(defaultFormat)
+                     // Qt6: No custom sample size.
+                     // Qt6: No custom byte orde. Qt expect the order of the
+                     // host.
                      << " defaultrate=" << (int)d.defaultRate
                      << " isDefaultDevice=" << (int)d.isDefaultDevice << endl;
             }
@@ -1483,7 +1493,8 @@ namespace IPCore
         if (AudioRenderer::debug)
         {
             cout << "AUDIO: init default device="
-                 << m_device.deviceName().toStdString() << endl;
+                 << m_device.description().toStdString() << endl;
+
             cout << "AUDIO: init m_parameters.device=" << m_parameters.device
                  << endl;
             cout << "AUDIO: init m_parameters.format="
@@ -1567,18 +1578,20 @@ namespace IPCore
 
             if (!rates.empty())
             {
-                double nearRate = rates[0];
+                // Check if the value is within the lower and upper boundaries
+                // sets in the rates vector.
+                int minVal = rates.front();
+                int maxVal = rates.back();
 
-                for (size_t i = 1; i < rates.size(); i++)
+                if (minVal == maxVal || state.rate < minVal)
                 {
-                    if (fabs(rates[i] - state.rate)
-                        < fabs(nearRate - state.rate))
-                    {
-                        nearRate = rates[i];
-                    }
+                    state.rate = minVal;
+                }
+                else if (state.rate > maxVal)
+                {
+                    state.rate = maxVal;
                 }
 
-                state.rate = nearRate;
                 m_parameters.rate = state.rate;
             }
 
@@ -1587,16 +1600,17 @@ namespace IPCore
             //
             m_format.setSampleRate((int)state.rate);
             m_format.setChannelCount(TwkAudio::channelsCount(state.layout));
-            m_format.setCodec(QString(m_codec.c_str()));
-            m_format.setByteOrder(QAudioFormat::LittleEndian);
-            // m_format.setByteOrder(QAudioFormat::BigEndian);
 
+            // Qt6: Expect the endian of the host.
             setSampleSizeAndType(state.layout, state.format, m_format);
 
             if (!m_device.isFormatSupported(m_format))
             {
-                m_format = m_device.nearestFormat(m_format);
-                if (m_format.sampleType() == QAudioFormat::Unknown)
+                // Qt6: does not have the nearestFormat avaiable. Take the
+                // prefered format.
+                m_format = m_device.preferredFormat();
+
+                if (sampleType(m_format) == QAudioFormat::Unknown)
                 {
                     cout << "AUDIO: Default format not supported - trying to "
                             "use nearest"
@@ -1608,10 +1622,8 @@ namespace IPCore
                 {
                     if (AudioRenderer::debug)
                     {
-                        cout << "AUDIO: nearest m_format.sampleType()="
-                             << (int)m_format.sampleType() << endl;
-                        cout << "AUDIO: nearest m_format.sampleSize()="
-                             << (int)m_format.sampleSize() << endl;
+                        cout << "AUDIO: nearest m_format.sampleFormat()="
+                             << (int)sampleType(m_format) << endl;
                         cout << "AUDIO: nearest m_format.sampleRate()="
                              << (int)m_format.sampleRate() << endl;
                         cout << "AUDIO: nearest m_format.channelCount()="
@@ -1628,10 +1640,8 @@ namespace IPCore
 #ifdef DEBUG_QTAUDIO
             if (AudioRenderer::debug)
             {
-                cout << "AUDIO: m_format.sampleType()="
-                     << (int)m_format.sampleType() << endl;
-                cout << "AUDIO: m_format.sampleSize()="
-                     << (int)m_format.sampleSize() << endl;
+                cout << "AUDIO: nearest m_format.sampleFormat()="
+                     << (int)sampleType(m_format) << endl;
                 cout << "AUDIO: m_format.sampleRate()="
                      << (int)m_format.sampleRate() << endl;
                 cout << "AUDIO: m_format.channelCount()="

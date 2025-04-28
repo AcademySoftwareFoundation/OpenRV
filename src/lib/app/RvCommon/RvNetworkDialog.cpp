@@ -11,6 +11,7 @@
 #include <RvCommon/RvPreferences.h>
 #include <RvCommon/PermDelegate.h>
 #include <RvCommon/StreamConnection.h>
+#include <QRegularExpression>
 #include <QtNetwork/QtNetwork>
 #include <QtWidgets/QMessageBox>
 #include <TwkQtChat/Client.h>
@@ -145,7 +146,18 @@ namespace Rv
 
         foreach (QString string, envVariables)
         {
-            int index = environment.indexOf(QRegExp(string));
+            QRegularExpression re(string);
+            int index = -1;
+
+            // Search for the first matching environment variable.
+            for (int i = 0; i < environment.size(); ++i)
+            {
+                if (re.match(environment.at(i)).hasMatch())
+                {
+                    index = i;
+                    break;
+                }
+            }
 
             if (index != -1)
             {
