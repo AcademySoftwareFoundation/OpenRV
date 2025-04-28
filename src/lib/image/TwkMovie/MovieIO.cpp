@@ -426,6 +426,8 @@ namespace TwkMovie
                 }
             }
         }
+
+        return str.str();
     }
 
     void GenericIO::Preloader::loaderThreadFunc(std::shared_ptr<Reader> reader)

@@ -357,7 +357,8 @@ namespace IPCore
         if (!m_matrix_rec709_to_xyz)
         {
             m_matrix_rec709_to_xyz = createMatrixTransformXYZToRec709();
-            m_matrix_rec709_to_xyz->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
+            m_matrix_rec709_to_xyz->setDirection(
+                OCIO::TRANSFORM_DIR_INVERSE);
         }
 
         return m_matrix_rec709_to_xyz;
