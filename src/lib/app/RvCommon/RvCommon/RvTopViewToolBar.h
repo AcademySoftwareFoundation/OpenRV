@@ -157,7 +157,10 @@ namespace Rv
         QAction* m_scanlineStereoAction;
         QAction* m_leftStereoAction;
         QAction* m_rightStereoAction;
-        QAction* m_shutterStereoAction;
+        // Shutter mode gone since Qt6/QOpenGLWidget. No customer
+        // demand for it. Maybe fix & re-enable if customers demand it and
+        // leaving existing code in case customers want to revive it.
+        // QAction* m_shutterStereoAction;
         QAction* m_swapStereoAction;
         QActionVector m_stereoActions;
         QAction* m_channelMenuAction;

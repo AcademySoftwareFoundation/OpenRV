@@ -90,7 +90,7 @@ namespace Rv
     static const char* StereoRight = "right";
     static const char* StereoChecker = "checker";
     static const char* StereoScanline = "scanline";
-    static const char* StereoHardware = "hardware";
+    // static const char* StereoHardware = "hardware";
     static const char* Solid0 = "black";
     static const char* Solid18 = "grey18";
     static const char* Solid50 = "grey50";
@@ -539,10 +539,10 @@ namespace Rv
                 n = 6;
             else if (s == StereoScanline)
                 n = 7;
-            else if (s == StereoHardware)
-                n = 8;
+            //            else if (s == StereoHardware)
+            //                n = 8;
             else if (s == StereoLumAnaglyph)
-                n = 9;
+                n = 8;
         }
 
         m_ui.stereoModeCombo->setCurrentIndex(n);
@@ -1040,8 +1040,8 @@ namespace Rv
             opts.stereoMode = (char*)StereoChecker;
         if (s == StereoScanline)
             opts.stereoMode = (char*)StereoScanline;
-        if (s == StereoHardware)
-            opts.stereoMode = (char*)StereoHardware;
+        //        if (s == StereoHardware)
+        //            opts.stereoMode = (char*)StereoHardware;
         if (s == StereoLeft)
             opts.stereoMode = (char*)StereoLeft;
         if (s == StereoRight)
@@ -1461,10 +1461,10 @@ namespace Rv
         case 7:
             stereo = (char*)StereoScanline;
             break;
+            //        case 8:
+            //            stereo = (char*)StereoHardware;
+            //            break;
         case 8:
-            stereo = (char*)StereoHardware;
-            break;
-        case 9:
             stereo = (char*)StereoLumAnaglyph;
             break;
         }
