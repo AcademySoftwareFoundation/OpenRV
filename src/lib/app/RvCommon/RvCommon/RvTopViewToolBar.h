@@ -94,7 +94,7 @@ namespace Rv
         void scanlineStereo();
         void leftStereo();
         void rightStereo();
-        void shutterStereo();
+        // void shutterStereo();
         void swapEyes();
 
         void channelMenuUpdate();
