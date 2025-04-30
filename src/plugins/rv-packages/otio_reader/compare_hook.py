@@ -34,7 +34,14 @@ def hook_function(
             )
 
         case "difference":
-            pass
+            sequence_group = argument_map["sequence"]
+            sequence = extra_commands.nodesInGroupOfType(sequence_group, "RVSequence")[
+                0
+            ]
+            composite_property = f"{sequence}.composite"
+            effectHook.set_rv_effect_props(
+                composite_property, {"inputBlendModes": ["difference"]}
+            )
 
         case "angular_mask":
             angle_in_radians = in_timeline.angular_mask["angle_in_radians"]
