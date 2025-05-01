@@ -121,7 +121,9 @@ namespace Rv
             return provider.icon(QFileIconProvider::Folder);
         }
 
-#if defined(RV_VFX_CY2024)
+    
+#ifndef PLATFORM_WINDOWS
+    #if defined(RV_VFX_CY2024)
         // Adding more heuristics to find the right icon for a file based on the
         // MIME type. The following heuristics should work for Qt 5, but in
         // order to keep the same behavior as before, this code will only run
@@ -134,13 +136,18 @@ namespace Rv
         // be image-png)
         QIcon icon = QIcon::fromTheme(mime.iconName());
         if (!icon.isNull())
+        {
             return icon;
+        }
 
         // Search for an icon based on the MIME generic type. (e.g. for a PNG,
         // it would be image-x-generic)
         icon = QIcon::fromTheme(mime.genericIconName());
         if (!icon.isNull())
+        {
             return icon;
+        }
+    #endif
 #endif
 
         return provider.icon(info);

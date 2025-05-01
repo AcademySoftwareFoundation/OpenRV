@@ -231,7 +231,7 @@ namespace Rv
         m_scanlineStereoAction = m->addAction("  Scanline");
         m_leftStereoAction = m->addAction("  Left Only");
         m_rightStereoAction = m->addAction("  Right Only");
-        m_shutterStereoAction = m->addAction("  Shutter");
+        // m_shutterStereoAction = m->addAction("  Shutter");
         m_monoStereoAction->setCheckable(true);
         m_anaglyphStereoAction->setCheckable(true);
         m_lumanaglyphStereoAction->setCheckable(true);
@@ -241,7 +241,7 @@ namespace Rv
         m_scanlineStereoAction->setCheckable(true);
         m_leftStereoAction->setCheckable(true);
         m_rightStereoAction->setCheckable(true);
-        m_shutterStereoAction->setCheckable(true);
+        // m_shutterStereoAction->setCheckable(true);
         m_monoStereoAction->setData(QString("off"));
         m_anaglyphStereoAction->setData(QString("anaglyph"));
         m_lumanaglyphStereoAction->setData(QString("lumanaglyph"));
@@ -251,7 +251,7 @@ namespace Rv
         m_scanlineStereoAction->setData(QString("scanline"));
         m_leftStereoAction->setData(QString("left"));
         m_rightStereoAction->setData(QString("right"));
-        m_shutterStereoAction->setData(QString("hardware"));
+        //        m_shutterStereoAction->setData(QString("hardware"));
         m->addSeparator();
         m_swapStereoAction = m->addAction("Swap Eyes");
         m_swapStereoAction->setCheckable(true);
@@ -268,7 +268,7 @@ namespace Rv
         m_stereoActions.push_back(m_scanlineStereoAction);
         m_stereoActions.push_back(m_leftStereoAction);
         m_stereoActions.push_back(m_rightStereoAction);
-        m_stereoActions.push_back(m_shutterStereoAction);
+        // m_stereoActions.push_back(m_shutterStereoAction);
 
         connect(m, SIGNAL(aboutToShow()), this, SLOT(stereoMenuUpdate()));
         connect(m_monoStereoAction, SIGNAL(triggered()), this,
@@ -289,8 +289,8 @@ namespace Rv
                 SLOT(leftStereo()));
         connect(m_rightStereoAction, SIGNAL(triggered()), this,
                 SLOT(rightStereo()));
-        connect(m_shutterStereoAction, SIGNAL(triggered()), this,
-                SLOT(shutterStereo()));
+        // connect(m_shutterStereoAction, SIGNAL(triggered()), this,
+        //         SLOT(shutterStereo()));
         connect(m_swapStereoAction, SIGNAL(triggered()), this,
                 SLOT(swapEyes()));
 
@@ -880,7 +880,7 @@ namespace Rv
 
     void RvTopViewToolBar::rightStereo() { setStereo("right"); }
 
-    void RvTopViewToolBar::shutterStereo() { setStereo("hardware"); }
+    // void RvTopViewToolBar::shutterStereo() { setStereo("hardware"); }
 
     void RvTopViewToolBar::swapEyes()
     {
