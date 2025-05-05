@@ -1,6 +1,6 @@
 //******************************************************************************
-// Copyright (c) 2006 Tweak Inc.
-// All rights reserved.
+//
+// Copyright (C) 2025 Autodesk, Inc. All Rights Reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -109,26 +109,26 @@ namespace IPCore
     class IPImage
     {
     public:
-        typedef Shader::Expression Expression;
-        typedef TwkFB::FrameBuffer FrameBuffer;
-        typedef TwkMath::Vec4f Vec4;
-        typedef TwkMath::Vec3f Vec3;
-        typedef TwkMath::Vec2f Vec2;
-        typedef TwkMath::Box2f Box2;
-        typedef TwkMath::Mat33f Matrix33;
-        typedef TwkMath::Mat44f Matrix;
-        typedef TwkMovie::MovieInfo MovieInfo;
-        typedef TwkMath::Col4f Color;
-        typedef std::stringstream ShaderStream;
-        typedef stl_ext::replacement_allocator<const FrameBuffer*> FBAlloc;
-        typedef std::vector<const FrameBuffer*, FBAlloc> FBVector;
-        typedef std::vector<const Paint::Command*> PaintCommands;
-        typedef std::vector<IPImage*> IPImageVector;
-        typedef std::map<std::string, std::string> TagMap;
-        typedef Shader::Function::ResourceUsage ResourceUsage;
-        typedef TwkApp::VideoDevice VideoDevice;
-        typedef TwkApp::VideoDevice::Margins Margins;
-        typedef unsigned int HashValue;
+        using Expression = Shader::Expression;
+        using FrameBuffer = TwkFB::FrameBuffer;
+        using Vec4 = TwkMath::Vec4f;
+        using Vec3 = TwkMath::Vec3f;
+        using Vec2 = TwkMath::Vec2f;
+        using Box2 = TwkMath::Box2f;
+        using Matrix33 = TwkMath::Mat33f;
+        using Matrix = TwkMath::Mat44f;
+        using MovieInfo = TwkMovie::MovieInfo;
+        using Color = TwkMath::Col4f;
+        using ShaderStream = std::stringstream;
+        using FBAlloc = stl_ext::replacement_allocator<const FrameBuffer*>;
+        using FBVector = std::vector<const FrameBuffer*, FBAlloc>;
+        using PaintCommands = std::vector<Paint::Command*>;
+        using IPImageVector = std::vector<IPImage*>;
+        using TagMap = std::map<std::string, std::string>;
+        using ResourceUsage = Shader::Function::ResourceUsage;
+        using VideoDevice = TwkApp::VideoDevice;
+        using Margins = TwkApp::VideoDevice::Margins;
+        using HashValue = unsigned int;
 
         //
         //  NOTE: if you add/change a RenderType and/or RenderDestination
