@@ -202,11 +202,20 @@ static void setPlatformSpecificLocale()
     // on macOS, "UTF-8" is a catch-all, region-agnostic UTF-8 locale
     // (ex: "UTF-8" is an alias to "en_US.UTF-8" "en_GB.UTF-8" "*.UTF-8", etc)
 
-    // setenv("LANG", "C", 1);    // Qt5
-    // setenv("LC_ALL", "C", 1);  // Qt5
+    // The QT code does this:
+    //   warnOnOverride = qstrcmp(setlocale(LC_CTYPE, nullptr), "C") != 0
+    //        || getenv("LC_ALL") || getenv("LC_CTYPE") || getenv("LANG");
+    //   newLocale = setlocale(LC_CTYPE, "UTF-8");
+    //
+    // therefore, to remove the warning, we unset the env variables that
+    // would cause the warning, and we ourselves to the same as what Qt does
+    // which is to set the LC_CTYPE locale to UTF-8.
 
-    setenv("LANG", "UTF-8", 1);
-    setenv("LC_ALL", "UTF-8", 1);
+    unsetenv("LC_ALL");
+    unsetenv("LC_CTYPE");
+    unsetenv("LANG");
+    setlocale(LC_ALL, "UTF-8");
+    setlocale(LC_CTYPE, "UTF-8"); // LC_ALL already has LC_CTYPE, but no harm.
 }
 
 //
@@ -233,6 +242,29 @@ static int gc_filter(const char* name, void* ptr, size_t size)
     {
         return 1;
     }
+}
+
+void noOpenGLWarnOnStartup(QtMsgType t, const QMessageLogContext& context,
+                           const QString& qmsg)
+{
+    // This warning appears because RV requires OpenGL 2.1
+    // in macOS because it needs legacy functions like glBegin/glEnd
+    // Usually this is done with a higher OpenGL context version,
+    // but with compatibility profile, but on macOS there
+    // is no compatibility profile.
+    // In any case, silence this message since it's harmless for us, since
+    // we don't do any rendering in the web view.
+    // Also note the Qt typo "surfcace" (present in at least Qt 6.5.3)
+
+    const QString silenced =
+        "An OpenGL surfcace format was requested that is either not "
+        "version 3.2 or higher or a not Core Profile.\nChromium on "
+        "macOS will fall back to software rendering in this case.\n"
+        "Hardware acceleration and features such as WebGL will not be "
+        "available.";
+
+    if (silenced != qmsg)
+        std::cout << qmsg.toUtf8().constData() << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -548,7 +580,17 @@ int main(int argc, char* argv[])
 
     QSurfaceFormat::setDefaultFormat(fmt);
 
+    // Install/remove temporary handler to silence opengl message when
+    // QApplication is created (opengl warning due to not having
+    // a compatibility profile available)
+    // The main message handler is done in RvApplication
+    qInstallMessageHandler(noOpenGLWarnOnStartup);
+
+    // init app
     QApplication* app = new QApplication(argc, argv);
+
+    // remove handler
+    qInstallMessageHandler(nullptr);
 
     QTranslator* translator = new QTranslator();
     QLocale locale = QLocale(getenv("ORIGINALLOCAL"));
