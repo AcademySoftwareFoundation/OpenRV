@@ -91,8 +91,8 @@ def hook_function(
                     "duration": duration,
                     "hold": is_hold,
                     "ghost": is_ghost,
-                    "ghostBefore": 3,
-                    "ghostAfter": 3,
+                    "ghostBefore": 5,
+                    "ghostAfter": 5,
                 },
             )
 

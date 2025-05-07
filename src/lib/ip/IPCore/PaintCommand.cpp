@@ -5,6 +5,7 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
+#include "IPBaseNodes/PaintIPNode.h"
 #include <IPCore/PaintCommand.h>
 #include <TwkMath/Function.h>
 #include <TwkGLF/GL.h>
@@ -378,6 +379,12 @@ namespace IPCore
 
             // set uniforms
             Color pcolor = color;
+            const auto* localCommand =
+                dynamic_cast<const PaintIPNode::LocalCommand*>(this);
+            bool isGhostOn =
+                (localCommand != nullptr) ? localCommand->ghostOn : false;
+            pcolor = isGhostOn ? localCommand->ghostColor : color;
+
             glPipeline->setUniformFloat("uniformColor", 4, &(pcolor[0]));
             float coffset[2] = {50, 50};
             if (mode == CloneMode)

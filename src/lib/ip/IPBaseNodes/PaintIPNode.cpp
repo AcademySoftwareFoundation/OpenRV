@@ -16,26 +16,35 @@ namespace
 {
     using namespace IPCore;
 
-    float getGhostFactor(const int level, const int maxLevel)
+    // Calculates the opacity based on the distance from the annotated frame to
+    // make the ghosted annotation more visible closer to the frame and less
+    // visible further away
+    float getGhostOpacity(const int frame, const int startFrame,
+                          const int duration)
     {
-        constexpr float maxFactor = 0.5;
-        constexpr float minFactor = 0.1;
-        constexpr float factorRange = maxFactor - minFactor;
-        float visibility = 1.0;
+        constexpr float minOpacity = 0.075;
+        float ghostOpacity = 0.0;
 
-        if (level > 1 && maxLevel > 1)
+        if (frame > startFrame) // Command starts before the current frame
+                                // (ghostBefore)
         {
-            visibility = 1.0f
-                         - (static_cast<float>(level - 1)
-                            / static_cast<float>(maxLevel - 1));
+            ghostOpacity = static_cast<float>(duration)
+                               / static_cast<float>(frame - startFrame)
+                           + minOpacity;
+        }
+        else // Command starts after the current frame (ghostAfter)
+        {
+            ghostOpacity = static_cast<float>(duration)
+                               / static_cast<float>(startFrame - frame)
+                           + minOpacity;
         }
 
-        return minFactor + (visibility * factorRange);
+        return ghostOpacity;
     }
 
     PaintIPNode::LocalCommands
     generateVisibleCommands(const PaintIPNode::LocalCommands& commands,
-                            const int frame, const int eye)
+                            const int frame, const size_t eye)
     {
         PaintIPNode::LocalCommands
             allCommands; // visible commands, including hold and ghost
@@ -49,12 +58,13 @@ namespace
 
         for (auto* localCommand : commands)
         {
+            // Skip invisible annotations
             if (localCommand->eye != 2 && localCommand->eye != eye)
             {
                 continue;
             }
 
-            // Don't add polyLines with 0 points
+            // Don't add polylines with 0 points
             if (auto* localPolyLine =
                     dynamic_cast<PaintIPNode::LocalPolyLine*>(localCommand))
             {
@@ -67,7 +77,8 @@ namespace
             const int startFrame = localCommand->startFrame;
             const int endFrame = startFrame + localCommand->duration - 1;
 
-            if (frame >= startFrame && frame <= endFrame) // Command is visible
+            if (frame >= startFrame
+                && frame <= endFrame) // Command is visible on the current frame
             {
                 CurrentFrameCommands.push_back(localCommand);
             }
@@ -90,19 +101,19 @@ namespace
 
         {
             int levelIndex = 1;
-            bool firstLevelContainsHoldeldCommands = false;
+            bool isHoldedCommandsInFirstLevel = false;
 
             for (const auto& beforeCommand : beforeCommands)
             {
                 int ghostLevel =
-                    levelIndex - (firstLevelContainsHoldeldCommands ? 1 : 0);
+                    levelIndex - (isHoldedCommandsInFirstLevel ? 1 : 0);
 
                 for (auto* command : beforeCommand.second)
                 {
                     if (levelIndex == 1 && noCurrentFrameCommands
                         && command->hold != 0)
                     {
-                        firstLevelContainsHoldeldCommands = true;
+                        isHoldedCommandsInFirstLevel = true;
                         command->ghostOn = true;
 
                         if (auto* polyLine =
@@ -127,8 +138,8 @@ namespace
                         command->ghostColor = PaintIPNode::Color(
                             1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
                                                  // are drawn in green
-                        command->ghostColor[3] *=
-                            getGhostFactor(ghostLevel, command->ghostBefore);
+                        command->ghostColor[3] = getGhostOpacity(
+                            frame, command->startFrame, command->duration);
                         allCommands.push_back(command);
                     }
                 }
@@ -150,8 +161,8 @@ namespace
                         command->ghostColor = PaintIPNode::Color(
                             0.0, 1.0, 0.0,
                             1.0); // Ghosted "After" commands are drawn in red
-                        command->ghostColor[3] *=
-                            getGhostFactor(levelIndex, command->ghostAfter);
+                        command->ghostColor[3] = getGhostOpacity(
+                            frame, command->startFrame, command->duration);
                         allCommands.push_back(command);
                     }
                 }
@@ -692,12 +703,16 @@ namespace IPCore
                 if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(
                         visibleCommand))
                 {
+                    polyLine->ghostOn = visibleCommand->ghostOn;
+                    polyLine->ghostColor = visibleCommand->ghostColor;
                     head->commands.push_back(polyLine);
                 }
                 else if (auto* localText =
                              dynamic_cast<PaintIPNode::LocalText*>(
                                  visibleCommand))
                 {
+                    localText->ghostOn = visibleCommand->ghostOn;
+                    localText->ghostColor = visibleCommand->ghostColor;
                     head->commands.push_back(localText);
                 }
             }
