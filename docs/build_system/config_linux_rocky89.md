@@ -119,8 +119,7 @@ Download the latest open-source [Qt installer](https://www.qt.io/download-open-s
 ```bash
 - Start the Qt installer
 - Installation path: ~/Qt
-- Click "Archive" box on the right side of the window
-- Click "Filter" to see installable options
+- Click "Archive" in the hard-to-find dropbown box in the top right side of the window
 ```
 
 
