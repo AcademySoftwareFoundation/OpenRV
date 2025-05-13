@@ -1,4 +1,4 @@
-# Installing Open RV on Rocky 8 and 9
+# Preparing Open RV on Rocky 8 and 9
 
 In general, setting up for Rocky 8 or 9 is quite similar, with only minor differences.
 
@@ -16,14 +16,14 @@ Here's a table of what versions are needed for each:
 
 All other dependencies are shared across variations.
 
-1. [Install tools and build dependencies](install_tools_and_dependencies)
-2. [Install Pyenv / Python](install_pyenv_and_python)
-3. [Install CMake](install_cmake)
-4. [Install Qt](install_qt)
-5. [Building with Docker (Optional)](building_with_docker)
+1. [Install tools and build dependencies](rocky_install_tools_and_dependencies)
+2. [Install Pyenv / Python](rocky_install_pyenv_and_python)
+3. [Install CMake](rocky_install_cmake)
+4. [Install Qt](rocky_install_qt)
+5. [Building with Docker (Optional)](rocky_building_with_docker)
 
 
-(install_tools_and_dependencies)=
+(rocky_install_tools_and_dependencies)=
 ### 1. Install tools and build dependencies
 
 #### 1.1. Set the config manager
@@ -64,7 +64,7 @@ sudo dnf clean all
 sudo dnf config-manager --set-disabled devel
 ```
 
-(install_pyenv_and_python)=
+(rocky_install_pyenv_and_python)=
 ### 2. Install Pyenv and Python
 
 Install pyenv to be able to install the specific version of python associated the VFX reference platform
@@ -94,7 +94,7 @@ pyenv install 3.11.8
 pyenv global 3.11.8
 ```
 
-(install_cmake)=
+(rocky_install_cmake)=
 ### 3. Install CMake
 
 Since the dnf-installable version is not quite recent enough, you'll need to build and install CMake from source.
@@ -111,7 +111,7 @@ cmake --version  # confirm the version of your newly installed version of CMake
 cmake version 3.31.6
 ```
 
-(install_qt)=
+(rocky_install_qt)=
 ### 4. Install Qt
 
 Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recommend that you install Qt from other installable sources as it may introduce build issues.
@@ -139,7 +139,7 @@ Note 1: If you install Qt at a different installation path, you will need to man
 
 Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build OpenRV. 
 
-(building_with_docker)=
+(rocky_building_with_docker)=
 ### 5. Building with Docker (Optional)
 
 To build OpenRV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 

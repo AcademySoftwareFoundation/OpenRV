@@ -1,4 +1,4 @@
-# Installing Open RV on Windows
+# Preparing Open RV on Windows
 
 ## Summary
 
