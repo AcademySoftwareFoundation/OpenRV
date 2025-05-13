@@ -32,12 +32,12 @@ All other dependencies are shared across variations.
 #### 1.1. Set the config manager
 ```bash
 # Rocky 8
-sudo dnf config-manager --set-enabled crb devel
+sudo dnf config-manager --set-enabled powertools devel
 ```
 
 ```bash
 # Rocky 9
-sudo dnf config-manager --set-enabled powertools devel
+sudo dnf config-manager --set-enabled crb devel
 dnf install -y perl-CPAN
 cpan FindBin
 ```

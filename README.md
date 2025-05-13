@@ -24,7 +24,7 @@ The quickest way to download OpenRV's source code is to clone this repository.
 git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 ```
 
-However, if you'd like to actually build OpenRV or contribute to the project, we recommend you follow the instructions below *before* cloning the repository, as it involves quite a lot more setup than just cloning. If that's your case, skip this step for now, we'll get to it in a bit.
+However, if you'd like to actually build OpenRV or contribute to the project, we recommend you follow the instructions below *before* cloning the repository, as it involves quite a lot more setup than just cloning. If that's your case, skip this step for now, we'll get to cloning in a bit.
 
 
 ## Contributing to Open RV
