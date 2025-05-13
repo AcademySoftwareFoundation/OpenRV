@@ -37,7 +37,16 @@ A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
-#### 1.3 Load command aliases to build OpenRV
+
+#### 1.3 Install the required additional python packages. 
+
+```bash
+# install requirements.txt from the root of the git repository
+python3 -m pip install -r requirements.txt
+```
+
+
+#### 1.4 Load command aliases to build OpenRV
 
 Command-line aliases are provided to simplify the process of setting up the environment and to build OpenRV. Once in your OpenRV directory:
 
@@ -45,7 +54,7 @@ Command-line aliases are provided to simplify the process of setting up the envi
 source rvcmds.sh
 ```
 
-#### 1.4 First-time build only: rvbootstrap
+#### 1.5 First-time build only: rvbootstrap
 
 This step only needs to be done on a freshly cloned git repository. Under the hood, his command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
 

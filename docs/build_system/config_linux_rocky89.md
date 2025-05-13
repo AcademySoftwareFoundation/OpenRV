@@ -87,12 +87,6 @@ pyenv install 3.11.8
 pyenv global 3.11.8
 ```
 
-#### 2.3 Install the required additional python packages. 
-
-```bash
-# install requirements.txt from the root of the git repository
-python3 -m pip install -r requirements.txt
-```
 
 ### 3. Install CMake
 
@@ -140,7 +134,9 @@ Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to bu
 
 ### 5. Building with Docker (Optional)
 
-To build OpenRV using Docker, use the provided Dockerfile found in this repository, which includes all required dependencies. 
+To build OpenRV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 
+
+Please go through the cloning procedure found in the [common build process](config_common_build.md). Once cloned, get back here to build the docker image, run the container, and build OpenRV within the docker container.
 
 
 #### 5.1. Build the image and run
