@@ -60,8 +60,6 @@ This step only needs to be done on a freshly cloned git repository. Under the ho
 
 After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
 
-*On macOS, in the unlikely event you want to build for a different deployment target than your current operating system, make sure to define the MACOSX_DEPLOYMENT_TARGET environment variable in your ~/.zshrc file before starting any build process.
-
 
 ```bash
 # Produces default optimized build in ~/OpenRV/_build
@@ -118,6 +116,7 @@ rvbuildtd dependencies
 
 Once OpenRV is finished building, its executable binary can be found here:
 
+For Windows and Linux:
 ```bash
 # For the default optimized build:
 `~/OpenRV/_build/stage/app/bin/rv`.
@@ -125,6 +124,17 @@ Once OpenRV is finished building, its executable binary can be found here:
 ```bash
 # For the debug build
 `~/OpenRV/_build_debug/stage/app/bin/rv`.
+```
+
+
+For macOS:
+```bash
+# For the default optimized build:
+`~/OpenRV/_build/stage/app/RV.app/Contents/MacOS/RV`
+```
+```bash
+# For the debug build
+`~/OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV`
 ```
 
 
