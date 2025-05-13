@@ -368,8 +368,8 @@ namespace Mu
     typedef STLString<wchar_t>::Type UTF16String;
     typedef std::basic_string<wchar_t> stdUTF16String;
 #else
-    typedef STLString<unsigned short>::Type UTF16String;
-    typedef std::basic_string<unsigned short> stdUTF16String;
+    typedef STLString<char16_t>::Type UTF16String;
+    typedef std::basic_string<char16_t> stdUTF16String;
 #endif
 
 #ifdef _MSC_VER

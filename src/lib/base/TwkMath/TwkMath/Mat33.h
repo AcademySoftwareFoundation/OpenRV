@@ -522,8 +522,7 @@ namespace TwkMath
     inline Vec2<T> Mat33<T>::transformDir(const Vec2<T>& d) const
     {
         assert(isAffine());
-        return Vec2<T>((m00 * this->v.x) + (m01 * this->v.y),
-                       (m10 * this->v.x) + (m11 * this->v.y));
+        return Vec2<T>((m00 * d.x) + (m01 * d.y), (m10 * d.x) + (m11 * d.y));
     }
 
     //******************************************************************************
