@@ -41,11 +41,7 @@ namespace IPCore
         class LocalCommand
         {
         public:
-            LocalCommand()
-                : ghostColor(Color(0.0))
-            {
-            }
-
+            LocalCommand() = default;
             virtual ~LocalCommand() = default;
 
             int startFrame{};
@@ -57,7 +53,7 @@ namespace IPCore
             int eye{-1};
 
             bool ghostOn{};
-            TwkMath::Col4f ghostColor;
+            TwkMath::Col4f ghostColor{Color(0.0)};
         };
 
         class LocalPolyLine
@@ -98,8 +94,6 @@ namespace IPCore
         void propertyChanged(const Property* proprety) override;
         void readCompleted(const std::string& typeName,
                            unsigned int version) override;
-
-        void clearAll();
 
     protected:
         void compilePenComponent(Component*);

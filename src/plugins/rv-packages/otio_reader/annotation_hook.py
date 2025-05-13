@@ -56,8 +56,9 @@ def hook_function(
             # Set properties on the paint component of the RVPaint node
             effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id + 1})
 
-            is_hold = argument_map["effect_metadata"]["hold"]
-            is_ghost = argument_map["effect_metadata"]["ghost"]
+            metadata = argument_map.get("effect_metadata")
+            is_hold = metadata.get("hold")
+            is_ghost = metadata.get("ghost")
 
             start_time = int(time_range.start_time.value)
             end_time = int(start_time + time_range.duration.value)
