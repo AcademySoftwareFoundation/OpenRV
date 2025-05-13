@@ -39,16 +39,15 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 
 #### 1.3 Load command aliases to build OpenRV
 
-Command-line aliases are provided to simplify the process of setting up the environment and to build OpenRV.
+Command-line aliases are provided to simplify the process of setting up the environment and to build OpenRV. Once in your OpenRV directory:
 
 ```bash
-cd OpenRV
 source rvcmds.sh
 ```
 
 #### 1.4 First-time build only: rvbootstrap
 
-This step only needs to be done on a freshly cloned git repository. Under the hood, his command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under `.venv`
+This step only needs to be done on a freshly cloned git repository. Under the hood, his command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
 
 After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
 
@@ -81,7 +80,7 @@ rvmk
 rvmkd
 ```
 
-Note that, under the hood, rvmk/rvmkd is litterally the equivalent to these two commands:
+Note that, under the hood, rvmk/rvmkd is literally the equivalent to these two commands:
 ```bash
 rvcfg/rvcfgd      # sets environment variables
 rvbuild/rvbuildd  # launches the build process

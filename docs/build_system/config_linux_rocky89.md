@@ -22,10 +22,7 @@ All other dependencies are shared across variations.
 2. [Install Pyenv / Python](#2.-Install-pyenv-and-python)
 3. [Install CMake](#3.-install-cmake)
 4. [Install Qt](#4.-install-qt)
-5. [Building OpenRV for the first time](#5.-building-openrv-for-the-first-time)
-6. [Building OpenRV after the first time](#6.-building-openrv-after-the-first-time)
-7. [Starting the OpenRV executable](#7.starting-the-openrv-executable)
-8. [Building with Docker (Optional)](8.building-with-docker-(optional))
+5. [Building with Docker (Optional)](8.building-with-docker-(optional))
 
 ### 1. Install tools and build dependencies
 
