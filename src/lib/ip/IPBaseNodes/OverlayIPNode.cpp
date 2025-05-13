@@ -144,15 +144,12 @@ namespace IPCore
     namespace
     {
 
-        static void initializeOutline(Paint::PolyLine& outline,
-                                      const Vec2f* points, size_t npoints,
-                                      TwkPaint::Color oc, float outlineWidth,
-                                      const string& brush)
+        void initializeOutline(Paint::PolyLine& outline, const Vec2f* points,
+                               size_t npoints, TwkPaint::Color oc,
+                               float outlineWidth, const string& brush)
         {
             // these polyline owns the memory of their own points
-            outline.points = new Vec2f[npoints];
-            memcpy((void*)outline.points, (void*)points,
-                   npoints * sizeof(Vec2f));
+            outline.points.assign(points->begin(), points->end());
             outline.ownPoints = true;
 
             outline.npoints = npoints;
