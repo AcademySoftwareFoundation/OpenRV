@@ -2715,7 +2715,7 @@ namespace IPCore
                 glEnable(GL_BLEND);
                 glBlendEquation(GL_FUNC_ADD);
                 // src is assumed premultiplied
-                glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+                glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                 break;
             case IPImage::Add:
                 glEnable(GL_BLEND);

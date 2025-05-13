@@ -5,8 +5,8 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
-#include "IPBaseNodes/PaintIPNode.h"
 #include <IPCore/PaintCommand.h>
+#include <IPBaseNodes/PaintIPNode.h>
 #include <TwkMath/Function.h>
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLPipeline.h>
@@ -378,7 +378,7 @@ namespace IPCore
             }
 
             // set uniforms
-            Color pcolor = color;
+            Color pcolor;
             const auto* localCommand =
                 dynamic_cast<const PaintIPNode::LocalCommand*>(this);
             bool isGhostOn =
@@ -429,20 +429,42 @@ namespace IPCore
             glState->useGLProgram(defaultGLProgram());
         }
 
-        void PolyLine::hash(ostream& o) const
+        void PolyLine::hash(ostream& ostream) const
         {
-            o << (void*)points << npoints << width << smoothingWidth << splat
-              << widths << color << brush << join << cap << mode << debug;
+            for (const auto& point : points)
+            {
+                ostream << point;
+            }
+
+            ostream << npoints << width << smoothingWidth << splat;
+
+            for (const auto& width : widths)
+            {
+                ostream << width;
+            }
+
+            ostream << color << brush << join << cap << mode << debug;
         }
 
         PolyLine::HashValue PolyLine::hashValue() const
         {
-            ostringstream o;
+            ostringstream ostream;
 
-            o << (void*)points << npoints << width << smoothingWidth << splat
-              << widths << color << brush << join << cap << mode << debug;
+            for (const auto& point : points)
+            {
+                ostream << point;
+            }
 
-            std::string id = o.str();
+            ostream << npoints << width << smoothingWidth << splat;
+
+            for (const auto& width : widths)
+            {
+                ostream << width;
+            }
+
+            ostream << color << brush << join << cap << mode << debug;
+
+            std::string id = ostream.str();
 
             boost::hash<string> string_hash;
             size_t v = string_hash(id);
@@ -461,7 +483,7 @@ namespace IPCore
         {
             path.clear();
 
-            if (widths)
+            if (!widths.empty())
             {
                 for (size_t i = 0; i < npoints; i++)
                     path.add(points[i], widths[i]);
@@ -689,7 +711,14 @@ namespace IPCore
             if (!f->initialized())
                 f->init();
             f->setSize(ptsize);
-            f->setColor(color.x, color.y, color.z, color.w);
+
+            Color textColor;
+            const auto* localCommand =
+                dynamic_cast<const PaintIPNode::LocalCommand*>(this);
+            bool isGhostOn =
+                (localCommand != nullptr) ? localCommand->ghostOn : false;
+            textColor = isGhostOn ? localCommand->ghostColor : color;
+            f->setColor(textColor.x, textColor.y, textColor.z, textColor.w);
 
             const float w = fbo->width();
             const float h = fbo->height();

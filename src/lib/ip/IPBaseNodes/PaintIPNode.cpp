@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 #include <IPBaseNodes/PaintIPNode.h>
+#include <IPCore/PaintCommand.h>
 #include <IPCore/Exception.h>
 #include <IPCore/IPGraph.h>
 #include <TwkGLText/TwkGLText.h>
@@ -11,10 +12,12 @@
 #include <stl_ext/string_algo.h>
 #include <cstdlib>
 #include <IPCore/ShaderCommon.h>
+#include <tuple>
 
 namespace
 {
     using namespace IPCore;
+    using PerFramePaintCommands = std::map<int, PaintIPNode::LocalCommands>;
 
     // Calculates the opacity based on the distance from the annotated frame to
     // make the ghosted annotation more visible closer to the frame and less
@@ -42,17 +45,12 @@ namespace
         return ghostOpacity;
     }
 
-    PaintIPNode::LocalCommands
-    generateVisibleCommands(const PaintIPNode::LocalCommands& commands,
-                            const int frame, const size_t eye)
+    auto
+    separateCommandsByFrameGroup(const PaintIPNode::LocalCommands& commands,
+                                 const int frame, const size_t eye)
     {
         PaintIPNode::LocalCommands
-            allCommands; // visible commands, including hold and ghost
-        PaintIPNode::LocalCommands
-            CurrentFrameCommands; // visible commands, excluding hold and ghost
-
-        using PerFramePaintCommands = std::map<int, PaintIPNode::LocalCommands>;
-
+            currentFrameCommands; // visible commands, excluding hold and ghost
         PerFramePaintCommands beforeCommands;
         PerFramePaintCommands afterCommands;
 
@@ -80,7 +78,7 @@ namespace
             if (frame >= startFrame
                 && frame <= endFrame) // Command is visible on the current frame
             {
-                CurrentFrameCommands.push_back(localCommand);
+                currentFrameCommands.push_back(localCommand);
             }
             else
             {
@@ -97,86 +95,114 @@ namespace
             }
         }
 
-        bool noCurrentFrameCommands = CurrentFrameCommands.empty();
+        return std::make_tuple(currentFrameCommands, beforeCommands,
+                               afterCommands);
+    }
 
+    void addBeforeCommands(PaintIPNode::LocalCommands* allCommands,
+                           PaintIPNode::LocalCommands* currentFrameCommands,
+                           const PerFramePaintCommands& beforeCommands,
+                           const int frame)
+    {
+        int levelIndex = 1;
+        bool isHoldedCommandsInFirstLevel = false;
+
+        for (const auto& beforeCommand : beforeCommands)
         {
-            int levelIndex = 1;
-            bool isHoldedCommandsInFirstLevel = false;
+            int ghostLevel =
+                levelIndex - (isHoldedCommandsInFirstLevel ? 1 : 0);
 
-            for (const auto& beforeCommand : beforeCommands)
+            for (auto* command : beforeCommand.second)
             {
-                int ghostLevel =
-                    levelIndex - (isHoldedCommandsInFirstLevel ? 1 : 0);
-
-                for (auto* command : beforeCommand.second)
+                if (levelIndex == 1 && currentFrameCommands->empty()
+                    && command->hold != 0)
                 {
-                    if (levelIndex == 1 && noCurrentFrameCommands
-                        && command->hold != 0)
-                    {
-                        isHoldedCommandsInFirstLevel = true;
-                        command->ghostOn = true;
+                    isHoldedCommandsInFirstLevel = true;
+                    command->ghostOn = true;
 
-                        if (auto* polyLine =
-                                dynamic_cast<PaintIPNode::LocalPolyLine*>(
-                                    command))
-                        {
-                            command->ghostColor = polyLine->color;
-                        }
-                        else if (auto* text =
-                                     dynamic_cast<PaintIPNode::LocalText*>(
-                                         command))
-                        {
-                            command->ghostColor = text->color;
-                        }
-
-                        CurrentFrameCommands.push_back(command);
-                    }
-                    else if (command->ghost != 0
-                             && command->ghostBefore >= ghostLevel)
+                    if (auto* polyLine =
+                            dynamic_cast<PaintIPNode::LocalPolyLine*>(command))
                     {
-                        command->ghostOn = true;
-                        command->ghostColor = PaintIPNode::Color(
-                            1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
-                                                 // are drawn in green
-                        command->ghostColor[3] = getGhostOpacity(
-                            frame, command->startFrame, command->duration);
-                        allCommands.push_back(command);
+                        command->ghostColor = polyLine->color;
                     }
+                    else if (auto* text =
+                                 dynamic_cast<PaintIPNode::LocalText*>(command))
+                    {
+                        command->ghostColor = text->color;
+                    }
+
+                    currentFrameCommands->push_back(command);
                 }
-                levelIndex++;
-            }
-        }
-
-        {
-            int levelIndex = 1;
-
-            for (const auto& afterCommand : afterCommands)
-            {
-                for (auto* command : afterCommand.second)
+                else if (command->ghost != 0
+                         && command->ghostBefore >= ghostLevel)
                 {
-                    if (command->ghost != 0
-                        && command->ghostAfter >= levelIndex)
-                    {
-                        command->ghostOn = true;
-                        command->ghostColor = PaintIPNode::Color(
-                            0.0, 1.0, 0.0,
-                            1.0); // Ghosted "After" commands are drawn in red
-                        command->ghostColor[3] = getGhostOpacity(
-                            frame, command->startFrame, command->duration);
-                        allCommands.push_back(command);
-                    }
+                    command->ghostOn = true;
+                    command->ghostColor = PaintIPNode::Color(
+                        1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
+                                             // are drawn in green
+                    command->ghostColor[3] = getGhostOpacity(
+                        frame, command->startFrame, command->duration);
+                    allCommands->push_back(command);
                 }
-                levelIndex++;
             }
+            levelIndex++;
         }
+    }
 
+    void addAfterCommands(PaintIPNode::LocalCommands* allCommands,
+                          const PerFramePaintCommands& afterCommands,
+                          const int frame)
+    {
+        int levelIndex = 1;
+
+        for (const auto& afterCommand : afterCommands)
         {
-            for (auto* command : CurrentFrameCommands)
+            for (auto* command : afterCommand.second)
             {
-                command->ghostOn = false;
-                allCommands.push_back(command);
+                if (command->ghost != 0 && command->ghostAfter >= levelIndex)
+                {
+                    command->ghostOn = true;
+                    command->ghostColor = PaintIPNode::Color(
+                        0.0, 1.0, 0.0,
+                        1.0); // Ghosted "After" commands are drawn in red
+                    command->ghostColor[3] = getGhostOpacity(
+                        frame, command->startFrame, command->duration);
+                    allCommands->push_back(command);
+                }
             }
+            levelIndex++;
         }
+    }
+
+    void
+    addVisibleCommands(PaintIPNode::LocalCommands* allCommands,
+                       const PaintIPNode::LocalCommands& currentFrameCommands)
+    {
+        for (auto* command : currentFrameCommands)
+        {
+            command->ghostOn = false;
+            allCommands->push_back(command);
+        }
+    }
+
+    PaintIPNode::LocalCommands
+    generateVisibleCommands(const PaintIPNode::LocalCommands& commands,
+                            const int frame, const size_t eye)
+    {
+        PaintIPNode::LocalCommands
+            allCommands; // visible commands, including hold and ghost
+        PaintIPNode::LocalCommands
+            currentFrameCommands; // visible commands, excluding hold and ghost
+        PerFramePaintCommands beforeCommands;
+        PerFramePaintCommands afterCommands;
+
+        std::tie(currentFrameCommands, beforeCommands, afterCommands) =
+            separateCommandsByFrameGroup(commands, frame, eye);
+
+        addBeforeCommands(&allCommands, &currentFrameCommands, beforeCommands,
+                          frame);
+        addAfterCommands(&allCommands, afterCommands, frame);
+        addVisibleCommands(&allCommands, currentFrameCommands);
 
         return allCommands;
     }
@@ -305,17 +331,21 @@ namespace IPCore
         if (widthP && pointsP && widthP->size() == pointsP->size()
             && widthP->size() > 1)
         {
-            p.widths = (const float*)widthP->rawData();
+            p.widths.assign(static_cast<const float*>(widthP->rawData()),
+                            static_cast<const float*>(widthP->rawData())
+                                + widthP->size());
         }
 
         if (pointsP && pointsP->size())
         {
-            p.points = (const Vec2f*)pointsP->rawData();
+            p.points.assign(static_cast<const Vec2f*>(pointsP->rawData()),
+                            static_cast<const Vec2f*>(pointsP->rawData())
+                                + pointsP->size());
             p.npoints = pointsP->size();
         }
         else
         {
-            p.points = 0;
+            p.points.clear();
             p.npoints = 0;
         }
 
@@ -327,8 +357,8 @@ namespace IPCore
         const size_t prevNumTexts = m_texts.size();
         LocalText& p = m_texts[c];
 
-        // Add newly created strokes to the commands vector
-        if (prevNumTexts != m_penStrokes.size())
+        // Add newly created text boxes to the commands vector
+        if (prevNumTexts != m_texts.size())
         {
             m_commands.push_back(&p);
         }
@@ -407,14 +437,6 @@ namespace IPCore
         p.ghost = ghost;
         p.ghostBefore = ghostBefore;
         p.ghostAfter = ghostAfter;
-    }
-
-    void PaintIPNode::clearAll()
-    {
-        std::lock_guard<std::mutex> commandsGuard{m_commandsMutex};
-        m_texts.clear();
-        m_penStrokes.clear();
-        m_commands.clear();
     }
 
     void PaintIPNode::compileFrame(Component* comp)
@@ -703,16 +725,12 @@ namespace IPCore
                 if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(
                         visibleCommand))
                 {
-                    polyLine->ghostOn = visibleCommand->ghostOn;
-                    polyLine->ghostColor = visibleCommand->ghostColor;
                     head->commands.push_back(polyLine);
                 }
                 else if (auto* localText =
                              dynamic_cast<PaintIPNode::LocalText*>(
                                  visibleCommand))
                 {
-                    localText->ghostOn = visibleCommand->ghostOn;
-                    localText->ghostColor = visibleCommand->ghostColor;
                     head->commands.push_back(localText);
                 }
             }
