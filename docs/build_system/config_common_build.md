@@ -255,6 +255,6 @@ cmake --install _build --prefix _install
 
 ### 13. Building with Docker
 
-Building with Docker is essentially no different than building natively. To set up and use a docker on your specific operating system, refer to the platform-specific setup instructions. 
+Building with Docker is currently only supported on Rocky Linux. Please refer to the Rocky Linux setup instructions for details.
 
 

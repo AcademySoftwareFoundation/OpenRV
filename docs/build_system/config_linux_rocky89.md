@@ -1,20 +1,20 @@
 # Building Open RV on Rocky 8 and 9
 
-The build process is largely the same, with some small exceptions, discussed below as appropriate.
+In general, setting up for Rocky 8 or 9 is quite similar, with only minor differences.
 
 ## Summary
 
 OpenRV 2025 can be built for Rocky 8 and Rocky 9, using VFX reference platform CY2023 or CY2024.
 
-Here's a table of what's versions are needed for each:
+Here's a table of what versions are needed for each:
 
 |                      | Rocky 8<br>CY2023 | Rocky 8<br>CY2024 |Rocky 9<br>CY2023 | Rocky 9<br>CY2024 |
 |----------------------|------------|------------|-----------|---------|
 | Config manager repo  | powertools | powertools | crb       | crb     |
-| Qt                   | 5.12.2     | 5.12.2     | 6.5.3     | 6.5.3   |
+| Qt                   | 5.12.2     | 6.5.3      | 5.12.2    | 6.5.3   |
 | Cmake                | 3.31.6     | 3.31.6     | 3.31.6    | 3.31.6  |
 | Python               | 3.10.0     | 3.11.8     | 3.10.0    | 3.11.8  |
-| Perl-CPAN            | --         | 2.36+      | --        | 2.36+   |
+| Perl-CPAN            | --         | --         | 2.36+     | 2.36+   |
 
 All other dependencies are shared across variations.
 
@@ -29,7 +29,7 @@ All other dependencies are shared across variations.
 
 ### 1. Install tools and build dependencies
 
-#### 1.1. Set the config manager depending Rocky's version:
+#### 1.1. Set the config manager
 ```bash
 # Rocky 8
 sudo dnf config-manager --set-enabled crb devel
@@ -115,7 +115,7 @@ cmake version 3.31.6
 
 ### 4. Install Qt
 
-Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recomment that you install Qt from other installable sources as it may introduce build isues.
+Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recommend that you install Qt from other installable sources as it may introduce build issues.
 
 ```bash
 - Start the Qt installer
@@ -137,124 +137,16 @@ Select Qt 6.5.3
 # Any 6.5.3+ should work, but Autodesk's RV is build against 6.5.3)
 ```
 
-Note 1: If you select a different installation path, you will need to manually export the environment variable "QT_HOME" to this path in your ~/.bashrc file.
+Note 1: If you install Qt at a different installation path, you will need to manually export the environment variable "QT_HOME" to that path in your ~/.bashrc file such that the build scripts will be able to find it.
 
 Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build OpenRV. 
 
-
-### 5. Building OpenRV for the first time
-
-In general, to maximize your chances of successfully building and contributing to OpenRV, you should:
-
-- Be familiar with git and its usage.
-- Create a branch from 'main' before modifying code
-- Always update your branch (git pull, git rebase) with the latest from github
-- Fix conflicts prior to creating a pull request
-
-#### 5.1 Clone the RV repository using HTTPS or SSH key
-
-Clone the Open RV repository. Typically, this will create an "OpenRV" folder from your current location.
-
-```bash
-# If using a password-protected SSH key:
-git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-```bash
-# Or if using the web URL:
-git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-**Note: If you plan to contribute and submit pull requests for review** you should create a GitHub account and follow the standard GitHub fork model for submitting PRs. This involves creating your own github account, forking the Academy Software Foundation's OpenRV repository, making your changes in a branch of your forked version, and then submitting pull requests from your forked repository (don't forget to sync your fork regularly!). In that case, substitute the above repository URL above with the URL of your own fork.
-
-
-#### 5.2 Load command aliases to build OpenRV
-
-Command-line aliases are provided to simplify the process of setting up the environment and to build OpenRV.
-
-```bash
-cd OpenRV
-source rvcmds.sh
-```
-
-#### 5.3 - First-time build only: rvbootstrap
-
-This step only needs to be done on a freshly cloned git repository. Under the hood, his command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under `.venv`
-
-After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
-
-```bash
-# Produces default optimized build in ~/OpenRV/_build
-rvbootstrap
-```
-```bash
-# Produces unoptimized debug build in ~/OpenRV/_build_debug
-rvbootstrapd
-```
-
-Note: launch the default optimized build unless you have a reason to want the unoptimized debug build.
-
-
-### 6. Building OpenRV after the first time
-
-Once you've built OpenRV for the first time, there is no need to run "rvboostrap" again.
-
-#### 6.1 Build OpenRV (incrementally) using rvmk
-
-To build OpenRV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process. 
-
-```bash
-# Produces incremental optimized build in ~/OpenRV/_build_debug
-rvmk
-```
-```bash
-# Produces incremental unoptimized debug build in ~/OpenRV/_build_debug
-rvmkd
-```
-
-Note that, under the hood, rvmk/rvmkd is litterally the equivalent to these two commands:
-```bash
-rvcfg/rvcfgd      # sets environment variables
-rvbuild/rvbuildd  # launches the build process
-```
-
-
-#### 6.2 Rebuilding the dependencies
-
-Building the source dependencies is done automatically the first time we build OpenRV with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
-
-
-```bash
-# Rebuild dependencies for default optimized build
-rvbuildt dependencies
-```
-```bash
-# Rebuild dependencies for debug build
-rvbuildtd dependencies
-```
-
-
-### 7. Starting the OpenRV executable
-
-Once OpenRV is finished building, its executable binary can be found here:
-
-```bash
-# For the default optimized build:
-`~/OpenRV/_build/stage/app/bin/rv`.
-```
-```bash
-# For the debug build
-`~/OpenRV/_build_debug/stage/app/bin/rv`.
-```
-
-
-### 8. Building with Docker (Optional)
+### 5. Building with Docker (Optional)
 
 To build OpenRV using Docker, use the provided Dockerfile found in this repository, which includes all required dependencies. 
 
-#### 8.1. Build the image and run
+
+#### 5.1. Build the image and run
 
 ```bash
 # For Rocky 8
@@ -270,7 +162,7 @@ docker build -t openrv-rocky9 -f Dockerfile.Linux-Rocky9 .
 docker run -d openrv-rocky9 /bin/bash -c "sleep infinity"
 ```
 
-#### 8.2. Create and run the container
+#### 5.2. Create and run the container
 ```bash
 # Lookup the container id for openrv-rocky{8/9}
 docker container ls
@@ -284,9 +176,11 @@ docker container ls
 docker container exec -it <id> /bin/bash  # replace 'id' with your value
 ```
 
-Once you are into the container, you can follow the [standard process](5.-building-openrv-for-the-first-time).
+#### 5.3. Build OpenRV in the container
 
-#### 8.3. Copy the stage folder outside of the container
+Once you are into the container, you can follow the [common build process](config_common_build.md) to build OpenRV.
+
+#### 5.4. Copy the stage folder outside of the container
 
 If you are on a host that is the same as, or compatible with, your version of Rocky Linux, you can copy the stage folder outside of the container and execute Open RV.
 
