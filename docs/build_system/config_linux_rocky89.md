@@ -2,8 +2,6 @@
 
 In general, setting up for Rocky 8 or 9 is quite similar, with only minor differences.
 
-## Summary
-
 OpenRV 2025 can be built for Rocky 8 and Rocky 9, using VFX reference platform CY2023 or CY2024.
 
 Here's a table of what versions are needed for each:
