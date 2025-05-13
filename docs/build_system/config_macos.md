@@ -1,4 +1,4 @@
-# Building Open RV on macOS
+# Installing Open RV on macOS
 
 (summary)=
 ## Summary

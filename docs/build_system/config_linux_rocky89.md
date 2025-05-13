@@ -1,4 +1,4 @@
-# Building Open RV on Rocky 8 and 9
+# Installing Open RV on Rocky 8 and 9
 
 In general, setting up for Rocky 8 or 9 is quite similar, with only minor differences.
 
@@ -111,7 +111,7 @@ cmake --version  # confirm the version of your newly installed version of CMake
 cmake version 3.31.6
 ```
 
-(install_qt)
+(install_qt)=
 ### 4. Install Qt
 
 Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recommend that you install Qt from other installable sources as it may introduce build issues.
