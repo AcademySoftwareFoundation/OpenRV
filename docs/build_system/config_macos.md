@@ -70,9 +70,13 @@ In that case, you can create one with this command `ln -s python3 $(dirname $(wh
 Install pyenv to be able to install the specific version of python associated the VFX reference platform
 
 #### 6.1 Install Pyenv
+
+Install pyenv, and add its installation path to your ~/.zshrc and apply the changes to your current terminal window:
+
 ```bash
 curl https://pyenv.run | bash
-export PYENV_ROOT="$HOME/.pyenv"
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
 #### 6.2 Install the Python version associated with the VFX reference platform

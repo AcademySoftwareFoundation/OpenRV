@@ -70,10 +70,16 @@ sudo dnf config-manager --set-disabled devel
 Install pyenv to be able to install the specific version of python associated the VFX reference platform
 
 #### 2.1 Install Pyenv
+
+Install pyenv, and add its installation path to your ~/.bashrc and apply the changes to your current terminal window:
+
 ```bash
 curl https://pyenv.run | bash
-export PYENV_ROOT="$HOME/.pyenv"
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+source ~/.bashrc
 ```
+
+
 
 #### 2.2 Install the Python version associated with the VFX reference platform
 ```bash
