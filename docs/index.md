@@ -4,11 +4,10 @@
 :maxdepth: 2
 :hidden:
 :caption: Building Open RV
-build_system/config_linux_centos7
-build_system/config_linux_rocky8
-build_system/config_linux_rocky9
+build_system/config_linux_rocky89
 build_system/config_macos
 build_system/config_windows
+build_system/config_common_build
 build_system/build_errors
 ```
 
