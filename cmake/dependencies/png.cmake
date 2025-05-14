@@ -13,7 +13,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "1.6.39" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "1.6.48" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
@@ -21,19 +21,19 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "a704977d681a40d8223d8b957fd41b29"
+    "be6cc9e411c26115db3b9eab1159a1d9"
 )
 
 SET(_libpng_lib_version
-    "16.39.0"
+    "16.48.0"
 )
 IF(NOT RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("png16" "${_libpng_lib_version}" "SHARED" "d")
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME("libpng16" "${_libpng_lib_version}" "SHARED" "d")
 ENDIF()
-# The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-# Future: The main branch of libpng has deprecated 'PNG_EXECUTABLES' in favor of 'PNG_TOOLS'.
+# The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES' Future: The main branch of libpng has deprecated
+# 'PNG_EXECUTABLES' in favor of 'PNG_TOOLS'.
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 LIST(APPEND _configure_options "-DPNG_EXECUTABLES=OFF")
 LIST(APPEND _configure_options "-DPNG_TESTS=OFF")
@@ -75,9 +75,8 @@ IF(NOT RV_TARGET_WINDOWS)
     PROPERTY IMPORTED_SONAME ${_libname}
   )
 ELSE()
-  # An import library (.lib) file is often used to resolve references to 
-  # functions and variables in a DLL, enabling the linker to generate code 
-  # for loading the DLL and calling its functions at runtime.
+  # An import library (.lib) file is often used to resolve references to functions and variables in a DLL, enabling the linker to generate code for loading the
+  # DLL and calling its functions at runtime.
   SET_PROPERTY(
     TARGET PNG::PNG
     PROPERTY IMPORTED_LOCATION "${_implibpath}"
