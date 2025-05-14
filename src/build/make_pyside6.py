@@ -88,6 +88,9 @@ def prepare() -> None:
             os.popen("clang --version").read(),
         )
         clang_version_str = ".".join(clang_version_search.groups())
+        if clang_version_str == "17.0.0":
+            # The 17.0.0 version does not exist on the Qt server
+            clang_version_str = "17.0.1"
         clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
     elif system == "Linux":
         clang_filename_suffix = "19.1.0-based-linux-Rhel8.8-gcc10.3-x86_64.7z"
