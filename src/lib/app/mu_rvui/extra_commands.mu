@@ -809,14 +809,8 @@ Return list of node names in the given group, with type equal to the given type.
         node  = if group eq nil then innode else group,
         name  = "%s.ui.name" % node;
 
-    let prop = getStringProperty(name);
-
-    if (!prop.empty())
-        return prop.front();
-    
-    return node;
+    return if propertyExists(name) then getStringProperty(name).front() else node;
 }
-
 
 \: isViewNode (bool; string name)
 {
