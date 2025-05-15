@@ -42,11 +42,13 @@ namespace IPCore
         struct LocalPolyLine : public Paint::PolyLine
         {
             int eye;
+            Color baseColor;
         };
 
         struct LocalText : public Paint::Text
         {
             int eye;
+            Color baseColor;
         };
 
         typedef TwkMath::Vec4f Vec4;

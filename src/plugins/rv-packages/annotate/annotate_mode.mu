@@ -60,6 +60,8 @@ class: AnnotateMinorMode : MinorMode
 
     union: PressureMode { None | Size | Opacity | Saturation }
 
+    union: ColorMode { Draw | OnionBefore | OnionAfter }
+
     class: DrawMode
     {
         string       name;
@@ -110,6 +112,7 @@ class: AnnotateMinorMode : MinorMode
     string            _machine;
     bool              _linkToolColors;
     bool              _colorDialogLock;
+    ColorMode         _colorMode;
     QPushButton       _colorButton;
     QColorDialog      _colorDialog;
     //QComboBox         _comboBox;
@@ -140,6 +143,13 @@ class: AnnotateMinorMode : MinorMode
     DrawDockWidget    _drawDock;
     QToolBar          _toolBar;
     QLabel            _toolSliderLabel;
+    QCheckBox         _onionCheckBox;
+    QSpinBox          _onionBeforeSpinBox;
+    QSpinBox          _onionAfterSpinBox;
+    QPushButton       _onionBeforeButton;
+    QPushButton       _onionAfterButton;
+    Color             _onionBeforeColor;
+    Color             _onionAfterColor;
     QtColorTriangle   _colorTriangle;
     bool              _setColorLock;
     bool              _activeSampleColor;
@@ -246,6 +256,7 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
+    // Settings
     method: saveSettings (void;)
     {
         use SettingsValue;
@@ -685,10 +696,10 @@ class: AnnotateMinorMode : MinorMode
         let c = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
         _sampleColor += c;
         _sampleCount++;
-        setColor(_sampleColor / float(_sampleCount));
+        setDrawColor(_sampleColor / float(_sampleCount));
         _activeSampleColor = true;
         //let v = sourcePixelValue(sName, pinfo.px, pinfo.py);
-        //setColor(v);
+        //setDrawColor(v);
     }
 
     method: dropperStartSample (void; Event event)
@@ -844,7 +855,8 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
+        if (filterLiveReviewEvents())
+        {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
@@ -902,7 +914,8 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
+        if (filterLiveReviewEvents()) 
+        {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
@@ -1014,38 +1027,113 @@ class: AnnotateMinorMode : MinorMode
         redraw();
     }
 
+    // ColorMode
+    method: updateUiFromColorMode(void;ColorMode colorMode)
+    {
+        if (!_setColorLock)
+        {
+            _setColorLock = true;
+
+            Color c = getColorFromMode(colorMode);
+
+            // Update the related color button
+            QPushButton button = getColorButtonFromMode(colorMode);
+            if (button neq nil)
+            {
+                let css = "QPushButton#%s { border-radius: 0px; background-color: rgb(%d,%d,%d); }"
+                    % (button.objectName(), int(c.x * 255), int(c.y * 255), int(c.z * 255));
+                button.setStyleSheet(css);
+            }
+
+            let qc = toQColor(c);
+
+            // Update the colorDialog
+            if (!_colorDialogLock && _colorDialog neq nil)
+            {
+                case(_colorMode) // only when colorDialog is opened in ColorMode.Draw
+                {
+                    ColorMode.Draw -> {
+                        _colorDialog.setCurrentColor(qc);
+                    }
+                }
+            }
+
+            // Special case when changing the ColorMode.Draw
+            case(colorMode)
+            {
+                ColorMode.Draw -> {
+                    // Update the colorTriangle
+                    if (_colorTriangle neq nil) _colorTriangle.setColor(qc);
+                    // Update the opacitySlider
+                    if (_opacitySlider neq nil) _opacitySlider.setValue(int(c.w * 255.0));
+                    // Link tool colors
+                    if (_linkToolColors) for_each (mode; _drawModes) mode.color = c;
+                }
+            }
+
+            _setColorLock = false;
+        }
+    }
+
+    method: getColorModeName(string; ColorMode colorMode)
+    {
+        case(colorMode)
+        {
+            ColorMode.Draw        -> { return "Draw"; }
+            ColorMode.OnionBefore -> { return "OnionBefore"; }
+            ColorMode.OnionAfter  -> { return "OnionAfter"; }
+            _ -> return "Unknown mode";
+        }
+    }
+
+    method: setColorFromMode(void; ColorMode colorMode, Color c)
+    {
+        case (colorMode)
+        {
+            ColorMode.Draw        -> { setDrawColor(c); }
+            ColorMode.OnionBefore -> { setOnionBeforeColor(c); }
+            ColorMode.OnionAfter  -> { setOnionAfterColor(c); }
+            _ -> { print("bad colorMode\n"); }
+        }
+    }
+
+    method: getColorFromMode(Color; ColorMode colorMode)
+    {
+        case (colorMode)
+        {
+            ColorMode.Draw        -> { return _currentDrawMode.color; }
+            ColorMode.OnionBefore -> { return _onionBeforeColor; }
+            ColorMode.OnionAfter  -> { return _onionAfterColor; }
+            _ -> { print("bad colorMode\n"); return Color(1,1,1,1); }
+        }
+    }
+
+    method: getColorButtonFromMode(QPushButton; ColorMode colorMode)
+    {
+        case (colorMode)
+        {
+            ColorMode.Draw        -> { return _colorButton; }
+            ColorMode.OnionBefore -> { return _onionBeforeButton; }
+            ColorMode.OnionAfter  -> { return _onionAfterButton; }
+            _ -> { print("bad colorMode\n"); return nil; }
+        }
+    }
+
+    // Brush Size
     method: setBrushSize (void; float dist)
     {
         _currentDrawMode.size = dist;
+        // Update Ui
         let v = (_currentDrawMode.size - _currentDrawMode.minSize) / (_currentDrawMode.maxSize - _currentDrawMode.minSize);
         _sizeSlider.setValue(int(v * 999.0));
     }
 
-    method: setColor (void; Color c)
+    // Draw Color
+    method: setDrawColor(void; Color color)
     {
-        if (!_setColorLock)
-        {
-            _currentDrawMode.color = c;
-            _setColorLock = true;
-            let qc = toQColor(c);
-
-            let css = "QPushButton { background-color: rgb(%d,%d,%d); }"
-                % (int(c.x * 255), int(c.y * 255), int(c.z * 255));
-
-            if (_colorButton neq nil) _colorButton.setStyleSheet(css);
-
-            if (!_colorDialogLock && _colorDialog neq nil)
-            {
-                _colorDialog.setCurrentColor(qc);
-            }
-
-            if (_colorTriangle neq nil) _colorTriangle.setColor(qc);
-            if (_opacitySlider neq nil) _opacitySlider.setValue(int(c.w * 255.0));
-
-            if (_linkToolColors) for_each (mode; _drawModes) mode.color = c;
-
-            _setColorLock = false;
-        }
+        _currentDrawMode.color = color;
+        // Update Ui
+        updateUiFromColorMode(ColorMode.Draw);
     }
 
     method: auxFilePath (string; string icon)
@@ -1135,30 +1223,41 @@ class: AnnotateMinorMode : MinorMode
     method: newOpacitySlot (void; int value)
     {
         let c = _currentDrawMode.color;
-        setColor(Color(c.x, c.y, c.z, value / 255.0));
+        setDrawColor(Color(c.x, c.y, c.z, value / 255.0));
     }
 
     method: newColorSlot (void; QColor color, bool lock, bool alpha)
     {
-        _colorDialogLock = lock;
-        let cc = _currentDrawMode.color;
-
-        try
+        if (!_colorDialogLock && !_setColorLock)
         {
-            Color c = fromQColor(color);
-            setColor(if alpha then c else Color(c.x, c.y, c.z, cc.w));
-        }
-        catch (...)
-        {
-            print("caught exception in newColorSlot\n");
-        }
+            _colorDialogLock = lock;
 
-        _colorDialogLock = false;
+            // The colorTriangle and the opacitySlider are dedicated to Draw color.
+            // If lock is false, then the color comes from the colorTriangle.
+            // In this case, we change the Draw color, else we change the _colorMode one.
+            let cm = if !lock then ColorMode.Draw else _colorMode;
+
+            let cc = getColorFromMode(cm);
+            try
+            {
+                Color c = fromQColor(color);
+                setColorFromMode(cm, if alpha then c else Color(c.x, c.y, c.z, cc.w));
+            }
+            catch (...)
+            {
+                print("caught exception in newColorSlot\n");
+            }
+
+            _colorDialogLock = false;
+        }
     }
 
-    method: chooseColorSlot (void; bool checked)
+    method: chooseColorSlot (void; bool checked, ColorMode mode)
     {
-        _colorDialog.setCurrentColor(toQColor(_currentDrawMode.color));
+        _colorMode = mode;
+        _colorDialogLock = true;
+        _colorDialog.setCurrentColor(toQColor(getColorFromMode(mode)));
+        _colorDialogLock = false;
         _colorDialog.setWindowModality(Qt.NonModal);
         _colorDialog.show();
     }
@@ -1332,7 +1431,7 @@ class: AnnotateMinorMode : MinorMode
     method: toggleLinkToolColors (void; Event event)
     {
         _linkToolColors = !_linkToolColors;
-        setColor(_currentDrawMode.color);
+        setDrawColor(_currentDrawMode.color);
     }
 
     method: unlinkToolColors (int;)
@@ -1510,6 +1609,159 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
+    // Onion Show
+    method: getOnionShow (bool;)
+    {
+        try
+        {
+            let pname = "%s.paint.onionShow" % _currentNode,
+                v = getIntProperty(pname).front();
+            return if v == 0 then false else true;
+        }
+        catch (...)
+        {
+            return false;
+        }
+    }
+    method: setOnionShow (void;bool enabled)
+    {
+        try
+        {
+            let pname = "%s.paint.onionShow" % _currentNode;
+            setIntProperty(pname, int[] {if enabled == false then 0 else 1});
+            // Update Ui
+            _onionCheckBox.setCheckState(if enabled == false then Qt.Unchecked else Qt.Checked);
+            redraw();
+        }
+        catch (...)
+        {
+            ;
+        }
+    }
+
+    // Onion Before Frame
+    method: getOnionBeforeFrame (int;)
+    {
+        try
+        {
+            let pname = "%s.paint.onionBeforeFrame" % _currentNode,
+                v = getIntProperty(pname).front();
+            return v;
+        }
+        catch (...)
+        {
+            return 5;
+        }
+    }
+    method: setOnionBeforeFrame (void;int value)
+    {
+        try
+        {
+            let pname = "%s.paint.onionBeforeFrame" % _currentNode;
+            setIntProperty(pname, int[] {value});
+            // Update Ui
+            _onionBeforeSpinBox.setValue(value);
+            redraw();
+        }
+        catch (...)
+        {
+            ;
+        }
+    }
+
+    // Onion After Frame
+    method: getOnionAfterFrame (int;)
+    {
+        try
+        {
+            let pname = "%s.paint.onionAfterFrame" % _currentNode,
+                v = getIntProperty(pname).front();
+            return v;
+        }
+        catch (...)
+        {
+            return 5;
+        }
+    }
+    method: setOnionAfterFrame (void;int value)
+    {
+        try
+        {
+            let pname = "%s.paint.onionAfterFrame" % _currentNode;
+            setIntProperty(pname, int[] {value});
+            // Update Ui
+            _onionAfterSpinBox.setValue(value);
+            redraw();
+        }
+        catch (...)
+        {
+            ;
+        }
+    }
+
+    // Onion Before Color
+    method: getOnionBeforeColor (Color;)
+    {
+        try
+        {
+            let pname = "%s.paint.onionBeforeColor" % _currentNode,
+                v = getFloatProperty(pname);
+            return Color(v[0], v[1], v[2], v[3]);
+        }
+        catch (...)
+        {
+            return Color(1,0,0,1);
+        }
+    }
+    method: setOnionBeforeColor (void;Color c)
+    {
+        try
+        {
+            _onionBeforeColor = c;
+            let pname = "%s.paint.onionBeforeColor" % _currentNode;
+            setFloatProperty(pname, float[] {c[0], c[1], c[2], c[3]}, true);
+            // Update Ui
+            updateUiFromColorMode(ColorMode.OnionBefore);
+            redraw();
+        }
+        catch (...)
+        {
+            ;
+        }
+    }
+
+    // Onion After Color
+    method: getOnionAfterColor(Color;)
+    {
+        try
+        {
+            let pname = "%s.paint.onionAfterColor" % _currentNode,
+                v = getFloatProperty(pname);
+            return Color(v[0], v[1], v[2], v[3]);
+        }
+        catch (...)
+        {
+            return Color(0,1,0,1);
+        }
+    }
+    method: setOnionAfterColor (void;Color c)
+    {
+        try
+        {
+            _onionAfterColor = c;
+            let pname = "%s.paint.onionAfterColor" % _currentNode;
+            setFloatProperty(pname, float[] {c[0], c[1], c[2], c[3]}, true);
+            // Update Ui
+            updateUiFromColorMode(ColorMode.OnionAfter);
+            redraw();
+        }
+        catch (...)
+        {
+            ;
+        }
+    }
+
+    // Scale Brush
     method: scaleBrushSlot (void; Event event)
     {
         _scaleBrush = !_scaleBrush;
@@ -1520,6 +1772,7 @@ class: AnnotateMinorMode : MinorMode
         return if _scaleBrush then CheckedMenuState else UncheckedMenuState;
     }
 
+    // Show Brush
     method: showBrushSlot (void; Event event)
     {
         _showBrush = !_showBrush;
@@ -1530,6 +1783,7 @@ class: AnnotateMinorMode : MinorMode
         return if _showBrush then CheckedMenuState else UncheckedMenuState;
     }
 
+    // Save
     method: saveDefaults (void; Event event)
     {
         saveSettings();
@@ -1579,17 +1833,22 @@ class: AnnotateMinorMode : MinorMode
 
         if (_activeSampleColor)
         {
-            if (_sampleCount != 0) setColor(_sampleColor / float(_sampleCount));
+            if (_sampleCount != 0) setDrawColor(_sampleColor / float(_sampleCount));
             _activeSampleColor = false;
         }
         else
         {
-            setColor(_currentDrawMode.color);
+            setDrawColor(_currentDrawMode.color);
         }
 
         setBrushSize(_currentDrawMode.size);
         _currentDrawMode.button.setChecked(true);
         drawModeTable(_currentDrawMode.eventTable);
+        setOnionShow(getOnionShow());
+        setOnionBeforeFrame(getOnionBeforeFrame());
+        setOnionAfterFrame(getOnionAfterFrame());
+        setOnionBeforeColor(getOnionBeforeColor());
+        setOnionAfterColor(getOnionAfterColor());
     }
 
     method: removeTags (void;)
@@ -1725,6 +1984,7 @@ class: AnnotateMinorMode : MinorMode
         let m = mainWindowWidget(),
             g = QActionGroup(m);
 
+        _colorMode = ColorMode.Draw;
         _colorDialog = QColorDialog(m);
         _colorDialog.setOption(QColorDialog.ShowAlphaChannel, true);
         _colorDialog.setOption(QColorDialog.DontUseNativeDialog, true);
@@ -1767,6 +2027,12 @@ class: AnnotateMinorMode : MinorMode
             _clearButton       = _drawPane.findChild("clearButton");
             _opacitySlider     = _drawPane.findChild("opacitySlider");
             _toolSliderLabel   = _drawPane.findChild("toolSliderLabel");
+
+            _onionCheckBox     = _drawPane.findChild("onionCheckBox");
+            _onionBeforeSpinBox= _drawPane.findChild("onionBeforeSpinBox");
+            _onionAfterSpinBox = _drawPane.findChild("onionAfterSpinBox");
+            _onionBeforeButton = _drawPane.findChild("onionBeforeButton");
+            _onionAfterButton  = _drawPane.findChild("onionAfterButton");
         }
         catch (exception exc)
         {
@@ -2029,7 +2295,7 @@ class: AnnotateMinorMode : MinorMode
         connect(_drawDock, QDockWidget.dockLocationChanged, locationChangedSlot);
         connect(_drawDock, QDockWidget.topLevelChanged, topLevelChangedSlot);
 
-        connect(_colorButton, QPushButton.clicked, chooseColorSlot);
+        connect(_colorButton, QPushButton.clicked, chooseColorSlot(,ColorMode.Draw));
         connect(_colorDialog, QColorDialog.currentColorChanged, newColorSlot(,true,true));
 
         _undoAct = QAction(auxIcon("undo_64x64.png"), "Undo", m);
@@ -2051,6 +2317,11 @@ class: AnnotateMinorMode : MinorMode
         _redoButton.setDefaultAction(_redoAct);
         _clearButton.setDefaultAction(_clearAct);
 
+        connect(_onionCheckBox, QAbstractButton.toggled, setOnionShow);
+        connect(_onionBeforeSpinBox, QSpinBox.valueChanged, setOnionBeforeFrame);
+        connect(_onionAfterSpinBox,  QSpinBox.valueChanged, setOnionAfterFrame);
+        connect(_onionBeforeButton, QPushButton.clicked, chooseColorSlot(,ColorMode.OnionBefore));
+        connect(_onionAfterButton,  QPushButton.clicked, chooseColorSlot(,ColorMode.OnionAfter));
 
         _drawDock.setWidget(_drawPane);
         _drawDock.ensurePolished();
@@ -2068,9 +2339,14 @@ class: AnnotateMinorMode : MinorMode
         //  Force update of UI elements
         //
 
-        setColor(_currentDrawMode.color);
+        setDrawColor(_currentDrawMode.color);
         setBrushSize(_currentDrawMode.size);
         _currentDrawMode.button.setChecked(true);
+        setOnionShow(getOnionShow());
+        setOnionBeforeFrame(getOnionBeforeFrame());
+        setOnionAfterFrame(getOnionAfterFrame());
+        setOnionBeforeColor(getOnionBeforeColor());
+        setOnionAfterColor(getOnionAfterColor());
 
         //
         //  Call mode init
