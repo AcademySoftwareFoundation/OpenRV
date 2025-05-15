@@ -25,7 +25,7 @@ Some of the build dependencies come from outside the main AppStream repo. So fir
 ```bash
 sudo dnf install epel-release
 sudo dnf config-manager --set-enabled powertools
-sudo dnf install alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson ninja-build openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel tcl-devel tcsh tk-devel yasm zip zlib-devel
+sudo dnf install alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson ninja-build openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers python3 python3-devel qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel
 ```
 
 You can disable the devel repo afterwards since dnf will warn about it:
@@ -51,7 +51,7 @@ python3 -m pip install -r requirements.txt
 
 ## Install CMake
 
-You need CMake version 3.27+ to build RV. The dnf-installable version is not quite recent enough, you'll to build and install CMake from sources.
+You need CMake version 3.27+ to build RV. The dnf-installable version is not quite recent enough, you'll need to build and install CMake from source.
 
 ```bash
 wget https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3.tar.gz
