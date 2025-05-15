@@ -498,6 +498,8 @@ namespace Rv
         presentFormat = (char*)"";
         presentData = (char*)"";
 
+        addSourceToDefaultView = true;
+
 #ifdef PLATFORM_DARWIN
         fontSize1 = 13;
         fontSize2 = 10;
@@ -533,6 +535,7 @@ namespace Rv
                 inSource = true;
                 sources.resize(sources.size() + 1);
                 sources.back().singleSource = true;
+                sources.back().addSourceToDefaultView = true;
 
                 SourceArgs& a = sources.back();
 

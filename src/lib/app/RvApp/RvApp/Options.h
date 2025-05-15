@@ -45,6 +45,7 @@ namespace Rv
                 , hasuncrop(false)
                 , singleSource(false)
                 , noMovieAudio(false)
+                , addSourceToDefaultView(true)
             {
                 cutIn = (std::numeric_limits<int>::max)();
                 cutOut = (std::numeric_limits<int>::max)();
@@ -68,6 +69,7 @@ namespace Rv
             float stereoRightOffset;
             int cutIn;
             int cutOut;
+            bool addSourceToDefaultView;
             std::string fcdl;
             std::string lcdl;
             std::string flut;
@@ -349,6 +351,8 @@ namespace Rv
         int presentAudio;
         int fontSize1;
         int fontSize2;
+
+        bool addSourceToDefaultView;
 
         SendExternalEventVector sendEvents;
     };
