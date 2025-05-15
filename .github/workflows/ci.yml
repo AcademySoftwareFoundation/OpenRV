@@ -471,6 +471,8 @@ jobs:
       - name: Install Python dependencies
         run: |
           python3 -m pip install --user --upgrade -r requirements.txt
+          python3 -m pip install --user --upgrade pipdeptree
+          python3 -m pipdeptree
   
       - name: Install Homebrew dependencies
         # icu4c is needed for Qt UIC executable / AUTOUIC.
