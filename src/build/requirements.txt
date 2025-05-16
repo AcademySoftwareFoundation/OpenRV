@@ -4,11 +4,12 @@ pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
 # We need to use the main branch of the OTIO Github repo since the latest release available as a Pypi package is missing some features we need for Live Review
 git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@main#egg=OpenTimelineIO # License: Other/Proprietary License (Modified Apache 2.0 License)
-PyOpenGL                # License: BSD License (BSD)
-# PyOpenGL_accelerate as issue with native arm64 build on MacOS.
-# Use PyOpenGL_accelerate only on x86_64 platform.
-PyOpenGL_accelerate ; platform_machine=='x86_64' # License: BSD License (BSD)
-
+# PyOpenGL                # License: BSD License (BSD)
+# # PyOpenGL_accelerate as issue with native arm64 build on MacOS.
+# # Use PyOpenGL_accelerate only on x86_64 platform.
+# PyOpenGL_accelerate ; platform_machine=='x86_64' # License: BSD License (BSD)
+PyOpenGL @ git+https://github.com/mcfletch/pyopengl.git@release-3.1.7#egg=PyOpenGL
+PyOpenGL_accelerate @ git+https://github.com/mcfletch/pyopengl.git@release-3.1.7#egg=PyOpenGL_accelerate&subdirectory=accelerate ; platform_machine=='x86_64'
 
 # Those are installed by the src/build/make_python.py script, adding them here to list their licenses.
 
