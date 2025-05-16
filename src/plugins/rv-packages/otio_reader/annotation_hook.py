@@ -12,6 +12,24 @@ import opentimelineio as otio
 from rv import commands, extra_commands
 
 
+def calculate_next_available_start_time(in_timeline, frame):
+    annotations = []
+
+    for layer in in_timeline.layers:
+        if layer.name == "Paint":
+            time_range = layer.layer_range
+            start_time = int(time_range.start_time.value)
+            annotations.append(start_time)
+
+    annotations.sort()
+
+    for start_time in annotations:
+        if start_time > frame:
+            return start_time
+
+    return None
+
+
 def hook_function(
     in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None
 ) -> None:
@@ -38,6 +56,27 @@ def hook_function(
             # Set properties on the paint component of the RVPaint node
             effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id + 1})
 
+            metadata = argument_map.get("effect_metadata")
+            is_hold = metadata.get("hold")
+            is_ghost = metadata.get("ghost")
+
+            start_time = int(time_range.start_time.value)
+            end_time = int(start_time + time_range.duration.value)
+
+            if is_hold:
+                next_available_start_time = calculate_next_available_start_time(
+                    in_timeline, frame
+                )
+                if next_available_start_time is not None:
+                    duration = next_available_start_time - start_time
+                else:
+                    source = argument_map.get("src")
+                    media_info = commands.sourceMediaInfo(source)
+                    end_frame = int(media_info["endFrame"])
+                    duration = end_frame - start_time
+            else:
+                duration = end_time - start_time
+
             # Add and set properties on the pen component of the RVPaint node
             effectHook.add_rv_effect_props(
                 pen_component,
@@ -49,6 +88,12 @@ def hook_function(
                     "cap": 1,
                     "splat": 0,
                     "mode": 0 if layer.type == "COLOR" else 1,
+                    "startFrame": start_time,
+                    "duration": duration,
+                    "hold": is_hold,
+                    "ghost": is_ghost,
+                    "ghostBefore": 5,
+                    "ghostAfter": 5,
                 },
             )
 
