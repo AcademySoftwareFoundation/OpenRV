@@ -36,3 +36,9 @@ rvui.mu
 window_mode.mu
 # See session_manager.mu.in
 session_manager.mu
+# See maya_tools.mu.in
+maya_tools.mu
+# See rvnuke_mode.mu.in
+rvnuke_mode.mu
+# See sync.mu
+sync.mu
