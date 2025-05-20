@@ -239,10 +239,10 @@ def _create_track(in_seq, context=None):
     with set_context(context, sequence=new_seq, track_kind=in_seq.kind):
         new_inputs = []
 
-        edl_time = context.get("global_start_time")
+        edl_time = None
         if not edl_time and len(items_to_serialize) > 0:
             edl_time = otio.opentime.RationalTime(
-                0, items_to_serialize[0].trimmed_range().start_time.rate
+                1, items_to_serialize[0].trimmed_range().start_time.rate
             )
         edl = {
             "in": [],
@@ -347,7 +347,16 @@ def _calculate_edl(edl, edl_time, item, seq_rate, pre_transition_item=None):
 
     edl["in"].append(in_frame)
     edl["out"].append(out_frame)
-    edl["frame"].append(edl_time.to_frames())
+
+    if not edl["frame"]:
+        edl["frame"].append(1)
+
+    accum = 1
+    for i in range(len(edl["in"])):
+        in_frame_other, out_frame_other = edl["in"][i], edl["out"][i]
+        accum += out_frame_other - in_frame_other + 1
+
+    edl["frame"].append(accum)
 
     return otio.opentime.TimeRange(edl_time, duration)
 
@@ -356,9 +365,9 @@ def _set_sequence_edl(sequence, edl_time, edl):
     # edl.in/out are terminated by 0. edl.frame is terminated by last frame + 1.
     edl["in"].append(0)
     edl["out"].append(0)
+    # The last edl["frame"] is filled out in _calculate_edl.
     # Note that the edl_time is already exclusive so we don't need to add 1 here
     # For reference: _create_track() - edl_time = edl_range.end_time_exclusive()
-    edl["frame"].append(edl_time.to_frames())
 
     # This effectively forces each cut to use the otio trimmed_range, regardless
     # of effects or other modifications to a sources timing.
@@ -385,20 +394,28 @@ def _get_in_out_frame(it, range_to_read, seq_rate=None):
 
     if not in_frame and not out_frame:
         rate = seq_rate if seq_rate is not None else range_to_read.duration.rate
-        in_frame = otio.opentime.to_frames(
-            range_to_read.start_time.rescaled_to(rate), rate=rate
-        )
-        out_frame = otio.opentime.to_frames(
-            range_to_read.end_time_inclusive().rescaled_to(rate), rate=rate
-        )
-    return (in_frame, out_frame)
+        # The in frame is the start_time of the current clip at its rate.
+        in_frame = otio.opentime.to_frames(range_to_read.start_time)
+        if rate != range_to_read.start_time.rate:
+            # RV expectation:
+            # The value of the out frame is the start_time of the current clip at its rate PLUS the duration of
+            # the current clip at the rate of the timeline.
+            out_frame = (
+                range_to_read.start_time.value
+                + range_to_read.duration.rescaled_to(rate).value
+            )
+        else:
+            # The out frame is the end_time inclusive of the current clip at its rate.
+            out_frame = otio.opentime.to_frames(range_to_read.end_time_inclusive())
+
+    return (in_frame, int(out_frame))
 
 
 def _create_timeline(tl, context=None):
     with set_context(
         context,
         global_start_time=tl.global_start_time,
-        **_get_global_transform(tl, context)
+        **_get_global_transform(tl, context),
     ):
         stack = create_rv_node_from_otio(tl.tracks, context)
 
