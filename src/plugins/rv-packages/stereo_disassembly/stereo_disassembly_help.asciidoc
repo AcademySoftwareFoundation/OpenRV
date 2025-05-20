@@ -25,7 +25,7 @@ This experimental package enables you to load stereo media with both eyes in the
 Four menu items provide access to various functions of the package:
 
 ==== 'Image/Stereo/Disassembly-Add Disassembly Node' ====
-Selecting this menu item will cause RV to examine the currently visible sources, and for each, if it does not already have a StereoDisassmbly node, add one.  Note that the node will be added "internally" (in the RVLinearizePipelineGroup within the Source), so the new node will not be visible in the Session Manager, and any view using this Source will see the result of the "disassembly".
+Selecting this menu item will cause RV to examine the currently visible sources, and for each, if it does not already have a StereoDisassembly node, add one.  Note that the node will be added "internally" (in the RVLinearizePipelineGroup within the Source), so the new node will not be visible in the Session Manager, and any view using this Source will see the result of the "disassembly".
 
 ==== 'Image/Stereo/Disassembly-Remove Disassembly Node' ====
 Remove StereoDisassembly nodes from all visible sources.
