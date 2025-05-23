@@ -294,7 +294,10 @@ EXTERNALPROJECT_ADD(
 # ##############################################################################################################################################################
 # This is temporary until the patch gets into the official PyOpenGL repo.      #
 # ##############################################################################################################################################################
-IF(NOT RV_TARGET_APPLE_ARM64)
+# Only for Apple Intel. Windows and Linux uses the requirements.txt file to install PyOpenGL-accelerate.
+IF(APPLE
+   AND RV_TARGET_APPLE_X86_64
+)
   MESSAGE(STATUS "Patching PyOpenGL and building PyOpenGL from source")
   SET(_patch_pyopengl_command
       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pyopengl-accelerate.patch

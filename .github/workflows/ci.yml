@@ -470,10 +470,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          python3 --version
           python3 -m pip install --user --upgrade -r requirements.txt
-          python3 -m pip install --user --upgrade pipdeptree
-          python3 -m pipdeptree
   
       - name: Install Homebrew dependencies
         # icu4c is needed for Qt UIC executable / AUTOUIC.
@@ -537,11 +534,7 @@ jobs:
         run: |
           cmake --build _build --config ${{ matrix.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
           ls -al _build
-
-      - name: Display RV's python dependencies list to confirm pyopengl-accelerate installation
-        run: |
-          ./_build/RV_DEPS_PYTHON/install/bin/python -m pip list
-
+          
       - name: Build OpenRV main executable
         run: |
           cmake --build _build --config ${{ matrix.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v

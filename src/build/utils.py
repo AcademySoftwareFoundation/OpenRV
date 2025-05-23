@@ -231,6 +231,8 @@ def download_file(url, file_path):
     """
     Download a file with HTTP or HTTPS.
 
+    Returns True if the HTTP request succeeded, False otherwise
+
     param: url: url to download
     param file_path: destination file path
     """
@@ -250,6 +252,8 @@ def download_file(url, file_path):
                 current += len(chunk)
                 file.write(chunk)
                 print(f"{current} / {total} ({round((current / total) * 100)}%)")
+
+    return req.ok
 
 
 def get_cygpath_windows(cygpath: str) -> str:
