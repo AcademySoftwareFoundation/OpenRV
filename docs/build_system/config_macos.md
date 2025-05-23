@@ -11,6 +11,7 @@
 - [Install tools and build dependencies](install_tools_and_build_dependencies)
 - [Install Qt](install_qt)
 - [Build Open RV](build_openrv)
+- [Setting up debugging in VSCode](debugging_openrv)
 
 ````{note}
 OpenRV can be built for *x86_64* by changing the architecture of the terminal to *x86_64* using the following command:
@@ -160,3 +161,62 @@ Once the build is completed, the Open RV application can be found in the Open RV
 Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/app/RV.app/Contents/MacOS/RV`.
 ```
 ````
+
+(debugging_openrv)=
+## 9. Setting up debugging in VSCode
+
+For a general understanding on how to debug C++ code in VSCode, please refer to the [Microsoft documentation](https://code.visualstudio.com/docs/cpp/launch-json-reference).
+
+To set up the C++ debugger in VSCode for Open RV, use the following steps:
+
+1. **Install the [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb) extension**
+2. **Configure the debugger**  
+    Create a `.vscode` folder at the root of the project if it doesn't already exist. Inside this folder, create a `launch.json` file to configure the debugger with the following content:
+
+    ```json
+    {
+        "version": "0.2.0",
+        "configurations": [
+            {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug Open RV (Debug Build)",
+            "program": "${workspaceFolder}/_build_debug/stage/app/RV.app/Contents/MacOS/RV",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "build"
+            }
+        ]
+    }
+    ```
+
+    **NOTE:** `program` should point to the build of the Open RV executable you want to debug. `preLaunchTask` is only necessary if you decide to follow step 3.
+
+3. **Set up automatic rebuild (Optional)**  
+    If you want to automatically rebuild Open RV before starting the debugger, add a `tasks.json` file in the `.vscode` folder created in the previous step:
+
+    ```json
+    {
+      "version": "2.0.0",
+      "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "_build_debug",
+                "--target",
+                "main_executable"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always"
+            }
+        }
+      ]
+    }
+    ```
