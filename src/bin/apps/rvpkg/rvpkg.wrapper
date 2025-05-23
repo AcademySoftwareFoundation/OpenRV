@@ -55,40 +55,30 @@ else
      export LD_LIBRARY_PATH="$RV_HOME/lib"
 fi
 
-# Detect if VFX2023 (OpenSSL 1.1.1) or VFX2024+ (OpenSSL (3+).
-set python_version = `$RV_HOME/bin/python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")'`
-set minor_version = `echo $python_version | cut -d. -f2`
+# Detect if VFX2023 (OpenSSL 1.1.1) or VFX2024+ (OpenSSL 3+).
+python_version=$("$RV_HOME/bin/python" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+minor_version=$(echo "$python_version" | cut -d. -f2)
 
-set is_python_vfx2023 = 0 # VFX2023 Python 3.10
-set is_python_vfx2024 = 0 # VFX2024 Python 3.11
+is_python_vfx2023=0 # VFX2023 Python 3.10
+is_python_vfx2024=0 # VFX2024 Python 3.11
 
-if ($minor_version > 10) then
-    set is_python_vfx2024 = 1
+if [ "$minor_version" -gt 10 ]; then
+    is_python_vfx2024=1
 else
-    set is_python_vfx2023 = 1
-endif
+    is_python_vfx2023=1
+fi
 
 # Unless the RV_USE_SYSTEM_OPENSSL environment variable is set, use the
 # OpenSSL provided with RV when the required OpenSSL version cannot be found.
-<<<<<<< HEAD
-# 
-if (! $?RV_USE_SYSTEM_OPENSSL) then
-    set required_openssl_found = ""
-    if ($is_python_vfx2023) then
-        set required_openssl_found = "`openssl version | grep 1.1.1`"
-    endif
-
-    if ( "$required_openssl_found" == "" ) then
-        setenv LD_LIBRARY_PATH "$RV_HOME/lib/OpenSSL:$LD_LIBRARY_PATH"
-    endif
-endif
-=======
 if [ -z "$RV_USE_SYSTEM_OPENSSL" ]; then
-     required_openssl_found=$(openssl version | grep 1.1.1)
-     if [ -z "$required_openssl_found" ]; then
-        export LD_LIBRARY_PATH "$RV_HOME/lib/OpenSSL:$LD_LIBRARY_PATH"
-     fi
+    required_openssl_found=""
+    if [ "$is_python_vfx2023" -eq 1 ]; then
+        required_openssl_found=$(openssl version | grep 1.1.1)
+    fi
+
+    if [ -z "$required_openssl_found" ]; then
+        export LD_LIBRARY_PATH="$RV_HOME/lib/OpenSSL:$LD_LIBRARY_PATH"
+    fi
 fi
->>>>>>> pr/rockylinux8
 
 exec "$bin" "$@"
