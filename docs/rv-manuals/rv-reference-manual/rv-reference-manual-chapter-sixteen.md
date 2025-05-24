@@ -441,6 +441,12 @@ Paint nodes are used primarily to store per frame annotations. Below *id* is the
 | pen: *id* : *frame* : *user* .cap | int | 1 | The cap style of the stroke:NoCap = 0; SquareCap = 1; RoundCap = 2; |
 | pen: *id* : *frame* : *user* .splat | int | 1 |  |
 | pen: *id* : *frame* : *user* .mode | int | 1 | Drawing mode of the stroke (Default if missing is 0):RenderOverMode = 0; RenderEraseMode = 1; |
+| pen: *id* : *frame* : *user* .startFrame | int | 1 | The first frame on which the pen stroke should be displayed |
+| pen: *id* : *frame* : *user* .duration | int | 1 | The number of frames on which the pen stroke should be displayed |
+| pen: *id* : *frame* : *user* .hold | int | 1 | Enable holding strokes based on their duration and startFrame properties |
+| pen: *id* : *frame* : *user* .ghost | int | 1 | Enable ghosting strokes based on their duration, startFrame, ghostBefore and ghostAfter properties |
+| pen: *id* : *frame* : *user* .ghostBefore | int | 1 | The number of frames on which to display the ghosted stroke before the actual stroke |
+| pen: *id* : *frame* : *user* .ghostAfter | int | 1 | The number of frames on which to display the ghosted stroke after the actual stroke |
 | text: *id* : *frame* : *user* .position | float[2] | 1 | Location of the text in the normalized coordinate system |
 | text: *id* : *frame* : *user* .color | float[4] | 1 | The color of the text |
 | text: *id* : *frame* : *user* .spacing | float | 1 | The spacing of the text |
@@ -451,6 +457,12 @@ Paint nodes are used primarily to store per frame annotations. Below *id* is the
 | text: *id* : *frame* : *user* .text | string | 1 | Content of the text |
 | text: *id* : *frame* : *user* .origin | string | 1 | The origin of the text box. The position property will store the location of the origin, but the origin can be on any corner of the text box or centered in between. The valid possible values for origin are top-left, top-center, top-right, center-left, center-center, center-right, bottom-left, bottom-center, bottom-right, and the empty string (which is the default for backwards compatibility). |
 | text: *id* : *frame* : *user* .debug | int | 1 | (unused) |
+| text: *id* : *frame* : *user* .startFrame | int | 1 | The first frame on which the text box should be displayed |
+| text: *id* : *frame* : *user* .duration | int | 1 | The number of frames on which the text box should be displayed |
+| text: *id* : *frame* : *user* .hold | int | 1 | Enable holding text boxes based on their duration and startFrame properties |
+| text: *id* : *frame* : *user* .ghost | int | 1 | Enable ghosting strokes based on their duration, startFrame, ghostBefore and ghostAfter properties |
+| text: *id* : *frame* : *user* .ghostBefore | int | 1 | The number of frames on which to display the ghosted stroke before the actual stroke |
+| text: *id* : *frame* : *user* .ghostAfter | int | 1 | The number of frames on which to display the ghosted stroke after the actual stroke |
 
 ## RVPrimaryConvert
 
