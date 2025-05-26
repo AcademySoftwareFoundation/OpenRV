@@ -254,6 +254,41 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
+# ##############################################################################################################################################################
+# This is temporary until the patch gets into the official PyOpenGL repo.      #
+# ##############################################################################################################################################################
+# Only for Apple Intel. Windows and Linux uses the requirements.txt file to install PyOpenGL-accelerate.
+IF(APPLE
+   AND RV_TARGET_APPLE_X86_64
+)
+  MESSAGE(STATUS "Patching PyOpenGL and building PyOpenGL from source")
+  SET(_patch_pyopengl_command
+      patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pyopengl-accelerate.patch
+  )
+
+  EXTERNALPROJECT_ADD(
+    pyopengl_accelerate
+    URL "https://github.com/mcfletch/pyopengl/archive/refs/tags/release-3.1.8.tar.gz"
+    URL_MD5 "d7a9e2f8c2d981b58776ded865b3e22a"
+    DOWNLOAD_NAME release-3.1.8.tar.gz
+    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_DIR ${CMAKE_BINARY_DIR}/pyopengl_accelerate
+    PATCH_COMMAND ${_patch_pyopengl_command}
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND "${_python3_executable}" -m pip install ./accelerate
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/pyopengl_accelerate/.pip_installed
+    BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/pyopengl_accelerate/setup.py
+    DEPENDS ${${_python3_target}-requirements-flag}
+    BUILD_IN_SOURCE TRUE
+    USES_TERMINAL_BUILD TRUE
+  )
+
+  # Ensure pyopengl_accelerate is built as part of the dependencies target
+  ADD_DEPENDENCIES(dependencies pyopengl_accelerate)
+ENDIF()
+# ##############################################################################################################################################################
+
 SET(${_python3_target}-requirements-flag
     ${_install_dir}/${_python3_target}-requirements-flag
 )
