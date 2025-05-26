@@ -107,6 +107,11 @@ namespace
         int levelIndex = 1;
         bool isHoldedCommandsInFirstLevel = false;
 
+        bool isNewAnnotation = std::any_of(
+            currentFrameCommands->begin(), currentFrameCommands->end(),
+            [&frame](const auto* command)
+            { return command->startFrame == frame; });
+
         for (const auto& beforeCommand : beforeCommands)
         {
             int ghostLevel =
@@ -114,8 +119,9 @@ namespace
 
             for (auto* command : beforeCommand.second)
             {
-                if (levelIndex == 1 && currentFrameCommands->empty()
-                    && command->hold != 0)
+                // Keep held annotations on the current frame only if there is
+                // no new annotation to add
+                if (levelIndex == 1 && command->hold != 0 && !isNewAnnotation)
                 {
                     isHoldedCommandsInFirstLevel = true;
                     command->ghostOn = true;
@@ -133,8 +139,8 @@ namespace
 
                     currentFrameCommands->push_back(command);
                 }
-                else if (command->ghost != 0
-                         && command->ghostBefore >= ghostLevel)
+
+                if (command->ghost != 0 && command->ghostBefore >= ghostLevel)
                 {
                     command->ghostOn = true;
                     command->ghostColor = PaintIPNode::Color(
