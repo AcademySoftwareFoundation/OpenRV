@@ -76,6 +76,12 @@ class: AnnotateMinorMode : MinorMode
         int          cap;
         float        maxSize;
         float        minSize;
+        int          startFrame;
+        int          duration;
+        int          hold;
+        int          ghost;
+        int          ghostBefore;
+        int          ghostAfter;
         PressureMode pressureMode;
         DrawMode     eraserMode;
         DrawMode     penMode;
@@ -394,7 +400,14 @@ class: AnnotateMinorMode : MinorMode
                      "%s.debug" % n,
                      "%s.join" % n,
                      "%s.cap" % n,
-                     "%s.points" % n];
+                     "%s.points" % n,
+                     "%s.startFrame" % n,
+                     "%s.duration" % n,
+                     "%s.hold" % n,
+                     "%s.ghost" % n,
+                     "%s.ghostBefore" % n,
+                     "%s.ghostAfter" % n
+                    ];
 
         beginCompoundStateChange();
 
@@ -421,6 +434,12 @@ class: AnnotateMinorMode : MinorMode
                        string brush,
                        int join,
                        int cap,
+                       int startFrame,
+                       int duration,
+                       int hold,
+                       int ghost,
+                       int ghostBefore,
+                       int ghostAfter,
                        int mode=RenderOverMode,
                        int debug=0)
     {
@@ -433,6 +452,12 @@ class: AnnotateMinorMode : MinorMode
             capName    = "%s.cap" % n,
             pointsName = "%s.points" % n,
             splatName  = "%s.splat" % n,
+            startFrameName = "%s.startFrame" % n,
+            durationName = "%s.duration" % n,
+            holdName = "%s.hold" % n,
+            ghostName = "%s.ghost" % n,
+            ghostBeforeName = "%s.ghostBefore" % n,
+            ghostAfterName = "%s.ghostAfter" % n,
             orderName  = frameOrderName(node, frame);
 
         beginCompoundStateChange();
@@ -444,6 +469,12 @@ class: AnnotateMinorMode : MinorMode
         newProperty(joinName, IntType, 1);
         newProperty(capName, IntType, 1);
         newProperty(splatName, IntType, 1);
+        newProperty(startFrameName, IntType, 1);
+        newProperty(durationName, IntType, 1);
+        newProperty(holdName, IntType, 1);
+        newProperty(ghostName, IntType, 1);
+        newProperty(ghostBeforeName, IntType, 1);
+        newProperty(ghostAfterName, IntType, 1);
 
         if (mode != RenderOverMode)
         {
@@ -475,6 +506,12 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(capName, int[] {cap}, true);
         setIntProperty(debugName, int[] {debug}, true);
         setIntProperty(splatName, int[] {if brush == "gauss" then 1 else 0}, true);
+        setIntProperty(startFrameName, int[] {startFrame}, true);
+        setIntProperty(durationName, int[] {duration}, true);
+        setIntProperty(holdName, int[] {hold}, true);
+        setIntProperty(ghostName, int[] {ghost}, true);
+        setIntProperty(ghostBeforeName, int[] {ghostBefore}, true);
+        setIntProperty(ghostAfterName, int[] {ghostAfter}, true);
 
         try
         {
@@ -530,6 +567,12 @@ class: AnnotateMinorMode : MinorMode
                      float size,
                      float scale,
                      float rot,
+                     int startFrame,
+                     int duration,
+                     int hold,
+                     int ghost,
+                     int ghostBefore,
+                     int ghostAfter,
                      string font = "",
                      string origin = "",
                      int mode=RenderOverMode,
@@ -546,6 +589,12 @@ class: AnnotateMinorMode : MinorMode
             originName  = "%s.origin" % n,
             posName     = "%s.position" % n,
             debugName   = "%s.debug" % n,
+            startFrameName = "%s.startFrame" % n,
+            durationName = "%s.duration" % n,
+            holdName = "%s.hold" % n,
+            ghostName = "%s.ghost" % n,
+            ghostBeforeName = "%s.ghostBefore" % n,
+            ghostAfterName = "%s.ghostAfter" % n,
             orderName   = frameOrderName(node, frame);
 
         beginCompoundStateChange();
@@ -559,6 +608,12 @@ class: AnnotateMinorMode : MinorMode
         newProperty(textName, StringType, 1);
         newProperty(originName, StringType, 1);
         newProperty(debugName, IntType, 1);
+        newProperty(startFrameName, IntType, 1);
+        newProperty(durationName, IntType, 1);
+        newProperty(holdName, IntType, 1);
+        newProperty(ghostName, IntType, 1);
+        newProperty(ghostBeforeName, IntType, 1);
+        newProperty(ghostAfterName, IntType, 1);
 
         if (mode != RenderOverMode)
         {
@@ -577,6 +632,12 @@ class: AnnotateMinorMode : MinorMode
         setStringProperty(textName, string[] {""}, true);
         setStringProperty(originName, string[] {origin}, true);
         setIntProperty(debugName, int[] {debug}, true);
+        setIntProperty(startFrameName, int[] {startFrame}, true);
+        setIntProperty(durationName, int[] {duration}, true);
+        setIntProperty(holdName, int[] {hold}, true);
+        setIntProperty(ghostName, int[] {ghost}, true);
+        setIntProperty(ghostBeforeName, int[] {ghostBefore}, true);
+        setIntProperty(ghostAfterName, int[] {ghostAfter}, true);
 
         try
         {
@@ -750,6 +811,12 @@ class: AnnotateMinorMode : MinorMode
                                          d.size,
                                          1.0 / (if _scaleBrush then scale() else 1.0),
                                          0.0,
+                                         _currentNodeInfo.frame,
+                                         d.duration,
+                                         d.hold,
+                                         d.ghost,
+                                         d.ghostBefore,
+                                         d.ghostAfter,
                                          "", "", d.renderMode, _debug);
         }
         catch (exception exc)
@@ -865,7 +932,7 @@ class: AnnotateMinorMode : MinorMode
             _currentDrawObject = newStroke(_currentNode,
                                            _currentNodeInfo.frame,
                                            incolor, twidth, d.brushName,
-                                           d.join, d.cap, d.renderMode, _debug);
+                                           d.join, d.cap, _currentNodeInfo.frame, d.duration, d.hold, d.ghost, d.ghostBefore, d.ghostAfter, d.renderMode, _debug);
         }
         catch (exception exc)
         {
@@ -1045,6 +1112,51 @@ class: AnnotateMinorMode : MinorMode
             if (_linkToolColors) for_each (mode; _drawModes) mode.color = c;
 
             _setColorLock = false;
+        }
+    }
+
+    method: setAnnotationHold (void; Event event)
+    {
+        let isHold = int(event.contents());
+
+        for_each (d; _drawModes)
+        {
+            d.hold = isHold;
+        }
+
+        if (_currentNode eq nil) return;
+
+        for_each (prop; properties(_currentNode))
+        {
+            if (regex("\\.hold$").match(prop))
+            {
+                setIntProperty(prop, int[] {isHold}, true);
+            }
+
+            if (regex("\\.duration$").match(prop) && isHold == 0)
+            {
+                setIntProperty(prop, int[] {1}, true);
+            }
+        }
+    }
+    
+    method: setAnnotationGhost (void; Event event)
+    {
+        let isGhost = int(event.contents());
+
+        for_each (d; _drawModes)
+        {
+            d.ghost = isGhost;
+        }
+
+        if (_currentNode eq nil) return;
+        
+        for_each (prop; properties(_currentNode))
+        {
+            if (regex("\\.ghost$").match(prop))
+            {
+                setIntProperty(prop, int[] {isGhost}, true);
+            }
         }
     }
 
@@ -1796,6 +1908,12 @@ class: AnnotateMinorMode : MinorMode
                                      "",
                                      RoundJoin,
                                      SquareCap,
+                                     1,
+                                     1,
+                                     0,
+                                     0,
+                                     5,
+                                     5,
                                      0.024, 0.001,
                                      PressureMode.None };
 
@@ -1812,6 +1930,12 @@ class: AnnotateMinorMode : MinorMode
                                      RoundJoin,
                                      SquareCap,
                                      0.024, 0.001,
+                                     1,
+                                     1,
+                                     0,
+                                     0,
+                                     5,
+                                     5,
                                      PressureMode.None };
 
         _textDrawMode  = DrawMode { "Text",
@@ -1827,6 +1951,12 @@ class: AnnotateMinorMode : MinorMode
                                      RoundJoin,
                                      SquareCap,
                                      0.01, 0.0015,
+                                     1,
+                                     1,
+                                     0,
+                                     0,
+                                     5,
+                                     5,
                                      PressureMode.None };
 
         _penDrawMode = DrawMode { "Pen",
@@ -1842,6 +1972,12 @@ class: AnnotateMinorMode : MinorMode
                                   RoundJoin,
                                   SquareCap,
                                   0.024, 0.001,
+                                  1,
+                                  1,
+                                  0,
+                                  0,
+                                  5,
+                                  5,
                                   defaultPMode };
 
 
@@ -1858,6 +1994,12 @@ class: AnnotateMinorMode : MinorMode
                                        RoundJoin,
                                        SquareCap,
                                        0.044, 0.001,
+                                       1,
+                                       1,
+                                       0,
+                                       0,
+                                       5,
+                                       5,
                                        defaultPMode };
 
 
@@ -1875,6 +2017,12 @@ class: AnnotateMinorMode : MinorMode
                                         RoundJoin,
                                         SquareCap,
                                         0.024, 0.001,
+                                        1,
+                                        1,
+                                        0,
+                                        0,
+                                        5,
+                                        5,
                                         PressureMode.None };
 
         _softEraseDrawMode = DrawMode { "Air Brush Erase",
@@ -1891,6 +2039,12 @@ class: AnnotateMinorMode : MinorMode
                                         RoundJoin,
                                         SquareCap,
                                         0.044, 0.001,
+                                        1,
+                                        1,
+                                        0,
+                                        0,
+                                        5,
+                                        5,
                                         PressureMode.None };
 
         _dodgeDrawMode     = DrawMode { "Dodge",
@@ -1906,6 +2060,12 @@ class: AnnotateMinorMode : MinorMode
                                         RoundJoin,
                                         SquareCap,
                                         0.044, 0.001,
+                                        1,
+                                        1,
+                                        0,
+                                        0,
+                                        5,
+                                        5,
                                         PressureMode.None,
                                         _hardEraseDrawMode,
                                         nil,
@@ -1925,6 +2085,12 @@ class: AnnotateMinorMode : MinorMode
                                         RoundJoin,
                                         SquareCap,
                                         0.044, 0.001,
+                                        1,
+                                        1,
+                                        0,
+                                        0,
+                                        5,
+                                        5,
                                         PressureMode.None,
                                         _hardEraseDrawMode,
                                         nil,
@@ -1944,6 +2110,12 @@ class: AnnotateMinorMode : MinorMode
                                         RoundJoin,
                                         SquareCap,
                                         0.044, 0.001,
+                                        1,
+                                        1,
+                                        0,
+                                        0,
+                                        5,
+                                        5,
                                         PressureMode.None };
 
         _smudgeDrawMode   = DrawMode { "Smudge",
@@ -1959,6 +2131,12 @@ class: AnnotateMinorMode : MinorMode
                                         RoundJoin,
                                         SquareCap,
                                         0.044, 0.001,
+                                        1,
+                                        1,
+                                        0,
+                                        0,
+                                        5,
+                                        5,
                                         PressureMode.None };
 
         _drawModes = DrawMode[] { _selectDrawMode, _penDrawMode, _airBrushDrawMode,
@@ -2109,6 +2287,8 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
+              ("set-annotation-ghost", setAnnotationGhost, ""),
+              ("set-annotation-hold", setAnnotationHold, ""),
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),
