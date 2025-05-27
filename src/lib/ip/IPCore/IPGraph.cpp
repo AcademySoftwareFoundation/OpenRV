@@ -363,11 +363,21 @@ namespace IPCore
 
         DisplayGroupIPNode* displayGroup = primaryDisplayGroup();
         const VideoDevice* d = displayGroup ? displayGroup->imageDevice() : 0;
+        const auto isMuted = m_mute ? m_mute->front() : false;
 
         initializeIPTree(modules);
 
         if (d)
+        {
             setPrimaryDisplayGroup(d);
+        }
+
+        // Preserve the mute audio state that we had before the reset.
+        // Note that IPGraph::reset() is called when clearing an RV session
+        if (m_mute)
+        {
+            m_mute->front() = isMuted;
+        }
     }
 
     void IPGraph::clear()
