@@ -1,9 +1,7 @@
 //
-//  Copyright (c) 2009 Tweak Software.
-//  All rights reserved.
+// Copyright (C) 2025 Autodesk, Inc. All Rights Reserved.
 //
-//  SPDX-License-Identifier: Apache-2.0
-//
+// SPDX-License-Identifier: Apache-2.0
 //
 #ifndef __IPCore__PaintCommand__h__
 #define __IPCore__PaintCommand__h__
@@ -16,8 +14,7 @@
 #include <TwkGLF/GLRenderPrimitives.h>
 #include <TwkPaint/Path.h>
 #include <IPCore/IPImage.h>
-#include <list>
-#include <map>
+#include <vector>
 
 namespace IPCore
 {
@@ -120,13 +117,13 @@ namespace IPCore
         class Command
         {
         public:
-            typedef TwkMath::Vec4f Vec4;
-            typedef TwkMath::Vec3f Vec3;
-            typedef TwkMath::Vec2f Vec2;
-            typedef TwkMath::Box2f Box2;
-            typedef TwkMath::Mat44f Matrix;
-            typedef TwkMath::Col4f Color;
-            typedef TwkPaint::Path Path;
+            using Vec4 = TwkMath::Vec4f;
+            using Vec3 = TwkMath::Vec3f;
+            using Vec2 = TwkMath::Vec2f;
+            using Box2 = TwkMath::Box2f;
+            using Matrix = TwkMath::Mat44f;
+            using Color = TwkMath::Col4f;
+            using Path = TwkPaint::Path;
 
             enum CommandType
             {
@@ -141,24 +138,28 @@ namespace IPCore
 
             float offset;
             unsigned int version;
+            Color color;
 
-            virtual void execute(CommandContext&) const = 0;
-            virtual void hash(std::ostream&) const = 0;
-            virtual size_t getType() const = 0;
+            virtual void execute(CommandContext& context) const = 0;
+            virtual void hash(std::ostream& ostream) const = 0;
+            [[nodiscard]] virtual size_t getType() const = 0;
 
             Command()
                 : offset(0)
                 , version(3)
+                , color(Color(0.0))
             {
             }
 
-            virtual ~Command() {}
+            Command(const Command& command) = default;
+
+            virtual ~Command() = default;
         };
 
         class PolyLine : public Command
         {
         public:
-            typedef unsigned int HashValue;
+            using HashValue = unsigned int;
 
             enum Mode
             {
@@ -170,50 +171,78 @@ namespace IPCore
                 TessellateMode // each triangle can have its own color
             };
 
-            PolyLine(const Vec2* v = 0, size_t n = 0, float w = 0,
-                     Color c = Color(0.0), bool o = false)
-                : Command()
-                , npoints(n)
-                , width(w)
+            explicit PolyLine(const Vec2* vector2d = nullptr,
+                              size_t npoints = 0, float width = 0,
+                              Color color = Color(0.0), bool ownPoints = false)
+                : npoints(npoints)
+                , width(width)
                 , smoothingWidth(1.0)
-                , color(c)
-                , ownPoints(o)
+                , ownPoints(ownPoints)
                 , debug(0)
                 , join(Path::RoundJoin)
                 , cap(Path::SquareCap)
                 , mode(OverMode)
-                , widths(0)
                 , splat(false)
                 , built(false)
                 , idhash(0)
             {
+                color = color;
+
                 if (ownPoints)
                 {
-                    points = new Vec2[n];
-                    memcpy((void*)points, (void*)v, n * sizeof(Vec2));
+                    points.assign(vector2d->begin(), vector2d->end());
                 }
                 else
                 {
-                    points = v;
+                    points = {};
                 }
             }
 
-            ~PolyLine()
+            PolyLine(const PolyLine& polyLine)
+                : Command(polyLine)
+                , width(polyLine.width)
+                , brush(polyLine.brush)
+                , debug(polyLine.debug)
+                , join(polyLine.join)
+                , cap(polyLine.cap)
+                , mode(polyLine.mode)
+                , splat(polyLine.splat)
+                , smoothingWidth(polyLine.smoothingWidth)
+                , built(polyLine.built)
             {
-                if (ownPoints)
+                if (polyLine.npoints > 0)
                 {
-                    delete[] points;
-                    points = NULL;
+                    npoints = polyLine.npoints;
+                    points.assign(polyLine.points.begin(),
+                                  polyLine.points.end());
                 }
+                else
+                {
+                    npoints = 0;
+                    points = {};
+                }
+
+                if (polyLine.width != 0.0f)
+                {
+                    widths.assign(polyLine.widths.begin(),
+                                  polyLine.widths.end());
+                }
+                else
+                {
+                    widths = {};
+                }
+
+                ownPoints = true;
             }
 
-            const Vec2* points;
+            virtual ~PolyLine() = default;
+
+            std::vector<Vec2> points{};
             size_t npoints;
             float width;
             float smoothingWidth;
             bool splat;
-            const float* widths;
-            Color color;
+            std::vector<float> widths{};
             std::string brush;
             TwkPaint::Path::JoinStyle join;
             TwkPaint::Path::CapStyle cap;
@@ -235,37 +264,35 @@ namespace IPCore
             mutable Path path;
             mutable bool built;
 
-            virtual void execute(CommandContext&) const;
-            void executeOldOverMode(CommandContext&) const;
+            void execute(CommandContext& context) const override;
+            void executeOldOverMode(CommandContext& context) const;
 
-            virtual void hash(std::ostream&) const;
+            void hash(std::ostream& ostream) const override;
             virtual HashValue hashValue() const;
 
             void build() const;
 
-            virtual size_t getType() const;
+            size_t getType() const override;
         };
 
         class Text : public Command
         {
         public:
-            Text(const std::string& str = "", const std::string& fnt = "",
-                 float ptsze = 1.0, Color c = Color(1, 1, 1, 1))
-                : Command()
-                , text("")
-                , font("")
-                , origin("")
-                , ptsize(ptsze)
-                , color(c)
+            explicit Text(const std::string& /*str*/ = "",
+                          const std::string& /*fnt*/ = "", float ptsze = 1.0,
+                          Color color = Color(1, 1, 1, 1))
+                : ptsize(ptsze)
                 , scale(1.0)
                 , rotation(0.0)
                 , spacing(1.0)
                 , pos(0, 0)
             {
+                color = color;
             }
 
+            Text(const Text& text) = default;
+
             Vec2 pos;
-            Color color;
             std::string text;
             std::string font;
             std::string origin;
@@ -274,9 +301,9 @@ namespace IPCore
             float rotation;
             float spacing;
 
-            virtual void execute(CommandContext&) const;
-            virtual void hash(std::ostream&) const;
-            virtual size_t getType() const;
+            void execute(CommandContext& context) const override;
+            void hash(std::ostream& ostream) const override;
+            [[nodiscard]] size_t getType() const override;
 
             static void setup(CommandContext&);
             static void cleanup(CommandContext&);
@@ -286,39 +313,41 @@ namespace IPCore
         {
         public:
             PushFrameBuffer();
-            virtual void execute(CommandContext&) const;
-            virtual void hash(std::ostream&) const;
-            virtual size_t getType() const;
+            void execute(CommandContext& context) const override;
+            void hash(std::ostream& ostream) const override;
+            [[nodiscard]] size_t getType() const override;
         };
 
         class PopFrameBuffer : public Command
         {
         public:
             PopFrameBuffer();
-            virtual void execute(CommandContext&) const;
-            virtual void hash(std::ostream&) const;
-            virtual size_t getType() const;
+            void execute(CommandContext& context) const override;
+            void hash(std::ostream& ostream) const override;
+            [[nodiscard]] size_t getType() const override;
         };
 
         class Rectangle : public Command
         {
         public:
-            Rectangle(float h = 0, float w = 0, Color c = Color(0, 0, 0, 1.0))
-                : height(h)
-                , width(w)
-                , color(c)
+            explicit Rectangle(float height = 0, float width = 0,
+                               Color color = Color(0, 0, 0, 1.0))
+                : height(height)
+                , width(width)
                 , pos(0, 0)
             {
+                color = color;
             }
+
+            Rectangle(const Rectangle& rectangle) = default;
 
             Vec2 pos;
             float height;
             float width;
-            Color color;
 
-            virtual void execute(CommandContext&) const;
-            virtual void hash(std::ostream&) const;
-            virtual size_t getType() const;
+            void execute(CommandContext&) const override;
+            void hash(std::ostream&) const override;
+            [[nodiscard]] size_t getType() const override;
         };
 
         class Quad : public Command
@@ -330,23 +359,33 @@ namespace IPCore
                 OutlineMode
             };
 
+            Quad() = default;
+
+            Quad(const Quad& quad)
+                : drawMode(quad.drawMode)
+            {
+                points[0] = quad.points[0];
+                points[1] = quad.points[1];
+                points[2] = quad.points[2];
+                points[3] = quad.points[3];
+            }
+
             Vec2 points[4];
-            Color color;
             DrawMode drawMode;
 
-            virtual void execute(CommandContext&) const;
-            virtual void hash(std::ostream&) const;
-            virtual size_t getType() const;
+            void execute(CommandContext&) const override;
+            void hash(std::ostream&) const override;
+            [[nodiscard]] size_t getType() const override;
         };
 
         class ExecuteAllBefore : public Command
         {
         public:
-            ExecuteAllBefore() {}
+            ExecuteAllBefore() = default;
 
-            virtual void execute(CommandContext&) const;
-            virtual void hash(std::ostream&) const;
-            virtual size_t getType() const;
+            void execute(CommandContext& context) const override;
+            void hash(std::ostream& ostream) const override;
+            [[nodiscard]] size_t getType() const override;
         };
 
         struct PaintContext
