@@ -26,7 +26,7 @@ namespace
                           const int duration)
     {
         constexpr float minOpacity = 0.075;
-        float ghostOpacity = 0.0;
+        float ghostOpacity = 1.0;
 
         if (frame > startFrame) // Command starts before the current frame
                                 // (ghostBefore)
@@ -35,7 +35,8 @@ namespace
                                / static_cast<float>(frame - startFrame)
                            + minOpacity;
         }
-        else // Command starts after the current frame (ghostAfter)
+        if (frame < startFrame) // Command starts after the current frame
+                                // (ghostAfter)
         {
             ghostOpacity = static_cast<float>(duration)
                                / static_cast<float>(startFrame - frame)
@@ -45,6 +46,11 @@ namespace
         return ghostOpacity;
     }
 
+    // Loop over all commands and separate them in 3 containers:
+    // 1. Commands that are visible on the current frame (based only on their
+    // visibility range settings)
+    // 2. Commands that end *before* the current frame
+    // 3. Commands that start *after* the current frame
     auto
     separateCommandsByFrameGroup(const PaintIPNode::LocalCommands& commands,
                                  const int frame, const size_t eye)
