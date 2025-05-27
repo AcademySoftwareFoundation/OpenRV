@@ -99,7 +99,9 @@ def prepare() -> None:
 
         def get_fallback_clang_filename_suffix(version):
             major_minor_version_str = ".".join(version[:2])
-            if major_minor_version_str == "17.0":
+            if major_minor_version_str == "14.0":
+                return "14.0.3-based-macos-universal.7z"
+            elif major_minor_version_str == "17.0":
                 return "17.0.1-based-macos-universal.7z"
             return None
 
