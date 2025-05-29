@@ -23,6 +23,7 @@
 #include <GL/glew.h>
 #endif
 #include <RvCommon/GLView.h> // WINDOWS: include AFTER other stuff
+#include <RvCommon/DiagnosticsView.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtGui/QtGui>
 #include <QtNetwork/QtNetwork>
@@ -113,6 +114,7 @@ namespace Rv
         , m_vsyncDisabled(false)
         , m_oldGLView(0)
         , m_glView(0)
+        , m_diagnosticsView(0)
         , m_sourceEditor(0)
         , m_displayLink(0)
     {
@@ -175,6 +177,9 @@ namespace Rv
                 opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
                 opts.dispAlphaBits, !m_startupResize);
         }
+
+        m_diagnosticsView = new DiagnosticsView(this, m_glView->format());
+        showDiagnostics();
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -827,6 +832,8 @@ namespace Rv
         m_oldGLView->hide();
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
+
+    void RvDocument::showDiagnostics() { m_diagnosticsView->show(); }
 
     void RvDocument::setStereo(bool b)
     {

@@ -46,14 +46,14 @@ IF(RV_TARGET_WINDOWS)
   INCLUDE(expat)
 ENDIF()
 
-# TODO_QT: Not generic enough.. But maybe we could use something like NOT CY2023
-#          since after 2023, it is Qt6
+# TODO_QT: Not generic enough.. But maybe we could use something like NOT CY2023 since after 2023, it is Qt6
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   INCLUDE(qt5)
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   INCLUDE(qt6)
 ENDIF()
 
+INCLUDE(imgui)
 INCLUDE(openssl) # Python3 requirement
 INCLUDE(python3)
 INCLUDE(boost)
@@ -129,18 +129,10 @@ ENDIF()
 MESSAGE(STATUS "Using PNG:          ${RV_DEPS_PNG_VERSION}")
 MESSAGE(STATUS "Using Python3:      ${RV_DEPS_PYTHON3_VERSION}")
 
-RV_VFX_SET_VARIABLE(
-  _rv_deps_pyside_version
-  CY2023 "Using PySide2:      ${RV_DEPS_PYSIDE_VERSION}"
-  CY2024 "Using PySide6:      ${RV_DEPS_PYSIDE_VERSION}"
-)
+RV_VFX_SET_VARIABLE(_rv_deps_pyside_version CY2023 "Using PySide2:      ${RV_DEPS_PYSIDE_VERSION}" CY2024 "Using PySide6:      ${RV_DEPS_PYSIDE_VERSION}")
 MESSAGE(STATUS "${_rv_deps_pyside_version}")
 
-RV_VFX_SET_VARIABLE(
-  _rv_deps_qt_version
-  CY2023 "Using Qt5:          ${RV_DEPS_QT5_VERSION}"
-  CY2024 "Using Qt6:          ${RV_DEPS_QT6_VERSION}"
-)
+RV_VFX_SET_VARIABLE(_rv_deps_qt_version CY2023 "Using Qt5:          ${RV_DEPS_QT5_VERSION}" CY2024 "Using Qt6:          ${RV_DEPS_QT6_VERSION}")
 MESSAGE(STATUS "${_rv_deps_qt_version}")
 
 MESSAGE(STATUS "Using Raw:          ${RV_DEPS_RAW_VERSION}")

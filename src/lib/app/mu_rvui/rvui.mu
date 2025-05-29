@@ -2123,6 +2123,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     writeSetting("ViewToolBars", "bottom", SettingsValue.Bool(isBottomViewToolbarVisible()));
 }
 
+\: showDiagnostics (void; Event event)
+{
+    commands.showDiagnostics();
+}
+
 \: infoShown (int;)
 {
     State state = data();
@@ -6185,6 +6190,8 @@ global bool debugGC = false;
             {"   Region Cache",  cacheModeFunc(CacheGreedy), "C", cacheStateFunc(CacheGreedy)},
             {"   Cache Off", cacheModeFunc(CacheOff),  nil, cacheStateFunc(CacheOff)},
             {"   Release All Cached Images", ~releaseAllCachedImages,  nil, nil},
+            {"_", nil},
+            {"Diagnostics", showDiagnostics, nil, nil},
             {"_", nil},
             }},
         {"Audio", Menu {
