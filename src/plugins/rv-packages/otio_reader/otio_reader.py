@@ -629,12 +629,13 @@ def _create_movieproc(time_range, kind="blank"):
 
 def _add_effects(it, last_result, context=None):
     for effect in it.effects:
-        result = create_rv_node_from_otio(effect, context)
+        with set_context(context, effect_metadata=effect.metadata):
+            result = create_rv_node_from_otio(effect, context)
 
-        if result:
-            commands.setNodeInputs(result, [last_result])
-            _add_metadata_to_node(effect, result)
-            last_result = result
+            if result:
+                commands.setNodeInputs(result, [last_result])
+                _add_metadata_to_node(effect, result)
+                last_result = result
 
     return last_result
 
