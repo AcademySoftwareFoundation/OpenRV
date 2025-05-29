@@ -54,13 +54,14 @@ class Annotation(otio.schema.Effect):
 
     def __str__(self) -> str:
         return (
-            f"Annotation({self.name}, {self.effect_name}, {self.visible}, "
-            f"{self.layers})"
+            f"Annotation({self.name}, {self.effect_name}, {self.metadata}, "
+            f"{self.layers}), {self.visible}"
         )
 
     def __repr__(self) -> str:
         return (
             f"otio.schema.Annotation(name={self.name!r}, "
             f"effect_name={self.effect_name!r}, "
+            f"metadata={self.metadata!r}, "
             f"visible={self.visible!r}, layers={self.layers!r})"
         )
