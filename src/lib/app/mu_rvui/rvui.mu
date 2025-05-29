@@ -2125,7 +2125,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: showDiagnostics (void; Event event)
 {
-    commands.showDiagnostics();
+  //  commands.showDiagnostics();
 }
 
 \: infoShown (int;)

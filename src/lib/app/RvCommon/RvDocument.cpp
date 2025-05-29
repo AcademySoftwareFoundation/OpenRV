@@ -178,8 +178,8 @@ namespace Rv
                 opts.dispAlphaBits, !m_startupResize);
         }
 
-        m_diagnosticsView = new DiagnosticsView(this, m_glView->format());
-        showDiagnostics();
+        //        m_diagnosticsView = new DiagnosticsView(this,
+        //        m_glView->format()); showDiagnostics();
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -833,7 +833,10 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
-    void RvDocument::showDiagnostics() { m_diagnosticsView->show(); }
+    void RvDocument::showDiagnostics()
+    {
+        // m_diagnosticsView->show();
+    }
 
     void RvDocument::setStereo(bool b)
     {
