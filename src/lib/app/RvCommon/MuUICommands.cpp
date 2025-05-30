@@ -509,6 +509,11 @@ namespace Rv
 
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
+            new Function(c, "setConnectNewSourcesToDefaultViews",
+                         setConnectNewSourcesToDefaultViews, None, Return,
+                         "void", Parameters, new Param(c, "enable", "bool"),
+                         End),
+
             EndArguments);
     }
 
@@ -2365,6 +2370,12 @@ namespace Rv
     {
         // Note: This is no longer relevant in RV Open Source but kept to
         // maintain backward compatibility.
+    }
+
+    NODE_IMPLEMENTATION(setConnectNewSourcesToDefaultViews, void)
+    {
+        bool enable = NODE_ARG(0, bool);
+        Rv::Options::sharedOptions().addSourceToDefaultView = enable;
     }
 
 } // namespace Rv
