@@ -24,14 +24,13 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC TwkMovie
+  PUBLIC TwkMovie ffmpeg::avutil
   PRIVATE mp4v2Utils
           Boost::filesystem
           TwkUtil
           TwkFB
           ffmpeg::avcodec
           ffmpeg::avformat
-          ffmpeg::avutil
           ffmpeg::swscale
           OpenJph::OpenJph
 )
