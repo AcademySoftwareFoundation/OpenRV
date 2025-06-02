@@ -117,6 +117,7 @@ namespace Rv
             case 1:
                 a->setIcon(QIcon(":/images/paint_48x48.png"));
                 a->setToolTip("Toggle Annotation tools");
+                a->setCheckable(true);
                 m_paintAction = a;
                 break;
             case 2:
@@ -481,6 +482,11 @@ namespace Rv
                     }
                 }
             }
+            else if (name == "annotate-panel-visibility")
+            {
+                bool isVisible = (contents == "1");
+                m_paintAction->setChecked(isVisible);
+            }
         }
 
         return EventAcceptAndContinue;
@@ -496,10 +502,10 @@ namespace Rv
                                     "session_manager");
     }
 
-    void RvBottomViewToolBar::paintActionTriggered(bool b)
+    void RvBottomViewToolBar::paintActionTriggered(bool isChecked)
     {
-        m_session->userGenericEvent("mode-manager-toggle-mode",
-                                    "annotate_mode");
+        std::string value = isChecked ? std::to_string(1) : std::to_string(0);
+        m_session->userGenericEvent("toggle-draw-panel", value);
     }
 
     void RvBottomViewToolBar::infoActionTriggered(bool)

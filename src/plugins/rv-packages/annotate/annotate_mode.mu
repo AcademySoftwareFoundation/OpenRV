@@ -22,15 +22,6 @@ class: DrawDockWidget : QDockWidget
         QDockWidget.QDockWidget("Draw", parent, Qt.Tool);
         _mode = m;
     }
-
-    method: closeEvent(void; QCloseEvent event)
-    {
-        _mode.toggle();
-
-        // Dont execute this event by OS. We dont want
-        // that Windows closes it.
-        event.ignore();
-    }
 }
 
 class: AnnotateMinorMode : MinorMode
@@ -443,6 +434,11 @@ class: AnnotateMinorMode : MinorMode
                        int mode=RenderOverMode,
                        int debug=0)
     {
+        if (_currentDrawMode eq _selectDrawMode)
+        {
+            return;
+        }
+
         let n          = newUniqueName(node, "pen", frame),
             colorName  = "%s.color" % n,
             widthName  = "%s.width" % n,
@@ -911,6 +907,11 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
+        if (_currentDrawMode eq _selectDrawMode)
+        {
+            togglePlayVerbose(true);
+        }
+
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
@@ -943,6 +944,11 @@ class: AnnotateMinorMode : MinorMode
             print("annotate_mode: UNCAUGHT EXCEPTION\n");
         }
 
+        if (_currentDrawObject eq nil)
+        {
+            return;
+        }
+
         let pei = eventToImageSpace(name, ip, true);
 
         bool useWidth = false;
@@ -969,6 +975,11 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
+        if (_currentDrawMode eq _selectDrawMode)
+        {
+            return;
+        }
+
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
@@ -1014,6 +1025,11 @@ class: AnnotateMinorMode : MinorMode
 
     method: release (void; Event event)
     {
+        if (_currentDrawMode eq _selectDrawMode)
+        {
+            return;
+        }
+
         runtime.gc.enable();
         drag(event);
         _currentDrawObject = nil;
@@ -1160,6 +1176,23 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
+    method: toggleDrawPanel (void; Event event)
+    {
+        let isToggled = int(event.contents());
+
+        if (_drawDock neq nil)
+        {
+            if (isToggled == 1)
+            {
+                _drawDock.show();
+            }
+            else
+            {
+                _drawDock.hide();
+            }
+        }
+    }
+
     method: auxFilePath (string; string icon)
     {
         io.path.join(supportPath("annotate_mode", "annotate"), icon);
@@ -1233,6 +1266,16 @@ class: AnnotateMinorMode : MinorMode
     method: topLevelChangedSlot (void; bool toplevel)
     {
         _topLevel = toplevel;
+    }
+
+    method: drawDockVisibilityChangedSlot (void; bool isVisible)
+    {
+        sendInternalEvent("annotate-panel-visibility", if isVisible then "1" else "0");
+        if (!isVisible)
+        _currentDrawMode = _selectDrawMode;
+        commands.setCursor(_currentDrawMode.cursor);
+        updateDrawModeUI();
+        _currentDrawMode.button.setChecked(true);
     }
 
     method: newSizeSlot (void; int value)
@@ -1678,16 +1721,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: updateDrawModeUI (void;)
     {
-        if (_currentDrawMode eq _selectDrawMode)
-        {
-            _hideDrawPane = _hideDrawPane + 1;
-            if (_active) toggle();
-        }
-        else
-        {
-            if (!_active) toggle();
-            _hideDrawPane = 0;
-        }
 
         if (_activeSampleColor)
         {
@@ -2166,7 +2199,11 @@ class: AnnotateMinorMode : MinorMode
             _dockArea = Qt.LeftDockWidgetArea;
         }
 
-        if (_currentDrawMode eq nil) _currentDrawMode = _penDrawMode;
+        if (_currentDrawMode eq nil) 
+        {
+            _currentDrawMode = _selectDrawMode;
+            updateDrawModeUI();
+        }
 
         for_each (d; _drawModes)
         {
@@ -2206,6 +2243,7 @@ class: AnnotateMinorMode : MinorMode
         connect(_sizeSlider, QAbstractSlider.valueChanged, newSizeSlot);
         connect(_drawDock, QDockWidget.dockLocationChanged, locationChangedSlot);
         connect(_drawDock, QDockWidget.topLevelChanged, topLevelChangedSlot);
+        connect(_drawDock, QDockWidget.visibilityChanged, drawDockVisibilityChangedSlot);
 
         connect(_colorButton, QPushButton.clicked, chooseColorSlot);
         connect(_colorDialog, QColorDialog.currentColorChanged, newColorSlot(,true,true));
@@ -2240,7 +2278,7 @@ class: AnnotateMinorMode : MinorMode
 
         _drawDock.setFloating(_topLevel);
 
-        _drawDock.show();
+        _drawDock.hide();
 
         //
         //  Force update of UI elements
@@ -2289,6 +2327,7 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
               ("set-annotation-ghost", setAnnotationGhost, ""),
               ("set-annotation-hold", setAnnotationHold, ""),
+              ("toggle-draw-panel", toggleDrawPanel, ""),
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),
@@ -2410,32 +2449,11 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
-    method: deactivate (void;)
-    {
-        if (_hideDrawPane != 1)
-        {
-            if (_manageDock neq nil) _manageDock.hide();
-            if (_drawDock neq nil) _drawDock.hide();
-            _hideDrawPane = 0;
-        }
-
-        setCursor(CursorDefault);
-        removeTags();
-    }
-
-    method: activate (void;)
-    {
-        updateCurrentNode();
-        if (_manageDock neq nil) _manageDock.show();
-        if (_drawDock neq nil) _drawDock.show();
-        setCursor(_currentDrawMode.cursor);
-        updateDrawModeUI();
-        setTags();
-    }
 
     method: render (void; Event event)
     {
         if (_currentDrawMode eq _dropperDrawMode ||
+            _currentDrawMode eq _selectDrawMode ||
             !_showBrush ||
             _pointerGone)
         {
