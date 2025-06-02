@@ -291,7 +291,7 @@ class: AnnotateMinorMode : MinorMode
         _autoMark         = b5;
         _linkToolColors   = b6;
 
-        let String name = readSetting("Annotate", "drawmode", String("Pen"));
+        let String name = readSetting("Annotate", "drawmode", String("Select"));
 
         for_each (d; _drawModes)
         {
