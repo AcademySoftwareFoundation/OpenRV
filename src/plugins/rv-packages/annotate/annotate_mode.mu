@@ -1277,11 +1277,14 @@ class: AnnotateMinorMode : MinorMode
     method: drawDockVisibilityChangedSlot (void; bool isVisible)
     {
         sendInternalEvent("annotate-panel-visibility", if isVisible then "1" else "0");
+        
         if (!isVisible)
-        _currentDrawMode = _selectDrawMode;
-        commands.setCursor(_currentDrawMode.cursor);
-        updateDrawModeUI();
-        _currentDrawMode.button.setChecked(true);
+        {
+            _currentDrawMode = _selectDrawMode;
+            commands.setCursor(_currentDrawMode.cursor);
+            updateDrawModeUI();
+            _currentDrawMode.button.setChecked(true);
+        }
     }
 
     method: newSizeSlot (void; int value)
@@ -1805,12 +1808,16 @@ class: AnnotateMinorMode : MinorMode
 
     method: shutdown (void; Event event)
     {
+        _currentDrawMode = _selectDrawMode;
+        commands.setCursor(_currentDrawMode.cursor);
+        updateDrawModeUI();
+        _currentDrawMode.button.setChecked(true);
+
         if (_autoSave)
         {
             saveSettings();
         }
         commitTextInternal();
-        if (_active) toggle();
         event.reject();
     }
 
