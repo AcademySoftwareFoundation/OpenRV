@@ -5,8 +5,7 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
-// #include <QtGui/QtGui>
-// #include <QtOpenGL/QtOpenGL>
+
 #ifdef PLATFORM_WINDOWS
 #include <GL/glew.h>
 #include <GL/wglew.h>
@@ -14,10 +13,13 @@
 #include <TwkGLF/GL.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <RvCommon/GLView.h>
+#include <RvCommon/DesktopVideoDevice.h>
 #include <TwkGLF/GLFBO.h>
 #include <IPCore/Session.h>
 #include <TwkApp/Application.h>
 #include <TwkApp/VideoModule.h>
+
+#include <QScreen>
 
 namespace Rv
 {
@@ -100,6 +102,34 @@ namespace Rv
         return 0;
     }
 
+    void QTGLVideoDevice::setPhysicalDevice(VideoDevice* d)
+    {
+        TwkGLF::GLVideoDevice::setPhysicalDevice(d);
+
+        // Update the DevicePixelRatio associated with the physical device.
+        // This is important for high DPI displays, where the device pixel ratio
+        // may differ from the logical pixel ratio on a per screen basis.
+        m_devicePixelRatio = 1.0f;
+
+        static bool noQtHighDPISupport =
+            getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
+        if (noQtHighDPISupport)
+        {
+            return;
+        }
+
+        if (const DesktopVideoDevice* desktopVideoDevice =
+                dynamic_cast<const DesktopVideoDevice*>(d))
+        {
+            const QList<QScreen*> screens = QGuiApplication::screens();
+            if (desktopVideoDevice->qtScreen() < screens.size())
+            {
+                m_devicePixelRatio =
+                    screens[desktopVideoDevice->qtScreen()]->devicePixelRatio();
+            }
+        }
+    }
+
     void QTGLVideoDevice::redraw() const
     {
         if (!isWorkerDevice())
@@ -141,6 +171,12 @@ namespace Rv
 
     VideoDevice::Resolution QTGLVideoDevice::resolution() const
     {
+        return Resolution(m_view->width() * devicePixelRatio(),
+                          m_view->height() * devicePixelRatio(), 1.0f, 1.0f);
+    }
+
+    VideoDevice::Resolution QTGLVideoDevice::internalResolution() const
+    {
         return Resolution(m_view->width(), m_view->height(), 1.0f, 1.0f);
     }
 
@@ -156,7 +192,8 @@ namespace Rv
 
     VideoDevice::VideoFormat QTGLVideoDevice::format() const
     {
-        return VideoFormat(m_view->width(), m_view->height(), 1.0, 1.0,
+        return VideoFormat(m_view->width() * devicePixelRatio(),
+                           m_view->height() * devicePixelRatio(), 1.0, 1.0,
                            (m_refresh != -1.0) ? m_refresh : 0.0,
                            hardwareIdentification());
     }
@@ -185,9 +222,15 @@ namespace Rv
         }
     }
 
-    size_t QTGLVideoDevice::width() const { return m_view->width(); }
+    size_t QTGLVideoDevice::width() const
+    {
+        return m_view->width() * devicePixelRatio();
+    }
 
-    size_t QTGLVideoDevice::height() const { return m_view->height(); }
+    size_t QTGLVideoDevice::height() const
+    {
+        return m_view->height() * devicePixelRatio();
+    }
 
     void QTGLVideoDevice::syncBuffers() const
     {
@@ -207,7 +250,7 @@ namespace Rv
         {
             float refresh = -1.0;
 
-            VideoDevice::Resolution res = resolution();
+            VideoDevice::Resolution res = internalResolution();
             int tx = x + res.width / 2;
             int ty = y + res.height / 2;
 

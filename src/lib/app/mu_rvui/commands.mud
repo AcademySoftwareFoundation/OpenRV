@@ -1766,5 +1766,10 @@ For a device in a module return the ID string for one of the ModuleNameID, Devic
 or VideoAndDataFormatID. This is currently used to locate settings for display profiles.
 """
 
+devicePixelRatio """
+Return the device pixel ratio for high DPI displays.
+For reference: https://doc.qt.io/qt-6/highdpi.html
+"""
+
 }
 }
