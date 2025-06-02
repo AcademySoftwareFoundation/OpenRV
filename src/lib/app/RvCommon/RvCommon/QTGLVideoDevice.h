@@ -46,6 +46,10 @@ namespace Rv
 
         void setAbsolutePosition(int x, int y);
 
+        // Device pixel ratio for high DPI displays
+        // For reference: https://doc.qt.io/qt-6/highdpi.html
+        float devicePixelRatio() const { return m_devicePixelRatio; };
+
         //
         //  VideoDevice API
         //
@@ -58,6 +62,8 @@ namespace Rv
 
         virtual size_t width() const;
         virtual size_t height() const;
+
+        virtual Resolution internalResolution() const;
 
         virtual void open(const StringVector&);
         virtual void close();
@@ -72,6 +78,8 @@ namespace Rv
             return Capabilities(capabilities()) == NoCapabilities;
         }
 
+        virtual void setPhysicalDevice(VideoDevice* d);
+
     protected:
         QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
 
@@ -79,6 +87,7 @@ namespace Rv
         int m_x;
         int m_y;
         float m_refresh;
+        float m_devicePixelRatio{1.0f};
         QOpenGLWidget* m_view;
         QTTranslator* m_translator;
     };

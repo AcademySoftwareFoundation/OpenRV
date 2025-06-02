@@ -64,6 +64,10 @@ namespace Rv
 
         QImage readPixels(int x, int y, int w, int h);
 
+        // Device pixel ratio for high DPI displays
+        // For reference: https://doc.qt.io/qt-6/highdpi.html
+        float devicePixelRatio() const;
+
     public slots:
         void eventProcessingTimeout();
 

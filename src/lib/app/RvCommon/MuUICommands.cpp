@@ -509,6 +509,9 @@ namespace Rv
 
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
+            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return,
+                         "float", End),
+
             EndArguments);
     }
 
@@ -2365,6 +2368,22 @@ namespace Rv
     {
         // Note: This is no longer relevant in RV Open Source but kept to
         // maintain backward compatibility.
+    }
+
+    NODE_IMPLEMENTATION(devicePixelRatio, float)
+    {
+        float devicePixelRatio = 1.0f;
+
+        const Session* s = Session::currentSession();
+        const RvDocument* doc =
+            reinterpret_cast<RvDocument*>(s->opaquePointer());
+
+        if (doc != nullptr && doc->view() != nullptr)
+        {
+            devicePixelRatio = doc->view()->devicePixelRatio();
+        }
+
+        NODE_RETURN(devicePixelRatio);
     }
 
 } // namespace Rv
