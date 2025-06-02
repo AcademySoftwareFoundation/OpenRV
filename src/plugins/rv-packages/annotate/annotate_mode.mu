@@ -1142,16 +1142,19 @@ class: AnnotateMinorMode : MinorMode
 
         if (_currentNode eq nil) return;
 
-        for_each (prop; properties(_currentNode))
+        for_each(node; nodes())
         {
-            if (regex("\\.hold$").match(prop))
+            for_each (prop; properties(node))
             {
-                setIntProperty(prop, int[] {isHold}, true);
-            }
+                if (regex("\\.hold$").match(prop))
+                {
+                    setIntProperty(prop, int[] {isHold}, true);
+                }
 
-            if (regex("\\.duration$").match(prop) && isHold == 0)
-            {
-                setIntProperty(prop, int[] {1}, true);
+                if (regex("\\.duration$").match(prop) && isHold == 0)
+                {
+                    setIntProperty(prop, int[] {1}, true);
+                }
             }
         }
     }
@@ -1166,12 +1169,15 @@ class: AnnotateMinorMode : MinorMode
         }
 
         if (_currentNode eq nil) return;
-        
-        for_each (prop; properties(_currentNode))
+
+        for_each(node; nodes())
         {
-            if (regex("\\.ghost$").match(prop))
+            for_each(prop; properties(node))
             {
-                setIntProperty(prop, int[] {isGhost}, true);
+                if (regex("\\.ghost$").match(prop))
+                {
+                    setIntProperty(prop, int[] {isGhost}, true);
+                }
             }
         }
     }
