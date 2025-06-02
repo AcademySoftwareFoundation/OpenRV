@@ -399,7 +399,7 @@ class: Inspector : Widget
         let domain = event.subDomain(),
             p      = event.relativePointer(),
             m      = state.config.bevelMargin,
-            tri    = vec2f(_widW - 32, domain.y-0.7*m),
+            tri    = vec2f(_widW/devicePixelRatio() - 32, domain.y-0.7*m),
             pc     = p - tri,
             d      = mag(pc),
             near   = d < 9;
@@ -488,14 +488,13 @@ class: Inspector : Widget
 
     method: _drawCross (void; Point p, float t)
     {
-        let x0 = Vec2(2, 0),
-            x1 = Vec2(7, 0),
-            y0 = Vec2(0, 2),
-            y1 = Vec2(0, 7);
+        let devicePixelRatio = devicePixelRatio(),
+            x0 = Vec2(2*devicePixelRatio, 0),
+            x1 = Vec2(7*devicePixelRatio, 0),
+            y0 = Vec2(0, 2*devicePixelRatio),
+            y1 = Vec2(0, 7*devicePixelRatio);
 
-       float f = t/2.0;
-
-        glLineWidth(3.0);
+        glLineWidth(3.0*devicePixelRatio);
 
         glColor(0.5-t,0.5-t,0.5-t,1);
 
@@ -506,7 +505,7 @@ class: Inspector : Widget
         glVertex(p - y0); glVertex(p - y1);
         glEnd();
 
-        glLineWidth(1.0);
+        glLineWidth(1.0*devicePixelRatio);
         glColor(0.5+t,0.5+t,0.5+t,1);
 
         glBegin(GL_LINES);
@@ -527,7 +526,9 @@ class: Inspector : Widget
             initializeNoPoint(this);
         }
 
-        let pinfo = imagesAtPixel(_colorPointEvent, nil, true).front(),
+        let isRenderEvent = event.name() == "render",
+            devicePixelRatio = (if isRenderEvent then devicePixelRatio() else 1.0),
+            pinfo = imagesAtPixel(_colorPointEvent, nil, true).front(),
             sName = sourceNameWithoutFrame(pinfo.name),
             sp = getSourcePixel(pinfo, sName, frame());
 
@@ -536,22 +537,22 @@ class: Inspector : Widget
         let domain = event.domain(),
             bg     = state.config.bg,
             fg     = state.config.fg,
-            margin = state.config.bevelMargin,
+            margin = state.config.bevelMargin*devicePixelRatio,
             m2     = margin,
             md     = margin / 2,
-            p      = imageToEventSpace(sName, _colorPointImage), // + Vec2(50,50),
+            p      = imageToEventSpace(sName, _colorPointImage)*devicePixelRatio,
             c      = if _showFBColor then _fbColor else _currentColor;
 
         if (event.domainVerticalFlip()) p.y = domain.y - 1 - p.y;
 
-        gltext.size(state.config.inspectorTextSize);
+        gltext.size(state.config.inspectorTextSize * devicePixelRatio);
 
         if (_colorSampling && (frame() != _colorFrame || _inputsChanged || _graphStateChanged || _glReadPending))
         {
             if (_showFBColor)
             {
                 float[] pixels;
-                glReadPixels(_colorPointEvent.x, _colorPointEvent.y, 1, 1, GL_RGBA, pixels);
+                glReadPixels(_colorPointEvent.x*devicePixelRatio, _colorPointEvent.y*devicePixelRatio, 1, 1, GL_RGBA, pixels);
                 _fbColor = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
                 c = _fbColor;
             }
@@ -674,7 +675,7 @@ class: Inspector : Widget
             emin = vec2f(x, y) - vec2f(margin, margin),
             emax = emin + tbox + vec2f(margin*2.0, 0.0);
 
-        this.updateBounds(emin, emax);
+        this.updateBounds(emin/devicePixelRatio, emax/devicePixelRatio);
 
         glColor(bg);
         glPushAttrib(GL_ENABLE_BIT);
@@ -704,21 +705,21 @@ class: Inspector : Widget
         if (_pointerStyle == PointerStyleBox)
         {
             glColor(bg);
-            let offset = 2;
-            glLineWidth(2.0);
+            let offset = 2*devicePixelRatio;
+            glLineWidth(2.0*devicePixelRatio);
             drawRect(GL_LINE_LOOP,
                     p+Vec2( offset,  offset),
                     p+Vec2( offset, -offset),
                     p+Vec2(-offset, -offset),
                     p+Vec2(-offset,  offset));
-            offset = 4;
+            offset = 4*devicePixelRatio;
             glColor(0.8*fg);
             drawRect(GL_LINE_LOOP,
                     p+Vec2( offset,  offset),
                     p+Vec2( offset, -offset),
                     p+Vec2(-offset, -offset),
                     p+Vec2(-offset,  offset));
-            glLineWidth(1.0);
+            glLineWidth(1.0*devicePixelRatio);
         }
         else
         if (_pointerStyle == PointerStyleCross)
@@ -751,7 +752,7 @@ class: Inspector : Widget
         //  Menu triangle
 
         glColor((if _nearTriangle then 0.9 else 0.7)*fg);
-        draw (triangleGlyph, x + _widW - 52, tbox.y + y - 1.7*margin , 90.0, 8.0, false);
+        draw (triangleGlyph, x + _widW - 52*devicePixelRatio, tbox.y + y - 1.7*margin , 90.0, 8.0*devicePixelRatio, false);
 
         if (_inCloseArea || (_containsPointer && _closeButtonStyle == CloseButtonAlways))
         {

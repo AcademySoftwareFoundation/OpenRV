@@ -127,7 +127,8 @@ class: Wipe : MinorMode
 
         State state = data();
         let domain  = event.domain(),
-            p       = state.pointerPosition;
+            p       = state.pointerPosition,
+            devicePixelRatio = devicePixelRatio();
 
         _cornerEdit = false;
         _drawManip = false;
@@ -156,6 +157,8 @@ class: Wipe : MinorMode
             let param   = "%s.stencil.visibleBox" % tformNode,
                 vals    = getFloatProperty(param),
                 corners = imageGeometryByTag(i.tags[0]._0, i.tags[0]._1);
+
+            for_index (c; corners) corners[c] /= devicePixelRatio;
 
             if (i.inside)
             {
@@ -197,15 +200,15 @@ class: Wipe : MinorMode
             _sourceName      = sourceNameWithoutFrame(info.name);
             _sourcePoint     = state.pointerPosition;
             _nearEdge        = 0;
-            _grabPoint       = _manipPoint._1;
-	    _grabPointNorm   = eventToImageSpace(_sourceName, _grabPoint, true);
+            _grabPoint       = _manipPoint._1*devicePixelRatio;
+            _grabPointNorm   = eventToImageSpace(_sourceName, _grabPoint, true);
             _centerEdit      = !_cornerEdit;
             _currentEditNode = _manipPoint._2;
         }
         else if (info neq nil)
         {
             _sourceName    = sourceNameWithoutFrame(info.name);
-            _grabPoint     = Point(info.x, info.y);
+            _grabPoint     = Point(info.x*devicePixelRatio, info.y*devicePixelRatio);
 	    _grabPointNorm = eventToImageSpace(_sourceName, _grabPoint, true);
             _manipPoint    = (info, _grabPoint, editNode(tagValue(info.tags, "wipe")));
             _sourcePoint   = state.pointerPosition;
@@ -231,11 +234,7 @@ class: Wipe : MinorMode
             // this happens when the view changes for some reason
             //assert(_nearEdge != -1);
             if (_nearEdge == -1) print("wipes: _nearEdge == -1\n");
-        }
-        else
-        {
-            //print("nada\n");
-            ;
+
         }
 
         redraw();
@@ -272,10 +271,11 @@ class: Wipe : MinorMode
                 pp    = event.pointer(),
                 dp    = _downPoint,
                 ip    = pp - dp,
-                a     = _corners[0],
-                b     = _corners[1],
-                c     = _corners[2],
-                d     = _corners[3],
+                devicePixelRatio = devicePixelRatio(),
+                a     = _corners[0]/devicePixelRatio,
+                b     = _corners[1]/devicePixelRatio,
+                c     = _corners[2]/devicePixelRatio,
+                d     = _corners[3]/devicePixelRatio,
                 dx    = dot(ip, normalize(b - a)) * xs / mag(b - a),
                 dy    = dot(ip, normalize(d - a)) * ys / mag(d - a),
                 v0    = vals[0] + dx,
@@ -563,9 +563,10 @@ class: Wipe : MinorMode
         if (_cameraChange || !state.pointerInSession) return;
 
         let domain  = event.domain(),
+            devicePixelRatio = devicePixelRatio(),
             bg      = state.config.bg,
             fg      = state.config.fg,
-            p       = state.pointerPosition,
+            p       = state.pointerPosition*devicePixelRatio,
 	    ms      = margins();
 
 	if (p.x < ms[0] || p.x > domain.x - ms[1] || p.y > domain.y - ms[2] || p.y < ms[3]) return;
@@ -584,9 +585,6 @@ class: Wipe : MinorMode
 
 	    let infos = imagesAtPixel(_sourcePoint),
 	        name = sourceNameWithoutFrame(_manipPoint._0.name);
-
-            //if (_corners.empty()) _corners = imageGeometry(sourceNameWithoutFrame(_manipPoint._0.name));
-            //if (_corners.empty()) _corners = imageGeometry(infos.front().name);
 
 	    let ep = imageToEventSpace (name, _grabPointNorm, true);
 
@@ -628,7 +626,7 @@ class: Wipe : MinorMode
                 {
                     glPushMatrix();
                     glTranslate(ep.x, ep.y, 0.0);
-                    glScale(25.0, 25.0, 25.0);
+                    glScale(25.0*devicePixelRatio, 25.0*devicePixelRatio, 25.0*devicePixelRatio);
                     glRotate(rotang, 0, 0, 1);
                     glColor(bg * Color(1,1,1,.5));
                     circleGlyph(false);
@@ -637,7 +635,7 @@ class: Wipe : MinorMode
 
                     glPushMatrix();
                     glTranslate(ep.x, ep.y, 0.0);
-                    glScale(25.0, 25.0, 25.0);
+                    glScale(25.0*devicePixelRatio, 25.0*devicePixelRatio, 25.0*devicePixelRatio);
                     glRotate(rotang, 0, 0, 1);
                     glColor(fg);
                     translateIconGlyph(false);
@@ -650,7 +648,7 @@ class: Wipe : MinorMode
                 { 
                     glPushMatrix();
                     glTranslate(ep.x, ep.y, 0.0);
-                    glScale(25.0, 25.0, 25.0);
+                    glScale(25.0*devicePixelRatio, 25.0*devicePixelRatio, 25.0*devicePixelRatio);
                     glRotate(rotang, 0, 0, 1);
                     glColor(bg * Color(1,1,1,.25));
                     circleGlyph(false);
@@ -659,7 +657,7 @@ class: Wipe : MinorMode
 
                     glPushMatrix();
                     glTranslate(ep.x, ep.y, 0.0);
-                    glScale(25.0, 25.0, 25.0);
+                    glScale(25.0*devicePixelRatio, 25.0*devicePixelRatio, 25.0*devicePixelRatio);
                     glRotate(rotang, 0, 0, 1);
                     glColor(fg);
                     if ((_nearEdge & 1) == 0) translateXIconGlyph(false);
@@ -672,16 +670,16 @@ class: Wipe : MinorMode
                 }
                 
                 glColor(fg*0.5);
-                glPointSize(12.0);
+                glPointSize(12.0*devicePixelRatio);
                 glBegin(GL_POINTS); glVertex(ep); glEnd();
                 glColor(fg);
-                glPointSize(8.0);
+                glPointSize(8.0*devicePixelRatio);
                 glBegin(GL_POINTS); glVertex(ep); glEnd();
 
                 if (_showInfo)
                 {
                     (string,string)[] pairs;
-                    gltext.size(state.config.wipeInfoTextSize);
+                    gltext.size(state.config.wipeInfoTextSize*devicePixelRatio);
 
                     \: reverse ((string,string)[]; (string,string)[] s)
                     {
@@ -739,7 +737,7 @@ class: Wipe : MinorMode
                         ey = y + th * (state.pixelInfo.size() - 1) + fd + th/2 + 2.0;
 
                     glEnable(GL_POINT_SMOOTH);
-                    glPointSize(6.0);
+                    glPointSize(6.0*devicePixelRatio);
                     glBegin(GL_POINTS);
                     glColor(Color(.75,.75,.15,1));
                     glVertex(gx, gy);

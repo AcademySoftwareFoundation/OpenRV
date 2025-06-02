@@ -628,6 +628,9 @@ namespace TwkApp
 
         virtual void setPhysicalDevice(VideoDevice* d) { m_physicalDevice = d; }
 
+        // Device pixel ratio for high DPI displays
+        virtual float devicePixelRatio() const { return 1.0f; }
+
     protected:
         void setCapabilities(unsigned int caps) { m_capabilities = caps; }
 

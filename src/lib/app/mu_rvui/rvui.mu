@@ -4771,9 +4771,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: drawFeedback (void; Event event)
 {
     State state = data();
-    gltext.size(20);
 
     if (state.feedbackText eq nil) return;
+
+    let devicePixelRatio = devicePixelRatio(),
+        textsize = 20 * devicePixelRatio;
+    gltext.size(textsize);
 
     let d  = event.domain(),
         w  = d.x,
@@ -4794,8 +4797,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     let m = margins();
-    drawTextWithCartouche(m[0] + 20, h-20-sb[3] - m[2], state.feedbackText,
-                          20, fg, bg,
+    drawTextWithCartouche(m[0]*devicePixelRatio + textsize,
+                          h-textsize-sb[3] - m[2]*devicePixelRatio,
+                          state.feedbackText,
+                          textsize, fg, bg,
                           state.feedbackGlyph, gc);
     glDisable(GL_BLEND);
 
@@ -4898,7 +4903,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         attrs    = getCurrentAttributes(),
         srcs     = sources(),
         noAttrs  = attrs == nil || attrs.empty(),
-        textsize = 20,
+        textsize = 20 * devicePixelRatio(),
         colorscl = 0.75,
         fstatus  = currentFrameStatus();
 
