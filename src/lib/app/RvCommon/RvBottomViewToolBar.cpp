@@ -563,15 +563,20 @@ namespace Rv
 
     void RvBottomViewToolBar::audioSliderChanged(int value)
     {
-        // turn off mute first
-        audioMuteTriggered(false);
-        m_muteAction->setChecked(false);
-
-        float v = float(value) / 99.0;
+        const float v = float(value) / 99.0;
         FloatPropertyEditor editor(m_session->graph(),
                                    m_session->currentFrame(),
                                    "#RVSoundTrack.audio.volume");
-        editor.setValue(v);
+
+        // Has the volume changed?
+        if (v != editor.value())
+        {
+            // Turn off the mute audio first
+            audioMuteTriggered(false);
+            m_muteAction->setChecked(false);
+
+            editor.setValue(v);
+        }
     }
 
     void RvBottomViewToolBar::setVolumeIcon()
