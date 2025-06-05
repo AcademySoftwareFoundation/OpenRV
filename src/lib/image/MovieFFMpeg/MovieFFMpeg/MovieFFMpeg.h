@@ -268,6 +268,10 @@ namespace TwkMovie
                               int width, int height, bool convertFormat,
                               SwsContext*& imgConvertContext);
 
+        
+        FrameBuffer*  jpeg2000Decode(int inframe, VideoTrack* track);
+
+
         //
         // Data Members
         //

@@ -33,6 +33,7 @@ TARGET_LINK_LIBRARIES(
           ffmpeg::avformat
           ffmpeg::avutil
           ffmpeg::swscale
+          OpenJph::OpenJph
 )
 
 IF(RV_TARGET_WINDOWS)
