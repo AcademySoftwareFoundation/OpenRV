@@ -3883,7 +3883,7 @@ namespace TwkMovie
             else
             {
                 // Figure out if we got a good timestamp. Whether we are using
-                // pts ot dts for this format calculate the frame this decode
+                // pts or dts for this format calculate the frame this decode
                 // represents for RV.
                 const int64_t pktPTS = track->videoFrame->pts;
                 const int64_t pktDTS = track->videoFrame->pkt_dts;
