@@ -7,23 +7,11 @@
 INCLUDE(cxx_defaults)
 
 SET(_target
-    "PyTwkApp"
+    "ImGuiPythonBridge"
 )
 
 SET(_sources
-    PyInterface.cpp
-    PyEventType.cpp
-    PyFunctionAction.cpp
-    PyCommands.cpp
-    PyMenuState.cpp
-    PyMu.cpp
-    PyMuSymbolType.cpp
-)
-
-FIND_PACKAGE(
-  ${RV_QT_PACKAGE_NAME}
-  COMPONENTS Core
-  REQUIRED
+    ImGuiPythonBridge.cpp
 )
 
 ADD_LIBRARY(
@@ -38,14 +26,6 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Python::Python
-  PRIVATE Mu
-          MuLang
-          MuPy
-          MuTwkApp
-          Qt::Core
-          TwkPython
-          imgui::imgui
-          ImGuiPythonBridge
 )
 
 IF(RV_TARGET_DARWIN)

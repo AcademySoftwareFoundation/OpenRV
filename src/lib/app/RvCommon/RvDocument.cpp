@@ -62,6 +62,8 @@
 #include <RvCommon/CGDesktopVideoDevice.h>
 #endif
 
+#include <QDockWidget>
+
 namespace Rv
 {
     using namespace std;
@@ -178,8 +180,16 @@ namespace Rv
                 opts.dispAlphaBits, !m_startupResize);
         }
 
-        //        m_diagnosticsView = new DiagnosticsView(this,
-        //        m_glView->format()); showDiagnostics();
+        // Create DiagnosticsView as a dockable widget.
+        m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
+
+        // Dockable to QMainWindow, not centralwidget.
+        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+        m_diagnosticsDock->setWidget(m_diagnosticsView);
+        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        addDockWidget(Qt::LeftDockWidgetArea, m_diagnosticsDock);
+        m_diagnosticsDock->hide();                    // Hide by default
+        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -833,10 +843,7 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
-    void RvDocument::showDiagnostics()
-    {
-        // m_diagnosticsView->show();
-    }
+    void RvDocument::showDiagnostics() { m_diagnosticsDock->show(); }
 
     void RvDocument::setStereo(bool b)
     {

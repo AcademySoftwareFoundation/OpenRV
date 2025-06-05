@@ -164,6 +164,7 @@ namespace Rv
         QMenu* m_userPopup;
         TwkApp::Menu* m_userMenu;
         DiagnosticsView* m_diagnosticsView;
+        QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
         QWidget* m_viewContainerWidget;

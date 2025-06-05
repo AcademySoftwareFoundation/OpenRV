@@ -1,15 +1,15 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "1.91.9" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "bundle_20250323" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_imgui_download_url
-    "https://github.com/ocornut/imgui/archive/refs/tags/v${_version}.zip"
+    "https://github.com/pthom/imgui/archive/refs/tags/${_version}.zip"
 )
 
 # Hashes for verification (replace with actual hash values)
 SET(_imgui_download_hash
-    "909ebf627ea5c7298c9f4d1f589c77a0"
+    "1ea3f48e9c6ae8230dac6e8a54f6e74b"
 )
 
 # There is no version suffix for imgui library name.
@@ -69,7 +69,20 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-MESSAGE(STATUS "Using Qt6 from: ${RV_DEPS_QT_LOCATION}")
+# Download imgui-node-editor into a separate directory Using imgui-node-editor fork from imgui-bundle repository.
+EXTERNALPROJECT_ADD(
+  imgui_node_editor_download
+  GIT_REPOSITORY "https://github.com/pthom/imgui-node-editor.git"
+  GIT_TAG "dae8edccf15d19e995599ecd505e7fa1d3264a4c"
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ""
+  BUILD_IN_SOURCE TRUE
+  USES_TERMINAL_DOWNLOAD TRUE
+)
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -83,14 +96,15 @@ EXTERNALPROJECT_ADD(
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends
+    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_BYPRODUCTS ${_imgui_byproducts}
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_BUILD TRUE
-  DEPENDS implot_download imgui_backend_qt_download
+  DEPENDS implot_download imgui_backend_qt_download imgui_node_editor_download
 )
 
 RV_COPY_LIB_BIN_FOLDERS()

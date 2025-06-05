@@ -252,6 +252,7 @@ TARGET_LINK_LIBRARIES(
           IOtarga
           IOtiff
           spdlog::spdlog
+          ImGuiPythonBridge
           imgui::imgui
 )
 

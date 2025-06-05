@@ -1,0 +1,53 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
+PROJECT(pyimgui)
+
+SET(_target
+    "pyimgui"
+)
+
+FIND_PACKAGE(
+  Python
+  COMPONENTS Interpreter Development
+  REQUIRED
+)
+EXECUTE_PROCESS(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  OUTPUT_VARIABLE nanobind_ROOT
+)
+FIND_PACKAGE(nanobind CONFIG REQUIRED)
+
+SET(IMGUI_NB_SOURCES
+    imgui_pywrappers/imgui_pywrappers.cpp bindings/pybind_imgui_module.cpp
+)
+
+SET(IMGUI_NB_HEADERS
+    imgui_pywrappers/imgui_pywrappers.h
+)
+
+NANOBIND_ADD_MODULE(pyimgui ${IMGUI_NB_SOURCES})
+
+TARGET_LINK_LIBRARIES(
+  pyimgui
+  PUBLIC ${imgui_LIBRARY}
+)
+
+TARGET_COMPILE_DEFINITIONS(
+  pyimgui
+  PUBLIC IMGUI_BUNDLE_PYTHON_API
+)
+
+TARGET_INCLUDE_DIRECTORIES(
+  pyimgui
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui_pywrappers ${CMAKE_CURRENT_SOURCE_DIR}/bindings ${imgui_INCLUDE_DIRS}
+)
+
+SET_TARGET_PROPERTIES(
+  pyimgui
+  PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+
+INSTALL(
+  TARGETS pyimgui
+  LIBRARY DESTINATION lib
+)
