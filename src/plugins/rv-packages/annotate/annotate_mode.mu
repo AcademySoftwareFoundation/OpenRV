@@ -1184,17 +1184,15 @@ class: AnnotateMinorMode : MinorMode
 
     method: toggleDrawPanel (void; Event event)
     {
-        let isToggled = int(event.contents());
-
         if (_drawDock neq nil)
         {
-            if (isToggled == 1)
+            if (_drawDock.visible())
             {
-                _drawDock.show();
+                _drawDock.hide();
             }
             else
             {
-                _drawDock.hide();
+                _drawDock.show();
             }
         }
     }
@@ -1276,8 +1274,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: drawDockVisibilityChangedSlot (void; bool isVisible)
     {
-        sendInternalEvent("annotate-panel-visibility", if isVisible then "1" else "0");
-        
         if (!isVisible)
         {
             _currentDrawMode = _selectDrawMode;
@@ -1714,7 +1710,7 @@ class: AnnotateMinorMode : MinorMode
     method: saveAnnotationSlot (void;)
     {
         let (text, ok) = QInputDialog.getText(mainWindowWidget(),
-                                              "Annoation Title",
+                                              "Annotation Title",
                                               "Title:",
                                               QLineEdit.Normal,
                                               "annotation",
@@ -2338,9 +2334,10 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("set-annotation-ghost", setAnnotationGhost, ""),
-              ("set-annotation-hold", setAnnotationHold, ""),
-              ("toggle-draw-panel", toggleDrawPanel, ""),
+              ("set-annotation-ghost", setAnnotationGhost, "Set Annotation Ghost Value"),
+              ("set-annotation-hold", setAnnotationHold, "Set Annotation"),
+              ("toggle-draw-panel", toggleDrawPanel, "Toggle Draw Panel"),
+              ("key-down--f10", toggleDrawPanel, "Toggle Draw Panel"),
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),

@@ -3,7 +3,7 @@ author: Autodesk, Inc.
 organization: Autodesk, Inc.
 version: 1.20
 rv: 2025
-openrv: 2.0.0
+openrv: 3.0.0
 requires: ''
 system: true
 hidden: true

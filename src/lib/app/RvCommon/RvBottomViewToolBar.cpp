@@ -502,10 +502,9 @@ namespace Rv
                                     "session_manager");
     }
 
-    void RvBottomViewToolBar::paintActionTriggered(bool isChecked)
+    void RvBottomViewToolBar::paintActionTriggered(bool)
     {
-        std::string value = isChecked ? std::to_string(1) : std::to_string(0);
-        m_session->userGenericEvent("toggle-draw-panel", value);
+        m_session->userGenericEvent("toggle-draw-panel", "");
     }
 
     void RvBottomViewToolBar::infoActionTriggered(bool)
