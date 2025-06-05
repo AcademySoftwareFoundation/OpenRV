@@ -2268,7 +2268,7 @@ namespace TwkMovie
         // Get the extension support capability
         //
 
-        string ext = boost::filesystem::extension(m_filename);
+        string ext = std::filesystem::path(m_filename).extension().string();;
         if (ext[0] == '.')
             ext.erase(0, 1);
         MovieFFMpegIO::MFFormatMap formats = m_io->getFormats();
