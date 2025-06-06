@@ -74,6 +74,12 @@ TARGET_COMPILE_DEFINITIONS(
   PUBLIC IMGUI_BUNDLE_PYTHON_API
 )
 
+TARGET_COMPILE_DEFINITIONS(
+  imgui
+  PUBLIC
+    "IMPLOT_CUSTOM_NUMERIC_TYPES=(signed char)(unsigned char)(signed short)(unsigned short)(signed int)(unsigned int)(signed long)(unsigned long)(signed long long)(unsigned long long)(float)(double)(long double)"
+)
+
 TARGET_LINK_LIBRARIES(
   imgui
   PRIVATE OpenGL::GL OpenGL::GLU Qt::Core Qt::Gui Qt::Widgets Qt::OpenGL
@@ -88,10 +94,14 @@ INSTALL(
   LIBRARY DESTINATION lib
 )
 INSTALL(
-  FILES ${IMGUI_HEADERS} ${IMGUI_MISC_HEADERS} ${IMPLOT_HEADERS} ${IMGUI_NODE_EDITOR_HEADERS}
+  FILES ${IMGUI_HEADERS} ${IMGUI_NODE_EDITOR_HEADERS}
   DESTINATION include
 )
 INSTALL(
   FILES ${IMGUI_MISC_HEADERS}
   DESTINATION include/misc/cpp
+)
+INSTALL(
+  FILES ${IMPLOT_HEADERS}
+  DESTINATION include/implot
 )

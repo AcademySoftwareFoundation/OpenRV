@@ -42,8 +42,8 @@ LIST(APPEND _imgui_byproducts ${_imgui_lib})
 # Download implot into a separate directory
 EXTERNALPROJECT_ADD(
   implot_download
-  GIT_REPOSITORY "https://github.com/epezent/implot.git"
-  GIT_TAG "master"
+  GIT_REPOSITORY "https://github.com/pthom/implot.git"
+  GIT_TAG "61af48ee1369083a3da391a849867af6d1b811a6"
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/implot

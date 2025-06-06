@@ -10,7 +10,7 @@
 #include <imgui.h>
 #include <imgui_impl_qt.hpp>
 #include <imgui_impl_opengl2.h>
-#include <implot.h>
+#include <implot/implot.h>
 
 #include <ImGuiPythonBridge.h>
 #include <imgui_node_editor.h>

@@ -57,6 +57,7 @@ INCLUDE(openssl) # Python3 requirement
 INCLUDE(python3)
 INCLUDE(imgui)
 INCLUDE(pyimgui)
+INCLUDE(pyimplot)
 INCLUDE(boost)
 INCLUDE(dav1d)
 IF(RV_TARGET_WINDOWS)
