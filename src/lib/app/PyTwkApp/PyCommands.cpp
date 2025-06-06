@@ -186,7 +186,8 @@ namespace TwkApp
         return PyLong_FromLong(1);
     }
 
-    static PyObject* py_imgui_register_callback(PyObject*, PyObject* args)
+    static PyObject* py_imgui_register_diagnostics_callback(PyObject*,
+                                                            PyObject* args)
     {
         PyObject* callable;
         if (!PyArg_ParseTuple(args, "O", &callable))
@@ -207,7 +208,8 @@ namespace TwkApp
         {"bindRegex", bindRegex, METH_VARARGS, "bind regex event to action."},
         {"defineModeMenu", defineModeMenu, METH_VARARGS,
          "define the menu for a mode."},
-        {"register_callback", py_imgui_register_callback, METH_VARARGS,
+        {"register_diagnostics_callback",
+         py_imgui_register_diagnostics_callback, METH_VARARGS,
          "Register a Python ImGui draw callback"},
         {NULL}};
 
