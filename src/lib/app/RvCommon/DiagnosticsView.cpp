@@ -87,15 +87,26 @@ namespace Rv
 
     DiagnosticsView::DiagnosticsView(QWidget* parent, const QSurfaceFormat& fmt)
         : QOpenGLWidget(parent)
+        , m_timer(this)
     {
         setFormat(fmt);
 
         DiagnosticsModule::init();
 
         ImGui_ImplQt_RegisterWidget(this);
+
+        // Send an invalidate request every 33 milliseconds (eg: 30 fps tops)
+        connect(&m_timer, &QTimer::timeout, this,
+                QOverload<>::of(&QWidget::update));
+        m_timer.start(
+            40); // every 40 ms = 25 fps -- more than enough for idle updates
     }
 
-    DiagnosticsView::~DiagnosticsView() { DiagnosticsModule::shutdown(); }
+    DiagnosticsView::~DiagnosticsView()
+    {
+        m_timer.stop();
+        DiagnosticsModule::shutdown();
+    }
 
     void DiagnosticsView::initializeGL()
     {
