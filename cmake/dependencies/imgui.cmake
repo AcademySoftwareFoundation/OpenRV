@@ -113,6 +113,16 @@ ADD_LIBRARY(imgui::imgui SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 ADD_DEPENDENCIES(imgui::imgui ${_target})
 
+IF(RV_TARGET_LINUX)
+  # Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
+  SET(_lib_dir
+    ${_install_dir}/lib
+  )
+  SET(_libpath
+    ${_lib_dir}/${_libname}
+  )
+ENDIF()
+
 SET_PROPERTY(
   TARGET imgui::imgui
   PROPERTY IMPORTED_LOCATION ${_libpath}

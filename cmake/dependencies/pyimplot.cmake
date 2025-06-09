@@ -53,6 +53,20 @@ IF(RV_TARGET_DARWIN)
   SET(_libname
       "pyimplot.cpython-${RV_DEPS_PYTHON_VERSION_SHORT}-darwin.so"
   )
+ELSEIF(RV_TARGET_LINUX)
+  SET(_libname
+    "pyimplot.cpython-${RV_DEPS_PYTHON_VERSION_SHORT}-x86_64-linux-gnu.so"
+    )
+ENDIF()
+
+IF(RV_TARGET_LINUX)
+  # Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
+  SET(_lib_dir
+    ${_install_dir}/lib
+  )
+  SET(_libpath
+    ${_lib_dir}/${_libname}
+  )
 ENDIF()
 
 SET(_PYTHON_LIB_DIR
