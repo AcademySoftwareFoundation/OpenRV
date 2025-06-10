@@ -26,9 +26,9 @@ rv-manuals/rv-user-manual/rv-user-manual-chapter-seven
 rv-manuals/rv-user-manual/rv-user-manual-chapter-eight
 rv-manuals/rv-user-manual/rv-user-manual-chapter-nine
 rv-manuals/rv-user-manual/rv-user-manual-chapter-ten
-rv-manuals/rv-user-manual/rv-user-manual-chapter-thirteen
 rv-manuals/rv-user-manual/rv-user-manual-chapter-eleven
 rv-manuals/rv-user-manual/rv-user-manual-chapter-twelve
+rv-manuals/rv-user-manual/rv-user-manual-chapter-thirteen
 rv-manuals/rv-user-manual/rv-user-manual-chapter-fourteen
 rv-manuals/rv-user-manual/rv-user-manual-chapter-fifteen
 rv-manuals/rv-user-manual/rv-user-manual-chapter-sixteen
