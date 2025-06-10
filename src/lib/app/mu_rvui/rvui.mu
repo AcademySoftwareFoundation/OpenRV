@@ -6190,7 +6190,7 @@ global bool debugGC = false;
             {"   Cache Off", cacheModeFunc(CacheOff),  nil, cacheStateFunc(CacheOff)},
             {"   Release All Cached Images", ~releaseAllCachedImages,  nil, nil},
             {"_", nil},
-            {"Show diagnostics",    showDiagnosticsWindow, nil, nil},
+            {"Diagnostics",    showDiagnosticsWindow, nil, nil},
             {"_", nil},
             }},
         {"Audio", Menu {
