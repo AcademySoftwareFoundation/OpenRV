@@ -84,6 +84,8 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
+RV_VFX_SET_VARIABLE(_qt_location CY2023 "${RV_DEPS_QT5_LOCATION}" CY2024 "${RV_DEPS_QT6_LOCATION}")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_imgui_download_url}
@@ -98,7 +100,7 @@ EXTERNALPROJECT_ADD(
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_BYPRODUCTS ${_imgui_byproducts}
@@ -116,10 +118,10 @@ ADD_DEPENDENCIES(imgui::imgui ${_target})
 IF(RV_TARGET_LINUX)
   # Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
   SET(_lib_dir
-    ${_install_dir}/lib
+      ${_install_dir}/lib
   )
   SET(_libpath
-    ${_lib_dir}/${_libname}
+      ${_lib_dir}/${_libname}
   )
 ENDIF()
 
