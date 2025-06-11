@@ -22,6 +22,23 @@ namespace Rv
         }
     }
 
+    void ImGuiPythonBridge::unregisterCallback(PyObject* callable)
+    {
+        for (auto it = s_callbacks.begin(); it != s_callbacks.end();)
+        {
+            if (PyObject_RichCompareBool(it->get(), callable, Py_EQ))
+            {
+                it = s_callbacks.erase(it);
+                Py_DECREF(callable);
+                return;
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
     void ImGuiPythonBridge::callCallbacks()
     {
         for (auto& cb : s_callbacks)

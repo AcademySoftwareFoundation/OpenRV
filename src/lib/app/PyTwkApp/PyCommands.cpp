@@ -201,6 +201,21 @@ namespace TwkApp
         Py_RETURN_NONE;
     }
 
+    static PyObject* py_imgui_unregister_diagnostics_callback(PyObject*,
+                                                            PyObject* args)
+    {
+        PyObject* callable;
+        if (!PyArg_ParseTuple(args, "O", &callable))
+            return nullptr;
+        Rv::ImGuiPythonBridge::unregisterCallback(callable);
+        if (!PyCallable_Check(callable))
+        {
+            PyErr_SetString(PyExc_TypeError, "Argument must be callable");
+            return nullptr;
+        }
+        Py_RETURN_NONE;
+    }
+
     static vector<PyMethodDef> methods;
 
     static PyMethodDef localmethods[] = {
@@ -211,6 +226,9 @@ namespace TwkApp
         {"register_diagnostics_callback",
          py_imgui_register_diagnostics_callback, METH_VARARGS,
          "Register a Python ImGui draw callback"},
+        {"unregister_diagnostics_callback",
+         py_imgui_unregister_diagnostics_callback, METH_VARARGS,
+         "Unregister a Python ImGui draw callback"},
         {NULL}};
 
     void pyInitCommands(void* othermethods)
