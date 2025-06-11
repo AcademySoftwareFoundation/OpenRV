@@ -152,6 +152,8 @@ IOhtj2k::readImage(FrameBuffer& fb,
     ojph::ui8 nl_type;
     bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
     bool is_signed = siz.is_signed(0);
+    int byte_offset = 0;
+
     /* For now we are setting the data type based on the first channel */
     switch(siz.get_bit_depth(0))
     {
@@ -159,7 +161,9 @@ IOhtj2k::readImage(FrameBuffer& fb,
             dtype    = FrameBuffer::UCHAR;
             break;
         case 10:
+            byte_offset = 6;
         case 12:
+            byte_offset = 4;
         case 16:
             if (has_nlt && is_signed)
                 dtype = FrameBuffer::HALF;
@@ -197,7 +201,8 @@ IOhtj2k::readImage(FrameBuffer& fb,
                     unsigned short* dout = fb.scanline<unsigned short>(h - i - 1);
                     dout += c;
                     for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                        *dout = *sp++;
+                        *dout = *sp << byte_offset;
+                        sp++;
                     }    
                 }
                 if (dtype == FrameBuffer::HALF){
@@ -230,7 +235,8 @@ IOhtj2k::readImage(FrameBuffer& fb,
                     unsigned short* dout = fb.scanline<unsigned short>(h - i - 1);
                     dout += c;
                     for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                        *dout = *sp++;
+                        *dout = *sp << byte_offset;
+                        sp++;
                     }
                 }
                 if (dtype == FrameBuffer::HALF){

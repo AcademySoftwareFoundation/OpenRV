@@ -3743,12 +3743,32 @@ namespace TwkMovie
         ojph::param_nlt nlt = codestream.access_nlt();
         codestream.create();
 
+        int byte_offset = 0;
+        
         const int ch = siz.get_num_components();
         const int w = siz.get_recon_width(0);
         const int h = siz.get_recon_height(0);
 
         // 4. Wrap the decoded image in a FrameBuffer
         FrameBuffer::DataType dtype = FrameBuffer::USHORT;
+
+        switch(siz.get_bit_depth(0))
+        {
+            case 8:
+                dtype    = FrameBuffer::UCHAR;
+                break;
+            case 10:
+                byte_offset = 6;
+            case 12:
+                byte_offset = 4;
+            case 16:
+                dtype    = FrameBuffer::USHORT;
+                break;
+            case 32:
+                dtype    = FrameBuffer::UINT;
+                break;
+        }
+        
         FrameBuffer* fb = new FrameBuffer(w, h, ch, dtype);
 
         fb->setOrientation(FrameBuffer::BOTTOMLEFT);
@@ -3772,7 +3792,8 @@ namespace TwkMovie
                             unsigned short* dout = fb->scanline<unsigned short>(i);
                             dout += c;
                             for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                                *dout = *sp++;
+                                *dout = *sp << byte_offset;
+                                sp++;
                             }    
                         }
 
@@ -3799,7 +3820,8 @@ namespace TwkMovie
                             unsigned short* dout = fb->scanline<unsigned short>(i);
                             dout += c;
                             for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                                *dout = *sp++;
+                                *dout = *sp << byte_offset;
+                                sp++;
                             }
                         }
                     }
