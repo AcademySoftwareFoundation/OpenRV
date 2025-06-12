@@ -85,6 +85,11 @@ EXTERNALPROJECT_ADD(
 )
 
 RV_VFX_SET_VARIABLE(_qt_location CY2023 "${RV_DEPS_QT5_LOCATION}" CY2024 "${RV_DEPS_QT6_LOCATION}")
+RV_VFX_SET_VARIABLE(_find_qt_version CY2023 "Qt5" CY2024 "Qt6")
+IF(NOT _qt_location)
+  RV_VFX_SET_VARIABLE(_qt_major CY2023 "5" CY2024 "6")
+  MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT${_qt_major}_LOCATION=<path> to CMake.")
+ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -100,7 +105,7 @@ EXTERNALPROJECT_ADD(
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_BYPRODUCTS ${_imgui_byproducts}
