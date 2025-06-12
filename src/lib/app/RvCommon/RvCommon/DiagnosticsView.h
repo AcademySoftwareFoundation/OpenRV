@@ -33,6 +33,10 @@ namespace Rv
         void initializeGL() override;
         void paintGL() override;
 
+        void applyStyle();
+        void handleMenuBar();
+        void resetDockSpace();
+
     private:
         QTimer m_timer;
         static std::vector<PyObject*> s_imguiCallbacks;

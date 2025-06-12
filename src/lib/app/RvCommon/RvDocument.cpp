@@ -187,7 +187,7 @@ namespace Rv
         m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
         m_diagnosticsDock->setWidget(m_diagnosticsView);
         m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::LeftDockWidgetArea, m_diagnosticsDock);
+        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
         m_diagnosticsDock->hide();                    // Hide by default
         m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
 
