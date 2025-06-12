@@ -11,6 +11,10 @@
 #include <TwkMovie/MovieWriter.h>
 #include <TwkMovie/MovieIO.h>
 #include <stdint.h>
+extern "C"
+{
+#include <libavutil/pixfmt.h>
+}
 
 //
 // AVClass Forward Declaration Placeholders
@@ -286,6 +290,7 @@ namespace TwkMovie
         AudioState* m_audioState;
         bool m_cloning{false};
         bool m_mustReadFirstFrame{false};
+        AVPixelFormat m_pxlFormatOnOpen{AV_PIX_FMT_NONE};
 
         friend class ContextPool;
     };
