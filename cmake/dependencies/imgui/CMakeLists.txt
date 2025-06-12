@@ -66,7 +66,7 @@ ADD_LIBRARY(
 
 TARGET_COMPILE_FEATURES(
   imgui
-  PUBLIC cxx_std_11
+  PUBLIC cxx_std_17
 )
 # Add this line to define IMGUI_BUNDLE_PYTHON_API for the imgui target
 TARGET_COMPILE_DEFINITIONS(

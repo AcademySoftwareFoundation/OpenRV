@@ -54,11 +54,16 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-# Download implot into a separate directory
+SET(_patch_command_for_imgui_backend_qt 
+    # This patch is needed to make the backend compatible with Qt 5 and Qt 6.
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_impl_qt.cpp.patch
+)
+
+# Download imgui_backend_qt into a separate directory
 EXTERNALPROJECT_ADD(
   imgui_backend_qt_download
   GIT_REPOSITORY "https://github.com/dpaulat/imgui-backend-qt.git"
-  GIT_TAG "main"
+  GIT_TAG "023345ca8abf731fc50568c0197ceebe76bb4324"
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt
@@ -104,7 +109,7 @@ EXTERNALPROJECT_ADD(
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor
+    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor && ${_patch_command_for_imgui_backend_qt}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}

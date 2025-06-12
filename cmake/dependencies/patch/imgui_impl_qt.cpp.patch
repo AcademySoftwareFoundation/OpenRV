@@ -1,0 +1,63 @@
+diff --git a/backends/imgui_impl_qt.cpp b/backends/imgui_impl_qt.cpp
+index 7cb3f4d..0313252 100644
+--- a/backends/imgui_impl_qt.cpp
++++ b/backends/imgui_impl_qt.cpp
+@@ -28,6 +28,7 @@
+ #include <QFocusEvent>
+ #include <QKeyEvent>
+ #include <QMouseEvent>
++#include <QScreen>
+ #include <QWheelEvent>
+ #include <QWidget>
+ #include <QWindow>
+@@ -462,11 +463,19 @@ void ImGuiQtBackend::HandleMouseMove(QObject* watched, QMouseEvent* event)
+ 
+    if (io_.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
++#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+       position = event->globalPosition();
++#else
++      position = event->globalPos();
++#endif
+    }
+    else
+    {
++#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+       position = event->position();
++#else
++      position = event->pos();
++#endif
+    }
+ 
+    mouseObject_            = watched;
+@@ -482,11 +491,19 @@ void ImGuiQtBackend::HandleEnter(QObject* watched, QEnterEvent* event)
+ 
+    if (io_.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
++#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+       position = event->globalPosition();
++#else
++      position = event->globalPos();
++#endif
+    }
+    else
+    {
++#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+       position = event->position();
++#else
++      position = event->pos();
++#endif
+    }
+ 
+    mouseObject_            = watched;
+@@ -689,6 +706,10 @@ bool ImGuiQtBackend::eventFilter(QObject* watched, QEvent* event)
+       HandleWheel(watched, reinterpret_cast<QWheelEvent*>(event));
+       widgetNeedsUpdate = true;
+       break;
++
++   default:
++      // Ignore all other event types
++      break;
+    }
+ 
+    if (widgetNeedsUpdate && watched->isWidgetType())
