@@ -19,6 +19,10 @@ SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
+SET(_lib_dir
+    ${_install_dir}/lib
+)
+
 IF(RV_TARGET_WINDOWS)
   SET(_imgui_name
       ${CMAKE_SHARED_LIBRARY_PREFIX}imgui${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -31,10 +35,6 @@ ENDIF()
 
 SET(_imgui_lib
     ${_lib_dir}/${_imgui_name}
-)
-
-SET(_lib_dir
-    ${_install_dir}/lib
 )
 
 LIST(APPEND _imgui_byproducts ${_imgui_lib})
@@ -50,6 +50,7 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  BUILD_ALWAYS FALSE
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
 )
@@ -122,7 +123,6 @@ EXTERNALPROJECT_ADD(
 RV_COPY_LIB_BIN_FOLDERS()
 
 ADD_LIBRARY(imgui::imgui SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 ADD_DEPENDENCIES(imgui::imgui ${_target})
 
 IF(RV_TARGET_LINUX)
@@ -151,4 +151,6 @@ TARGET_INCLUDE_DIRECTORIES(
   INTERFACE ${_include_dir}
 )
 
+
+ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 LIST(APPEND RV_DEPS_LIST imgui::imgui)

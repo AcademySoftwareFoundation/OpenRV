@@ -25,6 +25,13 @@ SET(IMGUI_NB_HEADERS
     imgui_pywrappers/imgui_pywrappers.h
 )
 
+# Overwrite NB_SUFFIX to control the name of the output library.
+IF(RV_TARGET_WINDOWS)
+  SET(NB_SUFFIX ".pyd")
+ELSE()
+  SET(NB_SUFFIX "${CMAKE_SHARED_MODULE_SUFFIX}")
+ENDIF()
+
 NANOBIND_ADD_MODULE(pyimgui ${IMGUI_NB_SOURCES})
 
 TARGET_LINK_LIBRARIES(

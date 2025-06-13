@@ -21,6 +21,13 @@ SET(IMPLOT_NB_SOURCES
     bindings/pybind_implot_module.cpp
 )
 
+# Overwrite NB_SUFFIX to control the name of the output library.
+IF(RV_TARGET_WINDOWS)
+  SET(NB_SUFFIX ".pyd")
+ELSE()
+  SET(NB_SUFFIX "${CMAKE_SHARED_MODULE_SUFFIX}")
+ENDIF()
+
 NANOBIND_ADD_MODULE(pyimplot ${IMPLOT_NB_SOURCES})
 
 TARGET_LINK_LIBRARIES(
