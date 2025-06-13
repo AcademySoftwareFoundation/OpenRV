@@ -7,12 +7,20 @@ RV_SHOW_STANDARD_DEPS_VARIABLES()
 GET_TARGET_PROPERTY(_python_executable Python::Python IMPORTED_LOCATION)
 MESSAGE(STATUS "Python executable 123: ${_python_executable}")
 
-SET(_requirements_install_command
-    "${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT}" -m pip install nanobind
-)
+IF(RV_TARGET_WINDOWS)
+  SET(_requirements_install_command
+      "${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3" -m pip install nanobind
+  )
+ELSE()
+  SET(_requirements_install_command
+      "${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT}" -m pip install nanobind
+  )
+ENDIF()
 
 # Create a stamp file to track nanobind installation
-SET(_nanobind_stamp ${CMAKE_CURRENT_BINARY_DIR}/${_target}-nanobind-stamp)
+SET(_nanobind_stamp
+    ${CMAKE_CURRENT_BINARY_DIR}/${_target}-nanobind-stamp
+)
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_nanobind_stamp}
   COMMAND ${_requirements_install_command}
@@ -42,16 +50,16 @@ LIST(APPEND _configure_options "-S ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-
 LIST(APPEND _configure_options "-B ${_build_dir}")
 
 SET(_libname
-  "pyimplot${CMAKE_SHARED_MODULE_SUFFIX}"
+    "pyimplot${CMAKE_SHARED_MODULE_SUFFIX}"
 )
 
 IF(RV_TARGET_LINUX)
   # Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
   SET(_lib_dir
-    ${_install_dir}/lib
+      ${_install_dir}/lib
   )
   SET(_libpath
-    ${_lib_dir}/${_libname}
+      ${_lib_dir}/${_libname}
   )
 ENDIF()
 
@@ -70,7 +78,8 @@ EXTERNALPROJECT_ADD(
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists_PyImplot.cmake
     ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle-pyimplot/external/implot/CMakeLists.txt && ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_implot_module.cpp ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle-pyimplot/external/implot/bindings/pybind_implot_module.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_implot_module.cpp
+    ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle-pyimplot/external/implot/bindings/pybind_implot_module.cpp
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
                     -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file}
