@@ -136,7 +136,10 @@ namespace TwkMovie
     {
     }
 
-    GenericIO::Preloader::~Preloader() { shutdown(); }
+    GenericIO::Preloader::~Preloader()
+    {
+        shutdown();
+    }
 
     void GenericIO::Preloader::init()
     {
