@@ -1460,38 +1460,29 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
-    method: clearPaint (void; int[] frames)
+    method: clearPaint (void; string node, int frame)
     {
-        for_each(node; nodes())
+        let upropName = frameOrderName(node, frame);
+        let rpropName = frameOrderRedoStackName(node, frame);
+
+        if (propertyExists(upropName))
         {
-            for_each(frame; frames)
+            if (!propertyExists(rpropName)) newProperty(rpropName, StringType, 1);
+
+            let u = getStringProperty(upropName),
+                r = getStringProperty(rpropName);
+
+            if (u.size() > 0)
             {
-                let upropName = frameOrderName(node, frame);
-                let rpropName = frameOrderRedoStackName(node, frame);
-
-                if (propertyExists(upropName))
-                {
-                    if (!propertyExists(rpropName))
-                    {
-                        newProperty(rpropName, StringType, 1);
-                    }
-
-                    let u = getStringProperty(upropName);
-                    let r = getStringProperty(rpropName);
-
-                    if (u.size() > 0)
-                    {
-                        r.push_back("start");
-                        for (int i = 0; i < u.size(); i++)
-                            r.push_back(u[i]);
-                        r.push_back("end");
-                        u.clear();
-                    }
-
-                    setStringProperty(upropName, u, true);
-                    setStringProperty(rpropName, r, true);
-                }
+                r.push_back("start");
+                for (int i = 0; i < u.size(); i++)
+                    r.push_back(u[i]);
+                r.push_back("end");
+                u.clear();
             }
+
+            setStringProperty(upropName, u, true);
+            setStringProperty(rpropName, r, true);
         }
     }
 
@@ -1624,8 +1615,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: clearSlot (void; bool checked)
     {
-        let frame = int[] {sourceFrame(frame())};
-        clearPaint(frame);
+        clearPaint(_currentNode, sourceFrame(frame()));
         updateFrameDependentState();
         redraw();
     }
@@ -1640,19 +1630,15 @@ class: AnnotateMinorMode : MinorMode
         }
         else
         {
-            int[] frames;
-
             for_each(node; nodes())
             {
                 let annotatedFrames = findAnnotatedFrames(node);
-
                 for_each(frame; annotatedFrames)
                 {
-                    frames.push_back(sourceFrame(frame));
+                    clearPaint(node, sourceFrame(frame));
                 }
             }
 
-            clearPaint(frames);
             updateFrameDependentState();
             redraw();
         }
