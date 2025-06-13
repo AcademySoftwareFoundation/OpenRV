@@ -220,6 +220,7 @@ Some events will originate from RV itself. These include things like new-source 
 | unmark-frame | frame |  | Frame was unmarked |
 | set-annotation-hold |  |  | Enable held annotation |
 | set-annotation-ghost |  |  | Enable ghosted annotation |
+| toggle-draw-panel |  |  | Toggle the draw panel of the annotation package |
 | pixel-block | Event.data() |  | A block of pixels was received from a remote connection |
 | graph-state-change |  |  | A property in the image processing graph changed |
 | graph-node-inputs-changed | nodename |  | Inputs of a top-level node added/removed/re-ordered |
