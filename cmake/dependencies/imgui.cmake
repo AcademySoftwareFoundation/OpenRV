@@ -151,6 +151,13 @@ SET_PROPERTY(
   PROPERTY IMPORTED_SONAME ${_libname}
 )
 
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET imgui::imgui
+    PROPERTY IMPORTED_IMPLIB ${_implibpath}
+  )
+ENDIF()
+
 FILE(MAKE_DIRECTORY "${_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(
   imgui::imgui
