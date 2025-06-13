@@ -1,4 +1,9 @@
-# imgui/CMakeLists.txt
+#
+# Copyright (C) 2025  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 PROJECT(imgui)
 

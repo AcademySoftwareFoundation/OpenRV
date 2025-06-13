@@ -1,3 +1,9 @@
+#
+# Copyright (C) 2025  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 INCLUDE(ProcessorCount) # require CMake 3.15+
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "bundle_20250323" "" "")
