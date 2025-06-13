@@ -40,5 +40,3 @@ session_manager.mu
 maya_tools.mu
 # See rvnuke_mode.mu.in
 rvnuke_mode.mu
-# See sync.mu
-sync.mu
