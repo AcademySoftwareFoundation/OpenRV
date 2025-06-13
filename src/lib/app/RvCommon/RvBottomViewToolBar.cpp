@@ -529,13 +529,13 @@ namespace Rv
 
     void RvBottomViewToolBar::ghostTriggered(bool isChecked)
     {
-        std::string value = isChecked ? std::to_string(1) : std::to_string(0);
+        std::string value = isChecked ? "1" : "0";
         m_session->userGenericEvent("set-annotation-ghost", value);
     }
 
     void RvBottomViewToolBar::holdTriggered(bool isChecked)
     {
-        std::string value = isChecked ? std::to_string(1) : std::to_string(0);
+        std::string value = isChecked ? "1" : "0";
         m_session->userGenericEvent("set-annotation-hold", value);
     }
 
