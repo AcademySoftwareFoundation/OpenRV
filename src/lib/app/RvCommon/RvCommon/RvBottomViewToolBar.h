@@ -7,7 +7,6 @@
 //
 #ifndef __RvCommon__RvBottomViewToolBar__h__
 #define __RvCommon__RvBottomViewToolBar__h__
-#include <iostream>
 #include <QtCore/QtCore>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QToolButton>
@@ -47,6 +46,9 @@ namespace Rv
         void timelineMagActionTriggered(bool);
         void networkActionTriggered(bool);
 
+        void ghostTriggered(bool);
+        void holdTriggered(bool);
+
         void backStepTriggered();
         void forwardStepTriggered();
         void backPlayTriggered();
@@ -74,6 +76,8 @@ namespace Rv
         QAction* m_networkAction;
         QAction* m_timelineMagAction;
         QAction* m_timelineAction;
+        QAction* m_holdAction;
+        QAction* m_ghostAction;
         QAction* m_backStepAction;
         QAction* m_forwardStepAction;
         QAction* m_backPlayAction;
