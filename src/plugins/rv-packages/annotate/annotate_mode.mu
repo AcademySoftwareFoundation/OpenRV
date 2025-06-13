@@ -167,6 +167,12 @@ class: AnnotateMinorMode : MinorMode
 
     int              _hideDrawPane;
 
+    // filtering control based on time and dx/dy deltas during drag events
+    // to prevent sending ridiculous number of mouse/tablet events if using
+    // high sampling rate devices like some 1000hz wacoms.
+    int             _dragLastMsec;
+    Point           _dragLastPointer;
+
     \: colorToArray (float[]; Color c) { float[] {c.x, c.y, c.z, c.w}; }
     \: arrayToColor (Color; float[] a) { Color(a[0], a[1], a[2], a[3]); }
     method: encodedName (string; string name) { regex.replace("\.", _user, "+"); }
@@ -849,6 +855,16 @@ class: AnnotateMinorMode : MinorMode
             return;
         }
         runtime.gc.disable();
+
+        // Stop playback if we were playing.
+        // First, because it makes sense duh, but also setFrame should ensure 
+        // that all RV clients are sync'd at the same frame if they're in a 
+        // review session.
+        if (isPlaying()) {
+            stop();
+            setFrame(frame());
+        }
+
         updateCurrentNode();
         let (name, ip) = pointerLocation(event),
             d = _currentDrawMode;
@@ -876,6 +892,12 @@ class: AnnotateMinorMode : MinorMode
             print("annotate_mode: UNCAUGHT EXCEPTION\n");
         }
 
+        // Init vars for drag filtering
+        //        State state = data();
+//        _dragLastPointer = state.pointerPosition;
+        _dragLastPointer = ip;
+        _dragLastMsec = int(QDateTime.currentMSecsSinceEpoch());
+
         let pei = eventToImageSpace(name, ip, true);
 
         bool useWidth = false;
@@ -898,6 +920,34 @@ class: AnnotateMinorMode : MinorMode
         {
             addToStroke(pei);
         }
+    }
+
+    method: checkDragFilter (bool; Event event, Point ip)
+    {
+        let dx = abs(ip.x - _dragLastPointer.x);
+        let dy = abs(ip.y - _dragLastPointer.y);
+        let now = int(QDateTime.currentMSecsSinceEpoch());
+        let dt = now - _dragLastMsec;
+
+        let maxEventsPerSec = 60.0;
+        let millisecFiltering = (1000.0 / maxEventsPerSec);
+
+        if (dt < millisecFiltering) 
+        {
+            // print("millisec Filtering %d ms\n" % dt);
+            return false;
+        }
+
+        let maxDelta = 2;
+        if ((dx <= maxDelta) && (dy <= maxDelta)) 
+        {
+            return false;
+        }
+
+        _dragLastMsec = now;
+        _dragLastPointer = ip;
+
+        return true;
     }
 
     method: drag (void; Event event)
@@ -928,6 +978,13 @@ class: AnnotateMinorMode : MinorMode
 
             let (name, ip) = pointerLocation(event);
             if (name == "") return;
+
+//            State state = data();
+//            sp = state.pointerPosition;
+
+            if (checkDragFilter(event, ip) == false)
+                return;
+
             let pei = eventToImageSpace(name, ip, true);
 
             if (useWidth)
