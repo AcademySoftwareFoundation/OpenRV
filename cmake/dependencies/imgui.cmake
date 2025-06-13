@@ -30,20 +30,18 @@ SET(_lib_dir
 )
 
 IF(RV_TARGET_WINDOWS)
-  SET(_imgui_name
+  SET(_libname
       ${CMAKE_SHARED_LIBRARY_PREFIX}imgui${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSE()
-  SET(_imgui_name
+  SET(_libname
       ${CMAKE_SHARED_LIBRARY_PREFIX}imgui${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ENDIF()
 
-SET(_imgui_lib
-    ${_lib_dir}/${_imgui_name}
+SET(_libpath
+    ${_lib_dir}/${_libname}
 )
-
-LIST(APPEND _imgui_byproducts ${_imgui_lib})
 
 # Download implot into a separate directory
 EXTERNALPROJECT_ADD(
@@ -61,7 +59,7 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-SET(_patch_command_for_imgui_backend_qt 
+SET(_patch_command_for_imgui_backend_qt
     # This patch is needed to make the backend compatible with Qt 5 and Qt 6.
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_impl_qt.cpp.patch
 )
@@ -77,6 +75,7 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  BUILD_ALWAYS FALSE
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
 )
@@ -92,6 +91,7 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  BUILD_ALWAYS FALSE
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
 )
@@ -111,7 +111,6 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/src
-  # Copy the custom CMakeLists.txt for imgui and copy the source files from implot to imgui source directory.
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
@@ -120,8 +119,8 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_BYPRODUCTS ${_imgui_byproducts}
-  BUILD_IN_SOURCE TRUE
+  BUILD_BYPRODUCTS ${_libpath}
+  BUILD_ALWAYS FALSE
   USES_TERMINAL_BUILD TRUE
   DEPENDS implot_download imgui_backend_qt_download imgui_node_editor_download
 )
@@ -129,17 +128,8 @@ EXTERNALPROJECT_ADD(
 RV_COPY_LIB_BIN_FOLDERS()
 
 ADD_LIBRARY(imgui::imgui SHARED IMPORTED GLOBAL)
+ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 ADD_DEPENDENCIES(imgui::imgui ${_target})
-
-IF(RV_TARGET_LINUX)
-  # Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-  SET(_libpath
-      ${_lib_dir}/${_libname}
-  )
-ENDIF()
 
 SET_PROPERTY(
   TARGET imgui::imgui
@@ -164,6 +154,4 @@ TARGET_INCLUDE_DIRECTORIES(
   INTERFACE ${_include_dir}
 )
 
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 LIST(APPEND RV_DEPS_LIST imgui::imgui)

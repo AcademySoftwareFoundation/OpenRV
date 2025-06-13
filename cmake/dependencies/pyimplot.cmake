@@ -53,15 +53,18 @@ SET(_libname
     "pyimplot${CMAKE_SHARED_MODULE_SUFFIX}"
 )
 
-IF(RV_TARGET_LINUX)
-  # Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-  SET(_libpath
-      ${_lib_dir}/${_libname}
-  )
-ENDIF()
+# The built library will be at the root of the build directory.
+SET(_build_output_path
+    ${_build_dir}/${_libname}
+)
+
+# Override the library name for Linux for now because our CMakelists.txt install it in lib for all platform.
+SET(_lib_dir
+    ${_install_dir}/lib
+)
+SET(_libpath
+    ${_lib_dir}/${_libname}
+)
 
 SET(_PYTHON_LIB_DIR
     "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
@@ -85,11 +88,10 @@ EXTERNALPROJECT_ADD(
                     -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_BYPRODUCTS ${_libpath}
+  BUILD_BYPRODUCTS ${_build_output_path}
   BUILD_ALWAYS FALSE
-  BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
-  DEPENDS RV_DEPS_IMGUI Python::Python imgui::imgui ${_target}-nanobind-install
+  DEPENDS Python::Python imgui::imgui ${_target}-nanobind-install
 )
 
 # Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
