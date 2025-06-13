@@ -117,7 +117,6 @@ namespace Rv
             case 1:
                 a->setIcon(QIcon(":/images/paint_48x48.png"));
                 a->setToolTip("Toggle Annotation tools");
-                a->setCheckable(true);
                 m_paintAction = a;
                 break;
             case 2:
@@ -481,11 +480,6 @@ namespace Rv
                         break;
                     }
                 }
-            }
-            else if (name == "annotate-panel-visibility")
-            {
-                bool isVisible = (contents == "1");
-                m_paintAction->setChecked(isVisible);
             }
         }
 
