@@ -509,6 +509,9 @@ namespace Rv
 
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
+            new Function(c, "showDiagnostics", showDiagnostics, None, Return,
+                         "void", End),
+
             EndArguments);
     }
 
@@ -2365,6 +2368,15 @@ namespace Rv
     {
         // Note: This is no longer relevant in RV Open Source but kept to
         // maintain backward compatibility.
+    }
+
+    NODE_IMPLEMENTATION(showDiagnostics, void)
+    {
+        //        Process* p = NODE_THREAD.process();
+        //        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+        Session* s = Session::currentSession();
+        RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
+        doc->showDiagnostics();
     }
 
 } // namespace Rv

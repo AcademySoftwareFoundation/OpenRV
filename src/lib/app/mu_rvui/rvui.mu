@@ -5806,6 +5806,10 @@ global bool debugGC = false;
     return ret;
 }
 
+\: showDiagnosticsWindow (void; Event ev)
+{
+    commands.showDiagnostics();
+}
 
 \: queryClose (void; Event ev)
 {
@@ -6185,6 +6189,8 @@ global bool debugGC = false;
             {"   Region Cache",  cacheModeFunc(CacheGreedy), "C", cacheStateFunc(CacheGreedy)},
             {"   Cache Off", cacheModeFunc(CacheOff),  nil, cacheStateFunc(CacheOff)},
             {"   Release All Cached Images", ~releaseAllCachedImages,  nil, nil},
+            {"_", nil},
+            {"Diagnostics",    showDiagnosticsWindow, nil, nil},
             {"_", nil},
             }},
         {"Audio", Menu {
