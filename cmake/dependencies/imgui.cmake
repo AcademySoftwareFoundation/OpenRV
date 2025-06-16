@@ -39,9 +39,15 @@ ELSE()
   )
 ENDIF()
 
-SET(_libpath
-    ${_lib_dir}/${_libname}
-)
+IF(RV_TARGET_WINDOWS)
+  SET(_libpath
+    ${_bin_dir}/${_libname}
+  )
+ELSE()
+  SET(_libpath
+      ${_lib_dir}/${_libname}
+  )
+ENDIF()
 
 # Download implot into a separate directory
 EXTERNALPROJECT_ADD(

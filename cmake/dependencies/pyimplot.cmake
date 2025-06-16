@@ -37,7 +37,11 @@ ADD_CUSTOM_TARGET(
 )
 
 GET_TARGET_PROPERTY(_imgui_include_dirs imgui::imgui INTERFACE_INCLUDE_DIRECTORIES)
-GET_TARGET_PROPERTY(_imgui_library_file imgui::imgui LOCATION)
+IF(RV_TARGET_WINDOWS)
+  GET_TARGET_PROPERTY(_imgui_library_file imgui::imgui IMPORTED_IMPLIB)
+ELSE()
+  GET_TARGET_PROPERTY(_imgui_library_file imgui::imgui LOCATION)
+ENDIF()
 
 SET(_configure_options
     ""
