@@ -932,7 +932,6 @@ class: AnnotateMinorMode : MinorMode
 
         if (dt < millisecFiltering) 
         {
-            // print("millisec Filtering %d ms\n" % dt);
             return false;
         }
 
