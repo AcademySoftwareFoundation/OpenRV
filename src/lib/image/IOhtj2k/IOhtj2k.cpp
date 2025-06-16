@@ -124,6 +124,145 @@ ojph::si16 convert_si32_to_si16(const ojph::si32 si32_value, bool convert_specia
       return (ojph::si16)si32_value;
   }
 
+FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
+    ojph::codestream codestream;
+    codestream.read_headers(infile);
+
+    //codestream.enable_resilience();
+    ojph::param_siz siz = codestream.access_siz();
+    ojph::param_nlt nlt = codestream.access_nlt();
+    codestream.create();
+
+    int byte_offset = 0;
+    const int ch = siz.get_num_components();
+    const int w = siz.get_recon_width(0);
+    const int h = siz.get_recon_height(0);
+    bool nlt_is_signed;
+    ojph::ui8 nlt_bit_depth;
+    ojph::ui8 nl_type;
+    bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
+    bool is_signed = siz.is_signed(0);
+    // 4. Wrap the decoded image in a FrameBuffer
+    FrameBuffer::DataType dtype = FrameBuffer::USHORT;
+
+    switch(siz.get_bit_depth(0))
+    {
+        case 8:
+            dtype    = FrameBuffer::UCHAR;
+            break;
+        case 10:
+            byte_offset = 6;
+            dtype    = FrameBuffer::USHORT;
+            break;
+        case 12:
+            byte_offset = 4;
+        case 16:
+            if (has_nlt && is_signed)
+                dtype = FrameBuffer::HALF;
+            else
+                dtype    = FrameBuffer::USHORT;
+            break;
+        case 32:
+            if (has_nlt && is_signed)
+                dtype = FrameBuffer::DOUBLE;
+            else
+                dtype    = FrameBuffer::UINT;
+            break;
+    }
+    
+    if (fb == NULL)
+    {
+        // If no FrameBuffer is provided, create a new one
+        // Typically used when called from MovieFFMpeg
+        fb = new FrameBuffer(w, h, ch, dtype);
+        fb->setOrientation(FrameBuffer::BOTTOMLEFT);
+    }
+    else
+    {
+        // If a FrameBuffer is provided, restructure it
+        fb->restructure(w, h, 0, ch, dtype);
+        // I dont really understand why its TOPLEFT here, but BOTTOMLEFT for MovieFFMPEG
+        // when the underlying data is the same.
+        // I suspect it has to do with the way the FrameBuffer is used in MovieFFMPEG
+        // and how it expects the orientation to be set.
+        fb->setOrientation(FrameBuffer::TOPLEFT);
+
+    }
+    fb->newAttribute("fileBitDepth", siz.get_bit_depth(0));
+    if (codestream.is_planar()){
+            for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
+                
+                for (ojph::ui32 i = 0; i < h; ++i)
+                {
+                    ojph::ui32 comp_num;
+                    ojph::line_buf *line = codestream.pull(comp_num);
+                    const ojph::si32* sp = line->i32;
+                    assert(comp_num == c);
+                    if (dtype == FrameBuffer::UCHAR){
+                        unsigned char* dout = fb->scanline<unsigned char>(i);
+                        dout += c;
+                        for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                            *dout = *sp++;
+                        }
+                    }
+                    if (dtype == FrameBuffer::USHORT){
+                        unsigned short* dout = fb->scanline<unsigned short>(i);
+                        dout += c;
+                        for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                            *dout = *sp << byte_offset;
+                            sp++;
+                        }    
+                    }
+                    if (dtype == FrameBuffer::HALF){
+                        ojph::si16* dout = (ojph::si16 *)fb->scanline<unsigned short>(i);
+                        dout += c;
+                        for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                            *dout = convert_si32_to_si16(*sp++);
+                        }
+                    }
+
+                }
+            
+    } else {
+
+        for (ojph::ui32 i = 0; i < h; ++i)
+        {
+            for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
+            {
+                ojph::ui32 comp_num;
+                ojph::line_buf *line = codestream.pull(comp_num);
+                const ojph::si32* sp = line->i32;
+                assert(comp_num == c);
+                if (dtype == FrameBuffer::UCHAR){
+                    unsigned char* dout = fb->scanline<unsigned char>(i);
+                    dout += c;
+                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                        *dout = *sp++;
+                    }
+                }
+                if (dtype == FrameBuffer::USHORT){
+                    unsigned short* dout = fb->scanline<unsigned short>(i);
+                    dout += c;
+                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                        *dout = *sp << byte_offset;
+                        sp++;
+                    }
+                }
+                if (dtype == FrameBuffer::HALF){
+                    ojph::si16* dout = (ojph::si16 *)fb->scanline<unsigned short>(i);
+                    dout += c;
+                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
+                        *dout = convert_si32_to_si16(*sp++);
+                    }
+                }
+            }
+        }
+    }
+
+    return fb;
+    
+}
+
 void
 IOhtj2k::readImage(FrameBuffer& fb,
                    const std::string& filename,
@@ -133,23 +272,14 @@ IOhtj2k::readImage(FrameBuffer& fb,
     ojph::ui32 skipped_res_for_recon = 0;
     ojph::j2c_infile j2c_file;
     j2c_file.open(filename.c_str());
-    
-    ojph::codestream codestream;
-    codestream.read_headers(&j2c_file);
 
-    //codestream.enable_resilience();
-    ojph::param_siz siz = codestream.access_siz();
-    ojph::param_nlt nlt = codestream.access_nlt();
-    fb.setOrientation(FrameBuffer::TOPLEFT);
-
-    const int ch = siz.get_num_components();
-    const int w = siz.get_recon_width(0);
-    const int h = siz.get_recon_height(0);
-    FrameBuffer::DataType dtype;
-
+    decodeHTJ2K(&j2c_file, &fb);
+    return;
+#if 0
     bool nlt_is_signed;
     ojph::ui8 nlt_bit_depth;
     ojph::ui8 nl_type;
+    ojph::param_nlt nlt = codestream.access_nlt();
     bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
     bool is_signed = siz.is_signed(0);
     int byte_offset = 0;
@@ -249,7 +379,7 @@ IOhtj2k::readImage(FrameBuffer& fb,
             }
         }
     }
-
+#endif
 }
 
 } // TwkFB

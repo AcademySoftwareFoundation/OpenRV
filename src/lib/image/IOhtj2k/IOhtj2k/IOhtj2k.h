@@ -14,6 +14,7 @@
 #include <TwkFB/StreamingIO.h>
 #include <fstream>
 #include <pthread.h>
+#include <openjph/ojph_file.h>
 
 namespace TwkFB {
 
@@ -36,7 +37,11 @@ public:
     virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 };
 
-
+/// @brief Decode a HTJ2K file into a FrameBuffer
+/// @param infile ojph::infile_base object that provides the input stream
+/// @param fb if non-NULL, decode into this FrameBuffer, otherwise create a new one
+/// @return fb
+FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb=NULL);
 
 } // TwkFB
 

@@ -39,11 +39,7 @@
 #include <mp4v2Utils/mp4v2Utils.h>
 #include <cstring>
 
-#include <openjph/ojph_arg.h>
-#include <openjph/ojph_mem.h>
-#include <openjph/ojph_file.h>
-#include <openjph/ojph_codestream.h>
-#include <openjph/ojph_params.h>
+#include <IOhtj2k/IOhtj2k.h>
 
 extern "C"
 {
@@ -3735,103 +3731,7 @@ namespace TwkMovie
         ojph::mem_infile infile;
         infile.open(pkt->data, pkt->size);
 
-        ojph::codestream codestream;
-        codestream.read_headers(&infile);
-
-        //codestream.enable_resilience();
-        ojph::param_siz siz = codestream.access_siz();
-        ojph::param_nlt nlt = codestream.access_nlt();
-        codestream.create();
-
-        int byte_offset = 0;
-        
-        const int ch = siz.get_num_components();
-        const int w = siz.get_recon_width(0);
-        const int h = siz.get_recon_height(0);
-
-        // 4. Wrap the decoded image in a FrameBuffer
-        FrameBuffer::DataType dtype = FrameBuffer::USHORT;
-
-        switch(siz.get_bit_depth(0))
-        {
-            case 8:
-                dtype    = FrameBuffer::UCHAR;
-                break;
-            case 10:
-                byte_offset = 6;
-                dtype    = FrameBuffer::USHORT;
-                break;
-            case 12:
-                byte_offset = 4;
-            case 16:
-                dtype    = FrameBuffer::USHORT;
-                break;
-            case 32:
-                dtype    = FrameBuffer::UINT;
-                break;
-        }
-        
-        FrameBuffer* fb = new FrameBuffer(w, h, ch, dtype);
-
-        fb->setOrientation(FrameBuffer::BOTTOMLEFT);
-        if (codestream.is_planar()){
-                for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
-                    
-                    for (ojph::ui32 i = 0; i < h; ++i)
-                    {
-                        ojph::ui32 comp_num;
-                        ojph::line_buf *line = codestream.pull(comp_num);
-                        const ojph::si32* sp = line->i32;
-                        assert(comp_num == c);
-                        if (dtype == FrameBuffer::UCHAR){
-                            unsigned char* dout = fb->scanline<unsigned char>(i);
-                            dout += c;
-                            for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                                *dout = *sp++;
-                            }
-                        }
-                        if (dtype == FrameBuffer::USHORT){
-                            unsigned short* dout = fb->scanline<unsigned short>(i);
-                            dout += c;
-                            for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                                *dout = *sp << byte_offset;
-                                sp++;
-                            }    
-                        }
-
-                    }
-                
-            } else {
-
-                for (ojph::ui32 i = 0; i < h; ++i)
-                {
-                    for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
-                    {
-                        ojph::ui32 comp_num;
-                        ojph::line_buf *line = codestream.pull(comp_num);
-                        const ojph::si32* sp = line->i32;
-                        assert(comp_num == c);
-                        if (dtype == FrameBuffer::UCHAR){
-                            unsigned char* dout = fb->scanline<unsigned char>(i);
-                            dout += c;
-                            for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                                *dout = *sp++;
-                            }
-                        }
-                        if (dtype == FrameBuffer::USHORT){
-                            unsigned short* dout = fb->scanline<unsigned short>(i);
-                            dout += c;
-                            for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                                *dout = *sp << byte_offset;
-                                sp++;
-                            }
-                        }
-                    }
-                }
-            }
-
-        return fb;
-        
+        return decodeHTJ2K(&infile);
     }
 
 
