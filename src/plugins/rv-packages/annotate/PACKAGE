@@ -1,9 +1,9 @@
 package: Annotation
 author: Autodesk, Inc.
 organization: Autodesk, Inc.
-version: 1.16
-rv: 3.12.15
-openrv: 1.0.0
+version: 1.20
+rv: 2025
+openrv: 3.0.0
 requires: ''
 system: true
 hidden: true
@@ -13,7 +13,7 @@ modes:
     menu: Tools/Annotation
     shortcut: 'F10' 
     event: 'key-down--f10'
-    load: delay
+    load: immediate
 
 description: |
 

@@ -384,7 +384,15 @@ class: ModeManagerMode : MinorMode
         try
         {
             if (!entry.loaded) loadEntry(entry);
-            activateEntry(entry, !entry.mode._active);
+
+            if (entry.name == "annotate_mode")
+            {
+                sendInternalEvent("toggle-draw-panel");
+            }
+            else
+            {
+                activateEntry(entry, !entry.mode._active);   
+            }
         }
         catch (exception exc)
         {
