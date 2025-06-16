@@ -893,8 +893,6 @@ class: AnnotateMinorMode : MinorMode
         }
 
         // Init vars for drag filtering
-        //        State state = data();
-//        _dragLastPointer = state.pointerPosition;
         _dragLastPointer = ip;
         _dragLastMsec = int(QDateTime.currentMSecsSinceEpoch());
 
@@ -978,9 +976,6 @@ class: AnnotateMinorMode : MinorMode
 
             let (name, ip) = pointerLocation(event);
             if (name == "") return;
-
-//            State state = data();
-//            sp = state.pointerPosition;
 
             if (checkDragFilter(event, ip) == false)
                 return;
