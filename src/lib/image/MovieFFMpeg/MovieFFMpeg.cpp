@@ -3759,6 +3759,8 @@ namespace TwkMovie
                 break;
             case 10:
                 byte_offset = 6;
+                dtype    = FrameBuffer::USHORT;
+                break;
             case 12:
                 byte_offset = 4;
             case 16:
