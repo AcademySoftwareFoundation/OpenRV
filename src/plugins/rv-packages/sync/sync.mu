@@ -37,7 +37,7 @@ global float POINTER_TIME_TO_LIVE = 10.0;
         require qt;
 
         let d = qt.QDateTime.currentDateTime();
-        @SYNC_MU_DEB@
+        print(\"sync(%s,%s): %s\\n\" % (myNetworkPort(), d.toString(\"mm:ss:zzz\", qt.QCalendar()), s));
     }
 }
 
