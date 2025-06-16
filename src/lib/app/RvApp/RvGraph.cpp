@@ -371,7 +371,16 @@ namespace Rv
             copy(m_newSources.begin(), m_newSources.end(),
                  inputs.begin() + layer->inputs().size());
             HOP_ZONE(HOP_ZONE_COLOR_12);
-            layer->setInputs(inputs);
+
+            if (Rv::Options::sharedOptions().addSourceToDefaultView)
+            {
+                layer->setInputs(inputs);
+            }
+            else
+            {
+                cout << "INFO: Disabled adding sources to default views"
+                     << endl;
+            }
         }
 
         m_newSources.clear();
