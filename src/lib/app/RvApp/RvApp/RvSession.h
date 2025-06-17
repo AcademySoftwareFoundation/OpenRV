@@ -327,6 +327,8 @@ namespace Rv
         int loadCount();
         int loadTotal();
 
+        void updateAnnotationsUI();
+
         //
         //  Override
         //

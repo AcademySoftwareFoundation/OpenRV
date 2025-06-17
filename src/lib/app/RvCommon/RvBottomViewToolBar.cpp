@@ -481,6 +481,21 @@ namespace Rv
                     }
                 }
             }
+            else if (name == "update-ghost-button")
+            {
+                bool isChecked = (contents == "1");
+                m_ghostAction->setChecked(isChecked);
+            }
+            else if (name == "update-hold-button")
+            {
+                bool isChecked = (contents == "1");
+                m_holdAction->setChecked(isChecked);
+            }
+            else if (name == "after-clear-session")
+            {
+                m_ghostAction->setChecked(false);
+                m_holdAction->setChecked(false);
+            }
         }
 
         return EventAcceptAndContinue;
