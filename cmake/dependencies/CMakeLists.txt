@@ -56,6 +56,7 @@ ENDIF()
 INCLUDE(openssl) # Python3 requirement
 INCLUDE(python3)
 INCLUDE(imgui)
+INCLUDE(nanobind)
 INCLUDE(pyimgui)
 INCLUDE(pyimplot)
 INCLUDE(boost)

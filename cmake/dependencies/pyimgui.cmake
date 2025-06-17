@@ -3,39 +3,6 @@ INCLUDE(ProcessorCount) # require CMake 3.15+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PYIMGUI" "" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-# Get the Python executable from the Python::Python target
-GET_TARGET_PROPERTY(_python_executable Python::Python IMPORTED_LOCATION)
-MESSAGE(STATUS "Python executable 123: ${_python_executable}")
-
-IF(RV_TARGET_WINDOWS)
-  SET(_requirements_install_command
-      "${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3" -m pip install nanobind
-  )
-ELSE()
-  SET(_requirements_install_command
-      "${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT}" -m pip install nanobind
-  )
-ENDIF()
-
-# Create a stamp file to track nanobind installation
-SET(_nanobind_stamp
-    ${CMAKE_CURRENT_BINARY_DIR}/${_target}-nanobind-stamp
-)
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${_nanobind_stamp}
-  COMMAND ${_requirements_install_command}
-  COMMAND ${CMAKE_COMMAND} -E touch ${_nanobind_stamp}
-  COMMENT "Installing nanobind and creating stamp file"
-  DEPENDS Python::Python
-)
-
-# Add a custom target that depends on the stamp file
-ADD_CUSTOM_TARGET(
-  ${_target}-nanobind-install
-  DEPENDS ${_nanobind_stamp}
-  COMMENT "Ensuring nanobind is installed for ${_target}"
-)
-
 GET_TARGET_PROPERTY(_imgui_include_dirs imgui::imgui INTERFACE_INCLUDE_DIRECTORIES)
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(_imgui_library_file imgui::imgui IMPORTED_IMPLIB)
@@ -74,6 +41,10 @@ SET(_PYTHON_LIB_DIR
     "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
+SET(_patch_command_for_imgui_bindings
+    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pybind_imgui.cpp.patch
+)
+
 EXTERNALPROJECT_ADD(
   ${_target}
   GIT_REPOSITORY "https://github.com/pthom/imgui_bundle.git"
@@ -86,15 +57,16 @@ EXTERNALPROJECT_ADD(
     ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists_PyImGUI.cmake
     ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/CMakeLists.txt && ${CMAKE_COMMAND} -E copy_if_different
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_imgui_module.cpp ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/bindings
+    && ${_patch_command_for_imgui_bindings}
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
-                    -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file}
+                    -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file} -Dnanobind_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_NANOBIND/install/nanobind
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_BYPRODUCTS ${_build_output_path}
   BUILD_ALWAYS FALSE
   USES_TERMINAL_DOWNLOAD TRUE
-  DEPENDS Python::Python imgui::imgui ${_target}-nanobind-install
+  DEPENDS Python::Python imgui::imgui RV_DEPS_NANOBIND
 )
 
 # Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
