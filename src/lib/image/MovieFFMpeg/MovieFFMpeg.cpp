@@ -39,6 +39,8 @@
 #include <mp4v2Utils/mp4v2Utils.h>
 #include <cstring>
 
+#include <IOhtj2k/IOhtj2k.h>
+
 extern "C"
 {
 #include <libavcodec/avcodec.h>
@@ -280,6 +282,7 @@ namespace TwkMovie
             , lastEncodedVideo(0)
             , imgConvertContext(0)
             , isOpen(false)
+            , useOpenJPH(false)
             , rotate(false)
             , colrType("")
             , avCodecContext(0)
@@ -320,6 +323,7 @@ namespace TwkMovie
             fb.copyFrom(&t->fb);
 
             name = t->name;
+            useOpenJPH = t->useOpenJPH;
             number = t->number;
             rotate = t->rotate;
             return *this;
@@ -331,6 +335,7 @@ namespace TwkMovie
         bool rotate;
         int lastDecodedVideo;
         int lastEncodedVideo;
+        bool useOpenJPH;
         set<int64_t> tsSet;
         FrameBuffer fb;
         struct SwsContext* imgConvertContext;
@@ -2192,12 +2197,14 @@ namespace TwkMovie
 
         int height = 0;
         int width = 0;
+        bool isJ2K = false;
         string lang = "und";
         map<string, set<int>> chLangMap;
         map<pair<int, int>, vector<int>> resTrackMap;
         map<pair<string, int>, vector<int>> chTrackMap;
         vector<bool> heroVideoTracks;
         vector<bool> heroAudioTracks;
+        
         for (int i = 0; i < m_avFormatContext->nb_streams; i++)
         {
             heroVideoTracks.push_back(false);
@@ -2217,6 +2224,11 @@ namespace TwkMovie
                 pair<int, int> key(tsStream->codecpar->height,
                                    tsStream->codecpar->width);
                 resTrackMap[key].push_back(i);
+                if (tsStream->codecpar->codec_id == AV_CODEC_ID_JPEG2000 ||
+                    std::string(avcodec_get_name(tsStream->codecpar->codec_id)) == "jpeg2000")
+                {
+                    isJ2K = true;
+                }
             }
             else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
             {
@@ -2253,7 +2265,7 @@ namespace TwkMovie
         // Get the extension support capability
         //
 
-        string ext = boost::filesystem::extension(m_filename);
+        string ext = std::filesystem::path(m_filename).extension().string();;
         if (ext[0] == '.')
             ext.erase(0, 1);
         MovieFFMpegIO::MFFormatMap formats = m_io->getFormats();
@@ -2314,30 +2326,43 @@ namespace TwkMovie
                 {
                     ContextPool::Reservation reserve(this, i);
                     VideoTrack* track = new VideoTrack;
-                    if (openAVCodec(i, &track->avCodecContext,
-                                    &track->hardwareContext))
+                    track->useOpenJPH = isJ2K;
+                    if (isJ2K)
                     {
                         track->number = i;
-
                         ostringstream trackName;
                         trackName << "track " << m_videoTracks.size() + 1;
                         track->name = trackName.str();
                         track->isOpen = true;
+                        openAVCodec(i, &track->avCodecContext,
+                                       &track->hardwareContext);
                         m_videoTracks.push_back(track);
+                    } else {
+                        if (openAVCodec(i, &track->avCodecContext,
+                                        &track->hardwareContext))
+                        {
+                            track->number = i;
 
-                        FBInfo::ViewInfo vinfo;
-                        vinfo.name = trackName.str();
-                        m_info.viewInfos.push_back(vinfo);
-                        m_info.views.push_back(trackName.str());
-                        ostringstream trk;
-                        trk << "Track" << i;
+                            ostringstream trackName;
+                            trackName << "track " << m_videoTracks.size() + 1;
+                            track->name = trackName.str();
+                            track->isOpen = true;
+                            m_videoTracks.push_back(track);
 
-                        snagMetadata(tsStream->metadata, trk.str(),
-                                     &m_info.proxy);
-                    }
-                    else
-                    {
-                        delete track;
+                            FBInfo::ViewInfo vinfo;
+                            vinfo.name = trackName.str();
+                            m_info.viewInfos.push_back(vinfo);
+                            m_info.views.push_back(trackName.str());
+                            ostringstream trk;
+                            trk << "Track" << i;
+
+                            snagMetadata(tsStream->metadata, trk.str(),
+                                        &m_info.proxy);
+                        }
+                        else
+                        {
+                            delete track;
+                        }
                     }
                 }
                 break;
@@ -3691,6 +3716,26 @@ namespace TwkMovie
         }
     }
 
+    FrameBuffer*  MovieFFMpegReader::jpeg2000Decode(int inframe,
+                                            VideoTrack* track)
+    {
+
+
+        AVPacket* pkt = track->videoPacket;
+        if (!pkt || pkt->size <= 0)
+        {
+            TWK_THROW_EXC_STREAM("No valid JPEG-2000 packet found for frame "
+                                 << inframe);
+        }
+
+        ojph::mem_infile infile;
+        infile.open(pkt->data, pkt->size);
+
+        return decodeHTJ2K(&infile);
+    }
+
+
+
     bool MovieFFMpegReader::findImageWithBestTimestamp(int inframe,
                                                        double frameDur,
                                                        AVStream* videoStream,
@@ -3708,7 +3753,12 @@ namespace TwkMovie
             readPacketFromStream(inframe, track);
 
             // Then we need to send the packet as input to the decoder.
-            sendPacketToDecoder(track);
+            // but we dont do it we are using OpenJPH, since it will
+            // handle the decode itself.
+            if (!track->useOpenJPH){
+                sendPacketToDecoder(track);
+            }
+
         }
         // Look for the best (closest to the goal) timestamp in the updated
         // list.
@@ -3718,8 +3768,18 @@ namespace TwkMovie
         while (searching)
         {
             HOP_PROF("avcodec_receive_frame()");
-            int ret =
-                avcodec_receive_frame(track->avCodecContext, track->videoFrame);
+            // Get frame from decoder.
+            int ret = 0;
+            if (!track->useOpenJPH){
+                ret = avcodec_receive_frame(track->avCodecContext, track->videoFrame);
+            } else {
+                // We are going to use OpenJPH to do the decoding, but we do need to
+                // set the pts and dts from the packet, to get things behaving properly.
+                track->videoFrame->pts = track->videoPacket->pts;
+                track->videoFrame->pkt_dts = track->videoPacket->dts;
+                if (track->videoFrame->pkt_dts < goalTS)
+                    ret = AVERROR(EAGAIN); // Force it to read another packet, if we havent found the frame yet.
+            }
             if (ret < 0)
             {
                 if (ret == AVERROR(EAGAIN))
@@ -3727,8 +3787,15 @@ namespace TwkMovie
                     // This is valid. This occurs when we need more input.
                     // Let's supply a new packet to the codec and update the
                     // best timestamp.
-                    readPacketFromStream(inframe, track);
-                    sendPacketToDecoder(track);
+                        
+                        readPacketFromStream(inframe, track);
+                    
+                    // If we are using OpenJPH, we will not send the packet to
+                    // the decoder, since it will handle the decode itself.
+                    if (!track->useOpenJPH){
+                        sendPacketToDecoder(track);
+                    }
+
                     bestTS = findBestTS(goalTS, frameDur, track, false);
                     continue;
                 }
@@ -3741,7 +3808,7 @@ namespace TwkMovie
             else
             {
                 // Figure out if we got a good timestamp. Whether we are using
-                // pts ot dts for this format calculate the frame this decode
+                // pts or dts for this format calculate the frame this decode
                 // represents for RV.
                 const int64_t pktPTS = track->videoFrame->pts;
                 const int64_t pktDTS = track->videoFrame->pkt_dts;
@@ -3858,6 +3925,13 @@ namespace TwkMovie
             }
         }
         track->tsSet.erase(track->tsSet.begin(), pruneIT);
+
+
+        if (track->useOpenJPH){
+            // If we are using OpenJPH to decode JPEG-2000 frames, we decode
+            // the frame here and return the FrameBuffer.
+            return jpeg2000Decode(inframe, track);
+        }
 
 #if DB_TIMING & DB_LEVEL
         double decodeDuration = m_timingDetails->pauseTimer("decode");

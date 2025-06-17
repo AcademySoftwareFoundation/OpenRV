@@ -29,9 +29,11 @@ TARGET_LINK_LIBRARIES(
           Boost::filesystem
           TwkUtil
           TwkFB
+          IOhtj2k
           ffmpeg::avcodec
           ffmpeg::avformat
           ffmpeg::swscale
+          OpenJph::OpenJph
 )
 
 IF(RV_TARGET_WINDOWS)
