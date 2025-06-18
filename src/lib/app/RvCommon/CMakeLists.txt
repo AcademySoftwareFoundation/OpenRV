@@ -46,7 +46,6 @@ SET(_sources
     RvDocument.cpp
     RvConsoleApplication.cpp
     RvApplication.cpp
-    DiagnosticsView.cpp
     GLView.cpp
     TwkQTAction.cpp
     MediaDirModel.cpp
@@ -252,8 +251,6 @@ TARGET_LINK_LIBRARIES(
           IOtarga
           IOtiff
           spdlog::spdlog
-          ImGuiPythonBridge
-          imgui::imgui
 )
 
 IF(RV_TARGET_DARWIN)
