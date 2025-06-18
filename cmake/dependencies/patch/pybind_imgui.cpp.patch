@@ -1,0 +1,34 @@
+diff --git a/external/imgui/bindings/pybind_imgui.cpp b/external/imgui/bindings/pybind_imgui.cpp
+index cbd2bfb6..bf5aa230 100644
+--- a/external/imgui/bindings/pybind_imgui.cpp
++++ b/external/imgui/bindings/pybind_imgui.cpp
+@@ -167,6 +167,7 @@ void py_init_module_imgui_main(nb::module_& m)
+         "valid after Render() and until the next call to NewFrame(). this is what you have to render.",
+         nb::rv_policy::reference);
+ 
++#ifndef IMGUI_DISABLE_DEMO_WINDOWS
+     m.def("show_demo_window",
+         [](std::optional<bool> p_open = std::nullopt) -> std::optional<bool>
+         {
+@@ -184,6 +185,7 @@ void py_init_module_imgui_main(nb::module_& m)
+         },
+         nb::arg("p_open") = nb::none(),
+         "create Demo window. demonstrate most ImGui features. call this to learn about the library! try to make it always available in your application!");
++#endif // IMGUI_DISABLE_DEMO_WINDOWS
+ 
+     m.def("show_metrics_window",
+         [](std::optional<bool> p_open = std::nullopt) -> std::optional<bool>
+@@ -8334,6 +8336,7 @@ void imgui_manual_binding(nb::module_& m)
+         return IM_COL32(r, g, b, a);
+     });
+ 
++#ifndef IMGUI_DISABLE_DEMO_WINDOWS
+     //
+     // API for imgui_demo
+     //
+@@ -8352,4 +8355,5 @@ void imgui_manual_binding(nb::module_& m)
+         return GImGuiDemoMarker_IsActive;
+     });
+     m.def("set_imgui_demo_show_python_code", ImGuiDemoSetShowPythonCode);
++#endif // IMGUI_DISABLE_DEMO_WINDOWS
+ }

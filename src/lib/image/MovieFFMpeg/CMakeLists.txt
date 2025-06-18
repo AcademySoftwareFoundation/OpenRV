@@ -34,6 +34,13 @@ TARGET_LINK_LIBRARIES(
           ffmpeg::swscale
 )
 
+IF(RV_FFMPEG_USE_VIDEOTOOLBOX)
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE DarwinBundle "-framework VideoToolbox"
+  )
+ENDIF()
+
 IF(RV_TARGET_WINDOWS)
   TARGET_COMPILE_OPTIONS(
     ${_target}

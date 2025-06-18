@@ -1,10 +1,10 @@
 package: RV Sync
 author: Autodesk, Inc.
 organization: Autodesk, Inc.
-version: 1.4
+version: 1.5
 requires: ''
-rv: 2021.0.2
-openrv: 1.0.0
+rv: 2025.0.0
+openrv: 3.0.0
 optional: false
 
 modes:

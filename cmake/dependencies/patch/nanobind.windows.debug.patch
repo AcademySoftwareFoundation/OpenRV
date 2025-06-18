@@ -1,0 +1,48 @@
+From 41039d5c7a972b4e4eb44c82f893aae89dd46521 Mon Sep 17 00:00:00 2001
+From: Kerstin Keller <kerstin.keller@continental-corporation.com>
+Date: Mon, 31 Mar 2025 13:15:28 +0200
+Subject: [PATCH] Do not force Release linking in debug mode.
+
+---
+ include/nanobind/nb_python.h | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/include/nanobind/nb_python.h b/include/nanobind/nb_python.h
+index 356500c..4947a35 100644
+--- a/include/nanobind/nb_python.h
++++ b/include/nanobind/nb_python.h
+@@ -8,16 +8,6 @@
+     BSD-style license that can be found in the LICENSE file.
+ */
+ 
+-/// Include Python header, disable linking to pythonX_d.lib on Windows in debug mode
+-
+-#if defined(_MSC_VER)
+-#  pragma warning(push)
+-#  if defined(_DEBUG) && !defined(Py_DEBUG)
+-#    define NB_DEBUG_MARKER
+-#    undef _DEBUG
+-#  endif
+-#endif
+-
+ #include <Python.h>
+ #include <frameobject.h>
+ #include <pythread.h>
+@@ -48,14 +38,6 @@
+ #  undef getter
+ #endif
+ 
+-#if defined(_MSC_VER)
+-#  if defined(NB_DEBUG_MARKER)
+-#    define _DEBUG
+-#    undef NB_DEBUG_MARKER
+-#  endif
+-#  pragma warning(pop)
+-#endif
+-
+ #if PY_VERSION_HEX < 0x03080000
+ #  error The nanobind library requires Python 3.8 (or newer)
+ #endif
+-- 
+2.36.1.windows.1
+

@@ -31,6 +31,8 @@ QWidgetType* addAllQTSymbols(MuLangContext* c, Module* qt)
     qt->addSymbol(t_QUrl);
     QUrlQueryType* t_QUrlQuery = new QUrlQueryType(c, "QUrlQuery");
     qt->addSymbol(t_QUrlQuery);
+    QCalendarType* t_QCalendar = new QCalendarType(c, "QCalendar"); 
+    qt->addSymbol(t_QCalendar);
     QDateTimeType* t_QDateTime = new QDateTimeType(c, "QDateTime");
     qt->addSymbol(t_QDateTime);
     QTimeZoneType* t_QTimeZone = new QTimeZoneType(c, "QTimeZone");

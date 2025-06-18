@@ -29,6 +29,7 @@ namespace TwkApp
 namespace Rv
 {
     class GLView;
+    class DiagnosticsView;
     class DesktopVideoModule;
     class DesktopVideoDevice;
     class RvTopViewToolBar;
@@ -56,6 +57,7 @@ namespace Rv
         void resizeView(int w, int h);
         void toggleFullscreen(bool firstTime = false);
         void toggleMenuBar();
+        void showDiagnostics();
 
         bool menuBarShown() const { return m_menuBarShown; };
 
@@ -161,6 +163,8 @@ namespace Rv
         QMenu* m_mainPopup;
         QMenu* m_userPopup;
         TwkApp::Menu* m_userMenu;
+        DiagnosticsView* m_diagnosticsView;
+        QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
         QWidget* m_viewContainerWidget;

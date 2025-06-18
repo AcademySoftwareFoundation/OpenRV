@@ -91,6 +91,7 @@ namespace Rv
     NODE_DECLARATION(javascriptMuExport, void);
     NODE_DECLARATION(framebufferPixelValue, Mu::Vector4f);
     NODE_DECLARATION(devicePixelRatio, float);
+    NODE_DECLARATION(showDiagnostics, void);
 
 } // namespace Rv
 

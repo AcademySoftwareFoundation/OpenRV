@@ -1,0 +1,38 @@
+diff --git a/imgui.cpp b/imgui.cpp
+index da33e7ff..cbea017b 100644
+--- a/imgui.cpp
++++ b/imgui.cpp
+@@ -3018,7 +3018,6 @@ bool ImGuiTextFilter::PassFilter(const char* text, const char* text_end) const
+ #endif
+ #endif
+ 
+-char ImGuiTextBuffer::EmptyString[1] = { 0 };
+ 
+ void ImGuiTextBuffer::append(const char* str, const char* str_end)
+ {
+diff --git a/imgui.h b/imgui.h
+index 26cf9ea6..13b48490 100644
+--- a/imgui.h
++++ b/imgui.h
+@@ -2858,18 +2858,17 @@ struct ImGuiTextFilter
+ struct ImGuiTextBuffer
+ {
+     ImVector<char>      Buf;
+-    IMGUI_API static char EmptyString[1];
+ 
+     ImGuiTextBuffer()   { }
+     inline char         operator[](int i) const { IM_ASSERT(Buf.Data != NULL); return Buf.Data[i]; }
+-    const char*         begin() const           { return Buf.Data ? &Buf.front() : EmptyString; }
+-    const char*         end() const             { return Buf.Data ? &Buf.back() : EmptyString; } // Buf is zero-terminated, so end() will point on the zero-terminator
++    const char*         begin() const           { return Buf.Data ? &Buf.front() : ""; }
++    const char*         end() const             { return Buf.Data ? &Buf.back() : ""; } // Buf is zero-terminated, so end() will point on the zero-terminator
+     int                 size() const            { return Buf.Size ? Buf.Size - 1 : 0; }
+     bool                empty() const           { return Buf.Size <= 1; }
+     void                clear()                 { Buf.clear(); }
+     void                resize(int size)        { if (Buf.Size > size) Buf.Data[size] = 0; Buf.resize(size ? size + 1 : 0, 0); } // Similar to resize(0) on ImVector: empty string but don't free buffer.
+     void                reserve(int capacity)   { Buf.reserve(capacity); }
+-    const char*         c_str() const           { return Buf.Data ? Buf.Data : EmptyString; }
++    const char*         c_str() const           { return Buf.Data ? Buf.Data : ""; }
+     IMGUI_API void      append(const char* str, const char* str_end = NULL);
+     IMGUI_API void      appendf(const char* fmt, ...) IM_FMTARGS(2);
+     IMGUI_API void      appendfv(const char* fmt, va_list args) IM_FMTLIST(2);

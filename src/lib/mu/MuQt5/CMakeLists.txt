@@ -54,6 +54,7 @@ SET(_sources
 )
 
 SET(_autotypes
+    Calendar
     Color
     Size
     Point
