@@ -13,8 +13,8 @@
 #include <implot/implot.h>
 
 #include <ImGuiPythonBridge.h>
-#include <imgui_node_editor.h>
-namespace ed = ax::NodeEditor;
+
+#include "DiagnosticsView.Roboto_Regular"
 
 namespace Rv
 {
@@ -94,6 +94,8 @@ namespace Rv
         setMinimumSize(100, 100);
 
         DiagnosticsModule::init();
+
+        applyStyle();
 
         ImGui_ImplQt_RegisterWidget(this);
 
@@ -253,59 +255,13 @@ namespace Rv
         style->GrabRounding = 3;
         style->LogSliderDeadzone = 4;
         style->TabRounding = 4;
-    }
 
-    void DiagnosticsView::resetDockSpace()
-    {
-        ImGuiID dockspace_id = ImGui::GetID("CentralDockSpace");
-        //   ImGui::DockBuilderRemoveNode(dockspace_id);
-    }
+        ImFontConfig fontCfg;
+        fontCfg.FontDataOwnedByAtlas = false;
 
-    void DiagnosticsView::handleMenuBar()
-    {
-        if (ImGui::BeginMainMenuBar()) // Create the main menu bar
-        {
-            if (ImGui::BeginMenu("File")) // Create a "File" menu
-            {
-                if (ImGui::MenuItem("Open")) // Option: Open
-                {
-                }
-
-                if (ImGui::MenuItem("Save")) // Option: Save
-                {
-                }
-
-                if (ImGui::MenuItem("Exit")) // Option: Exit
-                {
-                }
-
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Edit")) // Create an "Edit" menu
-            {
-                if (ImGui::MenuItem("Undo")) // Option: Undo
-                {
-                }
-
-                if (ImGui::MenuItem("Redo")) // Option: Redo
-                {
-                }
-
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Options")) // Create an "Options" menu
-            {
-                if (ImGui::MenuItem("Reset")) // Option: Reset
-                {
-                    resetDockSpace();
-                }
-
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }
+        ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(
+            Roboto_Regular_compressed_data, Roboto_Regular_compressed_size, 13,
+            &fontCfg);
     }
 
     void DiagnosticsView::paintGL()
@@ -316,7 +272,6 @@ namespace Rv
         ImGui_ImplQt_NewFrame(this);
         ImGui_ImplOpenGL2_NewFrame();
         ImGui::NewFrame();
-        applyStyle();
 
         // Create a dockspace inside the Diagnostics View window
         ImGuiID dockspace_id = ImGui::GetID("DiagnosticsDockSpace");
