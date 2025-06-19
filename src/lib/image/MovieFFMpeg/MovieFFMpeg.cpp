@@ -39,6 +39,10 @@
 #include <mp4v2Utils/mp4v2Utils.h>
 #include <cstring>
 
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+#include <VideoToolbox/VideoToolbox.h>
+#endif
+
 extern "C"
 {
 #include <libavcodec/avcodec.h>
@@ -1082,6 +1086,68 @@ namespace TwkMovie
             return AV_PIX_FMT_NONE;
         }
 
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+        bool videoToolboxInit(const AVCodec* avCodec,
+                              AVCodecContext** avCodecContext,
+                              HardwareContext* hardwareContext)
+        {
+            if (avCodec == nullptr || avCodecContext == nullptr
+                || *avCodecContext == nullptr || hardwareContext == nullptr)
+            {
+                std::cerr << "ERROR: MovieFFMpeg: Invalid codec or context\n";
+                return false;
+            }
+
+            // Check if the ProRes codec is supported by the hardware decoder
+            if (avCodec->id == AV_CODEC_ID_PRORES)
+            {
+                if (!VTIsHardwareDecodeSupported(
+                        kCMVideoCodecType_AppleProRes4444)
+                    || !VTIsHardwareDecodeSupported(
+                        kCMVideoCodecType_AppleProRes422))
+                {
+                    return false;
+                }
+            }
+
+            const AVHWDeviceType deviceType =
+                av_hwdevice_find_type_by_name("videotoolbox");
+            if (deviceType == AV_HWDEVICE_TYPE_NONE)
+            {
+                std::cerr << "ERROR: Device type" << deviceType
+                          << "is not supported.\n";
+                return false;
+            }
+
+            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
+            if (config == nullptr)
+            {
+                std::cerr << "ERROR: Decoder " << avCodec->name
+                          << " does not support device type "
+                          << av_hwdevice_get_type_name(deviceType) << '\n';
+                return false;
+            }
+
+            // Check if the hardware device context flag is set and the device
+            // type matches
+            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
+                && config->device_type == deviceType)
+            {
+                hardwareContext->pixelFormat = config->pix_fmt;
+            }
+
+            (*avCodecContext)->opaque = hardwareContext;
+            (*avCodecContext)->get_format = getHardwareFormat;
+
+            if (hardwareDecoderInit(*avCodecContext, deviceType) < 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+#endif // defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+
     } // namespace
 
     //----------------------------------------------------------------------
@@ -1440,36 +1506,16 @@ namespace TwkMovie
 #if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
         if (avStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
         {
-            deviceType = av_hwdevice_find_type_by_name("videotoolbox");
-            if (deviceType == AV_HWDEVICE_TYPE_NONE)
+            if (!videoToolboxInit(avCodec, avCodecContext, hardwareContext))
             {
-                std::cerr << "ERROR: Device type" << deviceType
-                          << "is not supported.\n";
-                return false;
-            }
-
-            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
-            if (config == nullptr)
-            {
-                std::cerr << "ERROR: Decoder " << avCodec->name
-                          << " does not support device type "
-                          << av_hwdevice_get_type_name(deviceType) << '\n';
-                return false;
-            }
-            // Check if the hardware device context flag is set and the device
-            // type matches
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0
-                && config->device_type == deviceType)
-            {
-                hardwareContext->pixelFormat = config->pix_fmt;
-            }
-
-            (*avCodecContext)->opaque = hardwareContext;
-            (*avCodecContext)->get_format = getHardwareFormat;
-
-            if (hardwareDecoderInit(*avCodecContext, deviceType) < 0)
-            {
-                return false;
+                static bool hasDisplayedError = false;
+                if (!hasDisplayedError)
+                {
+                    std::cout << "WARNING: Hardware decoder is not available "
+                                 "or failed to intialize."
+                              << std::endl;
+                    hasDisplayedError = true;
+                }
             }
         }
 #endif
@@ -1496,6 +1542,7 @@ namespace TwkMovie
                 avcodec_free_context(avCodecContext);
                 return false;
             }
+            m_pxlFormatOnOpen = nativeFormat;
         }
 
         //
@@ -3887,7 +3934,7 @@ namespace TwkMovie
         //
 
         AVFrame* softwareFrame = nullptr;
-        AVFrame* videoFrame = nullptr;
+        AVFrame* videoFrame = track->videoFrame;
         int result = 0;
 
         HardwareContext* hardwareContext =
@@ -3911,10 +3958,6 @@ namespace TwkMovie
                 videoFrame = softwareFrame;
             }
         }
-        else
-        {
-            videoFrame = track->videoFrame;
-        }
 
         //
         // Determine the native pixel format and make an effort to reconfigure
@@ -3928,6 +3971,26 @@ namespace TwkMovie
         AVPixelFormat nativeFormat = videoCodecContext->sw_pix_fmt;
         outFrame->format = nativeFormat;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
+        if (!desc && nativeFormat == AV_PIX_FMT_NONE)
+        {
+            static bool warned = false;
+            if (!warned)
+            {
+                std::cout << "WARNING: FFmpeg detected pixel format "
+                             "AV_PIX_FMT_NONE for frames in "
+                          << m_filename << ". Using fallback pixel format: "
+                          << av_get_pix_fmt_name(m_pxlFormatOnOpen)
+                          << std::endl;
+                warned = true;
+            }
+            // Use the pixel format detected when the file was opened as a
+            // fallback. Assumes that m_pxlFormatOnOpen is set because the file
+            // was opened.
+            outFrame->format = m_pxlFormatOnOpen;
+            nativeFormat = m_pxlFormatOnOpen;
+            desc = av_pix_fmt_desc_get(nativeFormat);
+        }
+
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         int numPlanes = 0;
         bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
