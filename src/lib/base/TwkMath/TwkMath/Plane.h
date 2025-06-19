@@ -178,7 +178,7 @@ namespace TwkMath
         //	parallel.
         //
 
-        return normal == plane.normaml;
+        return normal == plane.normal;
     }
 
     template <typename T>

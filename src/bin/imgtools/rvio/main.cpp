@@ -36,6 +36,7 @@
 #include <IPBaseNodes/SourceIPNode.h>
 #include <IPCore/GroupIPNode.h>
 #include <IPCore/OutputGroupIPNode.h>
+#include <IPBaseNodes/PaintIPNode.h>
 #ifdef RVIO_HW
 #include <MovieRV_FBO/MovieRV_FBO.h>
 #else
@@ -67,18 +68,18 @@
 #include <TwkUtil/File.h>
 #include <TwkUtil/ThreadName.h>
 #include <TwkQtBase/QtUtil.h>
-#include <IPCore/ImageRenderer.h>
 #include <RvApp/RvSession.h>
 #include <RvApp/FormatIPNode.h>
 #include <arg.h>
 #include <iostream>
 #include <sched.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <stl_ext/thread_group.h>
 #include <stl_ext/string_algo.h>
-#include <string.h>
+#include <cstring>
 #include <vector>
 #include <ImfHeader.h>
+#include <regex>
 
 #include <TwkMediaLibrary/Library.h>
 
@@ -124,6 +125,41 @@ using namespace TwkMovie;
 using namespace TwkUtil;
 using namespace TwkMath;
 using namespace TwkAudio;
+
+namespace
+{
+    void disableGhostOnAnnotations(IPCore::IPGraph& graph)
+    {
+        const auto& nodes = graph.nodeMap();
+
+        for (const auto& nodeInfo : nodes)
+        {
+            const auto& node = nodeInfo.second;
+            auto* paintNode = dynamic_cast<IPCore::PaintIPNode*>(node);
+
+            if (paintNode != nullptr)
+            {
+                for (const auto& component : paintNode->components())
+                {
+                    if (std::regex_match(component->name(),
+                                         std::regex("(pen:.*|text:.*)")))
+                    {
+                        auto* property =
+                            component->property<TwkContainer::IntProperty>(
+                                "ghost");
+
+                        if (property != nullptr)
+                        {
+                            node->propertyWillChange(property);
+                            paintNode->setProperty(property, 0);
+                            node->propertyChanged(property);
+                        }
+                    }
+                }
+            }
+        }
+    }
+} // namespace
 
 struct Illuminant
 {
@@ -464,6 +500,8 @@ MovieRV* makeInputMovie()
     {
         session->read(inputFiles.front().c_str(),
                       IPCore::Session::ReadRequest());
+
+        disableGhostOnAnnotations(session->graph());
     }
     else
     {

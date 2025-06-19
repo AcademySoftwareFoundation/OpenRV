@@ -182,6 +182,7 @@ def configure() -> None:
             configure_args.append(f"darwin64{ARCH}-cc")
         else:
             configure_args.append("darwin64-x86_64-cc")
+        configure_args.append("LDFLAGS=-headerpad_max_install_names")
     elif platform.system() == "Windows":
         configure_args.append("VC-WIN64A")
         configure_args.append("no-asm")
