@@ -156,6 +156,51 @@ namespace Rv
         connect(m_networkAction, SIGNAL(triggered(bool)), this,
                 SLOT(networkActionTriggered(bool)));
 
+        a = addAction("");
+        a->setIcon(QIcon(":/images/ghost.png"));
+        a->setToolTip("Ghost");
+        a->setCheckable(true);
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("left")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setStyleSheet(R"(
+            QToolButton:checked {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                stop: 0.0 rgb(70,70,255),
+                stop: .1 rgb(56,56,220),
+                stop: .5 rgb(45,45,210),
+                stop: .6 rgb(39,39,190),
+                stop: .9 rgb(36,36,220),
+                stop: 1.0 rgb(62,62,230));
+            }
+        )");
+        m_ghostAction = a;
+
+        a = addAction("");
+        a->setIcon(QIcon(":/images/hold.png"));
+        a->setToolTip("Hold");
+        a->setCheckable(true);
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("right")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setStyleSheet(R"(
+            QToolButton:checked {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                stop: 0.0 rgb(70,70,255),
+                stop: .1 rgb(56,56,220),
+                stop: .5 rgb(45,45,210),
+                stop: .6 rgb(39,39,190),
+                stop: .9 rgb(36,36,220),
+                stop: 1.0 rgb(62,62,230));
+            }
+        )");
+        m_holdAction = a;
+
+        connect(m_ghostAction, SIGNAL(triggered(bool)), this,
+                SLOT(ghostTriggered(bool)));
+        connect(m_holdAction, SIGNAL(triggered(bool)), this,
+                SLOT(holdTriggered(bool)));
+
         //
         //  Add some expanding space before the play buttons
         //
@@ -451,10 +496,9 @@ namespace Rv
                                     "session_manager");
     }
 
-    void RvBottomViewToolBar::paintActionTriggered(bool b)
+    void RvBottomViewToolBar::paintActionTriggered(bool)
     {
-        m_session->userGenericEvent("mode-manager-toggle-mode",
-                                    "annotate_mode");
+        m_session->userGenericEvent("toggle-draw-panel", "");
     }
 
     void RvBottomViewToolBar::infoActionTriggered(bool)
@@ -475,6 +519,18 @@ namespace Rv
     void RvBottomViewToolBar::networkActionTriggered(bool)
     {
         RvApp()->showNetworkDialog();
+    }
+
+    void RvBottomViewToolBar::ghostTriggered(bool isChecked)
+    {
+        std::string value = isChecked ? "1" : "0";
+        m_session->userGenericEvent("set-annotation-ghost", value);
+    }
+
+    void RvBottomViewToolBar::holdTriggered(bool isChecked)
+    {
+        std::string value = isChecked ? "1" : "0";
+        m_session->userGenericEvent("set-annotation-hold", value);
     }
 
     void RvBottomViewToolBar::backStepTriggered()
@@ -563,15 +619,20 @@ namespace Rv
 
     void RvBottomViewToolBar::audioSliderChanged(int value)
     {
-        // turn off mute first
-        audioMuteTriggered(false);
-        m_muteAction->setChecked(false);
-
-        float v = float(value) / 99.0;
+        const float v = float(value) / 99.0;
         FloatPropertyEditor editor(m_session->graph(),
                                    m_session->currentFrame(),
                                    "#RVSoundTrack.audio.volume");
-        editor.setValue(v);
+
+        // Has the volume changed?
+        if (v != editor.value())
+        {
+            // Turn off the mute audio first
+            audioMuteTriggered(false);
+            m_muteAction->setChecked(false);
+
+            editor.setValue(v);
+        }
     }
 
     void RvBottomViewToolBar::setVolumeIcon()

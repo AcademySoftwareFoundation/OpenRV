@@ -38,7 +38,14 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Python::Python
-  PRIVATE Mu MuLang MuPy MuTwkApp Qt::Core TwkPython
+  PRIVATE Mu
+          MuLang
+          MuPy
+          MuTwkApp
+          Qt::Core
+          TwkPython
+          imgui::imgui
+          ImGuiPythonBridge
 )
 
 IF(RV_TARGET_DARWIN)

@@ -7,14 +7,14 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_ZLIB" "1.2.13" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_ZLIB" "1.3.1" "" "")
 
 SET(_download_url
     "https://github.com/madler/zlib/archive/refs/tags/v${_version}.zip"
 )
 
 SET(_download_hash
-    "fdedf0c8972a04a7c153dd73492d2d91"
+    "127b8a71a3fb8bebe89df1080f15fdf6"
 )
 
 SET(_install_dir

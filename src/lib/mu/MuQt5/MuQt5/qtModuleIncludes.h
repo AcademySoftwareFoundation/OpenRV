@@ -18,6 +18,7 @@
 #include <MuQt5/QVariantType.h>
 #include <MuQt5/QUrlType.h>
 #include <MuQt5/QUrlQueryType.h>
+#include <MuQt5/QCalendarType.h>
 #include <MuQt5/QDateTimeType.h>
 #include <MuQt5/QTimeZoneType.h>
 #include <MuQt5/QTimeType.h>
