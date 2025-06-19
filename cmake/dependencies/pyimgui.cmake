@@ -1,4 +1,5 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
+PROCESSORCOUNT(_cpu_count)
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PYIMGUI" "" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
@@ -17,6 +18,19 @@ SET(_configure_options
 LIST(APPEND _configure_options "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
 LIST(APPEND _configure_options "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
 LIST(APPEND _configure_options "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
+# Windows Release mode workaround - testing minimal working set
+IF(RV_TARGET_WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  # /O2 - Keep speed optimization
+  # /GL- - Disable whole program optimization (prevents hangs)
+  # /Ob0 - Disable inlining (prevents template hang)
+  # /bigobj - Allow large object files (needed for nanobind)
+  # /DNDEBUG - Keep release mode defines
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS_RELEASE=/O2 /GL- /Ob0 /bigobj /DNDEBUG")
+  LIST(APPEND _configure_options "-DCMAKE_C_FLAGS_RELEASE=/O2 /GL- /Ob0 /bigobj /DNDEBUG")
+  MESSAGE(STATUS "PyImGui: Testing reduced Windows Release workaround flags")
+ENDIF()
+
 LIST(APPEND _configure_options "-S ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui")
 LIST(APPEND _configure_options "-B ${_build_dir}")
 
