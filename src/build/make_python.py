@@ -130,13 +130,18 @@ def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
         os.path.join(python_home, "bin", python_name_pattern)
     )
 
-    # sort put python# before python#-config
+    # sort put python# before python#-config, prioritize debug on Windows debug builds
     python_interpreters = sorted(
         [
             p
             for p in python_interpreters
             if os.path.islink(p) is False and os.access(p, os.X_OK)
-        ]
+        ],
+        key=lambda p: (
+            "-config" in os.path.basename(p),  # config variants last
+            not ("_d" in os.path.basename(p) and platform.system() == "Windows" and variant.lower() == "debug"),  # prioritize _d on Windows debug
+            os.path.basename(p)  # alphabetical
+        )
     )
 
     if not python_interpreters or os.path.exists(python_interpreters[0]) is False:
