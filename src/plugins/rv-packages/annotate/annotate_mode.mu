@@ -1615,7 +1615,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: clearSlot (void; bool checked)
     {
-        clearPaint(_currentNode, sourceFrame(frame()));
+        clearPaint(_currentNode, _currentNodeInfo.frame);
         updateFrameDependentState();
         redraw();
     }
@@ -1635,6 +1635,7 @@ class: AnnotateMinorMode : MinorMode
                 let annotatedFrames = findAnnotatedFrames(node);
                 for_each(frame; annotatedFrames)
                 {
+                    clearPaint(node, frame);
                     clearPaint(node, sourceFrame(frame));
                 }
             }
