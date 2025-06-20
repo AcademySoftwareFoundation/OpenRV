@@ -509,6 +509,9 @@ namespace Rv
 
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
+            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return,
+                         "float", End),
+
             new Function(c, "showDiagnostics", showDiagnostics, None, Return,
                          "void", End),
 
@@ -2370,10 +2373,24 @@ namespace Rv
         // maintain backward compatibility.
     }
 
+    NODE_IMPLEMENTATION(devicePixelRatio, float)
+    {
+        float devicePixelRatio = 1.0f;
+
+        const Session* s = Session::currentSession();
+        const RvDocument* doc =
+            reinterpret_cast<RvDocument*>(s->opaquePointer());
+
+        if (doc != nullptr && doc->view() != nullptr)
+        {
+            devicePixelRatio = doc->view()->devicePixelRatio();
+        }
+
+        NODE_RETURN(devicePixelRatio);
+    }
+  
     NODE_IMPLEMENTATION(showDiagnostics, void)
     {
-        //        Process* p = NODE_THREAD.process();
-        //        MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         doc->showDiagnostics();
