@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2009 Tweak Software. 
+//  Copyright (c) 2025 Sam Richards
 //  All rights reserved.
 //  
 //  SPDX-License-Identifier: Apache-2.0

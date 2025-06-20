@@ -1,6 +1,5 @@
 #
-# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
-#
+# Copyright (C) 2025 Sam Richards
 # SPDX-License-Identifier: Apache-2.0
 #
 
