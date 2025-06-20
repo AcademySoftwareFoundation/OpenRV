@@ -229,6 +229,13 @@ namespace BlackMagicDevices
          bmdMode8K4320p48},
         {8192, 4320, 1.0, 48.00, "4320p (8192x4320) DCI 8K 48Hz",
          bmdMode8kDCI48},
+        {1920, 1080, 1.0, 120.00, "1080p 120Hz", bmdModeHD1080p120},
+        {2048, 1080, 1.0, 120.00, "1080p (2048x1080) DCI 2K 120Hz",
+         bmdMode2kDCI120},
+        {3840, 2160, 1.0, 120.00, "2160p (3840x2160) UHD 4K 120Hz",
+         bmdMode4K2160p120},
+        {4096, 2160, 1.0, 120.00, "4096p (4096x2160) DCI 4K 120Hz",
+         bmdMode4kDCI120},
         {0, 0, 1.0, 00.00, NULL, bmdModeHD720p50},
     };
 
