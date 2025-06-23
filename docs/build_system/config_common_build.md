@@ -131,10 +131,10 @@ For Windows and Linux:
 
 ````{tabs}
 ```{code-tab} bash Release
-OpenRV/_build/stage/app/bin/rv.
+OpenRV/_build/stage/app/bin/rv
 ```
 ```{code-tab} bash Debug
-OpenRV/_build_debug/stage/app/bin/rv.
+OpenRV/_build_debug/stage/app/bin/rv
 ```
 ````
 
@@ -144,10 +144,10 @@ For macOS:
 
 ````{tabs}
 ```{code-tab} bash Release
-`OpenRV/_build/stage/app/RV.app/Contents/MacOS/RV`
+OpenRV/_build/stage/app/RV.app/Contents/MacOS/RV
 ```
 ```{code-tab} bash Debug
-`OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV`
+OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV
 ```
 ````
 
