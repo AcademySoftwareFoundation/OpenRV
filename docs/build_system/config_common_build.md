@@ -2,9 +2,9 @@
 
 Once the platform-specific installation process is done, building RV is essentially the same process for all platforms.
 
-### 1. Building OpenRV for the first time
+### 1. Building Open RV for the first time
 
-#### 1.1 Clone the RV repository using HTTPS or SSH key
+#### 1.1 Clone the Open RV repository using HTTPS or SSH key
 
 Clone the Open RV repository. Typically, this will create an "OpenRV" directory from your current location.
 
@@ -38,17 +38,17 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
 
-#### 1.3 Load command aliases to build OpenRV
+#### 1.3 Load command aliases to build Open RV
 
-Command-line aliases are provided to simplify the process of setting up the environment and to build OpenRV. Once in your OpenRV directory:
+Command-line aliases are provided to simplify the process of setting up the environment and to build Open RV. Once in your OpenRV directory:
 
 ```bash
 source rvcmds.sh
 ```
 
-#### 1.5 First-time build only: rvbootstrap
+#### 1.4 First-time build only: rvbootstrap
 
-This step only needs to be done on a freshly cloned git repository. Under the hood, his command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
+This step only needs to be done on a freshly cloned git repository. Under the hood, this command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
 
 After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
 
@@ -67,16 +67,16 @@ rvbootstrapd
 
 Note 1: launch the default optimized build unless you have a reason to want the unoptimized debug build.
 
-Note 2: It happen that after boostrapping the build has failed. When this happens, building again often fixes the problem. From the command like, call rvmk (Release) or rvmkd (Debug) to complete the build.
+Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call rvmk (Release) or rvmkd (Debug) to complete the build.
 
 
-### 2. Building OpenRV after the first time
+### 2. Building Open RV after the first time
 
-Once you've built OpenRV for the first time, there is no need to run "rvboostrap" again.
+Once you've built Open RV for the first time, there is no need to run "rvboostrap" again.
 
-#### 2.1 Build OpenRV (incrementally) using rvmk
+#### 2.1 Build Open RV (incrementally) using rvmk
 
-To build OpenRV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process. 
+To build Open RV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process. 
 
 
 ````{tabs}
@@ -101,7 +101,7 @@ rvmkd
 
 #### 2.2 Rebuilding the dependencies
 
-Building the source dependencies is done automatically the first time we build OpenRV with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
+Building the source dependencies is done automatically the first time we build Open RV with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
 
 
 ````{tabs}
@@ -114,9 +114,9 @@ rvbuildtd dependencies
 ````
 
 
-### 3. Starting the OpenRV executable
+### 3. Starting the Open RV executable
 
-Once OpenRV is finished building, its executable binary can be found here:
+Once Open RV is finished building, its executable binary can be found here:
 
 For Windows and Linux:
 
@@ -144,7 +144,7 @@ OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV
 ````
 
 
-### 4. Contributing to OpenRV 
+### 4. Contributing to Open RV 
 
 Before you can submit any code for a pull request, this repository uses the `pre-commit` tool to perform basic checks and to execute formatting hooks before a commit. To install the pre-commit hooks, run the following command:
 
@@ -192,7 +192,7 @@ rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_
 
 Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
 
-Installing the NDI SDK must be done before building OpenRV for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
+Installing the NDI SDK must be done before building Open RV for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
 
 ### 9. How to enable non-free FFmpeg codecs
 
@@ -227,7 +227,7 @@ Note that you should always have `-DRV_FFMPEG_USE_VIDEOTOOLBOX` enabled when dec
 
 ### 11. Running the automated tests
 
-OpenRV uses ctest to run its automated tests.
+Open RV uses ctest to run its automated tests.
 
 To run all tests automatically:
 
@@ -260,9 +260,9 @@ You can run the tests with extra verbosity with the flag `--extra-verbose`.
 
 ### 12. Creating the installation package
 
-To create the installation package, invoke the `install` step using cmake. The install step prepares OpenRV for packaging by building a copy of Open RV in the `_install` folder. This step will strip debug symbols from the executable if required.
+To create the installation package, invoke the `install` step using cmake. The install step prepares Open RV for packaging by building a copy of Open RV in the `_install` folder. This step will strip debug symbols from the executable if required.
 
-Afterwards, it's up to you to either sign or package the result, or to do both. The result should contain the minimum required to have a functional OpenRV.
+Afterwards, it's up to you to either sign or package the result, or to do both. The result should contain the minimum required to have a functional Open RV.
 
 #### 12.1 Creating the installation package automatically
 
