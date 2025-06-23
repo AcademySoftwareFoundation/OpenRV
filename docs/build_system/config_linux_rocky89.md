@@ -96,8 +96,6 @@ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-
-
 #### 2.2 Install the Python version associated with the VFX reference platform
 ````{tabs}
 ```{code-tab} bash VFX-CY2023
