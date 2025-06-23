@@ -54,7 +54,7 @@ def test_python_distribution(python_home: str) -> None:
         print(f"Moving {python_home} to {tmp_python_home}")
         shutil.move(python_home, tmp_python_home)
 
-        python_validation_args = get_python_interpreter_args(tmp_python_home) + [
+        python_validation_args = get_python_interpreter_args(tmp_python_home, VARIANT) + [
             "-c",
             "\n".join(
                 [
@@ -168,7 +168,7 @@ def prepare() -> None:
     os.environ["CLANG_INSTALL_DIR"] = libclang_install_dir
 
     # PySide6 build requires numpy 1.26.3
-    install_numpy_args = get_python_interpreter_args(PYTHON_OUTPUT_DIR) + [
+    install_numpy_args = get_python_interpreter_args(PYTHON_OUTPUT_DIR, VARIANT) + [
         "-m",
         "pip",
         "install",
@@ -237,7 +237,7 @@ def build() -> None:
     Run the build step of the build. It compile every target of the project.
     """
     python_home = PYTHON_OUTPUT_DIR
-    python_interpreter_args = get_python_interpreter_args(python_home)
+    python_interpreter_args = get_python_interpreter_args(python_home, VARIANT)
 
     pyside_build_args = python_interpreter_args + [
         os.path.join(SOURCE_DIR, "setup.py"),
