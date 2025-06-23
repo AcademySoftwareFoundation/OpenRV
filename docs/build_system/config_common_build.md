@@ -92,17 +92,17 @@ To build OpenRV after the first time, "rvmk" will correctly configure the enviro
 # Produces incremental optimized build in OpenRV/_build_debug
 rvmk
 
-Note that, under the hood, rvmk is literally the equivalent to these two commands:
-rvcfg      # sets environment variables
-rvbuild  # launches the build process
+# Note: rvmk is litean alias to these two commands:
+# rvcfg      # sets environment variables
+# rvbuild    # launches the build process
 ```
 ```{code-tab} bash Debug
 # Produces incremental unoptimized debug build in OpenRV/_build_debug
 rvmkd
 
-Note that, under the hood, rvmkd is literally the equivalent to these two commands:
-rvcfgd      # sets environment variables
-rvbuildd  # launches the build process
+# Note: rvmkd is litean alias to these two commands:
+# rvcfgd      # sets environment variables
+# rvbuildd    # launches the build process
 ```
 ````
 
@@ -131,10 +131,10 @@ For Windows and Linux:
 
 ````{tabs}
 ```{code-tab} bash Release
-`OpenRV/_build/stage/app/bin/rv`.
+OpenRV/_build/stage/app/bin/rv.
 ```
 ```{code-tab} bash Debug
-`OpenRV/_build_debug/stage/app/bin/rv`.
+OpenRV/_build_debug/stage/app/bin/rv.
 ```
 ````
 
@@ -185,7 +185,7 @@ Although not strictly enforced, it is highly suggested to enable clang-tidy loca
 
 To clean your build directory and restart from a clean slate, use the `rvclean` alias, or delete the `_build` folder.
 
-To keep your third-party builds between build cleanups, set `-DRV_DEPS_BASE_DIR=/path/to/third/party`.
+To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/to/third/party`.
 
 ### 7. Installing Blackmagicdesign&reg; Video Output Support (Optional)
 

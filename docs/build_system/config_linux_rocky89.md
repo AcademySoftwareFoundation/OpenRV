@@ -7,8 +7,8 @@ Select your VFX reference platform by clicking on the appropriate tab. Install i
 ````{tabs}
 ```{code-tab} bash VFX-CY2023
 Qt                  : 5.12.2
-Cmake               : 3.31.6
 Python              : 3.10
+Cmake               : 3.31.6
 
 Config manager repo : powertools  (Rocky 8)
 Config manager repo : crb         (Rocky 9)
@@ -17,8 +17,8 @@ Perl-CPAN           : 2.36+       (Rocky 9)
 ```
 ```{code-tab} bash VFX-CY2024
 Qt                  : 6.5.3
-Cmake               : 3.31.6
 Python              : 3.11.8
+Cmake               : 3.31.6
 
 Config manager repo : powertools  (Rocky 8)
 Config manager repo : crb         (Rocky 9)
@@ -134,14 +134,14 @@ Download the latest open-source [Qt installer](https://www.qt.io/download-open-s
 - Start the Qt installer
 - Installation path: ~/Qt
 - Click "Archive" in the hard-to-find dropbown box in the top right side of the window
-Select Qt 5.12.2
+- Select Qt 5.12.2
 # Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2
 ```
 ```{code-tab} bash VFX-CY2024
 - Start the Qt installer
 - Installation path: ~/Qt
 - Click "Archive" in the hard-to-find dropbown box in the top right side of the window
-Select Qt 6.5.3
+- Select Qt 6.5.3
 # Any 6.5.3+ should work, but Autodesk's RV is build against 6.5.3
 ```
 ````
