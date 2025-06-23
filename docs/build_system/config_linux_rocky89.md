@@ -6,25 +6,23 @@ Select your VFX reference platform by clicking on the appropriate tab. Install i
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2023
-Qt:      5.12.2
-Cmake:   3.31.6
-Python:  3.10
+Qt                  : 5.12.2
+Cmake               : 3.31.6
+Python              : 3.10
 
-|                      | Rocky 8    |Rocky 9 
-|----------------------|------------|-----------|
-| Config manager repo  | powertools | crb       |
-| Perl-CPAN            | --         | 2.36+     |
+Config manager repo : powertools  (Rocky 8)
+Config manager repo : crb         (Rocky 9)
+Perl-CPAN           : 2.36+       (Rocky 9)
 
 ```
 ```{code-tab} bash VFX-CY2024
-Qt:      6.5.3
-Cmake:   3.31.6
-Python:  3.11.8
+Qt                  : 6.5.3
+Cmake               : 3.31.6
+Python              : 3.11.8
 
-|                      | Rocky 8    | Rocky 9 |
-|----------------------|------------|---------|
-| Config manager repo  | powertools | crb     |
-| Perl-CPAN            | --         | 2.36+   |
+Config manager repo : powertools  (Rocky 8)
+Config manager repo : crb         (Rocky 9)
+Perl-CPAN           : 2.36+       (Rocky 9)
 
 ```
 ````
