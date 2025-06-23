@@ -276,10 +276,10 @@ namespace Rv
         ImGui::TextWrapped(
             "From your Python plugin, you simply need to register a "
             "diagnostics callback, and from the callback, call ImGui/ImPlot "
-            "functios to display your data.");
+            "functions to display your data.");
         ImGui::TextWrapped(
             "Note that there is no need to implement backends for handling "
-            "keyboard/mouse and graphics; this part is alredy done for you.");
+            "keyboard/mouse and graphics; this part is already done for you.");
         ImGui::TextWrapped("");
         ImGui::TextWrapped("Hello World example:");
         ImGui::TextWrapped("");
@@ -303,7 +303,7 @@ namespace Rv
         ImGui::SameLine();
         ImGui::TextWrapped("and");
         ImGui::SameLine();
-        ImGui::TextLinkOpenURL("ImGui Python Bindings",
+        ImGui::TextLinkOpenURL("ImGui Python bindings",
                                "https://github.com/pthom/imgui_bundle/blob/"
                                "main/external/imgui/bindings/pybind_imgui.cpp");
         ImGui::TextLinkOpenURL("ImPlot", "https://github.com/ocornut/imgui");
@@ -315,8 +315,8 @@ namespace Rv
             "https://github.com/pthom/imgui_bundle/blob/main/external/implot/"
             "bindings/pybind_implot.cpp");
         ImGui::TextWrapped("");
-        ImGui::TextWrapped(
-            "Comprehensive Python examples of how to create GUIs can be found");
+        ImGui::TextWrapped("Comprehensive Python examples of how to create "
+                           "interactive interfaces can be found");
         ImGui::TextLinkOpenURL(
             "here (ImGui)",
             "https://github.com/pthom/imgui_bundle/blob/main/bindings/"
