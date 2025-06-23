@@ -275,7 +275,7 @@ namespace Rv
             "than building your own Qt user interface.");
         ImGui::TextWrapped(
             "From your Python plugin, you simply need to register a "
-            "diagnsotics callback, and from the callback, call ImGui/ImPlot "
+            "diagnostics callback, and from the callback, call ImGui/ImPlot "
             "functios to display your data.");
         ImGui::TextWrapped(
             "Note that there is no need to implement backends for handling "
