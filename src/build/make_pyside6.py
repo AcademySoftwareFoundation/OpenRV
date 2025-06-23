@@ -54,7 +54,7 @@ def test_python_distribution(python_home: str) -> None:
         print(f"Moving {python_home} to {tmp_python_home}")
         shutil.move(python_home, tmp_python_home)
 
-        python_validation_args = get_python_interpreter_args(tmp_python_home) + [
+        python_validation_args = get_python_interpreter_args(tmp_python_home, VARIANT) + [
             "-c",
             "\n".join(
                 [
@@ -80,15 +80,38 @@ def prepare() -> None:
     # PySide6 requires Clang 13+.
     print("Setting up Clang...")
     clang_filename_suffix = ""
+    fallback_clang_filename_suffix = None
 
     system = platform.system()
     if system == "Darwin":
-        clang_version_search = re.search(
-            "version (\d+)\.(\d+)\.(\d+)",
-            os.popen("clang --version").read(),
-        )
-        clang_version_str = ".".join(clang_version_search.groups())
-        clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
+
+        def get_clang_version():
+            version_output = os.popen("clang --version").read()
+            version_search = re.search(r"version (\d+)\.(\d+)\.(\d+)", version_output)
+            if version_search:
+                return version_search.groups()
+            print(f"ERROR: Could not extract clang --version")
+            return None
+
+        def get_clang_filename_suffix(version):
+            version_str = ".".join(version)
+            return f"{version_str}-based-macos-universal.7z"
+
+        def get_fallback_clang_filename_suffix(version):
+            major_minor_version_str = ".".join(version[:2])
+            if major_minor_version_str == "14.0":
+                return "14.0.3-based-macos-universal.7z"
+            elif major_minor_version_str == "17.0":
+                return "17.0.1-based-macos-universal.7z"
+            return None
+
+        clang_version = get_clang_version()
+        if clang_version:
+            clang_filename_suffix = get_clang_filename_suffix(clang_version)
+            fallback_clang_filename_suffix = get_fallback_clang_filename_suffix(
+                clang_version
+            )
+
     elif system == "Linux":
         clang_filename_suffix = "19.1.0-based-linux-Rhel8.8-gcc10.3-x86_64.7z"
     elif system == "Windows":
@@ -96,13 +119,28 @@ def prepare() -> None:
 
     download_url = LIBCLANG_URL_BASE + clang_filename_suffix
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
-    if os.path.exists(libclang_zip) is False:
-        download_file(download_url, libclang_zip)
+
     # if we have a failed download, clean it up and redownload.
     # checking for False since it can return None when archive doesn't have a CRC
-    elif verify_7z_archive(libclang_zip) is False:
+    if os.path.exists(libclang_zip) and verify_7z_archive(libclang_zip) is False:
         os.remove(libclang_zip)
-        download_file(download_url, libclang_zip)
+
+    # download it if necessary
+    if os.path.exists(libclang_zip) is False:
+        download_ok = download_file(download_url, libclang_zip)
+        if not download_ok and fallback_clang_filename_suffix:
+            fallback_download_url = LIBCLANG_URL_BASE + fallback_clang_filename_suffix
+            print(
+                f"WARNING: Could not download or version does not exist: {download_url}"
+            )
+            print(
+                f"WARNING: Attempting to fallback on known version: {fallback_download_url}..."
+            )
+            download_ok = download_file(fallback_download_url, libclang_zip)
+        if not download_ok:
+            print(
+                f"ERROR: Could not download or version does not exist: {download_url}"
+            )
 
     # clean up previous failed extraction
     libclang_tmp = os.path.join(TEMP_DIR, "libclang-tmp")
@@ -130,7 +168,7 @@ def prepare() -> None:
     os.environ["CLANG_INSTALL_DIR"] = libclang_install_dir
 
     # PySide6 build requires numpy 1.26.3
-    install_numpy_args = get_python_interpreter_args(PYTHON_OUTPUT_DIR) + [
+    install_numpy_args = get_python_interpreter_args(PYTHON_OUTPUT_DIR, VARIANT) + [
         "-m",
         "pip",
         "install",
@@ -199,7 +237,7 @@ def build() -> None:
     Run the build step of the build. It compile every target of the project.
     """
     python_home = PYTHON_OUTPUT_DIR
-    python_interpreter_args = get_python_interpreter_args(python_home)
+    python_interpreter_args = get_python_interpreter_args(python_home, VARIANT)
 
     pyside_build_args = python_interpreter_args + [
         os.path.join(SOURCE_DIR, "setup.py"),

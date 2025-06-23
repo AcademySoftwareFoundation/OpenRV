@@ -30,6 +30,7 @@ if [[ "$OSTYPE" == "linux"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
   RV_TOOLCHAIN=""
+  export PATH="/opt/homebrew/opt/python@3.11/libexec/bin:$PATH" 
 
 # Windows
 elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
