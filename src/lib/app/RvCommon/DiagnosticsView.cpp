@@ -306,7 +306,7 @@ namespace Rv
         ImGui::TextLinkOpenURL("ImGui Python bindings",
                                "https://github.com/pthom/imgui_bundle/blob/"
                                "main/external/imgui/bindings/pybind_imgui.cpp");
-        ImGui::TextLinkOpenURL("ImPlot", "https://github.com/ocornut/imgui");
+        ImGui::TextLinkOpenURL("ImPlot", "https://github.com/pthom/implot");
         ImGui::SameLine();
         ImGui::TextWrapped("and");
         ImGui::SameLine();
