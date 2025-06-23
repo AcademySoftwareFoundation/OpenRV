@@ -129,19 +129,19 @@ cmake version 3.31.6
 
 Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recommend that you install Qt from other installable sources as it may introduce build issues.
 
-```bash
+````{tabs}
+```{code-tab} bash VFX-CY2023
 - Start the Qt installer
 - Installation path: ~/Qt
 - Click "Archive" in the hard-to-find dropbown box in the top right side of the window
-```
-
-````{tabs}
-```{code-tab} bash VFX-CY2023
 Select Qt 5.12.2
 # Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2
 ```
 
 ```{code-tab} bash VFX-CY2024
+- Start the Qt installer
+- Installation path: ~/Qt
+- Click "Archive" in the hard-to-find dropbown box in the top right side of the window
 Select Qt 6.5.3
 # Any 6.5.3+ should work, but Autodesk's RV is build against 6.5.3
 ```
