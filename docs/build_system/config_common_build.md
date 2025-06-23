@@ -6,7 +6,7 @@ Once the platform-specific installation process is done, building RV is essentia
 
 #### 1.1 Clone the RV repository using HTTPS or SSH key
 
-Clone the Open RV repository. Typically, this will create an "OpenRV" folder from your current location.
+Clone the Open RV repository. Typically, this will create an "OpenRV" directory from your current location.
 
 ```bash
 # If using a password-protected SSH key:
@@ -61,16 +61,21 @@ This step only needs to be done on a freshly cloned git repository. Under the ho
 After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
 
 
-```bash
-# Produces default optimized build in ~/OpenRV/_build
+````{tabs}
+```{code-tab} bash Release
+# Produces default optimized build in OpenRV/_build
 rvbootstrap
 ```
-```bash
-# Produces unoptimized debug build in ~/OpenRV/_build_debug
+```{code-tab} bash Debug
+# Produces unoptimized debug build in OpenRV/_build_debug
 rvbootstrapd
 ```
+````
 
-Note: launch the default optimized build unless you have a reason to want the unoptimized debug build.
+
+Note 1: launch the default optimized build unless you have a reason to want the unoptimized debug build.
+
+Note 2: It happen that after boostrapping the build has failed. When this happens, building again often fixes the problem. From the command like, call rvmk (Release) or rvmkd (Debug) to complete the build.
 
 
 ### 2. Building OpenRV after the first time
@@ -81,20 +86,25 @@ Once you've built OpenRV for the first time, there is no need to run "rvboostrap
 
 To build OpenRV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process. 
 
-```bash
-# Produces incremental optimized build in ~/OpenRV/_build_debug
-rvmk
-```
-```bash
-# Produces incremental unoptimized debug build in ~/OpenRV/_build_debug
-rvmkd
-```
 
-Note that, under the hood, rvmk/rvmkd is literally the equivalent to these two commands:
-```bash
-rvcfg/rvcfgd      # sets environment variables
-rvbuild/rvbuildd  # launches the build process
+````{tabs}
+```{code-tab} bash Release
+# Produces incremental optimized build in OpenRV/_build_debug
+rvmk
+
+Note that, under the hood, rvmk is literally the equivalent to these two commands:
+rvcfg      # sets environment variables
+rvbuild  # launches the build process
 ```
+```{code-tab} bash Debug
+# Produces incremental unoptimized debug build in OpenRV/_build_debug
+rvmkd
+
+Note that, under the hood, rvmkd is literally the equivalent to these two commands:
+rvcfgd      # sets environment variables
+rvbuildd  # launches the build process
+```
+````
 
 
 #### 2.2 Rebuilding the dependencies
@@ -102,14 +112,14 @@ rvbuild/rvbuildd  # launches the build process
 Building the source dependencies is done automatically the first time we build OpenRV with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
 
 
-```bash
-# Rebuild dependencies for default optimized build
+````{tabs}
+```{code-tab} bash Release
 rvbuildt dependencies
 ```
-```bash
-# Rebuild dependencies for debug build
+```{code-tab} bash Debug
 rvbuildtd dependencies
 ```
+````
 
 
 ### 3. Starting the OpenRV executable
@@ -117,25 +127,29 @@ rvbuildtd dependencies
 Once OpenRV is finished building, its executable binary can be found here:
 
 For Windows and Linux:
-```bash
-# For the default optimized build:
-`~/OpenRV/_build/stage/app/bin/rv`.
+
+
+````{tabs}
+```{code-tab} bash Release
+`OpenRV/_build/stage/app/bin/rv`.
 ```
-```bash
-# For the debug build
-`~/OpenRV/_build_debug/stage/app/bin/rv`.
+```{code-tab} bash Debug
+`OpenRV/_build_debug/stage/app/bin/rv`.
 ```
+````
 
 
 For macOS:
-```bash
-# For the default optimized build:
-`~/OpenRV/_build/stage/app/RV.app/Contents/MacOS/RV`
+
+
+````{tabs}
+```{code-tab} bash Release
+`OpenRV/_build/stage/app/RV.app/Contents/MacOS/RV`
 ```
-```bash
-# For the debug build
-`~/OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV`
+```{code-tab} bash Debug
+`OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV`
 ```
+````
 
 
 ### 4. Contributing to OpenRV 

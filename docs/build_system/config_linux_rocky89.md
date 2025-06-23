@@ -1,16 +1,35 @@
 # Preparing Open RV on Rocky 8 and 9
 
-OpenRV 2025 can be built for Rocky 8 and Rocky 9, using VFX reference platform CY2023 or CY2024, with only minor differences.
+OpenRV 2025 can be built for Rocky 8 and Rocky 9, using the VFX reference platform CY2023 or CY2024, with only minor differences for the config manager repo and the requirement for Perl-CPAN.
 
-Here's a table of what versions are needed for each:
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
-|                      | Rocky 8<br>CY2023 | Rocky 8<br>CY2024 |Rocky 9<br>CY2023 | Rocky 9<br>CY2024 |
-|----------------------|------------|------------|-----------|---------|
-| Config manager repo  | powertools | powertools | crb       | crb     |
-| Qt                   | 5.12.2     | 6.5.3      | 5.12.2    | 6.5.3   |
-| Cmake                | 3.31.6     | 3.31.6     | 3.31.6    | 3.31.6  |
-| Python               | 3.10.0     | 3.11.8     | 3.10.0    | 3.11.8  |
-| Perl-CPAN            | --         | --         | 2.36+     | 2.36+   |
+````{tabs}
+```{code-tab} bash VFX-CY2023
+Qt:      5.12.2
+Cmake:   3.31.6
+Python:  3.10
+
+|                      | Rocky 8    |Rocky 9 
+|----------------------|------------|-----------|
+| Config manager repo  | powertools | crb       |
+| Perl-CPAN            | --         | 2.36+     |
+
+```
+```{code-tab} bash VFX-CY2024
+Qt:      6.5.3
+Cmake:   3.31.6
+Python:  3.11.8
+
+|                      | Rocky 8    | Rocky 9 |
+|----------------------|------------|---------|
+| Config manager repo  | powertools | crb     |
+| Perl-CPAN            | --         | 2.36+   |
+
+```
+````
+
+
 
 All other dependencies are shared across variations.
 
@@ -25,17 +44,17 @@ All other dependencies are shared across variations.
 ### 1. Install tools and build dependencies
 
 #### 1.1. Set the config manager
-```bash
-# Rocky 8
+
+````{tabs}
+```{code-tab} bash # Rocky 8
 sudo dnf config-manager --set-enabled powertools devel
 ```
-
-```bash
-# Rocky 9
+```{code-tab} bash # Rocky 9
 sudo dnf config-manager --set-enabled crb devel
 dnf install -y perl-CPAN
 cpan FindBin
 ```
+````
 
 #### 1.2. Install other dependencies
 ```bash
@@ -80,17 +99,17 @@ source ~/.bashrc
 
 
 #### 2.2 Install the Python version associated with the VFX reference platform
-```bash
-# For VFX platform CY2023
+````{tabs}
+```{code-tab} bash VFX-CY2023
 pyenv install 3.10
 pyenv global 3.10
 ```
-
-```bash
-# For VFX platform CY2024
+```{code-tab} bash VFX-CY2024
 pyenv install 3.11.8
 pyenv global 3.11.8
 ```
+````
+
 
 (rocky_install_cmake)=
 ### 3. Install CMake
@@ -120,18 +139,19 @@ Download the latest open-source [Qt installer](https://www.qt.io/download-open-s
 - Click "Archive" in the hard-to-find dropbown box in the top right side of the window
 ```
 
-
-```bash
-# For VFX platform CY2023
+````{tabs}
+```{code-tab} bash VFX-CY2023
 Select Qt 5.12.2
-# Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2)
+# Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2
 ```
 
-```bash
-# For VFX platform CY2024
+```{code-tab} bash VFX-CY2024
 Select Qt 6.5.3
-# Any 6.5.3+ should work, but Autodesk's RV is build against 6.5.3)
+# Any 6.5.3+ should work, but Autodesk's RV is build against 6.5.3
 ```
+````
+
+
 
 Note 1: If you install Qt at a different installation path, you will need to manually export the environment variable "QT_HOME" to that path in your ~/.bashrc file such that the build scripts will be able to find it.
 
@@ -147,19 +167,21 @@ Please go through the cloning procedure found in the [common build process](conf
 
 #### 5.1. Build the image and run
 
-```bash
-# For Rocky 8
+````{tabs}
+```{code-tab} bash Rocky 8
 cd dockerfiles
 docker build -t openrv-rocky8 -f Dockerfile.Linux-Rocky8 .
 docker run -d openrv-rocky8 /bin/bash -c "sleep infinity"
 ```
 
-```bash
-# For Rocky 9
+```{code-tab} bash Rocky 8
 cd dockerfiles
 docker build -t openrv-rocky9 -f Dockerfile.Linux-Rocky9 .
 docker run -d openrv-rocky9 /bin/bash -c "sleep infinity"
 ```
+````
+
+
 
 #### 5.2. Create and run the container
 ```bash
