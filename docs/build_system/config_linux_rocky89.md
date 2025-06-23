@@ -46,10 +46,10 @@ All other dependencies are shared across variations.
 #### 1.1. Set the config manager
 
 ````{tabs}
-```{code-tab} bash # Rocky 8
+```{code-tab} bash Rocky 8
 sudo dnf config-manager --set-enabled powertools devel
 ```
-```{code-tab} bash # Rocky 9
+```{code-tab} bash Rocky 9
 sudo dnf config-manager --set-enabled crb devel
 dnf install -y perl-CPAN
 cpan FindBin
@@ -172,7 +172,7 @@ docker build -t openrv-rocky8 -f Dockerfile.Linux-Rocky8 .
 docker run -d openrv-rocky8 /bin/bash -c "sleep infinity"
 ```
 
-```{code-tab} bash Rocky 8
+```{code-tab} bash Rocky 9
 cd dockerfiles
 docker build -t openrv-rocky9 -f Dockerfile.Linux-Rocky9 .
 docker run -d openrv-rocky9 /bin/bash -c "sleep infinity"
