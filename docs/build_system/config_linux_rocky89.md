@@ -137,7 +137,6 @@ Download the latest open-source [Qt installer](https://www.qt.io/download-open-s
 Select Qt 5.12.2
 # Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2
 ```
-
 ```{code-tab} bash VFX-CY2024
 - Start the Qt installer
 - Installation path: ~/Qt
