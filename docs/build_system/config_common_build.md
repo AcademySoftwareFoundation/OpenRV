@@ -38,15 +38,7 @@ git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
 
-#### 1.3 Install the required additional python packages. 
-
-```bash
-# install requirements.txt from the root of the git repository
-python3 -m pip install -r requirements.txt
-```
-
-
-#### 1.4 Load command aliases to build OpenRV
+#### 1.3 Load command aliases to build OpenRV
 
 Command-line aliases are provided to simplify the process of setting up the environment and to build OpenRV. Once in your OpenRV directory:
 
