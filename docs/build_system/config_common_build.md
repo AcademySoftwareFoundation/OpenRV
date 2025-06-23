@@ -92,7 +92,7 @@ To build OpenRV after the first time, "rvmk" will correctly configure the enviro
 # Produces incremental optimized build in OpenRV/_build_debug
 rvmk
 
-# Note: rvmk is litean alias to these two commands:
+# Note: rvmk is just an alias to these two commands:
 # rvcfg      # sets environment variables
 # rvbuild    # launches the build process
 ```
@@ -100,7 +100,7 @@ rvmk
 # Produces incremental unoptimized debug build in OpenRV/_build_debug
 rvmkd
 
-# Note: rvmkd is litean alias to these two commands:
+# Note: rvmkd is just an alias to these two commands:
 # rvcfgd      # sets environment variables
 # rvbuildd    # launches the build process
 ```
@@ -183,7 +183,7 @@ Although not strictly enforced, it is highly suggested to enable clang-tidy loca
 
 ### 6. Cleaning up your build directory
 
-To clean your build directory and restart from a clean slate, use the `rvclean` alias, or delete the `_build` folder.
+To clean your build directory and restart from a clean slate, use the `rvclean` (or `rvcleand`) alias, or delete the `_build` (or `_build_debug`) directory.
 
 To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/to/third/party`.
 
