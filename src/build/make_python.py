@@ -120,7 +120,7 @@ def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
     :return: Path to the python interpreter
     """
 
-    build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
+    build_opentimelineio = platform.system() == "Windows" and variant == "Debug"
     python_name_pattern = "python*" if not build_opentimelineio else "python_d*"
 
     python_interpreters = glob.glob(
