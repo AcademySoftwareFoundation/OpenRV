@@ -285,10 +285,16 @@ namespace Rv
         ImGui::TextWrapped("");
         ImGui::TextWrapped("---------------------------------------------");
         ImGui::TextWrapped("");
+        ImGui::TextWrapped("import pyimgui as imgui");
+        ImGui::TextWrapped("import pyimplot as implot");
+        ImGui::TextWrapped("");
         ImGui::TextWrapped("def __init__( self ):");
         ImGui::TextWrapped(
             "   commands.register_diagnostics_callback( self.my_callback )");
         ImGui::TextWrapped("");
+        ImGui::TextWrapped("def __del__( self ):");
+        ImGui::TextWrapped(
+            "   commands.unregister_diagnostics_callback( self.my_callback )");
         ImGui::TextWrapped("");
         ImGui::TextWrapped("def my_callback( self ):");
         ImGui::TextWrapped("   imgui.begin( \"Example Window\" )");
