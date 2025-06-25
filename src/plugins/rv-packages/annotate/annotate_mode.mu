@@ -916,6 +916,7 @@ class: AnnotateMinorMode : MinorMode
         if (_currentDrawMode eq _selectDrawMode)
         {
             togglePlayVerbose(true);
+            return;
         }
 
         if (filterLiveReviewEvents()) {
