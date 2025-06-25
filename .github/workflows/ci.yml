@@ -603,11 +603,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Check if it is a schedule job
-        if: github.event_name == 'schedule'
-        run: |
-          echo "SKIP_DEPS_CACHE='true'" >> $GITHUB_ENV
-
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
         with:
@@ -750,27 +745,6 @@ jobs:
         run: |
           python3 -m pip install --user --upgrade -r ./requirements.txt
         shell: msys2 {0}
-
-      - name: Check if the dependencies changed
-        if: matrix.build-type == 'Release'
-        uses: dorny/paths-filter@v3
-        id: changes-in-deps
-        with:
-          filters: |
-            dependencies:
-              - 'cmake/**'
-
-      - name: Restore some dependencies
-        # Restore only if there are no changes under cmake folder and Release build.
-        if: env.SKIP_DEPS_CACHE == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && matrix.build-type == 'Release'
-        id: cmake-dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ./_build/RV_DEPS_*
-            ./_build/cmake/dependencies
-            ./_build/_deps
-          key: windows-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
