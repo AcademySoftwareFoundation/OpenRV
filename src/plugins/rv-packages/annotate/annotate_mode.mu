@@ -1023,15 +1023,16 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
         if (_currentDrawMode eq _selectDrawMode)
         {
             return;
         }
 
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         let d = _currentDrawMode;
         _pointerGone = false;
 
