@@ -14,7 +14,7 @@
 - [Setting up debugging in VSCode](debugging_openrv)
 
 ````{note}
-OpenRV can be built for *x86_64* by changing the architecture of the terminal to *x86_64* using the following command:
+Open RV can be built for *x86_64* by changing the architecture of the terminal to *x86_64* using the following command:
 ```bash
 arch -x86_64 $SHELL
 ```
