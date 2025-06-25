@@ -65,12 +65,12 @@ Make sure `xcode-select -p` still returns `/Applications/Xcode.app/Contents/Deve
 (install_qt)=
 ## Install Qt
 
-Download the last version of Qt 6.5.x using the online installer on the [Qt page](https://www.qt.io/download-open-source). Qt logs, Android, iOS, and WebAssembly are not required to build OpenRV.
+Download the last version of Qt 6.5.x using the online installer on the [Qt page](https://www.qt.io/download-open-source). Qt logs, Android, iOS, and WebAssembly are not required to build Open RV.
 
 
 WARNING: If you fetch Qt from another source, make sure it is built with SSL support, contains everything required to build PySide6, and that the file structure is similar to the official package.
 
-Note: Qt6 from homebrew is known to not work well with OpenRV.
+Note: Qt6 from homebrew is known to not work well with Open RV.
 Note: The CI build agents are currently using Qt 6.5.3
 
 (build_openrv)=

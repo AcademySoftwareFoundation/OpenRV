@@ -1,6 +1,6 @@
 # Preparing Open RV on Rocky 8 and 9
 
-OpenRV 2025 can be built for Rocky 8 and Rocky 9, using the VFX reference platform CY2023 or CY2024, with only minor differences for the config manager repo and the requirement for Perl-CPAN.
+Open RV 2025 can be built for Rocky 8 and Rocky 9, using the VFX reference platform CY2023 or CY2024, with only minor differences for the config manager repo and the requirement for Perl-CPAN.
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
@@ -150,14 +150,14 @@ Download the latest open-source [Qt installer](https://www.qt.io/download-open-s
 
 Note 1: If you install Qt at a different installation path, you will need to manually export the environment variable "QT_HOME" to that path in your ~/.bashrc file such that the build scripts will be able to find it.
 
-Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build OpenRV. 
+Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build Open RV. 
 
 (rocky_building_with_docker)=
 ### 5. Building with Docker (Optional)
 
-To build OpenRV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 
+To build Open RV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 
 
-Please go through the cloning procedure found in the [common build process](config_common_build.md). Once cloned, get back here to build the docker image, run the container, and build OpenRV within the docker container.
+Please go through the cloning procedure found in the [common build process](config_common_build.md). Once cloned, get back here to build the docker image, run the container, and build Open RV within the docker container.
 
 
 #### 5.1. Build the image and run
@@ -192,9 +192,9 @@ docker container ls
 docker container exec -it <id> /bin/bash  # replace 'id' with your value
 ```
 
-#### 5.3. Build OpenRV in the container
+#### 5.3. Build Open RV in the container
 
-Once you are into the container, you can follow the [common build process](config_common_build.md) to build OpenRV.
+Once you are into the container, you can follow the [common build process](config_common_build.md) to build Open RV.
 
 #### 5.4. Copy the stage folder outside of the container
 

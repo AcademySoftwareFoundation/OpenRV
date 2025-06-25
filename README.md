@@ -24,16 +24,16 @@ The quickest way to download OpenRV's source code is to clone this repository.
 git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
 ```
 
-However, if you'd like to actually build OpenRV or contribute to the project, we recommend you follow the instructions below *before* cloning the repository, as it involves quite a lot more setup than just cloning. If that's your case, skip this step for now, we'll get to cloning in a bit.
+However, if you'd like to actually build Open RV or contribute to the project, we recommend you follow the instructions below *before* cloning the repository, as it involves quite a lot more setup than just cloning. If that's your case, skip this step for now, we'll get to cloning in a bit.
 
 
 ## Contributing to Open RV
 
-We welcome community contributions. In general, to maximize your chances of successfully building and contributing to OpenRV, you should:
+We welcome community contributions. In general, to maximize your chances of successfully building and contributing to Open RV, you should:
 
 - Be very familiar with git/github and its usage.
 - Have your own github account, where you will fork this repository
-- Clone your forked repository instead of the main OpenRV repository
+- Clone your forked repository instead of the main Open RV repository
 - Create a branch from your fork's 'main' branch before modifying code
 - Fix conflicts prior to creating a pull request
 - Update your branch (git pull, git rebase) before creating your pull request
@@ -43,7 +43,7 @@ If you're comfortable and familiar with the above, we are looking forward to you
 
 ## Building the workstation
 
-OpenRV is currently supported on macOS Ventura 13.x and later, Windows 10 and later, and Rocky Linux 8.x/9.x.
+Open RV is currently supported on macOS Ventura 13.x and later, Windows 10 and later, and Rocky Linux 8.x/9.x.
 
 You should start by setting up the platform-specifc packages and dependencies for your operating system:
 
@@ -63,5 +63,5 @@ Also note that support for other *current* operating systems (typically, other L
 
 ## About third-party licenses
 
-See [THIRD-PARTY.md](THIRD-PARTY.md) for license information about portions of OpenRV that have been imported from other projects.
+See [THIRD-PARTY.md](THIRD-PARTY.md) for license information about portions of Open RV that have been imported from other projects.
 
