@@ -227,6 +227,7 @@ Some events will originate from RV itself. These include things like new-source 
 | range-changed |  |  | The time range changed |
 | narrowed-range-changed |  |  | The narrowed time range changed |
 | margins-changed | left right top bottom |  | View margins changed |
+| output-video-device-changed | outputVideoModuleName/outputVideoDeviceName |  | The output video device changed |
 | view-resized | old-w new-w | old-h new-h |  | Main view changed size |
 | preferences-show |  |  | Pref dialog will be shown |
 | preferences-hide |  |  | Pref dialog was hidden |
