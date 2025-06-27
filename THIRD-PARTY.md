@@ -19,4 +19,8 @@ Please refer to the NDI&reg; SDK license agreement.
 
 ---------------------------------------------------------------------
 
+
+See [Notice.txt](Notice.txt) for license information of other open-source third-party components used by Open RV.
+
+
 If we have left anything out, it is unintentional. Please let us know.
