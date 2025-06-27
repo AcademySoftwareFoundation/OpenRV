@@ -25,6 +25,7 @@
 #include <IPBaseNodes/StackGroupIPNode.h>
 #include <IPBaseNodes/StackIPNode.h>
 #include <IPBaseNodes/SwitchIPNode.h>
+#include <IPBaseNodes/PaintIPNode.h>
 #include <IPCore/AdaptorIPNode.h>
 #include <IPCore/Application.h>
 #include <IPCore/CacheIPNode.h>
@@ -82,6 +83,7 @@
 #include <sys/types.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <regex>
 
 #ifndef PLATFORM_WINDOWS
 #include <stdio.h>
@@ -3813,6 +3815,8 @@ namespace Rv
                     }
                 }
             }
+
+            updateAnnotationsUI();
         } // HOP_PROF_DYN for PASS 6
 
         {
@@ -4337,6 +4341,39 @@ namespace Rv
         auto imageRenderer = renderer();
         if (imageRenderer)
             imageRenderer->unlinkNode(node);
+    }
+
+    void RvSession::updateAnnotationsUI()
+    {
+        const auto& nodes = graph().nodeMap();
+
+        for (const auto& nodeInfo : nodes)
+        {
+            const auto& node = nodeInfo.second;
+            auto* paintNode = dynamic_cast<IPCore::PaintIPNode*>(node);
+
+            if (paintNode != nullptr)
+            {
+                for (const auto& component : paintNode->components())
+                {
+                    if (std::regex_match(component->name(),
+                                         std::regex("(pen:.*|text:.*)")))
+                    {
+                        auto* ghostProperty =
+                            component->property<TwkContainer::IntProperty>(
+                                "ghost");
+                        userGenericEvent("update-ghost-button",
+                                         ghostProperty->valueAsString());
+
+                        auto* holdProperty =
+                            component->property<TwkContainer::IntProperty>(
+                                "hold");
+                        userGenericEvent("update-hold-button",
+                                         holdProperty->valueAsString());
+                    }
+                }
+            }
+        }
     }
 
 } // namespace Rv
