@@ -1539,6 +1539,10 @@ class: AnnotateMinorMode : MinorMode
 
     method: autoMark (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
         return if _autoMark then CheckedMenuState else UncheckedMenuState;
     }
 
