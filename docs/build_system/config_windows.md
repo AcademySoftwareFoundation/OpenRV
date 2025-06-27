@@ -275,8 +275,11 @@ MSYS2 is only used for convenience as it comes with a package manager with utili
 ### 7.1 Install required MSYS2 pacman packages
 
 ````{note}
-The MSYS2 MingGW64 terminal MUST be used.\
+The MSYS2 MingGW64 (mingw64.exe) terminal MUST be used.\
+Other executables such as MSYS2 (msys2.exe) or MSYS2 MingGW32 (mingw32.exe) will not work.\
+
 ![MSYS2-MinGW64](../images/rv-msys2-mingw64-shortcut.png)
+
 
 ````
 
