@@ -172,7 +172,7 @@ FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
     ojph::param_nlt nlt = codestream.access_nlt();
     codestream.create();
 
-    int byte_offset = 0;
+    int bit_offset = 0;
     const int ch = siz.get_num_components();
     const int w = siz.get_recon_width(0);
     const int h = siz.get_recon_height(0);
@@ -190,11 +190,11 @@ FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
             dtype    = FrameBuffer::UCHAR;
             break;
         case 10:
-            byte_offset = 6;
+            bit_offset = 6;
             dtype    = FrameBuffer::USHORT;
             break;
         case 12:
-            byte_offset = 4;
+            bit_offset = 4;
         case 16:
             if (has_nlt && is_signed)
                 dtype = FrameBuffer::HALF;
