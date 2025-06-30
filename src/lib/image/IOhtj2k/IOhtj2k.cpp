@@ -246,12 +246,12 @@ FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
     }
     fb->newAttribute("fileBitDepth", siz.get_bit_depth(0));
     if (codestream.is_planar()){
-            for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
+        // Its pretty rare for RGB to be planar, possibily the most common case is a single channel image
+        for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
                 for (ojph::ui32 i = 0; i < h; ++i)
                     copyScanLine(&codestream, w, ch, i, c, dtype, bit_offset, fb);
             
     } else {
-
         for (ojph::ui32 i = 0; i < h; ++i)
             for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
                     copyScanLine(&codestream, w, ch, i, c, dtype, bit_offset, fb);
@@ -266,8 +266,9 @@ IOhtj2k::readImage(FrameBuffer& fb,
                    const std::string& filename,
                    const ReadRequest& request) const
 {
-    ojph::ui32 skipped_res_for_read = 0;
-    ojph::ui32 skipped_res_for_recon = 0;
+    // The other case where we are decoding is in IOffmpeg where we are decoding from memory, so are using a different reader
+    // but both modules then call decodeHTJ2K
+
     ojph::j2c_infile j2c_file;
     j2c_file.open(filename.c_str());
 
