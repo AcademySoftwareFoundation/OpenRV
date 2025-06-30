@@ -124,6 +124,45 @@ ojph::si16 convert_si32_to_si16(const ojph::si32 si32_value, bool convert_specia
       return (ojph::si16)si32_value;
   }
 
+void
+copyScanLine(ojph::codestream *codestream, 
+    ojph::ui32 width, 
+    ojph::ui32 channels, 
+    ojph::ui32 row, 
+    ojph::ui32 component, 
+    FrameBuffer::DataType dtype,
+    int bit_offset,
+    FrameBuffer *fb){
+
+    ojph::ui32 comp_num;
+    ojph::line_buf *line = codestream->pull(comp_num);
+    const ojph::si32* sp = line->i32;
+    assert(comp_num == component);
+    if (dtype == FrameBuffer::UCHAR){
+        unsigned char* dout = fb->scanline<unsigned char>(row);
+        dout += component;
+        for(ojph::ui32 j=width; j > 0; j--, dout += channels){
+            *dout = *sp++;
+        }
+    }
+    if (dtype == FrameBuffer::USHORT){
+        unsigned short* dout = fb->scanline<unsigned short>(row);
+        dout += component;
+        for(ojph::ui32 j=width; j > 0; j--, dout += channels){
+            *dout = *sp << bit_offset;
+            sp++;
+        }    
+    }
+    if (dtype == FrameBuffer::HALF){
+        ojph::si16* dout = (ojph::si16 *)fb->scanline<unsigned short>(row);
+        dout += component;
+        for(ojph::ui32 j=width; j > 0; j--, dout += channels){
+            *dout = convert_si32_to_si16(*sp++);
+        }
+    }
+    
+}
+
 FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
     ojph::codestream codestream;
     codestream.read_headers(infile);
@@ -191,72 +230,14 @@ FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
     fb->newAttribute("fileBitDepth", siz.get_bit_depth(0));
     if (codestream.is_planar()){
             for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
-                
                 for (ojph::ui32 i = 0; i < h; ++i)
-                {
-                    ojph::ui32 comp_num;
-                    ojph::line_buf *line = codestream.pull(comp_num);
-                    const ojph::si32* sp = line->i32;
-                    assert(comp_num == c);
-                    if (dtype == FrameBuffer::UCHAR){
-                        unsigned char* dout = fb->scanline<unsigned char>(i);
-                        dout += c;
-                        for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                            *dout = *sp++;
-                        }
-                    }
-                    if (dtype == FrameBuffer::USHORT){
-                        unsigned short* dout = fb->scanline<unsigned short>(i);
-                        dout += c;
-                        for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                            *dout = *sp << byte_offset;
-                            sp++;
-                        }    
-                    }
-                    if (dtype == FrameBuffer::HALF){
-                        ojph::si16* dout = (ojph::si16 *)fb->scanline<unsigned short>(i);
-                        dout += c;
-                        for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                            *dout = convert_si32_to_si16(*sp++);
-                        }
-                    }
-
-                }
+                    copyScanLine(&codestream, w, ch, i, c, dtype, bit_offset, fb);
             
     } else {
 
         for (ojph::ui32 i = 0; i < h; ++i)
-        {
             for (ojph::ui32 c = 0; c < siz.get_num_components(); ++c)
-            {
-                ojph::ui32 comp_num;
-                ojph::line_buf *line = codestream.pull(comp_num);
-                const ojph::si32* sp = line->i32;
-                assert(comp_num == c);
-                if (dtype == FrameBuffer::UCHAR){
-                    unsigned char* dout = fb->scanline<unsigned char>(i);
-                    dout += c;
-                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                        *dout = *sp++;
-                    }
-                }
-                if (dtype == FrameBuffer::USHORT){
-                    unsigned short* dout = fb->scanline<unsigned short>(i);
-                    dout += c;
-                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                        *dout = *sp << byte_offset;
-                        sp++;
-                    }
-                }
-                if (dtype == FrameBuffer::HALF){
-                    ojph::si16* dout = (ojph::si16 *)fb->scanline<unsigned short>(i);
-                    dout += c;
-                    for(ojph::ui32 j=w; j > 0; j--, dout += ch){
-                        *dout = convert_si32_to_si16(*sp++);
-                    }
-                }
-            }
-        }
+                    copyScanLine(&codestream, w, ch, i, c, dtype, bit_offset, fb);
     }
 
     return fb;
