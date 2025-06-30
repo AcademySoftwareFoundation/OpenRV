@@ -75,6 +75,12 @@ IOhtj2k::getImageInfo(const std::string& filename, FBInfo& fbi) const
 
     //codestream.enable_resilience();
     ojph::param_siz siz = codestream.access_siz();
+    ojph::param_nlt nlt = codestream.access_nlt();
+    bool nlt_is_signed;
+    ojph::ui8 nlt_bit_depth;
+    ojph::ui8 nl_type;
+    bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
+    bool is_signed = siz.is_signed(0);
 
     fbi.numChannels = siz.get_num_components();
     fbi.width       = siz.get_recon_width(0);
@@ -89,8 +95,19 @@ IOhtj2k::getImageInfo(const std::string& filename, FBInfo& fbi) const
             break;
         case 10:
         case 12:
-        case 16:
             fbi.dataType    = FrameBuffer::USHORT;
+            break;
+        case 16:
+            if (has_nlt && is_signed)
+                fbi.dataType = FrameBuffer::HALF;
+            else
+                fbi.dataType = FrameBuffer::USHORT;
+            break;
+        case 32:
+            if (has_nlt && is_signed)
+                fbi.dataType = FrameBuffer::DOUBLE;
+            else
+                fbi.dataType = FrameBuffer::UINT;
             break;
     }
 
