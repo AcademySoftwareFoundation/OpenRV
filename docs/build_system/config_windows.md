@@ -1,4 +1,4 @@
-# Building Open RV on Windows
+# Preparing Open RV on Windows
 
 ## Summary
 
@@ -108,12 +108,16 @@ You must install Python 3.10 using the official Python installer. The latest ver
 On the [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
 the correct version will be **Windows installer (64-bit)**.
 
-### 3.2 VFX Reference Platform 2023
+It is highly recommended that you install this Python in C:\Python310
+
+### 3.2 VFX Reference Platform 2024
 Same as VFX 2023 but download and install the latest [Python 3.11 with binaries](https://www.python.org/downloads/release/python-3119/).
 
 ### 3.3 Installation
 
-The carousel below shows how to install Python. The images refer to Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
+The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
+
+
 
 ````{carousel}
 :show_controls:
@@ -271,8 +275,11 @@ MSYS2 is only used for convenience as it comes with a package manager with utili
 ### 7.1 Install required MSYS2 pacman packages
 
 ````{note}
-The MSYS2 MingGW64 terminal MUST be used.\
+The MSYS2 MingGW64 (mingw64.exe) terminal MUST be used.\
+Other executables such as MSYS2 (msys2.exe) or MSYS2 MingGW32 (mingw32.exe) will not work.\
+
 ![MSYS2-MinGW64](../images/rv-msys2-mingw64-shortcut.png)
+
 
 ````
 
@@ -300,6 +307,10 @@ pacman -Sy --needed \
 ```
 
 While installing the MSYS packages, review the list for any missing package. Some packages might not be installed after the first command.
+
+
+
+
 
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
@@ -412,10 +423,17 @@ source rvcmds.sh
 (build_windows_openrv4)=
 ### Install Python dependencies
 
+
+
 ````{note}
 This section need to be done only one time when a fresh Open RV repository is cloned. 
 The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
 ````
+
+Note that on Windows, use the following command to install the python requirements from an MSYS2-MinGW64 shell:
+```bash
+SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
+```
 
 From the Open RV directory, the following command will download and install the Python dependencies.
 ```shell
@@ -486,3 +504,5 @@ Once the build is completed, the Open RV application can be found in the Open RV
 Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/bin/rv.exe`.
 ```
 ````
+
+

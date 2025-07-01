@@ -51,4 +51,7 @@ namespace Rv
             PyGILState_Release(gstate);
         }
     }
+
+    int ImGuiPythonBridge::nbCallbacks() { return (int)s_callbacks.size(); }
+
 } // namespace Rv

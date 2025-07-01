@@ -264,6 +264,88 @@ namespace Rv
             &fontCfg);
     }
 
+    void DiagnosticsView::showHelpWindow()
+    {
+        ImGui::Begin("ImGui/ImPlot Help");
+        ImGui::TextWrapped("The diagnostics window uses the easy-to-learn Dear "
+                           "ImGui and ImPlot APIs and their python bindings.");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped(
+            "Adding your own diagnostics info is quick and easy, much easier "
+            "than building your own Qt user interface.");
+        ImGui::TextWrapped(
+            "From your Python plugin, you simply need to register a "
+            "diagnostics callback, and from the callback, call ImGui/ImPlot "
+            "functions to display your data.");
+        ImGui::TextWrapped(
+            "Note that there is no need to implement backends for handling "
+            "keyboard/mouse and graphics; this part is already done for you.");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("Hello World example:");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("---------------------------------------------");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("import pyimgui as imgui");
+        ImGui::TextWrapped("import pyimplot as implot");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("def __init__( self ):");
+        ImGui::TextWrapped(
+            "   commands.register_diagnostics_callback( self.my_callback )");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("def __del__( self ):");
+        ImGui::TextWrapped(
+            "   commands.unregister_diagnostics_callback( self.my_callback )");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("def my_callback( self ):");
+        ImGui::TextWrapped("   imgui.begin( \"Example Window\" )");
+        ImGui::TextWrapped("   imgui.text( \"Hello World!\" )");
+        ImGui::TextWrapped("   imgui.end()");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("---------------------------------------------");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("Full reference for Dear ImGui and Implot and their "
+                           "bindings can be found here:");
+        ImGui::TextLinkOpenURL("ImGui", "https://github.com/ocornut/imgui");
+        ImGui::SameLine();
+        ImGui::TextWrapped("and");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL("ImGui Python bindings",
+                               "https://github.com/pthom/imgui_bundle/blob/"
+                               "main/external/imgui/bindings/pybind_imgui.cpp");
+        ImGui::TextLinkOpenURL("ImPlot", "https://github.com/pthom/implot");
+        ImGui::SameLine();
+        ImGui::TextWrapped("and");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL(
+            "ImPlot Python bindings",
+            "https://github.com/pthom/imgui_bundle/blob/main/external/implot/"
+            "bindings/pybind_implot.cpp");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped("Comprehensive Python examples of how to create "
+                           "interactive interfaces can be found");
+        ImGui::TextLinkOpenURL(
+            "here (ImGui)",
+            "https://github.com/pthom/imgui_bundle/blob/main/bindings/"
+            "imgui_bundle/demos_python/demos_immapp/imgui_demo.py");
+        ImGui::SameLine();
+        ImGui::TextWrapped("and");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL(
+            "here (ImPlot)",
+            "https://github.com/pthom/imgui_bundle/blob/main/bindings/"
+            "pyodide_web_demo/examples/demo_implot_stock.py");
+        ImGui::TextWrapped("");
+        ImGui::TextWrapped(
+            "Finally, several good additional resources for ImGui and its "
+            "add-ons are easily found online, including video tutorials.");
+        ImGui::TextWrapped("A good interactive reference manual can be found");
+        ImGui::SameLine();
+        ImGui::TextLinkOpenURL("here",
+                               "https://pthom.github.io/imgui_manual_online/"
+                               "manual/imgui_manual.html");
+        ImGui::End();
+    }
+
     void DiagnosticsView::paintGL()
     {
         QOpenGLWidget::paintGL();
@@ -277,6 +359,13 @@ namespace Rv
         ImGuiID dockspace_id = ImGui::GetID("DiagnosticsDockSpace");
         ImVec2 dockspace_size = ImGui::GetContentRegionAvail();
         ImGui::DockSpaceOverViewport(dockspace_id);
+
+        bool forceShowHelp = false;
+        if ((Rv::ImGuiPythonBridge::nbCallbacks() == 0) || forceShowHelp)
+        {
+            showHelpWindow();
+        }
+
         Rv::ImGuiPythonBridge::callCallbacks();
 
         // Render ImGui Frame

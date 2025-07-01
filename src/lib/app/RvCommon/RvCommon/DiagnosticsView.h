@@ -33,6 +33,7 @@ namespace Rv
         void initializeGL() override;
         void paintGL() override;
 
+        void showHelpWindow();
         void applyStyle();
         void handleMenuBar();
         void resetDockSpace();
