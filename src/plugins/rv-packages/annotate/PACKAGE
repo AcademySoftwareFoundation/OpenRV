@@ -13,7 +13,7 @@ modes:
     menu: Tools/Annotation
     shortcut: 'F10' 
     event: 'key-down--f10'
-    load: immediate
+    load: delay
 
 description: |
 
