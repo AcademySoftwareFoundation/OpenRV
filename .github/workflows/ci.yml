@@ -170,13 +170,34 @@ jobs:
 
       - name: Install system dependencies
         run: |
-          dnf install -y epel-release
-          dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel
-          dnf groupinstall "Development Tools" -y
-          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd
-          dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel
-          dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
-          dnf clean all
+          retry_count=0
+          max_retries=5
+          
+          until [ $retry_count -ge $max_retries ]; do
+            echo "Attempt $((retry_count + 1)) of $max_retries"
+            
+            if dnf install -y epel-release && \
+               dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel && \
+               dnf groupinstall "Development Tools" -y && \
+               dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd && \
+               dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel && \
+               dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel && \
+               dnf clean all; then
+              echo "Dependencies installed successfully"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              if [ $retry_count -lt $max_retries ]; then
+                echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+                sleep 5
+              fi
+            fi
+          done
+          
+          if [ $retry_count -ge $max_retries ]; then
+            echo "Failed to install dependencies after $max_retries attempts"
+            exit 1
+          fi
 
       - name: Install other system dependencies
         if: ${{ matrix.rocky-version == '9' }}
@@ -476,8 +497,29 @@ jobs:
         # icu4c is needed for Qt UIC executable / AUTOUIC.
         # Might be to find another way to install icu4c if the icu4c recipe disappear.
         run: |
-          brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew
-          brew install --formula icu4c
+          retry_count=0
+          max_retries=5
+          
+          until [ $retry_count -ge $max_retries ]; do
+            echo "Attempt $((retry_count + 1)) of $max_retries"
+            
+            if brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew && \
+               brew install --formula icu4c; then
+              echo "Homebrew dependencies installed successfully"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              if [ $retry_count -lt $max_retries ]; then
+                echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+                sleep 5
+              fi
+            fi
+          done
+          
+          if [ $retry_count -ge $max_retries ]; then
+            echo "Failed to install Homebrew dependencies after $max_retries attempts"
+            exit 1
+          fi
 
       - name: Set QT_HOME
         if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
