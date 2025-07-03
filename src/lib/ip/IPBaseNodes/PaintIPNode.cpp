@@ -323,10 +323,6 @@ namespace IPCore
         p.eye = eye;
         p.startFrame = startFrame;
         p.duration = duration;
-        // p.hold = hold;
-        // p.ghost = ghost;
-        // p.ghostBefore = ghostBefore;
-        // p.ghostAfter = ghostAfter;
 
         if (widthP && pointsP && widthP->size() == pointsP->size()
             && widthP->size() > 1)
