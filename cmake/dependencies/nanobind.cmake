@@ -18,17 +18,6 @@ SET(_git_commit
     "44ad9a9e5729abda24ef8dc9d76233d801e651e9"
 )
 
-SET(_patch_command_nanobind_windows_debug
-    ""
-)
-IF(RV_TARGET_WINDOWS
-   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
-)
-  SET(_patch_command_nanobind_windows_debug
-      patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/nanobind.windows.debug.patch
-  )
-ENDIF()
-
 IF(RV_TARGET_WINDOWS)
   SET(_nanobind_python_executable
       ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3.exe
@@ -83,8 +72,7 @@ EXTERNALPROJECT_ADD(
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
   UPDATE_COMMAND ""
-  PATCH_COMMAND ${_patch_command_nanobind_windows_debug}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_BUILD_TYPE="Release" -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
                     -DPython_EXECUTABLE=${_nanobind_python_executable}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
