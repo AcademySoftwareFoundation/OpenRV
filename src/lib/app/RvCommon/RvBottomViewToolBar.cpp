@@ -503,7 +503,8 @@ namespace Rv
                     m_holdAction->setDisabled(true);
                 }
             }
-            else if (name == "internal-sync-presenter-changed")
+            else if (name == "internal-sync-presenter-changed"
+                     || name == "sync-session-ended")
             {
                 if (m_session->filterLiveReviewEvents())
                 {
