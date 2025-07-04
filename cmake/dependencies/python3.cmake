@@ -100,7 +100,7 @@ SET(_python3_make_command
     python3 "${_python3_make_command_script}"
 )
 LIST(APPEND _python3_make_command "--variant")
-LIST(APPEND _python3_make_command ${CMAKE_BUILD_TYPE})
+LIST(APPEND _python3_make_command "Release")
 LIST(APPEND _python3_make_command "--source-dir")
 LIST(APPEND _python3_make_command ${_source_dir})
 LIST(APPEND _python3_make_command "--output-dir")
@@ -133,7 +133,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   )
 
   LIST(APPEND _pyside_make_command "--variant")
-  LIST(APPEND _pyside_make_command ${CMAKE_BUILD_TYPE})
+  LIST(APPEND _pyside_make_command "Release")
   LIST(APPEND _pyside_make_command "--source-dir")
   LIST(APPEND _pyside_make_command ${rv_deps_pyside2_SOURCE_DIR})
   LIST(APPEND _pyside_make_command "--output-dir")
@@ -161,7 +161,7 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   )
 
   LIST(APPEND _pyside_make_command "--variant")
-  LIST(APPEND _pyside_make_command ${CMAKE_BUILD_TYPE})
+  LIST(APPEND _pyside_make_command "Release")
   LIST(APPEND _pyside_make_command "--source-dir")
   LIST(APPEND _pyside_make_command ${rv_deps_pyside6_SOURCE_DIR})
   LIST(APPEND _pyside_make_command "--output-dir")
@@ -183,15 +183,9 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    SET(PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG
-        "_d"
-    )
-  ELSE()
-    SET(PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG
-        ""
-    )
-  ENDIF()
+  SET(PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG
+      ""
+  )
   SET(_python_name
       python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${PYTHON3_EXTRA_WIN_LIBRARY_SUFFIX_IF_DEBUG}
   )
@@ -337,19 +331,6 @@ ADD_CUSTOM_COMMAND(
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${_requirements_file}
 )
-
-IF(RV_TARGET_WINDOWS
-   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
-)
-  # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib.
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_python3_target}
-    POST_BUILD
-    COMMENT "Copying Debug Python lib as a unversionned file for Debug"
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
-  )
-ENDIF()
 
 SET(${_pyside_target}-build-flag
     ${_install_dir}/${_pyside_target}-build-flag

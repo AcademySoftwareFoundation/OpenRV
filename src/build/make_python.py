@@ -112,7 +112,7 @@ except Exception as e:
 '''
 
 
-def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
+def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
     """
     Return the path to the python interpreter given a Python home
 
@@ -120,8 +120,7 @@ def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
     :return: Path to the python interpreter
     """
 
-    build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
-    python_name_pattern = "python*" if not build_opentimelineio else "python_d*"
+    python_name_pattern = "python*"
 
     python_interpreters = glob.glob(
         os.path.join(python_home, python_name_pattern), recursive=True
@@ -139,9 +138,13 @@ def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
         ],
         key=lambda p: (
             "-config" in os.path.basename(p),  # config variants last
-            not ("_d" in os.path.basename(p) and platform.system() == "Windows" and variant.lower() == "debug"),  # prioritize _d on Windows debug
-            os.path.basename(p)  # alphabetical
-        )
+            not (
+                "_d" in os.path.basename(p)
+                and platform.system() == "Windows"
+                and variant.lower() == "debug"
+            ),  # prioritize _d on Windows debug
+            os.path.basename(p),  # alphabetical
+        ),
     )
 
     if not python_interpreters or os.path.exists(python_interpreters[0]) is False:
@@ -297,57 +300,6 @@ def test_python_distribution(python_home: str) -> None:
 
         python_interpreter_args = get_python_interpreter_args(tmp_python_home, VARIANT)
 
-        # Note: We need to build opentimelineio from sources in Windows+Debug
-        #       because the official wheel links with the release version of
-        #       python while RV uses the debug version.
-        build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
-        if build_opentimelineio:
-            print(f"Building opentimelineio")
-
-            # Request an opentimelineio debug build
-            my_env = os.environ.copy()
-            my_env["OTIO_CXX_DEBUG_BUILD"] = "1"
-
-            # Specify the location of the debug python import lib (eg. python39_d.lib)
-            python_include_dirs = os.path.join(tmp_python_home, "include")
-            python_lib = os.path.join(
-                tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib"
-            )
-            my_env["CMAKE_ARGS"] = (
-                f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
-            )
-
-            opentimelineio_install_arg = python_interpreter_args + [
-                "-m",
-                "pip",
-                "install",
-                ".",
-            ]
-
-            result = subprocess.run(
-                opentimelineio_install_arg,
-                env=my_env,
-                cwd=OPENTIMELINEIO_SOURCE_DIR,
-            ).check_returncode()
-
-            # Note : The OpenTimelineIO build will generate the pyd with names that are not loadable by default
-            # Example: _opentimed_d.cp39-win_amd64.pyd instead of _opentime_d.pyd
-            # and _otiod_d.cp39-win_amd64.pyd instead of _otio_d.pyd
-            # We fix those names here
-            otio_module_dir = os.path.join(
-                tmp_python_home, "lib", "site-packages", "opentimelineio"
-            )
-            for _file in os.listdir(otio_module_dir):
-                if _file.endswith("pyd"):
-                    otio_lib_name_split = os.path.basename(_file).split(".")
-                    if len(otio_lib_name_split) > 2:
-                        new_otio_lib_name = (
-                            otio_lib_name_split[0].replace("d_d", "_d") + ".pyd"
-                        )
-                        src_file = os.path.join(otio_module_dir, _file)
-                        dst_file = os.path.join(otio_module_dir, new_otio_lib_name)
-                        shutil.copyfile(src_file, dst_file)
-
         wheel_install_arg = python_interpreter_args + [
             "-m",
             "pip",
@@ -355,8 +307,7 @@ def test_python_distribution(python_home: str) -> None:
             "cryptography",
         ]
 
-        if not build_opentimelineio:
-            wheel_install_arg.append("opentimelineio")
+        wheel_install_arg.append("opentimelineio")
 
         print(f"Validating the that we can install a wheel with {wheel_install_arg}")
         subprocess.run(wheel_install_arg).check_returncode()
@@ -694,10 +645,7 @@ def install_python_vfx2023() -> None:
         dst_dir = os.path.join(OUTPUT_DIR, "bin")
         shutil.copytree(src_dir, dst_dir)
         # Create a python3.exe file to mimic Mac+Linux
-        if VARIANT == "Debug":
-            src_python_exe = "python_d.exe"
-        else:
-            src_python_exe = "python.exe"
+        src_python_exe = "python.exe"
         src_file = os.path.join(src_dir, src_python_exe)
         dst_file = os.path.join(dst_dir, "python3.exe")
         shutil.copyfile(src_file, dst_file)
@@ -724,6 +672,7 @@ def install_python_vfx2023() -> None:
     patch_python_distribution(OUTPUT_DIR)
     test_python_distribution(OUTPUT_DIR)
 
+
 def install_python_vfx2024() -> None:
     """
     Run the install step of the build. It puts all the files inside of the output directory and make them ready to be
@@ -740,8 +689,6 @@ def install_python_vfx2024() -> None:
         # Using the python that OpenRV built to execute the script because it seems
         # like it need to be the same dot release. (e.g. run the script with 3.11 to install a 3.11)
         python_executable = "python"
-        if VARIANT == "Debug":
-            python_executable = "python_d"
         python_executable = os.path.join(build_path, python_executable)
 
         install_args = [
@@ -769,20 +716,14 @@ def install_python_vfx2024() -> None:
 
         print(f"Executing {install_args}")
 
-        subprocess.run(
-            install_args,
-            cwd=SOURCE_DIR
-        ).check_returncode()
+        subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()
 
         # bin
         libs_dir = os.path.join(OUTPUT_DIR, "libs")
         dst_dir = os.path.join(OUTPUT_DIR, "bin")
 
         # Create a python3.exe file to mimic Mac+Linux
-        if VARIANT == "Debug":
-            src_python_exe = "python_d.exe"
-        else:
-            src_python_exe = "python.exe"
+        src_python_exe = "python.exe"
 
         src_file = os.path.join(OUTPUT_DIR, src_python_exe)
         dst_file = os.path.join(dst_dir, "python3.exe")
@@ -793,7 +734,7 @@ def install_python_vfx2024() -> None:
 
         # Move files under root directory into the bin folder.
         for filename in os.listdir(os.path.join(OUTPUT_DIR)):
-            file_path = os.path.join(OUTPUT_DIR, filename)  
+            file_path = os.path.join(OUTPUT_DIR, filename)
             if os.path.isfile(file_path):
                 shutil.move(file_path, os.path.join(dst_dir, filename))
 
@@ -805,9 +746,16 @@ def install_python_vfx2024() -> None:
             python3_lib = "python3_d.lib"
             python3xx_lib = f"python{PYTHON_VERSION}_d.lib"
 
-        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib))
-        shutil.copy(os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib))
-        shutil.copy(os.path.join(build_path, python3xx_lib), os.path.join(dst_dir, python3xx_lib))
+        shutil.copy(
+            os.path.join(build_path, python3_lib), os.path.join(dst_dir, python3_lib)
+        )
+        shutil.copy(
+            os.path.join(build_path, python3_lib), os.path.join(libs_dir, python3_lib)
+        )
+        shutil.copy(
+            os.path.join(build_path, python3xx_lib),
+            os.path.join(dst_dir, python3xx_lib),
+        )
 
         # Tcl and Tk DLL are not copied by the main.py script in Debug.
         # Assuming that Tcl and Tk are not built in debug.
@@ -839,6 +787,7 @@ def install_python_vfx2024() -> None:
 
     patch_python_distribution(OUTPUT_DIR)
     test_python_distribution(OUTPUT_DIR)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -914,7 +863,7 @@ if __name__ == "__main__":
         build()
 
     if args.install:
-        # The install functions has a lot of similiarity but I think it is better to have two differents 
+        # The install functions has a lot of similiarity but I think it is better to have two differents
         # functions because it will be easier to drop the support for a VFX platform.
         if VFX_PLATFORM == 2023:
             install_python_vfx2023()
