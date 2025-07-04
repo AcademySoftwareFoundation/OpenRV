@@ -274,7 +274,7 @@ jobs:
         run: |
           python3 -m pip install --user --upgrade -r requirements.txt
 
-      # For Rocky Linux, we can't cache the dependencies of OpenRV 
+      # For Rocky Linux, we can't cache the dependencies of Open RV 
       # because there is not enough room in the cache (10GB limit) for all platforms.
 
       - name: Configure OpenRV
