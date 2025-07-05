@@ -414,18 +414,28 @@ ENDIF()
 
 ADD_LIBRARY(Python::Python SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(Python::Python ${_python3_target})
-SET_PROPERTY(
-  TARGET Python::Python
-  PROPERTY IMPORTED_LOCATION ${_python3_lib}
+
+set_target_properties(Python::Python PROPERTIES
+    IMPORTED_LOCATION "${_python3_lib}"
+    IMPORTED_LOCATION_DEBUG "${_python3_lib}"
+    IMPORTED_LOCATION_RELEASE "${_python3_lib}"
 )
-SET_PROPERTY(
-  TARGET Python::Python
-  PROPERTY IMPORTED_SONAME ${_python3_lib_name}
-)
+
+set_target_properties(Python::Python PROPERTIES
+  IMPORTED_SONAME "${_python3_lib_name}"
+  IMPORTED_SONAME_DEBUG "${_python3_lib_name}"
+  IMPORTED_SONAME_RELEASE "${_python3_lib_name}"
+  )
+
+set(Python_LIBRARY "${_python3_lib}")
+set(Python_LIBRARY_DEBUG "${_python3_lib}")
+set(Python_LIBRARY_RELEASE "${_python3_lib}")
+  
 IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Python::Python
-    PROPERTY IMPORTED_IMPLIB ${_python3_implib}
+  set_target_properties(Python::Python PROPERTIES
+      IMPORTED_IMPLIB "${_python3_implib}"
+      IMPORTED_IMPLIB_DEBUG "${_python3_implib}"
+      IMPORTED_IMPLIB_RELEASE "${_python3_implib}"
   )
 ENDIF()
 FILE(MAKE_DIRECTORY ${_include_dir})
