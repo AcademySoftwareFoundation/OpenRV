@@ -416,16 +416,14 @@ ADD_LIBRARY(Python::Python SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(Python::Python ${_python3_target})
 
 set_target_properties(Python::Python PROPERTIES
+    MAP_IMPORTED_CONFIG_DEBUG "RELEASE"
     IMPORTED_LOCATION "${_python3_lib}"
     IMPORTED_LOCATION_DEBUG "${_python3_lib}"
     IMPORTED_LOCATION_RELEASE "${_python3_lib}"
+    IMPORTED_SONAME "${_python3_lib_name}"
+    IMPORTED_SONAME_DEBUG "${_python3_lib_name}"
+    IMPORTED_SONAME_RELEASE "${_python3_lib_name}"
 )
-
-set_target_properties(Python::Python PROPERTIES
-  IMPORTED_SONAME "${_python3_lib_name}"
-  IMPORTED_SONAME_DEBUG "${_python3_lib_name}"
-  IMPORTED_SONAME_RELEASE "${_python3_lib_name}"
-  )
 
 set(Python_LIBRARY "${_python3_lib}")
 set(Python_LIBRARY_DEBUG "${_python3_lib}")
