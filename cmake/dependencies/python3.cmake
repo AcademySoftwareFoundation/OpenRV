@@ -430,15 +430,21 @@ set_target_properties(Python::Python PROPERTIES
 set(Python_LIBRARY "${_python3_lib}")
 set(Python_LIBRARY_DEBUG "${_python3_lib}")
 set(Python_LIBRARY_RELEASE "${_python3_lib}")
-  
+
+get_target_property(test123 Python::Python INTERFACE_LINK_LIBRARIES)
+message(STATUS "cedrik: ${test123}")
 IF(RV_TARGET_WINDOWS)
   set_target_properties(Python::Python PROPERTIES
       IMPORTED_IMPLIB "${_python3_implib}"
       IMPORTED_IMPLIB_DEBUG "${_python3_implib}"
       IMPORTED_IMPLIB_RELEASE "${_python3_implib}"
       IMPORTED_IMPLIB_SUFFIX ""
-      IMPORTED_IMPLIB_SUFFIX_DEBUG ""  
+      IMPORTED_IMPLIB_SUFFIX_DEBUG ""
+      INTERFACE_LINK_LIBRARIES "${_python3_implib};${_python3_lib}"
   )
+
+  get_target_property(test456 Python::Python INTERFACE_LINK_LIBRARIES)
+  message(STATUS "cedrik456: ${test456}")
 
   get_target_property(DEBUG_IMPLIB Python::Python IMPORTED_IMPLIB_DEBUG)
   get_target_property(RELEASE_IMPLIB Python::Python IMPORTED_IMPLIB_RELEASE)
