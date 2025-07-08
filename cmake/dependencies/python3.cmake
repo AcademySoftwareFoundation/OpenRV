@@ -416,6 +416,7 @@ ADD_LIBRARY(Python::Python SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(Python::Python ${_python3_target})
 
 set_target_properties(Python::Python PROPERTIES
+    IMPORTED_CONFIGURATIONS "DEBUG;RELEASE"
     MAP_IMPORTED_CONFIG_DEBUG "RELEASE"
     IMPORTED_LOCATION "${_python3_lib}"
     IMPORTED_LOCATION_DEBUG "${_python3_lib}"
@@ -423,6 +424,7 @@ set_target_properties(Python::Python PROPERTIES
     IMPORTED_SONAME "${_python3_lib_name}"
     IMPORTED_SONAME_DEBUG "${_python3_lib_name}"
     IMPORTED_SONAME_RELEASE "${_python3_lib_name}"
+    DEBUG_POSTFIX ""
 )
 
 set(Python_LIBRARY "${_python3_lib}")
@@ -434,7 +436,15 @@ IF(RV_TARGET_WINDOWS)
       IMPORTED_IMPLIB "${_python3_implib}"
       IMPORTED_IMPLIB_DEBUG "${_python3_implib}"
       IMPORTED_IMPLIB_RELEASE "${_python3_implib}"
+      IMPORTED_IMPLIB_SUFFIX ""
+      IMPORTED_IMPLIB_SUFFIX_DEBUG ""  
   )
+
+  get_target_property(DEBUG_IMPLIB Python::Python IMPORTED_IMPLIB_DEBUG)
+  get_target_property(RELEASE_IMPLIB Python::Python IMPORTED_IMPLIB_RELEASE)
+  message(STATUS "Python::Python DEBUG_IMPLIB: ${DEBUG_IMPLIB}")
+  message(STATUS "Python::Python RELEASE_IMPLIB: ${RELEASE_IMPLIB}")
+  message(STATUS "Python::Python _python3_implib: ${_python3_implib}")
 ENDIF()
 FILE(MAKE_DIRECTORY ${_include_dir})
 TARGET_INCLUDE_DIRECTORIES(
