@@ -80,7 +80,9 @@ def hook_function(
                     "Unable to get the global scale, using the aspect ratio of the first media file"
                 )
                 try:
-                    first_source_node = commands.sourcesAtFrame(0)[0]
+                    media_switch = commands.nodeConnections("MediaTrack")[0][0]
+                    media_source_group = commands.nodeConnections(media_switch)[0][0]
+                    first_source_node = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
                     media_info = commands.sourceMediaInfo(first_source_node)
                     height = media_info["height"]
                     aspect_ratio = media_info["width"] / height
