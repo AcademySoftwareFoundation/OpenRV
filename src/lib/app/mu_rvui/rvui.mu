@@ -25,6 +25,356 @@ use math;
 use math_util;
 use rvtypes;
 
+//
+// RemoteMuParameters 
+// -  packs and unpacks parameters
+// -  Same functionality to the C++ class found in RemoteMuParameters.h
+//
+// Public interface:
+//
+// add...() and get...() methods have suffixes.
+//   S: String
+//   B: Bool
+//   I: Int
+//   F: Float
+//   A: array
+//   AA: array of array
+//
+// Concatenating parameters
+// ------------------------
+//
+// -  addS(v), addB(v), addI(v), addF(v) where v is either "string", "bool", "int", "float"                       
+//    Adds a single value, delimited by ";;"
+//
+// -  addSA(v[]), addBA(v[]), addIA(v[]), addFA(v[]) where v is an array of either "string", "bool", "int", "float"                       
+//    Adds a list of values, delimited by ",," then ";;"
+//
+// -  addSAA(v), addBAA(v[][]), addIAA(v[][]), addFAA(v[][]) where v is an array of array of either "string", "bool", "int", "float"                       
+//    Adds a list of list of values, delimited by "@@" then ",," then ";;"
+// 
+// -  end()
+//    returns the resulting concatenation of all parameters.
+//
+// example usage: 
+//    RemoteMuParameters rp();
+//    rp.addB(true)
+//    rp.addS("hello")
+//    rp.addIA([1,2,3])
+//    rp.addSAA([["a", "b", "c"], ["d","e","f"]]);
+//    string parameters = rp.end();  --> "true;;hello;;1,2,3;;a,b,c@@d,e,f"
+//
+// or you can use chaining:
+//    RemoteMuParameters rp();
+//    rp.addB(true)
+//      .addS("hello")
+//      .addIA([1,2,3])
+//      .addSAA([["a", "b", "c"], ["d","e","f"]]);
+//    string parameters = rp.end();  --> "true;;hello;;1,2,3;;a,b,c@@d,e,f"
+//
+//  (the main advantage of chaining is to construct everything on a single line)
+//    string parameters = rp.add(true).add("hello").add(3.14).end();
+//
+//
+// Extracting parameters
+// ---------------------
+//
+// -  init(paramstring)
+//    initializes the param string prior to querying it
+//
+// -  getS(i), getB(i), getI(i), getF(i)
+//    Returns a single value at index i
+//
+// -  getSA(i), getBA(i), getIA(i), getFA(i)
+//    Returns a list of value at index i
+//
+// -  getSAA(i), getBAA(i), getIAA(i), getFAA(i)
+//    Returns a list of lists of values at index i
+//
+// example usage:
+//
+//    RemoteMuParameters rp("true;;hello;;1,2,3;;a,b,c@@d,e,f");
+//    bool _bool = rp.getB(0);
+//    string _hello = rp.getS(1);
+//    int[] _123 = rp.getIA(2);
+//    string[][] _abc_def = rp.getSAA(3);
+//
+class: RemoteMuParameters
+{
+    string params;
+
+    method: RemoteMuParameters (RemoteMuParameters; string p = "")
+    {
+        this.init(p);
+        return this;
+    }
+
+    method: init(void; string s)
+    {
+        params = s;
+    }
+
+    method: addS (RemoteMuParameters; string s)
+    {
+        _internalAdd(s);
+        return this;
+    }
+
+    method: addB (RemoteMuParameters; bool b)
+    {
+        _internalAdd(string(b));
+        return this;
+    }
+
+    method: addI (RemoteMuParameters; int i)
+    {
+        _internalAdd(string(i));
+        return this;
+    }
+
+    method: addF (RemoteMuParameters; float f)
+    {
+        _internalAdd(string(f));
+        return this;
+    }
+
+    method: addSA (RemoteMuParameters; string[] arr)
+    {
+        _internalAdd( _flattenStrings(arr) );
+        return this;
+    }
+
+    method: addBA (RemoteMuParameters; bool[] arr)
+    {
+        _internalAdd( _flattenBools(arr));
+        return this;
+    }
+
+    method: addIA (RemoteMuParameters; int[] arr)
+    {
+        _internalAdd( _flattenInts(arr) );
+        return this;
+    }
+
+    method: addFA (RemoteMuParameters; float[] arr)
+    {
+        _internalAdd( _flattenFloats(arr) );
+        return this;
+    }
+
+    method: addSAA (RemoteMuParameters; string[][] arrs)
+    {
+        string[] sarrs;
+        for_each(arr; arrs) sarrs.push_back( _flattenStrings(arr, ",,") );
+        _internalAdd( _flattenStrings(sarrs, "@@") );
+        return this;
+    }
+
+    method: addBAA (RemoteMuParameters; bool[][] arrs)
+    {
+        string[] sarrs;
+        for_each(arr; arrs) sarrs.push_back( _flattenBools(arr) );
+        _internalAdd( _flattenStrings(sarrs, "@@") );
+        return this;
+    }
+
+    method: addIAA (RemoteMuParameters; int[][] arrs)
+    {
+        string[] sarrs;
+        for_each(arr; arrs) sarrs.push_back( _flattenInts(arr) );
+        _internalAdd( _flattenStrings(sarrs, "@@") );
+        return this;
+    }
+
+    method: addFAA (RemoteMuParameters; float[][] arrs)
+    {
+        string[] sarrs;
+        for_each(arr; arrs) sarrs.push_back( _flattenFloats(arr) );
+        _internalAdd( _flattenStrings(sarrs, "@@") );
+        return this;
+    }
+
+    method: end (string;)
+    {
+        return params;
+    }
+
+
+    method: getS (string; int index)
+    {
+        return _getAt(index);
+    }
+
+    method: getB (bool; int index)
+    {
+        string s = _getAt(index);
+        return s == "true";
+    }
+
+    method: getI (int; int index)
+    {
+        string s = _getAt(index);
+        return int(s);
+    }
+
+    method: getF (float; int index)
+    {
+        string s = _getAt(index);
+        return float(s);
+    }
+
+    //
+
+    method: getSA (string[]; int index)
+    {
+        string s = _getAt(index);
+        return _expandStrings(s);
+    }
+
+    method: getBA (bool[]; int index)
+    {
+        string s = _getAt(index);
+        return _expandBools(s);
+    }
+
+    method: getIA (int[]; int index)
+    {
+        string s = _getAt(index);
+        return _expandInts(s);
+    }
+
+    method: getFA (float[]; int index)
+    {
+        string s = _getAt(index);
+        return _expandFloats(s);
+    }
+
+    method: getSAA (string[][]; int index)
+    {
+        string s = _getAt(index);
+        string[] slist = string.split(s, "@@");
+
+        string[][] lists;
+        for_each(s; slist) 
+            lists.push_back( _expandStrings(s) );
+        return lists;
+    }
+
+    method: getBAA (bool[][]; int index)
+    {
+        string s = _getAt(index);
+        string[] slist = string.split(s, "@@");
+
+        bool[][] lists;
+        for_each(s; slist) 
+            lists.push_back( _expandBools(s) );
+        return lists;
+    }
+
+    method: getIAA (int[][]; int index)
+    {
+        string s = _getAt(index);
+        string[] slist = string.split(s, "@@");
+
+        int[][] lists;
+        for_each(s; slist) 
+            lists.push_back( _expandInts(s) );
+        return lists;
+    }
+
+    method: getFAA (float[][]; int index)
+    {
+        string s = _getAt(index);
+        string[] slist = string.split(s, "@@");
+
+        float[][] lists;
+        for_each(s; slist) 
+            lists.push_back( _expandFloats(s) );
+        return lists;
+    }
+
+    //
+    // BEYOND THIS POINT ARE INTERNAL METHODS
+    // DO NOT CALL DIRECTLY
+    //
+
+    //
+    // ADDER HELPERS 
+    //
+    method: _internalAdd (void; string s)
+    {
+        if (params == "") params = s;
+        else params += ";;" + s;
+    }
+
+    method: _flattenStrings(string; string[] arr, string delimiter = ",,")
+    {
+        return string.join(arr, delimiter);
+    }
+
+    method: _flattenBools(string; bool[] arr)
+    {
+        string[] vals;
+        for_each (x; arr) vals.push_back(string(x));
+        return _flattenStrings(vals, ",,");
+    }
+
+    method: _flattenFloats(string; float[] arr)
+    {
+        string[] vals;
+        for_each (x; arr) vals.push_back(string(x));
+        return _flattenStrings(vals, ",,");
+    }
+
+    method: _flattenInts(string; int[] arr)
+    {
+        string[] vals;
+        for_each (x; arr) vals.push_back(string(x));
+        return _flattenStrings(vals, ",,");
+    }
+
+    //
+    // GETTER HELPERS 
+    //
+    method: _getAt (string; int index)
+    {
+        string s = "";
+        let parts = string.split(params, ";;");
+        if (index < parts.size())
+            s = parts[index];
+        return s;
+    }
+
+    method: _expandStrings(string[]; string x)
+    {
+        return string.split(x, ",,");
+    }
+
+    method: _expandBools (bool[]; string x)
+    {
+        string[] arr = _expandStrings(x);
+        bool[] out;
+        for_each (s; arr) out.push_back(s == "true");
+        return out;
+    }
+
+    method: _expandInts (int[]; string x)
+    {
+        string[] arr = _expandStrings(x);
+        int[] out;
+        for_each (s; arr) out.push_back( int(s) );
+        return out;
+    }
+
+    method: _expandFloats (float[]; string x)
+    {
+        string[] arr = _expandStrings(x);
+        float[] out;
+        for_each (s; arr) out.push_back( float(s) );
+        return out;
+    }
+}
+
+
 global int preSnapRenderCount = 0;
 global Vec2 snapTranslation;
 global bool snapDoit = false;
@@ -3615,6 +3965,82 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     sendInternalEvent ("session-clear-everything", "", "rvui");
 }
 
+\: testRemoteMuCommands (void;)
+{
+    string[] files = {"a.mov", "b.mov", "c.mov"};
+    string[][] filesfiles = { files, files, files };
+
+    clearSession();
+//    addSources(files, "explicit", true, true);
+//    addSourcesVerbose(filesfiles, "explicit");
+}
+
+\: testRemoteMuParameters (void;)
+{
+    let rmp = RemoteMuParameters();
+
+    rmp.addS("hello");
+    rmp.addB(true);
+    rmp.addI(3);
+    rmp.addF(3.14);
+
+    rmp.addSA( string[] {"a","b","c"});
+    rmp.addBA( bool[] {true, false, true});
+    rmp.addIA( int[] {1,2,3});
+    rmp.addFA( float[] {9.9,8.8,7.7});
+
+    rmp.addSAA( string[][] {{"x","y","z"},{"r","s","t"}});
+    rmp.addBAA( bool[][] {{true, false, true},{false, true, false}});
+    rmp.addIAA( int[][] {{0,1},{2,3}});
+    rmp.addFAA( float[][] {{4.4,5.5},{6.6,7.7}});
+
+    string result1 = rmp.end();
+
+    string s = rmp.getS(0);
+    bool b = rmp.getB(1);
+    int i = rmp.getI(2);
+    float f = rmp.getF(3);
+
+    string[] sa = rmp.getSA(4);
+    bool[] ba = rmp.getBA(5);
+    int[] ia = rmp.getIA(6);
+    float[] fa = rmp.getFA(7);
+
+    string[][] saa = rmp.getSAA(8);
+    bool[][] baa = rmp.getBAA(9);
+    int[][] iaa = rmp.getIAA(10);
+    float[][] faa = rmp.getFAA(11);
+
+    // reset.
+    rmp.init("");
+    rmp.addS(s);
+    rmp.addB(b);
+    rmp.addI(i);
+    rmp.addF(f);
+
+    rmp.addSA(sa);
+    rmp.addBA(ba);
+    rmp.addIA(ia);
+    rmp.addFA(fa);
+
+    rmp.addSAA(saa);
+    rmp.addBAA(baa);
+    rmp.addIAA(iaa);
+    rmp.addFAA(faa);
+
+    string result2 = rmp.end();
+
+    print("RES1: %s\n" % result1);
+    print("RES2: %s\n" % result2);
+
+    if (result1 == result2)
+        print("TEST PASSES\n");
+    else
+        print("TEST FAILS\n");
+}
+
+
+
 \: getMediaFilesFromBrowser (string[]; )
 {
     State state = data();
@@ -6084,6 +6510,8 @@ global bool debugGC = false;
             {"Export", exportMenu},
             {"_", nil},
             {"Clear",           ~clearEverything, "control N", nil},
+            {"TEST MU COMMANDS",   ~testRemoteMuCommands, nil, nil},
+            {"TEST MU PARAMETERS", ~testRemoteMuParameters, nil, nil},
             {"Close Session",    queryClose, "control w", nil}
             }},
         {"Edit", Menu {
