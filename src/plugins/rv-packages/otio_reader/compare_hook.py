@@ -50,7 +50,9 @@ def hook_function(
             pivot_x = pivot.x
             pivot_y = pivot.y
 
-            source = argument_map["src"]
+            media_switch = commands.nodeConnections("MediaTrack")[0][0]
+            media_source_group = commands.nodeConnections(media_switch)[0][0]
+            source = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
             transform = extra_commands.associatedNode("RVTransform2D", source)
             if commands.getIntProperty(f"{transform}.transform.active")[0] != 0:
                 global_translate_vec = otio.schema.V2d(0.0, 0.0)
