@@ -21,6 +21,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <TwkQtCoreUtil/QtConvert.h>
+#include <IPCore/IPNode.h>
+#include <IPCore/SessionIPNode.h>
 
 #include <RvApp/Options.h>
 
@@ -485,13 +487,35 @@ namespace Rv
             {
                 bool isChecked = (contents == "1");
                 m_ghostAction->setChecked(isChecked);
-                ghostTriggered(isChecked);
+
+                if (m_session->filterLiveReviewEvents())
+                {
+                    m_ghostAction->setDisabled(true);
+                }
             }
             else if (name == "update-hold-button")
             {
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
-                holdTriggered(isChecked);
+
+                if (m_session->filterLiveReviewEvents())
+                {
+                    m_holdAction->setDisabled(true);
+                }
+            }
+            else if (name == "internal-sync-presenter-changed"
+                     || name == "sync-session-ended")
+            {
+                if (m_session->filterLiveReviewEvents())
+                {
+                    m_holdAction->setDisabled(true);
+                    m_ghostAction->setDisabled(true);
+                }
+                else
+                {
+                    m_holdAction->setDisabled(false);
+                    m_ghostAction->setDisabled(false);
+                }
             }
         }
 
@@ -510,7 +534,8 @@ namespace Rv
 
     void RvBottomViewToolBar::paintActionTriggered(bool)
     {
-        m_session->userGenericEvent("toggle-draw-panel", "");
+        m_session->userGenericEvent("mode-manager-toggle-mode",
+                                    "annotate_mode");
     }
 
     void RvBottomViewToolBar::infoActionTriggered(bool)
@@ -535,14 +560,28 @@ namespace Rv
 
     void RvBottomViewToolBar::ghostTriggered(bool isChecked)
     {
-        std::string value = isChecked ? "1" : "0";
-        m_session->userGenericEvent("set-annotation-ghost", value);
+        auto* sessionNode = m_session->graph().sessionNode();
+        if (sessionNode != nullptr)
+        {
+            sessionNode->setProperty<IPNode::IntProperty>("paintEffects.ghost",
+                                                          isChecked ? 1 : 0);
+            m_session->userGenericEvent("graph-state-change",
+                                        sessionNode->name()
+                                            + ".paintEffects.ghost");
+        }
     }
 
     void RvBottomViewToolBar::holdTriggered(bool isChecked)
     {
-        std::string value = isChecked ? "1" : "0";
-        m_session->userGenericEvent("set-annotation-hold", value);
+        auto* sessionNode = m_session->graph().sessionNode();
+        if (sessionNode != nullptr)
+        {
+            sessionNode->setProperty<IPNode::IntProperty>("paintEffects.hold",
+                                                          isChecked ? 1 : 0);
+            m_session->userGenericEvent("graph-state-change",
+                                        sessionNode->name()
+                                            + ".paintEffects.hold");
+        }
     }
 
     void RvBottomViewToolBar::backStepTriggered()
