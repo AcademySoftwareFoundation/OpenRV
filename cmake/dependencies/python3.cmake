@@ -440,7 +440,7 @@ IF(RV_TARGET_WINDOWS)
       IMPORTED_IMPLIB_RELEASE "${_python3_implib}"
       IMPORTED_IMPLIB_SUFFIX ""
       IMPORTED_IMPLIB_SUFFIX_DEBUG ""
-      INTERFACE_LINK_LIBRARIES "${_python3_implib};${_python3_lib}"
+      INTERFACE_LINK_LIBRARIES "${_python3_implib}"
   )
 
   get_target_property(test456 Python::Python INTERFACE_LINK_LIBRARIES)
