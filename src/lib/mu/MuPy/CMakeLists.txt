@@ -65,7 +65,7 @@ print_target_properties(Python::Python)
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC Python::Python Mu
+  PUBLIC PythonWrapper Mu
   PRIVATE MuLang Imath::Imath TwkPython
 )
 
