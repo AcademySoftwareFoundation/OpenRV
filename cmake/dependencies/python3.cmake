@@ -447,6 +447,8 @@ IF(RV_TARGET_WINDOWS)
   ADD_LIBRARY(PythonWrapper INTERFACE)
   target_link_libraries(PythonWrapper INTERFACE "${_python3_implib}")
   target_include_directories(PythonWrapper INTERFACE ${_include_dir})
+
+  target_compile_definitions(PythonWrapper INTERFACE _DEBUG=0)
   
   get_target_property(test456 Python::Python INTERFACE_LINK_LIBRARIES)
   message(STATUS "cedrik456: ${test456}")
