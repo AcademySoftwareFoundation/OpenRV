@@ -444,7 +444,7 @@ IF(RV_TARGET_WINDOWS)
   )
 
   # Create a wrapper interface target
-  ADD_LIBRARY(Python::PythonWrapper INTERFACE)
+  ADD_LIBRARY(PythonWrapper INTERFACE)
   target_link_libraries(Python::PythonWrapper INTERFACE "${_python3_implib}")
   target_include_directories(Python::PythonWrapper INTERFACE ${_include_dir})
   
@@ -523,3 +523,4 @@ function(print_target_properties target)
 endfunction()
 
 print_target_properties(Python::Python)
+print_target_properties(PythonWrapper)
