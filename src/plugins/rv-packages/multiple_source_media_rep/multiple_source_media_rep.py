@@ -312,7 +312,9 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         self._media_representation_btn = QtWidgets.QToolButton(self._bottomToolBar)
         self._media_representation_btn.setToolTip("Select media playback type")
         self._media_representation_btn.setProperty("tbstyle", "solo_menu")
-        self._media_representation_btn.setStyleSheet("color: gray")
+        self._media_representation_btn.setStyleSheet(
+            "color: gray; QToolTip { color: black; }"
+        )
         self._media_representation_btn.setPopupMode(QtWidgets.QToolButton.InstantPopup)
 
         menu = QtWidgets.QMenu(self._media_representation_btn)
@@ -560,6 +562,29 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         event.reject()
         self._force_update_media_info = True
 
+    def _on_presenter_changed(self, event):
+        """
+        This method is bound to the internal-sync-presenter-changed event.
+        It disables the Multiple Media Representation button for all participants
+        that are not the presenter.
+        """
+        event.reject()
+        is_disabled = rvc.filterLiveReviewEvents()
+        self._media_representation_action.setDisabled(is_disabled)
+        self._media_representation_btn.setDisabled(is_disabled)
+        self._media_representation_btn.setToolTip("You must be presenter to use")
+
+    def _on_session_ended(self, event):
+        """
+        This method is bound to the sync-session-ended event.
+        It enables the Multiple Media Representation button when a participant
+        leaves a Live Review session.
+        """
+        event.reject()
+        self._media_representation_action.setDisabled(False)
+        self._media_representation_btn.setDisabled(False)
+        self._media_representation_btn.setToolTip("Select media playback type")
+
     def __init__(self):
         self._readingSession = False
 
@@ -596,6 +621,8 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
                     self._on_force_update_media_info,
                     "",
                 ),
+                ("internal-sync-presenter-changed", self._on_presenter_changed, ""),
+                ("sync-session-ended", self._on_session_ended, ""),
             ],
             None,
             "multiple_source_media_rep",

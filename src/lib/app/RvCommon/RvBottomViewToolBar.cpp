@@ -215,51 +215,51 @@ namespace Rv
 
         // play buts
         a = addAction("");
+        a->setIcon(QIcon(":/images/control_bstep.png"));
+        a->setToolTip("Step back one frame");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setIcon(QIcon(":/images/control_bstep.png"));
-        b->setToolTip("Step back one frame");
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m_backStepAction = a;
 
         a = addAction("");
+        a->setIcon(QIcon(":/images/control_fstep.png"));
+        a->setToolTip("Step forward one frame");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setIcon(QIcon(":/images/control_fstep.png"));
-        b->setToolTip("Step forward one frame");
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m_forwardStepAction = a;
 
         a = addAction("");
+        a->setIcon(QIcon(":/images/control_bplay.png"));
+        a->setToolTip("Play backwards");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setIcon(QIcon(":/images/control_bplay.png"));
-        b->setToolTip("Play backwards");
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setProperty("tbsize", QVariant(QString("double")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
         m_backPlayAction = a;
 
         a = addAction("");
+        a->setIcon(QIcon(":/images/control_play.png"));
+        a->setToolTip("Play forwards");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setIcon(QIcon(":/images/control_play.png"));
-        b->setToolTip("Play forwards");
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setProperty("tbsize", QVariant(QString("double")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
         m_forwardPlayAction = a;
 
         a = addAction("");
+        a->setIcon(QIcon(":/images/control_bmark.png"));
+        a->setToolTip("Skip to start of sequence");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setIcon(QIcon(":/images/control_bmark.png"));
-        b->setToolTip("Skip to start of sequence");
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m_backMarkAction = a;
 
         a = addAction("");
+        a->setIcon(QIcon(":/images/control_fmark.png"));
+        a->setToolTip("Skip to end of sequence");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setIcon(QIcon(":/images/control_fmark.png"));
-        b->setToolTip("Skip to end of sequence");
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m_forwardMarkAction = a;
@@ -307,16 +307,16 @@ namespace Rv
         switch (static_cast<Session::PlayMode>(opts.loopMode))
         {
         case Session::PlayOnce:
-            b->setIcon(m_playModeOnceIcon);
+            m_playModeAction->setIcon(m_playModeOnceIcon);
             break;
 
         case Session::PlayPingPong:
-            b->setIcon(m_playModePingPongIcon);
+            m_playModeAction->setIcon(m_playModePingPongIcon);
             break;
 
         default:
         case Session::PlayLoop:
-            b->setIcon(m_playModeLoopIcon);
+            m_playModeAction->setIcon(m_playModeLoopIcon);
             break;
         }
 
@@ -378,6 +378,20 @@ namespace Rv
                 SLOT(audioSliderChanged(int)));
         connect(m_audioSlider, SIGNAL(sliderReleased()), this,
                 SLOT(audioSliderReleased()));
+
+        m_liveReviewFilteredActions = {
+            {m_smAction, m_smAction->toolTip()},
+            {m_paintAction, m_paintAction->toolTip()},
+            {m_holdAction, m_holdAction->toolTip()},
+            {m_ghostAction, m_ghostAction->toolTip()},
+            {m_backStepAction, m_backStepAction->toolTip()},
+            {m_forwardStepAction, m_forwardStepAction->toolTip()},
+            {m_backPlayAction, m_backPlayAction->toolTip()},
+            {m_forwardPlayAction, m_forwardPlayAction->toolTip()},
+            {m_backMarkAction, m_backMarkAction->toolTip()},
+            {m_forwardMarkAction, m_forwardMarkAction->toolTip()},
+            {m_playModeAction, m_playModeAction->toolTip()},
+        };
 
         if (m_session)
             setSession(m_session);
@@ -506,16 +520,8 @@ namespace Rv
             else if (name == "internal-sync-presenter-changed"
                      || name == "sync-session-ended")
             {
-                if (m_session->filterLiveReviewEvents())
-                {
-                    m_holdAction->setDisabled(true);
-                    m_ghostAction->setDisabled(true);
-                }
-                else
-                {
-                    m_holdAction->setDisabled(false);
-                    m_ghostAction->setDisabled(false);
-                }
+                bool isDisabled = m_session->filterLiveReviewEvents();
+                setLiveReviewFilteredActions(isDisabled);
             }
         }
 
@@ -777,6 +783,22 @@ namespace Rv
             case Session::PlayPingPong:
                 b->setIcon(m_playModePingPongIcon);
                 break;
+            }
+        }
+    }
+
+    void RvBottomViewToolBar::setLiveReviewFilteredActions(bool isDisabled)
+    {
+        for (const auto& button : m_liveReviewFilteredActions)
+        {
+            QAction* action = button.first;
+            QString tooltipText = button.second;
+
+            if (action != nullptr)
+            {
+                action->setDisabled(isDisabled);
+                action->setToolTip(isDisabled ? "You must be presenter to use"
+                                              : tooltipText);
             }
         }
     }
