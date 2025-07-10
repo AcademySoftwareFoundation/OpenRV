@@ -822,6 +822,11 @@ class: Timeline : Widget
 
     method: popupOpts (void; Event event)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
         if (isCurrentFrameIncomplete() || !_pointerInTimeline)
         {
             event.reject();

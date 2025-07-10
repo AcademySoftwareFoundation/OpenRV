@@ -376,15 +376,19 @@ class: MotionScope : Widget
 
     method: clickFunction (void; Event event, (void;int,int,int) F)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
         deb ("clickFunction");
 
-	//   Disregard drag events if we didn't mouse-down in this widget.
-	//
-	if (!_drag && (event.name() == "pointer-1--drag" || event.name() == "stylus-pen--drag"))
-	{
-            event.reject();
-            return;
-	}
+        //   Disregard drag events if we didn't mouse-down in this widget.
+        //
+        if (!_drag && (event.name() == "pointer-1--drag" || event.name() == "stylus-pen--drag"))
+        {
+                event.reject();
+                return;
+        }
         State state = data();
         let loc = renderLocations(event);
         let {d, w, h, tlh, mxb, hm0, hm1, thm1, vm0, vm1, tOff, t, Y} = loc;
@@ -700,6 +704,11 @@ class: MotionScope : Widget
 
     method: popupOpts (void; Event event)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
         if (isCurrentFrameIncomplete() ||!_pointerInMotionScope)
         {
             event.reject();
