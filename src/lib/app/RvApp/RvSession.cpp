@@ -25,7 +25,6 @@
 #include <IPBaseNodes/StackGroupIPNode.h>
 #include <IPBaseNodes/StackIPNode.h>
 #include <IPBaseNodes/SwitchIPNode.h>
-#include <IPBaseNodes/PaintIPNode.h>
 #include <IPCore/AdaptorIPNode.h>
 #include <IPCore/Application.h>
 #include <IPCore/CacheIPNode.h>
@@ -79,11 +78,11 @@
 #include <sstream>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <regex>
 
 #ifndef PLATFORM_WINDOWS
 #include <stdio.h>
@@ -1343,6 +1342,8 @@ namespace Rv
                 readSourceHelper(movies, sargs, addContents,
                                  addToExistingSource);
             }
+
+            updateAnnotationsUI();
         }
     }
 
@@ -3815,8 +3816,6 @@ namespace Rv
                     }
                 }
             }
-
-            updateAnnotationsUI();
         } // HOP_PROF_DYN for PASS 6
 
         {
@@ -4345,34 +4344,25 @@ namespace Rv
 
     void RvSession::updateAnnotationsUI()
     {
-        const auto& nodes = graph().nodeMap();
-
-        for (const auto& nodeInfo : nodes)
+        auto* sessionNode = graph().sessionNode();
+        if (sessionNode != nullptr)
         {
-            const auto& node = nodeInfo.second;
-            auto* paintNode = dynamic_cast<IPCore::PaintIPNode*>(node);
+            const IntProperty* holdProperty =
+                sessionNode->property<IntProperty>("paintEffects", "hold");
+            const IntProperty* ghostProperty =
+                sessionNode->property<IntProperty>("paintEffects", "ghost");
 
-            if (paintNode != nullptr)
-            {
-                for (const auto& component : paintNode->components())
-                {
-                    if (std::regex_match(component->name(),
-                                         std::regex("(pen:.*|text:.*)")))
-                    {
-                        auto* ghostProperty =
-                            component->property<TwkContainer::IntProperty>(
-                                "ghost");
-                        userGenericEvent("update-ghost-button",
-                                         ghostProperty->valueAsString());
+            const int hold =
+                (holdProperty != nullptr && holdProperty->size() != 0)
+                    ? holdProperty->front()
+                    : 0;
+            const int ghost =
+                (ghostProperty != nullptr && ghostProperty->size() != 0)
+                    ? ghostProperty->front()
+                    : 0;
 
-                        auto* holdProperty =
-                            component->property<TwkContainer::IntProperty>(
-                                "hold");
-                        userGenericEvent("update-hold-button",
-                                         holdProperty->valueAsString());
-                    }
-                }
-            }
+            userGenericEvent("update-hold-button", std::to_string(hold));
+            userGenericEvent("update-ghost-button", std::to_string(ghost));
         }
     }
 

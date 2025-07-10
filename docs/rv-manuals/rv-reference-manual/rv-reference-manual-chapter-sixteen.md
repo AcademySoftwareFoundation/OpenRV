@@ -443,10 +443,6 @@ Paint nodes are used primarily to store per frame annotations. Below *id* is the
 | pen: *id* : *frame* : *user* .mode | int | 1 | Drawing mode of the stroke (Default if missing is 0):RenderOverMode = 0; RenderEraseMode = 1; |
 | pen: *id* : *frame* : *user* .startFrame | int | 1 | The first frame on which the pen stroke should be displayed |
 | pen: *id* : *frame* : *user* .duration | int | 1 | The number of frames on which the pen stroke should be displayed |
-| pen: *id* : *frame* : *user* .hold | int | 1 | Enable holding strokes based on their duration and startFrame properties |
-| pen: *id* : *frame* : *user* .ghost | int | 1 | Enable ghosting strokes based on their duration, startFrame, ghostBefore and ghostAfter properties |
-| pen: *id* : *frame* : *user* .ghostBefore | int | 1 | The number of frames on which to display the ghosted stroke before the actual stroke |
-| pen: *id* : *frame* : *user* .ghostAfter | int | 1 | The number of frames on which to display the ghosted stroke after the actual stroke |
 | text: *id* : *frame* : *user* .position | float[2] | 1 | Location of the text in the normalized coordinate system |
 | text: *id* : *frame* : *user* .color | float[4] | 1 | The color of the text |
 | text: *id* : *frame* : *user* .spacing | float | 1 | The spacing of the text |
@@ -459,10 +455,6 @@ Paint nodes are used primarily to store per frame annotations. Below *id* is the
 | text: *id* : *frame* : *user* .debug | int | 1 | (unused) |
 | text: *id* : *frame* : *user* .startFrame | int | 1 | The first frame on which the text box should be displayed |
 | text: *id* : *frame* : *user* .duration | int | 1 | The number of frames on which the text box should be displayed |
-| text: *id* : *frame* : *user* .hold | int | 1 | Enable holding text boxes based on their duration and startFrame properties |
-| text: *id* : *frame* : *user* .ghost | int | 1 | Enable ghosting strokes based on their duration, startFrame, ghostBefore and ghostAfter properties |
-| text: *id* : *frame* : *user* .ghostBefore | int | 1 | The number of frames on which to display the ghosted stroke before the actual stroke |
-| text: *id* : *frame* : *user* .ghostAfter | int | 1 | The number of frames on which to display the ghosted stroke after the actual stroke |
 
 ## RVPrimaryConvert
 
@@ -570,6 +562,10 @@ The session node is a great place to store centrally located information to easi
 | matte.heightVisible | float | 1 | Centralized setting for the fraction of the source height that is still visible from the matte used in all sources. |
 | matte.opacity | float | 1 | Centralized setting for the opacity of the matte used in all sources. 0 == clear 1 == opaque. |
 | matte.show | int | 1 | Centralized setting to turn on or off the matte used in all sources. 0 == OFF 1 == ON. |
+| paintEffects.hold | int | 1 | Centralized setting for enabling holding annotations based on their duration and startFrame properties |
+| paintEffects.ghost | int | 1 | Centralized setting for enabling ghosting annotations based on their duration, startFrame, ghostBefore and ghostAfter properties |
+| paintEffects.ghostBefore | int | 1 | Centralized setting for the number of frames on which to display the ghosted annotation before the actual annotation |
+| paintEffects.ghostAfter | int | 1 | Centralized setting for the number of frames on which to display the ghosted annotation after the actual annotation |
 
 ## RVSoundTrack
 
