@@ -443,6 +443,11 @@ IF(RV_TARGET_WINDOWS)
       INTERFACE_LINK_LIBRARIES "${_python3_implib}"
   )
 
+  # Create a wrapper interface target
+  ADD_LIBRARY(Python::PythonWrapper INTERFACE)
+  target_link_libraries(Python::PythonWrapper INTERFACE "${_python3_implib}")
+  target_include_directories(Python::PythonWrapper INTERFACE ${_include_dir})
+  
   get_target_property(test456 Python::Python INTERFACE_LINK_LIBRARIES)
   message(STATUS "cedrik456: ${test456}")
 
@@ -451,7 +456,13 @@ IF(RV_TARGET_WINDOWS)
   message(STATUS "Python::Python DEBUG_IMPLIB: ${DEBUG_IMPLIB}")
   message(STATUS "Python::Python RELEASE_IMPLIB: ${RELEASE_IMPLIB}")
   message(STATUS "Python::Python _python3_implib: ${_python3_implib}")
+ELSE()
+# Create a wrapper interface target
+  ADD_LIBRARY(Python::PythonWrapper INTERFACE)
+  target_link_libraries(Python::PythonWrapper INTERFACE "${_python3_lib}")
+  target_include_directories(Python::PythonWrapper INTERFACE ${_include_dir})
 ENDIF()
+
 FILE(MAKE_DIRECTORY ${_include_dir})
 TARGET_INCLUDE_DIRECTORIES(
   Python::Python
