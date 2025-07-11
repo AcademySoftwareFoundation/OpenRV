@@ -3971,8 +3971,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     string[][] filesfiles = { files, files, files };
 
     clearSession();
-//    addSources(files, "explicit", true, true);
-//    addSourcesVerbose(filesfiles, "explicit");
+    addSources(files, "explicit", true, true);
+    addSourcesVerbose(filesfiles, "explicit");
 }
 
 \: testRemoteMuParameters (void;)

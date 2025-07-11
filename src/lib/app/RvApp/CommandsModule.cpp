@@ -25,7 +25,7 @@
 #include <IPCore/IPInstanceNode.h>
 #include <OCIONodes/OCIOIPNode.h>
 #include <IPMu/CommandsModule.h>
-#include <IPMu/RemoteMuCommand.h>
+#include <IPMu/RemoteCommand.h>
 #include <TwkDeploy/Deploy.h>
 #include <Mu/ClassInstance.h>
 #include <Mu/Exception.h>
@@ -1361,9 +1361,8 @@ namespace Rv
 
         // silences broadcasting events below this constructor, replaced by
         // mu-addSources
-        string muparams =
-            IPMu::RemoteMuParameters::pack(sargs, tag, processOpts, merge);
-        IPMu::RemoteMuCommand remoteCommand(s, "addSources", muparams);
+        IPMu::RemoteCommand remoteCommand(s, "addSources", sargs, tag,
+                                          processOpts, merge);
 
         //
         //  Note we do not make GraphEdit object here, since this load will be
@@ -1421,9 +1420,8 @@ namespace Rv
 
         // Now send remote mu command  (eg: live review) while
         // silencing the broadcast of events after the constructor
-        string muparams =
-            IPMu::RemoteMuParameters::pack(allFilesAndOptions, tag);
-        IPMu::RemoteMuCommand remoteCommand(s, "addSourceVerbose", muparams);
+        IPMu::RemoteCommand remoteCommand(s, "addSourceVerbose",
+                                          allFilesAndOptions, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.

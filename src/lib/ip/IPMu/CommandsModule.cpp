@@ -67,7 +67,7 @@
 #include <TwkUtil/Timer.h>
 #include <TwkDeploy/Deploy.h>
 
-#include <IPMu/RemoteMuCommand.h>
+#include <IPMu/RemoteCommand.h>
 
 #include <algorithm>
 #include <limits>
@@ -2604,7 +2604,7 @@ namespace IPMu
     {
         Session* s = Session::currentSession();
 
-        IPMu::RemoteMuCommand remoteCommand(s, "clearSession");
+        IPMu::RemoteCommand remoteCommand(s, "clearSession");
 
         s->clear();
         s->askForRedraw();
