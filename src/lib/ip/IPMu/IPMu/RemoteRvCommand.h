@@ -20,7 +20,6 @@ namespace IPMu
     class RemoteRvCommand
     {
     public:
-        // Primary constructor - takes command name and arguments directly
         template <typename... Args>
         RemoteRvCommand(IPCore::Session* s, const std::string& command,
                         Args&&... args)
@@ -40,8 +39,6 @@ namespace IPMu
             m_session->userGenericEvent("pop-eat-broadcast-events", "");
         }
 
-        // Static pack method (for cases where you need the JSON without
-        // sending)
         template <typename... Args>
         static std::string pack(const std::string& name, Args&&... args)
         {
