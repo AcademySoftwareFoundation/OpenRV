@@ -1359,8 +1359,7 @@ namespace Rv
             sargs.push_back(IPCore::Application::mapFromVar(arg));
         }
 
-        // silences broadcasting events below this constructor, replaced by
-        // mu-addSources
+        // silences broadcasting events below this constructor
         IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargs, tag,
                                               processOpts, merge);
 
@@ -1418,8 +1417,7 @@ namespace Rv
             allFilesAndOptions.push_back(filesAndOptions);
         }
 
-        // Now send remote mu command  (eg: live review) while
-        // silencing the broadcast of events after the constructor
+        // silences broadcasting events below this constructor
         IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
                                               allFilesAndOptions, tag);
 
