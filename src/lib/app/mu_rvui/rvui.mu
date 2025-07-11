@@ -25,6 +25,7 @@ use math;
 use math_util;
 use rvtypes;
 
+
 global int preSnapRenderCount = 0;
 global Vec2 snapTranslation;
 global bool snapDoit = false;
@@ -3614,6 +3615,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
     sendInternalEvent ("session-clear-everything", "", "rvui");
 }
+
 
 \: getMediaFilesFromBrowser (string[]; )
 {
