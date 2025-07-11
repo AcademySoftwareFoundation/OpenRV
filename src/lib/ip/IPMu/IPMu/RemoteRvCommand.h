@@ -5,8 +5,8 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
-#ifndef __IPCore__RemoteCommand__h__
-#define __IPCore__RemoteCommand__h__
+#ifndef __IPCore__RemoteRvCommand__h__
+#define __IPCore__RemoteRvCommand__h__
 
 #include <iostream>
 #include <sstream>
@@ -17,26 +17,27 @@
 
 namespace IPMu
 {
-    class RemoteCommand
+    class RemoteRvCommand
     {
     public:
         // Primary constructor - takes command name and arguments directly
         template <typename... Args>
-        RemoteCommand(IPCore::Session* s, const std::string& command,
-                      Args&&... args)
+        RemoteRvCommand(IPCore::Session* s, const std::string& command,
+                        Args&&... args)
         {
             m_session = s;
             std::string parameters = pack(command, std::forward<Args>(args)...);
-            m_session->userGenericEvent("generic-mu-command",
+
+            std::cout << "PAYLOAD: " << parameters << std::endl;
+            m_session->userGenericEvent("generic-rv-command",
                                         parameters.c_str(), "");
+
+            m_session->userGenericEvent("push-eat-broadcast-events", "");
         }
 
-        // Legacy constructor for raw JSON strings (backwards compatibility)
-        RemoteCommand(IPCore::Session* s, const std::string& jsonParameters)
+        ~RemoteRvCommand()
         {
-            m_session = s;
-            m_session->userGenericEvent("generic-mu-command",
-                                        jsonParameters.c_str(), "");
+            m_session->userGenericEvent("pop-eat-broadcast-events", "");
         }
 
         // Static pack method (for cases where you need the JSON without
@@ -58,7 +59,7 @@ namespace IPMu
         // Self-test method
         static bool selfTest()
         {
-            std::cout << "=== RemoteCommand Self-Test ===\n";
+            std::cout << "=== RemoteRvCommand Self-Test ===\n";
 
             // Test 1: Basic types
             {
