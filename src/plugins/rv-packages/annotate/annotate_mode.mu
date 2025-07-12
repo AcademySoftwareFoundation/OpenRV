@@ -696,7 +696,8 @@ class: AnnotateMinorMode : MinorMode
 
             let pinfo = imagesAtPixel(event.pointer(), "annotate").front(),
                 name  = pinfo.name,
-                ip    = event.pointer();
+                devicePixelRatio = devicePixelRatio(),
+                ip    = event.pointer()*devicePixelRatio;
 
             _pointer = ip;
             _pointerRadius = mag(imageToEventSpace(name, ip, true)
@@ -742,7 +743,7 @@ class: AnnotateMinorMode : MinorMode
 
         let pinfo  = state.pixelInfo.front(),
             sName  = sourceNameWithoutFrame(pinfo.name),
-            ip     = state.pointerPosition;
+            ip     = state.pointerPosition*devicePixelRatio();
 
         let pixels = framebufferPixelValue(ip.x, ip.y);
         let c = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
