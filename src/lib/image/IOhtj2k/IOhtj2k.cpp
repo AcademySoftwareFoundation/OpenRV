@@ -82,6 +82,15 @@ IOhtj2k::getImageInfo(const std::string& filename, FBInfo& fbi) const
     bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
     bool is_signed = siz.is_signed(0);
 
+    // Signed and notlinear transforms are not supported, but it could be added in the future.
+    if (is_signed)
+        TWK_THROW_STREAM(UnsupportedException,
+                    "HTJ2K: unsupported signed jpeg2000 file " << filename);
+    
+    if (has_nlt)
+        TWK_THROW_STREAM(UnsupportedException,
+                        "HTJ2K: unsupported notlinear transform " << filename);
+
     fbi.numChannels = siz.get_num_components();
     fbi.width       = siz.get_recon_width(0);
     fbi.height      = siz.get_recon_height(0);
@@ -98,48 +107,14 @@ IOhtj2k::getImageInfo(const std::string& filename, FBInfo& fbi) const
             fbi.dataType    = FrameBuffer::USHORT;
             break;
         case 16:
-            if (has_nlt && is_signed)
-                fbi.dataType = FrameBuffer::HALF;
-            else
-                fbi.dataType = FrameBuffer::USHORT;
+            fbi.dataType = FrameBuffer::USHORT;
             break;
-        case 32:
-            if (has_nlt && is_signed)
-                fbi.dataType = FrameBuffer::DOUBLE;
-            else
-                fbi.dataType = FrameBuffer::UINT;
-            break;
+        default:
+            TWK_THROW_STREAM(UnsupportedException,
+                        "HTJ2K: unsupported bitdepth " << filename);
     }
 
 }
-
-ojph::si16 convert_si32_to_si16(const ojph::si32 si32_value, bool convert_special_numbers_to_finite_numbers = false)
-  {
-    if (si32_value > INT16_MAX)
-      return INT16_MAX;
-    else if (si32_value < INT16_MIN)
-      return INT16_MIN;
-    else if (true == convert_special_numbers_to_finite_numbers)
-    {
-      const ojph::si16 si16_value = (ojph::si16)si32_value;
-      half half_value;
-      half_value.setBits(si16_value);
-      if (half_value.isFinite())
-        return si16_value;
-
-      // handle non-real number to real-number mapping
-      if (half_value.isNan())
-        half_value = 0.0f;
-      else if (half_value.isInfinity() && !half_value.isNegative())
-        half_value = HALF_MAX;
-      else if (half_value.isInfinity() && half_value.isNegative())
-        half_value = -1.0f * HALF_MAX;
-      
-      return half_value.bits();
-    }  
-    else
-      return (ojph::si16)si32_value;
-  }
 
 void
 copyScanLine(ojph::codestream *codestream, 
@@ -170,13 +145,6 @@ copyScanLine(ojph::codestream *codestream,
             sp++;
         }    
     }
-    if (dtype == FrameBuffer::HALF){
-        ojph::si16* dout = (ojph::si16 *)fb->scanline<unsigned short>(row);
-        dout += component;
-        for(ojph::ui32 j=width; j > 0; j--, dout += channels){
-            *dout = convert_si32_to_si16(*sp++);
-        }
-    }
     
 }
 
@@ -198,6 +166,16 @@ FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
     ojph::ui8 nl_type;
     bool has_nlt = nlt.get_nonlinear_transform(0, nlt_bit_depth, nlt_is_signed, nl_type);
     bool is_signed = siz.is_signed(0);
+
+    // Signed and notlinear transforms are not supported, but it could be added in the future.
+    if (is_signed)
+        TWK_THROW_STREAM(UnsupportedException,
+                    "HTJ2K: unsupported signed jpeg2000 image");
+    
+    if (has_nlt)
+        TWK_THROW_STREAM(UnsupportedException,
+                        "HTJ2K: unsupported notlinear transform in jpeg2000 image");
+
     // 4. Wrap the decoded image in a FrameBuffer
     FrameBuffer::DataType dtype = FrameBuffer::USHORT;
 
@@ -213,16 +191,7 @@ FrameBuffer *decodeHTJ2K(ojph::infile_base *infile, FrameBuffer *fb){
         case 12:
             bit_offset = 4;
         case 16:
-            if (has_nlt && is_signed)
-                dtype = FrameBuffer::HALF;
-            else
-                dtype    = FrameBuffer::USHORT;
-            break;
-        case 32:
-            if (has_nlt && is_signed)
-                dtype = FrameBuffer::DOUBLE;
-            else
-                dtype    = FrameBuffer::UINT;
+            dtype    = FrameBuffer::USHORT;
             break;
     }
     
