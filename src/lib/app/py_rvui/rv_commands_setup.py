@@ -308,6 +308,7 @@ all_mu_commands = [
     "sourceMediaRepSwitchNode",
     "sourceMediaRepSourceNode",
     "sourceMediaRepsAndNodes",
+    "devicePixelRatio",
 ]
 
 
