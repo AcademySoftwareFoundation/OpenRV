@@ -92,6 +92,8 @@ namespace TwkFB
 
         std::string SMPTE240M() { return "SMPTE-240M"; }
 
+        std::string SMPTE2084() { return "SMPTE-2084"; }
+
         std::string CineonLog() { return "Cineon Log"; }
 
         std::string ArriLogC() { return "ARRI LogC"; }

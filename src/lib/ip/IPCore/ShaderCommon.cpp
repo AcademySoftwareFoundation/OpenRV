@@ -78,6 +78,7 @@ extern const char* ColorBlendWithConstant_glsl;
 extern const char* ColorSRGBLinear_glsl;
 extern const char* ColorRec709Linear_glsl;
 extern const char* ColorSMPTE240MLinear_glsl;
+extern const char* ColorSMPTE2084Linear_glsl;
 extern const char* ColorACESLogLinear_glsl;
 extern const char* ColorClamp_glsl;
 extern const char* ColorGamma_glsl;
@@ -89,6 +90,7 @@ extern const char* ColorCineonSoftClipLogLinear_glsl;
 extern const char* ColorLogCLinear_glsl;
 extern const char* ColorLinearLogC_glsl;
 extern const char* ColorLinearSMPTE240M_glsl;
+extern const char* ColorLinearSMPTE2084_glsl;
 extern const char* ColorViperLogLinear_glsl;
 extern const char* ColorRedLogLinear_glsl;
 extern const char* ColorLinearRedLog_glsl;
@@ -273,6 +275,8 @@ namespace IPCore
         static Function* Shader_ColorRec709Linear = 0;
         static Function* Shader_ColorSMPTE240MLinear = 0;
         static Function* Shader_ColorLinearSMPTE240M = 0;
+        static Function* Shader_ColorSMPTE2084Linear = 0;
+        static Function* Shader_ColorLinearSMPTE2084 = 0;
         static Function* Shader_ColorACESLogLinear = 0;
         static Function* Shader_ColorClamp = 0;
         static Function* Shader_ColorGamma = 0;
@@ -1667,6 +1671,35 @@ namespace IPCore
 
             return Shader_ColorLinearSMPTE240M;
         }
+
+        Function* colorSMPTE2084ToLinear()
+        {
+            if (!Shader_ColorSMPTE2084Linear)
+            {
+                SymbolVector params, globals;
+                params.push_back(P());
+                Shader_ColorSMPTE2084Linear = new Shader::Function(
+                    "ColorSMPTE2084Linear", ColorSMPTE2084Linear_glsl,
+                    Shader::Function::Color, params, globals);
+            }
+
+            return Shader_ColorSMPTE2084Linear;
+        }
+
+        Function* colorLinearToSMPTE2084()
+        {
+            if (!Shader_ColorLinearSMPTE2084)
+            {
+                SymbolVector params, globals;
+                params.push_back(P());
+                Shader_ColorLinearSMPTE2084 = new Shader::Function(
+                    "ColorLinearSMPTE2084", ColorLinearSMPTE2084_glsl,
+                    Shader::Function::Color, params, globals);
+            }
+
+            return Shader_ColorLinearSMPTE2084;
+        }
+
 
         Function* colorACESLogToLinear()
         {
@@ -3793,6 +3826,28 @@ namespace IPCore
             }
         }
 
+        Expression* newColorLinearToSMPTE2084(Expression* FA)
+        {
+            if (FA->function() == colorSMPTE2084ToLinear())
+            {
+                Expression* fexpr =
+                    static_cast<const BoundExpression*>(FA->arguments()[0])
+                        ->value()
+                        ->copy();
+                delete FA;
+                return fexpr;
+            }
+            else
+            {
+                const Function* F = colorLinearToSMPTE2084();
+                ArgumentVector args(F->parameters().size());
+                size_t i = 0;
+                args[i] = new BoundExpression(F->parameters()[i], FA);
+                i++;
+                return new Expression(F, args, FA->image());
+            }
+        }
+
         Expression* newColorLinearToACESLog(Expression* FA)
         {
             if (FA->function() == colorACESLogToLinear())
@@ -3969,6 +4024,28 @@ namespace IPCore
             else
             {
                 const Function* F = colorSMPTE240MToLinear();
+                ArgumentVector args(F->parameters().size());
+                size_t i = 0;
+                args[i] = new BoundExpression(F->parameters()[i], FA);
+                i++;
+                return new Expression(F, args, FA->image());
+            }
+        }
+
+        Expression* newColorSMPTE2084ToLinear(Expression* FA)
+        {
+            if (FA->function() == colorLinearToSMPTE2084())
+            {
+                Expression* fexpr =
+                    static_cast<const BoundExpression*>(FA->arguments()[0])
+                        ->value()
+                        ->copy();
+                delete FA;
+                return fexpr;
+            }
+            else
+            {
+                const Function* F = colorSMPTE2084ToLinear();
                 ArgumentVector args(F->parameters().size());
                 size_t i = 0;
                 args[i] = new BoundExpression(F->parameters()[i], FA);

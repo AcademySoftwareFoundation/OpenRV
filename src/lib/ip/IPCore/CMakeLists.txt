@@ -114,6 +114,8 @@ SET(_shaders
     ColorCDLForACESLog
     ColorSMPTE240MLinear
     ColorLinearSMPTE240M
+    ColorSMPTE2084Linear
+    ColorLinearSMPTE2084
     ColorLuminanceLUT
     ColorOutOfRange
     InlineBoxResize

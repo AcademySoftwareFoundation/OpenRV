@@ -2286,6 +2286,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                 (value == "Red Log Film"    && r == 0 && l == 7 && s == 0 && g == 1.0) ||
                 (value == "sRGB"       && r == 0 && l == 0 && s == 1 && g == 1.0) ||
                 (value == "Rec709"     && r == 1 && l == 0 && s == 0 && g == 1.0) ||
+                (value == "SMPTE 2084" && r == 0 && l == 8 && s == 0 && g == 1.0) ||
                 (value == "Kodak Log"  && r == 0 && l == 1 && s == 0 && g == 1.0) || // For backwards compat; same as cineon
                 (value == ""           && r == 0 && l == 0 && s == 0 && g == 1.0) ||
                 (value == "Gamma 2.2"  && r == 0 && l == 0 && s == 0 && g == 2.2))
@@ -2346,6 +2347,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         else if (type == "SONY S-Log") l = 5;
         else if (type == "Red Log") l = 6;
         else if (type == "Red Log Film") l = 7;
+        else if (type == "SMPTE 2084") l = 8;
         else if (type == "sRGB"     )  s = 1;
         else if (type == "Rec709"   )  r = 1;
         else if (type == "Gamma 2.2" ) g = 2.2;
@@ -6374,6 +6376,7 @@ global bool debugGC = false;
             {"   Red Log Film",     setLinConvert("Red Log Film"), nil, hasLinConversion("Red Log Film")},
             {"   sRGB",             setLinConvert("sRGB"), nil, hasLinConversion("sRGB")},
             {"   Rec709",           setLinConvert("Rec709"), nil, hasLinConversion("Rec709")},
+            {"   SMPTE 2084",       setLinConvert("SMPTE 2084"), nil, hasLinConversion("SMPTE 2084")},
             {"   File Gamma 2.2",        setLinConvert("Gamma 2.2"), nil, hasLinConversion("Gamma 2.2")},
             {"   File Gamma...",         enterFileGamma, nil, fileGammaState},
             {"_", nil},

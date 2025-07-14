@@ -114,6 +114,7 @@ namespace IPCore
         Expression* newColorSRGBToLinear(Expression*);
         Expression* newColorRec709ToLinear(Expression*);
         Expression* newColorSMPTE240MToLinear(Expression*);
+        Expression* newColorSMPTE2084ToLinear(Expression*);
         Expression* newColorACESLogToLinear(Expression*);
         Expression* newColorGamma(Expression*, const TwkMath::Vec3f&);
 
@@ -155,6 +156,7 @@ namespace IPCore
         Expression* newColorLinearToSRGB(Expression*);
         Expression* newColorLinearToRec709(Expression*);
         Expression* newColorLinearToSMPTE240M(Expression*);
+        Expression* newColorLinearToSMPTE2084(Expression*);
         Expression* newColorLinearToACESLog(Expression*);
         Expression* newColor3DLUTGLSampling(Expression*,
                                             const TwkFB::FrameBuffer*,
