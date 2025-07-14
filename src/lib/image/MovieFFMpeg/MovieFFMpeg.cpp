@@ -1943,6 +1943,16 @@ namespace TwkMovie
             case AVCOL_PRI_FILM: // = 8
                 cspace << "FILM (8)";
                 break;
+            case AVCOL_PRI_BT2020: // = 9
+                cspace << "ITU-R BT2020 (9)";
+                red[0] = 0.708;
+                red[1] = 0.292;
+                green[0] = 0.170;
+                green[1] = 0.797;
+                blue[0] = 0.131;
+                blue[1] = 0.046;
+                track->fb.setPrimaryColorSpace(ColorSpace::Rec2020());
+                break;
             default:
                 cspace << "UNKNOWN (" << videoCodecContext->color_primaries
                        << ")";
@@ -2026,6 +2036,14 @@ namespace TwkMovie
             case AVCOL_SPC_YCOCG: // = 8
                 // Used by Dirac, VC-2 and H.264 FRext, see ITU-T SG16
                 matrix << "YCoCg (8)";
+                break;
+            case AVCOL_SPC_BT2020_NCL: // 9
+                matrix << "ITU-R BT2020 NCL (9)";
+                track->fb.setConversion(ColorSpace::Rec2020());
+                break;
+            case AVCOL_SPC_BT2020_CL: // 10
+                matrix << "ITU-R BT2020 CL (10)";
+                track->fb.setConversion(ColorSpace::Rec2020());
                 break;
             default:
                 matrix << "UNKNOWN (" << videoCodecContext->colorspace << ")";
