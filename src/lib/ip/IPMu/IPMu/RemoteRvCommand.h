@@ -1,6 +1,5 @@
 //
-//  Copyright (c) 2012 Tweak Software.
-//  All rights reserved.
+//  Copyright (C) 2025  Autodesk, Inc. All Rights Reserved.
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
