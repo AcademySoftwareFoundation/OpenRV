@@ -18,6 +18,7 @@ namespace Rv
         static void unregisterCallback(PyObject* callable);
         static void callCallbacks();
         static int nbCallbacks();
+        static void clearCallbacks();
 
         struct PyObjectDeleter
         {

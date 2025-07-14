@@ -7,8 +7,10 @@ namespace Rv
 {
     void ImGuiPythonBridge::PyObjectDeleter::operator()(PyObject* obj) const
     {
-        if (obj)
-            Py_DECREF(obj);
+        // seems to crash on exit if we have a callback registered.
+        // so patching this out for now.
+        // if (obj)
+        //     Py_DECREF(obj);
     }
 
     std::vector<ImGuiPythonBridge::PyObjectPtr> ImGuiPythonBridge::s_callbacks;
@@ -53,5 +55,11 @@ namespace Rv
     }
 
     int ImGuiPythonBridge::nbCallbacks() { return (int)s_callbacks.size(); }
+
+    void ImGuiPythonBridge::clearCallbacks()
+    {
+        s_callbacks.clear();
+        // CAll DECREF for each element if we're not using the deleter for this?
+    }
 
 } // namespace Rv
