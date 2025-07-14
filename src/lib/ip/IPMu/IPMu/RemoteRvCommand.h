@@ -4,15 +4,15 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
-#ifndef __IPCore__RemoteRvCommand__h__
-#define __IPCore__RemoteRvCommand__h__
+#pragma once
+
+#include <IPCore/Session.h>
 
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <type_traits>
-#include <IPCore/Session.h>
 
 namespace IPMu
 {
@@ -194,5 +194,3 @@ namespace IPMu
         }
     };
 } // namespace IPMu
-
-#endif
