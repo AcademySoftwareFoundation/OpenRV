@@ -23,7 +23,15 @@ SET(_target
     "RV_DEPS_FFMPEG"
 )
 
-IF(RV_FFMPEG_7)
+IF(RV_FFMPEG_7_2)
+  SET(_version
+      "n7.2"
+  )
+
+  SET(_download_hash
+      "a7a85ec05c9bc3aeefee12743899d8ab"
+  )
+ELSEIF(RV_FFMPEG_7)
   SET(_version
       "n7.1"
   )
@@ -79,7 +87,57 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_FFMPEG_7)
+IF(RV_FFMPEG_7_2)
+  IF(RV_TARGET_DARWIN)
+    SET(_ffmpeg_avutil_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.60${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swresample_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample.6${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swscale_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale.9${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avcodec_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec.62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avformat_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat.62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+  ELSEIF(RV_TARGET_LINUX)
+    SET(_ffmpeg_avutil_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil${CMAKE_SHARED_LIBRARY_SUFFIX}.59
+    )
+    SET(_ffmpeg_swresample_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample${CMAKE_SHARED_LIBRARY_SUFFIX}.5
+    )
+    SET(_ffmpeg_swscale_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale${CMAKE_SHARED_LIBRARY_SUFFIX}.8
+    )
+    SET(_ffmpeg_avcodec_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec${CMAKE_SHARED_LIBRARY_SUFFIX}.61
+    )
+    SET(_ffmpeg_avformat_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat${CMAKE_SHARED_LIBRARY_SUFFIX}.61
+    )
+  ELSEIF(RV_TARGET_WINDOWS)
+    SET(_ffmpeg_avutil_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil-60${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swresample_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample-6${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swscale_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale-9${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avcodec_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec-62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avformat_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat-62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+  ENDIF()
+ELSEIF(RV_FFMPEG_7)
   IF(RV_TARGET_DARWIN)
     SET(_ffmpeg_avutil_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.59${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -239,7 +297,7 @@ LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--enable-shared")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-static")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-iconv")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-outdevs")
-LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-programs")
+# LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-programs")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-large-tests")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-vaapi")
 LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-doc")
@@ -389,8 +447,9 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   INSTALL_DIR ${_install_dir}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
+  GIT_REPOSITORY https://github.com/ffmpeg/ffmpeg.git
+  #URL ${_download_url}
+  #URL_MD5 ${_download_hash}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   PATCH_COMMAND ${RV_FFMPEG_PATCH_COMMAND_STEP}
   CONFIGURE_COMMAND
