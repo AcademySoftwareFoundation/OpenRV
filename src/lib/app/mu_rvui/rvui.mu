@@ -6396,11 +6396,18 @@ global bool debugGC = false;
             {"    Hue",        hueMode,        "h", videoSourcesAndNodeExistState("RVColor")},
             {"    Contrast",   contrastMode,   "k", videoSourcesAndNodeExistState("RVColor")},
             {"_", nil},
-            {"Range", Menu {
+            {"File YCbCr to RGB Conversion", nil, nil, inactiveState },
+            {"    Range", Menu {
                 {"From Image", ~setColorSpaceAttr("Range","From Image"), nil, matchesColorSpaceAttr("Range","From Image")},
                 {"_", nil},
                 {"Video Range", ~setColorSpaceAttr("Range","Video Range"), nil, matchesColorSpaceAttr("Range","Video Range")},
                 {"Full Range", ~setColorSpaceAttr("Range","Full Range"), nil, matchesColorSpaceAttr("Range","Full Range")}}},
+            {"    Color Space", Menu {
+                {"From Image", ~setColorSpaceAttr("Conversion","From Image"), nil, matchesColorSpaceAttr("Conversion","From Image")},
+                {"_", nil},
+                {"Rec. 601", ~setColorSpaceAttr("Conversion","Rec601"), nil, matchesColorSpaceAttr("Conversion","Rec601")},
+                {"Rec. 709", ~setColorSpaceAttr("Conversion","Rec709"), nil, matchesColorSpaceAttr("Conversion","Rec709")},
+                {"Rec. 2020", ~setColorSpaceAttr("Conversion","Rec2020"), nil, matchesColorSpaceAttr("Conversion","Rec2020")}}},
             {"_", nil},
             {"Ignore File Primaries", ~toggleChromaticities, nil, isIgnoringChromaticies},
             {"Reset All Color", ~resetAllColorParameters, "shift Home", videoSourcesAndNodeExistState("RVColor")}
