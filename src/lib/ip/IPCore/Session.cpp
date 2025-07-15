@@ -4622,9 +4622,6 @@ namespace IPCore
 
         if (m_filterLiveReviewEvents
             && (eventName == "mode-manager-toggle-mode"
-                || (eventName == "toggle-draw-panel")
-                || (eventName == "set-annotation-hold")
-                || (eventName == "set-annotation-ghost")
                 || (eventName == "remote-eval"
                     && (contents == "commands.stop()"
                         || contents

@@ -22,6 +22,15 @@ class: DrawDockWidget : QDockWidget
         QDockWidget.QDockWidget("Draw", parent, Qt.Tool);
         _mode = m;
     }
+
+    method: closeEvent(void; QCloseEvent event)
+    {
+        _mode.toggle();
+
+        // Dont execute this event by OS. We dont want
+        // that Windows closes it.
+        event.ignore();
+    }
 }
 
 class: AnnotateMinorMode : MinorMode
@@ -69,10 +78,6 @@ class: AnnotateMinorMode : MinorMode
         float        minSize;
         int          startFrame;
         int          duration;
-        int          hold;
-        int          ghost;
-        int          ghostBefore;
-        int          ghostAfter;
         PressureMode pressureMode;
         DrawMode     eraserMode;
         DrawMode     penMode;
@@ -297,7 +302,7 @@ class: AnnotateMinorMode : MinorMode
         _autoMark         = b5;
         _linkToolColors   = b6;
 
-        let String name = readSetting("Annotate", "drawmode", String("Select"));
+        let String name = readSetting("Annotate", "drawmode", String("Pen"));
 
         for_each (d; _drawModes)
         {
@@ -399,11 +404,7 @@ class: AnnotateMinorMode : MinorMode
                      "%s.cap" % n,
                      "%s.points" % n,
                      "%s.startFrame" % n,
-                     "%s.duration" % n,
-                     "%s.hold" % n,
-                     "%s.ghost" % n,
-                     "%s.ghostBefore" % n,
-                     "%s.ghostAfter" % n
+                     "%s.duration" % n
                     ];
 
         beginCompoundStateChange();
@@ -433,18 +434,9 @@ class: AnnotateMinorMode : MinorMode
                        int cap,
                        int startFrame,
                        int duration,
-                       int hold,
-                       int ghost,
-                       int ghostBefore,
-                       int ghostAfter,
                        int mode=RenderOverMode,
                        int debug=0)
     {
-        if (_currentDrawMode eq _selectDrawMode)
-        {
-            return;
-        }
-
         let n          = newUniqueName(node, "pen", frame),
             colorName  = "%s.color" % n,
             widthName  = "%s.width" % n,
@@ -456,10 +448,6 @@ class: AnnotateMinorMode : MinorMode
             splatName  = "%s.splat" % n,
             startFrameName = "%s.startFrame" % n,
             durationName = "%s.duration" % n,
-            holdName = "%s.hold" % n,
-            ghostName = "%s.ghost" % n,
-            ghostBeforeName = "%s.ghostBefore" % n,
-            ghostAfterName = "%s.ghostAfter" % n,
             orderName  = frameOrderName(node, frame);
 
         beginCompoundStateChange();
@@ -473,10 +461,6 @@ class: AnnotateMinorMode : MinorMode
         newProperty(splatName, IntType, 1);
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
-        newProperty(holdName, IntType, 1);
-        newProperty(ghostName, IntType, 1);
-        newProperty(ghostBeforeName, IntType, 1);
-        newProperty(ghostAfterName, IntType, 1);
 
         if (mode != RenderOverMode)
         {
@@ -510,10 +494,6 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(splatName, int[] {if brush == "gauss" then 1 else 0}, true);
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
-        setIntProperty(holdName, int[] {hold}, true);
-        setIntProperty(ghostName, int[] {ghost}, true);
-        setIntProperty(ghostBeforeName, int[] {ghostBefore}, true);
-        setIntProperty(ghostAfterName, int[] {ghostAfter}, true);
 
         try
         {
@@ -571,10 +551,6 @@ class: AnnotateMinorMode : MinorMode
                      float rot,
                      int startFrame,
                      int duration,
-                     int hold,
-                     int ghost,
-                     int ghostBefore,
-                     int ghostAfter,
                      string font = "",
                      string origin = "",
                      int mode=RenderOverMode,
@@ -593,10 +569,6 @@ class: AnnotateMinorMode : MinorMode
             debugName   = "%s.debug" % n,
             startFrameName = "%s.startFrame" % n,
             durationName = "%s.duration" % n,
-            holdName = "%s.hold" % n,
-            ghostName = "%s.ghost" % n,
-            ghostBeforeName = "%s.ghostBefore" % n,
-            ghostAfterName = "%s.ghostAfter" % n,
             orderName   = frameOrderName(node, frame);
 
         beginCompoundStateChange();
@@ -612,10 +584,6 @@ class: AnnotateMinorMode : MinorMode
         newProperty(debugName, IntType, 1);
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
-        newProperty(holdName, IntType, 1);
-        newProperty(ghostName, IntType, 1);
-        newProperty(ghostBeforeName, IntType, 1);
-        newProperty(ghostAfterName, IntType, 1);
 
         if (mode != RenderOverMode)
         {
@@ -636,10 +604,6 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(debugName, int[] {debug}, true);
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
-        setIntProperty(holdName, int[] {hold}, true);
-        setIntProperty(ghostName, int[] {ghost}, true);
-        setIntProperty(ghostBeforeName, int[] {ghostBefore}, true);
-        setIntProperty(ghostAfterName, int[] {ghostAfter}, true);
 
         try
         {
@@ -816,10 +780,6 @@ class: AnnotateMinorMode : MinorMode
                                          0.0,
                                          _currentNodeInfo.frame,
                                          d.duration,
-                                         d.hold,
-                                         d.ghost,
-                                         d.ghostBefore,
-                                         d.ghostAfter,
                                          "", "", d.renderMode, _debug);
         }
         catch (exception exc)
@@ -914,12 +874,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
-        if (_currentDrawMode eq _selectDrawMode)
-        {
-            togglePlayVerbose(true);
-            return;
-        }
-
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
@@ -951,7 +905,7 @@ class: AnnotateMinorMode : MinorMode
             _currentDrawObject = newStroke(_currentNode,
                                            _currentNodeInfo.frame,
                                            incolor, twidth, d.brushName,
-                                           d.join, d.cap, _currentNodeInfo.frame, d.duration, d.hold, d.ghost, d.ghostBefore, d.ghostAfter, d.renderMode, _debug);
+                                           d.join, d.cap, _currentNodeInfo.frame, d.duration, d.renderMode, _debug);
         }
         catch (exception exc)
         {
@@ -965,11 +919,6 @@ class: AnnotateMinorMode : MinorMode
         // Init vars for drag filtering
         _dragLastPointer = ip;
         _dragLastMsec = int(QDateTime.currentMSecsSinceEpoch());
-
-        if (_currentDrawObject eq nil)
-        {
-            return;
-        }
 
         let pei = eventToImageSpace(name, ip, true);
 
@@ -1028,12 +977,6 @@ class: AnnotateMinorMode : MinorMode
             sendInternalEvent("live-review-blocked-event");
             return;
         }
-
-        if (_currentDrawMode eq _selectDrawMode)
-        {
-            return;
-        }
-
         let d = _currentDrawMode;
         _pointerGone = false;
 
@@ -1079,11 +1022,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: release (void; Event event)
     {
-        if (_currentDrawMode eq _selectDrawMode)
-        {
-            return;
-        }
-
         runtime.gc.enable();
         drag(event);
         _currentDrawObject = nil;
@@ -1185,72 +1123,6 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
-    method: setAnnotationHold (void; Event event)
-    {
-        let isHold = int(event.contents());
-
-        for_each (d; _drawModes)
-        {
-            d.hold = isHold;
-        }
-
-        if (_currentNode eq nil) return;
-
-        for_each(node; nodes())
-        {
-            for_each (prop; properties(node))
-            {
-                if (regex("\\.hold$").match(prop))
-                {
-                    setIntProperty(prop, int[] {isHold}, true);
-                }
-
-                if (regex("\\.duration$").match(prop) && isHold == 0)
-                {
-                    setIntProperty(prop, int[] {1}, true);
-                }
-            }
-        }
-    }
-    
-    method: setAnnotationGhost (void; Event event)
-    {
-        let isGhost = int(event.contents());
-
-        for_each (d; _drawModes)
-        {
-            d.ghost = isGhost;
-        }
-
-        if (_currentNode eq nil) return;
-
-        for_each(node; nodes())
-        {
-            for_each(prop; properties(node))
-            {
-                if (regex("\\.ghost$").match(prop))
-                {
-                    setIntProperty(prop, int[] {isGhost}, true);
-                }
-            }
-        }
-    }
-
-    method: toggleDrawPanel (void; Event event)
-    {
-        if (_drawDock neq nil)
-        {
-            if (_drawDock.visible())
-            {
-                _drawDock.hide();
-            }
-            else
-            {
-                _drawDock.show();
-            }
-        }
-    }
-
     method: auxFilePath (string; string icon)
     {
         io.path.join(supportPath("annotate_mode", "annotate"), icon);
@@ -1324,17 +1196,6 @@ class: AnnotateMinorMode : MinorMode
     method: topLevelChangedSlot (void; bool toplevel)
     {
         _topLevel = toplevel;
-    }
-
-    method: drawDockVisibilityChangedSlot (void; bool isVisible)
-    {
-        if (!isVisible)
-        {
-            _currentDrawMode = _selectDrawMode;
-            commands.setCursor(_currentDrawMode.cursor);
-            updateDrawModeUI();
-            _currentDrawMode.button.setChecked(true);
-        }
     }
 
     method: newSizeSlot (void; int value)
@@ -1539,10 +1400,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: autoMark (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
         return if _autoMark then CheckedMenuState else UncheckedMenuState;
     }
 
@@ -1809,6 +1666,16 @@ class: AnnotateMinorMode : MinorMode
 
     method: updateDrawModeUI (void;)
     {
+        if (_currentDrawMode eq _selectDrawMode)
+        {
+            _hideDrawPane = _hideDrawPane + 1;
+            if (_active) toggle();
+        }
+        else
+        {
+            if (!_active) toggle();
+            _hideDrawPane = 0;
+        }
 
         if (_activeSampleColor)
         {
@@ -1887,11 +1754,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: shutdown (void; Event event)
     {
-        _currentDrawMode = _selectDrawMode;
-        commands.setCursor(_currentDrawMode.cursor);
-        updateDrawModeUI();
-        _currentDrawMode.button.setChecked(true);
-
         if (_autoSave)
         {
             saveSettings();
@@ -2035,10 +1897,6 @@ class: AnnotateMinorMode : MinorMode
                                      SquareCap,
                                      1,
                                      1,
-                                     0,
-                                     0,
-                                     5,
-                                     5,
                                      0.024, 0.001,
                                      PressureMode.None };
 
@@ -2057,10 +1915,6 @@ class: AnnotateMinorMode : MinorMode
                                      0.024, 0.001,
                                      1,
                                      1,
-                                     0,
-                                     0,
-                                     5,
-                                     5,
                                      PressureMode.None };
 
         _textDrawMode  = DrawMode { "Text",
@@ -2078,10 +1932,6 @@ class: AnnotateMinorMode : MinorMode
                                      0.01, 0.0015,
                                      1,
                                      1,
-                                     0,
-                                     0,
-                                     5,
-                                     5,
                                      PressureMode.None };
 
         _penDrawMode = DrawMode { "Pen",
@@ -2099,10 +1949,6 @@ class: AnnotateMinorMode : MinorMode
                                   0.024, 0.001,
                                   1,
                                   1,
-                                  0,
-                                  0,
-                                  5,
-                                  5,
                                   defaultPMode };
 
 
@@ -2121,10 +1967,6 @@ class: AnnotateMinorMode : MinorMode
                                        0.044, 0.001,
                                        1,
                                        1,
-                                       0,
-                                       0,
-                                       5,
-                                       5,
                                        defaultPMode };
 
 
@@ -2144,10 +1986,6 @@ class: AnnotateMinorMode : MinorMode
                                         0.024, 0.001,
                                         1,
                                         1,
-                                        0,
-                                        0,
-                                        5,
-                                        5,
                                         PressureMode.None };
 
         _softEraseDrawMode = DrawMode { "Air Brush Erase",
@@ -2166,10 +2004,6 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        0,
-                                        0,
-                                        5,
-                                        5,
                                         PressureMode.None };
 
         _dodgeDrawMode     = DrawMode { "Dodge",
@@ -2187,10 +2021,6 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        0,
-                                        0,
-                                        5,
-                                        5,
                                         PressureMode.None,
                                         _hardEraseDrawMode,
                                         nil,
@@ -2212,10 +2042,6 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        0,
-                                        0,
-                                        5,
-                                        5,
                                         PressureMode.None,
                                         _hardEraseDrawMode,
                                         nil,
@@ -2237,10 +2063,6 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        0,
-                                        0,
-                                        5,
-                                        5,
                                         PressureMode.None };
 
         _smudgeDrawMode   = DrawMode { "Smudge",
@@ -2258,10 +2080,6 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        0,
-                                        0,
-                                        5,
-                                        5,
                                         PressureMode.None };
 
         _drawModes = DrawMode[] { _selectDrawMode, _penDrawMode, _airBrushDrawMode,
@@ -2291,11 +2109,7 @@ class: AnnotateMinorMode : MinorMode
             _dockArea = Qt.LeftDockWidgetArea;
         }
 
-        if (_currentDrawMode eq nil) 
-        {
-            _currentDrawMode = _selectDrawMode;
-            updateDrawModeUI();
-        }
+        if (_currentDrawMode eq nil) _currentDrawMode = _penDrawMode;
 
         for_each (d; _drawModes)
         {
@@ -2335,7 +2149,6 @@ class: AnnotateMinorMode : MinorMode
         connect(_sizeSlider, QAbstractSlider.valueChanged, newSizeSlot);
         connect(_drawDock, QDockWidget.dockLocationChanged, locationChangedSlot);
         connect(_drawDock, QDockWidget.topLevelChanged, topLevelChangedSlot);
-        connect(_drawDock, QDockWidget.visibilityChanged, drawDockVisibilityChangedSlot);
 
         connect(_colorButton, QPushButton.clicked, chooseColorSlot);
         connect(_colorDialog, QColorDialog.currentColorChanged, newColorSlot(,true,true));
@@ -2379,7 +2192,7 @@ class: AnnotateMinorMode : MinorMode
 
         _drawDock.setFloating(_topLevel);
 
-        _drawDock.hide();
+        _drawDock.show();
 
         //
         //  Force update of UI elements
@@ -2426,10 +2239,6 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("set-annotation-ghost", setAnnotationGhost, "Set Annotation Ghost Value"),
-              ("set-annotation-hold", setAnnotationHold, "Set Annotation"),
-              ("toggle-draw-panel", toggleDrawPanel, "Toggle Draw Panel"),
-              ("key-down--f10", toggleDrawPanel, "Toggle Draw Panel"),
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),
@@ -2553,11 +2362,32 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
+    method: deactivate (void;)
+    {
+        if (_hideDrawPane != 1)
+        {
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+
+        setCursor(CursorDefault);
+        removeTags();
+    }
+
+    method: activate (void;)
+    {
+        updateCurrentNode();
+        if (_manageDock neq nil) _manageDock.show();
+        if (_drawDock neq nil) _drawDock.show();
+        setCursor(_currentDrawMode.cursor);
+        updateDrawModeUI();
+        setTags();
+    }
 
     method: render (void; Event event)
     {
         if (_currentDrawMode eq _dropperDrawMode ||
-            _currentDrawMode eq _selectDrawMode ||
             !_showBrush ||
             _pointerGone)
         {

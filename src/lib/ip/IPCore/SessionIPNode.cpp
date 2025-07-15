@@ -25,6 +25,10 @@ namespace IPCore
         declareProperty<FloatProperty>("matte.opacity", 0.66f);
         declareProperty<FloatProperty>("matte.heightVisible", -1.0);
         declareProperty<Vec2fProperty>("matte.centerPoint", Vec2f(0.0, 0.0));
+        declareProperty<IntProperty>("paintEffects.hold", 0);
+        declareProperty<IntProperty>("paintEffects.ghost", 0);
+        declareProperty<IntProperty>("paintEffects.ghostBefore", 5);
+        declareProperty<IntProperty>("paintEffects.ghostAfter", 5);
         setMaxInputs(0);
 
         ImageRenderer::queryGLIntoContainer(this);
