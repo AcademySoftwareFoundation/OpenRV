@@ -8,8 +8,12 @@
 
 #include <IPCore/Session.h>
 
-#include <iostream>
-#include <sstream>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QString>
+
 #include <string>
 #include <vector>
 #include <type_traits>
@@ -26,7 +30,6 @@ namespace IPMu
             m_session = s;
             std::string parameters = pack(command, std::forward<Args>(args)...);
 
-            std::cout << "PAYLOAD: " << parameters << std::endl;
             m_session->userGenericEvent("generic-rv-command",
                                         parameters.c_str(), "");
 
@@ -41,156 +44,59 @@ namespace IPMu
         template <typename... Args>
         static std::string pack(const std::string& name, Args&&... args)
         {
-            std::ostringstream oss;
-            oss << "{\"name\":\"" << name << "\",\"args\":[";
+            QJsonObject obj;
+            obj["name"] = QString::fromStdString(name);
 
-            bool first = true;
-            ((oss << (first ? (first = false, "") : ",") << formatValue(args)),
-             ...);
+            QJsonArray argsArray;
+            (argsArray.append(toJson(args)), ...);
+            obj["args"] = argsArray;
 
-            oss << "]}";
-            return oss.str();
+            QJsonDocument doc(obj);
+            return doc.toJson(QJsonDocument::Compact).toStdString();
         }
 
     private:
         IPCore::Session* m_session;
 
-        // Format single values
-        static std::string formatValue(const std::string& val)
+        // Ultra-simple conversion - let Qt handle most of the work
+        template <typename T> static QJsonValue toJson(T&& val)
         {
-            return "\"" + escapeString(val) + "\"";
+            if constexpr (std::is_same_v<std::decay_t<T>, std::string>)
+            {
+                return QString::fromStdString(val);
+            }
+            else if constexpr (std::is_same_v<std::decay_t<T>, const char*>)
+            {
+                return QString(val);
+            }
+            else if constexpr (std::is_same_v<std::decay_t<T>, bool>)
+            {
+                return QJsonValue(val);
+            }
+            else if constexpr (std::is_integral_v<std::decay_t<T>>)
+            {
+                return QJsonValue(static_cast<qint64>(val));
+            }
+            else if constexpr (std::is_floating_point_v<std::decay_t<T>>)
+            {
+                return QJsonValue(static_cast<double>(val));
+            }
+            else
+            {
+                return vectorToJson(val);
+            }
         }
 
-        static std::string formatValue(const char* val)
-        {
-            return "\"" + escapeString(std::string(val)) + "\"";
-        }
-
-        static std::string formatValue(bool val)
-        {
-            return val ? "true" : "false";
-        }
-
-        // Template for all numeric types (int, float, double, etc.)
+        // Handle all vector types generically
         template <typename T>
-        static typename std::enable_if<std::is_arithmetic<T>::value
-                                           && !std::is_same<T, bool>::value,
-                                       std::string>::type
-        formatValue(T val)
+        static QJsonArray vectorToJson(const std::vector<T>& vec)
         {
-            return std::to_string(val);
-        }
-
-        // Format single-level arrays
-        static std::string formatValue(const std::vector<std::string>& val)
-        {
-            std::ostringstream oss;
-            oss << "[";
-            bool first = true;
-            for (const auto& item : val)
+            QJsonArray arr;
+            for (const auto& item : vec)
             {
-                oss << (first ? (first = false, "") : ",") << "\""
-                    << escapeString(item) << "\"";
+                arr.append(toJson(item));
             }
-            oss << "]";
-            return oss.str();
-        }
-
-        // Template for vectors of numeric types (int, float, double, etc.)
-        template <typename T>
-        static typename std::enable_if<std::is_arithmetic<T>::value
-                                           && !std::is_same<T, bool>::value,
-                                       std::string>::type
-        formatValue(const std::vector<T>& val)
-        {
-            std::ostringstream oss;
-            oss << "[";
-            bool first = true;
-            for (const auto& item : val)
-            {
-                oss << (first ? (first = false, "") : ",") << item;
-            }
-            oss << "]";
-            return oss.str();
-        }
-
-        static std::string formatValue(const std::vector<bool>& val)
-        {
-            std::ostringstream oss;
-            oss << "[";
-            bool first = true;
-            for (bool item : val)
-            { // Note: bool, not const auto& due to vector<bool> quirks
-                oss << (first ? (first = false, "") : ",")
-                    << (item ? "true" : "false");
-            }
-            oss << "]";
-            return oss.str();
-        }
-
-        // Format nested arrays
-        static std::string
-        formatValue(const std::vector<std::vector<std::string>>& val)
-        {
-            std::ostringstream oss;
-            oss << "[";
-            bool first = true;
-            for (const auto& innerVec : val)
-            {
-                oss << (first ? (first = false, "") : ",")
-                    << formatValue(innerVec);
-            }
-            oss << "]";
-            return oss.str();
-        }
-
-        // Template for nested vectors of numeric types
-        template <typename T>
-        static typename std::enable_if<std::is_arithmetic<T>::value
-                                           && !std::is_same<T, bool>::value,
-                                       std::string>::type
-        formatValue(const std::vector<std::vector<T>>& val)
-        {
-            std::ostringstream oss;
-            oss << "[";
-            bool first = true;
-            for (const auto& innerVec : val)
-            {
-                oss << (first ? (first = false, "") : ",")
-                    << formatValue(innerVec);
-            }
-            oss << "]";
-            return oss.str();
-        }
-
-        static std::string
-        formatValue(const std::vector<std::vector<bool>>& val)
-        {
-            std::ostringstream oss;
-            oss << "[";
-            bool first = true;
-            for (const auto& innerVec : val)
-            {
-                oss << (first ? (first = false, "") : ",")
-                    << formatValue(innerVec);
-            }
-            oss << "]";
-            return oss.str();
-        }
-
-        // Escape quotes and backslashes in strings
-        static std::string escapeString(const std::string& str)
-        {
-            std::string result;
-            for (char c : str)
-            {
-                if (c == '"' || c == '\\')
-                {
-                    result += '\\';
-                }
-                result += c;
-            }
-            return result;
+            return arr;
         }
     };
 } // namespace IPMu
