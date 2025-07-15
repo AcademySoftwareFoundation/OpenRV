@@ -1053,3 +1053,51 @@ void planarP416_to_planarYUV444P16(
         }
     }
 }
+
+//------------------------------------------------------------------------------
+// Converts packed format AYUV 64-bits (16 bits per channel) to planar YUVA 4444
+// 16-bits.
+//
+// Context: To optimize the following FFmpeg formats conversion which is
+// required for Apple ProRes decoding on macOS via VideoToolbox since the
+// sws_scale() performance for the same conversions was way too slow.
+//
+//  AV_PIX_FMT_AYUV64LE && dstFormat -> AV_PIX_FMT_YUVA444P16LE
+//
+// AV_PIX_FMT_AYUV64LE - packed AYUV 4:4:4:4, 64bpp, little-endian
+// AV_PIX_FMT_YUVA444P16LE - planar YUVA 4:4:4:4, 64bpp, (1 Cr & Cb sample per
+// 1x1 Y samples & A samples), little-endian
+//
+void packedAYUV64_to_planarYUVA16(
+    size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+    uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
+    size_t strideY, size_t strideCb, size_t strideCr, size_t strideA)
+{
+    uint16_t* FASTMEMCPYRESTRICT startOutY = outY;
+    uint16_t* FASTMEMCPYRESTRICT startOutCb = outCb;
+    uint16_t* FASTMEMCPYRESTRICT startOutCr = outCr;
+    uint16_t* FASTMEMCPYRESTRICT startOutA = outA;
+
+    for (size_t i = 0; i < height; ++i)
+    {
+        outY = startOutY + i * strideY / 2;
+        outCb = startOutCb + i * strideCb / 2;
+        outCr = startOutCr + i * strideCr / 2;
+        outA = startOutA + i * strideA / 2;
+
+        for (size_t i = 0; i < width; ++i)
+        {
+            *outCr = (*inBuf & 0xFFFF000000000000) >> 48;
+            *outCb = (*inBuf & 0x0000FFFF00000000) >> 32;
+            *outY = (*inBuf & 0x00000000FFFF0000) >> 16;
+            *outA = (*inBuf & 0x000000000000FFFF);
+
+            ++outCr;
+            ++outCb;
+            ++outY;
+            ++outA;
+            ++inBuf;
+        }
+    }
+}
