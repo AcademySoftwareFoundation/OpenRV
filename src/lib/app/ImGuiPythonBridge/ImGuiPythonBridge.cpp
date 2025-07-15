@@ -61,5 +61,4 @@ namespace Rv
         s_callbacks.clear();
         // CAll DECREF for each element if we're not using the deleter for this?
     }
-
 } // namespace Rv
