@@ -1418,7 +1418,7 @@ namespace Rv
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
                                               allFilesAndOptions, tag);
 
         // Now that we've broadcast the remote event, complete the work without
