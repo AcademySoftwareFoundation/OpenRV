@@ -2075,6 +2075,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleWipe (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
     let vnode = viewNode();
 
@@ -2263,6 +2268,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: wipeShown (int;)
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     State state = data();
     let vnode = viewNode();
 
