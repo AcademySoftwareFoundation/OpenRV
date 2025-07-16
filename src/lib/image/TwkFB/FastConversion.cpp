@@ -12,6 +12,7 @@
 #include <TwkUtil/sgcHop.h>
 
 #include <algorithm>
+#include <cstdint>
 
 using namespace ILMTHREAD_NAMESPACE;
 
@@ -1055,8 +1056,8 @@ void planarP416_to_planarYUV444P16(
 }
 
 //------------------------------------------------------------------------------
-// Converts packed format AYUV 64-bits (16 bits per channel) to planar YUVA 4444
-// 16-bits.
+// Converts packed format AYUV 64-bits (16 bits per components) to planar YUVA
+// 4444 16-bits.
 //
 // Context: To optimize the following FFmpeg formats conversion which is
 // required for Apple ProRes decoding on macOS via VideoToolbox since the
@@ -1068,36 +1069,31 @@ void planarP416_to_planarYUV444P16(
 // AV_PIX_FMT_YUVA444P16LE - planar YUVA 4:4:4:4, 64bpp, (1 Cr & Cb sample per
 // 1x1 Y samples & A samples), little-endian
 //
-void packedAYUV64_to_planarYUVA16(
-    size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-    uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-    size_t strideY, size_t strideCb, size_t strideCr, size_t strideA)
+void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height,
+                                  const uint8_t* const inBuf,
+                                  std::uint16_t* outY, std::uint16_t* outCb,
+                                  std::uint16_t* outCr, std::uint16_t* outA)
 {
-    uint16_t* FASTMEMCPYRESTRICT startOutY = outY;
-    uint16_t* FASTMEMCPYRESTRICT startOutCb = outCb;
-    uint16_t* FASTMEMCPYRESTRICT startOutCr = outCr;
-    uint16_t* FASTMEMCPYRESTRICT startOutA = outA;
+#pragma pack(push, 1)
 
-    for (size_t i = 0; i < height; ++i)
+    struct components
     {
-        outY = startOutY + i * strideY / 2;
-        outCb = startOutCb + i * strideCb / 2;
-        outCr = startOutCr + i * strideCr / 2;
-        outA = startOutA + i * strideA / 2;
+        std::uint16_t A;
+        std::uint16_t Y;
+        std::uint16_t Cb;
+        std::uint16_t Cr;
+    };
 
-        for (size_t i = 0; i < width; ++i)
-        {
-            *outCr = (*inBuf & 0xFFFF000000000000) >> 48;
-            *outCb = (*inBuf & 0x0000FFFF00000000) >> 32;
-            *outY = (*inBuf & 0x00000000FFFF0000) >> 16;
-            *outA = (*inBuf & 0x000000000000FFFF);
+#pragma pack(pop)
 
-            ++outCr;
-            ++outCb;
-            ++outY;
-            ++outA;
-            ++inBuf;
-        }
+    const auto* pixelsBuf = reinterpret_cast<const components*>(inBuf);
+
+    std::size_t pixelCount = width * height;
+    for (std::size_t i = 0; i < pixelCount; ++i)
+    {
+        outA[i] = pixelsBuf[i].A;
+        outY[i] = pixelsBuf[i].Y;
+        outCb[i] = pixelsBuf[i].Cb;
+        outCr[i] = pixelsBuf[i].Cr;
     }
 }

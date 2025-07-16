@@ -10,6 +10,7 @@
 #define __TwkFB__FastConversion__h__
 
 #include <TwkFB/dll_defs.h>
+#include <cstdint>
 
 #ifdef __cplusplus
 extern "C"
@@ -167,10 +168,8 @@ extern "C"
     /// @param strideA The stride of the output channel buffer of the A
     /// component in bytes.
     TWKFB_EXPORT void packedAYUV64_to_planarYUVA16(
-        size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-        size_t strideY, size_t strideCb, size_t strideCr, size_t strideA);
+        size_t width, size_t height, const uint8_t* inBuf, uint16_t* outY,
+        uint16_t* outCb, uint16_t* outCr, uint16_t* outA);
 
     /// @brief Converts packed UYVY 16-bits to planar YUV 16-bits.
     ///

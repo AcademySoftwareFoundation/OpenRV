@@ -3073,23 +3073,13 @@ namespace TwkMovie
 
         if (isProRes4444WithAlpha)
         {
-            const auto* srcAYUV =
-                reinterpret_cast<const uint64_t*>(srcFrame->data[0]);
-            const size_t srcStride = srcFrame->linesize[0];
+            auto* dstY = reinterpret_cast<std::uint16_t*>(dstFrame->data[0]);
+            auto* dstCb = reinterpret_cast<std::uint16_t*>(dstFrame->data[1]);
+            auto* dstCr = reinterpret_cast<std::uint16_t*>(dstFrame->data[2]);
+            auto* dstA = reinterpret_cast<std::uint16_t*>(dstFrame->data[3]);
 
-            auto* dstY = reinterpret_cast<uint16_t*>(dstFrame->data[0]);
-            auto* dstCb = reinterpret_cast<uint16_t*>(dstFrame->data[1]);
-            auto* dstCr = reinterpret_cast<uint16_t*>(dstFrame->data[2]);
-            auto* dstA = reinterpret_cast<uint16_t*>(dstFrame->data[3]);
-
-            const size_t dstStrideY = dstFrame->linesize[0];
-            const size_t dstStrideCb = dstFrame->linesize[1];
-            const size_t dstStrideCr = dstFrame->linesize[2];
-            const size_t dstStrideA = dstFrame->linesize[3];
-
-            packedAYUV64_to_planarYUVA16(width, height, srcAYUV, dstY, dstCb,
-                                         dstCr, dstA, dstStrideY, dstStrideCb,
-                                         dstStrideCr, dstStrideA);
+            packedAYUV64_to_planarYUVA16(width, height, srcFrame->data[0], dstY,
+                                         dstCb, dstCr, dstA);
             return;
         }
 #endif
