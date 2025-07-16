@@ -161,6 +161,7 @@ namespace Rv
         a = addAction("");
         a->setIcon(QIcon(":/images/ghost.png"));
         a->setToolTip("Ghost");
+        a->setCheckable(true);
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -180,6 +181,7 @@ namespace Rv
         a = addAction("");
         a->setIcon(QIcon(":/images/hold.png"));
         a->setToolTip("Hold");
+        a->setCheckable(true);
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -485,11 +487,35 @@ namespace Rv
             {
                 bool isChecked = (contents == "1");
                 m_ghostAction->setChecked(isChecked);
+
+                if (m_session->filterLiveReviewEvents())
+                {
+                    m_ghostAction->setDisabled(true);
+                }
             }
             else if (name == "update-hold-button")
             {
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
+
+                if (m_session->filterLiveReviewEvents())
+                {
+                    m_holdAction->setDisabled(true);
+                }
+            }
+            else if (name == "internal-sync-presenter-changed"
+                     || name == "sync-session-ended")
+            {
+                if (m_session->filterLiveReviewEvents())
+                {
+                    m_holdAction->setDisabled(true);
+                    m_ghostAction->setDisabled(true);
+                }
+                else
+                {
+                    m_holdAction->setDisabled(false);
+                    m_ghostAction->setDisabled(false);
+                }
             }
         }
 
@@ -534,14 +560,6 @@ namespace Rv
 
     void RvBottomViewToolBar::ghostTriggered(bool isChecked)
     {
-        if (m_session->filterLiveReviewEvents())
-        {
-            m_session->userGenericEvent("live-review-blocked-event", "");
-            return;
-        }
-
-        m_ghostAction->setCheckable(true);
-
         auto* sessionNode = m_session->graph().sessionNode();
         if (sessionNode != nullptr)
         {
@@ -555,14 +573,6 @@ namespace Rv
 
     void RvBottomViewToolBar::holdTriggered(bool isChecked)
     {
-        if (m_session->filterLiveReviewEvents())
-        {
-            m_session->userGenericEvent("live-review-blocked-event", "");
-            return;
-        }
-
-        m_holdAction->setCheckable(true);
-
         auto* sessionNode = m_session->graph().sessionNode();
         if (sessionNode != nullptr)
         {
