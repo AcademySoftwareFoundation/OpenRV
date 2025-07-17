@@ -1991,6 +1991,10 @@ namespace TwkMovie
                 transfer << "SMPTE-2084 (16)";
                 track->fb.setTransferFunction(ColorSpace::SMPTE2084());
                 break;
+            case AVCOL_TRC_ARIB_STD_B67: // = 18
+                transfer << "ARIB STD-B67 (18)";
+                track->fb.setTransferFunction(ColorSpace::HybridLogGamma());
+                break;
             default:
                 transfer << "UNKNOWN (" << videoCodecContext->color_trc << ")";
                 break;

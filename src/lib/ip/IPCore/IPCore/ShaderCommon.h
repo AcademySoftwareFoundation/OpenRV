@@ -111,6 +111,7 @@ namespace IPCore
                                      const float);
 
         Expression* newColorOutOfRange(Expression*);
+        Expression* newColorHLGToLinear(Expression*);
         Expression* newColorSRGBToLinear(Expression*);
         Expression* newColorRec709ToLinear(Expression*);
         Expression* newColorSMPTE240MToLinear(Expression*);
@@ -153,6 +154,7 @@ namespace IPCore
         Expression* newColorPremult(Expression*);
         Expression* newColorPremultLight(Expression*);
         Expression* newColorUnpremult(Expression*);
+        Expression* newColorLinearToHLG(Expression*);
         Expression* newColorLinearToSRGB(Expression*);
         Expression* newColorLinearToRec709(Expression*);
         Expression* newColorLinearToSMPTE240M(Expression*);

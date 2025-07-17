@@ -130,6 +130,7 @@ namespace TwkFB
         TWKFB_EXPORT std::string SMPTE_C();      // SMPTE-C
         TWKFB_EXPORT std::string SMPTE240M();    // SMPTE-240M
         TWKFB_EXPORT std::string SMPTE2084();    // SMPTE-2084
+        TWKFB_EXPORT std::string HybridLogGamma(); // ARIB STD-B67
         TWKFB_EXPORT std::string CineonLog();    // Cineon/DPX Log
         TWKFB_EXPORT std::string ArriLogC();     // ARRI LogC
         TWKFB_EXPORT std::string ArriLogCFilm(); // ARRI LogC Film

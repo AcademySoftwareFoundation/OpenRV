@@ -71,6 +71,7 @@ extern const char* SourcePlanarYAC2Uncrop_glsl;
 extern const char* ColorCurve_glsl;
 extern const char* ColorShadow_glsl;
 extern const char* ColorHighlight_glsl;
+extern const char* ColorHLGLinear_glsl;
 extern const char* ColorVibrance_glsl;
 extern const char* ColorLinearGray_glsl;
 extern const char* ColorTemperatureOffset_glsl;
@@ -88,6 +89,7 @@ extern const char* ColorCineonLogLinear_glsl;
 extern const char* ColorLinearCineonLog_glsl;
 extern const char* ColorCineonSoftClipLogLinear_glsl;
 extern const char* ColorLogCLinear_glsl;
+extern const char* ColorLinearHLG_glsl;
 extern const char* ColorLinearLogC_glsl;
 extern const char* ColorLinearSMPTE240M_glsl;
 extern const char* ColorLinearSMPTE2084_glsl;
@@ -285,6 +287,8 @@ namespace IPCore
         static Function* Shader_ColorCineonLogLinear = 0;
         static Function* Shader_ColorLinearCineonLog = 0;
         static Function* Shader_ColorCineonSoftClipLogLinear = 0;
+        static Function* Shader_ColorHLGLinear = 0;
+        static Function* Shader_ColorLinearHLG = 0;
         static Function* Shader_ColorLogCLinear = 0;
         static Function* Shader_ColorLinearLogC = 0;
         static Function* Shader_ColorViperLogLinear = 0;
@@ -1564,6 +1568,34 @@ namespace IPCore
             }
 
             return Shader_ColorLinearGray;
+        }
+
+        Function* colorHLGToLinear()
+        {
+            if (!Shader_ColorHLGLinear)
+            {
+                SymbolVector params, globals;
+                params.push_back(P());
+                Shader_ColorHLGLinear = new Shader::Function(
+                    "ColorHLGLinear", ColorHLGLinear_glsl,
+                    Shader::Function::Color, params, globals);
+            }
+
+            return Shader_ColorHLGLinear;
+        }
+
+        Function* colorLinearToHLG()
+        {
+            if (!Shader_ColorLinearHLG)
+            {
+                SymbolVector params, globals;
+                params.push_back(P());
+                Shader_ColorLinearHLG = new Shader::Function(
+                    "ColorLinearHLG", ColorLinearHLG_glsl,
+                    Shader::Function::Color, params, globals);
+            }
+
+            return Shader_ColorLinearHLG;
         }
 
         Function* colorSRGBToLinear()
@@ -3374,6 +3406,50 @@ namespace IPCore
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], FA);
             return new Expression(F, args, FA->image());
+        }
+
+        Expression* newColorHLGToLinear(Expression* FA)
+        {
+            if (FA->function() == colorLinearToHLG())
+            {
+                Expression* fexpr =
+                    static_cast<const BoundExpression*>(FA->arguments()[0])
+                        ->value()
+                        ->copy();
+                delete FA;
+                return fexpr;
+            }
+            else
+            {
+                const Function* F = colorHLGToLinear();
+                ArgumentVector args(F->parameters().size());
+                size_t i = 0;
+                args[i] = new BoundExpression(F->parameters()[i], FA);
+                i++;
+                return new Expression(F, args, FA->image());
+            }
+        }
+
+        Expression* newColorLinearToHLG(Expression* FA)
+        {
+            if (FA->function() == colorHLGToLinear())
+            {
+                Expression* fexpr =
+                    static_cast<const BoundExpression*>(FA->arguments()[0])
+                        ->value()
+                        ->copy();
+                delete FA;
+                return fexpr;
+            }
+            else
+            {
+                const Function* F = colorLinearToHLG();
+                ArgumentVector args(F->parameters().size());
+                size_t i = 0;
+                args[i] = new BoundExpression(F->parameters()[i], FA);
+                i++;
+                return new Expression(F, args, FA->image());
+            }
         }
 
         Expression* newColorLogCLinear(Expression* FA, float pbs, float eo,

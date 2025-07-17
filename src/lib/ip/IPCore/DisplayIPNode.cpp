@@ -242,6 +242,10 @@ namespace IPCore
                 {
                      i->shaderExpr = Shader::newColorLinearToSMPTE2084(i->shaderExpr);
                 }
+                else if (overrideColorspace == TwkFB::ColorSpace::HybridLogGamma())
+                {
+                     i->shaderExpr = Shader::newColorLinearToHLG(i->shaderExpr);
+                }
                 else if (overrideColorspace == TwkFB::ColorSpace::Linear())
                 {
                     ; //  If "Linear", do nothing

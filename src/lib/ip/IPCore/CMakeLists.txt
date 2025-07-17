@@ -116,6 +116,8 @@ SET(_shaders
     ColorLinearSMPTE240M
     ColorSMPTE2084Linear
     ColorLinearSMPTE2084
+    ColorHLGLinear
+    ColorLinearHLG
     ColorLuminanceLUT
     ColorOutOfRange
     InlineBoxResize
