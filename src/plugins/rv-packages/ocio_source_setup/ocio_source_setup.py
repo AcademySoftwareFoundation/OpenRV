@@ -186,8 +186,13 @@ def ocioDisplayEvent(group, display, view):
         groupName = "RVDisplayPipelineGroup"
         dpipeline = groupMemberOfType(group, groupName)
         dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
+        # Both 'display' and 'view' must be set together.
+        # Disable the OCIONode during display/view propety changes.
+        # Prevents node from rebuilding shaders while it may be in an invalid state.
+        commands.setIntProperty(dOCIO + ".ocio.active", [0], True)
         commands.setStringProperty(dOCIO + ".ocio_display.display", [display], True)
         commands.setStringProperty(dOCIO + ".ocio_display.view", [view], True)
+        commands.setIntProperty(dOCIO + ".ocio.active", [1], True)
         commands.redraw()
 
     return F
