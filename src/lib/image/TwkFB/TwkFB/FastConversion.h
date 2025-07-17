@@ -10,6 +10,7 @@
 #define __TwkFB__FastConversion__h__
 
 #include <TwkFB/dll_defs.h>
+#include <cstdint>
 
 #ifdef __cplusplus
 extern "C"
@@ -147,6 +148,28 @@ extern "C"
         size_t inStrideCbCr, uint16_t* FASTMEMCPYRESTRICT outY,
         uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr,
         size_t outStrideY, size_t outStrideCb, size_t outStrideCr);
+
+    /// @brief Converts packed AYUV 64-bits (16 bits per channel) to planar YUVA
+    /// 16-bits.
+    ///
+    /// @param width The number of bytes per row.
+    /// @param height The number of rows.
+    /// @param inBuf The input buffer.
+    /// @param outY The output channel buffer of the Y component.
+    /// @param outCb The output channel buffer of the Cb component.
+    /// @param outCr The output channel buffer of the Cr component.
+    /// @param outA The output channel buffer of the A component.
+    /// @param strideY The stride of the output channel buffer of the Y
+    /// component in bytes.
+    /// @param strideCb The stride of the output channel buffer of the Cb
+    /// component in bytes.
+    /// @param strideCr The stride of the output channel buffer of the Cr
+    /// component in bytes.
+    /// @param strideA The stride of the output channel buffer of the A
+    /// component in bytes.
+    TWKFB_EXPORT void packedAYUV64_to_planarYUVA16(
+        size_t width, size_t height, const uint8_t* inBuf, uint16_t* outY,
+        uint16_t* outCb, uint16_t* outCr, uint16_t* outA);
 
     /// @brief Converts packed UYVY 16-bits to planar YUV 16-bits.
     ///
