@@ -12,10 +12,12 @@
 #include <OCIONodes/OCIO3DLUT.h>
 #include <IPCore/SessionIPNode.h>
 #include <IPCore/NodeDefinition.h>
+#include <IPCore/DispTransform2DIPNode.h>
 #include <IPCore/IPGraph.h>
 #include <IPCore/ShaderCommon.h>
 #include <TwkExc/Exception.h>
 #include <TwkUtil/EnvVar.h>
+#include <TwkMath/MatrixColor.h>
 
 #include <boost/functional/hash.hpp>
 
@@ -28,6 +30,7 @@ namespace IPCore
 {
     using namespace std;
     using namespace boost;
+    using namespace TwkMath;
 
     // In the eventualy of an RV user wanting to get the exact same results
     // as in RV 2024 and earlier versions of RV, the following environment
@@ -115,6 +118,10 @@ namespace IPCore
 
         declareProperty<StringProperty>("ocio_display.display", "");
         declareProperty<StringProperty>("ocio_display.view", "");
+
+        m_dither = declareProperty<IntProperty>("color.dither", 0);
+        m_channelOrder = declareProperty<StringProperty>("color.channelOrder", "RGBA");
+        m_channelFlood = declareProperty<IntProperty>("color.channelFlood", 0);
 
         if (func == "synlinearize")
         {
@@ -650,6 +657,10 @@ namespace IPCore
             || !m_state->function)
             return image;
 
+        string order = propertyValue(m_channelOrder, "");
+        int flood = propertyValue(m_channelFlood, 0);
+        int dither = propertyValue(m_dither, 0);
+        size_t seed = context.frame + DispTransform2DIPNode::transformHash();
         string ociofunction = stringProp("ocio.function", "color");
 
         //
@@ -729,6 +740,91 @@ namespace IPCore
             }
 
             expr = new Shader::Expression(F, args, image);
+
+            if (ociofunction == "display")
+            {
+
+                // Handle channel reording and flooding
+                Mat44f Ca;
+                if (order != "")
+                {
+                    Mat44f M(0.0);
+
+                    for (int i = 0; i < order.size() && i < 4; i++)
+                    {
+                        switch (order[i])
+                        {
+                        case 'R':
+                            M(i, 0) = 1.0;
+                            break;
+                        case 'G':
+                            M(i, 1) = 1.0;
+                            break;
+                        case 'B':
+                            M(i, 2) = 1.0;
+                            break;
+                        case 'A':
+                            M(i, 3) = 1.0;
+                            break;
+                        case '1':
+                            M(i, 0) = 1.0, M(i, 1) = 1.0, M(i, 2) = 1.0, M(i, 3) = 1.0;
+                            break;
+                        default:
+                        case '0':
+                            M(i, 0) = 0.0, M(i, 1) = 0.0, M(i, 2) = 0.0, M(i, 3) = 0.0;
+                            break;
+                        }
+                    }
+
+                    Ca = M * Ca;
+                }
+
+                if (flood != 0)
+                {
+                    int ch = flood;
+
+                    Mat44f M = Rec709FullRangeRGBToYUV8<float>();
+                    const float rw709 = M.m00;
+                    const float gw709 = M.m01;
+                    const float bw709 = M.m02;
+
+                    Mat44f F;
+
+                    switch (ch)
+                    {
+                    case 1:
+                        F = Mat44f(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1);
+                        break;
+                    case 2:
+                        F = Mat44f(0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1);
+                        break;
+                    case 3:
+                        F = Mat44f(0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+                        break;
+                    case 4:
+                        F = Mat44f(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+                        break;
+                    case 5:
+                        F = Mat44f(rw709, gw709, bw709, 0, rw709, gw709, bw709, 0,
+                                rw709, gw709, bw709, 0, 0, 0, 0, 1);
+                        break;
+                    default:
+                        // nothing
+                        break;
+                    }
+                    Ca = F * Ca;
+                }
+
+                if (Ca != Mat44f())
+                {
+                    expr = Shader::newColorMatrix4D(expr, Ca);
+                }
+
+                if (dither > 0)
+                {
+                    expr = Shader::newDither(image, expr, dither, seed);
+                }
+            }
 
             if (ociofunction == "display" && image->shaderExpr)
             {

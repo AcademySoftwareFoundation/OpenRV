@@ -1051,6 +1051,10 @@ namespace Rv
                                .arg(w->model())
                                .arg(w->name());
 
+            if (name.trimmed().isEmpty()) {
+                name = QString("Screen %1").arg(screen);
+            }
+
             DesktopVideoDevice* sd = new DesktopVideoDevice(
                 module, name.toUtf8().constData(), screen, shareDevice);
 
