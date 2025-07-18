@@ -91,7 +91,7 @@ SET_PROPERTY(
 
 # Supported FFmpeg versions.
 SET(RV_FFMPEG_SUPPORTED_OPTIONS
-    6 7 7_2
+    6 7 MASTER
 )
 # Default option
 SET(_RV_FFMPEG

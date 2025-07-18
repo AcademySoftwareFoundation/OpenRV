@@ -23,13 +23,13 @@ SET(_target
     "RV_DEPS_FFMPEG"
 )
 
-IF(RV_FFMPEG_7_2)
+IF(RV_FFMPEG_MASTER)
   SET(_version
-      "n7.2"
+      "master"
   )
 
   SET(_download_hash
-      "a7a85ec05c9bc3aeefee12743899d8ab"
+      ""
   )
 ELSEIF(RV_FFMPEG_7)
   SET(_version
@@ -55,6 +55,14 @@ ENDIF()
 SET(_download_url
     "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/${_version}.zip"
 )
+
+IF(RV_FFMPEG_MASTER)
+SET(_download_url
+    "https://github.com/FFmpeg/FFmpeg/archive/master.zip"
+)
+ENDIF()
+
+
 
 SET(_base_dir
     ${RV_DEPS_BASE_DIR}/${_target}
@@ -87,7 +95,7 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_FFMPEG_7_2)
+IF(RV_FFMPEG_MASTER)
   IF(RV_TARGET_DARWIN)
     SET(_ffmpeg_avutil_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.60${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -447,9 +455,9 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   INSTALL_DIR ${_install_dir}
-  GIT_REPOSITORY https://github.com/ffmpeg/ffmpeg.git
-  #URL ${_download_url}
-  #URL_MD5 ${_download_hash}
+  #GIT_REPOSITORY https://github.com/ffmpeg/ffmpeg.git
+  URL ${_download_url}
+  URL_MD5 ${_download_hash}
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   PATCH_COMMAND ${RV_FFMPEG_PATCH_COMMAND_STEP}
   CONFIGURE_COMMAND
