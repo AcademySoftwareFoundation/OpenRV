@@ -161,6 +161,7 @@ namespace Rv
         a = addAction("");
         a->setIcon(QIcon(":/images/ghost.png"));
         a->setToolTip("Ghost");
+        a->setCheckable(true);
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -180,6 +181,7 @@ namespace Rv
         a = addAction("");
         a->setIcon(QIcon(":/images/hold.png"));
         a->setToolTip("Hold");
+        a->setCheckable(true);
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
