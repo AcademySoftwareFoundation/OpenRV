@@ -126,6 +126,7 @@ namespace Rv
         void dither10();
 
         bool hasStandardDisplayPipeline();
+        bool hasOCIODisplayPipeline();
 
     private:
         void updateActionToolButton(QAction* action, const std::string& text,
