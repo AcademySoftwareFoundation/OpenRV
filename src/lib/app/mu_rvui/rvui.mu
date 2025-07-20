@@ -925,6 +925,22 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
     };
 }
 
+\: checkForDisplayNode (MenuStateFunc;)
+{
+    \: (int;)
+    {
+        if (metaEvaluateClosestByType(frame(),"OCIODisplay").size() > 0)
+        {
+            return UncheckedMenuState;
+        }
+        if (metaEvaluateClosestByType(frame(),"RVDisplayColor").size() > 0)
+        {
+            return UncheckedMenuState;
+        }
+        return DisabledMenuState;
+    };
+}
+
 \: checkForOTIOFile (MenuStateFunc;)
 {
     \: (int;)
@@ -941,8 +957,15 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
     {
         try
         {
-            return if getIntProperty("@RVDisplayColor.color.channelFlood").front() == ch
-                then CheckedMenuState else UncheckedMenuState;
+            string propertyName = "@OCIODisplay.color.channelFlood";
+            if (!propertyExists(propertyName))
+            {
+                propertyName = "@RVDisplayColor.color.channelFlood";
+            }
+
+            return if getIntProperty(propertyName).front() == ch
+                    then CheckedMenuState else UncheckedMenuState;
+
         }
         catch (...)
         {
@@ -957,14 +980,14 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
     {
         try
         {
-            if (getStringProperty("@RVDisplayColor.color.channelOrder").front() == order)
+            string propertyName = "@OCIODisplay.color.channelOrder";
+            if (!propertyExists(propertyName))
             {
-                return CheckedMenuState;
+                propertyName = "@RVDisplayColor.color.channelOrder";
             }
-            else
-            {
-                return UncheckedMenuState;
-            }
+
+            return if getStringProperty(propertyName).front() == order
+                    then CheckedMenuState else UncheckedMenuState;
         }
         catch (...)
         {
@@ -1262,8 +1285,14 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: orderPrompt (string;)
 {
+    string propertyName = "@OCIODisplay.color.channelOrder";
+    if (!propertyExists(propertyName))
+    {
+        propertyName = "@RVDisplayColor.color.channelOrder";
+    }
+
     "Enter Channel Order [%s]: " %
-        getStringProperty("@RVDisplayColor.color.channelOrder").back();
+        getStringProperty(propertyName).back();
 }
 
 \: pixaPrompt (string;)
@@ -1345,7 +1374,13 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setOrderValue (void; string order)
 {
-    setStringProperty("@RVDisplayColor.color.channelOrder", string[]{order});
+    string propertyName = "OCIODisplay.color.channelOrder";
+    if (!propertyExists("@%s" % propertyName))
+    {
+        propertyName = "RVDisplayColor.color.channelOrder";
+    }
+    
+    setStringProperty("#%s" % propertyName, string[]{order});
 }
 
 \: setPixaValue (void; string v)
@@ -2905,9 +2940,16 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (void;)
     {
         State state = data();
-        let v = getIntProperty("@RVDisplayColor.color.channelFlood").front();
+
+        string propertyName = "OCIODisplay.color.channelFlood";
+        if (!propertyExists("@%s" % propertyName))
+        {
+            propertyName = "RVDisplayColor.color.channelFlood";
+        }
+
+        let v = getIntProperty("@%s" % propertyName).front();
         let nch = if v == ch then 0 else ch;
-        setIntProperty("#RVDisplayColor.color.channelFlood", int[] {nch});
+        setIntProperty("#%s" % propertyName, int[] {nch});
         let (name, glyphFunc) = showChannelGlyphs[nch];
         displayFeedback(name, 2, glyphFunc);
         redraw();
@@ -2919,9 +2961,14 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (void;)
     {
         State state = data();
-        string chtext;
 
-        setStringProperty("@RVDisplayColor.color.channelOrder", string[] {order});
+        string propertyName = "OCIODisplay.color.channelOrder";
+        if (!propertyExists("@%s" % propertyName))
+        {
+            propertyName = "RVDisplayColor.color.channelOrder";
+        }
+
+        setStringProperty("#%s" % propertyName, string[] {order});
         displayFeedback("Channel Order => %s" % order);
         redraw();
     };
@@ -3146,7 +3193,13 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setDither (void; Event event, int bits)
 {
-    set("@RVDisplayColor.color.dither", bits);
+    string propertyName = "@OCIODisplay.color.dither";
+    if (!propertyExists(propertyName))
+    {
+        propertyName = "@RVDisplayColor.color.dither";
+    }
+
+    set(propertyName, bits);
     redraw();
 }
 
@@ -3155,8 +3208,14 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (int;)
     {
         try
-        {
-            let p = getIntProperty("@RVDisplayColor.color.dither").front();
+    {
+            string propertyName = "@OCIODisplay.color.dither";
+            if (!propertyExists(propertyName))
+            {
+                propertyName = "@RVDisplayColor.color.dither";
+            }
+
+            let p = getIntProperty(propertyName).front();
             return if p == bits then CheckedMenuState else UncheckedMenuState;
         }
         catch (...)
@@ -4773,9 +4832,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: drawFeedback (void; Event event)
 {
     State state = data();
-    gltext.size(20);
 
     if (state.feedbackText eq nil) return;
+
+    let devicePixelRatio = devicePixelRatio(),
+        textsize = 20 * devicePixelRatio;
+    gltext.size(textsize);
 
     let d  = event.domain(),
         w  = d.x,
@@ -4796,8 +4858,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     let m = margins();
-    drawTextWithCartouche(m[0] + 20, h-20-sb[3] - m[2], state.feedbackText,
-                          20, fg, bg,
+    drawTextWithCartouche(m[0]*devicePixelRatio + textsize,
+                          h-textsize-sb[3] - m[2]*devicePixelRatio,
+                          state.feedbackText,
+                          textsize, fg, bg,
                           state.feedbackGlyph, gc);
     glDisable(GL_BLEND);
 
@@ -4900,7 +4964,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         attrs    = getCurrentAttributes(),
         srcs     = sources(),
         noAttrs  = attrs == nil || attrs.empty(),
-        textsize = 20,
+        textsize = 20 * devicePixelRatio(),
         colorscl = 0.75,
         fstatus  = currentFrameStatus();
 
@@ -5993,7 +6057,7 @@ global bool debugGC = false;
         {"Channel Order", Menu {
             {"RGBA", ~channelOrder("RGBA"), nil, channelOrderState("RGBA")},
             {"_", nil},
-            {"Custom...", enterOrder, nil, checkForDisplayColor()},
+            {"Custom...", enterOrder, nil, checkForDisplayNode()},
             {"_", nil},
             {"RBGA", ~channelOrder("RBGA"), nil, channelOrderState("RBGA")},
             {"GBRA", ~channelOrder("GBRA"), nil, channelOrderState("GBRA")},
