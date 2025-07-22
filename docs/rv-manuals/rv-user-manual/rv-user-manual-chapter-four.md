@@ -18,31 +18,47 @@ Table 4.1: RV on Linux and on macOS.
 
 ### 4.1 Feedback
 
-
 RV provides feedback about its current state near the top left corner of the window.
 
 ![6_rv_rv-cxx98-release_feedback.jpg](../../images/rv-user-manual-6-rv-cxx98-release-feedback-05.jpg)  
 
 Figure 4.1: Feedback widget indicating full-color display
 
-### 4.2 Main Window Tool Bars
+### 4.2 Main Window Toolbars
 
+The main RV window contains two toolbars that are visible by default:
 
-The main RV window has two toolbars which are visible by default. The upper toolbar controls which view is displayed, viewing options, and current display device settings. The lower toolbar control play back, has tool buttons to show more functions, and audio controls.
+- **Upper toolbar**: Controls view display, viewing options, and display device settings
+- **Lower toolbar**: Controls playback, tool buttons, and audio functions
 
 ![7_toolbars_legend.png](../../images/rv-user-manual-7-rv-cxx-toolbars-legend-06.png)  
 
-Figure 4.2:
+Figure 4.2: Toolbar Controls
 
-Tool Bar Controls
+#### Lower Toolbar Layout
 
-The lower toolbar is in three sections from left to right: tool launch buttons, play controls, and audio/loop mode. The tool launch buttons toggle rv's main user interface components like the session manager or the heads-up timeline. The play controls control play back in the current view. These are similar to the heads-up play controls available from the timeline configuration. The loop mode determines what happens at the end of the timeline and the audio controls modify the volume and mute.
+The lower toolbar contains three sections (left to right):
 
-The frame content, display device settings, channel view, and stereo mode on the top tool bar are also available under the View menu. See Chapter [7](rv-user-manual-chapter-seven.md#7-how-a-pixel-gets-from-a-file-to-the-screen) for more information on what these settings do.
+1. **Tool launch buttons**: Toggle RV's main UI components (session manager, heads-up timeline)
+2. **Annotations display controls**: Ghost and Hold are available only during a Live Review session.
+3. **Play controls**: Control playback in the current view (similar to heads-up play controls)
+4. **Audio/loop mode**: Determine timeline end behavior and control volume/mute
 
-The full screen toggle is also under the Window menu.
+##### Live Review controls
 
-You can toggle the visibility for each of the tool bars under the Tools menu.
+Ghost and Hold are available during a Live Review session. Only the Presenter can activate these.
+
+**Ghost annotations.** Shows the last 5 annotations in red and the next 5 in green, with the opacity falling off the further away the annotation from the current frame.
+
+**Hold annotation.** Holds the current annotation on screen until the next one is reached on the timeline.
+
+#### Additional Access Points
+
+- Upper toolbar functions (frame content, display device settings, channel view, stereo mode) are also available in the **View** menu
+- Full-screen toggle is available in the **Window** menu  
+- Toolbar visibility can be toggled in the **Tools** menu
+
+For detailed information about these settings, see Chapter [7](rv-user-manual-chapter-seven.md#7-how-a-pixel-gets-from-a-file-to-the-screen).
 
 ### 4.3 Loading Images, Sequences, Movies and Audio
 
