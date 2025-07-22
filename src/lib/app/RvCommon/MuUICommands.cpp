@@ -512,6 +512,9 @@ namespace Rv
             new Function(c, "showDiagnostics", showDiagnostics, None, Return,
                          "void", End),
 
+            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return,
+                         "float", End),
+
             EndArguments);
     }
 
@@ -2377,6 +2380,22 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         doc->showDiagnostics();
+    }
+
+    NODE_IMPLEMENTATION(devicePixelRatio, float)
+    {
+        float devicePixelRatio = 1.0f;
+
+        const Session* s = Session::currentSession();
+        const RvDocument* doc =
+            reinterpret_cast<RvDocument*>(s->opaquePointer());
+
+        if (doc != nullptr && doc->view() != nullptr)
+        {
+            devicePixelRatio = doc->view()->devicePixelRatio();
+        }
+
+        NODE_RETURN(devicePixelRatio);
     }
 
 } // namespace Rv

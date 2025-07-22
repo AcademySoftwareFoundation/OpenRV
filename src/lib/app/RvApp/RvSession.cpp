@@ -78,6 +78,7 @@
 #include <sstream>
 #include <stl_ext/stl_ext_algo.h>
 #include <stl_ext/string_algo.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <boost/algorithm/string.hpp>
@@ -1341,6 +1342,8 @@ namespace Rv
                 readSourceHelper(movies, sargs, addContents,
                                  addToExistingSource);
             }
+
+            updateAnnotationsUI();
         }
     }
 
@@ -4337,6 +4340,30 @@ namespace Rv
         auto imageRenderer = renderer();
         if (imageRenderer)
             imageRenderer->unlinkNode(node);
+    }
+
+    void RvSession::updateAnnotationsUI()
+    {
+        auto* sessionNode = graph().sessionNode();
+        if (sessionNode != nullptr)
+        {
+            const IntProperty* holdProperty =
+                sessionNode->property<IntProperty>("paintEffects", "hold");
+            const IntProperty* ghostProperty =
+                sessionNode->property<IntProperty>("paintEffects", "ghost");
+
+            const int hold =
+                (holdProperty != nullptr && holdProperty->size() != 0)
+                    ? holdProperty->front()
+                    : 0;
+            const int ghost =
+                (ghostProperty != nullptr && ghostProperty->size() != 0)
+                    ? ghostProperty->front()
+                    : 0;
+
+            userGenericEvent("update-hold-button", std::to_string(hold));
+            userGenericEvent("update-ghost-button", std::to_string(ghost));
+        }
     }
 
 } // namespace Rv
