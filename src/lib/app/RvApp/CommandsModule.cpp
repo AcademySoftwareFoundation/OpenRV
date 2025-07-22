@@ -25,6 +25,7 @@
 #include <IPCore/IPInstanceNode.h>
 #include <OCIONodes/OCIOIPNode.h>
 #include <IPMu/CommandsModule.h>
+#include <IPMu/RemoteRvCommand.h>
 #include <TwkDeploy/Deploy.h>
 #include <Mu/ClassInstance.h>
 #include <Mu/Exception.h>
@@ -1358,6 +1359,10 @@ namespace Rv
             sargs.push_back(IPCore::Application::mapFromVar(arg));
         }
 
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargs, tag,
+                                              processOpts, merge);
+
         //
         //  Note we do not make GraphEdit object here, since this load will be
         //  asynchronous.
@@ -1392,6 +1397,8 @@ namespace Rv
             s->userGenericEvent("before-progressive-proxy-loading", "");
         }
 
+        vector<vector<string>> allFilesAndOptions;
+
         for (size_t i = 0; i < array->size(); i++)
         {
             DynamicArray* currentSource = array->element<DynamicArray*>(i);
@@ -1402,9 +1409,24 @@ namespace Rv
             {
                 string arg =
                     currentSource->element<StringType::String*>(j)->c_str();
+
                 filesAndOptions.emplace_back(
                     IPCore::Application::mapFromVar(arg));
             }
+
+            allFilesAndOptions.push_back(filesAndOptions);
+        }
+
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
+                                              allFilesAndOptions, tag);
+
+        // Now that we've broadcast the remote event, complete the work without
+        // broadcasting anything else.
+
+        for (size_t i = 0; i < allFilesAndOptions.size(); i++)
+        {
+            vector<string>& filesAndOptions = allFilesAndOptions[i];
 
             string nodeName = s->addSourceWithTag(filesAndOptions, tag)->name();
             names->element<StringType::String*>(i) = stype->allocate(nodeName);
