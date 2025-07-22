@@ -40,13 +40,13 @@ Figure 4.2: Toolbar Controls
 The lower toolbar contains three sections (left to right):
 
 1. **Tool launch buttons**: Toggle RV's main UI components (session manager, heads-up timeline)
-2. **Annotations display controls**: Ghost and Hold are available only during a Live Review session.
+2. **Annotations display controls**: Ghost and Hold control the display of annotations during a Live Review session
 3. **Play controls**: Control playback in the current view (similar to heads-up play controls)
 4. **Audio/loop mode**: Determine timeline end behavior and control volume/mute
 
 ##### Live Review controls
 
-Ghost and Hold are available during a Live Review session. Only the Presenter can activate these.
+During a Live Review session, the presenter can control the display of annotations with the Ghost and Hold display controls.
 
 **Ghost annotations.** Shows the last 5 annotations in red and the next 5 in green, with the opacity falling off the further away the annotation from the current frame.
 
