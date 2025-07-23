@@ -395,6 +395,11 @@ require system;
 
 \: toggleFilter (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
     setFiltering(if getFiltering() == GL_NEAREST then GL_LINEAR else GL_NEAREST);
 

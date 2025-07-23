@@ -1322,10 +1322,11 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
-    method: clearPaint (void; string node, int frame)
+    method: clearPaint (void; int frame)
     {
-        let upropName = frameOrderName(node, frame);
-        let rpropName = frameOrderRedoStackName(node, frame);
+        let f = _currentNodeInfo.frame,
+            upropName = frameOrderName(_currentNode, f),
+            rpropName = frameOrderRedoStackName(_currentNode, f);
 
         if (propertyExists(upropName))
         {
@@ -1477,34 +1478,9 @@ class: AnnotateMinorMode : MinorMode
 
     method: clearSlot (void; bool checked)
     {
-        clearPaint(_currentNode, _currentNodeInfo.frame);
+        clearPaint(sourceFrame(frame()));
         updateFrameDependentState();
         redraw();
-    }
-
-    method: clearAllSlot (void; bool checked)
-    {
-        let answer = alertPanel(true, InfoAlert, "Clear all annotations from the current timeline?", nil, "OK", "Cancel", nil);
-
-        if (answer != 0)
-        {
-            return;
-        }
-        else
-        {
-            for_each(node; nodes())
-            {
-                let annotatedFrames = findAnnotatedFrames(node);
-                for_each(frame; annotatedFrames)
-                {
-                    clearPaint(node, frame);
-                    clearPaint(node, sourceFrame(frame));
-                }
-            }
-
-            updateFrameDependentState();
-            redraw();
-        }
     }
 
     method: redoSlot (void; bool checked)
@@ -1523,7 +1499,6 @@ class: AnnotateMinorMode : MinorMode
     method: undoEvent (void; Event event) { undoSlot(true); }
     method: redoEvent (void; Event event) { redoSlot(true); }
     method: clearEvent (void; Event event) { clearSlot(true); }
-    method: clearAllEvent (void; Event event) { clearAllSlot(true); }
 
     method: keyUndoEvent (void; Event event)
     {
@@ -1804,6 +1779,14 @@ class: AnnotateMinorMode : MinorMode
     method: nextSlot (void; bool b) { nextAnnotatedFrame(); }
     method: prevSlot (void; bool b) { prevAnnotatedFrame(); }
 
+    method: onPresenterChanged(void; Event event)
+    {
+        if (_active && filterLiveReviewEvents())
+        {
+            toggle();
+        }
+        event.reject();
+    }
 
     method: AnnotateMinorMode (AnnotateMinorMode; string name)
     {
@@ -2166,21 +2149,12 @@ class: AnnotateMinorMode : MinorMode
 
         connect(_undoAct, QAction.triggered, undoSlot);
         connect(_redoAct, QAction.triggered, redoSlot);
+        connect(_clearAct, QAction.triggered, clearSlot);
 
         _undoButton.setDefaultAction(_undoAct);
         _redoButton.setDefaultAction(_redoAct);
         _clearButton.setDefaultAction(_clearAct);
 
-        let clearMenu = QMenu("Clear Frame", _clearButton);
-        let clearFrame = clearMenu.addAction("Clear Frame");
-        let clearAllFrames = clearMenu.addAction("Clear All Frames on Timeline");
-
-        _clearButton.setMenu(clearMenu);
-        _clearButton.setPopupMode(QToolButton.InstantPopup);
-
-        connect(clearFrame, QAction.triggered, clearSlot);
-        connect(clearAllFrames, QAction.triggered, clearAllSlot);
-        _clearButton.setStyleSheet("QToolButton::menu-indicator { subcontrol-position: bottom right; top: -2px; }");
 
         _drawDock.setWidget(_drawPane);
         _drawDock.ensurePolished();
@@ -2239,6 +2213,7 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
+              ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed")
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),
@@ -2249,13 +2224,11 @@ class: AnnotateMinorMode : MinorMode
                      {"Actions on Current Frame", nil, nil, inactiveState},
                      {"   Undo", undoEvent, nil, undoState},
                      {"   Redo", redoEvent, nil, redoState},
-                     {"   Clear Drawings", clearEvent, nil, undoState},
+                     {"   Clear All Drawings", clearEvent, nil, undoState},
                      {"_", nil, nil, nil},
-                     {"Actions on Timeline", nil, nil, inactiveState},
-                     {"   Clear All Drawings", clearAllEvent, nil, undoState},
-                     {"   Show Drawings", showDrawingsSlot, nil, isShowingDrawings},
-                     {"   Next Annotated Frame", nextEvent, "alt shift right", nextPrevState},
-                     {"   Previous Annotated Frame", prevEvent, "alt shift left", nextPrevState},
+                     {"Show Drawings", showDrawingsSlot, nil, isShowingDrawings},
+                     {"Next Annotated Frame", nextEvent, "alt shift right", nextPrevState},
+                     {"Previous Annotated Frame", prevEvent, "alt shift left", nextPrevState},
                      {"_", nil, nil, nil},
                      {"Configure", Menu {
                          {"Show Brush", showBrushSlot, nil, isShowingBrush},
