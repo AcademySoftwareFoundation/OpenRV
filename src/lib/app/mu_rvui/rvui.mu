@@ -6688,7 +6688,6 @@ global bool debugGC = false;
     bind("key-down--page-down", previousMarkedRange, "Set In/Out to Previous Marked Range");
     bind("key-down--page-up", nextMarkedRange, "Set In/Out to Next Marked Range");
     bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
-    bind("key-down--q", queryClose, "Close Session");
     bind("key-down--r", showChannel(1), "Show Red Channel");
     bind("key-down--right", stepForward1, "Step Forward 1 Frame");
     bind("key-down--t", toggleTimeline, "Toggle Heads-Up Timeline");
