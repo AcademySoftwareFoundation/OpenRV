@@ -1381,7 +1381,7 @@ namespace Rv
             else
             {
                 TWK_THROW_STREAM(IPCore::ReadFailedExc,
-                                 "Direcory contains too many sequences");
+                                 "Directory contains too many sequences");
             }
         }
 
