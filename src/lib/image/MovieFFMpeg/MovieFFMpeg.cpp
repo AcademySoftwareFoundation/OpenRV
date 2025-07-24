@@ -2251,7 +2251,7 @@ namespace TwkMovie
         map<pair<string, int>, vector<int>> chTrackMap;
         vector<bool> heroVideoTracks;
         vector<bool> heroAudioTracks;
-        
+
         for (int i = 0; i < m_avFormatContext->nb_streams; i++)
         {
             heroVideoTracks.push_back(false);
@@ -2271,8 +2271,10 @@ namespace TwkMovie
                 pair<int, int> key(tsStream->codecpar->height,
                                    tsStream->codecpar->width);
                 resTrackMap[key].push_back(i);
-                if (tsStream->codecpar->codec_id == AV_CODEC_ID_JPEG2000 ||
-                    std::string(avcodec_get_name(tsStream->codecpar->codec_id)) == "jpeg2000")
+                if (tsStream->codecpar->codec_id == AV_CODEC_ID_JPEG2000
+                    || std::string(
+                           avcodec_get_name(tsStream->codecpar->codec_id))
+                           == "jpeg2000")
                 {
                     isJ2K = true;
                 }
@@ -2383,9 +2385,11 @@ namespace TwkMovie
                         track->name = trackName.str();
                         track->isOpen = true;
                         openAVCodec(i, &track->avCodecContext,
-                                       &track->hardwareContext);
+                                    &track->hardwareContext);
                         m_videoTracks.push_back(track);
-                    } else {
+                    }
+                    else
+                    {
                         if (openAVCodec(i, &track->avCodecContext,
                                         &track->hardwareContext))
                         {
@@ -2405,7 +2409,7 @@ namespace TwkMovie
                             trk << "Track" << i;
 
                             snagMetadata(tsStream->metadata, trk.str(),
-                                        &m_info.proxy);
+                                         &m_info.proxy);
                         }
                         else
                         {
@@ -3764,10 +3768,9 @@ namespace TwkMovie
         }
     }
 
-    FrameBuffer*  MovieFFMpegReader::jpeg2000Decode(int inframe,
-                                            VideoTrack* track)
+    FrameBuffer* MovieFFMpegReader::jpeg2000Decode(int inframe,
+                                                   VideoTrack* track)
     {
-
 
         AVPacket* pkt = track->videoPacket;
         if (!pkt || pkt->size <= 0)
@@ -3781,8 +3784,6 @@ namespace TwkMovie
 
         return decodeHTJ2K(&infile);
     }
-
-
 
     bool MovieFFMpegReader::findImageWithBestTimestamp(int inframe,
                                                        double frameDur,
@@ -3803,10 +3804,10 @@ namespace TwkMovie
             // Then we need to send the packet as input to the decoder.
             // but we dont do it we are using OpenJPH, since it will
             // handle the decode itself.
-            if (!track->useOpenJPH){
+            if (!track->useOpenJPH)
+            {
                 sendPacketToDecoder(track);
             }
-
         }
         // Look for the best (closest to the goal) timestamp in the updated
         // list.
@@ -3818,15 +3819,21 @@ namespace TwkMovie
             HOP_PROF("avcodec_receive_frame()");
             // Get frame from decoder.
             int ret = 0;
-            if (!track->useOpenJPH){
-                ret = avcodec_receive_frame(track->avCodecContext, track->videoFrame);
-            } else {
-                // We are going to use OpenJPH to do the decoding, but we do need to
-                // set the pts and dts from the packet, to get things behaving properly.
+            if (!track->useOpenJPH)
+            {
+                ret = avcodec_receive_frame(track->avCodecContext,
+                                            track->videoFrame);
+            }
+            else
+            {
+                // We are going to use OpenJPH to do the decoding, but we do
+                // need to set the pts and dts from the packet, to get things
+                // behaving properly.
                 track->videoFrame->pts = track->videoPacket->pts;
                 track->videoFrame->pkt_dts = track->videoPacket->dts;
                 if (track->videoFrame->pkt_dts < goalTS)
-                    ret = AVERROR(EAGAIN); // Force it to read another packet, if we havent found the frame yet.
+                    ret = AVERROR(EAGAIN); // Force it to read another packet,
+                                           // if we havent found the frame yet.
             }
             if (ret < 0)
             {
@@ -3835,12 +3842,13 @@ namespace TwkMovie
                     // This is valid. This occurs when we need more input.
                     // Let's supply a new packet to the codec and update the
                     // best timestamp.
-                        
-                        readPacketFromStream(inframe, track);
-                    
+
+                    readPacketFromStream(inframe, track);
+
                     // If we are using OpenJPH, we will not send the packet to
                     // the decoder, since it will handle the decode itself.
-                    if (!track->useOpenJPH){
+                    if (!track->useOpenJPH)
+                    {
                         sendPacketToDecoder(track);
                     }
 
@@ -3974,8 +3982,8 @@ namespace TwkMovie
         }
         track->tsSet.erase(track->tsSet.begin(), pruneIT);
 
-
-        if (track->useOpenJPH){
+        if (track->useOpenJPH)
+        {
             // If we are using OpenJPH to decode JPEG-2000 frames, we decode
             // the frame here and return the FrameBuffer.
             return jpeg2000Decode(inframe, track);
@@ -4650,17 +4658,24 @@ namespace TwkMovie
             else
             {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-                    // New API (FFmpeg 7.0+)
-                    const enum AVPixelFormat *pix_fmts = NULL;
-                    int ret = avcodec_get_supported_config(avCodecContext, avCodec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, NULL);
-                    if (ret >= 0 && pix_fmts) {
-                        avCodecContext->pix_fmt = pix_fmts[0];
-                    } else {
-                        avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
-                    }
+                // New API (FFmpeg 7.0+)
+                const enum AVPixelFormat* pix_fmts = NULL;
+                int ret = avcodec_get_supported_config(
+                    avCodecContext, avCodec, AV_CODEC_CONFIG_PIX_FORMAT, 0,
+                    (const void**)&pix_fmts, NULL);
+                if (ret >= 0 && pix_fmts)
+                {
+                    avCodecContext->pix_fmt = pix_fmts[0];
+                }
+                else
+                {
+                    avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
+                }
 #else
-                    // Old API (FFmpeg < 7.0)
-                    avCodecContext->pix_fmt = (avCodec->pix_fmts) ? avCodec->pix_fmts[0] : RV_OUTPUT_FFMPEG_FMT;
+                // Old API (FFmpeg < 7.0)
+                avCodecContext->pix_fmt = (avCodec->pix_fmts)
+                                              ? avCodec->pix_fmts[0]
+                                              : RV_OUTPUT_FFMPEG_FMT;
 #endif
 
                 if (m_request.verbose)
@@ -4759,11 +4774,16 @@ namespace TwkMovie
             else
             {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
-                const enum AVSampleFormat *sample_fmts = NULL;
-                int ret = avcodec_get_supported_config(avCodecContext, NULL, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, (const void**)&sample_fmts, NULL);
-                if (ret >= 0 && sample_fmts) {
+                const enum AVSampleFormat* sample_fmts = NULL;
+                int ret = avcodec_get_supported_config(
+                    avCodecContext, NULL, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0,
+                    (const void**)&sample_fmts, NULL);
+                if (ret >= 0 && sample_fmts)
+                {
                     avCodecContext->sample_fmt = sample_fmts[0];
-                } else {
+                }
+                else
+                {
                     avCodecContext->sample_fmt = AV_SAMPLE_FMT_NONE;
                 }
 #else
