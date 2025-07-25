@@ -40,17 +40,20 @@ Figure 4.2: Toolbar Controls
 The lower toolbar contains three sections (left to right):
 
 1. **Tool launch buttons**: Toggle RV's main UI components (session manager, heads-up timeline)
-2. **Annotations display controls**: Ghost and Hold control the display of annotations during a Live Review session
+2. **Annotations display controls**: Ghost and Hold control the display of annotations
 3. **Play controls**: Control playback in the current view (similar to heads-up play controls)
 4. **Audio/loop mode**: Determine timeline end behavior and control volume/mute
 
-##### Live Review controls
+##### About Hold and Ghost
 
-During a Live Review session, the presenter can control the display of annotations with the Ghost and Hold display controls.
+The Ghost and Hold display controls help manage how annotations appear during playback. These controls are useful during a Live Review session by helping reviewers follow feedback and understand the context of comments.
 
-**Ghost annotations.** Shows the last 5 annotations in red and the next 5 in green, with the opacity falling off the further away the annotation from the current frame.
+**Ghost annotations**: Provides temporal context by showing annotations from nearby frames. This helps reviewers understand the progression of feedback and see upcoming annotations, maintaining context during continuous playback.
 
-**Hold annotation.** Holds the current annotation on screen until the next one is reached on the timeline.
+- **Previous annotations**: The previous five annotations appear in red, with decreasing opacity as they get further from the current frame.
+- **Upcoming annotations**: The next five annotations appear in green with decreasing opacity, with decreasing opacity as they get further from the current frame.
+
+**Hold annotations**: Keeps the current annotation visible during playback, holding it on screen until the next annotation. Important feedback remains visible even during fast playback, preventing viewers from missing critical notes.
 
 #### Additional Access Points
 
@@ -200,7 +203,7 @@ Graphics hardware does not always correctly apply linear filtering to floating p
 
 #### 4.4.6 Big Images
 
-RV can display any size image as long as it can fit into your computer's memory. When an image is larger than the graphics card can handle, RV will tile the image display. This makes it possible to send all the pixels of the image to the card for display. The downside is that all of the pixels are sent to the display even though you probably can't see them all. However, if you zoom in (for example hit \`\`1'' for 1:1 scale) when a large image is loaded, RV will only draw pixels that are visible.
+RV can display any size image as long as it can fit into your your computer's memory. When an image is larger than the graphics card can handle, RV will tile the image display. This makes it possible to send all the pixels of the image to the card for display. The downside is that all of the pixels are sent to the display even though you probably can't see them all. However, if you zoom in (for example hit \`\`1'' for 1:1 scale) when a large image is loaded, RV will only draw pixels that are visible.
 
 One of the constraints that determines how big an image can be before RV will tile it is the amount of available memory in your graphics card and limitations of the graphics card driver. On most systems, up to 2k by 2k images can be displayed without tiling (as long as the image has 8-bit integer channels). In some cases (newer cards) the limit is 4k by 4k. However, there are other factors that may reduce the limit.
 
