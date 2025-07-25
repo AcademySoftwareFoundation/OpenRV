@@ -213,7 +213,7 @@ namespace IPCore
         //  Finally if our asssumption was too low then we use the first index.
         //
 
-        else if (index < 0)
+        if (index < 0)
         {
             index = 0;
         }
@@ -288,12 +288,29 @@ namespace IPCore
     {
         const IPNodes& ins = inputs();
 
-        if (ins.size() > 0)
+        if (ins.size() > 0
+            && m_edlSource->size() > 0
+            && m_edlSourceIn->size() > 0
+            && m_edlSourceOut->size() > 0
+            && m_edlGlobalIn->size() > 0 )
         {
             const int index =
                 (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
 
+            if (index >= m_edlSource->size()
+                || index >= m_edlSourceIn->size()
+                || index >= m_edlGlobalIn->size()
+                || index < 0 )
+            {
+                return EvalPoint(-1, 0, -1);
+            }
+
             const int source = (*m_edlSource)[index];
+
+            if (source < 0 || source > ins.size())
+                return EvalPoint(-1, 0, -1);
+
+
             const int in = (*m_edlSourceIn)[index];
             const int out = (*m_edlSourceOut)[index];
             const int iframe = (*m_edlGlobalIn)[index];
@@ -832,7 +849,7 @@ namespace IPCore
     {
         lazyBuildState();
 
-        if (inputs().size() >= 1)
+        if (inputs().size() >= 1 && m_edlGlobalIn->size() >= 1)
         {
             ImageRangeInfo info;
             info.inc = 1;
@@ -853,12 +870,14 @@ namespace IPCore
         lazyBuildState();
 
         const bool interactive = interactiveSize(context);
+        const IPNodes& ins = inputs();
         const float vw =
             interactive ? context.viewWidth : float(m_structInfo.width);
         const float vh =
             interactive ? context.viewHeight : float(m_structInfo.height);
 
-        if (inputs().empty() || interactive)
+
+        if (ins.empty() || interactive)
         {
             return ImageStructureInfo(vw, vh);
         }
@@ -866,9 +885,14 @@ namespace IPCore
         {
             const float aspect = vw / vh;
             EvalPoint ep = evaluationPoint(context.frame);
+            if (ep.sourceIndex < 0 || ep.sourceIndex >= ins.size())
+            {
+                return ImageStructureInfo(vw, vh);
+            }
+
             Context context = graph()->contextForFrame(ep.sourceFrame);
             ImageStructureInfo ininfo =
-                inputs()[ep.sourceIndex]->imageStructureInfo(context);
+                ins[ep.sourceIndex]->imageStructureInfo(context);
 
             //
             //  We may have an input that has no media "behind it" (IE a
