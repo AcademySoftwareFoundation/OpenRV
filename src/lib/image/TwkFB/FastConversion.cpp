@@ -12,6 +12,7 @@
 #include <TwkUtil/sgcHop.h>
 
 #include <algorithm>
+#include <cstdint>
 
 using namespace ILMTHREAD_NAMESPACE;
 
@@ -1051,5 +1052,48 @@ void planarP416_to_planarYUV444P16(
             ++outCr;
             ++inCbCr;
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+// Converts packed format AYUV 64-bits (16 bits per components) to planar YUVA
+// 4444 16-bits.
+//
+// Context: To optimize the following FFmpeg formats conversion which is
+// required for Apple ProRes decoding on macOS via VideoToolbox since the
+// sws_scale() performance for the same conversions was way too slow.
+//
+//  AV_PIX_FMT_AYUV64LE && dstFormat -> AV_PIX_FMT_YUVA444P16LE
+//
+// AV_PIX_FMT_AYUV64LE - packed AYUV 4:4:4:4, 64bpp, little-endian
+// AV_PIX_FMT_YUVA444P16LE - planar YUVA 4:4:4:4, 64bpp, (1 Cr & Cb sample per
+// 1x1 Y samples & A samples), little-endian
+//
+void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height,
+                                  const uint8_t* const inBuf,
+                                  std::uint16_t* outY, std::uint16_t* outCb,
+                                  std::uint16_t* outCr, std::uint16_t* outA)
+{
+#pragma pack(push, 1)
+
+    struct components
+    {
+        std::uint16_t A;
+        std::uint16_t Y;
+        std::uint16_t Cb;
+        std::uint16_t Cr;
+    };
+
+#pragma pack(pop)
+
+    const auto* pixelsBuf = reinterpret_cast<const components*>(inBuf);
+
+    std::size_t pixelCount = width * height;
+    for (std::size_t i = 0; i < pixelCount; ++i)
+    {
+        outA[i] = pixelsBuf[i].A;
+        outY[i] = pixelsBuf[i].Y;
+        outCb[i] = pixelsBuf[i].Cb;
+        outCr[i] = pixelsBuf[i].Cr;
     }
 }

@@ -776,7 +776,7 @@ namespace TwkMovie
             boost::algorithm::to_lower(name);
             return std::any_of(
                 slowRandomAccessCodecs.begin(), slowRandomAccessCodecs.end(),
-                [name](const auto& codec) { return codec == name; });
+                [&name](const auto& codec) { return codec == name; });
         }
 
         bool isMP4format(AVFormatContext* avFormatContext)
@@ -3018,18 +3018,25 @@ namespace TwkMovie
 #if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
         // FFmpeg sws_scale() function is not optimized for the following
         // conversions which are used when decoding ProRes 422 and ProRes 4444
-        // videos on Apple Silicon via VideoToolbox:
-        // AV_PIX_FMT_P210LE -> AV_PIX_FMT_YUV422P16LE
+        // (with and without the alpha channel) videos on Apple Silicon via
+        // VideoToolbox: AV_PIX_FMT_P210LE -> AV_PIX_FMT_YUV422P16LE
         // AV_PIX_FMT_P416LE -> AV_PIX_FMT_YUV444P16LE
+        // AV_PIX_FMT_AYUV64LE -> AV_PIX_FMT_YUVA444P16LE
         // Latest benchmarks for a UHD image conversion via sws_scale() on
-        // ARM64 was 30 ms and 46 ms respectively for the two conversions.
-        // Whereas it was 3 ms and 2 ms with the following custom functions.
+        // ARM64 was 30 ms, 46 ms respectively for the first two conversions.
+        // With a 4K 60 fps, the image conversion was 45 ms for the third one.
+        // Whereas it was 3 ms, 2 ms and 2 ms with the following custom
+        // functions.
         bool isProRes422 = srcFrame->format == AV_PIX_FMT_P210LE
                            && dstFrame->format == AV_PIX_FMT_YUV422P16LE;
-        bool isProRes4444 = srcFrame->format == AV_PIX_FMT_P416LE
-                            && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
+        bool isProRes4444WithoutAlpha =
+            srcFrame->format == AV_PIX_FMT_P416LE
+            && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
+        bool isProRes4444WithAlpha =
+            srcFrame->format == AV_PIX_FMT_AYUV64LE
+            && dstFrame->format == AV_PIX_FMT_YUVA444P16LE;
 
-        if ((isProRes422 || isProRes4444))
+        if (isProRes422 || isProRes4444WithoutAlpha)
         {
             const uint16_t* srcY =
                 reinterpret_cast<const uint16_t*>(srcFrame->data[0]);
@@ -3056,7 +3063,7 @@ namespace TwkMovie
                 return;
             }
 
-            if (isProRes4444)
+            if (isProRes4444WithoutAlpha)
             {
                 planarP416_to_planarYUV444P16(
                     width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr,
@@ -3064,6 +3071,18 @@ namespace TwkMovie
 
                 return;
             }
+        }
+
+        if (isProRes4444WithAlpha)
+        {
+            auto* dstY = reinterpret_cast<std::uint16_t*>(dstFrame->data[0]);
+            auto* dstCb = reinterpret_cast<std::uint16_t*>(dstFrame->data[1]);
+            auto* dstCr = reinterpret_cast<std::uint16_t*>(dstFrame->data[2]);
+            auto* dstA = reinterpret_cast<std::uint16_t*>(dstFrame->data[3]);
+
+            packedAYUV64_to_planarYUVA16(width, height, srcFrame->data[0], dstY,
+                                         dstCb, dstCr, dstA);
+            return;
         }
 #endif
 
