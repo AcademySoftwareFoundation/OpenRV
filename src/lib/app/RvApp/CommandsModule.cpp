@@ -1303,6 +1303,13 @@ namespace Rv
 
         IPGraph::GraphEdit edit(s->graph());
 
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
+                                              filesAndOptions, tag);
+
+        // Now that we've broadcast the remote event, complete the work without
+        // broadcasting anything else.
+
         if (Options::sharedOptions().delaySessionLoading)
         {
             s->userGenericEvent("before-progressive-loading", "");
@@ -1387,16 +1394,6 @@ namespace Rv
         names->resize(array->size());
         IPGraph::GraphEdit edit(s->graph());
 
-        if (Options::sharedOptions().delaySessionLoading)
-        {
-            s->userGenericEvent("before-progressive-loading", "");
-
-            // Note: It was decided to trigger the
-            // before-progressive-proxy-loading event even when progressive
-            // source loading is disabled
-            s->userGenericEvent("before-progressive-proxy-loading", "");
-        }
-
         vector<vector<string>> allFilesAndOptions;
 
         for (size_t i = 0; i < array->size(); i++)
@@ -1423,6 +1420,16 @@ namespace Rv
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.
+
+        if (Options::sharedOptions().delaySessionLoading)
+        {
+            s->userGenericEvent("before-progressive-loading", "");
+
+            // Note: It was decided to trigger the
+            // before-progressive-proxy-loading event even when progressive
+            // source loading is disabled
+            s->userGenericEvent("before-progressive-proxy-loading", "");
+        }
 
         for (size_t i = 0; i < allFilesAndOptions.size(); i++)
         {
