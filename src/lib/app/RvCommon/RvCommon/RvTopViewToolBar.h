@@ -126,11 +126,14 @@ namespace Rv
         void dither10();
 
         bool hasStandardDisplayPipeline();
+        bool hasOCIODisplayPipeline();
 
     private:
         void updateActionToolButton(QAction* action, const std::string& text,
                                     const std::string& icon,
                                     bool forceRepaint = false);
+
+        void setLiveReviewFilteredActions(bool isDisabled);
 
     private:
         IPCore::Session* m_session;
@@ -197,6 +200,7 @@ namespace Rv
         QIconMap m_iconMap;
         const VideoDevice* m_device;
         const VideoDevice* m_outputDevice;
+        std::unordered_map<QAction*, QString> m_liveReviewFilteredActions;
     };
 
 } // namespace Rv

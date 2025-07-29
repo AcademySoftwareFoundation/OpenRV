@@ -298,11 +298,6 @@ int main(int argc, char* argv[])
     setenv("QT_QUICK_BACKEND", "software",
            0 /* changeFlag : Do not change the existing value */);
 
-    // Qt 5.12.1 specific
-    // Prevent Mac from automatically scaling app pixel coordinates in OpenGL
-    setenv("QT_MAC_WANTS_BEST_RESOLUTION_OPENGL_SURFACE", "0",
-           0); /* changeFlag : Do not change the existing value */
-
     // Prevent usage of native sibling widgets on Mac. This attribute can be
     // removed if GLView is changed to inherit from QOpenGLWidget.
     QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
@@ -312,9 +307,16 @@ int main(int argc, char* argv[])
     // Device.
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
-    const bool noHighDPISupport = getenv("RV_QT_HDPI_SUPPORT") == nullptr;
+    // Now supporting high DPI displays by default
+    // Setting the following environment variable, disable the high DPI support
+    const bool noHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
     if (noHighDPISupport)
     {
+        // Prevent Mac from automatically scaling app pixel coordinates in
+        // OpenGL
+        setenv("QT_MAC_WANTS_BEST_RESOLUTION_OPENGL_SURFACE", "0",
+               0); /* changeFlag : Do not change the existing value */
+
         unsetenv("QT_SCALE_FACTOR");
         unsetenv("QT_SCREEN_SCALE_FACTORS");
         unsetenv("QT_AUTO_SCREEN_SCALE_FACTOR");

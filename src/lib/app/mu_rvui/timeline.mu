@@ -147,22 +147,24 @@ class: Timeline : Widget
 
     method: renderLocations (Locations; Event event)
     {
-        let d            = event.domain(),
-            drawControls = _settings.showVCRButtons && (_controlSize * 14 < d.x),
-            tbounds      = gltext.bounds("||||"),
-            t            = floor(5 + 8 + 5 + tbounds[3] + 0.5); //floor(_vm0 + _tlh + vm1 + mxb[3] + 0.5),
+        let d                = event.domain(),
+            isRenderEvent    = event.name() == "render",
+            devicePixelRatio = (if isRenderEvent then devicePixelRatio() else 1.0),
+            drawControls     = _settings.showVCRButtons && (_controlSize * 14 * devicePixelRatio < d.x),
+            tbounds          = gltext.bounds("||||"),
+            t                = floor((5 + 8 + 5)*devicePixelRatio + tbounds[3] + 0.5); //floor(_vm0 + _tlh + vm1 + mxb[3] + 0.5),
 
         return Locations(d,
-                         d.x - (if drawControls then _controlSize * 6 else 0), // window width
-                         d.y,            // window height
+                         d.x - (if drawControls then _controlSize * devicePixelRatio * 6 else 0), // window width
+                         d.y,                   // window height
                          drawControls,
-                         8, // timeline height
+                         8*devicePixelRatio,    // timeline height
                          tbounds,
-                         100,  // horizontal margin
-                         100,  // vertical margin
+                         100*devicePixelRatio,  // horizontal margin
+                         100*devicePixelRatio,  // vertical margin
                          0,
-                         5, // bottom  margin
-                         5, // top margin
+                         5*devicePixelRatio,    // bottom  margin
+                         5*devicePixelRatio,    // top margin
                          t,
                          if _settings.drawAtTopOfView then floor(d.y - t + 0.5) else 0);
     }
@@ -178,8 +180,6 @@ class: Timeline : Widget
             fe = frameEnd();
 
         return (x - X0) / (X1 - X0) * (fe - fs + 1) + fs;
-        //_phantomFrame = /*floor*/
-            //((fromRelativeX(_phantomFrameXrelative, d.x) - _X0) / (_X1 - _X0) * (fe - fs + 1) + fs);
     }
 
     method: handleLeave (void; Event event)
@@ -194,7 +194,8 @@ class: Timeline : Widget
     {
         let gp = event.pointer(),
             p  = event.relativePointer(),
-            modified = false;
+            modified = false,
+            devicePixelRatio = devicePixelRatio();
 
         if (contains (gp))
         {
@@ -211,7 +212,11 @@ class: Timeline : Widget
                 modified = true;
                 redraw();
             }
-            if (    gp.x >= _ipCapX-4 &&  gp.x <= _ipCapX+4 &&
+
+            // The remaining comparisons are done in device pixels so adjust gp accordingly
+            gp *= devicePixelRatio;
+            
+            if (    gp.x >= _ipCapX-4 && gp.x <= _ipCapX+4 &&
                     gp.y >= _Ybot-2   && gp.y <= _Ytop+2)
             {
                 deb ("in inCap\n");
@@ -613,7 +618,7 @@ class: Timeline : Widget
         else
         {
             drawInMargin (-1);
-	    vec4f m = vec4f{-1.0, -1.0, -1.0, -1.0};
+            vec4f m = vec4f{-1.0, -1.0, -1.0, -1.0};
             m[whichMargin()] = 0;
             setMargins (m, true);
         }
@@ -636,7 +641,7 @@ class: Timeline : Widget
         {
             drawInMargin (whichMargin());
 
-	    vec4f m = vec4f{-1.0, -1.0, -1.0, -1.0};
+            vec4f m = vec4f{-1.0, -1.0, -1.0, -1.0};
             m[oldMargin] = 0;
             setMargins (m, true);
         }
@@ -817,6 +822,11 @@ class: Timeline : Widget
 
     method: popupOpts (void; Event event)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
         if (isCurrentFrameIncomplete() || !_pointerInTimeline)
         {
             event.reject();
@@ -1085,8 +1095,8 @@ class: Timeline : Widget
 
         _settings = Settings();
 
-	_sequenceBoundariesDirty = true;
-	_sequenceBoundaries = int[]();
+        _sequenceBoundariesDirty = true;
+        _sequenceBoundaries = int[]();
 
         setFrameDisplayFormat (_settings.frameDisplayFormat);
 
@@ -1106,22 +1116,23 @@ class: Timeline : Widget
         if (isCurrentFrameIncomplete()) updateBounds(vec2f(0,0), vec2f(0,0));
 
         State state = data();
-        gltext.size(state.config.tlFrameTextSize);
+        let devicePixelRatio = devicePixelRatio();
+        gltext.size(state.config.tlFrameTextSize * devicePixelRatio);
 
-        _vm0 =  if (_settings.drawAtTopOfView) then 5 else 5;  // vertical margin
-        _tlh = 8;                            // timeline height
+        _vm0 =  if (_settings.drawAtTopOfView) then 5*devicePixelRatio else 5*devicePixelRatio; // vertical margin
+        _tlh = 8*devicePixelRatio; // timeline height
 
         let d   = event.domain(),
             f   = frame(),
             s   = _frameFunc(f),
             sb  = gltext.bounds(s),             // size of frame string
             mxb = gltext.bounds("||||"),
-            vm1 = 5,
+            vm1 = 5*devicePixelRatio,
             t   = floor (_vm0 + _tlh + vm1 + mxb[3] + 0.5);
 
         _Y0  = if (_settings.drawAtTopOfView) then d.y - t else 0;
 
-        updateBounds(vec2f(0,_Y0), vec2f(d.x,_Y0+t));
+        updateBounds(vec2f(0,_Y0)/devicePixelRatio, vec2f(d.x,_Y0+t)/devicePixelRatio);
         event.reject();
     }
 
@@ -1151,7 +1162,8 @@ class: Timeline : Widget
             _pointerInInOutRegion = false;
         }
         State state = data();
-        gltext.size(state.config.tlFrameTextSize);
+        let devicePixelRatio = devicePixelRatio();
+        gltext.size(state.config.tlFrameTextSize * devicePixelRatio);
 
         let loc = renderLocations(event);
         let {d, w, h, drawControls, tlh, mxb, hm0, hm1, thm1, vm0, vm1, t, Y} = loc;
@@ -1205,7 +1217,8 @@ class: Timeline : Widget
 
         \: drawInfoTab (void; int frame, float xframe, string text)
         {
-            gltext.size(config.tlFrameTextSize * .75);
+            let devicePixelRatio = devicePixelRatio();
+            gltext.size(config.tlFrameTextSize * devicePixelRatio * .75);
 
             let mediaName   = text,
                 mediaBounds = gltext.bounds(mediaName),
@@ -1238,7 +1251,7 @@ class: Timeline : Widget
             gltext.writeAt(mediaX, mediaY - 4, mediaName);
 
             //glDisable(GL_BLEND);
-            gltext.size(config.tlFrameTextSize);
+            gltext.size(config.tlFrameTextSize * devicePixelRatio);
         }
 
 
@@ -1279,7 +1292,7 @@ class: Timeline : Widget
         //  presentation render (when event.name() == "render-output-device")
         //
 
-        if (event.name() == "render") updateBounds(vec2f(0,_Y0), vec2f(d.x,_Y0+t));
+        if (event.name() == "render") updateBounds(vec2f(0,_Y0)/devicePixelRatio, vec2f(d.x,_Y0+t)/devicePixelRatio);
 	else
 	//
 	//  OK this is a mess.  The problem is that the widget class still
@@ -1403,7 +1416,7 @@ class: Timeline : Widget
             glEnable(GL_POINT_SMOOTH);
             glEnable(GL_LINE_SMOOTH);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glLineWidth(1.5);
+            glLineWidth(1.5*devicePixelRatio);
 
             //
             //  In / Out points
@@ -1412,7 +1425,7 @@ class: Timeline : Widget
             if (_settings.showInOut)
             {
                 gltext.color(fg);
-                gltext.size(config.tlBoundsTextSize);
+                gltext.size(config.tlBoundsTextSize * devicePixelRatio);
 
                 let sin  = _frameFunc(fi),
                     sout = _frameFunc(fo),
@@ -1429,7 +1442,7 @@ class: Timeline : Widget
                                _Ytop + 3,
                                sout);
 
-                gltext.size(config.tlFrameTextSize);
+                gltext.size(config.tlFrameTextSize * devicePixelRatio);
             }
 
             //
@@ -1438,7 +1451,7 @@ class: Timeline : Widget
 
             if (cacheMode() != CacheOff)
             {
-                glLineWidth(3.0);
+                glLineWidth(3.0*devicePixelRatio);
                 glColor(lerp(config.tlCacheColor, config.tlCacheFullColor, vsecs));
                 glBegin(GL_LINES);
 
@@ -1452,12 +1465,12 @@ class: Timeline : Widget
                     let f0 = cachedRanges[i],
                         f1 = cachedRanges[i+1]+1;
 
-                    glVertex(xAtFrame(f0), _Ybot + 4);
-                    glVertex(xAtFrame(f1), _Ybot + 4);
+                    glVertex(xAtFrame(f0), _Ybot + 4*devicePixelRatio);
+                    glVertex(xAtFrame(f1), _Ybot + 4*devicePixelRatio);
                 }
 
                 glEnd();
-                glLineWidth(1.5);
+                glLineWidth(1.5*devicePixelRatio);
             }
 
             //
@@ -1466,7 +1479,7 @@ class: Timeline : Widget
 
             if (_displayAudioCache && (audioCacheMode() != CacheOff))
             {
-                glLineWidth(3.0);
+                glLineWidth(3.0*devicePixelRatio);
                 glColor(config.tlAudioCacheColor);
                 glBegin(GL_LINES);
 
@@ -1480,12 +1493,12 @@ class: Timeline : Widget
                     let f0 = cachedAudioRanges[i],
                         f1 = cachedAudioRanges[i+1]+1;
 
-                    glVertex(xAtFrame(f0), _Ybot + 6);
-                    glVertex(xAtFrame(f1), _Ybot + 6);
+                    glVertex(xAtFrame(f0), _Ybot + 6*devicePixelRatio);
+                    glVertex(xAtFrame(f1), _Ybot + 6*devicePixelRatio);
                 }
 
                 glEnd();
-                glLineWidth(1.5);
+                glLineWidth(1.5*devicePixelRatio);
             }
 
             //
@@ -1496,7 +1509,7 @@ class: Timeline : Widget
             _opCapX = hm0 + op * _tlw;
 
             glColor(config.tlInOutCapsColor);
-            glLineWidth(2);
+            glLineWidth(2*devicePixelRatio);
             glBegin(GL_LINES);
             glVertex(_ipCapX, _Ybot - 1);
             glVertex(_ipCapX, _Ytop + 1);
@@ -1505,7 +1518,7 @@ class: Timeline : Widget
             glEnd();
 
             glColor(fg);
-            glLineWidth(5);
+            glLineWidth(5*devicePixelRatio);
 
             if ((_pointerInInOutRegion &&
                 (fi != fs || fo != fe)) ||
@@ -1517,9 +1530,9 @@ class: Timeline : Widget
                 glEnd();
                 draw(triangleGlyph, _ipCapX-5, (_Ybot+_Ytop)/2.0, 0.0, 9.0, false);
                 glEnable(gl.GL_LINE_SMOOTH);
-                glLineWidth(1.5);
+                glLineWidth(1.5*devicePixelRatio);
                 draw(triangleGlyph, _ipCapX-6, (_Ybot+_Ytop)/2.0, 0.0, 9.0, true);
-                glLineWidth(5);
+                glLineWidth(5*devicePixelRatio);
 
             }
             if ((_pointerInInOutRegion &&
@@ -1532,9 +1545,9 @@ class: Timeline : Widget
                 glEnd();
                 draw(triangleGlyph, _opCapX+5, (_Ybot+_Ytop)/2.0, 180.0, 9.0, false);
                 glEnable(gl.GL_LINE_SMOOTH);
-                glLineWidth(1.5);
+                glLineWidth(1.5*devicePixelRatio);
                 draw(triangleGlyph, _opCapX+6, (_Ybot+_Ytop)/2.0, 180.0, 9.0, true);
-                glLineWidth(5);
+                glLineWidth(5*devicePixelRatio);
             }
 
             //
@@ -1544,7 +1557,7 @@ class: Timeline : Widget
             let mfs = markedFrames();
             glColor(config.tlMarkedColor);
 
-            glLineWidth(1.0);
+            glLineWidth(1.0*devicePixelRatio);
             glBegin(GL_LINES);
 
             for_each (mf; mfs)
@@ -1557,7 +1570,7 @@ class: Timeline : Widget
             }
 
             glEnd();
-            glLineWidth(1.5);
+            glLineWidth(1.5*devicePixelRatio);
 
             glPointSize(3.2);
             glBegin(GL_POINTS);
@@ -1659,7 +1672,7 @@ class: Timeline : Widget
             sw    = (sb[2] + sb[0]) / 2.0,
             sh    = -sb[1] + sb[3],
             sY    = _Ybot,
-            sYh   = sY + _tlh + 3,
+            sYh   = sY + _tlh + 3 * devicePixelRatio,
             ffilt = if playing then .1 else 1.0,
             fdiff = -sb[2] / 2.0 * ffilt + _frameTextOffset * (1.0 - ffilt),
             ftx   = xframeMid + fdiff;
@@ -1673,7 +1686,7 @@ class: Timeline : Widget
         glColor(fcol);
         gltext.color(fcol);
 
-        glLineWidth(2.0);
+        glLineWidth(2.0*devicePixelRatio);
         glBegin(GL_LINES);
         glVertex(xframe, sY - 1);
         glVertex(xframe, sYh - 2);
@@ -1683,10 +1696,10 @@ class: Timeline : Widget
         if (_settings.showFrameDirection)
         {
             let fwd    = inc() > 0,
-                xg     = if fwd then xframeMid - fdiff + 8.0 else ftx - 6.0,
+                xg     = if fwd then xframeMid - fdiff + 8.0*devicePixelRatio else ftx - 6.0,
                 yg     = sYh + (-mxb[1] + mxb[3]) / 2.0,
                 angle  = if fwd then 180.0 else 0.0,
-                radius = 8.0;
+                radius = 8.0 * devicePixelRatio;
 
             if (playing)
             {
@@ -1725,7 +1738,7 @@ class: Timeline : Widget
 
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-            glLineWidth(1.0);
+            glLineWidth(1.0*devicePixelRatio);
             glColor(fcol);
             glBegin(GL_LINES);
             glVertex(xframe1, sY - 1);
@@ -1733,7 +1746,7 @@ class: Timeline : Widget
             glEnd();
         }
 
-        glLineWidth(1.5);
+        glLineWidth(1.5*devicePixelRatio);
 
         if (_drag && _settings.showInputName)
         {
@@ -1751,7 +1764,7 @@ class: Timeline : Widget
             gltext.writeAtNL(10, _Ytop + 3, "%d" % (f - fi + 1));
         }
 
-        gltext.size(config.tlBoundsTextSize);
+        gltext.size(config.tlBoundsTextSize * devicePixelRatio);
         gltext.writeAtNL(10, _Ybot, _totalFunc(fo-fi+1));
 
         //
@@ -1816,8 +1829,8 @@ class: Timeline : Widget
 
         if (drawControls)
         {
-            let vcr_h  = _controlSize,
-                vcr_w  = _controlSize * 6,
+            let vcr_h  = _controlSize * devicePixelRatio,
+                vcr_w  = _controlSize * devicePixelRatio * 6,
                 vcr_x0 = d.x - vcr_w,
                 vcr_x1 = vcr_x0 + vcr_w,
                 vcr_y0 = 0,
@@ -1881,7 +1894,7 @@ class: Timeline : Widget
             glyphElement(4, advanceGlyph, 180, false);
 
             glColor(.15,.15,.15,1);
-            glLineWidth(1.0);
+            glLineWidth(1.0*devicePixelRatio);
             glyphElement(0, advanceGlyph, 0, true);
             glyphElement(1, triangleGlyph, 0, true);
             glyphElement(2, xformedGlyph(squareGlyph, 0, 0.8), 0, true);

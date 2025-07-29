@@ -112,7 +112,7 @@ except Exception as e:
 '''
 
 
-def get_python_interpreter_args(python_home: str) -> List[str]:
+def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
     """
     Return the path to the python interpreter given a Python home
 
@@ -120,7 +120,7 @@ def get_python_interpreter_args(python_home: str) -> List[str]:
     :return: Path to the python interpreter
     """
 
-    build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
+    build_opentimelineio = platform.system() == "Windows" and variant == "Debug"
     python_name_pattern = "python*" if not build_opentimelineio else "python_d*"
 
     python_interpreters = glob.glob(
@@ -130,13 +130,18 @@ def get_python_interpreter_args(python_home: str) -> List[str]:
         os.path.join(python_home, "bin", python_name_pattern)
     )
 
-    # sort put python# before python#-config
+    # sort put python# before python#-config, prioritize debug on Windows debug builds
     python_interpreters = sorted(
         [
             p
             for p in python_interpreters
             if os.path.islink(p) is False and os.access(p, os.X_OK)
-        ]
+        ],
+        key=lambda p: (
+            "-config" in os.path.basename(p),  # config variants last
+            not ("_d" in os.path.basename(p) and platform.system() == "Windows" and variant.lower() == "debug"),  # prioritize _d on Windows debug
+            os.path.basename(p)  # alphabetical
+        )
     )
 
     if not python_interpreters or os.path.exists(python_interpreters[0]) is False:
@@ -221,7 +226,7 @@ def patch_python_distribution(python_home: str) -> None:
                 print(f"Copying {lib_path} to the python home")
                 shutil.copy(lib_path, os.path.join(python_home, "libs"))
 
-    python_interpreter_args = get_python_interpreter_args(python_home)
+    python_interpreter_args = get_python_interpreter_args(python_home, VARIANT)
 
     # -I : isolate Python from the user's environment
     python_interpreter_args.append("-I")
@@ -290,7 +295,7 @@ def test_python_distribution(python_home: str) -> None:
         print(f"Moving {python_home} to {tmp_python_home}")
         shutil.move(python_home, tmp_python_home)
 
-        python_interpreter_args = get_python_interpreter_args(tmp_python_home)
+        python_interpreter_args = get_python_interpreter_args(tmp_python_home, VARIANT)
 
         # Note: We need to build opentimelineio from sources in Windows+Debug
         #       because the official wheel links with the release version of

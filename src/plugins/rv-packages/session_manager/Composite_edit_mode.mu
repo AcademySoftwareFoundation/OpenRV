@@ -122,6 +122,10 @@ class: CompositeEditMode : MinorMode
     {
         \: (int;)
         {
+            if (filterLiveReviewEvents()) {
+                return DisabledMenuState;
+            }
+
             let op = getStringProperty("#RVStack.composite.type").front();
             if op == n then CheckedMenuState else UncheckedMenuState;
         };

@@ -218,15 +218,15 @@ Some events will originate from RV itself. These include things like new-source 
 | before-play-start |  |  | Play mode will start |
 | mark-frame | frame |  | Frame was marked |
 | unmark-frame | frame |  | Frame was unmarked |
-| set-annotation-hold |  |  | Enable held annotation |
-| set-annotation-ghost |  |  | Enable ghosted annotation |
-| toggle-draw-panel |  |  | Toggle the draw panel of the annotation package |
+| update-hold-button |  |  | Update the checked state of the hold button |
+| update-ghost-button |  |  | Update the checked state of the ghost button |
 | pixel-block | Event.data() |  | A block of pixels was received from a remote connection |
 | graph-state-change |  |  | A property in the image processing graph changed |
 | graph-node-inputs-changed | nodename |  | Inputs of a top-level node added/removed/re-ordered |
 | range-changed |  |  | The time range changed |
 | narrowed-range-changed |  |  | The narrowed time range changed |
 | margins-changed | left right top bottom |  | View margins changed |
+| output-video-device-changed | outputVideoModuleName/outputVideoDeviceName |  | The output video device changed |
 | view-resized | old-w new-w | old-h new-h |  | Main view changed size |
 | preferences-show |  |  | Pref dialog will be shown |
 | preferences-hide |  |  | Pref dialog was hidden |

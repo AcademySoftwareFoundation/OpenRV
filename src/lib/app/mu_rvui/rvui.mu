@@ -25,6 +25,7 @@ use math;
 use math_util;
 use rvtypes;
 
+
 global int preSnapRenderCount = 0;
 global Vec2 snapTranslation;
 global bool snapDoit = false;
@@ -229,6 +230,11 @@ global Configuration globalConfig =
 
 \: randomLUT (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     float[] lut;
     int n = math_util.random(25);
     lut.resize(n * 3);
@@ -314,6 +320,11 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
             return if getIntProperty("#RVLinearize.color.alphaType").front() == alphaType
@@ -331,6 +342,11 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
             return if getFloatProperty("#RVLensWarp.warp.pixelAspectRatio").front() == a
@@ -356,6 +372,11 @@ global Configuration globalConfig =
 
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
             let a = getIntProperty("%s.%s.active" % fmt).front(),
@@ -373,11 +394,16 @@ global Configuration globalConfig =
 }
 
 \: fileLUTState (MenuStateFunc; string name) { lutState(name, "Color", "File"); }
-\: luminanceLUTState (MenuStateFunc; string name) { lutState(name, "Color", "Luminance"); }
+\: luminanceLUTState (MenuStateFunc; string name) {lutState(name, "Color", "Luminance"); }
 \: displayLUTState (MenuStateFunc; string name) { lutState(name, "Display", "LUT"); }
 
 \: dispGammaState (int;)
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     float g = 1.0;
 
     try
@@ -396,6 +422,11 @@ global Configuration globalConfig =
 
 \: fileGammaState (int;)
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     try
     {
         int a = getIntProperty("#RVLinearize.color.active").front();
@@ -455,6 +486,11 @@ global Configuration globalConfig =
 {
     \: (void;)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
         let s = getIntProperty(name).front(),
             n = string.split(name, ".").back();
 
@@ -580,6 +616,12 @@ global Configuration globalConfig =
 
 \: computePixelRelativeScale (float; float scl, bool fitWidthOnly, bool silent=false)
 {
+    if (filterLiveReviewEvents())
+    {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     require math_linear;
 
     updatePixelInfo(nil);
@@ -675,6 +717,11 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
             return if getFloatProperty("#RVFormat.geometry.scale").front() == res
@@ -690,6 +737,11 @@ global Configuration globalConfig =
 
 \: sourcesExistState (int;)
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     if sources().size() > 0 then NeutralMenuState else DisabledMenuState;
 }
 
@@ -709,6 +761,11 @@ global Configuration globalConfig =
 
 \: videoSourcesExistState (int;)
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     for_each (s; sources())
     {
         if (s eq nil) continue;
@@ -823,6 +880,11 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
             return if getIntProperty(name).front() == 0
@@ -916,6 +978,27 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
+        if (metaEvaluateClosestByType(frame(),"RVDisplayColor").size() > 0)
+        {
+            return UncheckedMenuState;
+        }
+        return DisabledMenuState;
+    };
+}
+
+\: checkForDisplayNode (MenuStateFunc;)
+{
+    \: (int;)
+    {
+        if (metaEvaluateClosestByType(frame(),"OCIODisplay").size() > 0)
+        {
+            return UncheckedMenuState;
+        }
         if (metaEvaluateClosestByType(frame(),"RVDisplayColor").size() > 0)
         {
             return UncheckedMenuState;
@@ -938,10 +1021,22 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
-            return if getIntProperty("@RVDisplayColor.color.channelFlood").front() == ch
-                then CheckedMenuState else UncheckedMenuState;
+            string propertyName = "@OCIODisplay.color.channelFlood";
+            if (!propertyExists(propertyName))
+            {
+                propertyName = "@RVDisplayColor.color.channelFlood";
+            }
+
+            return if getIntProperty(propertyName).front() == ch
+                    then CheckedMenuState else UncheckedMenuState;
+
         }
         catch (...)
         {
@@ -954,16 +1049,21 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         try
         {
-            if (getStringProperty("@RVDisplayColor.color.channelOrder").front() == order)
+            string propertyName = "@OCIODisplay.color.channelOrder";
+            if (!propertyExists(propertyName))
             {
-                return CheckedMenuState;
+                propertyName = "@RVDisplayColor.color.channelOrder";
             }
-            else
-            {
-                return UncheckedMenuState;
-            }
+
+            return if getStringProperty(propertyName).front() == order
+                    then CheckedMenuState else UncheckedMenuState;
         }
         catch (...)
         {
@@ -974,7 +1074,14 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 
 \: frameFunc (VoidFunc; (void;int) F)
 {
-    \: (void;) { F(frame()); };
+    \: (void;)
+    {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+        F(frame());
+    };
 }
 
 \: incN ((void;); int i)
@@ -1261,8 +1368,14 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: orderPrompt (string;)
 {
+    string propertyName = "@OCIODisplay.color.channelOrder";
+    if (!propertyExists(propertyName))
+    {
+        propertyName = "@RVDisplayColor.color.channelOrder";
+    }
+
     "Enter Channel Order [%s]: " %
-        getStringProperty("@RVDisplayColor.color.channelOrder").back();
+        getStringProperty(propertyName).back();
 }
 
 \: pixaPrompt (string;)
@@ -1344,7 +1457,13 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setOrderValue (void; string order)
 {
-    setStringProperty("@RVDisplayColor.color.channelOrder", string[]{order});
+    string propertyName = "OCIODisplay.color.channelOrder";
+    if (!propertyExists("@%s" % propertyName))
+    {
+        propertyName = "RVDisplayColor.color.channelOrder";
+    }
+    
+    setStringProperty("#%s" % propertyName, string[]{order});
 }
 
 \: setPixaValue (void; string v)
@@ -1362,6 +1481,11 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setFPSValue (void; string v)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     let f = float(v);
 
     if (f > 0)
@@ -1519,6 +1643,11 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setDispGamma (void; string v)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     setFloatProperty("@RVDisplayColor.color.gamma", float[]{float(v)});
     setIntProperty("@RVDisplayColor.color.Rec709", int[] {0});
     setIntProperty("@RVDisplayColor.color.sRGB", int[] {0});
@@ -1590,11 +1719,19 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: rangeState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if isPlayable() then NeutralMenuState else DisabledMenuState;
 }
 
 \: forwardState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if isPlayable()
          then (if inc() > 0 then CheckedMenuState else UncheckedMenuState)
          else DisabledMenuState;
@@ -1602,6 +1739,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: backwardState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if isPlayable()
         then (if inc() < 0 then CheckedMenuState else UncheckedMenuState)
         else DisabledMenuState;
@@ -1609,11 +1750,19 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: hasMarksState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if markedFrames().empty() then DisabledMenuState else NeutralMenuState;
 }
 
 \: markedState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if (isPlayable())
     {
         let array = markedFrames(),
@@ -1630,17 +1779,29 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: sequenceState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if sequenceBoundaries().size() > 1 then NeutralMenuState else DisabledMenuState;
 }
 
 \: playState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if isPlaying() then CheckedMenuState else
         (if isPlayable() then UncheckedMenuState else DisabledMenuState);
 }
 
 \: pingPongState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if isPlayable() then
       (if playMode() == PlayPingPong then CheckedMenuState else UncheckedMenuState)
       else DisabledMenuState;
@@ -1648,6 +1809,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: playOnceState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if isPlayable() then
       (if playMode() == PlayOnce then CheckedMenuState else UncheckedMenuState)
       else DisabledMenuState;
@@ -1655,6 +1820,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: realtimeState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if rangeState() == DisabledMenuState then DisabledMenuState
         else (if isRealtime() then UncheckedMenuState else CheckedMenuState);
 }
@@ -1665,8 +1834,20 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                  else DisabledMenuState;
 }
 
+\: displayProfilesState (int;)
+{
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+}
+
+
 \: filterState (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
     if getFiltering() == GL_LINEAR then CheckedMenuState else UncheckedMenuState;
 }
 
@@ -1894,6 +2075,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleWipe (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
     let vnode = viewNode();
 
@@ -2082,6 +2268,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: wipeShown (int;)
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     State state = data();
     let vnode = viewNode();
 
@@ -2200,6 +2391,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (int;)
     {
         let ret = DisabledMenuState;
+
+        if (filterLiveReviewEvents())
+        {
+            return ret;
+        }
+
         try
         {
             let s = getIntProperty("@RVDisplayColor.color.sRGB").front(),
@@ -2232,6 +2429,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (int;)
     {
         let ret = DisabledMenuState;
+
+        if (filterLiveReviewEvents()) {
+            return ret;
+        }
+
         try
         {
             int a = getIntProperty("#RVLinearize.color.active").front();
@@ -2544,6 +2746,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleMark (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     markFrame(frame(), !isMarked(frame()));
     redraw();
 }
@@ -2599,6 +2806,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setInOutMarkedRangeAtFrame (void; int f)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     let (start,end) = markedBoundariesAroundFrame(f),
         playing = (isPlaying() || isBuffering());
 
@@ -2763,6 +2975,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedRange (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     try
     {
         let (start,end) = markedBoundariesAroundFrame(frame());
@@ -2788,6 +3005,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedRange (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     try
     {
         let (start,end) = markedBoundariesAroundFrame(frame());
@@ -2813,6 +3035,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: expandMarkedRange (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     try
     {
         let marks = markedFrames();
@@ -2861,6 +3088,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: contractMarkedRange (void;)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     try
     {
         let marks = markedFrames(),
@@ -2903,10 +3135,22 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
         State state = data();
-        let v = getIntProperty("@RVDisplayColor.color.channelFlood").front();
+
+        string propertyName = "OCIODisplay.color.channelFlood";
+        if (!propertyExists("@%s" % propertyName))
+        {
+            propertyName = "RVDisplayColor.color.channelFlood";
+        }
+
+        let v = getIntProperty("@%s" % propertyName).front();
         let nch = if v == ch then 0 else ch;
-        setIntProperty("#RVDisplayColor.color.channelFlood", int[] {nch});
+        setIntProperty("#%s" % propertyName, int[] {nch});
         let (name, glyphFunc) = showChannelGlyphs[nch];
         displayFeedback(name, 2, glyphFunc);
         redraw();
@@ -2918,9 +3162,14 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (void;)
     {
         State state = data();
-        string chtext;
 
-        setStringProperty("@RVDisplayColor.color.channelOrder", string[] {order});
+        string propertyName = "OCIODisplay.color.channelOrder";
+        if (!propertyExists("@%s" % propertyName))
+        {
+            propertyName = "RVDisplayColor.color.channelOrder";
+        }
+
+        setStringProperty("#%s" % propertyName, string[] {order});
         displayFeedback("Channel Order => %s" % order);
         redraw();
     };
@@ -2935,6 +3184,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     // are resetting the in/out points, but if they do
     // then we are restoring the old values.
     //
+
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
 
     State state = data();
     
@@ -3013,13 +3267,26 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setFPSFunc (VoidFunc; float rate)
 {
-    \: (void;) { setFPS(rate); redraw(); };
+    \: (void;)
+    {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
+        setFPS(rate);
+        redraw();
+    };
 }
 
 \: bitDepthState (MenuStateFunc; int depth)
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents()) {
+            return DisabledMenuState;
+        }
+
         try
         {
             let d = getIntProperty("#RVFormat.color.maxBitDepth").front();
@@ -3036,6 +3303,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents()) {
+            return DisabledMenuState;
+        }
+
         try
         {
             let r = getFloatProperty(prop);
@@ -3052,6 +3323,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         State state = data();
         float smaspect = state.matteAspect;
         if (!state.showMatte && maspect == 0.0) return CheckedMenuState;
@@ -3072,6 +3348,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         State state = data();
         float smop = state.matteOpacity;
         if (mop == -1.0  &&
@@ -3145,7 +3426,13 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setDither (void; Event event, int bits)
 {
-    set("@RVDisplayColor.color.dither", bits);
+    string propertyName = "@OCIODisplay.color.dither";
+    if (!propertyExists(propertyName))
+    {
+        propertyName = "@RVDisplayColor.color.dither";
+    }
+
+    set(propertyName, bits);
     redraw();
 }
 
@@ -3153,9 +3440,20 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        try
+        if (filterLiveReviewEvents())
         {
-            let p = getIntProperty("@RVDisplayColor.color.dither").front();
+            return DisabledMenuState;
+        }
+
+        try
+    {
+            string propertyName = "@OCIODisplay.color.dither";
+            if (!propertyExists(propertyName))
+            {
+                propertyName = "@RVDisplayColor.color.dither";
+            }
+
+            let p = getIntProperty(propertyName).front();
             return if p == bits then CheckedMenuState else UncheckedMenuState;
         }
         catch (...)
@@ -3614,6 +3912,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
     sendInternalEvent ("session-clear-everything", "", "rvui");
 }
+
 
 \: getMediaFilesFromBrowser (string[]; )
 {
@@ -4595,11 +4894,21 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cycleStackForward (void; Event ev)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     smartCycleInputs (true);
 }
 
 \: cycleStackBackward (void; Event ev)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     smartCycleInputs (false);
 }
 
@@ -4613,6 +4922,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: isStackMode (int;)
 {
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
     let typeName = nodeType(viewNode());
     if typeName == "RVStackGroup" || typeName == "RVLayoutGroup" 
                then UncheckedMenuState 
@@ -4661,6 +4973,16 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                                               else UncheckedMenuState;
 }
 
+\: frameState (int;)
+{
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
+    return NeutralMenuState;
+}
+
 \: isSetToRenderer ((int;); string type)
 {
     \: (int;)
@@ -4673,6 +4995,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
         let t = getStringProperty("@RVDisplayStereo.stereo.type").front();
 
         if (type == "any")
@@ -4692,6 +5019,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int; )
     {
+        if (filterLiveReviewEvents()) {
+            return DisabledMenuState;
+        }
+
         bool toggled = false;
         try 
         {
@@ -4713,6 +5044,16 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
         result;
     };
+}
+
+
+\: eyeOffsetState(int;)
+{
+    if (filterLiveReviewEvents()) {
+        return DisabledMenuState;
+    }
+
+    return NeutralMenuState;
 }
 
 \: isCompositeMode ((int;); string type)
@@ -4771,9 +5112,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: drawFeedback (void; Event event)
 {
     State state = data();
-    gltext.size(20);
 
     if (state.feedbackText eq nil) return;
+
+    let devicePixelRatio = devicePixelRatio(),
+        textsize = 20 * devicePixelRatio;
+    gltext.size(textsize);
 
     let d  = event.domain(),
         w  = d.x,
@@ -4794,8 +5138,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     let m = margins();
-    drawTextWithCartouche(m[0] + 20, h-20-sb[3] - m[2], state.feedbackText,
-                          20, fg, bg,
+    drawTextWithCartouche(m[0]*devicePixelRatio + textsize,
+                          h-textsize-sb[3] - m[2]*devicePixelRatio,
+                          state.feedbackText,
+                          textsize, fg, bg,
                           state.feedbackGlyph, gc);
     glDisable(GL_BLEND);
 
@@ -4898,7 +5244,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         attrs    = getCurrentAttributes(),
         srcs     = sources(),
         noAttrs  = attrs == nil || attrs.empty(),
-        textsize = 20,
+        textsize = 20 * devicePixelRatio(),
         colorscl = 0.75,
         fstatus  = currentFrameStatus();
 
@@ -5836,6 +6182,10 @@ global bool debugGC = false;
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents()) {
+            return DisabledMenuState;
+        }
+
         let t = getStringProperty("defaultStack_stack.composite.type").front(),
             isStack = (viewNode() == "defaultStack");
 
@@ -5847,6 +6197,10 @@ global bool debugGC = false;
 {
     \: (int;)
     {
+        if (filterLiveReviewEvents()) {
+            return DisabledMenuState;
+        }
+
         let itIs = (viewNode() == name);
 
         return if (itIs) then CheckedMenuState else UncheckedMenuState;
@@ -5894,6 +6248,11 @@ global bool debugGC = false;
 
 \: lockResizeScaleState (int; )
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
+
     State state = data();
     return if (state.lockResizeScale) then CheckedMenuState else UncheckedMenuState;
 }
@@ -5906,6 +6265,10 @@ global bool debugGC = false;
 
 \: isExpandedWidth (int; )
 {
+    if (filterLiveReviewEvents())
+    {
+        return DisabledMenuState;
+    }
     return if (expandWidth) then CheckedMenuState else UncheckedMenuState;
 }
 
@@ -5932,10 +6295,10 @@ global bool debugGC = false;
             {"Global Flop Right Eye", ~toggleRFlop, nil, propToggledAndStereoOnState("@RVDisplayStereo.rightTransform.flop")},
             {"_", nil},
             {"Interactive Edit",      nil, nil, inactiveState },
-            {"    Global Relative Eye Offset (%)", stereoOffsetMode, nil, nil},
-            {"    Global Right Eye Only Offset (%)", stereoROffsetMode, nil, nil},
+            {"    Global Relative Eye Offset (%)", stereoOffsetMode, nil, eyeOffsetState},
+            {"    Global Right Eye Only Offset (%)", stereoROffsetMode, nil, eyeOffsetState},
             {"_", nil},
-            {"Reset All Stereo Offsets", resetStereoOffsets, nil, nil},
+            {"Reset All Stereo Offsets", resetStereoOffsets, nil, eyeOffsetState},
             }},
         //{"Renderer", Menu {
             //{"Composite", setToRenderer("Composite"), nil, isSetToRenderer("Composite")}
@@ -5945,8 +6308,8 @@ global bool debugGC = false;
         {"Presentation Mode", ~togglePresentationMode, "control p", presentationModeState},
         {"Presentation Settings", Menu()},
         {"_", nil},
-        {"Frame",           ~frameImage,     "f"},
-        {"Frame Width",     frameWidth,     "control f"},
+        {"Frame",           ~frameImage,     "f", frameState},
+        {"Frame Width",     frameWidth,     "control f", frameState},
         {"_", nil},
         {"Linear to Display Correction", nil, nil, inactiveState},
         {"   No Correction", setDispConvert(""), nil, hasDispConversion("")},
@@ -5991,7 +6354,7 @@ global bool debugGC = false;
         {"Channel Order", Menu {
             {"RGBA", ~channelOrder("RGBA"), nil, channelOrderState("RGBA")},
             {"_", nil},
-            {"Custom...", enterOrder, nil, checkForDisplayColor()},
+            {"Custom...", enterOrder, nil, checkForDisplayNode()},
             {"_", nil},
             {"RBGA", ~channelOrder("RBGA"), nil, channelOrderState("RBGA")},
             {"GBRA", ~channelOrder("GBRA"), nil, channelOrderState("GBRA")},
@@ -6023,7 +6386,7 @@ global bool debugGC = false;
         {"_", nil},
         {"Show Out Of Range Colors", ~toggleOutOfRange, nil, isOutOfRange},
         {"_", nil},
-        {"Create/Edit Display Profiles...", ~editProfiles, nil, nil},
+        {"Create/Edit Display Profiles...", ~editProfiles, nil, displayProfilesState},
         {"_", nil},
         {"Linear Filter",   ~toggleFilter, "n", filterState},
         {"Lock Pixel Scale During Resize",  toggleLockResizeScale, nil, lockResizeScaleState},
@@ -6266,8 +6629,8 @@ global bool debugGC = false;
                     {"Flop Right Eye", ~toggleSourceRFlop, nil, propToggledAndStereoOnState("#RVSourceStereo.rightTransform.flop")},
                     {"_", nil},
                     {"Interactive Edit",      nil, nil, inactiveState },
-                    {"    Relative Eye Offset (%)", sourceStereoOffsetMode, nil, nil},
-                    {"    Right Eye Only Offset (%)", sourceStereoROffsetMode, nil, nil},
+                    {"    Relative Eye Offset (%)", sourceStereoOffsetMode, nil, eyeOffsetState},
+                    {"    Right Eye Only Offset (%)", sourceStereoROffsetMode, nil, eyeOffsetState},
                     }},
             {"_", nil},
             {"Flip",            ~toggleFlip, "Y", toggleFlipState},
@@ -6699,7 +7062,6 @@ global bool debugGC = false;
     bind("key-down--page-down", previousMarkedRange, "Set In/Out to Previous Marked Range");
     bind("key-down--page-up", nextMarkedRange, "Set In/Out to Next Marked Range");
     bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
-    bind("key-down--q", queryClose, "Close Session");
     bind("key-down--r", showChannel(1), "Show Red Channel");
     bind("key-down--right", stepForward1, "Step Forward 1 Frame");
     bind("key-down--t", toggleTimeline, "Toggle Heads-Up Timeline");
