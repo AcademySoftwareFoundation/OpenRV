@@ -1312,7 +1312,25 @@ namespace Rv
 
         if (Options::sharedOptions().delaySessionLoading)
         {
-            s->userGenericEvent("before-progressive-loading", "");
+            // Note: It was decided to trigger the before-progressive-loading
+            // event even when progressive source loading is disabled as per the
+            // documentation. When progressive source loading is enabled, we
+            // have to check that some media is not already loading before
+            // triggering the event because the after-progressive-loading event
+            // is triggered when all the media are loaded, and we don't want to
+            // trigger it if some media is still loading, otherwise we would end
+            // up with an imbalance between the before-progressive-loading and
+            // after-progressive-loading events. This is the reason why we check
+            // if the graph isMediaLoading() before triggering the
+            // before-progressive-loading event.
+            // If progressive source loading is disabled, we don't have to check
+            // if the graph isMediaLoading() because this mechanism is not used
+            // in that case.
+            if (!Options::sharedOptions().progressiveSourceLoading
+                || !s->graph().isMediaLoading())
+            {
+                s->userGenericEvent("before-progressive-loading", "");
+            }
 
             // Note: It was decided to trigger the
             // before-progressive-proxy-loading event even when progressive
@@ -1423,7 +1441,25 @@ namespace Rv
 
         if (Options::sharedOptions().delaySessionLoading)
         {
-            s->userGenericEvent("before-progressive-loading", "");
+            // Note: It was decided to trigger the before-progressive-loading
+            // event even when progressive source loading is disabled as per the
+            // documentation. When progressive source loading is enabled, we
+            // have to check that some media is not already loading before
+            // triggering the event because the after-progressive-loading event
+            // is triggered when all the media are loaded, and we don't want to
+            // trigger it if some media is still loading, otherwise we would end
+            // up with an imbalance between the before-progressive-loading and
+            // after-progressive-loading events. This is the reason why we check
+            // if the graph isMediaLoading() before triggering the
+            // before-progressive-loading event.
+            // If progressive source loading is disabled, we don't have to check
+            // if the graph isMediaLoading() because this mechanism is not used
+            // in that case.
+            if (!Options::sharedOptions().progressiveSourceLoading
+                || !s->graph().isMediaLoading())
+            {
+                s->userGenericEvent("before-progressive-loading", "");
+            }
 
             // Note: It was decided to trigger the
             // before-progressive-proxy-loading event even when progressive
