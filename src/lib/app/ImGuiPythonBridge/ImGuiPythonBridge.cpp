@@ -43,6 +43,12 @@ namespace Rv
 
     void ImGuiPythonBridge::callCallbacks()
     {
+        // Early exit optimization - avoid Python overhead if no callbacks registered
+        if (s_callbacks.empty())
+        {
+            return;
+        }
+        
         for (auto& cb : s_callbacks)
         {
             PyGILState_STATE gstate = PyGILState_Ensure();

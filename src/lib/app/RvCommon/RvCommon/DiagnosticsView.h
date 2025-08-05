@@ -11,6 +11,8 @@
 #include <QOpenGLExtraFunctions>
 #include <QSurfaceFormat>
 #include <QTimer>
+#include <QShowEvent>
+#include <QHideEvent>
 
 #include <vector>
 
@@ -38,9 +40,16 @@ namespace Rv
         void handleMenuBar();
         void resetDockSpace();
 
+    protected:
+        void showEvent(QShowEvent* event) override;
+        void hideEvent(QHideEvent* event) override;
+
     private:
+        void initializeImGui();
+
         QTimer m_timer;
-        static std::vector<PyObject*> s_imguiCallbacks;
+        bool m_initialized = false;
+        
     };
 } // namespace Rv
 
