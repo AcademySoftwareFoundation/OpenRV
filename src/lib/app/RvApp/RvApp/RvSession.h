@@ -386,6 +386,8 @@ namespace Rv
         void onGraphMediaSetEmpty();
         void onGraphNodeWillRemove(IPCore::IPNode* node);
 
+        void updateAnnotationsUI();
+
     private:
         UINameCache m_uiNameCache;
 

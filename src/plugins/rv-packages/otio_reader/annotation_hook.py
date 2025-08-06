@@ -16,6 +16,16 @@ def hook_function(
     in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None
 ) -> None:
     """A hook for the annotation schema"""
+
+    metadata = argument_map.get("effect_metadata")
+    is_hold = metadata.get("hold")
+    is_ghost = metadata.get("ghost")
+
+    commands.setIntProperty("#Session.paintEffects.hold", [is_hold])
+    commands.setIntProperty("#Session.paintEffects.ghost", [is_ghost])
+    commands.setIntProperty("#Session.paintEffects.ghostBefore", [5])
+    commands.setIntProperty("#Session.paintEffects.ghostAfter", [5])
+
     for layer in in_timeline.layers:
         if layer.name == "Paint":
             if isinstance(layer.layer_range, otio.opentime.TimeRange):
@@ -38,10 +48,6 @@ def hook_function(
             # Set properties on the paint component of the RVPaint node
             effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id + 1})
 
-            metadata = argument_map.get("effect_metadata")
-            is_hold = metadata.get("hold")
-            is_ghost = metadata.get("ghost")
-
             start_time = int(time_range.start_time.value)
             end_time = int(start_time + time_range.duration.value)
 
@@ -60,10 +66,6 @@ def hook_function(
                     "mode": 0 if layer.type == "COLOR" else 1,
                     "startFrame": start_time,
                     "duration": duration,
-                    "hold": is_hold,
-                    "ghost": is_ghost,
-                    "ghostBefore": 5,
-                    "ghostAfter": 5,
                 },
             )
 
@@ -80,7 +82,9 @@ def hook_function(
                     "Unable to get the global scale, using the aspect ratio of the first media file"
                 )
                 try:
-                    first_source_node = commands.sourcesAtFrame(0)[0]
+                    media_switch = commands.nodeConnections("MediaTrack")[0][0]
+                    media_source_group = commands.nodeConnections(media_switch)[0][0]
+                    first_source_node = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
                     media_info = commands.sourceMediaInfo(first_source_node)
                     height = media_info["height"]
                     aspect_ratio = media_info["width"] / height

@@ -250,7 +250,9 @@ int utf8Main(int argc, char* argv[])
     XInitThreads();
 #endif
 
-    const bool noHighDPISupport = getenv("RV_QT_HDPI_SUPPORT") == nullptr;
+    // Now supporting high DPI displays by default
+    // Setting the following environment variable, disable the high DPI support
+    const bool noHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
     if (noHighDPISupport)
     {
         qunsetenv("QT_SCALE_FACTOR");
