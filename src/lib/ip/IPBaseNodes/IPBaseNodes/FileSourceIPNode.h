@@ -276,7 +276,7 @@ namespace IPCore
         std::atomic<IPGraph::WorkItemID> m_workItemID;
         Mutex m_dispatchIDListMutex;
         std::list<Application::DispatchID> m_dispatchIDList;
-        std::atomic<IPGraph::WorkItemID> m_loadingID;
+        std::atomic<IPGraph::WorkItemID> m_loadingID{0};
         Mutex m_dispatchIDCancelRequestedMutex;
         std::set<Application::DispatchID> m_dispatchIDCancelRequestedSet;
         bool m_progressiveSourceLoading;
