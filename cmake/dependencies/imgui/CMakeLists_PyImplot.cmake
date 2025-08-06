@@ -32,6 +32,11 @@ ENDIF()
 
 NANOBIND_ADD_MODULE(pyimplot ${IMPLOT_NB_SOURCES})
 
+# Set the correct suffix for Windows Python modules
+IF(RV_TARGET_WINDOWS)
+  SET_TARGET_PROPERTIES(pyimplot PROPERTIES SUFFIX ".pyd")
+ENDIF()
+
 TARGET_LINK_LIBRARIES(
   pyimplot
   PUBLIC ${imgui_LIBRARY}
