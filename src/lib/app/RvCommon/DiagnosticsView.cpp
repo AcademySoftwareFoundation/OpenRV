@@ -52,7 +52,6 @@ namespace Rv
 
             if (_initCount == 0)
             {
-                int callbackCount = Rv::ImGuiPythonBridge::nbCallbacks();
                 Rv::ImGuiPythonBridge::clearCallbacks();
                 ImGui_ImplOpenGL2_Shutdown();
                 ImGui_ImplQt_Shutdown();
