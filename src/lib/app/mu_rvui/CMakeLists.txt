@@ -10,8 +10,12 @@ SET(_target
 
 IF(RV_VFX_PLATFORM STREQUAL CY2024)
   SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
-      "let screen = qt.QApplication.screenAt(mainWin.mapToGlobal(qt.QPoint(0, 0)));\n \
-        let usedRect = screen.availableGeometry();\n"
+    "
+      // Get the screen containing the window (Qt 6 compatible)\n \
+      let screen = mainWin.screen();\n \
+      if (screen eq nil) screen = qt.QGuiApplication.primaryScreen();\n \
+      let usedRect = screen.availableGeometry();\n \
+    "
   )
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
