@@ -5128,6 +5128,14 @@ namespace IPMu
         NODE_RETURN(stype->allocate(idstr));
     }
 
+    NODE_IMPLEMENTATION(setOutputVideoDevice, void)
+    {
+        Session* s = Session::currentSession();
+        auto outputDevice = s->outputVideoDevice();
+
+        s->setOutputVideoDevice(outputDevice);
+    }
+
     NODE_IMPLEMENTATION(audioTextureID, int)
     {
         Session* s = Session::currentSession();
@@ -6449,6 +6457,9 @@ namespace IPMu
                          new Param(c, "moduleName", "string"),
                          new Param(c, "deviceName", "string"),
                          new Param(c, "idtype", "int"), End),
+
+            new Function(c, "setOutputVideoDevice", setOutputVideoDevice, None,
+                         Return, "void", End),
 
             new Function(c, "licensingState", licensingState, None, Return,
                          "int", End),
