@@ -180,7 +180,7 @@ namespace Rv
                 opts.dispAlphaBits, !m_startupResize);
         }
 
-        // Create DiagnosticsView as a dockable widget.
+        // Create DiagnosticsView as a dockable widget (lazy initialization).
         m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
 
         // Dockable to QMainWindow, not centralwidget.
@@ -843,7 +843,10 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
-    void RvDocument::showDiagnostics() { m_diagnosticsDock->show(); }
+    void RvDocument::showDiagnostics() 
+    {
+        m_diagnosticsDock->show(); 
+    }
 
     void RvDocument::setStereo(bool b)
     {
