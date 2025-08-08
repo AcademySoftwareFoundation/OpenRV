@@ -62,8 +62,13 @@ class: WindowMinorMode : MinorMode
             wide = va > ia,
             ns = (if wide then h / double(d.y) else w / double(d.x));
 
+        // Get main window for screen detection
+        let mainWin = commands.mainWindowWidget();
+
         int width = int(w * scale/ns + 0.5);
         int height = int(h * scale/ns + 0.5);
+
+        @MU_DPI_SCALING_ADJUSTMENT@
 
         //
         // Set the new dimensions while maintaining the same zoom scale
@@ -76,8 +81,7 @@ class: WindowMinorMode : MinorMode
         // Determine if the window is out of bounds on the screen and pull it in
         //
 
-        let mainWin = commands.mainWindowWidget(),
-            mainRect = mainWin.frameGeometry();
+        let mainRect = mainWin.frameGeometry();
 
         // IMPORTANT: SEE src/lib/app/mu_rvui/CMakeLists.txt
         @MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY@
