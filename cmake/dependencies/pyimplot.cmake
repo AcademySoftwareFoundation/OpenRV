@@ -84,10 +84,16 @@ EXTERNALPROJECT_ADD(
 )
 
 # Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
+IF (RV_TARGET_WINDOWS)
+  SET(_pybindings_location "${RV_STAGE_LIB_DIR}/site-packages")
+ELSE()
+  SET(_pybindings_location "${RV_STAGE_LIB_DIR}/${_PYTHON_LIB_DIR}")
+ENDIF()
+
 ADD_CUSTOM_COMMAND(
   COMMENT "Installing ${_target}'s libs into site-packages"
   OUTPUT ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_libpath} ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_libpath} ${_pybindings_location}/${_libname}
   DEPENDS ${_target}
 )
 ADD_CUSTOM_TARGET(
