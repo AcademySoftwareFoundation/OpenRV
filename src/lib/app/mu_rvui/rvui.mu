@@ -2332,6 +2332,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragZoom (void; Event event)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
 
     let dp = event.pointer() - event.reference(),
@@ -2357,6 +2362,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragMoveLocked (void; bool lockToAxis, Event event)
 {
+    if (filterLiveReviewEvents()) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+   
     recordPixelInfo(event);
     State state = data();
     if (state.pixelInfo eq nil || state.pixelInfo.empty()) return;

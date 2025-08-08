@@ -12,7 +12,6 @@ IF(RV_VFX_PLATFORM STREQUAL CY2024)
   SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
     "
        // Get available screen geometry for the screen containing the window\n \
-       let globalPos = mainWin.mapToGlobal(qt.QPoint(0, 0));\n \
        let screen = qt.QGuiApplication.screenAt(globalPos);\n \
        if (screen eq nil) screen = qt.QGuiApplication.primaryScreen();\n \
        let usedRect = screen.availableGeometry();\n \
