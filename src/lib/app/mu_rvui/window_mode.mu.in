@@ -65,6 +65,8 @@ class: WindowMinorMode : MinorMode
         int width = int(w * scale/ns + 0.5);
         int height = int(h * scale/ns + 0.5);
 
+        @MU_DPI_SCALING_ADJUSTMENT@
+
         //
         // Set the new dimensions while maintaining the same zoom scale
         //
