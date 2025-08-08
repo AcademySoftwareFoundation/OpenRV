@@ -16,6 +16,8 @@
 
 #include "DiagnosticsView.Roboto_Regular"
 
+#include <iostream>
+
 namespace Rv
 {
     class DiagnosticsModule
@@ -34,7 +36,6 @@ namespace Rv
 
         if (_initCount == 1)
         {
-            _initCount++;
             ImGui::CreateContext();
             ImPlot::CreateContext();
             ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -51,72 +52,62 @@ namespace Rv
 
             if (_initCount == 0)
             {
+                Rv::ImGuiPythonBridge::clearCallbacks();
                 ImGui_ImplOpenGL2_Shutdown();
                 ImGui_ImplQt_Shutdown();
                 ImPlot::DestroyContext();
                 ImGui::DestroyContext();
             }
         }
+        else
+        {
+            std::cout << "DiagnosticsModule::shutdown - Warning: shutdown called but init count is already 0" << std::endl;
+        }
     }
 
     int DiagnosticsModule::_initCount = 0;
 
-    std::vector<PyObject*> DiagnosticsView::s_imguiCallbacks;
-
-    void DiagnosticsView::registerImGuiCallback(PyObject* callable)
-    {
-        if (PyCallable_Check(callable))
-        {
-            Py_INCREF(callable);
-            s_imguiCallbacks.push_back(callable);
-        }
-    }
-
-    void DiagnosticsView::callImGuiCallbacks()
-    {
-        for (auto* cb : s_imguiCallbacks)
-        {
-            PyGILState_STATE gstate = PyGILState_Ensure();
-            PyObject* result = PyObject_CallObject(cb, nullptr);
-            if (!result && PyErr_Occurred())
-                PyErr_Print();
-            Py_XDECREF(result);
-            PyGILState_Release(gstate);
-        }
-    }
-
     DiagnosticsView::DiagnosticsView(QWidget* parent, const QSurfaceFormat& fmt)
         : QOpenGLWidget(parent)
         , m_timer(this)
+        , m_initialized(false)
     {
         setFormat(fmt);
-
         setMinimumSize(100, 100);
 
-        DiagnosticsModule::init();
+        // Set the timer interval (40 ms = 25 fps -- more than enough for idle updates)
+        // but don't connect it yet - connection happens when first shown.
+        m_timer.setInterval(40);
+        
+        // NOTE: No ImGui initialization here - it will be done lazily when first shown.
+        // NOTE: Timer connection is also deferred until first show to minimize overhead.
+    }
 
-        applyStyle();
-
-        ImGui_ImplQt_RegisterWidget(this);
-
-        // Send an invalidate request every 33 milliseconds (eg: 30 fps tops)
-        connect(&m_timer, &QTimer::timeout, this,
-                QOverload<>::of(&QWidget::update));
-
-        // every 40 ms = 25 fps -- more than enough for idle updates
-        m_timer.start(40);
+    void DiagnosticsView::initializeImGui()
+    {
+        if (!m_initialized)
+        {
+            DiagnosticsModule::init();
+            applyStyle();
+            ImGui_ImplQt_RegisterWidget(this);
+            m_initialized = true;
+        }
     }
 
     DiagnosticsView::~DiagnosticsView()
     {
         m_timer.stop();
-        DiagnosticsModule::shutdown();
+        if (m_initialized)
+        {
+            DiagnosticsModule::shutdown();
+        }
     }
 
     void DiagnosticsView::initializeGL()
     {
         QOpenGLWidget::initializeGL();
         initializeOpenGLFunctions();
+        // NOTE: ImGui initialization moved to showEvent for lazy loading.
     }
 
     void DiagnosticsView::applyStyle()
@@ -348,6 +339,12 @@ namespace Rv
 
     void DiagnosticsView::paintGL()
     {
+        // Only paint if we're initialized (i.e., if the widget has been shown).
+        if (!m_initialized)
+        {
+            return;
+        }
+
         QOpenGLWidget::paintGL();
 
         // Start ImGui Frame
@@ -360,17 +357,47 @@ namespace Rv
         ImVec2 dockspace_size = ImGui::GetContentRegionAvail();
         ImGui::DockSpaceOverViewport(dockspace_id);
 
+        // Check if we have any Python callbacks registered
+        size_t numCallbacks = Rv::ImGuiPythonBridge::nbCallbacks();
         bool forceShowHelp = false;
-        if ((Rv::ImGuiPythonBridge::nbCallbacks() == 0) || forceShowHelp)
+        
+        if (numCallbacks == 0 || forceShowHelp)
         {
             showHelpWindow();
         }
 
-        Rv::ImGuiPythonBridge::callCallbacks();
+        if (numCallbacks > 0)
+        {
+            Rv::ImGuiPythonBridge::callCallbacks();
+        }
 
         // Render ImGui Frame
         ImGui::Render();
         ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    }
+
+    void DiagnosticsView::showEvent(QShowEvent* event)
+    {
+        QOpenGLWidget::showEvent(event);
+        
+        // Perform lazy initialization when first shown
+        if (!m_initialized)
+        {
+            initializeImGui();
+            
+            // Connect the timer now that we actually need it
+            connect(&m_timer, &QTimer::timeout, this, QOverload<>::of(&QWidget::update));
+        }
+        
+        // Start the timer when the widget becomes visible.
+        m_timer.start();
+    }
+
+    void DiagnosticsView::hideEvent(QHideEvent* event)
+    {
+        QOpenGLWidget::hideEvent(event);
+        // Stop the timer when the widget is hidden to save CPU/GPU resources.
+        m_timer.stop();
     }
 
 } // namespace Rv

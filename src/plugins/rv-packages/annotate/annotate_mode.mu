@@ -1804,6 +1804,14 @@ class: AnnotateMinorMode : MinorMode
     method: nextSlot (void; bool b) { nextAnnotatedFrame(); }
     method: prevSlot (void; bool b) { prevAnnotatedFrame(); }
 
+    method: onPresenterChanged(void; Event event)
+    {
+        if (_active && filterLiveReviewEvents())
+        {
+            toggle();
+        }
+        event.reject();
+    }
 
     method: AnnotateMinorMode (AnnotateMinorMode; string name)
     {
@@ -2239,6 +2247,7 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
+              ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed")
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),
