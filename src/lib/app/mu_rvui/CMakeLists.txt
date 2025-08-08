@@ -23,14 +23,18 @@ IF(RV_VFX_PLATFORM STREQUAL CY2024)
        let globalPos = mainWin.mapToGlobal(qt.QPoint(0, 0));\n \
        let dpiScreen = qt.QGuiApplication.screenAt(globalPos);\n \
        if (dpiScreen eq nil) dpiScreen = qt.QGuiApplication.primaryScreen();\n \
-       if (dpiScreen neq nil)\n \
+       let hdpi = system.getenv(\"RV_NO_QT_HDPI_SUPPORT\", nil);\n \
+       if (hdpi eq nil || hdpi == 0)\n \
        {\n \
-           let dpr = dpiScreen.devicePixelRatio();\n \
-               if (dpr > 1.0)\n \
-               {\n \
-                   width = int(width / dpr + 0.5);\n \
-                   height = int(height / dpr + 0.5);\n \
-               }\n \
+          if (dpiScreen neq nil)\n \
+          {\n \
+              let dpr = dpiScreen.devicePixelRatio();\n \
+              if (dpr > 1.0)\n \
+              {\n \
+                  width = int(width / dpr + 0.5);\n \
+                  height = int(height / dpr + 0.5);\n \
+              }\n \
+          }\n \
        }\n \
     "
   )
