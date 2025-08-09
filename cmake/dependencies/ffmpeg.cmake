@@ -23,7 +23,15 @@ SET(_target
     "RV_DEPS_FFMPEG"
 )
 
-IF(RV_FFMPEG_7)
+IF(RV_FFMPEG_MASTER)
+  SET(_version
+      "master"
+  )
+
+  SET(_download_hash
+      ""
+  )
+ELSEIF(RV_FFMPEG_7)
   SET(_version
       "n7.1"
   )
@@ -47,6 +55,14 @@ ENDIF()
 SET(_download_url
     "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/${_version}.zip"
 )
+
+IF(RV_FFMPEG_MASTER)
+SET(_download_url
+    "https://github.com/FFmpeg/FFmpeg/archive/master.zip"
+)
+ENDIF()
+
+
 
 SET(_base_dir
     ${RV_DEPS_BASE_DIR}/${_target}
@@ -79,7 +95,57 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_FFMPEG_7)
+IF(RV_FFMPEG_MASTER)
+  IF(RV_TARGET_DARWIN)
+    SET(_ffmpeg_avutil_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.60${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swresample_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample.6${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swscale_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale.9${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avcodec_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec.62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avformat_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat.62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+  ELSEIF(RV_TARGET_LINUX)
+    SET(_ffmpeg_avutil_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil${CMAKE_SHARED_LIBRARY_SUFFIX}.59
+    )
+    SET(_ffmpeg_swresample_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample${CMAKE_SHARED_LIBRARY_SUFFIX}.5
+    )
+    SET(_ffmpeg_swscale_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale${CMAKE_SHARED_LIBRARY_SUFFIX}.8
+    )
+    SET(_ffmpeg_avcodec_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec${CMAKE_SHARED_LIBRARY_SUFFIX}.61
+    )
+    SET(_ffmpeg_avformat_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat${CMAKE_SHARED_LIBRARY_SUFFIX}.61
+    )
+  ELSEIF(RV_TARGET_WINDOWS)
+    SET(_ffmpeg_avutil_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil-60${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swresample_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample-6${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_swscale_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale-9${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avcodec_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec-62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+    SET(_ffmpeg_avformat_lib_name
+        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat-62${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+  ENDIF()
+ELSEIF(RV_FFMPEG_7)
   IF(RV_TARGET_DARWIN)
     SET(_ffmpeg_avutil_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.59${CMAKE_SHARED_LIBRARY_SUFFIX}
