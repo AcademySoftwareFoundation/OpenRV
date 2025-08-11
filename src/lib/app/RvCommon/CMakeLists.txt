@@ -7,6 +7,15 @@
 INCLUDE(cxx_defaults)
 INCLUDE(rv_quote_file)
 
+# Custom Theme Generation Option
+OPTION(RV_ENABLE_CUSTOM_THEMES "Generate custom themes from variables" OFF)
+
+# Auto-enable if variables file exists
+IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/rv_theme_variables.conf")
+    SET(RV_ENABLE_CUSTOM_THEMES ON CACHE BOOL "Custom theme variables detected" FORCE)
+    MESSAGE(STATUS "Custom theme variables found - enabling theme generation")
+ENDIF()
+
 SET(_target
     "RvCommon"
 )
@@ -69,6 +78,19 @@ IF(RV_TARGET_DARWIN)
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
+  # Custom theme generation (if enabled)
+  IF(RV_ENABLE_CUSTOM_THEMES)
+    FIND_PACKAGE(Python3 COMPONENTS Interpreter REQUIRED)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/rv_mac_dark.qss
+      COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate_stylesheet.py
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/rv_theme_variables.conf
+              ${CMAKE_CURRENT_SOURCE_DIR}/rv_mac_dark.qss.template
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      COMMENT "Generating custom theme stylesheet from variables..."
+    )
+  ENDIF()
+  
   QUOTE_FILE(_filename INPUT_FILENAME "rv_mac_dark.qss" CPP_SYMBOL "rv_mac_dark")
   LIST(APPEND _sources ${_filename})
 ENDIF()

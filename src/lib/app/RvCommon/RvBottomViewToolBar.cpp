@@ -165,17 +165,17 @@ namespace Rv
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setStyleSheet(R"(
-            QToolButton:checked {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0.0 rgb(70,70,255),
-                stop: .1 rgb(56,56,220),
-                stop: .5 rgb(45,45,210),
-                stop: .6 rgb(39,39,190),
-                stop: .9 rgb(36,36,220),
-                stop: 1.0 rgb(62,62,230));
-            }
-        )");
+        // b->setStyleSheet(R"(
+        //     QToolButton:checked {
+        //         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+        //         stop: 0.0 rgb(70,70,255),
+        //         stop: .1 rgb(56,56,220),
+        //         stop: .5 rgb(45,45,210),
+        //         stop: .6 rgb(39,39,190),
+        //         stop: .9 rgb(36,36,220),
+        //         stop: 1.0 rgb(62,62,230));
+        //     }
+        // )");
         m_ghostAction = a;
 
         a = addAction("");
@@ -185,17 +185,17 @@ namespace Rv
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setStyleSheet(R"(
-            QToolButton:checked {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0.0 rgb(70,70,255),
-                stop: .1 rgb(56,56,220),
-                stop: .5 rgb(45,45,210),
-                stop: .6 rgb(39,39,190),
-                stop: .9 rgb(36,36,220),
-                stop: 1.0 rgb(62,62,230));
-            }
-        )");
+        // b->setStyleSheet(R"(
+        //     QToolButton:checked {
+        //         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+        //         stop: 0.0 rgb(70,70,255),
+        //         stop: .1 rgb(56,56,220),
+        //         stop: .5 rgb(45,45,210),
+        //         stop: .6 rgb(39,39,190),
+        //         stop: .9 rgb(36,36,220),
+        //         stop: 1.0 rgb(62,62,230));
+        //     }
+        // )");
         m_holdAction = a;
 
         connect(m_ghostAction, SIGNAL(triggered(bool)), this,
