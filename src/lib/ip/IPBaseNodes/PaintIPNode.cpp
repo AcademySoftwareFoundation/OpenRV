@@ -9,16 +9,46 @@
 #include <IPCore/Exception.h>
 #include <IPCore/IPGraph.h>
 #include <TwkGLText/TwkGLText.h>
+#include <exception>
 #include <mutex>
 #include <stl_ext/string_algo.h>
 #include <cstdlib>
 #include <IPCore/ShaderCommon.h>
+#include <string>
 #include <tuple>
 
 namespace
 {
     using namespace IPCore;
     using PerFramePaintCommands = std::map<int, PaintIPNode::LocalCommands>;
+
+    int getStartFrame(const TwkContainer::Component& component)
+    {
+        std::stringstream stringStream;
+        stringStream << component.name();
+
+        std::string property;
+        std::vector<std::string> properties{};
+
+        while (std::getline(stringStream, property, ':'))
+        {
+            properties.push_back(property);
+        }
+
+        if (properties.size() > 2)
+        {
+            try
+            {
+                return std::stoi(properties[2]);
+            }
+            catch (const std::exception& e)
+            {
+                std::cout
+                    << "ERROR: Unable to get the frame from the pen component: "
+                    << e.what() << "'\n";
+            }
+        }
+    }
 
     // Calculates the opacity based on the distance from the annotated frame to
     // make the ghosted annotation more visible closer to the frame and less
@@ -305,10 +335,10 @@ namespace IPCore
         const int startFrame =
             (startFrameP != nullptr && startFrameP->size() != 0)
                 ? startFrameP->front()
-                : 0;
+                : getStartFrame(*c);
         const int duration = (durationP != nullptr && durationP->size() != 0)
                                  ? durationP->front()
-                                 : 0;
+                                 : 1;
 
         p.width = width;
         p.color = color;
@@ -467,11 +497,11 @@ namespace IPCore
             m_paintEffects.ghostBefore = (ghostBeforeProperty != nullptr
                                           && ghostBeforeProperty->size() != 0)
                                              ? ghostBeforeProperty->front()
-                                             : 0;
+                                             : 5;
             m_paintEffects.ghostAfter = (ghostAfterProperty != nullptr
                                          && ghostAfterProperty->size() != 0)
                                             ? ghostAfterProperty->front()
-                                            : 0;
+                                            : 5;
         }
     }
 
