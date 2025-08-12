@@ -488,22 +488,27 @@ namespace IPCore
                 sessionNode->property<IntProperty>("paintEffects",
                                                    "ghostAfter");
 
-            m_paintEffects.hold =
-                (holdProperty != nullptr && holdProperty->size() != 0)
-                    ? holdProperty->front()
-                    : 0;
-            m_paintEffects.ghost =
-                (ghostProperty != nullptr && ghostProperty->size() != 0)
-                    ? ghostProperty->front()
-                    : 0;
-            m_paintEffects.ghostBefore = (ghostBeforeProperty != nullptr
-                                          && ghostBeforeProperty->size() != 0)
-                                             ? ghostBeforeProperty->front()
-                                             : 5;
-            m_paintEffects.ghostAfter = (ghostAfterProperty != nullptr
-                                         && ghostAfterProperty->size() != 0)
-                                            ? ghostAfterProperty->front()
-                                            : 5;
+            if (holdProperty != nullptr && holdProperty->size() != 0)
+            {
+                m_paintEffects.hold = holdProperty->front();
+            }
+
+            if (ghostProperty != nullptr && ghostProperty->size() != 0)
+            {
+                m_paintEffects.ghost = ghostProperty->front();
+            }
+
+            if (ghostBeforeProperty != nullptr
+                && ghostBeforeProperty->size() != 0)
+            {
+                m_paintEffects.ghostBefore = ghostBeforeProperty->front();
+            }
+
+            if (ghostAfterProperty != nullptr
+                && ghostAfterProperty->size() != 0)
+            {
+                m_paintEffects.ghostAfter = ghostAfterProperty->front();
+            }
         }
     }
 
