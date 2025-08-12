@@ -48,6 +48,8 @@ namespace
                     << e.what() << "'\n";
             }
         }
+
+        return 0;
     }
 
     // Calculates the opacity based on the distance from the annotated frame to
