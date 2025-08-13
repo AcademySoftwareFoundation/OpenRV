@@ -1965,6 +1965,10 @@ namespace TwkFB
             {
                 C = Rec709FullRangeYUVToRGB8<float>();
             }
+            else if (infb->primaryColorSpace() == ColorSpace::Rec2020())
+            {
+                C = Rec2020FullRangeYUVToRGB8<float>();
+            }
             else
             {
                 C = Rec601FullRangeYUVToRGB8<float>();
@@ -3295,6 +3299,23 @@ namespace TwkFB
                 break;
             }
         }
+        else if (fb_conversion == ColorSpace::Rec2020()
+            && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
+        {
+            switch (bits)
+            {
+            default:
+            case 8:
+                M = Rec2020VideoRangeYUVToRGB8<float>();
+                break;
+            case 10:
+                M = Rec2020VideoRangeYUVToRGB10<float>();
+                break;
+            case 16:
+                M = Rec2020VideoRangeYUVToRGB16<float>();
+                break;
+            }
+        }
         else if ((fb_conversion == ColorSpace::Rec601()
                   && (fb_range == "None"
                       || fb_range == ColorSpace::VideoRange()))
@@ -3348,6 +3369,23 @@ namespace TwkFB
                 break;
             }
         }
+        else if (fb_conversion == ColorSpace::Rec2020()
+                 && fb_range == ColorSpace::FullRange())
+        {
+            switch (bits)
+            {
+            default:
+            case 8:
+                M = Rec2020FullRangeYUVToRGB8<float>();
+                break;
+            case 10:
+                M = Rec2020FullRangeYUVToRGB10<float>();
+                break;
+            case 16:
+                M = Rec2020FullRangeYUVToRGB16<float>();
+                break;
+            }
+        }
     }
 
     //
@@ -3396,6 +3434,24 @@ namespace TwkFB
                 break;
             }
         }
+        else if (fb_conversion == ColorSpace::Rec2020()
+                 && (fb_range == "None"
+                     || fb_range == ColorSpace::VideoRange()))
+        {
+            switch (bits)
+            {
+            default:
+            case 8:
+                M = Rec2020VideoRangeRGBToYUV8<float>();
+                break;
+            case 10:
+                M = Rec2020VideoRangeRGBToYUV10<float>();
+                break;
+            case 16:
+                M = Rec2020VideoRangeRGBToYUV16<float>();
+                break;
+            }
+        }
         else if (fb_conversion == ColorSpace::Rec601()
                  && fb_range == ColorSpace::FullRange())
         {
@@ -3427,6 +3483,23 @@ namespace TwkFB
                 break;
             case 16:
                 M = Rec709FullRangeRGBToYUV16<float>();
+                break;
+            }
+        }
+        else if (fb_conversion == ColorSpace::Rec2020()
+                 && fb_range == ColorSpace::FullRange())
+        {
+            switch (bits)
+            {
+            default:
+            case 8:
+                M = Rec2020FullRangeRGBToYUV8<float>();
+                break;
+            case 10:
+                M = Rec2020FullRangeRGBToYUV10<float>();
+                break;
+            case 16:
+                M = Rec2020FullRangeRGBToYUV16<float>();
                 break;
             }
         }
@@ -3631,14 +3704,12 @@ namespace TwkFB
                 float M[16];
                 yrybyYweights(fb, Yw.x, Yw.y, Yw.z);
                 applyTransform(nfb, nfb, yryby2rgbColorTransform, &Yw);
-
                 if (fb->hasPrimaries())
                 {
                     rec709Matrix(fb, M);
                     applyTransform(nfb, nfb, linearColorTransform, M);
                     removeChromaticityAttrs(nfb);
                 }
-
                 nfb->setChannelName(0, "R");
                 nfb->setChannelName(1, "G");
                 nfb->setChannelName(2, "B");
