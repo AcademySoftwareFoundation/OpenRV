@@ -41,7 +41,7 @@ class: ExternalQProcess : ExternalProcess
         }
     }
 
-    method: finish (void; int exitcode = -1, qt.QProcess.ExitStatus exitStatus = -1)
+    method: finish (void; int exitcode, qt.QProcess.ExitStatus exitStatus)
     {
         if (_proc neq nil)
         {

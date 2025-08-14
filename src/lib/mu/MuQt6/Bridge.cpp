@@ -1124,6 +1124,33 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
+    bool isKnownDeprecatedSignal(const char* className,
+                                 const std::string& signalName,
+                                 const char* fullSignature)
+    {
+        // Uncomment and modify this function to add known deprecated signals.
+        // See src/lib/mu/MuQt5/Bridge.cpp
+
+        // Example:
+
+        // const std::string classStr = className;
+        // const std::string sigStr = fullSignature;
+
+        // if (classStr == "QMyClass")
+        // {
+        //     if (signalName == "mySignal")
+        //     {
+        //         if (sigStr == "mySignal(int)" || sigStr.find("mySignal(int)")
+        //         == 0)
+        //         {
+        //             return true;
+        //         }
+        //     }
+        // }
+
+        return false;
+    }
+
     void populate(Class* c, const QMetaObject& m, const char** propExclusions)
     {
         bool verbose = false;
@@ -1390,6 +1417,36 @@ namespace Mu
                 || mm.methodSignature()[0] == '_')
             {
                 continue;
+            }
+
+            if (verbose)
+            {
+                std::cout << "Method: " << mm.methodSignature().constData()
+                          << std::endl;
+            }
+
+            // Skip known deprecated signals to avoid errors at runtime.
+            if (mm.methodType() == QMetaMethod::Signal)
+            {
+                std::string currentSignalName =
+                    mm.methodSignature().constData();
+                std::string::size_type parenPos = currentSignalName.find('(');
+                currentSignalName.erase(parenPos,
+                                        currentSignalName.size() - parenPos);
+
+                bool deprecated =
+                    isKnownDeprecatedSignal(m.className(), currentSignalName,
+                                            mm.methodSignature().constData());
+                if (deprecated)
+                {
+                    if (verbose)
+                    {
+                        std::cout << "Skipping known deprecated signal: "
+                                  << mm.methodSignature().constData()
+                                  << std::endl;
+                    }
+                    continue;
+                }
             }
 
             STLVector<ParameterVariable*>::Type params;
