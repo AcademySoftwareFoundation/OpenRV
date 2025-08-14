@@ -17,8 +17,18 @@ def hook_function(
 ) -> None:
     """A hook for the annotation schema"""
 
-    commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
-    commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
+    if argument_map["effect_metadata"]:
+        effect_metadata = argument_map["effect_metadata"]
+        commands.setIntProperty(
+            "#Session.paintEffects.hold", [effect_metadata.get("hold")]
+        )
+        commands.setIntProperty(
+            "#Session.paintEffects.ghost", [effect_metadata.get("ghost")]
+        )
+    else:
+        commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
+        commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
+
     commands.setIntProperty(
         "#Session.paintEffects.ghostBefore", [in_timeline.ghost_before]
     )
