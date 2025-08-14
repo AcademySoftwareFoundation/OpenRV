@@ -17,24 +17,27 @@ def hook_function(
 ) -> None:
     """A hook for the annotation schema"""
 
-    if argument_map["effect_metadata"]:
-        effect_metadata = argument_map["effect_metadata"]
-        commands.setIntProperty(
-            "#Session.paintEffects.hold", [effect_metadata.get("hold")]
-        )
-        commands.setIntProperty(
-            "#Session.paintEffects.ghost", [effect_metadata.get("ghost")]
-        )
-    else:
-        commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
-        commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
+    try:
+        if argument_map["effect_metadata"]:
+            effect_metadata = argument_map["effect_metadata"]
+            commands.setIntProperty(
+                "#Session.paintEffects.hold", [effect_metadata.get("hold", 0)]
+            )
+            commands.setIntProperty(
+                "#Session.paintEffects.ghost", [effect_metadata.get("ghost", 0)]
+            )
+        else:
+            commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
+            commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
 
-    commands.setIntProperty(
-        "#Session.paintEffects.ghostBefore", [in_timeline.ghost_before]
-    )
-    commands.setIntProperty(
-        "#Session.paintEffects.ghostAfter", [in_timeline.ghost_after]
-    )
+        commands.setIntProperty(
+            "#Session.paintEffects.ghostBefore", [in_timeline.ghost_before]
+        )
+        commands.setIntProperty(
+            "#Session.paintEffects.ghostAfter", [in_timeline.ghost_after]
+        )
+    except Exception:
+        logging.exception("Unable to set Hold and Ghost properties")
 
     for layer in in_timeline.layers:
         if layer.name == "Paint":
