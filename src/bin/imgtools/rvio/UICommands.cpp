@@ -229,6 +229,9 @@ namespace RVIO
             new Function(c, "openUrl", openUrl, None, Return, "void",
                          Parameters, new Param(c, "url", "string"), End),
 
+            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return,
+                         "float", End),
+
             EndArguments);
     }
 
@@ -320,5 +323,7 @@ namespace RVIO
     NODE_DECLARATION(javascriptMuExport, void) {}
 
     NODE_IMPLEMENTATION(myNetworkHost, Pointer) { NODE_RETURN(0); }
+
+    NODE_IMPLEMENTATION(devicePixelRatio, float) { NODE_RETURN(1.0f); }
 
 } //  End namespace RVIO
