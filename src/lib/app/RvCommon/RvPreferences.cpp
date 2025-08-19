@@ -1918,6 +1918,25 @@ namespace Rv
 #endif
             qApp->setStyleSheet(csstext);
         }
+        else
+        {
+            // Handle custom CSS files
+            QFile file(opts.qtcss);
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                QTextStream in(&file);
+                QString csstext = in.readAll();
+                file.close();
+                
+                // Apply font size parameters if the CSS has placeholders
+                if (csstext.contains("%1") && csstext.contains("%2"))
+                {
+                    csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2);
+                }
+                
+                qApp->setStyleSheet(csstext);
+            }
+        }
     }
 
     void RvPreferences::stylusAsMouseChanged(int state)

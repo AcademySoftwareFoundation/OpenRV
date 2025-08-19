@@ -9,11 +9,20 @@
 * not expressly
  *
  */
- 
 
 QWidget {
     background-color: {{PRIMARY_BACKGROUND}};
     font-size: %1pt;
+}
+
+QMainWindow::separator {
+    background-color: {{PRIMARY_BACKGROUND}};
+    width: 6px; /* when vertical */
+    height: 6px; /* when horizontal */
+}
+
+QMainWindow::separator:hover {
+    background-color: {{BUTTON_HOVER}};
 }
 
 QFrame {
@@ -183,6 +192,7 @@ QMenu::item:disabled {
 }
 
 QMenuBar::item:selected { 
+    font-size: %1pt;
     color: white;
     background: {{SECONDARY_BACKGROUND}};
     border-radius: 4px;
@@ -225,6 +235,7 @@ QAbstractScrollArea::corner {
 }
     
 QAbstractItemView { /* folder list and session manager inputs list */
+    font-size: %1pt;
     color: {{TEXT_PRIMARY}};
     background-color: {{PRIMARY_BACKGROUND}};
     selection-color: rgb(255, 255, 255);
@@ -376,6 +387,7 @@ QComboBox::icon {
 }
 
 QHeaderView::section {
+    font-size: %3pt;
     color: {{TEXT_PRIMARY}};
     border: 1px solid {{BORDER_MEDIUM}};
     border-top: 1px solid {{BORDER_MEDIUM}};
@@ -538,9 +550,11 @@ QToolBar[tbstyle="play_controls"] QToolButton {
 }
     
 QToolBar[tbstyle="viewer"] QWidget {
+    font-size: %2pt;
 }
     
 QToolBar[tbstyle="play_controls"] QWidget {
+    font-size: %2pt;
 }
     
 QToolBar[tbstyle="play_controls"] QToolButton:hover { 
@@ -895,6 +909,7 @@ QDialog#RvFileDialog QToolButton#nextButton {
 /* TREE VIEW */
     
 QTreeView {
+    font-size: %1pt;
     color: {{TEXT_PRIMARY}};
     background-color: {{PRIMARY_BACKGROUND}};
     alternate-background-color: {{SECONDARY_BACKGROUND}};
@@ -983,6 +998,7 @@ QWidget#sessionManager QToolButton:pressed {
 }
     
 QWidget#sessionManager QTreeView {
+    font-size: %2pt;
 }
     
 QWidget#sessionManager QTreeView::item {
@@ -990,6 +1006,7 @@ QWidget#sessionManager QTreeView::item {
 }
     
 QWidget#sessionManager QListView {
+    font-size: %2pt;
 }
     
 QWidget#sessionManager QListView::item {
@@ -1011,6 +1028,7 @@ QWidget#sessionManager QTabBar {
 }
     
 QWidget#sessionManager QTabBar::tab {
+    font-size: %2pt;
     color: {{TEXT_SECONDARY}};
     min-width: 50px;
     background-color: {{BORDER_MEDIUM}};
@@ -1052,10 +1070,11 @@ QWidget#sessionManager QGroupBox {
 }
     
 QWidget#sessionManager QAbstractItemView#uiTreeWidget {
+    font-size: %2pt;
     qproperty-indentation: 0;
     font-weight: bold;
     background-color: {{PRIMARY_BACKGROUND}};
-    /*selection-color: rgb(20,20,20);*/
+    /*selection-color: {{SESSION_ITEM_BORDER}};*/
 }
     
 QWidget#sessionManager QAbstractItemView#uiTreeWidget::item {
@@ -1075,7 +1094,7 @@ QWidget#sessionManager QAbstractItemView#uiTreeWidget::item {
     padding-right: 0em;
     padding-top: .25em;
     padding-bottom: .25em;
-    background-color: {{SECONDARY_BACKGROUND}}
+    background-color: {{SECONDARY_BACKGROUND}};
 }
     
 QWidget#sessionManager QAbstractItemView#uiTreeWidget::item:open {
@@ -1092,7 +1111,7 @@ QWidget#sessionManager QAbstractItemView#uiTreeWidget::item:!has-children {
     border-top-left-radius: 0em;
     border-top-right-radius: 0em;
     border-top: 1px none {{SESSION_ITEM_BORDER}};
-    background-color: {{SECONDARY_BACKGROUND}}
+    background-color: {{SECONDARY_BACKGROUND}};
 }
     
 QWidget::sessionManager QScrollBar::handle:horizontal {
@@ -1104,6 +1123,7 @@ QWidget::sessionManager QScrollBar::handle:vertical {
 }
     
 QAbstractItemView#uiTreeWidget QWidget {
+    font-size: %2pt;
 }
     
 QWidget#annotationTool QGroupBox {

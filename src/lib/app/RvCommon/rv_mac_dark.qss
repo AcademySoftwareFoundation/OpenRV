@@ -1,5 +1,12 @@
-/* Copyright (C) 2012 Tweak Software 
- * All rights reserved
+/* Copyright (c) 2025 Autodesk.
+
+* CONFIDENTIAL AND PROPRIETARY
+
+* This work is provided "AS IS" and subject to the ShotGrid Pipeline Toolkit
+* Source Code License included in this distribution package. See LICENSE.
+* By accessing, using, copying or modifying this work you indicate your
+* agreement to the ShotGrid Pipeline Toolkit Source Code License. All rights
+* not expressly
  *
  */
 
@@ -7,12 +14,6 @@ QWidget {
     background-color: rgb(34, 34, 34);
     font-size: %1pt;
 }
-
-/* CREATIVE REVIEW TEXT HIERARCHY */
-/* Primary text: rgb(240, 240, 240) - Main UI text, button labels */
-/* Secondary text: rgb(200, 200, 200) - Standard content */  
-/* Tertiary text: rgb(160, 160, 160) - Metadata, timestamps */
-/* Disabled text: rgb(120, 120, 120) - Inactive elements */
 
 QFrame {
     border: 0px;
@@ -208,9 +209,9 @@ QGroupBox {
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    border-radius: .2em;
     margin-left: 1.25em;
-    padding: 0px 1px 2px 1px;
+    margin-top: -6px; 
+    padding: 0px 1px 0px 1px;
     background-color: rgb(34,34,34);
 }
     
@@ -235,11 +236,19 @@ QCheckBox {
 }
 
 QCheckBox::indicator, QGroupBox::indicator {
-    image: url(":images/check_box_not_checked.png");
+    image: url(":images/checkbox_off_default.png");
+}
+
+QCheckBox::indicator:hover:!checked, QGroupBox::indicator:hover:!checked {
+    image: url(":images/checkbox_off_hover.png");
 }
 
 QCheckBox::indicator:checked, QGroupBox::indicator:checked {
-    image: url(":images/check_box_checked2.png");
+    image: url(":images/checkbox_on_default.png");
+}
+
+QCheckBox::indicator:disabled, QGroupBox::indicator:disabled {
+    image: url(":images/checkbox_off_disabled.png");
 }
 
 QCheckBox::disabled, QGroupBox:disabled {
@@ -269,11 +278,7 @@ QLineEdit {
     selection-background-color: rgb(180, 180, 180);
     selection-color: rgb(43, 43, 43);
 }
-    
-QLineEdit:focus  {
-    border: 2px solid rgb(7, 75, 120);
-    padding-left: 0px;
-}
+
     
 QLineEdit:disabled  {
     color: rgb(120, 120, 120);
@@ -310,10 +315,6 @@ QSpinBox::up-arrow {
 QSpinBox::down-arrow {
     image: url(":images/down_triangle.png");
 }
-
-QLineEdit:focus,  QSpinBox:focus {
-    border: 2px solid rgb(7,75,120);
-}
     
 /* COMBO BOX */
 
@@ -325,6 +326,10 @@ QComboBox {
     padding-left: 15px;
     color: rgb(200,200,200);
     background-color: rgb(23, 23, 23);
+}
+
+QComboBox:hover {
+    border: 1px solid rgb(7, 75, 120);
 }
 
 QComboBox::down-arrow {
@@ -342,9 +347,9 @@ QComboBox::separator {
 }
 
 QComboBox QListView {
-    border: none;
+    border: 1px solid rgb(77, 77, 77);
     border-radius: 6px;
-    padding: 0px;
+    padding: 3px 0px;
     background: rgb(34,34,34);
     color: rgb(200,200,200);
     show-decoration-selected: 1;
@@ -665,6 +670,13 @@ QToolButton[tbstyle="right_menu"] {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
 }
+
+QToolButton#backStepButton,
+QToolButton#forwardStepButton,
+QToolButton#firstFrameButton,
+QToolButton#lastFrameButton {
+    min-width: 30px;
+}  
     
 QToolButton::menu-indicator {
     image: url(":images/button_down_arrow.png");
@@ -758,7 +770,7 @@ QPushButton:disabled {
 QPushButton:default {   	
     color: rgb(200,200,200); 
     background-color: rgb(43,43,43);
-    border: 1px solid rgb(7, 75, 120);	
+    border: 1px solid rgb(70,70,70);
     border-radius: 10px;
     padding: .1em 1em .1em 1em;
 }
@@ -771,7 +783,7 @@ QPushButton:default:hover {
 
 QPushButton:hover {       
     background-color: rgb(43,43,43);
-    border: 1px solid rgb(80,80,80); 
+    border: 1px solid rgb(7, 75, 120); 
     color: white;
 }
    
@@ -884,7 +896,7 @@ QDialog#RvFileDialog QToolButton#nextButton {
 QTreeView {
     color: rgb(200,200,200);
     background-color: rgb(34, 34, 34);
-    alternate-background-color: rgb(55,55,55);
+    alternate-background-color: rgb(43, 43, 43);
     /*selection-background-color: rgb(86,86,86);
     selection-color: rgb(255, 255, 255);
     */
@@ -892,7 +904,8 @@ QTreeView {
     
 QTreeView::item {
     border-image: none;
-    margin: 1px;
+    margin: 0px;
+    border: none;
 }
 
 QTreeView::item:hover {
@@ -903,12 +916,20 @@ QTreeView::item:selected {
     background-color: rgb(7, 75, 120); 
 }
     
-QTreeView::indicator:checked {
-    image: url(":images/check_box_checked2.png");
+QTreeView::indicator {
+    image: url(":images/checkbox_off_default.png");
 }
-    
-QTreeView::indicator{
-    image: url(":images/check_box_not_checked.png");
+
+QTreeView::indicator:hover:!checked {
+    image: url(":images/checkbox_off_hover.png");
+}
+
+QTreeView::indicator:checked {
+    image: url(":images/checkbox_on_default.png");
+}
+
+QTreeView::indicator:disabled {
+    image: url(":images/checkbox_off_disabled.png");
 }
     
 QTreeView::branch {
@@ -919,12 +940,17 @@ QTreeView::branch:selected {
     background-color: transparent;
     color: rgb(255, 255, 255);
 }
-    
+
+QTreeView::item:has-children { 
+    color: rgb(200, 200, 200); 
+}
+
 QTreeView::branch:has-children:!has-siblings:closed,
     QTreeView::branch:closed:has-children:has-siblings {
     border-image: none;
     image: url(":images/branch_closed.png");
     background-color: transparent;
+
 }
     
 QTreeView::branch:open:has-children:!has-siblings, QTreeView::branch:open:has-children:has-siblings  {
@@ -959,7 +985,7 @@ QWidget#sessionManager QTreeView {
 }
     
 QWidget#sessionManager QTreeView::item {
-    margin: 1px;
+    margin: 0px;
 }
     
 QWidget#sessionManager QListView {
@@ -1081,4 +1107,4 @@ QAbstractItemView#uiTreeWidget QWidget {
     
 QWidget#annotationTool QGroupBox {
     margin: 0px;
-}    
+}      

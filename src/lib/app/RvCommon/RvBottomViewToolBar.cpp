@@ -219,7 +219,8 @@ namespace Rv
         a->setToolTip("Step back one frame");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("backStepButton");
         m_backStepAction = a;
 
         a = addAction("");
@@ -227,7 +228,8 @@ namespace Rv
         a->setToolTip("Step forward one frame");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("forwardStepButton");
         m_forwardStepAction = a;
 
         a = addAction("");
@@ -253,7 +255,8 @@ namespace Rv
         a->setToolTip("Skip to start of sequence");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("firstFrameButton");
         m_backMarkAction = a;
 
         a = addAction("");
@@ -261,7 +264,8 @@ namespace Rv
         a->setToolTip("Skip to end of sequence");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("lastFrameButton");
         m_forwardMarkAction = a;
 
         connect(m_backStepAction, SIGNAL(triggered()), this,

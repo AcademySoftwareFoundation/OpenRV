@@ -712,7 +712,15 @@ int main(int argc, char* argv[])
     if (opts.qtcss)
     {
         string s = scarfFile(opts.qtcss);
-        csstext = s.c_str();
+        QString qcss = QString(s.c_str());
+        if (qcss.contains("%1") || qcss.contains("%2"))
+        {
+            csstext = qcss.arg(opts.fontSize1).arg(opts.fontSize2);
+        }
+        else
+        {
+            csstext = qcss;
+        }
     }
     else
     {
