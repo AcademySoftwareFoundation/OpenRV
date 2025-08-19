@@ -67,6 +67,8 @@
 #include <TwkUtil/Timer.h>
 #include <TwkDeploy/Deploy.h>
 
+#include <IPMu/RemoteRvCommand.h>
+
 #include <algorithm>
 #include <limits>
 #include <fstream>
@@ -2607,6 +2609,9 @@ namespace IPMu
     NODE_IMPLEMENTATION(clearSession, void)
     {
         Session* s = Session::currentSession();
+
+        IPMu::RemoteRvCommand remoteRvCommand(s, "clearSession");
+
         s->clear();
         s->askForRedraw();
     }
@@ -5123,6 +5128,14 @@ namespace IPMu
         NODE_RETURN(stype->allocate(idstr));
     }
 
+    NODE_IMPLEMENTATION(refreshOutputVideoDevice, void)
+    {
+        Session* s = Session::currentSession();
+        auto outputDevice = s->outputVideoDevice();
+
+        s->setOutputVideoDevice(outputDevice);
+    }
+
     NODE_IMPLEMENTATION(audioTextureID, int)
     {
         Session* s = Session::currentSession();
@@ -6444,6 +6457,9 @@ namespace IPMu
                          new Param(c, "moduleName", "string"),
                          new Param(c, "deviceName", "string"),
                          new Param(c, "idtype", "int"), End),
+
+            new Function(c, "refreshOutputVideoDevice",
+                         refreshOutputVideoDevice, None, Return, "void", End),
 
             new Function(c, "licensingState", licensingState, None, Return,
                          "int", End),

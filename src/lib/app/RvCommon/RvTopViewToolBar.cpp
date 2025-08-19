@@ -100,18 +100,18 @@ namespace Rv
         setProperty("tbstyle", QVariant(QString("viewer")));
 
         m_viewBackAction = addAction("");
+        m_viewBackAction->setIcon(QIcon(":/images/view_back.png"));
+        m_viewBackAction->setToolTip("Switch to previous View");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_viewBackAction));
-        b->setIcon(QIcon(":/images/view_back.png"));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        b->setToolTip("Switch to previous View");
 
         m_viewForwardAction = addAction("");
+        m_viewForwardAction->setIcon(QIcon(":/images/view_forwd.png"));
+        m_viewForwardAction->setToolTip("Switch to next View");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_viewForwardAction));
-        b->setIcon(QIcon(":/images/view_forwd.png"));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        b->setToolTip("Switch to next View");
 
         connect(m_viewBackAction, SIGNAL(triggered(bool)), this,
                 SLOT(previousViewNode()));
@@ -142,8 +142,8 @@ namespace Rv
                 SLOT(viewMenuUpdate()));
 
         m_fullScreenAction = addAction("");
+        m_fullScreenAction->setIcon(QIcon(":/images/fullscreen.png"));
         b = dynamic_cast<QToolButton*>(widgetForAction(m_fullScreenAction));
-        b->setIcon(QIcon(":/images/fullscreen.png"));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
         b->setPopupMode(QToolButton::InstantPopup);
@@ -215,9 +215,9 @@ namespace Rv
                 SLOT(bgHatch()));
 
         m_stereoMenuAction = addAction("Mono");
+        m_stereoMenuAction->setIcon(QIcon(":/images/stereo.png"));
         b = dynamic_cast<QToolButton*>(widgetForAction(m_stereoMenuAction));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
-        b->setIcon(QIcon(":/images/stereo.png"));
         b->setPopupMode(QToolButton::InstantPopup);
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m = new QMenu(b);
@@ -295,9 +295,9 @@ namespace Rv
                 SLOT(swapEyes()));
 
         m_channelMenuAction = addAction("Color (RGB)");
+        m_channelMenuAction->setIcon(QIcon(":/images/view_channel.png"));
         b = dynamic_cast<QToolButton*>(widgetForAction(m_channelMenuAction));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
-        b->setIcon(QIcon(":/images/view_channel.png"));
         b->setPopupMode(QToolButton::InstantPopup);
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m = new QMenu(b);
@@ -328,9 +328,9 @@ namespace Rv
         connect(m_LChannelAction, SIGNAL(triggered()), this, SLOT(channelsL()));
 
         m_monitorMenuAction = addAction("NO MONITOR");
+        m_monitorMenuAction->setIcon(QIcon(":/images/view_display.png"));
         b = dynamic_cast<QToolButton*>(widgetForAction(m_monitorMenuAction));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
-        b->setIcon(QIcon(":/images/view_display.png"));
         b->setPopupMode(QToolButton::InstantPopup);
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         m = new QMenu(b);
@@ -414,6 +414,14 @@ namespace Rv
         connect(m_ditherOff, SIGNAL(triggered()), this, SLOT(ditherOff()));
         connect(m_dither8, SIGNAL(triggered()), this, SLOT(dither8()));
         connect(m_dither10, SIGNAL(triggered()), this, SLOT(dither10()));
+
+        m_liveReviewFilteredActions = {
+            {m_viewMenuAction, m_viewMenuAction->toolTip()},
+            {m_viewBackAction, m_viewBackAction->toolTip()},
+            {m_viewForwardAction, m_viewForwardAction->toolTip()},
+            {m_stereoMenuAction, m_stereoMenuAction->toolTip()},
+            {m_channelMenuAction, m_channelMenuAction->toolTip()},
+            {m_monitorMenuAction, m_monitorMenuAction->toolTip()}};
 
         if (m_session)
             setSession(m_session);
@@ -554,6 +562,12 @@ namespace Rv
             else if (name == "bg-pattern-change")
             {
                 bgMenuUpdate();
+            }
+            else if (name == "internal-sync-presenter-changed"
+                     || name == "sync-session-ended")
+            {
+                bool isDisabled = m_session->filterLiveReviewEvents();
+                setLiveReviewFilteredActions(isDisabled);
             }
         }
         else if (const VideoDeviceContextChangeEvent* vevent =
@@ -1506,6 +1520,22 @@ namespace Rv
             dynamic_cast<QToolButton*>(widgetForAction(m_fullScreenAction));
         b->setIcon(QIcon(fullscreen ? ":/images/unfullscreen"
                                     : ":/images/fullscreen.png"));
+    }
+
+    void RvTopViewToolBar::setLiveReviewFilteredActions(bool isDisabled)
+    {
+        for (const auto& button : m_liveReviewFilteredActions)
+        {
+            QAction* action = button.first;
+            QString tooltipText = button.second;
+
+            if (action != nullptr)
+            {
+                action->setDisabled(isDisabled);
+                action->setToolTip(isDisabled ? "You must be presenter to use"
+                                              : tooltipText);
+            }
+        }
     }
 
 } // namespace Rv

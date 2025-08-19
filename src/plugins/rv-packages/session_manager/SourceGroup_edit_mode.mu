@@ -283,7 +283,22 @@ class: SourceGroupEditMode : MinorMode
 
     method: syncState (int; )
     {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+    
         if (syncGuiInOut()) then CheckedMenuState else UncheckedMenuState;
+    }
+
+    method: sourceMenuState (int; )
+    {
+        if (filterLiveReviewEvents())
+        {
+            return DisabledMenuState;
+        }
+
+        return NeutralMenuState;
     }
 
     method: SourceGroupEditMode (SourceGroupEditMode; string name)
@@ -299,9 +314,9 @@ class: SourceGroupEditMode : MinorMode
              ("graph-state-change", propertyChanged,  "Maybe update session UI")],
             Menu {
                 {"Source", Menu {
-                    {"Set Source Cut In ...",  setCutInMode,  nil, nil},
-                    {"Set Source Cut Out ...", setCutOutMode,  nil, nil},
-                    {"Clear Source Cut In/Out", resetCut,  nil, nil},
+                    {"Set Source Cut In ...",  setCutInMode,  nil, sourceMenuState},
+                    {"Set Source Cut Out ...", setCutOutMode,  nil, sourceMenuState},
+                    {"Clear Source Cut In/Out", resetCut,  nil, sourceMenuState},
                     {"Sync GUI With Source Cut In/Out", toggleSync, nil, syncState},
                     }
                 }

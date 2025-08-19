@@ -25,6 +25,7 @@
 #include <IPCore/IPInstanceNode.h>
 #include <OCIONodes/OCIOIPNode.h>
 #include <IPMu/CommandsModule.h>
+#include <IPMu/RemoteRvCommand.h>
 #include <TwkDeploy/Deploy.h>
 #include <Mu/ClassInstance.h>
 #include <Mu/Exception.h>
@@ -1302,9 +1303,34 @@ namespace Rv
 
         IPGraph::GraphEdit edit(s->graph());
 
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
+                                              filesAndOptions, tag);
+
+        // Now that we've broadcast the remote event, complete the work without
+        // broadcasting anything else.
+
         if (Options::sharedOptions().delaySessionLoading)
         {
-            s->userGenericEvent("before-progressive-loading", "");
+            // Note: It was decided to trigger the before-progressive-loading
+            // event even when progressive source loading is disabled as per the
+            // documentation. When progressive source loading is enabled, we
+            // have to check that some media is not already loading before
+            // triggering the event because the after-progressive-loading event
+            // is triggered when all the media are loaded, and we don't want to
+            // trigger it if some media is still loading, otherwise we would end
+            // up with an imbalance between the before-progressive-loading and
+            // after-progressive-loading events. This is the reason why we check
+            // if the graph isMediaLoading() before triggering the
+            // before-progressive-loading event.
+            // If progressive source loading is disabled, we don't have to check
+            // if the graph isMediaLoading() because this mechanism is not used
+            // in that case.
+            if (!Options::sharedOptions().progressiveSourceLoading
+                || !s->graph().isMediaLoading())
+            {
+                s->userGenericEvent("before-progressive-loading", "");
+            }
 
             // Note: It was decided to trigger the
             // before-progressive-proxy-loading event even when progressive
@@ -1358,6 +1384,10 @@ namespace Rv
             sargs.push_back(IPCore::Application::mapFromVar(arg));
         }
 
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargs, tag,
+                                              processOpts, merge);
+
         //
         //  Note we do not make GraphEdit object here, since this load will be
         //  asynchronous.
@@ -1382,15 +1412,7 @@ namespace Rv
         names->resize(array->size());
         IPGraph::GraphEdit edit(s->graph());
 
-        if (Options::sharedOptions().delaySessionLoading)
-        {
-            s->userGenericEvent("before-progressive-loading", "");
-
-            // Note: It was decided to trigger the
-            // before-progressive-proxy-loading event even when progressive
-            // source loading is disabled
-            s->userGenericEvent("before-progressive-proxy-loading", "");
-        }
+        vector<vector<string>> allFilesAndOptions;
 
         for (size_t i = 0; i < array->size(); i++)
         {
@@ -1402,9 +1424,52 @@ namespace Rv
             {
                 string arg =
                     currentSource->element<StringType::String*>(j)->c_str();
+
                 filesAndOptions.emplace_back(
                     IPCore::Application::mapFromVar(arg));
             }
+
+            allFilesAndOptions.push_back(filesAndOptions);
+        }
+
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
+                                              allFilesAndOptions, tag);
+
+        // Now that we've broadcast the remote event, complete the work without
+        // broadcasting anything else.
+
+        if (Options::sharedOptions().delaySessionLoading)
+        {
+            // Note: It was decided to trigger the before-progressive-loading
+            // event even when progressive source loading is disabled as per the
+            // documentation. When progressive source loading is enabled, we
+            // have to check that some media is not already loading before
+            // triggering the event because the after-progressive-loading event
+            // is triggered when all the media are loaded, and we don't want to
+            // trigger it if some media is still loading, otherwise we would end
+            // up with an imbalance between the before-progressive-loading and
+            // after-progressive-loading events. This is the reason why we check
+            // if the graph isMediaLoading() before triggering the
+            // before-progressive-loading event.
+            // If progressive source loading is disabled, we don't have to check
+            // if the graph isMediaLoading() because this mechanism is not used
+            // in that case.
+            if (!Options::sharedOptions().progressiveSourceLoading
+                || !s->graph().isMediaLoading())
+            {
+                s->userGenericEvent("before-progressive-loading", "");
+            }
+
+            // Note: It was decided to trigger the
+            // before-progressive-proxy-loading event even when progressive
+            // source loading is disabled
+            s->userGenericEvent("before-progressive-proxy-loading", "");
+        }
+
+        for (size_t i = 0; i < allFilesAndOptions.size(); i++)
+        {
+            vector<string>& filesAndOptions = allFilesAndOptions[i];
 
             string nodeName = s->addSourceWithTag(filesAndOptions, tag)->name();
             names->element<StringType::String*>(i) = stype->allocate(nodeName);
