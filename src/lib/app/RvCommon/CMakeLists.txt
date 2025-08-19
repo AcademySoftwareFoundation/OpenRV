@@ -69,7 +69,6 @@ IF(RV_TARGET_DARWIN)
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  
   QUOTE_FILE(_filename INPUT_FILENAME "rv_mac_dark.qss" CPP_SYMBOL "rv_mac_dark")
   LIST(APPEND _sources ${_filename})
 ENDIF()
