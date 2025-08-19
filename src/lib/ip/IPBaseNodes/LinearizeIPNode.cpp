@@ -140,6 +140,10 @@ namespace IPCore
             return "ITU Rec.2020";
         else if (t == ColorSpace::SMPTE240M())
             return "SMPTE 240M";
+        else if (t == ColorSpace::SMPTE2084())
+            return "SMPTE 2084";
+        else if (t == ColorSpace::HybridLogGamma())
+            return "Hybrid Log-Gamma";
         else if (t == ColorSpace::ArriLogC())
             return "ARRI LogC";
         else if (t == ColorSpace::ArriLogCFilm())
@@ -577,6 +581,16 @@ namespace IPCore
         {
             img->shaderExpr =
                 Shader::newColorSMPTE240MToLinear(img->shaderExpr);
+        }
+        else if (transfer == "SMPTE 2084")
+        {
+            img->shaderExpr =
+                Shader::newColorSMPTE2084ToLinear(img->shaderExpr);
+        }
+        else if (transfer == "Hybrid Log-Gamma")
+        {
+            img->shaderExpr =
+                Shader::newColorHLGToLinear(img->shaderExpr);
         }
         else if (transfer == "Gamma 1.8")
         {
