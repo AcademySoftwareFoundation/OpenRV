@@ -1,10 +1,10 @@
-# OpenRV Theme Generator
+# Open RV Theme Generator
 
-A Python script that creates custom themes for OpenRV. Instead of editing complex CSS files by hand, you can specify your colors in a config file or enter them interactively, and the generator creates a professional theme for you.
+`generate_theme.py` is a Python script that creates custom themes for Open RV. Instead of editing complex CSS files by hand, you can specify your colors in a config file or enter them interactively, and the generator creates a professional theme for you.
 
 **Here's exactly how it works:**
 
-1. **Template System**: The script uses pre-built template files (`rv_mac_dark.qss.template` and `rv_linux_dark.qss.template`) that contain the complete OpenRV interface styling.
+1. **Template System**: The script uses pre-built template files (`rv_mac_dark.qss.template` and `rv_linux_dark.qss.template`) that contain the complete Open RV interface styling.
 
 2. **Variable Substitution**: You provide color values either through a simple config file, command-line arguments, or interactive prompts. The script finds all `{{VARIABLE_NAME}}` placeholders in the template and replaces them with your actual color values.
 
@@ -12,9 +12,9 @@ A Python script that creates custom themes for OpenRV. Instead of editing comple
 
 4. **Validation**: Before generating the final theme, the script validates that all your color values are proper CSS colors (like `rgb(255,0,0)`, `#ff0000`, or `red`) to prevent broken stylesheets.
 
-5. **Output Generation**: The result is a complete, valid QSS file that you can use directly with OpenRV using the `-qtcss` command-line option.
+5. **Output Generation**: The result is a complete, valid QSS file that you can use directly with Open RV using the `-qtcss` command-line option.
 
-**The key benefit**: Instead of learning CSS and manually editing 1000+ line files, you just specify 20+ color variables in a simple format like `ACCENT_PRIMARY = rgb(0,150,255)`, and get a complete, professional theme that covers every UI element in OpenRV - from buttons and menus to sliders and text inputs.
+**The key benefit**: Instead of learning CSS and manually editing 1000+ line files, you just specify 20+ color variables in a simple format like `ACCENT_PRIMARY = rgb(0,150,255)`, and get a complete, professional theme that covers every UI element in Open RV - from buttons and menus to sliders and text inputs.
 
 **Default Config File**: The repository includes `src/lib/app/RvCommon/rv_theme_variables.conf` which contains all available theme variables with example values. This file serves as both a working example and a starting point for your custom themes.
 
@@ -33,7 +33,7 @@ BORDER_DARK = black
 ```bash
 python src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output my_custom_theme.qss
 ```
-*Note: When run from OpenRV root directory, config files are automatically looked for in `src/lib/app/RvCommon/` and output files are placed there to keep all theme files organized.*
+*Note: When run from Open RV root directory, config files are automatically looked for in `src/lib/app/RvCommon/` and output files are placed there to keep all theme files organized.*
 
 **Command Reference:**
 ```bash
@@ -63,7 +63,7 @@ python src/lib/app/RvCommon/generate_theme.py -c base.conf -o custom.qss -s ACCE
 python src/lib/app/RvCommon/generate_theme.py --list-variables rv_theme_variables.conf
 ```
 
-**3. Use your theme in OpenRV:**
+**3. Use your theme in Open RV:**
 ```bash
 RV -qtcss src/lib/app/RvCommon/my_custom_theme.qss
 ```
@@ -197,8 +197,8 @@ python src/lib/app/RvCommon/generate_theme.py --list-variables existing_theme.co
 ### Common Errors:
 
 **"Template file 'rv_mac_dark.qss.template' not found"**
-- **Solution**: Run the script from the OpenRV root directory (not from src/lib/app/RvCommon)
-- **Check**: Make sure you're in the OpenRV root with `ls src/lib/app/RvCommon/*.template`
+- **Solution**: Run the script from the Open RV root directory (not from src/lib/app/RvCommon)
+- **Check**: Make sure you're in the Open RV root with `ls src/lib/app/RvCommon/*.template`
 
 **"Invalid CSS value 'badcolor'"**
 - **Solution**: Use proper CSS colors: `rgb(255,0,0)`, `#ff0000`, or `red`
@@ -211,7 +211,7 @@ python src/lib/app/RvCommon/generate_theme.py --list-variables existing_theme.co
 **"No such file or directory" for config file**
 - **Solution**: Make sure your config file is in `src/lib/app/RvCommon/` directory
 - **Check**: `ls -la src/lib/app/RvCommon/your_config.conf` to verify the file exists
-- **Note**: When running from OpenRV root, the script automatically looks for config files in the RvCommon directory
+- **Note**: When running from Open RV root, the script automatically looks for config files in the RvCommon directory
 
 ## Platform Support
 

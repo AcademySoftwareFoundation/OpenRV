@@ -1928,11 +1928,8 @@ namespace Rv
                 QString csstext = in.readAll();
                 file.close();
                 
-                // Apply font size parameters if the CSS has placeholders
-                if (csstext.contains("%1") && csstext.contains("%2"))
-                {
-                    csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2);
-                }
+                // Always apply font size parameters - Qt handles missing placeholders safely
+                csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2);
                 
                 qApp->setStyleSheet(csstext);
             }

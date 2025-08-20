@@ -764,14 +764,8 @@ int utf8Main(int argc, char* argv[])
     {
         string s = scarfFile(opts.qtcss);
         QString qcss = QString(s.c_str());
-        if (qcss.contains("%1") || qcss.contains("%2"))
-        {
-            csstext = qcss.arg(opts.fontSize1).arg(opts.fontSize2).arg(opts.fontSize2 - 1);;
-        }
-        else
-        {
-            csstext = qcss;
-        }
+        // Always apply font size parameters - Qt handles missing placeholders safely
+        csstext = qcss.arg(opts.fontSize1).arg(opts.fontSize2).arg(opts.fontSize2 - 1);
     }
     else
     {
