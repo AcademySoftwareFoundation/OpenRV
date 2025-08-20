@@ -1927,10 +1927,11 @@ namespace Rv
                 QTextStream in(&file);
                 QString csstext = in.readAll();
                 file.close();
-                
-                // Always apply font size parameters - Qt handles missing placeholders safely
+
+                // Always apply font size parameters - Qt handles missing
+                // placeholders safely
                 csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2);
-                
+
                 qApp->setStyleSheet(csstext);
             }
         }

@@ -8,7 +8,7 @@
 
 2. **Variable Substitution**: You provide color values either through a simple config file, command-line arguments, or interactive prompts. The script finds all `{{VARIABLE_NAME}}` placeholders in the template and replaces them with your actual color values.
 
-3. **Platform Detection**: The script automatically detects whether you're on macOS, Windows, or Linux and selects the appropriate template file.
+3. **Platform Detection**: The script automatically detects whether you're on macOS, Windows, or Linux and selects the appropriate template file. Windows and Linux both use the same template for UI consistency.
 
 4. **Validation**: Before generating the final theme, the script validates that all your color values are proper CSS colors (like `rgb(255,0,0)`, `#ff0000`, or `red`) to prevent broken stylesheets.
 
@@ -21,6 +21,7 @@
 ## Quick Start
 
 **1. Create a config file with your colors:**
+
 ```ini
 # my_theme.conf
 PRIMARY_BACKGROUND = rgb(25,25,30)
@@ -30,14 +31,31 @@ BORDER_DARK = black
 ```
 
 **2. Generate your theme:**
+
 ```bash
 python src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output my_custom_theme.qss
+# OR
+./src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output my_custom_theme.qss
 ```
-*Note: When run from Open RV root directory, config files are automatically looked for in `src/lib/app/RvCommon/` and output files are placed there to keep all theme files organized.*
+
+**Running Options:**
+
+- **From Open RV root** (recommended):
+  - `python src/lib/app/RvCommon/generate_theme.py [options]`
+  - `./src/lib/app/RvCommon/generate_theme.py [options]` (executable)
+  - Config files automatically looked for in `src/lib/app/RvCommon/`
+  - Output files automatically placed in `src/lib/app/RvCommon/`
+- **From RvCommon directory**:
+  - `cd src/lib/app/RvCommon && python generate_theme.py [options]`
+  - `cd src/lib/app/RvCommon && ./generate_theme.py [options]` (executable)
+  - Uses relative paths for config and output files
 
 **Command Reference:**
+
 ```bash
 python src/lib/app/RvCommon/generate_theme.py [options]
+# OR (executable)
+./src/lib/app/RvCommon/generate_theme.py [options]
 
 Required:
   --output FILE             Output theme file (.qss)
@@ -49,28 +67,53 @@ Options:
 ```
 
 **Examples:**
+
 ```bash
-# Basic generation with config file (from RvCommon directory)
+# Basic generation with config file
 python src/lib/app/RvCommon/generate_theme.py --config my_colors.conf --output my_theme.qss
+./src/lib/app/RvCommon/generate_theme.py --config my_colors.conf --output my_theme.qss
 
 # Generate with command-line variables (no config file needed)
-python src/lib/app/RvCommon/generate_theme.py --output blue_theme.qss --set ACCENT_PRIMARY=rgb(0,100,255)
+./src/lib/app/RvCommon/generate_theme.py --output blue_theme.qss --set ACCENT_PRIMARY=rgb(0,100,255)
 
 # Mix config file with command-line overrides
-python src/lib/app/RvCommon/generate_theme.py -c base.conf -o custom.qss -s ACCENT_PRIMARY=red -s TEXT_PRIMARY=white
+./src/lib/app/RvCommon/generate_theme.py -c base.conf -o custom.qss -s ACCENT_PRIMARY=red -s TEXT_PRIMARY=white
 
 # Check what variables are in the default config file
-python src/lib/app/RvCommon/generate_theme.py --list-variables rv_theme_variables.conf
+./src/lib/app/RvCommon/generate_theme.py --list-variables rv_theme_variables.conf
+```
+
+**Interactive Mode with Default Values:**
+
+When variables are missing from your config file, the script will prompt you interactively and **show default values from `rv_theme_variables.conf`**:
+
+```bash
+./src/lib/app/RvCommon/generate_theme.py --config incomplete.conf --output my_theme.qss
+
+# Example interactive session:
+Missing variables detected. Please provide values:
+('quit' to abort, 'default' or Enter to use default value, 'help' for examples, Ctrl+C to cancel)
+
+ACCENT_PRIMARY (default: rgb(7,75,120)) = default
+Set: ACCENT_PRIMARY = rgb(7,75,120)
+
+BORDER_DARK (default: black) = rgb(50,50,50)  
+Set: BORDER_DARK = rgb(50,50,50)
+
+TEXT_PRIMARY (no default) = rgb(220,220,220)
+Set: TEXT_PRIMARY = rgb(220,220,220)
 ```
 
 **3. Use your theme in Open RV:**
+
 ```bash
 RV -qtcss src/lib/app/RvCommon/my_custom_theme.qss
 ```
 
 ## Writing Config Files
 
-### Basic Format:
+### Basic Format
+
 ```ini
 # Comments start with #
 PRIMARY_BACKGROUND = rgb(34,34,34)
@@ -80,7 +123,8 @@ BORDER_DARK = black
 BORDER_LIGHT = #8c8c8c
 ```
 
-### Color Formats You Can Use:
+### Color Formats You Can Use
+
 ```ini
 # RGB (most common)
 PRIMARY_BACKGROUND = rgb(34,34,34)
@@ -98,49 +142,59 @@ BUTTON_PRESSED = red
 
 ## Available Theme Variables
 
-### Main Background Colors:
+### Main Background Colors
+
 - `PRIMARY_BACKGROUND` - Main application background (behind all widgets)
 - `SECONDARY_BACKGROUND` - Buttons, tabs, group boxes, dock titles, menu separators, tree view alternating rows
 - `TERTIARY_BACKGROUND` - Hover states for dock titles and tabs
 
-### Accent Colors:
+### Accent Colors
+
 - `ACCENT_PRIMARY` - **Most important color** - Menu hovers/selections, combo box hovers, button hover borders, tool button checked states, tree view selections, all interactive highlight states
 - `ACCENT_SECONDARY` - Secondary accent used for dock widget borders and group box outlines
 
-### Text Colors:
+### Text Colors
+
 - `TEXT_PRIMARY` - Main text throughout the interface (labels, buttons, combo boxes)
 - `TEXT_SECONDARY` - View menu text and combo box text
 - `TEXT_BRIGHT` - Tab selected text and emphasized text states
 - `TEXT_DISABLED` - Grayed out disabled text and controls
 
-### Border Colors:
+### Border Colors
+
 - `BORDER_DARK` - Dark borders on toolbars, input fields, and separators
 - `BORDER_LIGHT` - Light borders on toolbars and UI dividers
 - `BORDER_MEDIUM` - Medium tone borders for various UI elements
 
-### Button States:
+### Button States
+
 - `BUTTON_BORDER` - Default button borders (push buttons)
 - `BUTTON_BORDER_DISABLED` - Borders for disabled/inactive buttons
 - `BUTTON_HOVER` - Background color when hovering over tool buttons in play controls and view menus
 - `BUTTON_PRESSED` - Background color when clicking/pressing buttons
 
-### Input Controls:
+### Input Controls
+
 - `CONTROL_BACKGROUND` - Combo box private scrollers and control track backgrounds
 - `CONTROL_HANDLE` - Slider handles, scroll bar handles, dock widget close/float buttons
 - `CONTROL_HANDLE_HOVER` - Slider and scroll bar handles when hovering
 - `INPUT_BACKGROUND` - Text inputs, line edits, spin boxes, combo boxes, tool buttons, text edit areas
 
-### Selection States:
+### Selection States
+
 - `SELECTION_BACKGROUND` - Background color for selected text in input fields
 - `SELECTION_TEXT` - Text color for selected text in input fields
 
-### Session Manager:
+### Session Manager
+
 - `SESSION_ITEM_BORDER` - Borders around session manager items and tree elements
 
 ## Tips & Advanced Usage
 
-### Start Simple:
+### Start Simple
+
 Begin with just a few key colors and let the generator ask for the rest:
+
 ```ini
 # minimal.conf
 PRIMARY_BACKGROUND = rgb(30,30,35)
@@ -148,67 +202,77 @@ ACCENT_PRIMARY = rgb(0,150,255)
 TEXT_PRIMARY = rgb(220,220,220)
 ```
 
-### Copy Existing Themes:
+### Copy Existing Themes
+
 Look at `src/lib/app/RvCommon/rv_theme_variables.conf` for a complete example with all variables.
 
-### Interactive Help:
+### Interactive Help
+
 When prompted for a color, type `help` to see an example:
+
 ```bash
 ACCENT_PRIMARY = help
 Example for ACCENT_PRIMARY: rgb(7,75,120)
 ```
 
-### Quick Testing Workflow:
+### Quick Testing Workflow
+
 Use command-line overrides to test color changes without editing files:
+
 ```bash
 # Test a different accent color quickly
-python src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output test.qss \
+./src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output test.qss \
   --set ACCENT_PRIMARY=rgb(255,100,0)
 ```
 
-### Recommended Workflow:
+### Recommended Workflow
+
 1. **Copy the default config to RvCommon directory:**
+
    ```bash
    cp src/lib/app/RvCommon/rv_theme_variables.conf src/lib/app/RvCommon/my_theme.conf
    ```
 
 2. **Edit your colors:**
+
    ```bash
    nano src/lib/app/RvCommon/my_theme.conf
    # Change PRIMARY_BACKGROUND, ACCENT_PRIMARY, etc.
    ```
 
 3. **Generate and test (using just the filename):**
+
    ```bash
-   python src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output my_theme.qss
+   ./src/lib/app/RvCommon/generate_theme.py --config my_theme.conf --output my_theme.qss
    RV -qtcss src/lib/app/RvCommon/my_theme.qss
    ```
 
 4. **Refine and repeat!**
 
-### Inspect Config Files:
+### Inspect Config Files
+
 Check what variables are defined in any config file:
+
 ```bash
-python src/lib/app/RvCommon/generate_theme.py --list-variables existing_theme.conf
+./src/lib/app/RvCommon/generate_theme.py --list-variables existing_theme.conf
 ```
 
 ## Troubleshooting
 
-### Common Errors:
+### Common Errors
 
-**"Template file 'rv_mac_dark.qss.template' not found"**
-- **Solution**: Run the script from the Open RV root directory (not from src/lib/app/RvCommon)
-- **Check**: Make sure you're in the Open RV root with `ls src/lib/app/RvCommon/*.template`
+#### Invalid CSS value 'badcolor'
 
-**"Invalid CSS value 'badcolor'"**
 - **Solution**: Use proper CSS colors: `rgb(255,0,0)`, `#ff0000`, or `red`
 - **Valid formats**: RGB values 0-255, hex codes, or named colors (black, white, red, etc.)
 
-**Variables missing or prompting unexpectedly**
-- **Check**: Your config file syntax with `python src/lib/app/RvCommon/generate_theme.py --list-variables myfile.conf`
+#### Variables missing or prompting unexpectedly
+
+- **Check**: Your config file syntax with `./src/lib/app/RvCommon/generate_theme.py --list-variables myfile.conf`
 - **Common issue**: Missing `=` sign or extra spaces around variable names
 
-**"No such file or directory" for config file**
+#### No such file or directory for config file
+
 - **Solution**: Make sure your config file is in `src/lib/app/RvCommon/` directory
 - **Check**: `ls -la src/lib/app/RvCommon/your_config.conf` to verify the file exists
 - **Note**: When running from Open RV root, the script automatically looks for config files in the RvCommon directory
@@ -216,7 +280,9 @@ python src/lib/app/RvCommon/generate_theme.py --list-variables existing_theme.co
 ## Platform Support
 
 The generator automatically detects your platform and uses the appropriate template:
-- **macOS/Windows**: Uses `rv_mac_dark.qss.template`
+
+- **macOS**: Uses `rv_mac_dark.qss.template`
 - **Linux**: Uses `rv_linux_dark.qss.template`
+- **Windows**: Uses `rv_linux_dark.qss.template`
 
 No configuration needed - it just works!
