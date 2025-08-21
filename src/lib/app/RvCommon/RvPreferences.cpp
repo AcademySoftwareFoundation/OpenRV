@@ -1930,7 +1930,13 @@ namespace Rv
 
                 // Always apply font size parameters - Qt handles missing
                 // placeholders safely
+#ifdef PLATFORM_DARWIN
                 csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2);
+#else
+                csstext = csstext.arg(opts.fontSize1)
+                              .arg(opts.fontSize2)
+                              .arg(opts.fontSize2 - 1);
+#endif
 
                 qApp->setStyleSheet(csstext);
             }

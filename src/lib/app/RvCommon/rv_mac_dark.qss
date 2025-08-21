@@ -237,6 +237,7 @@ QCheckBox {
 
 QCheckBox::indicator, QGroupBox::indicator {
     image: url(":images/checkbox_off_default.png");
+    subcontrol-position: center left;
 }
 
 QCheckBox::indicator:hover:!checked, QGroupBox::indicator:hover:!checked {
