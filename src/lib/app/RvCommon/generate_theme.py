@@ -277,11 +277,14 @@ def validate_css_value(var_name: str, value: str) -> bool:
             "color1",
         }
 
-        # Check Hex format, named colors, or non-empty string
+        # Check Hex format or named colors (case insensitive)
         return (
-            re.match(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$", value)
+            re.match(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$", value) is not None
             or value.lower() in named_colors
-        ) and len(value.strip()) != 0
+        )
+
+    # Non-color variables: for now all variables are colors
+    return len(value.strip()) > 0
 
 
 def get_example_value(var_name: str) -> str:
@@ -320,7 +323,7 @@ def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
                     value = input(prompt).strip()
 
                     if value.lower() == "quit":
-                        print("Aborted by user.")
+                        logger.info("Aborted by user.")
                         sys.exit(1)
                     elif value.lower().startswith("help"):
                         example = get_example_value(var_name)
@@ -349,10 +352,10 @@ def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
                             continue
 
                 except KeyboardInterrupt:
-                    print("\n\nOperation cancelled by user (Ctrl+C)")
+                    logger.info("\n\nOperation cancelled by user (Ctrl+C)")
                     sys.exit(1)
                 except EOFError:
-                    print("\n\nUnexpected end of input")
+                    logger.info("\n\nUnexpected end of input")
                     sys.exit(1)
 
     except Exception as e:
@@ -508,11 +511,11 @@ def main():
         if args.list_variables:
             variables = load_variables_from_config(args.list_variables)
             if variables:
-                print(f"Variables in {args.list_variables}:")
+                logger.info(f"Variables in {args.list_variables}:")
                 for key, value in variables.items():
-                    print(f"  {key} = {value}")
+                    logger.info(f"  {key} = {value}")
             else:
-                print(f"No variables found in {args.list_variables}")
+                logger.info(f"No variables found in {args.list_variables}")
             return 0
 
         # Check if output file ends with .qss
