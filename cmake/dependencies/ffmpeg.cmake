@@ -25,11 +25,11 @@ SET(_target
 
 IF(RV_FFMPEG_8)
   SET(_version
-      "release/8.0"
+      "n8.0"
   )
 
   SET(_download_hash
-      ""
+      "fcf93d5855f654b82d4aa8aae62d64d3"
   )
 ELSEIF(RV_FFMPEG_7)
   SET(_version
@@ -55,12 +55,6 @@ ENDIF()
 SET(_download_url
     "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/${_version}.zip"
 )
-
-IF(RV_FFMPEG_8)
-  SET(_download_url
-      "https://code.ffmpeg.org/FFmpeg/FFmpeg/archive/release/8.0.zip"
-  )
-ENDIF()
 
 SET(_base_dir
     ${RV_DEPS_BASE_DIR}/${_target}
