@@ -1377,15 +1377,17 @@ namespace Rv
         string tag = (muTag) ? muTag->c_str() : "";
 
         vector<string> sargs;
+        vector<string> sargsRemote;
 
         for (size_t i = 0; i < array->size(); i++)
         {
             string arg = array->element<StringType::String*>(i)->c_str();
+            sargsRemote.push_back(arg);
             sargs.push_back(IPCore::Application::mapFromVar(arg));
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargs, tag,
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargsRemote, tag,
                                               processOpts, merge);
 
         //
@@ -1413,28 +1415,32 @@ namespace Rv
         IPGraph::GraphEdit edit(s->graph());
 
         vector<vector<string>> allFilesAndOptions;
+        vector<vector<string>> allFilesAndOptionsRemote;
 
         for (size_t i = 0; i < array->size(); i++)
         {
             DynamicArray* currentSource = array->element<DynamicArray*>(i);
 
             vector<string> filesAndOptions;
+            vector<string> filesAndOptionsRemote;
             filesAndOptions.reserve(currentSource->size());
             for (size_t j = 0; j < currentSource->size(); j++)
             {
                 string arg =
                     currentSource->element<StringType::String*>(j)->c_str();
 
+                filesAndOptionsRemote.emplace_back(arg);
                 filesAndOptions.emplace_back(
                     IPCore::Application::mapFromVar(arg));
             }
 
             allFilesAndOptions.push_back(filesAndOptions);
+            allFilesAndOptionsRemote.push_back(filesAndOptionsRemote);
         }
 
         // silences broadcasting events below this constructor
         IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
-                                              allFilesAndOptions, tag);
+                                              allFilesAndOptionsRemote, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.
