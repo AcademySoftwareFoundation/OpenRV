@@ -304,8 +304,18 @@ namespace Mu
     Pointer qt_QGuiApplication_primaryScreen_QScreen(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeinstance<QScreenType>(c, QGuiApplication::primaryScreen(),
-                                         "qt.QScreen");
+
+        // Retrieve the primary screen
+        QScreen* screen = QGuiApplication::primaryScreen();
+
+        // If no screen is found, return nullptr
+        if (!screen)
+        {
+            return nullptr;
+        }
+
+        // Create a new instance of QScreenType and return it
+        return makeinstance<QScreenType>(c, screen, "qt.QScreen");
     }
 
     int qt_QGuiApplication_queryKeyboardModifiers_int(Mu::Thread& NODE_THREAD)
@@ -323,10 +333,24 @@ namespace Mu
     Pointer qt_QGuiApplication_screenAt_QScreen_QPoint(Mu::Thread& NODE_THREAD,
                                                        Pointer param_point)
     {
-        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QPoint arg0 = getqtype<QPointType>(param_point);
-        return makeinstance<QScreenType>(c, QGuiApplication::screenAt(arg0),
-                                         "qt.QScreen");
+        // Retrieve the current MuLangContext from the NODE_THREAD context
+        MuLangContext* context =
+            static_cast<MuLangContext*>(NODE_THREAD.context());
+
+        // Convert the passed parameter to a QPoint object
+        const QPoint point = getqtype<QPointType>(param_point);
+
+        // Retrieve the screen at the specified point
+        QScreen* screen = QGuiApplication::screenAt(point);
+
+        // If no screen is found, return nullptr
+        if (!screen)
+        {
+            return nullptr;
+        }
+
+        // Create a new instance of QScreenType and return it
+        return makeinstance<QScreenType>(context, screen, "qt.QScreen");
     }
 
     void qt_QGuiApplication_setDesktopSettingsAware_void_bool(
