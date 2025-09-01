@@ -2159,7 +2159,7 @@ class: AnnotateMinorMode : MinorMode
         connect(_drawDock, QDockWidget.topLevelChanged, topLevelChangedSlot);
 
         connect(_colorButton, QPushButton.clicked, chooseColorSlot);
-        connect(_colorDialog, QColorDialog.currentColorChanged, newColorSlot(,true,true));
+        connect(_colorDialog, QColorDialog.colorSelected, newColorSlot(,true,true));
 
         _undoAct = QAction(auxIcon("undo_64x64.png"), "Undo", m);
         _redoAct = QAction(auxIcon("redo_64x64.png"), "Redo", m);
