@@ -213,11 +213,13 @@ class: ModeManagerMode : MinorMode
     {
         \: (int; )
         {
-            if entry.mode eq nil
-                 then UncheckedMenuState
-                 else if entry.mode._active
-                        then CheckedMenuState
-                        else UncheckedMenuState;
+            if (filterLiveReviewEvents())
+                then DisabledMenuState
+                else if entry.mode eq nil
+                     then UncheckedMenuState
+                     else if entry.mode._active
+                            then CheckedMenuState
+                            else UncheckedMenuState;
         };
     }
 
@@ -424,6 +426,11 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
+        if (filterLiveReviewEvents() && (entry.name == "session_manager" || entry.name == "annotate_mode"))
+        {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
         mm.toggleEntry(entry);
     }
 

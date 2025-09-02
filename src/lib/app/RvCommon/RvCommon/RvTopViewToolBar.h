@@ -133,6 +133,8 @@ namespace Rv
                                     const std::string& icon,
                                     bool forceRepaint = false);
 
+        void setLiveReviewFilteredActions(bool isDisabled);
+
     private:
         IPCore::Session* m_session;
         QAction* m_viewBackAction;
@@ -198,6 +200,7 @@ namespace Rv
         QIconMap m_iconMap;
         const VideoDevice* m_device;
         const VideoDevice* m_outputDevice;
+        std::unordered_map<QAction*, QString> m_liveReviewFilteredActions;
     };
 
 } // namespace Rv
