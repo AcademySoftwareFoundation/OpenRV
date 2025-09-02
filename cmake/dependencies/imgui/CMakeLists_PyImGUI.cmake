@@ -36,6 +36,11 @@ ENDIF()
 
 NANOBIND_ADD_MODULE(pyimgui ${IMGUI_NB_SOURCES})
 
+# Set the correct suffix for Windows Python modules
+IF(RV_TARGET_WINDOWS)
+  SET_TARGET_PROPERTIES(pyimgui PROPERTIES SUFFIX ".pyd")
+ENDIF()
+
 TARGET_LINK_LIBRARIES(
   pyimgui
   PUBLIC ${imgui_LIBRARY}
