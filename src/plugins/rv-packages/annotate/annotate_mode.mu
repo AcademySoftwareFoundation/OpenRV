@@ -109,7 +109,7 @@ class: AnnotateMinorMode : MinorMode
     Point             _editPoint;
     string            _image;
     string            _user;
-    string            _machine;
+    int64             _processId;
     bool              _linkToolColors;
     bool              _colorDialogLock;
     QPushButton       _colorButton;
@@ -367,7 +367,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: newUniqueName (string; string node, string type, int frame)
     {
-        "%s.%s:%d:%d:%s" % (node, type, nextID(node), frame, encodedName(_user), _machine);
+        "%s.%s:%d:%d:%s_%d" % (node, type, nextID(node), frame, encodedName(_user), _processId);
     }
 
     method: frameOrderName (string; string node, int frame)
@@ -942,6 +942,8 @@ class: AnnotateMinorMode : MinorMode
         {
             addToStroke(pei);
         }
+
+        print("PUSH %s\n" % _currentDrawObject);
     }
 
     method: checkDragFilter (bool; Event event, Point ip)
@@ -977,6 +979,8 @@ class: AnnotateMinorMode : MinorMode
             sendInternalEvent("live-review-blocked-event");
             return;
         }
+
+        print("DRAG %s\n" % _currentDrawObject);
         let d = _currentDrawMode;
         _pointerGone = false;
 
@@ -1038,6 +1042,8 @@ class: AnnotateMinorMode : MinorMode
         if (_syncWholeStrokes) endCompoundStateChange();
         undoRedoUpdate();
         redraw();
+
+        print("RELEASE %s\n" % _currentDrawObject);
     }
 
     method: maybeAutoMark (void; Event event)
@@ -1816,7 +1822,7 @@ class: AnnotateMinorMode : MinorMode
     method: AnnotateMinorMode (AnnotateMinorMode; string name)
     {
         _textPlacementMode = false;
-        _machine           = "computer";
+        _processId         = QApplication.applicationPid();
         _user              = remoteLocalContactName();
         _setColorLock      = false;
         _activeSampleColor = false;
