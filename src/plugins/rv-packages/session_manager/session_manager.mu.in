@@ -1442,7 +1442,7 @@ class: SessionManagerMode : MinorMode
             child = QTreeWidgetItem(string[] {""}, QTreeWidgetItem.Type);
 
         widget.setAutoFillBackground(true);
-        item.setIcon(0, QIcon(":/images/radio_button_blue_on.png"));
+        item.setIcon(0, QIcon(":/images/radio_button_on_default.png"));
         item.setFlags(Qt.ItemIsEnabled);
 
         item.addChild(child);
