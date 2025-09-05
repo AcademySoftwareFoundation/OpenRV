@@ -165,15 +165,46 @@
         return;
     }
 
-    // Present chooser UI
+    // If only one RV app found, launch it directly without showing chooser
+    if ([appURLs count] == 1) {
+        NSURL *selectedAppURL = [appURLs firstObject];
+        NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:[selectedAppURL path]];
+        NSLog(@"Only one RV application found, launching directly: %@", displayName);
+        
+        NSURL *targetURL = [NSURL URLWithString:rvlinkURL];
+        if (targetURL != nil) {
+            NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
+            [[NSWorkspace sharedWorkspace] openURLs:@[targetURL]
+                              withApplicationAtURL:selectedAppURL
+                                    configuration:config
+                               completionHandler:^(NSRunningApplication *app, NSError *err) {
+                if (err != nil) {
+                    NSLog(@"Failed to launch app: %@", [selectedAppURL path]);
+                    NSLog(@"Error: %@", [err localizedDescription]);
+                } else {
+                    NSLog(@"Successfully opened URL: %@ with app: %@", rvlinkURL, [selectedAppURL path]);
+                }
+            }];
+        } else {
+            NSLog(@"Invalid rvlink URL: %@", rvlinkURL);
+        }
+        return;
+    }
+
+    // Present chooser UI for multiple apps
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:@"Choose RV Application"];
     [alert setInformativeText:[NSString stringWithFormat:@"Opening: %@", rvlinkURL]];
     [alert addButtonWithTitle:@"Open"];
     [alert addButtonWithTitle:@"Cancel"];
 
+    // Sort apps by path for consistent ordering
+    NSArray *sortedAppURLs = [appURLs sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+        return [[url1 path] compare:[url2 path]];
+    }];
+    
     NSPopUpButton *popup = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0,0,400,24)];
-    for (NSURL *appURL in appURLs) {
+    for (NSURL *appURL in sortedAppURLs) {
         NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:[appURL path]];
         NSString *appPath = [appURL path];
         

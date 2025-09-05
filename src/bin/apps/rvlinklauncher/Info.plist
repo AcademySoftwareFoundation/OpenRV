@@ -5,25 +5,23 @@
     <key>CFBundleName</key>
     <string>RVLinkLauncher</string>
     <key>CFBundleIdentifier</key>
-    <string>com.autodesk.RVLinkLauncher</string>
+    <string>com.autodesk.${_target}.${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
     <key>CFBundleVersion</key>
-    <string>1.0</string>
+    <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
     <key>CFBundleExecutable</key>
     <string>RVLinkLauncher</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
-    <key>CFBundleSignature</key>
-    <string>????</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleIconFile</key>
-    <string>RV.icns</string>
+    <string>RVLinkLauncher.icns</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.utilities</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
     <key>CFBundleSupportedPlatforms</key>
     <array>
         <string>MacOSX</string>
