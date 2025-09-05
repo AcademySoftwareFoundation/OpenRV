@@ -10,7 +10,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 # These variables are parsed by sphinx for the documentation. One-line formatting facilitates parsing and readability.
 # cmake-format: off
 SET(RV_MAJOR_VERSION "3" CACHE STRING "RV's version major")
-SET(RV_MINOR_VERSION "0" CACHE STRING "RV's version minor")
+SET(RV_MINOR_VERSION "1" CACHE STRING "RV's version minor")
 SET(RV_REVISION_NUMBER "0" CACHE STRING "RV's revision number")
 SET(RV_VERSION_YEAR "2025" CACHE STRING "RV's year of release.")
 # cmake-format: on
