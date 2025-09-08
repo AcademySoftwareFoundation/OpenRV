@@ -674,6 +674,39 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
+    method: pointerLocationFromNDC ((string, Point); Point point)
+    {
+        try
+        {
+            // Convert NDC space [-1, 1] directly to viewport coordinates using ndcToEventSpace
+            // The ndcToEventSpace function now handles aspect ratio correction internally
+            let viewportPoint = ndcToEventSpace(point);
+            
+            State state = data();
+            state.pointerPosition = viewportPoint;
+            recordPixelInfo(nil);
+
+            let pinfo = imagesAtPixel(viewportPoint, "annotate").front(),
+                name  = pinfo.name,
+                devicePixelRatio = devicePixelRatio(),
+                ip    = viewportPoint;// * devicePixelRatio;  // Same as original pointerLocation method
+
+            if (name == "")
+            {
+                return ("", Point(0,0));
+            }
+
+            _pointer = ip;
+            _pointerRadius = mag(imageToEventSpace(name, ip, true)
+                                 - imageToEventSpace(name, ip + Point(0,_currentDrawMode.size), true));
+            return (name, ip);
+        }
+        catch (...)
+        {
+            return ("", Point(0,0));
+        }
+    }
+
     method: penPush (void; Event event)
     {
         updateCurrentNode();
@@ -980,7 +1013,6 @@ class: AnnotateMinorMode : MinorMode
             return;
         }
 
-        print("DRAG %s\n" % _currentDrawObject);
         let d = _currentDrawMode;
         _pointerGone = false;
 
@@ -1026,6 +1058,8 @@ class: AnnotateMinorMode : MinorMode
 
     method: release (void; Event event)
     {
+
+        print("RELEASE %s\n" % _currentDrawObject);
         runtime.gc.enable();
         drag(event);
         _currentDrawObject = nil;
@@ -1043,7 +1077,157 @@ class: AnnotateMinorMode : MinorMode
         undoRedoUpdate();
         redraw();
 
-        print("RELEASE %s\n" % _currentDrawObject);
+    }
+
+    method: color_rgb (void; Event event)
+    {
+        let parts = event.contents().split(";;");
+        if (parts.size() >= 3)
+        {
+            let r = float(parts[0]),
+                g = float(parts[1]),
+                b = float(parts[2]);
+
+            setColor(Color(r,g,b,1));
+        }
+    }
+
+    method: color_hsv (void; Event event)
+    {
+        let parts = event.contents().split(";;");
+        if (parts.size() >= 3)
+        {
+            let h = float(parts[0]),
+                s = float(parts[1]),
+                v = float(parts[2]);
+
+            let hsv = Vec3(h,s,v);
+            let rgb = toRGB(hsv);
+            setColor(Color(rgb[0], rgb[1], rgb[2], 1));
+        }
+    }
+
+
+    // NDC push/drag/release
+    //
+    // These functions mimic the regular push/drag/release handlers, but
+    // are used to test concurrent drawing of annoations in RV in a live 
+    // review session. We draw in a normalized [-1,1] space where (0,0) 
+    // is the center of the image.
+    // 
+    method: ndc_push (void; Event event)
+    {
+        let parts = event.contents().split(";;");
+        if (parts.size() >= 2)
+        {
+            let x = float(parts[0]),
+                y = float(parts[1]);
+            
+            // Get source name and image point using our new method
+            let (name, ip) = pointerLocationFromNDC(Point(x, y));
+            
+            if (name == "") 
+                return;
+            
+            runtime.gc.disable();
+            
+            if (isPlaying()) {
+                stop();
+                setFrame(frame());
+            }
+            
+            updateCurrentNode();
+            let d = _currentDrawMode;
+            
+            if (_syncWholeStrokes) beginCompoundStateChange();
+            
+            let twidth = d.size / (if _scaleBrush then scale() else 1.0),
+                incolor = if d.colorFunction eq nil then d.color else d.colorFunction(d.color);
+            
+            try
+            {
+                _currentDrawObject = newStroke(_currentNode,
+                                               _currentNodeInfo.frame,
+                                               incolor, twidth, d.brushName,
+                                               d.join, d.cap, _currentNodeInfo.frame, d.duration, d.renderMode, _debug);
+            }
+            catch (exception exc)
+            {
+                print("annotate_mode: exception = %s\n" % exc);
+            }
+            catch (...)
+            {
+                print("annotate_mode: UNCAUGHT EXCEPTION\n");
+            }
+            
+            _dragLastPointer = ip;
+            _dragLastMsec = int(QDateTime.currentMSecsSinceEpoch());
+            
+            let pei = eventToImageSpace(name, ip, true);
+            addToStroke(pei);
+        }
+    }
+
+    method: ndc_drag (void; Event event)
+    {
+        let parts = event.contents().split(";;");
+        if (parts.size() >= 2)
+        {
+            let x = float(parts[0]),
+                y = float(parts[1]);
+            
+            // Get source name and image point using our new method
+            let (name, ip) = pointerLocationFromNDC(Point(x, y));
+            
+            let d = _currentDrawMode;
+            _pointerGone = false;
+            
+            if (_currentDrawObject eq nil)
+            {
+                // Call ndc_push to start a new stroke
+                ndc_push(event);
+            }
+            else
+            {
+                if (name == "") 
+                    return;
+                
+                let pei = eventToImageSpace(name, ip, true);
+                addToStroke(pei);
+            }
+        }
+    }
+
+    method: ndc_release (void; Event event)
+    {
+        let parts = event.contents().split(";;");
+        if (parts.size() >= 2)
+        {
+            let x = float(parts[0]),
+                y = float(parts[1]);
+            
+            // Get source name and image point using our new method
+            let (name, ip) = pointerLocationFromNDC(Point(x, y));
+            
+            runtime.gc.enable();
+            ndc_drag(event);
+            _currentDrawObject = nil;
+            
+            let f = _currentNodeInfo.frame,
+                rprop= frameOrderRedoStackName(_currentNode, f);
+            
+            if (propertyExists(rprop) && propertyInfo(rprop).size > 0)
+            {
+                for_each (c; getStringProperty(rprop)) deleteStroke(_currentNode, c);
+                setStringProperty(rprop, string[](), true);
+            }
+            
+            if (_syncWholeStrokes) 
+                endCompoundStateChange();
+
+            undoRedoUpdate();
+            redraw();
+        }
     }
 
     method: maybeAutoMark (void; Event event)
@@ -2222,7 +2406,10 @@ class: AnnotateMinorMode : MinorMode
 
         init(name,
              nil,
-             [("pointer-1--drag", drag, "Add to current stroke"),
+             [("ndc-pointer-1--drag", ndc_drag, "Add to current stroke in NDC space"),
+              ("ndc-pointer-1--push", ndc_push, "Start New Stroke in NDC space"),
+              ("ndc-pointer-1--release", ndc_release, "End Current Stroke in NDC space"),
+              ("pointer-1--drag", drag, "Add to current stroke"),
               ("pointer-1--push", push, "Start New Stroke"),
               ("pointer-1--release", release, "End Current Stroke"),
               ("pointer--move", move, ""),
@@ -2240,6 +2427,8 @@ class: AnnotateMinorMode : MinorMode
               ("stylus-pen--shift--move", editRadius, ""),
               ("stylus-pen--move", move, "Pen Move"),
               ("stylus-pen--release", release, "Pen Release"),
+              ("stylus-color-rgb", color_rgb, "Select color RGB"),
+              ("stylus-color-hsv", color_hsv, "Select color HSV"),
               ("stylus-eraser--push", eraserPush, "Pen Down"),
               ("stylus-eraser--drag", drag, "Pen Drag"),
               ("stylus-eraser--move", move, "Pen Move"),
