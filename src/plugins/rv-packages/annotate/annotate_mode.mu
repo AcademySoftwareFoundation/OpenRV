@@ -975,8 +975,6 @@ class: AnnotateMinorMode : MinorMode
         {
             addToStroke(pei);
         }
-
-        print("PUSH %s\n" % _currentDrawObject);
     }
 
     method: checkDragFilter (bool; Event event, Point ip)
