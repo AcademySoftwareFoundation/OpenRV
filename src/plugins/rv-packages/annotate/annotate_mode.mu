@@ -1056,8 +1056,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: release (void; Event event)
     {
-
-        print("RELEASE %s\n" % _currentDrawObject);
         runtime.gc.enable();
         drag(event);
         _currentDrawObject = nil;
