@@ -1582,7 +1582,8 @@ namespace TwkMovie
         return true;
     }
 
-    void MovieFFMpegReader::populateTimecodeMetadata(const AVDictionaryEntry* tcEntry, const AVTimecode& avTimecode)
+    void MovieFFMpegReader::populateTimecodeMetadata(
+        const AVDictionaryEntry* tcEntry, const AVTimecode& avTimecode)
     {
         ostringstream tcStart, tcFR, tcFlags;
         tcStart << tcEntry->value << " (" << avTimecode.start << ")";
@@ -1604,7 +1605,9 @@ namespace TwkMovie
         m_info.proxy.newAttribute("Timecode/Flags", tcFlags.str());
     }
 
-    AVRational MovieFFMpegReader::getTimecodeRate(AVStream* tsStream, AVFormatContext* formatContext)
+    AVRational
+    MovieFFMpegReader::getTimecodeRate(AVStream* tsStream,
+                                       AVFormatContext* formatContext)
     {
         AVRational tcRate = {tsStream->time_base.den, tsStream->time_base.num};
 
@@ -1659,7 +1662,8 @@ namespace TwkMovie
                 }
 
                 AVTimecode avTimecode;
-                av_timecode_init_from_string(&avTimecode, tcRate, tcEntry->value, m_avFormatContext);
+                av_timecode_init_from_string(&avTimecode, tcRate,
+                                             tcEntry->value, m_avFormatContext);
                 // Add the timecode attributes to the movie info
                 populateTimecodeMetadata(tcEntry, avTimecode);
                 m_timecodeTrack = i;
@@ -1668,21 +1672,25 @@ namespace TwkMovie
             }
         }
 
-        // Fallback: check format-level metadata for timecode if not found in any stream
+        // Fallback: check format-level metadata for timecode if not found in
+        // any stream
         if (!foundTimecode && m_avFormatContext->metadata)
         {
-            AVDictionaryEntry* fmtTcEntry = av_dict_get(m_avFormatContext->metadata, "timecode", NULL, 0);
+            AVDictionaryEntry* fmtTcEntry =
+                av_dict_get(m_avFormatContext->metadata, "timecode", NULL, 0);
             if (fmtTcEntry && fmtTcEntry->value)
             {
-                // Try to get a valid frame rate the same way as the standard mechanism above.
-                AVRational tcRate = {25, 1}; // Default to 25fps
+                // Try to get a valid frame rate the same way as the standard
+                // mechanism above.
+                AVRational tcRate = {24, 1}; // Default to 24fps
                 for (unsigned int s = 0; s < m_avFormatContext->nb_streams; ++s)
                 {
                     AVStream* tsStream = m_avFormatContext->streams[s];
                     tcRate = getTimecodeRate(tsStream, m_avFormatContext);
                 }
                 AVTimecode avTimecode;
-                av_timecode_init_from_string(&avTimecode, tcRate, fmtTcEntry->value, m_avFormatContext);
+                av_timecode_init_from_string(
+                    &avTimecode, tcRate, fmtTcEntry->value, m_avFormatContext);
                 // Add the timecode attributes to the movie info
                 populateTimecodeMetadata(fmtTcEntry, avTimecode);
                 firstFrame = avTimecode.start;
