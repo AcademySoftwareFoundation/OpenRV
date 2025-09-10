@@ -66,6 +66,7 @@ namespace TwkAudio
         SDDS_7_1, // Surround_5_1   | FrontLeftOfCenter | FrontRightOfCenter,
         Surround_7_1, // Surround_5_1   | BackLeft          | BackRight,
         Back_7_1,     // Back_5_1       | SideLeft          | SideRight,
+        Generic_9,    // Surround_7_1   | BackCenter,
         Surround_9_1, // Surround_7_1   | LeftHeight        | RightHeight,
         Generic_16,
 

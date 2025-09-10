@@ -224,6 +224,9 @@ namespace TwkAudio
         case Back_7_1:
             chstr = "7.1 (Back)";
             break;
+        case Generic_9:
+            chstr = "9.0 (Generic)";
+            break;
         case Surround_9_1:
             chstr = "9.1";
             break;
@@ -273,8 +276,11 @@ namespace TwkAudio
         case 8:
             lv.push_back(Surround_7_1);
             lv.push_back(Back_7_1);
-            break;
+            // break;
             lv.push_back(SDDS_7_1);
+            break;
+        case 9:
+            lv.push_back(Generic_9);
             break;
         case 10:
             lv.push_back(Surround_9_1);
@@ -348,6 +354,10 @@ namespace TwkAudio
         {
             return SDDS_7_1;
         }
+        else if (cv == layoutChannels(Generic_9))
+        {
+            return Generic_9;
+        }
         else if (cv == layoutChannels(Generic_16))
         {
             return Generic_16;
@@ -408,6 +418,9 @@ namespace TwkAudio
             break;
         case Back_7_1:
             count = 8;
+            break;
+        case Generic_9:
+            count = 9;
             break;
         case Surround_9_1:
             count = 10;
@@ -548,6 +561,18 @@ namespace TwkAudio
             chv.push_back(BackRight);
             chv.push_back(SideLeft);
             chv.push_back(SideRight);
+            break;
+        case Generic_9:
+            // Surround_7_1 + BackCenter
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(BackCenter);
             break;
         case Surround_9_1:
             chv.push_back(FrontLeft);
