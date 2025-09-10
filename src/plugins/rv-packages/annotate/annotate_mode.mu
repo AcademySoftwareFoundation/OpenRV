@@ -905,12 +905,10 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
-    method: push (void; Event event)
+    method: pushStrokeCommon (void; string name, Point ip, Event event = nil, bool supportPressure = true)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
+        if (name == "") return;
+
         runtime.gc.disable();
 
         // Stop playback if we were playing.
@@ -923,10 +921,7 @@ class: AnnotateMinorMode : MinorMode
         }
 
         updateCurrentNode();
-        let (name, ip) = pointerLocation(event),
-            d = _currentDrawMode;
-
-        if (name == "") return;
+        let d = _currentDrawMode;
 
         if (_syncWholeStrokes) beginCompoundStateChange();
 
@@ -957,13 +952,16 @@ class: AnnotateMinorMode : MinorMode
 
         bool useWidth = false;
 
-        case (_currentDrawMode.pressureMode)
+        if (supportPressure)
         {
-            Size -> { useWidth = true;}
-            _ -> { useWidth = false; }
+            case (_currentDrawMode.pressureMode)
+            {
+                Size -> { useWidth = true;}
+                _ -> { useWidth = false; }
+            }
         }
 
-        if (useWidth)
+        if (useWidth && event neq nil)
         {
             let p = event.pressure(),
                 p2 = math_util.clamp(p, .01, 1.0),
@@ -975,6 +973,17 @@ class: AnnotateMinorMode : MinorMode
         {
             addToStroke(pei);
         }
+    }
+
+    method: push (void; Event event)
+    {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
+        let (name, ip) = pointerLocation(event);
+        pushStrokeCommon(name, ip, event, true /*supportPressure*/);
     }
 
     method: checkDragFilter (bool; Event event, Point ip)
@@ -1004,24 +1013,16 @@ class: AnnotateMinorMode : MinorMode
         return true;
     }
 
-    method: drag (void; Event event)
+    method: dragCommon (void; string name, Point ip, Event event, bool supportPressure )
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         let d = _currentDrawMode;
         _pointerGone = false;
 
-        if (_currentDrawObject eq nil)
-        {
-            //
-            //  This can happen on the mac when "clicking through"
-            //
-            push(event);
-        }
-        else
+        if (name == "") return;
+
+        let pei = eventToImageSpace(name, ip, true);
+
+        if (supportPressure)
         {
             bool useWidth = false;
 
@@ -1031,15 +1032,7 @@ class: AnnotateMinorMode : MinorMode
                 _ -> { useWidth = false; }
             }
 
-            let (name, ip) = pointerLocation(event);
-            if (name == "") return;
-
-            if (checkDragFilter(event, ip) == false)
-                return;
-
-            let pei = eventToImageSpace(name, ip, true);
-
-            if (useWidth)
+            if (useWidth && event neq nil)
             {
                 let p = event.pressure(),
                     p2 = math_util.clamp(p, .01, 1.0),
@@ -1052,12 +1045,39 @@ class: AnnotateMinorMode : MinorMode
                 addToStroke(pei);
             }
         }
+        else
+        {
+            addToStroke(pei);
+        }
     }
 
-    method: release (void; Event event)
+    method: drag (void; Event event)
+    {
+        if (filterLiveReviewEvents()) {
+            sendInternalEvent("live-review-blocked-event");
+            return;
+        }
+
+        if (_currentDrawObject eq nil)
+        {
+            //
+            //  This can happen on the mac when "clicking through"
+            //
+            push(event);
+            return;
+        }
+
+        let (name, ip) = pointerLocation(event);
+        
+        if (name != "" && checkDragFilter(event, ip) == false)
+            return;
+
+        dragCommon(name, ip, event, true /*supportPressure*/);
+    }
+
+    method: finalizeStroke (void;)
     {
         runtime.gc.enable();
-        drag(event);
         _currentDrawObject = nil;
 
         let f = _currentNodeInfo.frame,
@@ -1072,10 +1092,15 @@ class: AnnotateMinorMode : MinorMode
         if (_syncWholeStrokes) endCompoundStateChange();
         undoRedoUpdate();
         redraw();
-
     }
 
-    method: color_rgb (void; Event event)
+    method: release (void; Event event)
+    {
+        drag(event);
+        finalizeStroke();
+    }
+
+    method: setColorRGB (void; Event event)
     {
         let parts = event.contents().split(";;");
         if (parts.size() >= 3)
@@ -1088,7 +1113,7 @@ class: AnnotateMinorMode : MinorMode
         }
     }
 
-    method: color_hsv (void; Event event)
+    method: setColorHSV (void; Event event)
     {
         let parts = event.contents().split(";;");
         if (parts.size() >= 3)
@@ -1111,7 +1136,7 @@ class: AnnotateMinorMode : MinorMode
     // review session. We draw in a normalized [-1,1] space where (0,0) 
     // is the center of the image.
     // 
-    method: ndc_push (void; Event event)
+    method: pushNDC (void; Event event)
     {
         let parts = event.contents().split(";;");
         if (parts.size() >= 2)
@@ -1122,50 +1147,22 @@ class: AnnotateMinorMode : MinorMode
             // Get source name and image point using our new method
             let (name, ip) = pointerLocationFromNDC(Point(x, y));
             
-            if (name == "") 
-                return;
-            
-            runtime.gc.disable();
-            
-            if (isPlaying()) {
-                stop();
-                setFrame(frame());
-            }
-            
-            updateCurrentNode();
-            let d = _currentDrawMode;
-            
-            if (_syncWholeStrokes) beginCompoundStateChange();
-            
-            let twidth = d.size / (if _scaleBrush then scale() else 1.0),
-                incolor = if d.colorFunction eq nil then d.color else d.colorFunction(d.color);
-            
-            try
-            {
-                _currentDrawObject = newStroke(_currentNode,
-                                               _currentNodeInfo.frame,
-                                               incolor, twidth, d.brushName,
-                                               d.join, d.cap, _currentNodeInfo.frame, d.duration, d.renderMode, _debug);
-            }
-            catch (exception exc)
-            {
-                print("annotate_mode: exception = %s\n" % exc);
-            }
-            catch (...)
-            {
-                print("annotate_mode: UNCAUGHT EXCEPTION\n");
-            }
-            
-            _dragLastPointer = ip;
-            _dragLastMsec = int(QDateTime.currentMSecsSinceEpoch());
-            
-            let pei = eventToImageSpace(name, ip, true);
-            addToStroke(pei);
+            // NDC push doesn't support pressure, so we pass nil for event and false for supportPressure
+            pushStrokeCommon(name, ip, nil /*event*/, false /*supportPressure*/);
         }
     }
 
-    method: ndc_drag (void; Event event)
+    method: dragNDC (void; Event event)
     {
+        if (_currentDrawObject eq nil)
+        {
+            //
+            //  This can happen on the mac when "clicking through"
+            //
+            pushNDC(event);
+            return;
+        }
+
         let parts = event.contents().split(";;");
         if (parts.size() >= 2)
         {
@@ -1174,27 +1171,12 @@ class: AnnotateMinorMode : MinorMode
             
             // Get source name and image point using our new method
             let (name, ip) = pointerLocationFromNDC(Point(x, y));
-            
-            let d = _currentDrawMode;
-            _pointerGone = false;
-            
-            if (_currentDrawObject eq nil)
-            {
-                // Call ndc_push to start a new stroke
-                ndc_push(event);
-            }
-            else
-            {
-                if (name == "") 
-                    return;
-                
-                let pei = eventToImageSpace(name, ip, true);
-                addToStroke(pei);
-            }
+
+            dragCommon(name, ip, nil /*event*/, false /*supportPressure*/);
         }
     }
 
-    method: ndc_release (void; Event event)
+    method: releaseNDC (void; Event event)
     {
         let parts = event.contents().split(";;");
         if (parts.size() >= 2)
@@ -1205,24 +1187,8 @@ class: AnnotateMinorMode : MinorMode
             // Get source name and image point using our new method
             let (name, ip) = pointerLocationFromNDC(Point(x, y));
             
-            runtime.gc.enable();
-            ndc_drag(event);
-            _currentDrawObject = nil;
-            
-            let f = _currentNodeInfo.frame,
-                rprop= frameOrderRedoStackName(_currentNode, f);
-            
-            if (propertyExists(rprop) && propertyInfo(rprop).size > 0)
-            {
-                for_each (c; getStringProperty(rprop)) deleteStroke(_currentNode, c);
-                setStringProperty(rprop, string[](), true);
-            }
-            
-            if (_syncWholeStrokes) 
-                endCompoundStateChange();
-
-            undoRedoUpdate();
-            redraw();
+            dragNDC(event);
+            finalizeStroke();
         }
     }
 
@@ -2402,10 +2368,7 @@ class: AnnotateMinorMode : MinorMode
 
         init(name,
              nil,
-             [("ndc-pointer-1--drag", ndc_drag, "Add to current stroke in NDC space"),
-              ("ndc-pointer-1--push", ndc_push, "Start New Stroke in NDC space"),
-              ("ndc-pointer-1--release", ndc_release, "End Current Stroke in NDC space"),
-              ("pointer-1--drag", drag, "Add to current stroke"),
+             [("pointer-1--drag", drag, "Add to current stroke"),
               ("pointer-1--push", push, "Start New Stroke"),
               ("pointer-1--release", release, "End Current Stroke"),
               ("pointer--move", move, ""),
@@ -2423,8 +2386,6 @@ class: AnnotateMinorMode : MinorMode
               ("stylus-pen--shift--move", editRadius, ""),
               ("stylus-pen--move", move, "Pen Move"),
               ("stylus-pen--release", release, "Pen Release"),
-              ("stylus-color-rgb", color_rgb, "Select color RGB"),
-              ("stylus-color-hsv", color_hsv, "Select color HSV"),
               ("stylus-eraser--push", eraserPush, "Pen Down"),
               ("stylus-eraser--drag", drag, "Pen Drag"),
               ("stylus-eraser--move", move, "Pen Move"),
@@ -2438,7 +2399,15 @@ class: AnnotateMinorMode : MinorMode
               ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed")
+              ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
+              // --------------------------------------------------------------
+              // For NDC drawing support used in automated testing
+              ("stylus-color-rgb", setColorRGB, "Select color RGB"),
+              ("stylus-color-hsv", setColorHSV, "Select color HSV"),
+              ("ndc-pointer-1--drag", dragNDC, "Add to current stroke in NDC space"),
+              ("ndc-pointer-1--push", pushNDC, "Start New Stroke in NDC space"),
+              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space")
+              // --------------------------------------------------------------
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
               //("preferences-show", prefsShow, "Configure Preferences"),

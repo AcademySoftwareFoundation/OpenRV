@@ -1807,7 +1807,8 @@ namespace IPMu
 
     NODE_IMPLEMENTATION(ndc2event, Mu::Vector2f)
     {
-        // Convert from NDC space [-1, 1] to event space coordinates.
+        // Convert from Normalized Device Coordinates (NDC) space [-1, 1] to
+        // event space coordinates.
         // This bypasses image transforms and works purely in viewport space.
         // Height spans 2 NDC units, and assumes the viewport fully contains the
         // height of the image (eg: has vertical bars, no horizontal bars).
