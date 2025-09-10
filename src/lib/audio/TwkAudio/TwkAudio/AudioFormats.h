@@ -68,6 +68,7 @@ namespace TwkAudio
         Back_7_1,     // Back_5_1       | SideLeft          | SideRight,
         Generic_9,    // Surround_7_1   | BackCenter,
         Surround_9_1, // Surround_7_1   | LeftHeight        | RightHeight,
+        Generic_11,   // Surround_9_1   | Channel14,
         Generic_16,
 
         AC3_5_1,  // FrontLeft   | FrontCenter | FrontRight | SideLeft |
