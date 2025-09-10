@@ -239,6 +239,12 @@ namespace TwkAudio
         case Generic_13:
             chstr = "13.0 (Generic)";
             break;
+        case Generic_14:
+            chstr = "14.0 (Generic)";
+            break;
+        case Generic_15:
+            chstr = "15.0 (Generic)";
+            break;
         case Generic_16:
             chstr = "16";
             break;
@@ -302,6 +308,12 @@ namespace TwkAudio
             break;
         case 13:
             lv.push_back(Generic_13);
+            break;
+        case 14:
+            lv.push_back(Generic_14);
+            break;
+        case 15:
+            lv.push_back(Generic_15);
             break;
         case 16:
             lv.push_back(Generic_16);
@@ -388,6 +400,14 @@ namespace TwkAudio
         {
             return Generic_13;
         }
+        else if (cv == layoutChannels(Generic_14))
+        {
+            return Generic_14;
+        }
+        else if (cv == layoutChannels(Generic_15))
+        {
+            return Generic_15;
+        }
         else if (cv == layoutChannels(Generic_16))
         {
             return Generic_16;
@@ -463,6 +483,12 @@ namespace TwkAudio
             break;
         case Generic_13:
             count = 13;
+            break;
+        case Generic_14:
+            count = 14;
+            break;
+        case Generic_15:
+            count = 15;
             break;
         case Generic_16:
             count = 16;
@@ -640,7 +666,7 @@ namespace TwkAudio
             chv.push_back(Channel14);
             break;
         case Generic_12:
-            // Generic_11 + Channel15
+            // Base 8 + Heights + FrontLeftOfCenter + Channel14
             chv.push_back(FrontLeft);
             chv.push_back(FrontRight);
             chv.push_back(FrontCenter);
@@ -651,11 +677,12 @@ namespace TwkAudio
             chv.push_back(SideRight);
             chv.push_back(LeftHeight);
             chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
             chv.push_back(Channel14);
-            chv.push_back(Channel15);
             break;
         case Generic_13:
-            // Generic_12 + Channel16
+            // Base 8 + Heights + FrontLeftOfCenter + FrontRightOfCenter +
+            // Channel14
             chv.push_back(FrontLeft);
             chv.push_back(FrontRight);
             chv.push_back(FrontCenter);
@@ -666,9 +693,46 @@ namespace TwkAudio
             chv.push_back(SideRight);
             chv.push_back(LeftHeight);
             chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(Channel14);
+            break;
+        case Generic_14:
+            // Base 8 + Heights + FrontLeftOfCenter + FrontRightOfCenter +
+            // BackCenter + Channel14
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            break;
+        case Generic_15:
+            // Base 8 + Heights + FrontLeftOfCenter + FrontRightOfCenter +
+            // BackCenter + Channel14 + Channel15
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
             chv.push_back(Channel14);
             chv.push_back(Channel15);
-            chv.push_back(Channel16);
             break;
         case Generic_16: // Not sure?
             chv.push_back(FrontLeft);
