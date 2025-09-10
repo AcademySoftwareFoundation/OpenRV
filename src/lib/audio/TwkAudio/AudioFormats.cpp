@@ -291,6 +291,9 @@ namespace TwkAudio
         case 11:
             lv.push_back(Generic_11);
             break;
+        case 12:
+            lv.push_back(Generic_12);
+            break;
         case 16:
             lv.push_back(Generic_16);
             break;
@@ -368,6 +371,10 @@ namespace TwkAudio
         {
             return Generic_11;
         }
+        else if (cv == layoutChannels(Generic_12))
+        {
+            return Generic_12;
+        }
         else if (cv == layoutChannels(Generic_16))
         {
             return Generic_16;
@@ -437,6 +444,9 @@ namespace TwkAudio
             break;
         case Generic_11:
             count = 11;
+            break;
+        case Generic_12:
+            count = 12;
             break;
         case Generic_16:
             count = 16;
@@ -612,6 +622,21 @@ namespace TwkAudio
             chv.push_back(LeftHeight);
             chv.push_back(RightHeight);
             chv.push_back(Channel14);
+            break;
+        case Generic_12:
+            // Generic_11 + Channel15
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
             break;
         case Generic_16: // Not sure?
             chv.push_back(FrontLeft);
