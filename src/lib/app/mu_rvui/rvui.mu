@@ -315,6 +315,20 @@ global Configuration globalConfig =
 //  Higher order functions.
 //
 
+
+// This function disables the menu item if in live review we're 
+// not the host (aka presenter). (eg: disable when participant)
+// (for example, participants arent allowed to load or change media)
+\: nonhostState (int;)
+{
+    if (filterEventCategory("review_nonhost", false /*notify*/))
+    {
+        return DisabledMenuState;
+    }
+
+    return EnabledMenuState;
+}
+
 \: alphaTypeState (MenuStateFunc; int alphaType)
 {
     \: (int;)
@@ -3865,6 +3879,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: clearEverything (void;)
 {
+    // Prevent participants from clearing the session
+    if (filterEventCategory("review_nonhost"))
+        return;
+
     let mode = cacheMode(),
         presMode = presentationMode();
 
@@ -3923,6 +3941,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: addMovieOrImageSources (void; Event ev, bool mark, bool merge)
 {
+    // Prevent participants from clearing the session
+    if (filterEventCategory("review_nonhost"))
+        return;
+
     State state = data();
 
     let files = getMediaFilesFromBrowser();
@@ -4413,6 +4435,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: openSimpleEDL (void;)
 {
+    if (filterEventCategory("review_nonhost")) {
+        return;
+    }
+
     State state = data();
 
     try
@@ -4472,6 +4498,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cloneRV (void; Event ev)
 {
+    // Prevent participants from clearing the session
+    if (filterEventCategory("review_nonhost"))
+        return;
+
     let target = tmpSessionCopyName(),
         rv     = system.getenv ("RV_APP_RV");
 
@@ -4484,6 +4514,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cloneSyncedRV (void; Event ev)
 {
+    // Prevent participants from clearing the session
+    if (filterEventCategory("review_nonhost"))
+        return;
+
     //  Turn on network
     remoteNetwork(true);
 
@@ -6397,14 +6431,14 @@ global bool debugGC = false;
     Menu mainMenu_part1 = {
         {"File", Menu {
             {"New Session", \: (void; Event ev) { newSession(nil); }, "control n", newSessionState},
-            {"Open...",  addMovieOrImageSources(,true,false), "control o", nil},
-            {"Merge...",  addMovieOrImageSources(,true,true), nil, nil},
+            {"Open...",  addMovieOrImageSources(,true,false), "control o", nonhostState},
+            {"Merge...",  addMovieOrImageSources(,true,true), nil, nonhostState},
             {"Open into Layer...",  addMovieOrImage(,addToClosestSource(,"explicit"),false), nil, sourcesExistState},
             {"Open in New Session...",  openMovieOrImage, "control O", newSessionState},
             {"_", nil},
             {"Clone Session", cloneSession, nil, newSessionState},
-            {"Clone RV", cloneRV, nil, nil},
-            {"Clone Synced RV", cloneSyncedRV, nil, nil},
+            {"Clone RV", cloneRV, nil, nonhostState},
+            {"Clone Synced RV", cloneSyncedRV, nil, nonhostState},
             {"_", nil},
             {"Relocate Movie or Image Sequence...",  relocateMovieOrImage, nil, singleSourceState},
             {"Replace Source Media...", replaceSourceMedia, nil, singleSourceState},
@@ -6420,10 +6454,10 @@ global bool debugGC = false;
                 {"Look LUT...",  openLUTFile("#RVLookLUT"), nil, videoSourcesAndNodeExistState("RVLookLUT")},
                 {"Look CDL...",  openCDLFile("#RVColor"), nil, videoSourcesAndNodeExistState("RVColor")},
                 {"File OTIO...",  openOTIOFile(), nil, checkForOTIOFile()},
-                {"Simple EDL...",  ~openSimpleEDL, nil, nil}}},
+                {"Simple EDL...",  ~openSimpleEDL, nil, nonhostState}}},
             {"Export", exportMenu},
             {"_", nil},
-            {"Clear",           ~clearEverything, "control N", nil},
+            {"Clear",           ~clearEverything, "control N", nonhostState},
             {"Close Session",    queryClose, "control w", nil}
             }},
         {"Edit", Menu {
