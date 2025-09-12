@@ -661,6 +661,10 @@ namespace IPCore
                  << (int)m_enableFastTurnAround << endl;
         }
 
+        // Initialize event filtering system
+        // m_allowedEventCategories is automatically initialized as empty vector
+        m_filteredEventsEnabled = false;
+
         setRendererType("Composite");
         setDebugOptions();
     }
@@ -754,6 +758,65 @@ namespace IPCore
         }
 
         return shouldFilter;
+    }
+
+    // New filtering API implementation
+    void Session::setFilteredEvents(bool enabled)
+    {
+        m_filteredEventsEnabled = enabled;
+    }
+
+    bool Session::isFilteredEvents(bool notify)
+    {
+        if (m_filteredEventsEnabled && notify)
+        {
+            GenericStringEvent event("filtered-event", this, "");
+            sendEvent(event);
+        }
+        return m_filteredEventsEnabled;
+    }
+
+    void Session::allowFilteredEvent(const std::string& category)
+    {
+        // Check if category already exists before adding
+        auto it = std::find(m_allowedEventCategories.begin(),
+                            m_allowedEventCategories.end(), category);
+        if (it == m_allowedEventCategories.end())
+        {
+            m_allowedEventCategories.push_back(category);
+        }
+    }
+
+    void Session::disallowFilteredEvent(const std::string& category)
+    {
+        auto it = std::find(m_allowedEventCategories.begin(),
+                            m_allowedEventCategories.end(), category);
+        if (it != m_allowedEventCategories.end())
+        {
+            m_allowedEventCategories.erase(it);
+        }
+    }
+
+    bool Session::isFilteredEventsAllow(const std::string& category,
+                                        bool notify)
+    {
+        // If filtering is not enabled globally, allow everything
+        if (!m_filteredEventsEnabled)
+            return false;
+
+        // Check if category is in allowed list
+        bool isAllowed = std::find(m_allowedEventCategories.begin(),
+                                   m_allowedEventCategories.end(), category)
+                         != m_allowedEventCategories.end();
+
+        // If not allowed and notify is true, send blocked event
+        if (!isAllowed && notify)
+        {
+            GenericStringEvent event("filtered-event-category", this, "");
+            sendEvent(event);
+        }
+
+        return !isAllowed; // Return true if should be filtered (not allowed)
     }
 
     void Session::setName(const string& n) { m_name = n; }
@@ -4650,7 +4713,7 @@ namespace IPCore
             return "";
 
         // Check for general events first
-        if (filterEventCategory("review_nonhost", false))
+        if (isFilteredEvents(false /*notify*/))
         {
             if (eventName == "mode-manager-toggle-mode")
             {

@@ -213,7 +213,7 @@ class: ModeManagerMode : MinorMode
     {
         \: (int; )
         {
-            if (filterEventCategory("review_nonhost", false /*notify*/))
+            if (isFilteredEvents(false /*notify*/))
                 then DisabledMenuState
                 else if entry.mode eq nil
                      then UncheckedMenuState
@@ -426,8 +426,8 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
-        if ((filterEventCategory("review_nonhost") && entry.name == "session_manager") ||
-            (filterEventCategory("review_annotation") && entry.name == "annotate_mode"))
+        if ((isFilteredEvents() && entry.name == "session_manager") ||
+            (isFilteredEventsAllow("annotations") && entry.name == "annotate_mode"))
         {
             return;
         }

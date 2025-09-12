@@ -376,7 +376,7 @@ class: MotionScope : Widget
 
     method: clickFunction (void; Event event, (void;int,int,int) F)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
         deb ("clickFunction");
@@ -703,7 +703,7 @@ class: MotionScope : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
 

@@ -816,9 +816,18 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
+        // Old category-based API (to be deprecated)
         void enableFilterEventCategory(const std::string& category);
         void disableFilterEventCategory(const std::string& category);
         bool filterEventCategory(const std::string& category, bool notify);
+
+        // New global + allow-list API
+        void setFilteredEvents(bool enabled);
+        bool isFilteredEvents(bool notify);
+        void allowFilteredEvent(const std::string& category);
+        void disallowFilteredEvent(const std::string& category);
+        bool isFilteredEventsAllow(const std::string& category,
+                                   bool notify = true);
 
         //
         //  Marks
@@ -1298,6 +1307,10 @@ namespace IPCore
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
         std::vector<std::string> m_filterEventCategories;
+
+        // New filtering system
+        bool m_filteredEventsEnabled;
+        std::vector<std::string> m_allowedEventCategories;
 
         class FpsCalculator;
         struct FBStatusCheck;

@@ -283,7 +283,7 @@ class: SourceGroupEditMode : MinorMode
 
     method: syncState (int; )
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -293,7 +293,7 @@ class: SourceGroupEditMode : MinorMode
 
     method: sourceMenuState (int; )
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }

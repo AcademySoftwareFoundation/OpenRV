@@ -387,7 +387,7 @@ class: Timeline : Widget
             event.reject();
             return;
 	}
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
         State state = data();
@@ -821,7 +821,7 @@ class: Timeline : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
 
@@ -1021,7 +1021,7 @@ class: Timeline : Widget
 
     method: doubleClick (void; Event event)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
         if (! _pointerInTimeline)

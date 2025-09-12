@@ -4168,6 +4168,47 @@ namespace IPMu
         NODE_RETURN(s->filterEventCategory(category->c_str(), notify));
     }
 
+    // New filtering API implementations
+    NODE_IMPLEMENTATION(setFilteredEvents, void)
+    {
+        Session* s = Session::currentSession();
+        bool enabled = NODE_ARG(0, bool);
+        s->setFilteredEvents(enabled);
+    }
+
+    NODE_IMPLEMENTATION(isFilteredEvents, bool)
+    {
+        Session* s = Session::currentSession();
+        bool notify = true;
+        if (NODE_NUM_ARGS() > 0)
+            notify = NODE_ARG(0, bool);
+        NODE_RETURN(s->isFilteredEvents(notify));
+    }
+
+    NODE_IMPLEMENTATION(allowFilteredEvent, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        s->allowFilteredEvent(category->c_str());
+    }
+
+    NODE_IMPLEMENTATION(disallowFilteredEvent, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        s->disallowFilteredEvent(category->c_str());
+    }
+
+    NODE_IMPLEMENTATION(isFilteredEventsAllow, bool)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        bool notify = true;
+        if (NODE_NUM_ARGS() > 1)
+            notify = NODE_ARG(1, bool);
+        NODE_RETURN(s->isFilteredEventsAllow(category->c_str(), notify));
+    }
+
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
     {
         Session* s = Session::currentSession();
@@ -6430,6 +6471,28 @@ namespace IPMu
 
             new Function(c, "filterEventCategory", filterEventCategory, None,
                          Return, "bool", Parameters,
+                         new Param(c, "category", "string"),
+                         new Param(c, "notify", "bool", Value(true)), End),
+
+            // New filtering API functions
+            new Function(c, "setFilteredEvents", setFilteredEvents, None,
+                         Return, "void", Parameters,
+                         new Param(c, "enabled", "bool"), End),
+
+            new Function(c, "isFilteredEvents", isFilteredEvents, None, Return,
+                         "bool", Parameters,
+                         new Param(c, "notify", "bool", Value(true)), End),
+
+            new Function(c, "allowFilteredEvent", allowFilteredEvent, None,
+                         Return, "void", Parameters,
+                         new Param(c, "category", "string"), End),
+
+            new Function(c, "disallowFilteredEvent", disallowFilteredEvent,
+                         None, Return, "void", Parameters,
+                         new Param(c, "category", "string"), End),
+
+            new Function(c, "isFilteredEventsAllow", isFilteredEventsAllow,
+                         None, Return, "bool", Parameters,
                          new Param(c, "category", "string"),
                          new Param(c, "notify", "bool", Value(true)), End),
 

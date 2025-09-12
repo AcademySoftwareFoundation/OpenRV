@@ -317,7 +317,7 @@ require system;
 
 \: toggleForwardsBackwards (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     setInc(-inc());
@@ -326,7 +326,7 @@ require system;
 
 \: toggleRealtime (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     State state = data();
@@ -393,7 +393,7 @@ require system;
 
 \: toggleFilter (void;)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -417,7 +417,7 @@ require system;
 
 \: stepForward (void; int n)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     let f = frame(),
@@ -441,7 +441,7 @@ require system;
 
 \: stepBackward (void; int n)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     let f = frame(),

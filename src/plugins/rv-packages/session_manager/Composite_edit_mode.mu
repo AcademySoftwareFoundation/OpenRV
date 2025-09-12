@@ -122,7 +122,7 @@ class: CompositeEditMode : MinorMode
     {
         \: (int;)
         {
-            if (filterEventCategory("review_nonhost", false /*notify*/)) {
+            if (isFilteredEvents(false /*notify*/)) {
                 return DisabledMenuState;
             }
 

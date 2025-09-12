@@ -230,7 +230,7 @@ global Configuration globalConfig =
 
 \: randomLUT (void;)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -319,21 +319,21 @@ global Configuration globalConfig =
 // This function disables the menu item if in live review we're 
 // not the host (aka presenter). (eg: disable when participant)
 // (for example, participants arent allowed to load or change media)
-\: nonhostState (int;)
+\: filteredEventsState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
 
-    return EnabledMenuState;
+    return UncheckedMenuState;
 }
 
 \: alphaTypeState (MenuStateFunc; int alphaType)
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -355,7 +355,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -385,7 +385,7 @@ global Configuration globalConfig =
 
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -412,7 +412,7 @@ global Configuration globalConfig =
 
 \: dispGammaState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -435,7 +435,7 @@ global Configuration globalConfig =
 
 \: fileGammaState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -499,7 +499,7 @@ global Configuration globalConfig =
 {
     \: (void;)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
 
@@ -628,7 +628,7 @@ global Configuration globalConfig =
 
 \: computePixelRelativeScale (float; float scl, bool fitWidthOnly, bool silent=false)
 {
-    if (filterEventCategory("review_nonhost"))
+    if (isFilteredEvents())
     {
         return;
     }
@@ -695,7 +695,7 @@ global Configuration globalConfig =
     return 0.0;
 }
 
-\: setPixelRelativeScale(void; float ns, float requestedScale=0.0)
+\: setPixelRelativeScale (void; float ns, float requestedScale=0.0)
 {
     setScale(ns);
 
@@ -728,7 +728,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -748,7 +748,7 @@ global Configuration globalConfig =
 
 \: sourcesExistState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -772,7 +772,7 @@ global Configuration globalConfig =
 
 \: videoSourcesExistState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -891,7 +891,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -989,7 +989,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -1032,7 +1032,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -1060,7 +1060,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -1089,7 +1089,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
     {
         // Bernard/Eloise. Is this a transport func, or a general func
         // based on the frame? Assume filter on non-host for now
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
         F(frame());
@@ -1100,7 +1100,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (void;) {
         // Bernard/Eloise same question as above.
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
         setInc(i);
@@ -1152,7 +1152,7 @@ global (string, Glyph)[] showChannelGlyphs =
 {
     \: (void; Event event)
     {
-        if (filterEventCategory("review_nonhost") && regex.match("color", param)) {
+        if (isFilteredEvents() && regex.match("color", param)) {
             return;
         }
         if (!sources().empty())
@@ -1196,7 +1196,7 @@ global (string, Glyph)[] showChannelGlyphs =
 
 \: resetAllColorParameters (void;)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
     for_each (p; (string, float)[] {
@@ -1320,7 +1320,7 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: gotoFrame (void; string text)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     setFrame(int(text));
@@ -1490,7 +1490,7 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setFPSValue (void; string v)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -1651,7 +1651,7 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setDispGamma (void; string v)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -1726,7 +1726,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: rangeState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1735,7 +1735,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: forwardState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1746,7 +1746,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: backwardState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1757,7 +1757,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: hasMarksState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1768,7 +1768,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     // Bernard/Eloise: do we allow this for muc?
     // assuming filter for nonhost for now
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1790,7 +1790,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     // Bernard/Eloise: is the sequence state menu item based on
     // transport permissions or nonhost permissions?
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1799,7 +1799,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: playState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1809,7 +1809,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: pingPongState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1820,7 +1820,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: playOnceState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1831,7 +1831,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: realtimeState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/)) {
+    if (isFilteredEventsAllow("transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1847,7 +1847,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: displayProfilesState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEvents(false /*notify*/)) {
         return DisabledMenuState;
     }
 }
@@ -1855,7 +1855,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: filterState (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEvents(false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1906,7 +1906,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     //
     if (event.activationTime() > 0.0 && event.activationTime() < 0.2) return;
 
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     State state = data();
@@ -1917,7 +1917,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: releaseScrub (void; Event event)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     State state = data();
@@ -1936,7 +1936,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragScrub (void; bool enable, Event event)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     State state = data();
@@ -2083,7 +2083,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleWipe (void;)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -2189,7 +2189,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: togglePlayFunc (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     togglePlay();
@@ -2197,7 +2197,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: stopFunc (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     stop();
@@ -2205,6 +2205,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: togglePingPong (void;)
 {
+    if (isFilteredEventsAllow("transport")) {
+        return;
+    }
+
     setPlayMode(if playMode() == PlayPingPong then PlayLoop else PlayPingPong);
     displayFeedback("Ping Pong Mode: %s"
                     % (if playMode() == PlayPingPong then "ON" else "OFF"));
@@ -2213,6 +2217,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: togglePlayOnce (void;)
 {
+    if (isFilteredEventsAllow("transport")) {
+        return;
+    }
+
     setPlayMode(if playMode() == PlayOnce then PlayLoop else PlayOnce);
     displayFeedback("Play Once Mode: %s"
                     % (if playMode() == PlayOnce then "ON" else "OFF"));
@@ -2273,7 +2281,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: wipeShown (int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -2329,6 +2337,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: beginMoveOrZoom (void; Event event)
 {
+    if (isFilteredEvents()) {
+        return;
+    }
+
     State state = data();
     state.downPoint = translation();
     state.downScale = scale();
@@ -2337,7 +2349,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragZoom (void; Event event)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -2366,7 +2378,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragMoveLocked (void; bool lockToAxis, Event event)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
    
@@ -2396,6 +2408,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragMove (void; Event event)
 {
+    if (isFilteredEvents()) {
+        return;
+    }
+
     dragMoveLocked(false, event);
 }
 
@@ -2405,7 +2421,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     {
         let ret = DisabledMenuState;
 
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return ret;
         }
@@ -2443,7 +2459,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     {
         let ret = DisabledMenuState;
 
-        if (filterEventCategory("review_nonhost", false /*notify*/)) {
+        if (isFilteredEvents(false /*notify*/)) {
             return ret;
         }
 
@@ -2510,7 +2526,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void; Event ev)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
         int l = 0;
@@ -2550,7 +2566,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleLUT (void; string lutType, string lutKind) // Display or Color
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
     State state = data();
@@ -2602,7 +2618,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleCDL (void; string cdlType, string cdlKind)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
     State state = data();
@@ -2646,7 +2662,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleICC (void; string iccType, string iccKind)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
     State state = data();
@@ -2690,7 +2706,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleInvert (void;)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
     State state = data();
@@ -2732,7 +2748,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: beginning (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     if (isPlaying()) stop();
@@ -2742,7 +2758,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: ending (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     if (isPlaying()) stop();
@@ -2752,7 +2768,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleMark (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -2811,7 +2827,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setInOutMarkedRangeAtFrame (void; int f)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -2846,7 +2862,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedFrame (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     try
@@ -2863,7 +2879,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedFrame (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     try
@@ -2880,7 +2896,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMatchedFrame (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     try
@@ -2916,7 +2932,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMatchedFrame (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     try
@@ -2952,7 +2968,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setMatchedFrame (void; int currentLocal, int globalStart, int globalEnd)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
     let localStart = sourceFrame(globalStart),
@@ -2974,7 +2990,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedRange (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -3003,7 +3019,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedRange (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -3032,7 +3048,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: expandMarkedRange (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -3084,7 +3100,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: contractMarkedRange (void;)
 {
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -3130,7 +3146,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
-        if (filterEventCategory("review_nonhost")) {
+        if (isFilteredEvents()) {
             return;
         }
 
@@ -3179,7 +3195,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     // then we are restoring the old values.
     //
 
-    if (filterEventCategory("review_transport")) {
+    if (isFilteredEventsAllow("transport")) {
         return;
     }
 
@@ -3262,7 +3278,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
-        if (filterEventCategory("review_transport")) {
+        if (isFilteredEventsAllow("transport")) {
             return;
         }
 
@@ -3275,7 +3291,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/)) {
+        if (isFilteredEvents(false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -3295,7 +3311,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/)) {
+        if (isFilteredEvents(false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -3315,7 +3331,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -3340,7 +3356,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -3432,7 +3448,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -3880,7 +3896,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: clearEverything (void;)
 {
     // Prevent participants from clearing the session
-    if (filterEventCategory("review_nonhost"))
+    if (isFilteredEvents())
         return;
 
     let mode = cacheMode(),
@@ -3942,7 +3958,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: addMovieOrImageSources (void; Event ev, bool mark, bool merge)
 {
     // Prevent participants from clearing the session
-    if (filterEventCategory("review_nonhost"))
+    if (isFilteredEvents())
         return;
 
     State state = data();
@@ -3964,6 +3980,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: addMovieOrImage (void; Event ev, (void;string) addFunc, bool mark)
 {
+    if (isFilteredEvents())
+        return;
+
     State state = data();
 
     let files = getMediaFilesFromBrowser();
@@ -4435,7 +4454,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: openSimpleEDL (void;)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -4490,6 +4509,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cloneSession (void; Event ev)
 {
+    if (isFilteredEvents())
+        return;
+
     let target = tmpSessionCopyName();
     saveSession(target, true, true);
     newSession(string[] {target});
@@ -4499,7 +4521,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: cloneRV (void; Event ev)
 {
     // Prevent participants from clearing the session
-    if (filterEventCategory("review_nonhost"))
+    if (isFilteredEvents())
         return;
 
     let target = tmpSessionCopyName(),
@@ -4515,7 +4537,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: cloneSyncedRV (void; Event ev)
 {
     // Prevent participants from clearing the session
-    if (filterEventCategory("review_nonhost"))
+    if (isFilteredEvents())
         return;
 
     //  Turn on network
@@ -4533,6 +4555,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: save (void; Event ev)
 {
+    if (isFilteredEvents())
+        return;
+
     string n = sessionFileName();
 
     if (n == "Untitled" || path.extension(n) != "rv")
@@ -4547,6 +4572,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: saveAs (void; Event ev)
 {
+    if (isFilteredEvents())
+        return;
+
     State state = data();
 
     try
@@ -4639,6 +4667,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: exportAnnotatedFrames (void; Event event)
 {
+    if (isFilteredEvents())
+        return;
+
     let marks = markedFrames();
     clearAllMarks();
     markAnnotatedFrames();
@@ -4660,6 +4691,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: exportAs (void; Event ev, string requiredExt, string outputType)
 {
+    if (isFilteredEvents())
+        return;
+
     State state = data();
 
     if (state.externalProcess neq nil)
@@ -4738,6 +4772,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: exportFrame (void; Event ev, (void;string) outputFunc)
 {
+    if (isFilteredEvents())
+        return;
+
     State state = data();
 
     try
@@ -4753,6 +4790,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: exportAttrs (void; Event ev)
 {
+    if (isFilteredEvents())
+        return;
+
     State state = data();
 
     try
@@ -4777,6 +4817,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: exportNodeDefinition (void; bool all, Event ev)
 {
+    if (isFilteredEvents())
+        return;
+
     try
     {
         string f   = saveFileDialog(false);
@@ -4906,7 +4949,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cycleStackForward (void; Event ev)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -4915,7 +4958,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cycleStackBackward (void; Event ev)
 {
-    if (filterEventCategory("review_nonhost")) {
+    if (isFilteredEvents()) {
         return;
     }
 
@@ -4933,7 +4976,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: isStackMode (int;)
 {
     // Bernard/Eloise: What's stack mode? is part of the transport family?
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEvents(false /*notify*/)) {
         return DisabledMenuState;
     }
     let typeName = nodeType(viewNode());
@@ -4986,7 +5029,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: frameState (int;)
 {
-    if (filterEventCategory("review_transport", false /*notify*/))
+    if (isFilteredEventsAllow("transport", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -5006,7 +5049,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/))
+        if (isFilteredEvents(false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -5030,7 +5073,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int; )
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/)) {
+        if (isFilteredEvents(false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -5060,7 +5103,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: eyeOffsetState(int;)
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/)) {
+    if (isFilteredEvents(false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -6193,7 +6236,7 @@ global bool debugGC = false;
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/)) {
+        if (isFilteredEvents(false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -6208,7 +6251,7 @@ global bool debugGC = false;
 {
     \: (int;)
     {
-        if (filterEventCategory("review_nonhost", false /*notify*/)) {
+        if (isFilteredEvents(false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -6259,7 +6302,7 @@ global bool debugGC = false;
 
 \: lockResizeScaleState (int; )
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -6276,7 +6319,7 @@ global bool debugGC = false;
 
 \: isExpandedWidth (int; )
 {
-    if (filterEventCategory("review_nonhost", false /*notify*/))
+    if (isFilteredEvents(false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -6431,14 +6474,14 @@ global bool debugGC = false;
     Menu mainMenu_part1 = {
         {"File", Menu {
             {"New Session", \: (void; Event ev) { newSession(nil); }, "control n", newSessionState},
-            {"Open...",  addMovieOrImageSources(,true,false), "control o", nonhostState},
-            {"Merge...",  addMovieOrImageSources(,true,true), nil, nonhostState},
+            {"Open...",  addMovieOrImageSources(,true,false), "control o", filteredEventsState},
+            {"Merge...",  addMovieOrImageSources(,true,true), nil, filteredEventsState},
             {"Open into Layer...",  addMovieOrImage(,addToClosestSource(,"explicit"),false), nil, sourcesExistState},
             {"Open in New Session...",  openMovieOrImage, "control O", newSessionState},
             {"_", nil},
             {"Clone Session", cloneSession, nil, newSessionState},
-            {"Clone RV", cloneRV, nil, nonhostState},
-            {"Clone Synced RV", cloneSyncedRV, nil, nonhostState},
+            {"Clone RV", cloneRV, nil, filteredEventsState},
+            {"Clone Synced RV", cloneSyncedRV, nil, filteredEventsState},
             {"_", nil},
             {"Relocate Movie or Image Sequence...",  relocateMovieOrImage, nil, singleSourceState},
             {"Replace Source Media...", replaceSourceMedia, nil, singleSourceState},
@@ -6454,10 +6497,10 @@ global bool debugGC = false;
                 {"Look LUT...",  openLUTFile("#RVLookLUT"), nil, videoSourcesAndNodeExistState("RVLookLUT")},
                 {"Look CDL...",  openCDLFile("#RVColor"), nil, videoSourcesAndNodeExistState("RVColor")},
                 {"File OTIO...",  openOTIOFile(), nil, checkForOTIOFile()},
-                {"Simple EDL...",  ~openSimpleEDL, nil, nonhostState}}},
+                {"Simple EDL...",  ~openSimpleEDL, nil, filteredEventsState}}},
             {"Export", exportMenu},
             {"_", nil},
-            {"Clear",           ~clearEverything, "control N", nonhostState},
+            {"Clear",           ~clearEverything, "control N", filteredEventsState},
             {"Close Session",    queryClose, "control w", nil}
             }},
         {"Edit", Menu {

@@ -977,7 +977,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
-        if (filterEventCategory("review_annotation")) {
+        if (isFilteredEventsAllow("annotations")) {
             return;
         }
 
@@ -1052,7 +1052,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
-        if (filterEventCategory("review_annotation")) {
+        if (isFilteredEventsAllow("annotations")) {
             return;
         }
 
@@ -1094,7 +1094,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: release (void; Event event)
     {
-        if (filterEventCategory("review_annotation")) {
+        if (isFilteredEventsAllow("annotations")) {
             return;
         }
 
@@ -1960,7 +1960,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onPresenterChanged(void; Event event)
     {
-        if (_active && filterEventCategory("review_nonhost", false /*notify*/))
+        if (_active && isFilteredEvents(false /*notify*/))
         {
             toggle();
         }
