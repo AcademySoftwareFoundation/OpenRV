@@ -4185,18 +4185,18 @@ namespace IPMu
         NODE_RETURN(s->isFilteredEvents(notify));
     }
 
-    NODE_IMPLEMENTATION(allowFilteredEvent, void)
+    NODE_IMPLEMENTATION(allowFilteredEventCategory, void)
     {
         Session* s = Session::currentSession();
         StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
-        s->allowFilteredEvent(category->c_str());
+        s->allowFilteredEventCategory(category->c_str());
     }
 
-    NODE_IMPLEMENTATION(disallowFilteredEvent, void)
+    NODE_IMPLEMENTATION(disallowFilteredEventCategory, void)
     {
         Session* s = Session::currentSession();
         StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
-        s->disallowFilteredEvent(category->c_str());
+        s->disallowFilteredEventCategory(category->c_str());
     }
 
     NODE_IMPLEMENTATION(isFilteredEventsAllow, bool)
@@ -6483,13 +6483,13 @@ namespace IPMu
                          "bool", Parameters,
                          new Param(c, "notify", "bool", Value(true)), End),
 
-            new Function(c, "allowFilteredEvent", allowFilteredEvent, None,
-                         Return, "void", Parameters,
-                         new Param(c, "category", "string"), End),
+            new Function(c, "allowFilteredEventCategory",
+                         allowFilteredEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
 
-            new Function(c, "disallowFilteredEvent", disallowFilteredEvent,
-                         None, Return, "void", Parameters,
-                         new Param(c, "category", "string"), End),
+            new Function(c, "disallowFilteredEventCategory",
+                         disallowFilteredEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
 
             new Function(c, "isFilteredEventsAllow", isFilteredEventsAllow,
                          None, Return, "bool", Parameters,

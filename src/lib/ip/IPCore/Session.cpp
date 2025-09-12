@@ -776,7 +776,7 @@ namespace IPCore
         return m_filteredEventsEnabled;
     }
 
-    void Session::allowFilteredEvent(const std::string& category)
+    void Session::allowFilteredEventCategory(const std::string& category)
     {
         // Check if category already exists before adding
         auto it = std::find(m_allowedEventCategories.begin(),
@@ -787,7 +787,7 @@ namespace IPCore
         }
     }
 
-    void Session::disallowFilteredEvent(const std::string& category)
+    void Session::disallowFilteredEventCategory(const std::string& category)
     {
         auto it = std::find(m_allowedEventCategories.begin(),
                             m_allowedEventCategories.end(), category);

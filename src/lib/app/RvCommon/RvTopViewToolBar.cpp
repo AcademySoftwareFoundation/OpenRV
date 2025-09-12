@@ -567,8 +567,7 @@ namespace Rv
             else if (name == "internal-sync-presenter-changed"
                      || name == "sync-session-ended")
             {
-                bool isDisabled = m_session->filterEventCategory(
-                    "review_nonhost", false /*notify*/);
+                bool isDisabled = m_session->isFilteredEvents(false /*notify*/);
                 setLiveReviewFilteredActions(isDisabled);
             }
         }

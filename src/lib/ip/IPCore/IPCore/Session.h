@@ -824,8 +824,8 @@ namespace IPCore
         // New global + allow-list API
         void setFilteredEvents(bool enabled);
         bool isFilteredEvents(bool notify);
-        void allowFilteredEvent(const std::string& category);
-        void disallowFilteredEvent(const std::string& category);
+        void allowFilteredEventCategory(const std::string& category);
+        void disallowFilteredEventCategory(const std::string& category);
         bool isFilteredEventsAllow(const std::string& category,
                                    bool notify = true);
 

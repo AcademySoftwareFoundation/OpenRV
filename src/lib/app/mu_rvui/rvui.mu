@@ -758,6 +758,11 @@ global Configuration globalConfig =
 
 \: singleSourceState (int;)
 {
+    if (isFilteredEvents(false /*notify*/))
+    {
+        return DisabledMenuState;
+    }
+
     try
     {
         return if sourcesRendered().size() == 1 then
@@ -812,6 +817,11 @@ global Configuration globalConfig =
 
 \: canExportOTIOState (int;)
 {
+    if (isFilteredEvents(false /*notify*/))
+    {
+        return DisabledMenuState;
+    }
+
     let vnode = viewNode();
 
     if (vnode neq nil) 
@@ -1022,6 +1032,11 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
+        if (isFilteredEvents(false /*notify*/))
+        {
+            return DisabledMenuState;
+        }
+
         return if isOtioEnabled() 
                then UncheckedMenuState
                else DisabledMenuState;
@@ -2281,11 +2296,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: wipeShown (int;)
 {
-    if (isFilteredEvents(false /*notify*/))
-    {
-        return DisabledMenuState;
-    }
-
     State state = data();
     let vnode = viewNode();
 
@@ -5017,6 +5027,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: newSessionState (int;)
 {
+    if (isFilteredEvents(false /*notify*/)) {
+        return DisabledMenuState;
+    }
+
     if presentationMode() then DisabledMenuState else UncheckedMenuState;
 }
 
