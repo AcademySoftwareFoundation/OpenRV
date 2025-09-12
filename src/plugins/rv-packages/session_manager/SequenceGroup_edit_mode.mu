@@ -218,7 +218,7 @@ class: SequenceGroupEditMode : MinorMode
     {
         \: (int;)
         {
-            if (filterLiveReviewEvents()) {
+            if (filterEventCategory("review_nonhost", false /*notify*/)) {
                 return DisabledMenuState;
             }
             let p = getIntProperty("#RVSequence.mode.%s" % name).front();

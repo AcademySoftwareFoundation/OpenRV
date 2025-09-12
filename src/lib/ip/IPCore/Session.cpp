@@ -720,12 +720,41 @@ namespace IPCore
         }
     }
 
-    void Session::setFilterLiveReviewEvents(bool shouldFilterEvents)
+    void Session::addFilterEventCategory(const std::string& category)
     {
-        m_filterLiveReviewEvents = shouldFilterEvents;
+        // Check if category already exists before adding
+        auto it = std::find(m_filterEventCategories.begin(),
+                            m_filterEventCategories.end(), category);
+        if (it == m_filterEventCategories.end())
+        {
+            m_filterEventCategories.push_back(category);
+        }
     }
 
-    bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
+    void Session::removeFilterEventCategory(const std::string& category)
+    {
+        auto it = std::find(m_filterEventCategories.begin(),
+                            m_filterEventCategories.end(), category);
+        if (it != m_filterEventCategories.end())
+        {
+            m_filterEventCategories.erase(it);
+        }
+    }
+
+    bool Session::filterEventCategory(const std::string& category, bool notify)
+    {
+        bool shouldFilter = std::find(m_filterEventCategories.begin(),
+                                      m_filterEventCategories.end(), category)
+                            != m_filterEventCategories.end();
+
+        if (shouldFilter && notify)
+        {
+            GenericStringEvent event("filtered-event-category", this, "");
+            sendEvent(event);
+        }
+
+        return shouldFilter;
+    }
 
     void Session::setName(const string& n) { m_name = n; }
 
@@ -4620,29 +4649,34 @@ namespace IPCore
         if (m_beingDeleted)
             return "";
 
-        if (m_filterLiveReviewEvents
-            && (eventName == "mode-manager-toggle-mode"
-                || (eventName == "remote-eval"
-                    && (contents == "commands.stop()"
-                        || contents
-                               == "commands.scrubAudio(false); "
-                                  "commands.setInc(-1); commands.play();"
-                        || contents == "commands.setInc(-1); commands.play();"
-                        || contents
-                               == "commands.scrubAudio(false); "
-                                  "commands.setInc(1); commands.play();"
-                        || contents == "commands.setInc(1); commands.play();"
-                        || contents == "rvui.previousMarkedFrame()"
-                        || contents == "rvui.nextMarkedFrame()"
-                        || contents == "extra_commands.stepForward(1)"
-                        || contents == "extra_commands.stepBackward(1)"
-                        || contents == "commands.setPlayMode(PlayOnce)"
-                        || contents == "commands.setPlayMode(PlayPingPong)"
-                        || contents == "commands.setPlayMode(PlayLoop)"))))
+        // Check for general events first
+        if (filterEventCategory("review_nonhost"))
         {
-            GenericStringEvent event("live-review-blocked-event", this, "");
-            sendEvent(event);
-            return "";
+            if (eventName == "mode-manager-toggle-mode")
+            {
+                return "";
+            }
+
+            if (eventName == "remote-eval"
+                && (contents == "commands.stop()"
+                    || contents
+                           == "commands.scrubAudio(false); "
+                              "commands.setInc(-1); commands.play();"
+                    || contents == "commands.setInc(-1); commands.play();"
+                    || contents
+                           == "commands.scrubAudio(false); commands.setInc(1); "
+                              "commands.play();"
+                    || contents == "commands.setInc(1); commands.play();"
+                    || contents == "rvui.previousMarkedFrame()"
+                    || contents == "rvui.nextMarkedFrame()"
+                    || contents == "extra_commands.stepForward(1)"
+                    || contents == "extra_commands.stepBackward(1)"
+                    || contents == "commands.setPlayMode(PlayOnce)"
+                    || contents == "commands.setPlayMode(PlayPingPong)"
+                    || contents == "commands.setPlayMode(PlayLoop)"))
+            {
+                return "";
+            }
         }
 
         // cout << "userGenericEvent: " << eventName << " '" << contents << "'"

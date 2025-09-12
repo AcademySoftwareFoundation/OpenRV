@@ -19,6 +19,8 @@
 #include <map>
 #include <limits>
 #include <deque>
+#include <vector>
+#include <string>
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -814,8 +816,10 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(bool shouldFilterEvents = false);
-        bool filterLiveReviewEvents();
+        void addFilterEventCategory(const std::string& category);
+        void removeFilterEventCategory(const std::string& category);
+        bool filterEventCategory(const std::string& category,
+                                 bool notify = true);
 
         //
         //  Marks
@@ -1294,7 +1298,7 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        bool m_filterLiveReviewEvents{false};
+        std::vector<std::string> m_filterEventCategories;
 
         class FpsCalculator;
         struct FBStatusCheck;

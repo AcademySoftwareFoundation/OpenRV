@@ -977,8 +977,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_annotation")) {
             return;
         }
 
@@ -1053,8 +1052,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_annotation")) {
             return;
         }
 
@@ -1096,6 +1094,10 @@ class: AnnotateMinorMode : MinorMode
 
     method: release (void; Event event)
     {
+        if (filterEventCategory("review_annotation")) {
+            return;
+        }
+
         drag(event);
         finalizeStroke();
     }
@@ -1958,7 +1960,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onPresenterChanged(void; Event event)
     {
-        if (_active && filterLiveReviewEvents())
+        if (_active && filterEventCategory("review_nonhost", false /*notify*/))
         {
             toggle();
         }

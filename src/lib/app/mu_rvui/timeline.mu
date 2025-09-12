@@ -387,8 +387,7 @@ class: Timeline : Widget
             event.reject();
             return;
 	}
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
         State state = data();
@@ -822,8 +821,7 @@ class: Timeline : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
 
@@ -1023,8 +1021,7 @@ class: Timeline : Widget
 
     method: doubleClick (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
         if (! _pointerInTimeline)

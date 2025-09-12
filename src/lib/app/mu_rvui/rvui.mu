@@ -230,8 +230,7 @@ global Configuration globalConfig =
 
 \: randomLUT (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -320,7 +319,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -342,7 +341,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -372,7 +371,7 @@ global Configuration globalConfig =
 
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -399,7 +398,7 @@ global Configuration globalConfig =
 
 \: dispGammaState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -422,7 +421,7 @@ global Configuration globalConfig =
 
 \: fileGammaState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -486,8 +485,7 @@ global Configuration globalConfig =
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
 
@@ -616,9 +614,8 @@ global Configuration globalConfig =
 
 \: computePixelRelativeScale (float; float scl, bool fitWidthOnly, bool silent=false)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost"))
     {
-        sendInternalEvent("live-review-blocked-event");
         return;
     }
 
@@ -717,7 +714,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -737,7 +734,7 @@ global Configuration globalConfig =
 
 \: sourcesExistState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -761,7 +758,7 @@ global Configuration globalConfig =
 
 \: videoSourcesExistState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -880,7 +877,7 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -978,7 +975,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -1021,7 +1018,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -1049,7 +1046,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -1076,8 +1073,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        // Bernard/Eloise. Is this a transport func, or a general func
+        // based on the frame? Assume filter on non-host for now
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
         F(frame());
@@ -1087,8 +1085,8 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 \: incN ((void;); int i)
 {
     \: (void;) {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        // Bernard/Eloise same question as above.
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
         setInc(i);
@@ -1140,8 +1138,7 @@ global (string, Glyph)[] showChannelGlyphs =
 {
     \: (void; Event event)
     {
-        if (filterLiveReviewEvents() && regex.match("color", param)) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost") && regex.match("color", param)) {
             return;
         }
         if (!sources().empty())
@@ -1185,8 +1182,7 @@ global (string, Glyph)[] showChannelGlyphs =
 
 \: resetAllColorParameters (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
     for_each (p; (string, float)[] {
@@ -1310,8 +1306,7 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: gotoFrame (void; string text)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     setFrame(int(text));
@@ -1481,8 +1476,7 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setFPSValue (void; string v)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -1643,8 +1637,7 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setDispGamma (void; string v)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -1719,7 +1712,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: rangeState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1728,7 +1721,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: forwardState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1739,7 +1732,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: backwardState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1750,7 +1743,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: hasMarksState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1759,7 +1752,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: markedState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    // Bernard/Eloise: do we allow this for muc?
+    // assuming filter for nonhost for now
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1779,7 +1774,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: sequenceState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    // Bernard/Eloise: is the sequence state menu item based on
+    // transport permissions or nonhost permissions?
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1788,7 +1785,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: playState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1798,7 +1795,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: pingPongState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1809,7 +1806,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: playOnceState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1820,7 +1817,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: realtimeState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_transport", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1836,7 +1833,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: displayProfilesState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
 }
@@ -1844,7 +1841,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: filterState (int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -1895,8 +1892,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     //
     if (event.activationTime() > 0.0 && event.activationTime() < 0.2) return;
 
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     State state = data();
@@ -1907,8 +1903,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: releaseScrub (void; Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     State state = data();
@@ -1927,8 +1922,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragScrub (void; bool enable, Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     State state = data();
@@ -2075,8 +2069,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleWipe (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -2182,8 +2175,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: togglePlayFunc (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     togglePlay();
@@ -2191,8 +2183,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: stopFunc (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     stop();
@@ -2268,7 +2259,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: wipeShown (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -2332,8 +2323,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragZoom (void; Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -2362,8 +2352,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragMoveLocked (void; bool lockToAxis, Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
    
@@ -2402,7 +2391,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     {
         let ret = DisabledMenuState;
 
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return ret;
         }
@@ -2440,7 +2429,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     {
         let ret = DisabledMenuState;
 
-        if (filterLiveReviewEvents()) {
+        if (filterEventCategory("review_nonhost", false /*notify*/)) {
             return ret;
         }
 
@@ -2507,8 +2496,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void; Event ev)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
         int l = 0;
@@ -2548,8 +2536,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleLUT (void; string lutType, string lutKind) // Display or Color
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
     State state = data();
@@ -2601,8 +2588,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleCDL (void; string cdlType, string cdlKind)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
     State state = data();
@@ -2646,8 +2632,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleICC (void; string iccType, string iccKind)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
     State state = data();
@@ -2691,8 +2676,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleInvert (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
     State state = data();
@@ -2734,8 +2718,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: beginning (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     if (isPlaying()) stop();
@@ -2745,8 +2728,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: ending (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     if (isPlaying()) stop();
@@ -2756,8 +2738,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleMark (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -2816,8 +2797,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setInOutMarkedRangeAtFrame (void; int f)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -2852,8 +2832,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     try
@@ -2870,8 +2849,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     try
@@ -2888,8 +2866,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMatchedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     try
@@ -2925,8 +2902,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMatchedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     try
@@ -2962,8 +2938,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setMatchedFrame (void; int currentLocal, int globalStart, int globalEnd)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     let localStart = sourceFrame(globalStart),
@@ -2985,8 +2960,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -3015,8 +2989,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -3045,8 +3018,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: expandMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -3098,8 +3070,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: contractMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -3145,8 +3116,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
 
@@ -3195,8 +3165,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     // then we are restoring the old values.
     //
 
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
 
@@ -3279,8 +3248,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_transport")) {
             return;
         }
 
@@ -3293,7 +3261,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
+        if (filterEventCategory("review_nonhost", false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -3313,7 +3281,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
+        if (filterEventCategory("review_nonhost", false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -3333,7 +3301,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -3358,7 +3326,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -3450,7 +3418,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -4904,8 +4872,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cycleStackForward (void; Event ev)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -4914,8 +4881,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cycleStackBackward (void; Event ev)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -4932,7 +4898,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: isStackMode (int;)
 {
-    if (filterLiveReviewEvents()) {
+    // Bernard/Eloise: What's stack mode? is part of the transport family?
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
     let typeName = nodeType(viewNode());
@@ -4985,7 +4952,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: frameState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_transport", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -5005,7 +4972,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterEventCategory("review_nonhost", false /*notify*/))
         {
             return DisabledMenuState;
         }
@@ -5029,7 +4996,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int; )
     {
-        if (filterLiveReviewEvents()) {
+        if (filterEventCategory("review_nonhost", false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -5059,7 +5026,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: eyeOffsetState(int;)
 {
-    if (filterLiveReviewEvents()) {
+    if (filterEventCategory("review_nonhost", false /*notify*/)) {
         return DisabledMenuState;
     }
 
@@ -6192,7 +6159,7 @@ global bool debugGC = false;
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
+        if (filterEventCategory("review_nonhost", false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -6207,7 +6174,7 @@ global bool debugGC = false;
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
+        if (filterEventCategory("review_nonhost", false /*notify*/)) {
             return DisabledMenuState;
         }
 
@@ -6258,7 +6225,7 @@ global bool debugGC = false;
 
 \: lockResizeScaleState (int; )
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }
@@ -6275,7 +6242,7 @@ global bool debugGC = false;
 
 \: isExpandedWidth (int; )
 {
-    if (filterLiveReviewEvents())
+    if (filterEventCategory("review_nonhost", false /*notify*/))
     {
         return DisabledMenuState;
     }

@@ -317,8 +317,7 @@ require system;
 
 \: toggleForwardsBackwards (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     setInc(-inc());
@@ -327,8 +326,7 @@ require system;
 
 \: toggleRealtime (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     State state = data();
@@ -395,8 +393,7 @@ require system;
 
 \: toggleFilter (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_nonhost")) {
         return;
     }
 
@@ -420,8 +417,7 @@ require system;
 
 \: stepForward (void; int n)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     let f = frame(),
@@ -445,8 +441,7 @@ require system;
 
 \: stepBackward (void; int n)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (filterEventCategory("review_transport")) {
         return;
     }
     let f = frame(),

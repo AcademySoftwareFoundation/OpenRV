@@ -376,8 +376,7 @@ class: MotionScope : Widget
 
     method: clickFunction (void; Event event, (void;int,int,int) F)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
         deb ("clickFunction");
@@ -704,8 +703,7 @@ class: MotionScope : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
+        if (filterEventCategory("review_nonhost")) {
             return;
         }
 

@@ -498,7 +498,8 @@ namespace Rv
                 {
                     stereoMenuUpdate();
                 }
-                else if (node->protocol() == "RVDisplayColor" || node->protocol() == "OCIODisplay" )
+                else if (node->protocol() == "RVDisplayColor"
+                         || node->protocol() == "OCIODisplay")
                 {
                     if (parts[1] == "color")
                     {
@@ -566,7 +567,8 @@ namespace Rv
             else if (name == "internal-sync-presenter-changed"
                      || name == "sync-session-ended")
             {
-                bool isDisabled = m_session->filterLiveReviewEvents();
+                bool isDisabled = m_session->filterEventCategory(
+                    "review_nonhost", false /*notify*/);
                 setLiveReviewFilteredActions(isDisabled);
             }
         }
@@ -873,7 +875,8 @@ namespace Rv
     {
         bool ocio = hasOCIODisplayPipeline();
         IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 ocio ? "#OCIODisplay.color.channelFlood" : "#RVDisplayColor.color.channelFlood");
+                                 ocio ? "#OCIODisplay.color.channelFlood"
+                                      : "#RVDisplayColor.color.channelFlood");
 
         editor.setValue(c);
     }
@@ -923,9 +926,10 @@ namespace Rv
         if (hasDisplay || hasOCIODisplay)
         {
 
-            IntPropertyEditor editor(m_session->graph(),
-                                     m_session->currentFrame(),
-                                     hasOCIODisplay ? "#OCIODisplay.color.channelFlood" : "#RVDisplayColor.color.channelFlood");
+            IntPropertyEditor editor(
+                m_session->graph(), m_session->currentFrame(),
+                hasOCIODisplay ? "#OCIODisplay.color.channelFlood"
+                               : "#RVDisplayColor.color.channelFlood");
 
             m_RGBChannelAction->setVisible(true);
             m_RChannelAction->setVisible(true);
@@ -1040,7 +1044,7 @@ namespace Rv
     bool RvTopViewToolBar::hasOCIODisplayPipeline()
     {
         if (!m_session)
-        return false;
+            return false;
 
         StringPropertyEditor displayPipeline(
             m_session->graph(), m_session->currentFrame(),
@@ -1217,8 +1221,9 @@ namespace Rv
         bool ocio = hasOCIODisplayPipeline();
         if (ocio)
         {
-            IntPropertyEditor dither(m_session->graph(), m_session->currentFrame(),
-            "@OCIODisplay.color.dither");
+            IntPropertyEditor dither(m_session->graph(),
+                                     m_session->currentFrame(),
+                                     "@OCIODisplay.color.dither");
 
             m_ditherOff->setChecked(dither.value() == 0);
             m_dither8->setChecked(dither.value() == 8);
@@ -1480,7 +1485,8 @@ namespace Rv
     {
         bool ocio = hasOCIODisplayPipeline();
         IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 ocio ? "@OCIODisplay.color.dither" : "@RVDisplayColor.color.dither");
+                                 ocio ? "@OCIODisplay.color.dither"
+                                      : "@RVDisplayColor.color.dither");
 
         editor.setValue(0);
     }
@@ -1489,7 +1495,8 @@ namespace Rv
     {
         bool ocio = hasOCIODisplayPipeline();
         IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 ocio ? "@OCIODisplay.color.dither" : "@RVDisplayColor.color.dither");
+                                 ocio ? "@OCIODisplay.color.dither"
+                                      : "@RVDisplayColor.color.dither");
 
         editor.setValue(8);
     }
@@ -1498,8 +1505,8 @@ namespace Rv
     {
         bool ocio = hasOCIODisplayPipeline();
         IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 ocio ?  "@OCIODisplay.color.dither" : "@RVDisplayColor.color.dither");
-
+                                 ocio ? "@OCIODisplay.color.dither"
+                                      : "@RVDisplayColor.color.dither");
 
         editor.setValue(10);
     }

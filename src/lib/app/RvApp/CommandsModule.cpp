@@ -207,6 +207,11 @@ namespace Rv
             throwBadProperty(thread, node, name->c_str());
     }
 
+    bool filterMediaChanges(Session* s)
+    {
+        return s->filterEventCategory("review_media", false /*notify*/);
+    }
+
     //----------------------------------------------------------------------
 
     Mu::Function* sessionFunction(const char* name)
@@ -1252,6 +1257,10 @@ namespace Rv
     NODE_IMPLEMENTATION(addSource, void)
     {
         Session* s = RvSession::currentRvSession();
+
+        if (filterMediaChanges(s))
+            return;
+
         const StringType::String* source =
             NODE_ARG_OBJECT(0, StringType::String);
         const StringType::String* tag = NODE_ARG_OBJECT(1, StringType::String);
@@ -1271,6 +1280,10 @@ namespace Rv
     NODE_IMPLEMENTATION(addSourceMulti, void)
     {
         RvSession* s = RvSession::currentRvSession();
+
+        if (filterMediaChanges(s))
+            return;
+
         DynamicArray* array = NODE_ARG_OBJECT(0, DynamicArray);
         StringType::String* muTag = NODE_ARG_OBJECT(1, StringType::String);
         string tag = (muTag) ? muTag->c_str() : "";
@@ -1288,6 +1301,10 @@ namespace Rv
     NODE_IMPLEMENTATION(addSourceVerbose, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
+
+        if (filterMediaChanges(s))
+            NODE_RETURN(0);
+
         DynamicArray* array = NODE_ARG_OBJECT(0, DynamicArray);
         StringType::String* muTag = NODE_ARG_OBJECT(1, StringType::String);
         string tag = (muTag) ? muTag->c_str() : "";
@@ -1377,6 +1394,9 @@ namespace Rv
     NODE_IMPLEMENTATION(addSources, void)
     {
         RvSession* s = RvSession::currentRvSession();
+        if (filterMediaChanges(s))
+            return;
+
         DynamicArray* array = NODE_ARG_OBJECT(0, DynamicArray);
         StringType::String* muTag = NODE_ARG_OBJECT(1, StringType::String);
         bool processOpts = NODE_ARG(2, bool);
@@ -1410,6 +1430,10 @@ namespace Rv
     NODE_IMPLEMENTATION(addSourcesVerbose, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
+
+        if (filterMediaChanges(s))
+            NODE_RETURN(0);
+
         DynamicArray* array = NODE_ARG_OBJECT(0, DynamicArray);
         const DynamicArrayType* atype =
             reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
