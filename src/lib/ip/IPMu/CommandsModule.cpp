@@ -4143,18 +4143,29 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
-    NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
+    NODE_IMPLEMENTATION(enableFilterEventCategory, void)
     {
         Session* s = Session::currentSession();
-        bool shouldFilterEvents = NODE_ARG(0, bool);
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
 
-        s->setFilterLiveReviewEvents(shouldFilterEvents);
+        s->enableFilterEventCategory(category->c_str());
     }
 
-    NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
+    NODE_IMPLEMENTATION(disableFilterEventCategory, void)
     {
         Session* s = Session::currentSession();
-        NODE_RETURN(s->filterLiveReviewEvents());
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        s->disableFilterEventCategory(category->c_str());
+    }
+
+    NODE_IMPLEMENTATION(filterEventCategory, bool)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        bool notify = NODE_ARG(1, bool);
+
+        NODE_RETURN(s->filterEventCategory(category->c_str(), notify));
     }
 
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
@@ -6409,13 +6420,18 @@ namespace IPMu
                 new Param(c, "contents", "string", Value(Pointer(0))),
                 new Param(c, "senderName", "string", Value(Pointer(0))), End),
 
-            new Function(c, "setFilterLiveReviewEvents",
-                         setFilterLiveReviewEvents, None, Return, "void",
-                         Parameters, new Param(c, "shouldFilterEvents", "bool"),
-                         End),
+            new Function(c, "enableFilterEventCategory",
+                         enableFilterEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
 
-            new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
-                         None, Return, "bool", End),
+            new Function(c, "disableFilterEventCategory",
+                         disableFilterEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
+
+            new Function(c, "filterEventCategory", filterEventCategory, None,
+                         Return, "bool", Parameters,
+                         new Param(c, "category", "string"),
+                         new Param(c, "notify", "bool", Value(true)), End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
                          "string", End),

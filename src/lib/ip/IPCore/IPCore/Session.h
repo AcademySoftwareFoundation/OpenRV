@@ -816,10 +816,9 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void addFilterEventCategory(const std::string& category);
-        void removeFilterEventCategory(const std::string& category);
-        bool filterEventCategory(const std::string& category,
-                                 bool notify = true);
+        void enableFilterEventCategory(const std::string& category);
+        void disableFilterEventCategory(const std::string& category);
+        bool filterEventCategory(const std::string& category, bool notify);
 
         //
         //  Marks

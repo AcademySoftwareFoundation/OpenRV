@@ -720,7 +720,7 @@ namespace IPCore
         }
     }
 
-    void Session::addFilterEventCategory(const std::string& category)
+    void Session::enableFilterEventCategory(const std::string& category)
     {
         // Check if category already exists before adding
         auto it = std::find(m_filterEventCategories.begin(),
@@ -731,7 +731,7 @@ namespace IPCore
         }
     }
 
-    void Session::removeFilterEventCategory(const std::string& category)
+    void Session::disableFilterEventCategory(const std::string& category)
     {
         auto it = std::find(m_filterEventCategories.begin(),
                             m_filterEventCategories.end(), category);
@@ -4650,7 +4650,7 @@ namespace IPCore
             return "";
 
         // Check for general events first
-        if (filterEventCategory("review_nonhost"))
+        if (filterEventCategory("review_nonhost", false))
         {
             if (eventName == "mode-manager-toggle-mode")
             {
