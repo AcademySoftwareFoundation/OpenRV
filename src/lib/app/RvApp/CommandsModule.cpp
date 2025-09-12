@@ -1293,7 +1293,6 @@ namespace Rv
     NODE_IMPLEMENTATION(addSourceVerbose, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
-
         DynamicArray* array = NODE_ARG_OBJECT(0, DynamicArray);
         StringType::String* muTag = NODE_ARG_OBJECT(1, StringType::String);
         string tag = (muTag) ? muTag->c_str() : "";
