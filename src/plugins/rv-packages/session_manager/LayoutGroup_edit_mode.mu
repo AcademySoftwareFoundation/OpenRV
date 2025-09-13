@@ -278,7 +278,7 @@ class: LayoutGroupEditMode : MinorMode
     {
         \: (int;)
         {
-            if (filterLiveReviewEvents()) {
+            if (isFilteredEvents(false /*notify*/)) {
                 return DisabledMenuState;
             }
             if this.layoutMode() == name then CheckedMenuState else UncheckedMenuState;

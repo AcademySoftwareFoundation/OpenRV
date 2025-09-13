@@ -19,6 +19,8 @@
 #include <map>
 #include <limits>
 #include <deque>
+#include <vector>
+#include <string>
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -814,8 +816,18 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(bool shouldFilterEvents = false);
-        bool filterLiveReviewEvents();
+        // Old category-based API (to be deprecated)
+        void enableFilterEventCategory(const std::string& category);
+        void disableFilterEventCategory(const std::string& category);
+        bool filterEventCategory(const std::string& category, bool notify);
+
+        // New global + allow-list API
+        void setFilteredEvents(bool enabled);
+        bool isFilteredEvents(bool notify);
+        void allowFilteredEventCategory(const std::string& category);
+        void disallowFilteredEventCategory(const std::string& category);
+        bool isFilteredEventsAllow(const std::string& category,
+                                   bool notify = true);
 
         //
         //  Marks
@@ -1294,7 +1306,11 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        bool m_filterLiveReviewEvents{false};
+        std::vector<std::string> m_filterEventCategories;
+
+        // New filtering system
+        bool m_filteredEventsEnabled;
+        std::vector<std::string> m_allowedEventCategories;
 
         class FpsCalculator;
         struct FBStatusCheck;

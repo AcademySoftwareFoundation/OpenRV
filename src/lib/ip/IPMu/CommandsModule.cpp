@@ -1805,6 +1805,49 @@ namespace IPMu
         NODE_RETURN(mp);
     }
 
+    NODE_IMPLEMENTATION(ndc2event, Mu::Vector2f)
+    {
+        // Convert from Normalized Device Coordinates (NDC) space [-1, 1] to
+        // event space coordinates.
+        // This bypasses image transforms and works purely in viewport space.
+        // Height spans 2 NDC units, and assumes the viewport fully contains the
+        // height of the image (eg: has vertical bars, no horizontal bars).
+        //
+        // When that is not the case (eg: we have horizontal bars) the
+        // scale of the drawing end up not being "quite" the same, but, since
+        // this functionality (at least for now) is purely to test concurrent
+        // annotation drawing on multiple computers in live review scenarios,
+        // this doesn't matter one bit.
+        //
+        Session* s = Session::currentSession();
+        Vector2f inp = NODE_ARG(0, Vector2f);
+        float x = inp[0];
+        float y = inp[1];
+
+        Vector2f mp;
+        try
+        {
+            Box2f vp = s->renderer()->viewport();
+            float vpWidth = vp.size().x;
+            float vpHeight = vp.size().y;
+            // Map from NDC space to viewport space using the smaller dimension
+            // This ensures square coordinate space regardless of viewport
+            // aspect ratio
+            float minDimension = min(vpWidth, vpHeight);
+            mp[0] = (x + 1.0f) * 0.5f * minDimension + vp.min.x
+                    + (vpWidth - minDimension) * 0.5f;
+            mp[1] = (y + 1.0f) * 0.5f * minDimension + vp.min.y
+                    + (vpHeight - minDimension) * 0.5f;
+        }
+        catch (...)
+        {
+            // If viewport is not available, return the input coordinates
+            mp[0] = x;
+            mp[1] = y;
+        }
+        NODE_RETURN(mp);
+    }
+
     NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
     {
         Process* p = NODE_THREAD.process();
@@ -4100,18 +4143,70 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
-    NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
+    NODE_IMPLEMENTATION(enableFilterEventCategory, void)
     {
         Session* s = Session::currentSession();
-        bool shouldFilterEvents = NODE_ARG(0, bool);
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
 
-        s->setFilterLiveReviewEvents(shouldFilterEvents);
+        s->enableFilterEventCategory(category->c_str());
     }
 
-    NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
+    NODE_IMPLEMENTATION(disableFilterEventCategory, void)
     {
         Session* s = Session::currentSession();
-        NODE_RETURN(s->filterLiveReviewEvents());
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        s->disableFilterEventCategory(category->c_str());
+    }
+
+    NODE_IMPLEMENTATION(filterEventCategory, bool)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        bool notify = NODE_ARG(1, bool);
+
+        NODE_RETURN(s->filterEventCategory(category->c_str(), notify));
+    }
+
+    // New filtering API implementations
+    NODE_IMPLEMENTATION(setFilteredEvents, void)
+    {
+        Session* s = Session::currentSession();
+        bool enabled = NODE_ARG(0, bool);
+        s->setFilteredEvents(enabled);
+    }
+
+    NODE_IMPLEMENTATION(isFilteredEvents, bool)
+    {
+        Session* s = Session::currentSession();
+        bool notify = true;
+        if (NODE_NUM_ARGS() > 0)
+            notify = NODE_ARG(0, bool);
+        NODE_RETURN(s->isFilteredEvents(notify));
+    }
+
+    NODE_IMPLEMENTATION(allowFilteredEventCategory, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        s->allowFilteredEventCategory(category->c_str());
+    }
+
+    NODE_IMPLEMENTATION(disallowFilteredEventCategory, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        s->disallowFilteredEventCategory(category->c_str());
+    }
+
+    NODE_IMPLEMENTATION(isFilteredEventsAllow, bool)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+        bool notify = true;
+        if (NODE_NUM_ARGS() > 1)
+            notify = NODE_ARG(1, bool);
+        NODE_RETURN(s->isFilteredEventsAllow(category->c_str(), notify));
     }
 
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
@@ -6083,6 +6178,10 @@ namespace IPMu
                          new Param(c, "sourceName", "string"),
                          new Param(c, "point", "vector float[2]"), End),
 
+            new Function(c, "ndcToEventSpace", ndc2event, None, Return,
+                         "vector float[2]", Parameters,
+                         new Param(c, "point", "vector float[2]"), End),
+
             new Function(c, "imagesAtPixel", imagesAtPixel, None, Return,
                          "PixelImageInfo[]", Parameters,
                          new Param(c, "point", "vector float[2]"),
@@ -6362,13 +6461,40 @@ namespace IPMu
                 new Param(c, "contents", "string", Value(Pointer(0))),
                 new Param(c, "senderName", "string", Value(Pointer(0))), End),
 
-            new Function(c, "setFilterLiveReviewEvents",
-                         setFilterLiveReviewEvents, None, Return, "void",
-                         Parameters, new Param(c, "shouldFilterEvents", "bool"),
-                         End),
+            new Function(c, "enableFilterEventCategory",
+                         enableFilterEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
 
-            new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
-                         None, Return, "bool", End),
+            new Function(c, "disableFilterEventCategory",
+                         disableFilterEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
+
+            new Function(c, "filterEventCategory", filterEventCategory, None,
+                         Return, "bool", Parameters,
+                         new Param(c, "category", "string"),
+                         new Param(c, "notify", "bool", Value(true)), End),
+
+            // New filtering API functions
+            new Function(c, "setFilteredEvents", setFilteredEvents, None,
+                         Return, "void", Parameters,
+                         new Param(c, "enabled", "bool"), End),
+
+            new Function(c, "isFilteredEvents", isFilteredEvents, None, Return,
+                         "bool", Parameters,
+                         new Param(c, "notify", "bool", Value(true)), End),
+
+            new Function(c, "allowFilteredEventCategory",
+                         allowFilteredEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
+
+            new Function(c, "disallowFilteredEventCategory",
+                         disallowFilteredEventCategory, None, Return, "void",
+                         Parameters, new Param(c, "category", "string"), End),
+
+            new Function(c, "isFilteredEventsAllow", isFilteredEventsAllow,
+                         None, Return, "bool", Parameters,
+                         new Param(c, "category", "string"),
+                         new Param(c, "notify", "bool", Value(true)), End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
                          "string", End),

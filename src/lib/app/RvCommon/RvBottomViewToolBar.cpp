@@ -502,7 +502,7 @@ namespace Rv
                 bool isChecked = (contents == "1");
                 m_ghostAction->setChecked(isChecked);
 
-                if (m_session->filterLiveReviewEvents())
+                if (m_session->isFilteredEvents(false /*notify*/))
                 {
                     m_ghostAction->setDisabled(true);
                 }
@@ -512,7 +512,7 @@ namespace Rv
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
 
-                if (m_session->filterLiveReviewEvents())
+                if (m_session->isFilteredEvents(false /*notify*/))
                 {
                     m_holdAction->setDisabled(true);
                 }
@@ -520,7 +520,7 @@ namespace Rv
             else if (name == "internal-sync-presenter-changed"
                      || name == "sync-session-ended")
             {
-                bool isDisabled = m_session->filterLiveReviewEvents();
+                bool isDisabled = m_session->isFilteredEvents(false /*notify*/);
                 setLiveReviewFilteredActions(isDisabled);
             }
         }

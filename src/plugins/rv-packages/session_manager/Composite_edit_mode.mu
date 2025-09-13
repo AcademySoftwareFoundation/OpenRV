@@ -122,7 +122,7 @@ class: CompositeEditMode : MinorMode
     {
         \: (int;)
         {
-            if (filterLiveReviewEvents()) {
+            if (isFilteredEvents(false /*notify*/)) {
                 return DisabledMenuState;
             }
 
