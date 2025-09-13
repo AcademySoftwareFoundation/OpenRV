@@ -423,6 +423,7 @@ namespace IPCore
         , m_waitingOnSync(false)
         , m_avPlaybackVersion(DEFAULT_AVPLAYBACK_VERSION)
         , m_lastDrawingTime(0)
+        , m_filteredEventsEnabled(false)
     {
         if (!m_graph)
             m_graph = new IPGraph(App()->nodeManager());
