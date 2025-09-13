@@ -661,10 +661,6 @@ namespace IPCore
                  << (int)m_enableFastTurnAround << endl;
         }
 
-        // Initialize event filtering system
-        // m_allowedEventCategories is automatically initialized as empty vector
-        m_filteredEventsEnabled = false;
-
         setRendererType("Composite");
         setDebugOptions();
     }
