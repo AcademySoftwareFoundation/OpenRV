@@ -2529,7 +2529,7 @@
                 <item row="3" column="0">
                  <widget class="QLabel" name="exrMaxInFlightLabel">
                   <property name="text">
-                   <string>Max Asyn Requests</string>
+                   <string>Max Async Requests</string>
                   </property>
                  </widget>
                 </item>
