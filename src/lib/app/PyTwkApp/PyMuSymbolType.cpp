@@ -56,12 +56,15 @@ namespace TwkApp
     using namespace std;
 
     // Thread safety tracking
-    static boost::thread::id
-        s_mainThreadId; // Default constructor creates "not-a-thread" ID
+    // Default constructor creates "not-a-thread" ID
+    static boost::thread::id s_mainThreadId;
 
     // Helper function for direct cout printing
     static PyObject* unsafe_mu_print(PyObject* args)
     {
+        // const char *prefix = "Unsafe Mu print: ";
+        const char* prefix = "";
+
         size_t nargs = PyTuple_Size(args);
         if (nargs >= 1)
         {
@@ -71,7 +74,7 @@ namespace TwkApp
                 const char* str = PyUnicode_AsUTF8(arg);
                 if (str)
                 {
-                    cout << "Unsafe Mu print: " << str << endl;
+                    cout << prefix << str;
                 }
             }
             else
@@ -82,7 +85,7 @@ namespace TwkApp
                     const char* str = PyUnicode_AsUTF8(strRepr);
                     if (str)
                     {
-                        cout << "Unsafe Mu print: " << str << endl;
+                        cout << prefix << str;
                     }
                     Py_DECREF(strRepr);
                 }
