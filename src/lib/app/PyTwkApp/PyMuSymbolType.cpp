@@ -349,9 +349,8 @@ namespace TwkApp
             // this cout will probably get redirected to the RV console, or go
             // to the terminal window.
             cout << "WARNING: Mu " << self->function->fullyQualifiedName()
-                 << "() called from non-main thread, will eventually crash (Mu "
-                    "isn't thread safe)."
-                 << endl;
+                 << "() called from non-main thread, will eventually crash "
+                 << "(Mu isn't thread-safe)." << endl;
         }
 
         size_t nargs = PyTuple_Size(args);
