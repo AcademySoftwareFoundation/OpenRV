@@ -73,22 +73,7 @@ namespace TwkApp
             {
                 const char* str = PyUnicode_AsUTF8(arg);
                 if (str)
-                {
                     cout << prefix << str;
-                }
-            }
-            else
-            {
-                PyObject* strRepr = PyObject_Str(arg);
-                if (strRepr)
-                {
-                    const char* str = PyUnicode_AsUTF8(strRepr);
-                    if (str)
-                    {
-                        cout << prefix << str;
-                    }
-                    Py_DECREF(strRepr);
-                }
             }
         }
         Py_RETURN_NONE;
