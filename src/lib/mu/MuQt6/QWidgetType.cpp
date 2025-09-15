@@ -1567,7 +1567,18 @@ namespace Mu
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg0 = object<QWidget>(param_this);
-        return makeinstance<QScreenType>(c, arg0->screen(), "qt.QScreen");
+
+        // Retrieve the screen the widget is on
+        QScreen* screen = arg0->screen();
+
+        // If no screen is found, return nullptr
+        if (!screen)
+        {
+            return nullptr;
+        }
+
+        // Create a new instance of QScreenType and return it
+        return makeinstance<QScreenType>(c, screen, "qt.QScreen");
     }
 
     void qt_QWidget_scroll_void_QWidget_int_int(Mu::Thread& NODE_THREAD,
