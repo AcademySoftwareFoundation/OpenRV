@@ -27,13 +27,8 @@
 #include <GL/glu.h>
 #endif
 
-#if defined(PLATFORM_DARWIN)
-#include <TwkGLF/GL.h>
-#endif
-
 #include <TwkGLF/GLFBO.h>
 #include <TwkGLF/GLFence.h>
-#include <iostream>
 #include <stl_ext/thread_group.h>
 #include <deque>
 #include <BlackMagicDevices/HDRVideoFrame.h>
@@ -44,9 +39,9 @@ namespace BlackMagicDevices
     class BlackMagicModule;
     class PinnedMemoryAllocator;
 
-    typedef boost::mutex::scoped_lock ScopedLock;
-    typedef boost::mutex Mutex;
-    typedef boost::condition_variable Condition;
+    using ScopedLock = boost::mutex::scoped_lock;
+    using Mutex = boost::mutex;
+    using Condition = boost::condition_variable;
 
     struct DeckLinkDataFormat
     {
@@ -78,8 +73,8 @@ namespace BlackMagicDevices
         const char* desc{nullptr};
     };
 
-    typedef std::vector<DeckLinkVideoFormat> DeckLinkVideoFormatVector;
-    typedef std::vector<DeckLinkDataFormat> DeckLinkDataFormatVector;
+    using DeckLinkVideoFormatVector = std::vector<DeckLinkVideoFormat>;
+    using DeckLinkDataFormatVector = std::vector<DeckLinkDataFormat>;
 
     struct DeckLinkVideo4KTransport
     {
@@ -99,15 +94,17 @@ namespace BlackMagicDevices
         //  Types
         //
 
-        typedef TwkUtil::Timer Timer;
-        typedef TwkGLF::GLFence GLFence;
-        typedef TwkGLF::GLFBO GLFBO;
-        typedef std::vector<unsigned char*> BufferVector;
-        typedef stl_ext::thread_group ThreadGroup;
-        typedef std::vector<int> AudioBuffer;
-        typedef std::map<void*, StereoVideoFrame*> StereoFrameMap;
-        typedef std::map<void*, HDRVideoFrame*> HDRVideoFrameMap;
-        typedef std::deque<IDeckLinkMutableVideoFrame*> DLVideoFrameDeque;
+        using Timer = TwkUtil::Timer;
+        using GLFence = TwkGLF::GLFence;
+        using GLFBO = TwkGLF::GLFBO;
+        using BufferVector = std::vector<unsigned char*>;
+        using ThreadGroup = stl_ext::thread_group;
+        using AudioBuffer = std::vector<int>;
+        using StereoFrameMap =
+            std::map<void*, std::unique_ptr<StereoVideoFrame::Provider>>;
+        using HDRVideoFrameMap =
+            std::map<void*, std::unique_ptr<HDRVideoFrame::Provider>>;
+        using DLVideoFrameDeque = std::deque<IDeckLinkMutableVideoFrame*>;
 
         struct PBOData
         {
@@ -119,7 +116,7 @@ namespace BlackMagicDevices
                 Ready
             };
 
-            PBOData(GLuint g);
+            explicit PBOData(GLuint g);
             ~PBOData();
 
             void lockData();
@@ -152,7 +149,7 @@ namespace BlackMagicDevices
             IDeckLinkVideoFrame* videoFrame{nullptr};
         };
 
-        typedef std::deque<PBOData*> PBOQueue;
+        using PBOQueue = std::deque<PBOData*>;
 
         //
         //  Constructors
@@ -267,7 +264,7 @@ namespace BlackMagicDevices
         bool m_supportsStereo;
         mutable size_t m_firstThreeCounter;
         mutable IDeckLinkMutableVideoFrame* m_readyFrame;
-        mutable StereoVideoFrame* m_readyStereoFrame;
+        mutable StereoVideoFrame::Provider* m_readyStereoFrame;
         mutable DLVideoFrameDeque m_DLOutputVideoFrameQueue;
         mutable DLVideoFrameDeque
             m_DLReadbackVideoFrameQueue; // only rgb formats

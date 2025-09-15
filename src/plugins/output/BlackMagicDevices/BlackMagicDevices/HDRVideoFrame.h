@@ -56,13 +56,12 @@ typedef BOOL IDeckLinkVideoFrameMetadataExtensions_GetFlagValueType;
 #endif
 
 #ifdef PLATFORM_DARWIN
-typedef CFStringRef IDeckLinkVideoFrameMetadataExtensions_GetStringValueType;
-typedef bool IDeckLinkVideoFrameMetadataExtensions_GetFlagValueType;
+using IDeckLinkVideoFrameMetadataExtensions_GetStringValueType = CFStringRef;
+using IDeckLinkVideoFrameMetadataExtensions_GetFlagValueType = bool;
 #endif
 
-#include <stdint.h>
+#include <cstdint>
 #include <atomic>
-#include <memory>
 #include <string>
 
 struct ChromaticityCoordinates
@@ -88,65 +87,70 @@ struct HDRMetadata
 };
 
 class HDRVideoFrame
-    : public IDeckLinkVideoFrame
-    , public IDeckLinkVideoFrameMetadataExtensions
 {
 public:
-    HDRVideoFrame(IDeckLinkMutableVideoFrame* frame);
-
-    virtual ~HDRVideoFrame() {}
-
-    // IUnknown interface
-    virtual HRESULT QueryInterface(REFIID iid, LPVOID* ppv);
-    virtual ULONG AddRef(void);
-    virtual ULONG Release(void);
-
-    // IDeckLinkVideoFrame interface
-    virtual long GetWidth(void) { return m_videoFrame->GetWidth(); }
-
-    virtual long GetHeight(void) { return m_videoFrame->GetHeight(); }
-
-    virtual long GetRowBytes(void) { return m_videoFrame->GetRowBytes(); }
-
-    virtual BMDPixelFormat GetPixelFormat(void)
+    class Provider
+        : public IDeckLinkVideoFrame
+        , public IDeckLinkVideoFrameMetadataExtensions
     {
-        return m_videoFrame->GetPixelFormat();
-    }
+    public:
+        explicit Provider(IDeckLinkMutableVideoFrame* frame);
+        virtual ~Provider();
 
-    virtual BMDFrameFlags GetFlags(void)
-    {
-        return m_videoFrame->GetFlags() | bmdFrameContainsHDRMetadata;
-    }
+        // IUnknown interface
+        HRESULT QueryInterface(REFIID iid, LPVOID* ppv) override;
+        ULONG AddRef() override;
+        ULONG Release() override;
 
-    virtual HRESULT GetBytes(void** buffer)
-    {
-        return m_videoFrame->GetBytes(buffer);
-    }
+        // IDeckLinkVideoFrame interface
+        long GetWidth() override { return m_videoFrame->GetWidth(); }
 
-    virtual HRESULT GetTimecode(BMDTimecodeFormat format,
-                                IDeckLinkTimecode** timecode)
-    {
-        return m_videoFrame->GetTimecode(format, timecode);
-    }
+        long GetHeight() override { return m_videoFrame->GetHeight(); }
 
-    virtual HRESULT GetAncillaryData(IDeckLinkVideoFrameAncillary** ancillary)
-    {
-        return m_videoFrame->GetAncillaryData(ancillary);
-    }
+        long GetRowBytes() override { return m_videoFrame->GetRowBytes(); }
 
-    // IDeckLinkVideoFrameMetadataExtensions interface
-    virtual HRESULT GetInt(BMDDeckLinkFrameMetadataID metadataID,
-                           int64_t* value);
-    virtual HRESULT GetFloat(BMDDeckLinkFrameMetadataID metadataID,
-                             double* value);
-    virtual HRESULT
-    GetFlag(BMDDeckLinkFrameMetadataID metadataID,
-            IDeckLinkVideoFrameMetadataExtensions_GetFlagValueType* value);
-    virtual HRESULT
-    GetString(BMDDeckLinkFrameMetadataID metadataID,
-              IDeckLinkVideoFrameMetadataExtensions_GetStringValueType* value);
-    virtual HRESULT GetBytes(BMDDeckLinkFrameMetadataID metadataID,
-                             void* buffer, uint32_t* bufferSize);
+        BMDPixelFormat GetPixelFormat() override
+        {
+            return m_videoFrame->GetPixelFormat();
+        }
+
+        BMDFrameFlags GetFlags() override
+        {
+            return m_videoFrame->GetFlags() | bmdFrameContainsHDRMetadata;
+        }
+
+        HRESULT GetTimecode(BMDTimecodeFormat format,
+                            IDeckLinkTimecode** timecode) override
+        {
+            return m_videoFrame->GetTimecode(format, timecode);
+        }
+
+        HRESULT
+        GetAncillaryData(IDeckLinkVideoFrameAncillary** ancillary) override
+        {
+            return m_videoFrame->GetAncillaryData(ancillary);
+        }
+
+        // IDeckLinkVideoFrameMetadataExtensions interface
+        HRESULT GetInt(BMDDeckLinkFrameMetadataID metadataID,
+                       int64_t* value) override;
+        HRESULT GetFloat(BMDDeckLinkFrameMetadataID metadataID,
+                         double* value) override;
+        HRESULT
+        GetFlag(BMDDeckLinkFrameMetadataID metadataID,
+                IDeckLinkVideoFrameMetadataExtensions_GetFlagValueType* value)
+            override;
+        HRESULT
+        GetString(BMDDeckLinkFrameMetadataID metadataID,
+                  IDeckLinkVideoFrameMetadataExtensions_GetStringValueType*
+                      value) override;
+        HRESULT GetBytes(BMDDeckLinkFrameMetadataID metadataID, void* buffer,
+                         uint32_t* bufferSize) override;
+
+    private:
+        IDeckLinkMutableVideoFrame* m_videoFrame;
+        std::atomic<ULONG> m_refCount;
+    };
 
     static std::string DumpHDRMetadata();
 

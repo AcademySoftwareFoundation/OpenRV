@@ -18,6 +18,8 @@
 #include <boost/program_options.hpp> // This has to come before the ByteSwap.h
 #include <TwkUtil/ByteSwap.h>
 #include <algorithm>
+#include <cstddef>
+#include <cstddef>
 #include <string>
 #include <stl_ext/replace_alloc.h>
 #include <TwkGLF/GL.h>
@@ -36,6 +38,33 @@ namespace
     }
 
 #define BM_CHECK(T) checkForFalse(T, __LINE__);
+
+    HRESULT getVideoFrameBuffer(IDeckLinkMutableVideoFrame* frame,
+                                void** buffer)
+    {
+        IDeckLinkVideoBuffer* videoBuffer = nullptr;
+        HRESULT result = frame->QueryInterface(
+            IID_IDeckLinkVideoBuffer, reinterpret_cast<void**>(&videoBuffer));
+
+        if (result != S_OK)
+        {
+            return result;
+        }
+
+        result = videoBuffer->StartAccess(bmdBufferAccessReadAndWrite);
+        if (result != S_OK)
+        {
+            videoBuffer->Release();
+            return result;
+        }
+
+        result = videoBuffer->GetBytes(buffer);
+
+        videoBuffer->EndAccess(bmdBufferAccessReadAndWrite);
+        videoBuffer->Release();
+
+        return result;
+    }
 
 } // namespace
 
@@ -889,7 +918,8 @@ namespace BlackMagicDevices
             }
 
             // Parse the HDR metadata provided and save it as a static in the
-            // HDRVideoFrame class
+            // HDRVideoFrame::Provider class
+            // HDRVideoFrame::Provider class
             // Note that the same HDR metadata will be used for all the video
             // frames in the queue
             bool parsingSuccessful = HDRVideoFrame::SetHDRMetadata(hdrMetadata);
@@ -897,9 +927,8 @@ namespace BlackMagicDevices
             {
                 if (m_infoFeedback)
                 {
-                    cout << "INFO: BMD HDR Metadata parsing successful ="
-                         << endl
-                         << HDRVideoFrame::DumpHDRMetadata() << endl;
+                    cout << "INFO: BMD HDR Metadata parsing successful =\n"
+                         << HDRVideoFrame::DumpHDRMetadata() << '\n';
                 }
             }
             else
@@ -910,7 +939,7 @@ namespace BlackMagicDevices
                     cout << "INFO: BMD HDR Metadata parsing error. HDR "
                             "metadata will not "
                             "be used"
-                         << endl;
+                         << '\n';
                 }
             }
         }
@@ -919,8 +948,10 @@ namespace BlackMagicDevices
         m_firstThreeCounter = 0;
         m_frameCount = 0;
         m_totalPlayoutFrames = 0;
-        m_lastPboData = NULL;
-        m_secondLastPboData = NULL;
+        m_lastPboData = nullptr;
+        m_secondLastPboData = nullptr;
+        m_lastPboData = nullptr;
+        m_secondLastPboData = nullptr;
 
         IDeckLinkDisplayModeIterator* pDLDisplayModeIterator = NULL;
         IDeckLinkDisplayMode* pDLDisplayMode = NULL;
@@ -1147,24 +1178,34 @@ namespace BlackMagicDevices
             for (int i = 1; i < m_DLOutputVideoFrameQueue.size(); i += 2)
             {
                 m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
-                    new StereoVideoFrame(m_DLOutputVideoFrameQueue.at(i - 1),
-                                         m_DLOutputVideoFrameQueue.at(i));
+                    std::make_unique<StereoVideoFrame::Provider>(
+                        m_DLOutputVideoFrameQueue.at(i - 1),
+                        m_DLOutputVideoFrameQueue.at(i));
+                std::make_unique<StereoVideoFrame::Provider>(
+                    m_DLOutputVideoFrameQueue.at(i - 1),
+                    m_DLOutputVideoFrameQueue.at(i));
             }
         }
 
         //
-        //  Create the HDRVideoFrames
+        //  Create the HDRVideoFrame::Providers
+        //  Create the HDRVideoFrame::Providers
         //  Note that no video frame memory will be allocated here, only a COM
-        //  object structure. An HDRVideoFrame is a COM object implementing the
-        //  following COM interfaces: IUnknown, IDeckLinkVideoFrame, and
-        //  IDeckLinkVideoFrameMetadataExtensions
+        //  object structure. An HDRVideoFrame::Provider manages HDR metadata
+        //  following BMD SDK 14.3+ best practices object structure. An
+        //  HDRVideoFrame::Provider manages HDR metadata following BMD SDK 14.3+
+        //  best practices following COM interfaces: IUnknown,
+        //  IDeckLinkVideoFrame, and IDeckLinkVideoFrameMetadataExtensions
         //
         if (m_useHDRMetadata)
         {
             for (int i = 0; i < m_DLOutputVideoFrameQueue.size(); i++)
             {
                 m_FrameToHDRFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
-                    new HDRVideoFrame(m_DLOutputVideoFrameQueue.at(i));
+                    std::make_unique<HDRVideoFrame::Provider>(
+                        m_DLOutputVideoFrameQueue.at(i));
+                std::make_unique<HDRVideoFrame::Provider>(
+                    m_DLOutputVideoFrameQueue.at(i));
             }
         }
 
@@ -1192,7 +1233,8 @@ namespace BlackMagicDevices
 
         m_readyFrame = m_DLOutputVideoFrameQueue.at(0);
         m_readyStereoFrame =
-            m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(1)];
+            m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(1)].get();
+        m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(1)].get();
 
         m_open = true;
     }
@@ -1239,23 +1281,11 @@ namespace BlackMagicDevices
 
             if (m_stereo)
             {
-                StereoFrameMap::iterator it;
-                for (it = m_rightEyeToStereoFrameMap.begin();
-                     it != m_rightEyeToStereoFrameMap.end(); ++it)
-                {
-                    delete it->second;
-                }
                 m_rightEyeToStereoFrameMap.clear();
             }
 
             if (m_useHDRMetadata)
             {
-                HDRVideoFrameMap::iterator it;
-                for (it = m_FrameToHDRFrameMap.begin();
-                     it != m_FrameToHDRFrameMap.end(); ++it)
-                {
-                    delete it->second;
-                }
                 m_FrameToHDRFrameMap.clear();
             }
         }
@@ -1328,7 +1358,10 @@ namespace BlackMagicDevices
         else if (n == 1) // in case of stereo, ready frame is updated when right
                          // eye is transfered
         {
-            m_readyStereoFrame = m_rightEyeToStereoFrameMap[outputVideoFrame];
+            m_readyStereoFrame =
+                m_rightEyeToStereoFrameMap[outputVideoFrame].get();
+            m_readyStereoFrame =
+                m_rightEyeToStereoFrameMap[outputVideoFrame].get();
         }
 
         return true;
@@ -1380,10 +1413,16 @@ namespace BlackMagicDevices
             void* p =
                 (void*)glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
             TWK_GLDEBUG;
-            if (p)
+
+            if (p != nullptr)
             {
-                void* pFrame;
-                outputVideoFrame->GetBytes(&pFrame);
+                void* pFrame = nullptr;
+                HRESULT result = getVideoFrameBuffer(outputVideoFrame, &pFrame);
+                if (result != S_OK)
+                {
+                    throw std::runtime_error(
+                        "Failed to get video frame buffer");
+                }
 
                 if (d.iformat >= VideoDevice::Y0CbY1Cr_8_422)
                 {
@@ -1503,14 +1542,24 @@ namespace BlackMagicDevices
     {
         HOP_PROF_FUNC();
 
-        void* pFrame;
+        void* pFrame = nullptr;
         if (m_needsFrameConverter)
         {
-            readbackVideoFrame->GetBytes(&pFrame);
+            HRESULT result = getVideoFrameBuffer(readbackVideoFrame, &pFrame);
+            if (result != S_OK)
+            {
+                throw std::runtime_error(
+                    "Failed to get readback video frame buffer");
+            }
         }
         else
         {
-            outputVideoFrame->GetBytes(&pFrame);
+            HRESULT result = getVideoFrameBuffer(outputVideoFrame, &pFrame);
+            if (result != S_OK)
+            {
+                throw std::runtime_error(
+                    "Failed to get output video frame buffer");
+            }
         }
 
         const DeckLinkDataFormat& d =
@@ -1531,8 +1580,13 @@ namespace BlackMagicDevices
             TwkUtil::Timer timer;
             timer.start();
 
-            void* outData;
-            outputVideoFrame->GetBytes(&outData);
+            void* outData = nullptr;
+            HRESULT result = getVideoFrameBuffer(outputVideoFrame, &outData);
+            if (result != S_OK)
+            {
+                throw std::runtime_error(
+                    "Failed to get output video frame buffer for conversion");
+            }
             if (d.iformat == VideoDevice::Y0CbY1Cr_8_422)
             {
                 subsample422_8bit_UYVY_MP(m_frameWidth, m_frameHeight,
@@ -1734,66 +1788,70 @@ namespace BlackMagicDevices
         if (isOpen())
         {
             IDeckLinkVideoFrame* outputVideoFrame =
-                m_stereo ? (IDeckLinkVideoFrame*)m_readyStereoFrame
+                m_stereo ? m_readyStereoFrame->GetLeftFrame()
                          : (IDeckLinkVideoFrame*)m_readyFrame;
 
             if (m_useHDRMetadata)
             {
-                outputVideoFrame =
-                    (IDeckLinkVideoFrame*)m_FrameToHDRFrameMap[m_readyFrame];
+                outputVideoFrame = m_FrameToHDRFrameMap[m_readyFrame].get();
+                m_FrameToHDRFrameMap[m_readyFrame].get();
             }
 
-            if (outputVideoFrame)
-            {
-                // Prevent undesirable audio artifacts when repeating the same
-                // frame Note that some conditions might prevent RV from
-                // fetching a new frame in time. In this case the same frame has
-                // to be sent to the output. Repeating one frame has a minimal
-                // impact on the review session. However repeating the same
-                // audio snippet might cause an undesirable audio artifact. This
-                // is what we want to prevent here. Example of such a condition:
-                // when adding media to a sequence while a playback is already
-                // in progress for example,
-                bool skipAudioIfAny = false;
-                static IDeckLinkVideoFrame*
-                    previouslyScheduledOutputVideoFrame = nullptr;
-                if (outputVideoFrame == previouslyScheduledOutputVideoFrame)
+            if (outputVideoFrame != nullptr)
+                if (outputVideoFrame != nullptr)
                 {
-                    skipAudioIfAny = true;
-                }
-                previouslyScheduledOutputVideoFrame = outputVideoFrame;
-
-                HRESULT r = m_outputAPI->ScheduleVideoFrame(
-                    outputVideoFrame, (m_totalPlayoutFrames * m_frameDuration),
-                    m_frameDuration, m_frameTimescale);
-
-                if (r != S_OK)
-                    TWK_THROW_EXC_STREAM("Cannot schedule frame.");
-
-                int rc = pthread_mutex_lock(&audioMutex);
-
-                if (m_hasAudio && !skipAudioIfAny)
-                {
-                    rc = pthread_mutex_unlock(&audioMutex);
-                    int index = (m_audioDataIndex == 1) ? 0 : 1;
-                    if (m_audioData[index]
-                        && m_outputAPI->ScheduleAudioSamples(
-                               m_audioData[index], m_audioSamplesPerFrame,
-                               (m_totalPlayoutFrames * m_audioSamplesPerFrame),
-                               bmdAudioSampleRate48kHz, NULL)
-                               != S_OK)
+                    // Prevent undesirable audio artifacts when repeating the
+                    // same frame Note that some conditions might prevent RV
+                    // from fetching a new frame in time. In this case the same
+                    // frame has to be sent to the output. Repeating one frame
+                    // has a minimal impact on the review session. However
+                    // repeating the same audio snippet might cause an
+                    // undesirable audio artifact. This is what we want to
+                    // prevent here. Example of such a condition: when adding
+                    // media to a sequence while a playback is already in
+                    // progress for example,
+                    bool skipAudioIfAny = false;
+                    static IDeckLinkVideoFrame*
+                        previouslyScheduledOutputVideoFrame = nullptr;
+                    if (outputVideoFrame == previouslyScheduledOutputVideoFrame)
                     {
-                        TWK_THROW_EXC_STREAM(
-                            "Failed to perform audio transfers.");
+                        skipAudioIfAny = true;
                     }
-                }
-                else
-                {
-                    rc = pthread_mutex_unlock(&audioMutex);
-                }
+                    previouslyScheduledOutputVideoFrame = outputVideoFrame;
 
-                m_totalPlayoutFrames++;
-            }
+                    HRESULT r = m_outputAPI->ScheduleVideoFrame(
+                        outputVideoFrame,
+                        (m_totalPlayoutFrames * m_frameDuration),
+                        m_frameDuration, m_frameTimescale);
+
+                    if (r != S_OK)
+                        TWK_THROW_EXC_STREAM("Cannot schedule frame.");
+
+                    int rc = pthread_mutex_lock(&audioMutex);
+
+                    if (m_hasAudio && !skipAudioIfAny)
+                    {
+                        rc = pthread_mutex_unlock(&audioMutex);
+                        int index = (m_audioDataIndex == 1) ? 0 : 1;
+                        if (m_audioData[index]
+                            && m_outputAPI->ScheduleAudioSamples(
+                                   m_audioData[index], m_audioSamplesPerFrame,
+                                   (m_totalPlayoutFrames
+                                    * m_audioSamplesPerFrame),
+                                   bmdAudioSampleRate48kHz, NULL)
+                                   != S_OK)
+                        {
+                            TWK_THROW_EXC_STREAM(
+                                "Failed to perform audio transfers.");
+                        }
+                    }
+                    else
+                    {
+                        rc = pthread_mutex_unlock(&audioMutex);
+                    }
+
+                    m_totalPlayoutFrames++;
+                }
         }
     }
 

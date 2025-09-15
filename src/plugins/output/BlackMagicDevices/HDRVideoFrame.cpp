@@ -55,15 +55,28 @@
 
 HDRMetadata HDRVideoFrame::s_metadata = HDRMetadata();
 
-HDRVideoFrame::HDRVideoFrame(IDeckLinkMutableVideoFrame* frame)
+HDRVideoFrame::Provider::Provider(IDeckLinkMutableVideoFrame* frame)
     : m_videoFrame(frame)
     , m_refCount(1)
 {
+    if (m_videoFrame != nullptr)
+    {
+        m_videoFrame->AddRef();
+    }
+}
+
+HDRVideoFrame::Provider::~Provider()
+{
+    if (m_videoFrame != nullptr)
+    {
+        m_videoFrame->Release();
+        m_videoFrame = nullptr;
+    }
 }
 
 /// IUnknown methods
 
-HRESULT HDRVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
+HRESULT HDRVideoFrame::Provider::QueryInterface(REFIID iid, LPVOID* ppv)
 {
     HRESULT result = S_OK;
 
@@ -101,23 +114,22 @@ HRESULT HDRVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
     return result;
 }
 
-ULONG HDRVideoFrame::AddRef(void) { return ++m_refCount; }
+ULONG HDRVideoFrame::Provider::AddRef() { return m_refCount.fetch_add(1) + 1; }
 
-ULONG HDRVideoFrame::Release(void)
+ULONG HDRVideoFrame::Provider::Release()
 {
-    ULONG refCount = --m_refCount;
+    ULONG refCount = m_refCount.fetch_sub(1) - 1;
     if (refCount == 0)
     {
         delete this;
-        return 0;
     }
     return refCount;
 }
 
 /// IDeckLinkVideoFrameMetadataExtensions methods
 
-HRESULT HDRVideoFrame::GetInt(BMDDeckLinkFrameMetadataID metadataID,
-                              int64_t* value)
+HRESULT HDRVideoFrame::Provider::GetInt(BMDDeckLinkFrameMetadataID metadataID,
+                                        int64_t* value)
 {
     HRESULT result = S_OK;
 
@@ -139,8 +151,8 @@ HRESULT HDRVideoFrame::GetInt(BMDDeckLinkFrameMetadataID metadataID,
     return result;
 }
 
-HRESULT HDRVideoFrame::GetFloat(BMDDeckLinkFrameMetadataID metadataID,
-                                double* value)
+HRESULT HDRVideoFrame::Provider::GetFloat(BMDDeckLinkFrameMetadataID metadataID,
+                                          double* value)
 {
     HRESULT result = S_OK;
 
@@ -202,7 +214,7 @@ HRESULT HDRVideoFrame::GetFloat(BMDDeckLinkFrameMetadataID metadataID,
     return result;
 }
 
-HRESULT HDRVideoFrame::GetFlag(
+HRESULT HDRVideoFrame::Provider::GetFlag(
     BMDDeckLinkFrameMetadataID metadataID,
     IDeckLinkVideoFrameMetadataExtensions_GetFlagValueType* value)
 {
@@ -210,7 +222,7 @@ HRESULT HDRVideoFrame::GetFlag(
     return E_INVALIDARG;
 }
 
-HRESULT HDRVideoFrame::GetString(
+HRESULT HDRVideoFrame::Provider::GetString(
     BMDDeckLinkFrameMetadataID metadataID,
     IDeckLinkVideoFrameMetadataExtensions_GetStringValueType* value)
 {
@@ -218,8 +230,8 @@ HRESULT HDRVideoFrame::GetString(
     return E_INVALIDARG;
 }
 
-HRESULT HDRVideoFrame::GetBytes(BMDDeckLinkFrameMetadataID metadataID,
-                                void* buffer, uint32_t* bufferSize)
+HRESULT HDRVideoFrame::Provider::GetBytes(BMDDeckLinkFrameMetadataID metadataID,
+                                          void* buffer, uint32_t* bufferSize)
 {
     // Not expecting GetString
     return E_INVALIDARG;
