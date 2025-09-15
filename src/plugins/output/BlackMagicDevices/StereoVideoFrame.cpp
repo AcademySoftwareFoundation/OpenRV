@@ -44,34 +44,42 @@
 
 #include <BlackMagicDevices/StereoVideoFrame.h>
 #include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 #define CompareREFIID(iid1, iid2) (memcmp(&iid1, &iid2, sizeof(REFIID)) == 0)
 
-StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* left,
-                                   IDeckLinkMutableVideoFrame* right)
+StereoVideoFrame::Provider::Provider(IDeckLinkMutableVideoFrame* left,
+                                     IDeckLinkMutableVideoFrame* right)
     : m_frameLeft(left)
     , m_frameRight(right)
     , m_refCount(1)
 {
-    if (!m_frameLeft)
+    if (m_frameLeft == nullptr)
     {
         throw std::invalid_argument("at minimum a left frame must be defined");
     }
     m_frameLeft->AddRef();
-    if (m_frameRight)
+    if (m_frameRight != nullptr)
     {
         m_frameRight->AddRef();
     }
 }
 
-StereoVideoFrame::~StereoVideoFrame()
+StereoVideoFrame::Provider::~Provider()
 {
-    // do not release the left right frames. the frames will be freed later by
-    // DeckLinkVideoDevice
+    if (m_frameLeft != nullptr)
+    {
+        m_frameLeft->Release();
+        m_frameLeft = nullptr;
+    }
+    if (m_frameRight != nullptr)
+    {
+        m_frameRight->Release();
+        m_frameRight = nullptr;
+    }
 }
 
-HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
+HRESULT StereoVideoFrame::Provider::QueryInterface(REFIID iid, LPVOID* ppv)
 {
 #ifdef PLATFORM_DARWIN
     CFUUIDBytes iunknown = CFUUIDGetUUIDBytes(IUnknownUUID);
@@ -79,23 +87,10 @@ HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
     REFIID iunknown = IID_IUnknown;
 #endif
 
-    if (CompareREFIID(iid, iunknown))
-        *ppv = static_cast<IDeckLinkVideoFrame*>(this);
-    else if (CompareREFIID(iid, IID_IDeckLinkVideoFrame))
-        *ppv = static_cast<IDeckLinkVideoFrame*>(this);
-    else if (CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
-        *ppv = static_cast<IDeckLinkVideoFrame3DExtensions*>(this);
-    else
-    {
-        *ppv = NULL;
-        return E_NOINTERFACE;
-    }
-
-    AddRef();
-    return S_OK;
+    return m_frameLeft->QueryInterface(iid, ppv);
 }
 
-ULONG StereoVideoFrame::AddRef(void)
+ULONG StereoVideoFrame::Provider::AddRef()
 {
 #ifdef PLATFORM_WINDOWS
     return _InterlockedIncrement((volatile long*)&m_refCount);
@@ -106,7 +101,7 @@ ULONG StereoVideoFrame::AddRef(void)
 #endif
 }
 
-ULONG StereoVideoFrame::Release(void)
+ULONG StereoVideoFrame::Provider::Release()
 {
 #ifdef PLATFORM_WINDOWS
     ULONG newRefValue = _InterlockedDecrement((volatile long*)&m_refCount);
@@ -115,56 +110,39 @@ ULONG StereoVideoFrame::Release(void)
         delete this;
     return newRefValue;
 #else
-    ScopedLock lock(m_refMutex);
-    m_refCount--;
-    return m_refCount;
+    ULONG refCount = 0;
+    {
+        ScopedLock lock(m_refMutex);
+        m_refCount--;
+        refCount = m_refCount;
+    }
+    if (refCount == 0)
+    {
+        delete this;
+    }
+    return refCount;
 #endif
 }
 
-long StereoVideoFrame::GetWidth(void) { return m_frameLeft->GetWidth(); }
-
-long StereoVideoFrame::GetHeight(void) { return m_frameLeft->GetHeight(); }
-
-long StereoVideoFrame::GetRowBytes(void) { return m_frameLeft->GetRowBytes(); }
-
-BMDPixelFormat StereoVideoFrame::GetPixelFormat(void)
-{
-    return m_frameLeft->GetPixelFormat();
-}
-
-BMDFrameFlags StereoVideoFrame::GetFlags(void)
-{
-    return m_frameLeft->GetFlags();
-}
-
-HRESULT StereoVideoFrame::GetBytes(/* out */ void** buffer)
-{
-    return m_frameLeft->GetBytes(buffer);
-}
-
-HRESULT StereoVideoFrame::GetTimecode(/* in */ BMDTimecodeFormat format,
-                                      /* out */ IDeckLinkTimecode** timecode)
-{
-    return m_frameLeft->GetTimecode(format, timecode);
-}
-
-HRESULT StereoVideoFrame::GetAncillaryData(
-    /* out */ IDeckLinkVideoFrameAncillary** ancillary)
-{
-    return m_frameLeft->GetAncillaryData(ancillary);
-}
-
-BMDVideo3DPackingFormat StereoVideoFrame::Get3DPackingFormat(void)
+BMDVideo3DPackingFormat StereoVideoFrame::Provider::Get3DPackingFormat()
 {
     return bmdVideo3DPackingLeftOnly;
 }
 
-HRESULT StereoVideoFrame::GetFrameForRightEye(
-    /* out */ IDeckLinkVideoFrame** rightEyeFrame)
+HRESULT StereoVideoFrame::Provider::GetFrameForRightEye(
+    IDeckLinkVideoFrame** rightEyeFrame)
 {
-    if (m_frameRight)
-        return m_frameRight->QueryInterface(IID_IDeckLinkVideoFrame,
-                                            (void**)rightEyeFrame);
-    else
-        return S_FALSE;
+    if (rightEyeFrame == nullptr)
+    {
+        return E_POINTER;
+    }
+
+    if (m_frameRight != nullptr)
+    {
+        return m_frameRight->QueryInterface(
+            IID_IDeckLinkVideoFrame, reinterpret_cast<void**>(rightEyeFrame));
+    }
+
+    *rightEyeFrame = nullptr;
+    return S_FALSE;
 }
