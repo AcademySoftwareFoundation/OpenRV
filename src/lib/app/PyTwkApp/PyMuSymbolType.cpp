@@ -45,13 +45,51 @@
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/MuInterface.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/thread.hpp>
 #include <half.h>
 #include <sstream>
 #include <stdexcept>
+#include <iostream>
 
 namespace TwkApp
 {
     using namespace std;
+
+    // Thread safety tracking
+    static boost::thread::id
+        s_mainThreadId; // Default constructor creates "not-a-thread" ID
+
+    // Helper function for direct cout printing
+    static PyObject* unsafe_mu_print(PyObject* args)
+    {
+        size_t nargs = PyTuple_Size(args);
+        if (nargs >= 1)
+        {
+            PyObject* arg = PyTuple_GetItem(args, 0);
+            if (PyUnicode_Check(arg))
+            {
+                const char* str = PyUnicode_AsUTF8(arg);
+                if (str)
+                {
+                    cout << "Unsafe Mu print: " << str << endl;
+                }
+            }
+            else
+            {
+                PyObject* strRepr = PyObject_Str(arg);
+                if (strRepr)
+                {
+                    const char* str = PyUnicode_AsUTF8(strRepr);
+                    if (str)
+                    {
+                        cout << "Unsafe Mu print: " << str << endl;
+                    }
+                    Py_DECREF(strRepr);
+                }
+            }
+        }
+        Py_RETURN_NONE;
+    }
 
     Mu::FunctionObject*
     createFunctionObjectFromPyObject(const Mu::FunctionType* t, PyObject* pyobj)
@@ -298,6 +336,34 @@ namespace TwkApp
             PyErr_SetString(PyExc_Exception,
                             "Mu symbol is not a function -- cannot call");
             return NULL;
+        }
+
+        // Thread safety check - initialize main thread ID on first call
+        boost::thread::id currentThreadId = boost::this_thread::get_id();
+        if (s_mainThreadId == boost::thread::id()) // Check if uninitialized
+                                                   // (default constructed)
+        {
+            s_mainThreadId = currentThreadId;
+        }
+
+        if (currentThreadId != s_mainThreadId)
+        {
+            // fix mu print commands from python to at least not crash from
+            // non-main thread
+            //  (because python print is often used to debug python code, so
+            //  we'll tolerate this because print is likely redirected to the RV
+            //  console)
+            if (self->function->fullyQualifiedName() == "extra_commands._print")
+            {
+                return unsafe_mu_print(args);
+            }
+
+            // this cout will probably get redirected to the RV console, or go
+            // to the terminal window.
+            cout << "WARNING: Mu " << self->function->fullyQualifiedName()
+                 << "() called from non-main thread, will eventually crash (Mu "
+                    "isn't thread safe)."
+                 << endl;
         }
 
         size_t nargs = PyTuple_Size(args);
