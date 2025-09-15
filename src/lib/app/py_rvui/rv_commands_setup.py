@@ -472,15 +472,3 @@ bind_symbols(["eval"], "runtime", rv.runtime)
 bind_constants(commands_int_constants, rv.commands)
 
 rv.extra_commands.displayFeedback = rv.extra_commands.displayFeedback2
-
-if "RV_NO_CONSOLE_REDIRECT" not in os.environ:
-
-    class RVStdOut:
-        def __init__(self):
-            self.write = MuSymbol("extra_commands._print")
-
-        def flush(self):
-            pass
-
-    sys.stdout = RVStdOut()
-    sys.stderr = sys.stdout
