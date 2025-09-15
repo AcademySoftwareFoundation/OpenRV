@@ -246,7 +246,55 @@ namespace TwkAudio
             chstr = "15.0 (Generic)";
             break;
         case Generic_16:
-            chstr = "16";
+            chstr = "16.0 (Generic)";
+            break;
+        case Generic_17:
+            chstr = "17.0 (Generic)";
+            break;
+        case Generic_18:
+            chstr = "18.0 (Generic)";
+            break;
+        case Generic_19:
+            chstr = "19.0 (Generic)";
+            break;
+        case Generic_20:
+            chstr = "20.0 (Generic)";
+            break;
+        case Generic_21:
+            chstr = "21.0 (Generic)";
+            break;
+        case Generic_22:
+            chstr = "22.0 (Generic)";
+            break;
+        case Generic_23:
+            chstr = "23.0 (Generic)";
+            break;
+        case Generic_24:
+            chstr = "24.0 (Generic)";
+            break;
+        case Generic_25:
+            chstr = "25.0 (Generic)";
+            break;
+        case Generic_26:
+            chstr = "26.0 (Generic)";
+            break;
+        case Generic_27:
+            chstr = "27.0 (Generic)";
+            break;
+        case Generic_28:
+            chstr = "28.0 (Generic)";
+            break;
+        case Generic_29:
+            chstr = "29.0 (Generic)";
+            break;
+        case Generic_30:
+            chstr = "30.0 (Generic)";
+            break;
+        case Generic_31:
+            chstr = "31.0 (Generic)";
+            break;
+        case Generic_32:
+            chstr = "32.0 (Generic)";
             break;
         case UnknownLayout:
         default:
@@ -291,7 +339,6 @@ namespace TwkAudio
         case 8:
             lv.push_back(Surround_7_1);
             lv.push_back(Back_7_1);
-            // break;
             lv.push_back(SDDS_7_1);
             break;
         case 9:
@@ -317,6 +364,54 @@ namespace TwkAudio
             break;
         case 16:
             lv.push_back(Generic_16);
+            break;
+        case 17:
+            lv.push_back(Generic_17);
+            break;
+        case 18:
+            lv.push_back(Generic_18);
+            break;
+        case 19:
+            lv.push_back(Generic_19);
+            break;
+        case 20:
+            lv.push_back(Generic_20);
+            break;
+        case 21:
+            lv.push_back(Generic_21);
+            break;
+        case 22:
+            lv.push_back(Generic_22);
+            break;
+        case 23:
+            lv.push_back(Generic_23);
+            break;
+        case 24:
+            lv.push_back(Generic_24);
+            break;
+        case 25:
+            lv.push_back(Generic_25);
+            break;
+        case 26:
+            lv.push_back(Generic_26);
+            break;
+        case 27:
+            lv.push_back(Generic_27);
+            break;
+        case 28:
+            lv.push_back(Generic_28);
+            break;
+        case 29:
+            lv.push_back(Generic_29);
+            break;
+        case 30:
+            lv.push_back(Generic_30);
+            break;
+        case 31:
+            lv.push_back(Generic_31);
+            break;
+        case 32:
+            lv.push_back(Generic_32);
             break;
         case 0:
         default:
@@ -412,6 +507,70 @@ namespace TwkAudio
         {
             return Generic_16;
         }
+        else if (cv == layoutChannels(Generic_17))
+        {
+            return Generic_17;
+        }
+        else if (cv == layoutChannels(Generic_18))
+        {
+            return Generic_18;
+        }
+        else if (cv == layoutChannels(Generic_19))
+        {
+            return Generic_19;
+        }
+        else if (cv == layoutChannels(Generic_20))
+        {
+            return Generic_20;
+        }
+        else if (cv == layoutChannels(Generic_21))
+        {
+            return Generic_21;
+        }
+        else if (cv == layoutChannels(Generic_22))
+        {
+            return Generic_22;
+        }
+        else if (cv == layoutChannels(Generic_23))
+        {
+            return Generic_23;
+        }
+        else if (cv == layoutChannels(Generic_24))
+        {
+            return Generic_24;
+        }
+        else if (cv == layoutChannels(Generic_25))
+        {
+            return Generic_25;
+        }
+        else if (cv == layoutChannels(Generic_26))
+        {
+            return Generic_26;
+        }
+        else if (cv == layoutChannels(Generic_27))
+        {
+            return Generic_27;
+        }
+        else if (cv == layoutChannels(Generic_28))
+        {
+            return Generic_28;
+        }
+        else if (cv == layoutChannels(Generic_29))
+        {
+            return Generic_29;
+        }
+        else if (cv == layoutChannels(Generic_30))
+        {
+            return Generic_30;
+        }
+        else if (cv == layoutChannels(Generic_31))
+        {
+            return Generic_31;
+        }
+        else if (cv == layoutChannels(Generic_32))
+        {
+            return Generic_32;
+        }
 
         return UnknownLayout;
     }
@@ -492,6 +651,54 @@ namespace TwkAudio
             break;
         case Generic_16:
             count = 16;
+            break;
+        case Generic_17:
+            count = 17;
+            break;
+        case Generic_18:
+            count = 18;
+            break;
+        case Generic_19:
+            count = 19;
+            break;
+        case Generic_20:
+            count = 20;
+            break;
+        case Generic_21:
+            count = 21;
+            break;
+        case Generic_22:
+            count = 22;
+            break;
+        case Generic_23:
+            count = 23;
+            break;
+        case Generic_24:
+            count = 24;
+            break;
+        case Generic_25:
+            count = 25;
+            break;
+        case Generic_26:
+            count = 26;
+            break;
+        case Generic_27:
+            count = 27;
+            break;
+        case Generic_28:
+            count = 28;
+            break;
+        case Generic_29:
+            count = 29;
+            break;
+        case Generic_30:
+            count = 30;
+            break;
+        case Generic_31:
+            count = 31;
+            break;
+        case Generic_32:
+            count = 32;
             break;
         case UnknownLayout:
         default:
@@ -734,7 +941,9 @@ namespace TwkAudio
             chv.push_back(Channel14);
             chv.push_back(Channel15);
             break;
-        case Generic_16: // Not sure?
+        case Generic_16:
+            // Base 8 + Heights + FrontLeftOfCenter + FrontRightOfCenter +
+            // BackCenter + Channel14 + Channel15 + Channel16
             chv.push_back(FrontLeft);
             chv.push_back(FrontRight);
             chv.push_back(FrontCenter);
@@ -751,6 +960,446 @@ namespace TwkAudio
             chv.push_back(Channel14);
             chv.push_back(Channel15);
             chv.push_back(Channel16);
+            break;
+        case Generic_17:
+            // Generic_16 + Channel17
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            break;
+        case Generic_18:
+            // Generic_17 + Channel18
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            break;
+        case Generic_19:
+            // Generic_18 + Channel19
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            break;
+        case Generic_20:
+            // Generic_19 + Channel20
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            break;
+        case Generic_21:
+            // Generic_20 + Channel21
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            break;
+        case Generic_22:
+            // Generic_21 + Channel22
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            break;
+        case Generic_23:
+            // Generic_22 + Channel23
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            break;
+        case Generic_24:
+            // Generic_23 + Channel24
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            break;
+        case Generic_25:
+            // Generic_24 + Channel25
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            break;
+        case Generic_26:
+            // Generic_25 + Channel26
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            break;
+        case Generic_27:
+            // Generic_26 + Channel27
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            chv.push_back(Channel27);
+            break;
+        case Generic_28:
+            // Generic_27 + Channel28
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            chv.push_back(Channel27);
+            chv.push_back(Channel28);
+            break;
+        case Generic_29:
+            // Generic_28 + Channel29
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            chv.push_back(Channel27);
+            chv.push_back(Channel28);
+            chv.push_back(Channel29);
+            break;
+        case Generic_30:
+            // Generic_29 + Channel30
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            chv.push_back(Channel27);
+            chv.push_back(Channel28);
+            chv.push_back(Channel29);
+            chv.push_back(Channel30);
+            break;
+        case Generic_31:
+            // Generic_30 + Channel31
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            chv.push_back(Channel27);
+            chv.push_back(Channel28);
+            chv.push_back(Channel29);
+            chv.push_back(Channel30);
+            chv.push_back(Channel31);
+            break;
+        case Generic_32:
+            // Generic_31 + Channel32
+            chv.push_back(FrontLeft);
+            chv.push_back(FrontRight);
+            chv.push_back(FrontCenter);
+            chv.push_back(LowFrequency);
+            chv.push_back(BackLeft);
+            chv.push_back(BackRight);
+            chv.push_back(SideLeft);
+            chv.push_back(SideRight);
+            chv.push_back(LeftHeight);
+            chv.push_back(RightHeight);
+            chv.push_back(FrontLeftOfCenter);
+            chv.push_back(FrontRightOfCenter);
+            chv.push_back(BackCenter);
+            chv.push_back(Channel14);
+            chv.push_back(Channel15);
+            chv.push_back(Channel16);
+            chv.push_back(Channel17);
+            chv.push_back(Channel18);
+            chv.push_back(Channel19);
+            chv.push_back(Channel20);
+            chv.push_back(Channel21);
+            chv.push_back(Channel22);
+            chv.push_back(Channel23);
+            chv.push_back(Channel24);
+            chv.push_back(Channel25);
+            chv.push_back(Channel26);
+            chv.push_back(Channel27);
+            chv.push_back(Channel28);
+            chv.push_back(Channel29);
+            chv.push_back(Channel30);
+            chv.push_back(Channel31);
+            chv.push_back(Channel32);
             break;
 
         case UnknownLayout:
