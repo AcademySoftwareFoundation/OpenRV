@@ -256,7 +256,6 @@ namespace BlackMagicDevices
                                        IDeckLinkMutableVideoFrame*,
                                        IDeckLinkMutableVideoFrame*) const;
         void ScheduleFrame() const;
-        size_t bytesPerRow(BMDPixelFormat bmdFormat, size_t width) const;
 
     private:
         DeckLinkVideoFormatVector m_decklinkVideoFormats;

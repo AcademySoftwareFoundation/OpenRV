@@ -19,7 +19,7 @@
 #include <TwkUtil/ByteSwap.h>
 #include <algorithm>
 #include <cstddef>
-#include <cstddef>
+#include <stdexcept>
 #include <string>
 #include <stl_ext/replace_alloc.h>
 #include <TwkGLF/GL.h>
@@ -1131,9 +1131,19 @@ namespace BlackMagicDevices
             IDeckLinkMutableVideoFrame* outputFrame = nullptr;
             const DeckLinkDataFormat& dataFormat =
                 m_decklinkDataFormats[m_internalDataFormat];
+
+            int32_t frameRowBytes = 0;
+            HRESULT hr = deckLinkOutput()->RowBytesForPixelFormat(
+                dataFormat.value, static_cast<int32_t>(m_frameWidth),
+                &frameRowBytes);
+            if (hr != S_OK)
+            {
+                throw runtime_error(
+                    "Cannot get the row bytes for the pixel format");
+            }
             if (m_outputAPI->CreateVideoFrame(
-                    m_frameWidth, m_frameHeight,
-                    bytesPerRow(dataFormat.value, m_frameWidth),
+                    static_cast<int32_t>(m_frameWidth),
+                    static_cast<int32_t>(m_frameHeight), frameRowBytes,
                     dataFormat.value, bmdFrameFlagFlipVertical, &outputFrame)
                 != S_OK)
             {
@@ -1852,26 +1862,6 @@ namespace BlackMagicDevices
 
                     m_totalPlayoutFrames++;
                 }
-        }
-    }
-
-    size_t DeckLinkVideoDevice::bytesPerRow(BMDPixelFormat bmdFormat,
-                                            size_t width) const
-    {
-        switch (bmdFormat)
-        {
-        case bmdFormat8BitYUV:
-            return m_frameWidth * 16 / 8;
-        case bmdFormat8BitBGRA:
-            return m_frameWidth * 32 / 8;
-        case bmdFormat10BitYUV:
-            return ((m_frameWidth + 47) / 48) * 128;
-        case bmdFormat10BitRGBXLE:
-            return ((m_frameWidth + 63) / 64) * 256;
-        case bmdFormat12BitRGBLE:
-            return (m_frameWidth * 36) / 8;
-        default:
-            TWK_THROW_EXC_STREAM("Unknown pixel format.");
         }
     }
 
