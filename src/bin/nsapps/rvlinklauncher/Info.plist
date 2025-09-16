@@ -5,7 +5,7 @@
     <key>CFBundleName</key>
     <string>RVLinkLauncher</string>
     <key>CFBundleIdentifier</key>
-    <string>com.autodesk.${_target}.${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
+    <string>com.autodesk.${RV_INTERNAL_APPLICATION_NAME}.${_target}.${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
     <key>CFBundleVersion</key>
     <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
     <key>CFBundleExecutable</key>
