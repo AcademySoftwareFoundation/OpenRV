@@ -62,9 +62,6 @@ namespace TwkApp
     // Helper function for direct cout printing
     static PyObject* unsafe_mu_print(PyObject* args)
     {
-        // const char *prefix = "Unsafe Mu print: ";
-        const char* prefix = "";
-
         size_t nargs = PyTuple_Size(args);
         if (nargs >= 1)
         {
@@ -73,7 +70,7 @@ namespace TwkApp
             {
                 const char* str = PyUnicode_AsUTF8(arg);
                 if (str)
-                    cout << prefix << str;
+                    cout << str;
             }
         }
         Py_RETURN_NONE;
