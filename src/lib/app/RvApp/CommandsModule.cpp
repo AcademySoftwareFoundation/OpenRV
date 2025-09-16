@@ -550,11 +550,16 @@ namespace Rv
             d->width() - m.left - m.right, d->height() - m.bottom - m.top, 4,
             TwkFB::FrameBuffer::UCHAR);
 
-        const ImageRenderer::GLFBO* fbo =
-            renderer->newOutputOnlyImageFBO(GL_RGBA8)->fbo();
+        // Get current framebuffer id.
+        GLuint qtDefaultFBO;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, (GLint*)&qtDefaultFBO);
+
         renderer->render(s->currentFrame(), s->displayImage());
 
         glFinish();
+
+        // Ensure we're reading from Qt's default framebuffer.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, d->fboID());
 
         glReadPixels(m.left, m.bottom, d->width() - m.left - m.right,
                      d->height() - m.bottom - m.top, GL_RGBA, GL_UNSIGNED_BYTE,
@@ -562,8 +567,8 @@ namespace Rv
 
         glFinish();
 
-        fbo->unbind();
-        renderer->releaseImageFBO(fbo);
+        // Restore original framebuffer.
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, qtDefaultFBO);
 
         TwkFB::FrameBufferIO::WriteRequest request;
         TwkFB::FrameBufferIO::ConstFrameBufferVector fbs(1);
@@ -1296,16 +1301,23 @@ namespace Rv
         const StringType* stype = c->stringType();
 
         vector<string> filesAndOptions;
+        vector<string> filesAndOptionsRemote;
         filesAndOptions.reserve(array->size());
-        for (size_t i = 0; i < array->size(); i++)
-            filesAndOptions.emplace_back(
-                array->element<StringType::String*>(i)->c_str());
+        filesAndOptionsRemote.reserve(array->size());
 
-        IPGraph::GraphEdit edit(s->graph());
+        for (size_t i = 0; i < array->size(); i++)
+        {
+
+            string arg = IPCore::Application::mapFromVar(
+                array->element<StringType::String*>(i)->c_str());
+            filesAndOptions.emplace_back(arg);
+            filesAndOptionsRemote.emplace_back(
+                IPCore::Application::mapToVar(arg));
+        }
 
         // silences broadcasting events below this constructor
         IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
-                                              filesAndOptions, tag);
+                                              filesAndOptionsRemote, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.
@@ -1377,15 +1389,18 @@ namespace Rv
         string tag = (muTag) ? muTag->c_str() : "";
 
         vector<string> sargs;
+        vector<string> sargsRemote;
 
         for (size_t i = 0; i < array->size(); i++)
         {
-            string arg = array->element<StringType::String*>(i)->c_str();
-            sargs.push_back(IPCore::Application::mapFromVar(arg));
+            string arg = IPCore::Application::mapFromVar(
+                array->element<StringType::String*>(i)->c_str());
+            sargs.push_back(arg);
+            sargsRemote.push_back(IPCore::Application::mapToVar(arg));
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargs, tag,
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargsRemote, tag,
                                               processOpts, merge);
 
         //
@@ -1413,28 +1428,31 @@ namespace Rv
         IPGraph::GraphEdit edit(s->graph());
 
         vector<vector<string>> allFilesAndOptions;
+        vector<vector<string>> allFilesAndOptionsRemote;
 
         for (size_t i = 0; i < array->size(); i++)
         {
             DynamicArray* currentSource = array->element<DynamicArray*>(i);
 
             vector<string> filesAndOptions;
+            vector<string> filesAndOptionsRemote;
             filesAndOptions.reserve(currentSource->size());
             for (size_t j = 0; j < currentSource->size(); j++)
             {
-                string arg =
-                    currentSource->element<StringType::String*>(j)->c_str();
-
-                filesAndOptions.emplace_back(
-                    IPCore::Application::mapFromVar(arg));
+                string arg = IPCore::Application::mapFromVar(
+                    currentSource->element<StringType::String*>(j)->c_str());
+                filesAndOptions.emplace_back(arg);
+                filesAndOptionsRemote.emplace_back(
+                    IPCore::Application::mapToVar(arg));
             }
 
             allFilesAndOptions.push_back(filesAndOptions);
+            allFilesAndOptionsRemote.push_back(filesAndOptionsRemote);
         }
 
         // silences broadcasting events below this constructor
         IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
-                                              allFilesAndOptions, tag);
+                                              allFilesAndOptionsRemote, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.

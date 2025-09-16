@@ -10,7 +10,6 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_NANOBIND" "2.7.0" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-
 SET(_download_url
     "https://github.com/wjakob/nanobind.git"
 )
@@ -19,8 +18,12 @@ SET(_git_commit
     "44ad9a9e5729abda24ef8dc9d76233d801e651e9"
 )
 
-SET(_patch_command_nanobind_windows_debug "")
-IF(RV_TARGET_WINDOWS AND CMAKE_BUILD_TYPE MATCHES "^Debug$")
+SET(_patch_command_nanobind_windows_debug
+    ""
+)
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
   SET(_patch_command_nanobind_windows_debug
       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/nanobind.windows.debug.patch
   )
@@ -33,26 +36,28 @@ IF(RV_TARGET_WINDOWS)
     )
   ELSE()
     SET(_nanobind_python_executable
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3.exe
+        ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3.exe
     )
   ENDIF()
 ELSE()
   SET(_nanobind_python_executable
-    ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3
+      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python3
   )
 ENDIF()
 
 # Set up dependencies - start with Python, add extra packages for CY2023.
-SET(_nanobind_dependencies Python::Python)
+SET(_nanobind_dependencies
+    Python::Python
+)
 
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_nanobind_python_extra_packages
-    "${_nanobind_python_executable}" -m pip install typing_extensions
+      "${_nanobind_python_executable}" -m pip install typing_extensions
   )
 
   # Create a stamp file to track nanobind installation
   SET(_nanobind_stamp
-    ${CMAKE_CURRENT_BINARY_DIR}/${_target}-extra-packages-stamp
+      ${CMAKE_CURRENT_BINARY_DIR}/${_target}-extra-packages-stamp
   )
 
   ADD_CUSTOM_COMMAND(
@@ -74,6 +79,10 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   LIST(APPEND _nanobind_dependencies ${_target}-extra-packages)
 ENDIF()
 
+LIST(APPEND _configure_options "-DNB_TEST=OFF")
+LIST(APPEND _configure_options "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
+LIST(APPEND _configure_options "-DPython_EXECUTABLE=${_nanobind_python_executable}")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   GIT_REPOSITORY "${_download_url}"
@@ -85,8 +94,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   UPDATE_COMMAND ""
   PATCH_COMMAND ${_patch_command_nanobind_windows_debug}
-  CONFIGURE_COMMAND 
-    ${CMAKE_COMMAND} ${_configure_options} -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install -DPython_EXECUTABLE=${_nanobind_python_executable}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_IN_SOURCE FALSE
@@ -95,7 +103,5 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
   DEPENDS ${_nanobind_dependencies}
 )
-
-
 
 ADD_DEPENDENCIES(dependencies RV_DEPS_NANOBIND)

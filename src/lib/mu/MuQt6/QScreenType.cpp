@@ -275,8 +275,19 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         QPoint arg1 = getqtype<QPointType>(param_point);
-        return makeinstance<QScreenType>(c, arg0->virtualSiblingAt(arg1),
-                                         "qt.QScreen");
+
+        // Retrieve the screen at point within the set of
+        // QScreen::virtualSiblings()
+        QScreen* screen = arg0->virtualSiblingAt(arg1);
+
+        // If no screen is found, return nullptr
+        if (!screen)
+        {
+            return nullptr;
+        }
+
+        // Create a new instance of QScreenType and return it
+        return makeinstance<QScreenType>(c, screen, "qt.QScreen");
     }
 
     Pointer qt_QScreen_virtualSize_QSize_QScreen(Mu::Thread& NODE_THREAD,
