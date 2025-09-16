@@ -60,7 +60,13 @@ namespace
 
         result = videoBuffer->GetBytes(buffer);
 
-        videoBuffer->EndAccess(bmdBufferAccessReadAndWrite);
+        result = videoBuffer->EndAccess(bmdBufferAccessReadAndWrite);
+        if (result != S_OK)
+        {
+            videoBuffer->Release();
+            return result;
+        }
+
         videoBuffer->Release();
 
         return result;
@@ -919,7 +925,6 @@ namespace BlackMagicDevices
 
             // Parse the HDR metadata provided and save it as a static in the
             // HDRVideoFrame::Provider class
-            // HDRVideoFrame::Provider class
             // Note that the same HDR metadata will be used for all the video
             // frames in the queue
             bool parsingSuccessful = HDRVideoFrame::SetHDRMetadata(hdrMetadata);
@@ -1199,23 +1204,14 @@ namespace BlackMagicDevices
 
         //
         //  Create the HDRVideoFrame::Providers
-        //  Create the HDRVideoFrame::Providers
         //  Note that no video frame memory will be allocated here, only a COM
-        //  object structure. An HDRVideoFrame::Provider manages HDR metadata
-        //  following BMD SDK 14.3+ best practices object structure. An
-        //  HDRVideoFrame::Provider manages HDR metadata following BMD SDK 14.3+
-        //  best practices following COM interfaces: IUnknown,
-        //  IDeckLinkVideoFrame, and IDeckLinkVideoFrameMetadataExtensions
-        //
+        //  object structure.
         if (m_useHDRMetadata)
         {
-            for (int i = 0; i < m_DLOutputVideoFrameQueue.size(); i++)
+            for (auto& videoFrame : m_DLOutputVideoFrameQueue)
             {
-                m_FrameToHDRFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
-                    std::make_unique<HDRVideoFrame::Provider>(
-                        m_DLOutputVideoFrameQueue.at(i));
-                std::make_unique<HDRVideoFrame::Provider>(
-                    m_DLOutputVideoFrameQueue.at(i));
+                m_FrameToHDRFrameMap[videoFrame] =
+                    std::make_unique<HDRVideoFrame::Provider>(videoFrame);
             }
         }
 
