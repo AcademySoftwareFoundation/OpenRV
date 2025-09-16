@@ -528,6 +528,15 @@ operator: & (Glyph; Glyph a, Glyph b)
         bsize = (h - m[2] - m[3]) / descriptors.size(),
         inregion = -1;
 
+    // Take device pixel ratio into account
+    // Note that w and h come from the domain.x and domain.y respectively which
+    // is the resolution in pixels of the viewable area that is already adjusted
+    // for devicePixelRatio, whereas x and y are mouse pointers which are not 
+    // adjusted for devicePixelRatio.
+    x *= devicePixelRatio;
+    y *= devicePixelRatio;
+    margin *= devicePixelRatio;
+
     for_index (i; descriptors)
     {
         gltext.size(20*devicePixelRatio);
