@@ -14,6 +14,8 @@
 extern "C"
 {
 #include <libavutil/pixfmt.h>
+#include <libavutil/dict.h>
+#include <libavutil/timecode.h>
 }
 
 //
@@ -216,6 +218,8 @@ namespace TwkMovie
         void finishTrackFBAttrs(FrameBuffer* fb, std::string view);
         void trackFromStreamIndex(int index, VideoTrack*& vTrack,
                                   AudioTrack*& aTrack);
+        void populateTimecodeMetadata(const AVDictionaryEntry* tcEntry, const AVTimecode& avTimecode);
+        AVRational getTimecodeRate(AVStream* tsStream, AVFormatContext* formatContext);
 
         //
         // Audio Methods
