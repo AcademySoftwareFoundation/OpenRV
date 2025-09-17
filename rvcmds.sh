@@ -183,8 +183,8 @@ alias rvclean='__rv_clean_build'
 alias rvappdir='cd ${RV_APP_DIR}'
 alias rvhomedir='cd ${RV_HOME}'
 alias rvhome='cd ${RV_HOME}'
-alias rvmk='rvbuild'
-alias rvbootstrap='rvsetup && rvcfg && rvbuild'
+alias rvmk='rvcfg && rvbuild'
+alias rvbootstrap='rvsetup && rvmk'
 
 # Set initial prompt when not in virtual environment
 __rv_set_first_prompt() {
