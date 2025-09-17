@@ -113,11 +113,25 @@ rvenv_shell() {
     activate_path=".venv/Scripts/activate"
   fi
 
+  # Deactivate first if already in a virtual environment to ensure fresh activation
+  if [ -n "$VIRTUAL_ENV" ]; then
+    deactivate 2>/dev/null || true
+  fi
+
   if [ -d ".venv" ]; then
     source "$activate_path"
   else
     python3 -m venv .venv
     source "$activate_path"
+  fi
+  
+  # Customize prompt based on build type
+  if [ -n "$RV_BUILD_TYPE" ]; then
+    if [ "$RV_BUILD_TYPE" = "Release" ]; then
+      export PS1="(.venv|rel) ${PS1#*) }"
+    elif [ "$RV_BUILD_TYPE" = "Debug" ]; then
+      export PS1="(.venv|dbg) ${PS1#*) }"
+    fi
   fi
 }
 
@@ -129,11 +143,19 @@ RV_INST="${RV_INST:-${RV_HOME}/_install}"
 RV_INST_DEBUG="${RV_INST_DEBUG:-${RV_HOME}/_install_debug}"
 RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.cpu_count())')}"
 
-# ALIASES: Basic commands
+RV_APP=""
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  RV_APP="${RV_BUILD}/stage/app/RV.app/Contents/MacOS"
+  RV_APP_DEBUG="${RV_BUILD_DEBUG}/stage/app/RV.app/Contents/MacOS"
+else
+  RV_APP="${RV_BUILD}/stage/app"
+  RV_APP_DEBUG="${RV_BUILD_DEBUG}/stage/app"
+fi
+
 alias rvenv="rvenv_shell"
 alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
-alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvcfgd="rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvcfg="export RV_BUILD_TYPE=Release && rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
+alias rvcfgd="export RV_BUILD_TYPE=Debug && rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
 alias rvbuildt="rvenv && cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuildtd="rvenv && cmake --build ${RV_BUILD_DEBUG} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
 alias rvbuild="rvenv && rvbuildt main_executable"
@@ -144,7 +166,8 @@ alias rvinst="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config 
 alias rvinstd="rvenv && cmake --install ${RV_BUILD_DEBUG} --prefix ${RV_INST_DEBUG} --config Debug"
 alias rvclean="rm -rf ${RV_BUILD} && rm -rf .venv"
 alias rvcleand="rm -rf ${RV_BUILD_DEBUG} && rm -rf .venv"
-
+alias rvappdir="cd ${RV_APP}"
+alias rvappdird="cd ${RV_APP_DEBUG}"
 # ALIASES: Config and Build
 
 alias rvmk="rvcfg && rvbuild"
