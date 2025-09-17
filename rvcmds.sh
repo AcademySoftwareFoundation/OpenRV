@@ -165,8 +165,6 @@ if [ -n "$VIRTUAL_ENV" ]; then
   deactivate
 fi
 
-echo "Debug: INIT_BUILD_TYPE='$INIT_BUILD_TYPE'"
-
 # Capture clean prompt before any RV modifications (only if not already set)
 if [ -z "$RV_CLEAN_PROMPT" ]; then
   RV_CLEAN_PROMPT="$PS1"
@@ -174,19 +172,19 @@ fi
 
 # Single set of aliases using current build variables
 # Note: Single quotes preserve variables for expansion at execution time
-alias rvenv="__rv_env_shell"
-alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
+alias rvenv='__rv_env_shell'
+alias rvsetup='rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt'
 alias rvcfg='rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
 alias rvbuildt='rvenv && cmake --build ${RV_BUILD_DIR} --config ${RV_BUILD_TYPE} -v --parallel=${RV_BUILD_PARALLELISM} --target '
-alias rvbuild="rvenv && rvbuildt main_executable"
+alias rvbuild='rvenv && rvbuildt main_executable'
 alias rvtest='rvenv && ctest --test-dir ${RV_BUILD_DIR} --extra-verbose'
 alias rvinst='rvenv && cmake --install ${RV_BUILD_DIR} --prefix ${RV_INST_DIR} --config ${RV_BUILD_TYPE}'
 alias rvclean='__rv_clean_build'
 alias rvappdir='cd ${RV_APP_DIR}'
 alias rvhomedir='cd ${RV_HOME}'
 alias rvhome='cd ${RV_HOME}'
-alias rvmk="rvbuild"
-alias rvbootstrap="rvsetup && rvcfg && rvbuild"
+alias rvmk='rvbuild'
+alias rvbootstrap='rvsetup && rvcfg && rvbuild'
 
 # Set initial prompt when not in virtual environment
 __rv_set_first_prompt() {
