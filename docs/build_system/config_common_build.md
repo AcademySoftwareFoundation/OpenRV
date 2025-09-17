@@ -46,9 +46,14 @@ Command-line aliases are provided to simplify the process of setting up the envi
 source rvcmds.sh
 ```
 
+By default, the commands and aliases will be configured for a release build, but you can swith between debug and release configurations by calling "rvdebug" or "rvrelease"
+
+
 #### 1.4 First-time build only: rvbootstrap
 
-This step only needs to be done on a freshly cloned git repository. Under the hood, this command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
+This step only needs to be done on a freshly cloned git repository, after you source rvcmds.sh. 
+
+Under the hood, this command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
 
 After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
 
@@ -60,7 +65,7 @@ rvbootstrap
 ```
 ```{code-tab} bash Debug
 # Produces unoptimized debug build in OpenRV/_build_debug
-rvbootstrapd
+rvbootstrap
 ```
 ````
 
@@ -93,8 +98,8 @@ rvmk
 rvmkd
 
 # Note: rvmkd is just an alias to these two commands:
-# rvcfgd      # sets environment variables
-# rvbuildd    # launches the build process
+# rvcfg       # sets environment variables
+# rvbuild     # launches the build process
 ```
 ````
 
@@ -109,7 +114,7 @@ Building the source dependencies is done automatically the first time we build O
 rvbuildt dependencies
 ```
 ```{code-tab} bash Debug
-rvbuildtd dependencies
+rvbuildt dependencies
 ```
 ````
 
@@ -143,6 +148,8 @@ OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV
 ```
 ````
 
+You can access the directory where the compiled binary is located by using the command "rvappdir" which should "cd" right into the correct directory (release or debug).
+
 
 ### 4. Contributing to Open RV 
 
@@ -175,7 +182,7 @@ Although not strictly enforced, it is highly suggested to enable clang-tidy loca
 
 ### 6. Cleaning up your build directory
 
-To clean your build directory and restart from a clean slate, use the `rvclean` (or `rvcleand`) alias, or delete the `_build` (or `_build_debug`) directory.
+To clean your build directory and restart from a clean slate, use the `rvclean` alias, or delete the `_build` (or `_build_debug`) directory.
 
 To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/to/third/party`.
 

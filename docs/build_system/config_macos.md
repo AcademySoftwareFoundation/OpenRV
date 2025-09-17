@@ -109,6 +109,9 @@ From the Open RV directory:
 source rvcmds.sh
 ```
 
+The aliases for the release and debug builds have been merged together. To control if the aliases operate on a release or debug build, call "rvdebug" or "rvrelease" from the command prompt.
+
+
 (build_openrv4)=
 ### Install Python dependencies
 
@@ -132,7 +135,7 @@ From the Open RV directory, the following command will configure CMake for the b
 rvcfg
 ```
 ```{code-tab} bash Debug
-rvcfgd
+rvcfg
 ```
 ````
 
@@ -146,7 +149,7 @@ From the Open RV directory, the following command will build the main executable
 rvbuild
 ```
 ```{code-tab} bash Debug
-rvbuildd
+rvbuild
 ```
 ````
 
