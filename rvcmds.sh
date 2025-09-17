@@ -197,7 +197,7 @@ __rv_set_first_prompt() {
     fi
     
     if [ -d "${RV_BUILD_DIR}" ]; then
-      export PS1="${build_prefix} (run rvcfg) $RV_CLEAN_PROMPT"
+      export PS1="${build_prefix} (run rvcfg/rvmk) $RV_CLEAN_PROMPT"
     else
       export PS1="${build_prefix} (run rvbootstrap) $RV_CLEAN_PROMPT"
     fi
