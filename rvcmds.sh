@@ -280,9 +280,14 @@ echo "Call 'rvbootstrap' if its your first time building or after calling rvclea
 echo "After 'rvbootstrap', use 'rvbuild' or 'rvmk' for incremental builds."
 echo
 
-# Initialize with appropriate build mode (after sourcing, if we were in debug, stay in debug)
+# Initialize with appropriate build mode
 if [ "$INIT_BUILD_TYPE" = "Debug" ]; then
   rvdebug
 else
-  rvrelease
+  # Check for existing build directories to determine best default
+  if [ -d "${RV_HOME}/_build_debug" ] && [ ! -d "${RV_HOME}/_build" ]; then
+    rvdebug
+  else
+    rvrelease
+  fi
 fi
