@@ -5575,8 +5575,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 \: audioCacheProgressGlyph (void; bool outline)
 {
     let (_, u, _) = cacheUsage(),
-        total     = (frameEnd() - frameStart()) / fps(),
-        pcent     = u / total;
+        total     = (frameEnd() - frameStart()) / fps();
+
+    if (total <= 0.0) return;
+
+    let pcent = u / total;
     
     glColor(Color(.25, .25, .25, 1));
     drawCircleFan(0, 0, 0.5, pcent, 1, .3, outline);
