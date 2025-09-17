@@ -114,6 +114,7 @@ namespace IPCore
         virtual void inputImageStructureChanged(int inputIndex,
                                                 PropagateTarget target);
         void lazyBuildState() const;
+        bool isValidEDLIndex(int index) const;
         bool interactiveSize(const Context&) const;
         void createDefaultEDLInternal(int append, const IPNodes& inputs) const;
         void updateInputDataInternal(const IPNodes& inputs) const;

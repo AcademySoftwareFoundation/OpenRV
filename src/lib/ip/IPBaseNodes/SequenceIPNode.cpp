@@ -130,6 +130,14 @@ namespace IPCore
                && c.viewHeight != 0;
     }
 
+    bool SequenceIPNode::isValidEDLIndex(int index) const
+    {
+        return index < m_edlSource->size()
+                && index < m_edlSourceIn->size()
+                && index < m_edlSourceOut->size()
+                && index < m_edlGlobalIn->size() && index >= 0;
+    }
+
     int SequenceIPNode::indexAtFrame(int frame) const
     {
         lazyBuildState();
@@ -220,16 +228,13 @@ namespace IPCore
 
         //
         //  Basically we are saying that if we have inputs, then make sure the
-        //  index we found does not exceed the valid range of indicies in our
+        //  index we found does not exceed the valid range of indices in our
         //  edl information.
         //
 
         if (inputs().size())
         {
-            if (index >= m_edlSource->size() - 1
-                || index >= m_edlSourceIn->size() - 1
-                || index >= m_edlSourceOut->size() - 1
-                || index >= m_edlGlobalIn->size() - 1 || index < 0)
+            if (!isValidEDLIndex(index))
             {
                 TWK_THROW_STREAM(SequenceOutOfBoundsExc,
                                  "Out-of-bounds EDL data");
@@ -278,6 +283,21 @@ namespace IPCore
             inputFrame = (*m_edlGlobalIn)[index];
             inputStart =
                 frameToSample(inputFrame - globalOffset, fps, sampleRate);
+        }
+
+        //
+        //  Basically we are saying that if we have inputs, then make sure the
+        //  index we found does not exceed the valid range of indices in our
+        //  edl information.
+        //
+
+        if (inputs().size())
+        {
+            if (!isValidEDLIndex(index))
+            {
+                TWK_THROW_STREAM(SequenceOutOfBoundsExc,
+                                 "Out-of-bounds EDL data");
+            }
         }
 
         return index;
