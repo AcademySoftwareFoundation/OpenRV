@@ -31,7 +31,6 @@
 #include <TwkGLF/GLFence.h>
 #include <stl_ext/thread_group.h>
 #include <deque>
-#include <BlackMagicDevices/HDRVideoFrame.h>
 #include <BlackMagicDevices/StereoVideoFrame.h>
 
 namespace BlackMagicDevices
@@ -102,8 +101,6 @@ namespace BlackMagicDevices
         using AudioBuffer = std::vector<int>;
         using StereoFrameMap =
             std::map<void*, std::unique_ptr<StereoVideoFrame::Provider>>;
-        using HDRVideoFrameMap =
-            std::map<void*, std::unique_ptr<HDRVideoFrame::Provider>>;
         using DLVideoFrameDeque = std::deque<IDeckLinkMutableVideoFrame*>;
 
         struct PBOData
@@ -147,6 +144,28 @@ namespace BlackMagicDevices
 
             void* audioData{nullptr};
             IDeckLinkVideoFrame* videoFrame{nullptr};
+        };
+
+        struct ChromaticityCoordinates
+        {
+            double RedX{0.0};
+            double RedY{0.0};
+            double GreenX{0.0};
+            double GreenY{0.0};
+            double BlueX{0.0};
+            double BlueY{0.0};
+            double WhiteX{0.0};
+            double WhiteY{0.0};
+        };
+
+        struct HDRMetadata
+        {
+            ChromaticityCoordinates referencePrimaries;
+            double minDisplayMasteringLuminance{0.0};
+            double maxDisplayMasteringLuminance{0.0};
+            double maxContentLightLevel{0.0};
+            double maxFrameAverageLightLevel{0.0};
+            int64_t electroOpticalTransferFunction{0};
         };
 
         using PBOQueue = std::deque<PBOData*>;
@@ -257,6 +276,10 @@ namespace BlackMagicDevices
                                        IDeckLinkMutableVideoFrame*) const;
         void ScheduleFrame() const;
 
+        std::string dumpHDRMetadata() const;
+        bool parseHDRMetadata(const std::string& data);
+        void setHDRMetadataOnFrame(IDeckLinkVideoFrame* frame) const;
+
     private:
         DeckLinkVideoFormatVector m_decklinkVideoFormats;
         DeckLinkDataFormatVector m_decklinkDataFormats;
@@ -271,8 +294,8 @@ namespace BlackMagicDevices
         mutable bool m_hasAudio;
         mutable StereoFrameMap
             m_rightEyeToStereoFrameMap; // indexed by the left eye
-        mutable HDRVideoFrameMap m_FrameToHDRFrameMap;
         mutable PBOQueue m_pboQueue;
+        HDRMetadata s_hdrMetadata;
         IDeckLinkOutput* m_outputAPI;
         IDeckLink* m_deviceAPI;
         IDeckLinkConfiguration* m_configuration;
