@@ -550,11 +550,16 @@ namespace Rv
             d->width() - m.left - m.right, d->height() - m.bottom - m.top, 4,
             TwkFB::FrameBuffer::UCHAR);
 
-        const ImageRenderer::GLFBO* fbo =
-            renderer->newOutputOnlyImageFBO(GL_RGBA8)->fbo();
+        // Get current framebuffer id.
+        GLuint qtDefaultFBO;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, (GLint*)&qtDefaultFBO);
+
         renderer->render(s->currentFrame(), s->displayImage());
 
         glFinish();
+
+        // Ensure we're reading from Qt's default framebuffer.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, d->fboID());
 
         glReadPixels(m.left, m.bottom, d->width() - m.left - m.right,
                      d->height() - m.bottom - m.top, GL_RGBA, GL_UNSIGNED_BYTE,
@@ -562,8 +567,8 @@ namespace Rv
 
         glFinish();
 
-        fbo->unbind();
-        renderer->releaseImageFBO(fbo);
+        // Restore original framebuffer.
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, qtDefaultFBO);
 
         TwkFB::FrameBufferIO::WriteRequest request;
         TwkFB::FrameBufferIO::ConstFrameBufferVector fbs(1);

@@ -2503,7 +2503,7 @@
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_5">
                   <property name="text">
-                   <string>Asyn I/O Chunk Size in Bytes</string>
+                   <string>Async I/O Chunk Size in Bytes</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2529,7 +2529,7 @@
                 <item row="3" column="0">
                  <widget class="QLabel" name="exrMaxInFlightLabel">
                   <property name="text">
-                   <string>Max Asyn Requests</string>
+                   <string>Max Async Requests</string>
                   </property>
                  </widget>
                 </item>

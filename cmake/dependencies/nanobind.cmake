@@ -79,6 +79,10 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   LIST(APPEND _nanobind_dependencies ${_target}-extra-packages)
 ENDIF()
 
+LIST(APPEND _configure_options "-DNB_TEST=OFF")
+LIST(APPEND _configure_options "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
+LIST(APPEND _configure_options "-DPython_EXECUTABLE=${_nanobind_python_executable}")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   GIT_REPOSITORY "${_download_url}"
@@ -90,8 +94,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   UPDATE_COMMAND ""
   PATCH_COMMAND ${_patch_command_nanobind_windows_debug}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DNB_TEST=OFF -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
-                    -DPython_EXECUTABLE=${_nanobind_python_executable}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_IN_SOURCE FALSE
