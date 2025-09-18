@@ -19,6 +19,7 @@
 #include <TwkUtil/ByteSwap.h>
 #include <algorithm>
 #include <cstddef>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <stl_ext/replace_alloc.h>
@@ -919,32 +920,28 @@ namespace BlackMagicDevices
 
             if (m_infoFeedback)
             {
-                cout << "INFO: BMD HDR Metadata input = " << hdrMetadata
-                     << endl;
+                std::cout << "INFO: BMD HDR Metadata input = " << hdrMetadata
+                          << '\n';
             }
 
-            // Parse the HDR metadata provided and save it as a static in the
-            // HDRVideoFrame::Provider class
+            // Parse the HDR metadata provided
             // Note that the same HDR metadata will be used for all the video
             // frames in the queue
-            bool parsingSuccessful = HDRVideoFrame::SetHDRMetadata(hdrMetadata);
-            if (parsingSuccessful)
+            bool parsingSuccessful = parseHDRMetadata(hdrMetadata);
+            if (parsingSuccessful && m_infoFeedback)
             {
-                if (m_infoFeedback)
-                {
-                    cout << "INFO: BMD HDR Metadata parsing successful =\n"
-                         << HDRVideoFrame::DumpHDRMetadata() << '\n';
-                }
+                std::cout << "INFO: BMD HDR Metadata parsing successful =\n"
+                          << dumpHDRMetadata() << '\n';
             }
             else
             {
                 m_useHDRMetadata = false;
                 if (m_infoFeedback)
                 {
-                    cout << "INFO: BMD HDR Metadata parsing error. HDR "
-                            "metadata will not "
-                            "be used"
-                         << '\n';
+                    std::cout << "INFO: BMD HDR Metadata parsing error. HDR "
+                                 "metadata will not "
+                                 "be used"
+                              << '\n';
                 }
             }
         }
@@ -1202,19 +1199,6 @@ namespace BlackMagicDevices
             }
         }
 
-        //
-        //  Create the HDRVideoFrame::Providers
-        //  Note that no video frame memory will be allocated here, only a COM
-        //  object structure.
-        if (m_useHDRMetadata)
-        {
-            for (auto& videoFrame : m_DLOutputVideoFrameQueue)
-            {
-                m_FrameToHDRFrameMap[videoFrame] =
-                    std::make_unique<HDRVideoFrame::Provider>(videoFrame);
-            }
-        }
-
         if (m_outputAPI->SetScheduledFrameCompletionCallback(this) != S_OK)
         {
             TWK_THROW_EXC_STREAM("Failed to set frame completion callback.");
@@ -1288,11 +1272,6 @@ namespace BlackMagicDevices
             if (m_stereo)
             {
                 m_rightEyeToStereoFrameMap.clear();
-            }
-
-            if (m_useHDRMetadata)
-            {
-                m_FrameToHDRFrameMap.clear();
             }
         }
 
@@ -1797,67 +1776,63 @@ namespace BlackMagicDevices
                 m_stereo ? m_readyStereoFrame->GetLeftFrame()
                          : (IDeckLinkVideoFrame*)m_readyFrame;
 
-            if (m_useHDRMetadata)
+            if (m_useHDRMetadata && (outputVideoFrame != nullptr))
             {
-                outputVideoFrame = m_FrameToHDRFrameMap[m_readyFrame].get();
-                m_FrameToHDRFrameMap[m_readyFrame].get();
+                setHDRMetadataOnFrame(outputVideoFrame);
             }
 
             if (outputVideoFrame != nullptr)
-                if (outputVideoFrame != nullptr)
+            {
+                // Prevent undesirable audio artifacts when repeating the
+                // same frame Note that some conditions might prevent RV
+                // from fetching a new frame in time. In this case the same
+                // frame has to be sent to the output. Repeating one frame
+                // has a minimal impact on the review session. However
+                // repeating the same audio snippet might cause an
+                // undesirable audio artifact. This is what we want to
+                // prevent here. Example of such a condition: when adding
+                // media to a sequence while a playback is already in
+                // progress for example,
+                bool skipAudioIfAny = false;
+                static IDeckLinkVideoFrame*
+                    previouslyScheduledOutputVideoFrame = nullptr;
+                if (outputVideoFrame == previouslyScheduledOutputVideoFrame)
                 {
-                    // Prevent undesirable audio artifacts when repeating the
-                    // same frame Note that some conditions might prevent RV
-                    // from fetching a new frame in time. In this case the same
-                    // frame has to be sent to the output. Repeating one frame
-                    // has a minimal impact on the review session. However
-                    // repeating the same audio snippet might cause an
-                    // undesirable audio artifact. This is what we want to
-                    // prevent here. Example of such a condition: when adding
-                    // media to a sequence while a playback is already in
-                    // progress for example,
-                    bool skipAudioIfAny = false;
-                    static IDeckLinkVideoFrame*
-                        previouslyScheduledOutputVideoFrame = nullptr;
-                    if (outputVideoFrame == previouslyScheduledOutputVideoFrame)
-                    {
-                        skipAudioIfAny = true;
-                    }
-                    previouslyScheduledOutputVideoFrame = outputVideoFrame;
-
-                    HRESULT r = m_outputAPI->ScheduleVideoFrame(
-                        outputVideoFrame,
-                        (m_totalPlayoutFrames * m_frameDuration),
-                        m_frameDuration, m_frameTimescale);
-
-                    if (r != S_OK)
-                        TWK_THROW_EXC_STREAM("Cannot schedule frame.");
-
-                    int rc = pthread_mutex_lock(&audioMutex);
-
-                    if (m_hasAudio && !skipAudioIfAny)
-                    {
-                        rc = pthread_mutex_unlock(&audioMutex);
-                        int index = (m_audioDataIndex == 1) ? 0 : 1;
-                        if (m_audioData[index]
-                            && m_outputAPI->ScheduleAudioSamples(
-                                   m_audioData[index], m_audioSamplesPerFrame,
-                                   (m_totalPlayoutFrames
-                                    * m_audioSamplesPerFrame),
-                                   bmdAudioSampleRate48kHz, NULL)
-                                   != S_OK)
-                        {
-                            TWK_THROW_EXC_STREAM(
-                                "Failed to perform audio transfers.");
-                        }
-                    }
-                    else
-                    {
-                        rc = pthread_mutex_unlock(&audioMutex);
-                    }
-
-                    m_totalPlayoutFrames++;
+                    skipAudioIfAny = true;
                 }
+                previouslyScheduledOutputVideoFrame = outputVideoFrame;
+
+                HRESULT r = m_outputAPI->ScheduleVideoFrame(
+                    outputVideoFrame, (m_totalPlayoutFrames * m_frameDuration),
+                    m_frameDuration, m_frameTimescale);
+
+                if (r != S_OK)
+                    TWK_THROW_EXC_STREAM("Cannot schedule frame.");
+
+                int rc = pthread_mutex_lock(&audioMutex);
+
+                if (m_hasAudio && !skipAudioIfAny)
+                {
+                    rc = pthread_mutex_unlock(&audioMutex);
+                    int index = (m_audioDataIndex == 1) ? 0 : 1;
+                    if (m_audioData[index]
+                        && m_outputAPI->ScheduleAudioSamples(
+                               m_audioData[index], m_audioSamplesPerFrame,
+                               (m_totalPlayoutFrames * m_audioSamplesPerFrame),
+                               bmdAudioSampleRate48kHz, NULL)
+                               != S_OK)
+                    {
+                        TWK_THROW_EXC_STREAM(
+                            "Failed to perform audio transfers.");
+                    }
+                }
+                else
+                {
+                    rc = pthread_mutex_unlock(&audioMutex);
+                }
+
+                m_totalPlayoutFrames++;
+            }
         }
     }
 
@@ -1891,6 +1866,337 @@ namespace BlackMagicDevices
             m_outputAPI->StartScheduledPlayback(0, 100, 1.0);
         }
         return S_OK;
+    }
+
+    std::string DeckLinkVideoDevice::dumpHDRMetadata() const
+    {
+        std::ostringstream hdrMetedata;
+
+        hdrMetedata << "redPrimaryX:                    "
+                    << s_hdrMetadata.referencePrimaries.RedX << '\n'
+                    << "redPrimaryY:                    "
+                    << s_hdrMetadata.referencePrimaries.RedY << '\n'
+                    << "greenPrimaryX:                  "
+                    << s_hdrMetadata.referencePrimaries.GreenX << '\n'
+                    << "greenPrimaryY:                  "
+                    << s_hdrMetadata.referencePrimaries.GreenY << '\n'
+                    << "bluePrimaryX:                   "
+                    << s_hdrMetadata.referencePrimaries.BlueX << '\n'
+                    << "bluePrimaryY:                   "
+                    << s_hdrMetadata.referencePrimaries.BlueY << '\n'
+                    << "whitePointX:                    "
+                    << s_hdrMetadata.referencePrimaries.WhiteX << '\n'
+                    << "whitePointY:                    "
+                    << s_hdrMetadata.referencePrimaries.WhiteY << '\n'
+                    << "minMasteringLuminance:          "
+                    << s_hdrMetadata.minDisplayMasteringLuminance << '\n'
+                    << "maxMasteringLuminance:          "
+                    << s_hdrMetadata.maxDisplayMasteringLuminance << '\n'
+                    << "maxContentLightLevel:           "
+                    << s_hdrMetadata.maxContentLightLevel << '\n'
+                    << "maxFrameAverageLightLevel:      "
+                    << s_hdrMetadata.maxFrameAverageLightLevel << '\n'
+                    << "electroOpticalTransferFunction: "
+                    << s_hdrMetadata.electroOpticalTransferFunction << '\n';
+        return hdrMetedata.str();
+    }
+
+    bool DeckLinkVideoDevice::parseHDRMetadata(const std::string& data)
+    {
+        // Very, very basic and brutal parsing routine for the hdr
+        // argument string.
+        // No error checking, no validation, no plan B, data must be
+        // exactly as expected or it won't work.
+        //
+        // Sample values :
+        //    redPrimaryX:                    0.708000004
+        //    redPrimaryY:                    0.291999996
+        //    greenPrimaryX:                  0.170000002
+        //    greenPrimaryY:                  0.79699999
+        //    bluePrimaryX:                   0.130999997
+        //    bluePrimaryY:                   0.0460000001
+        //    whitePointX:                    0.312700003
+        //    whitePointY:                    0.328999996
+        //    minMasteringLuminance:          0.00499999989
+        //    maxMasteringLuminance:          10000.0
+        //    maxContentLightLevel:           0.0
+        //    maxFrameAverageLightLevel:      0.0
+        //    electroOpticalTransferFunction: 2
+        //
+        // Expected format (to be entered in the "Additional Options"
+        // box of the Video preferences panel):
+        //
+        // --hdmi-hdr-metadata=0.708000004,0.291999996,0.170000002,0.79699999,0.130999997,0.0460000001,0.312700003,0.328999996,0.00499999989,10000.0,0.0,0.0,2
+        //
+        // or via env var:
+        //
+        // setenv TWK_BLACKMAGIC_HDMI_HDR_METADATA
+        // "0.708000004,0.291999996,0.170000002,0.79699999,0.130999997,0.0460000001,0.312700003,0.328999996,0.00499999989,10000.0,0.0,0.0,2"
+        //
+        // (the types - float vs int - are important!)
+
+        size_t pos0 = 0;
+        size_t pos1;
+
+        // redPrimaryX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.RedX =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // redPrimaryY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.RedY =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // greenPrimaryX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.GreenX =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // greenPrimaryY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.GreenY =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // bluePrimaryX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.BlueX =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // bluePrimaryY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.BlueY =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // whitePointX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.WhiteX =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // whitePointY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.WhiteY =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // minMasteringLuminance
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.minDisplayMasteringLuminance =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // maxMasteringLuminance
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.maxDisplayMasteringLuminance =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // maxContentLightLevel
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.maxContentLightLevel =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // maxFrameAverageLightLevel
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.maxFrameAverageLightLevel =
+            atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // electroOpticalTransferFunction (last value, no comma)
+        s_hdrMetadata.electroOpticalTransferFunction =
+            atoll(data.substr(pos0).c_str());
+
+        return true;
+    }
+
+    void
+    DeckLinkVideoDevice::setHDRMetadataOnFrame(IDeckLinkVideoFrame* frame) const
+    {
+        if (!frame || !m_useHDRMetadata)
+            return;
+
+        IDeckLinkVideoFrameMutableMetadataExtensions* metadataExtensions =
+            nullptr;
+        auto result = frame->QueryInterface(
+            IID_IDeckLinkVideoFrameMutableMetadataExtensions,
+            reinterpret_cast<void**>(&metadataExtensions));
+
+        if (result != S_OK || metadataExtensions == nullptr)
+        {
+            if (m_infoFeedback)
+            {
+                cout << "WARNING: Failed to query HDR metadata extensions "
+                        "interface\n";
+            }
+            return;
+        }
+
+        // Set colorspace to Rec.2020
+        result = metadataExtensions->SetInt(bmdDeckLinkFrameMetadataColorspace,
+                                            bmdColorspaceRec2020);
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set colorspace metadata\n";
+        }
+
+        // Set EOTF
+        result = metadataExtensions->SetInt(
+            bmdDeckLinkFrameMetadataHDRElectroOpticalTransferFunc,
+            s_hdrMetadata.electroOpticalTransferFunction);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set EOTF metadata\n";
+        }
+
+        // Set display primaries
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedX,
+            s_hdrMetadata.referencePrimaries.RedX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries red X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedY,
+            s_hdrMetadata.referencePrimaries.RedY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries red Y metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenX,
+            s_hdrMetadata.referencePrimaries.GreenX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries green X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenY,
+            s_hdrMetadata.referencePrimaries.GreenY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries green Y metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRDisplayPrimariesBlueX,
+            s_hdrMetadata.referencePrimaries.BlueX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries blue X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRDisplayPrimariesBlueY,
+            s_hdrMetadata.referencePrimaries.BlueY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries blue Y metadata\n";
+        }
+
+        // Set white point
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRWhitePointX,
+            s_hdrMetadata.referencePrimaries.WhiteX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries white X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRWhitePointY,
+            s_hdrMetadata.referencePrimaries.WhiteY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries white Y metadata\n";
+        }
+
+        // Set luminance levels
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRMaxDisplayMasteringLuminance,
+            s_hdrMetadata.maxDisplayMasteringLuminance);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set max display mastering "
+                         "luminance metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRMinDisplayMasteringLuminance,
+            s_hdrMetadata.minDisplayMasteringLuminance);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set min display mastering "
+                         "luminance metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRMaximumContentLightLevel,
+            s_hdrMetadata.maxContentLightLevel);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set maximum content light level "
+                         "metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(
+            bmdDeckLinkFrameMetadataHDRMaximumFrameAverageLightLevel,
+            s_hdrMetadata.maxFrameAverageLightLevel);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set maximum frame average light "
+                         "level metadata\n";
+        }
+
+        metadataExtensions->Release();
     }
 
 } // namespace BlackMagicDevices
