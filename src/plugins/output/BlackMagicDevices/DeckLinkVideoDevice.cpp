@@ -1189,13 +1189,23 @@ namespace BlackMagicDevices
         {
             for (int i = 1; i < m_DLOutputVideoFrameQueue.size(); i += 2)
             {
-                m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
+                auto stereoVideoFrameProvider =
                     std::make_unique<StereoVideoFrame::Provider>(
                         m_DLOutputVideoFrameQueue.at(i - 1),
                         m_DLOutputVideoFrameQueue.at(i));
-                std::make_unique<StereoVideoFrame::Provider>(
-                    m_DLOutputVideoFrameQueue.at(i - 1),
-                    m_DLOutputVideoFrameQueue.at(i));
+
+                HRESULT result =
+                    m_DLOutputVideoFrameQueue.at(i - 1)->SetInterfaceProvider(
+                        IID_IDeckLinkVideoFrame3DExtensions,
+                        stereoVideoFrameProvider.get());
+                if (result != S_OK)
+                {
+                    throw runtime_error("Failed to set stereo interface "
+                                        "provider on left frame.");
+                }
+
+                m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
+                    std::move(stereoVideoFrameProvider);
             }
         }
 

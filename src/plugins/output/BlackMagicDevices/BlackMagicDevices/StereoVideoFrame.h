@@ -51,45 +51,53 @@ typedef __int32 int32_t;
 #endif
 
 #include <boost/thread.hpp>
+#include <atomic>
 
 /*
  * An example class which may be used to output a frame or pair of frames to
  * a 3D capable output.
  *
- * This class implements a Provider for the IDeckLinkVideoFrame interface.
- * This class implements a Provider for the IDeckLinkVideoFrame interface.
+ * This class implements the IDeckLinkVideoFrame3DExtensions interface following
+ * the BMD provider pattern.
+ *
+ * The Provider class manages the relationship between the video frame and
+ * the 3D extensions, and is associated with the video frame using
+ * SetInterfaceProvider().
  *
  * Access to the right frame through the IDeckLinkVideoFrame3DExtensions
- * interface via StereoVideoFrame::Provider::QueryInterface pattern:
- * interface via StereoVideoFrame::Provider::QueryInterface pattern:
+ * interface:
  *
- * 	IDeckLinkVideoFrame *rightEyeFrame;
- * 	stereoProvider->QueryInterface(IID_IDeckLinkVideoFrame3DExtensions,
- * (void**)&extensions); hr = extensions->GetFrameForRightEye(&rightEyeFrame);
- * 	stereoProvider->QueryInterface(IID_IDeckLinkVideoFrame3DExtensions,
+ * 	IDeckLinkVideoFrame3DExtensions *extensions;
+ * 	hr = leftEyeFrame->QueryInterface(IID_IDeckLinkVideoFrame3DExtensions,
  * (void**)&extensions); hr = extensions->GetFrameForRightEye(&rightEyeFrame);
  *
  * After which IDeckLinkVideoFrame operations are performed directly
  * on the rightEyeFrame object.
  */
 
-class StereoVideoFrame
+class StereoVideoFrame : public IDeckLinkVideoFrame3DExtensions
 {
 public:
     using ScopedLock = boost::mutex::scoped_lock;
     using Mutex = boost::mutex;
     using Condition = boost::condition_variable;
 
-    StereoVideoFrame(IDeckLinkMutableVideoFrame* left,
-                     IDeckLinkMutableVideoFrame& right);
-    ~StereoVideoFrame() = default;
+    // IUnknown methods
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv) override;
+    ULONG STDMETHODCALLTYPE AddRef() override;
+    ULONG STDMETHODCALLTYPE Release() override;
 
-    class Provider : public IDeckLinkVideoFrame3DExtensions
+    // IDeckLinkVideoFrame3DExtensions methods
+    BMDVideo3DPackingFormat STDMETHODCALLTYPE Get3DPackingFormat() override;
+    HRESULT STDMETHODCALLTYPE
+    GetFrameForRightEye(/* out */ IDeckLinkVideoFrame** rightEyeFrame) override;
+
+    class Provider : public IUnknown
     {
     public:
-        explicit Provider(IDeckLinkMutableVideoFrame* left,
-                          IDeckLinkMutableVideoFrame* right = nullptr);
-        virtual ~Provider();
+        Provider(IDeckLinkMutableVideoFrame* parent,
+                 IDeckLinkMutableVideoFrame* right);
+        virtual ~Provider() = default;
 
         // IUnknown methods
         HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid,
@@ -97,21 +105,21 @@ public:
         ULONG STDMETHODCALLTYPE AddRef() override;
         ULONG STDMETHODCALLTYPE Release() override;
 
-        // IDeckLinkVideoFrame3DExtensions methods
-        BMDVideo3DPackingFormat STDMETHODCALLTYPE Get3DPackingFormat() override;
-        HRESULT STDMETHODCALLTYPE GetFrameForRightEye(
-            /* out */ IDeckLinkVideoFrame** rightEyeFrame) override;
+        IDeckLinkVideoFrame* GetLeftFrame() const { return m_parentFrame; }
 
-        IDeckLinkVideoFrame* GetLeftFrame() const { return m_frameLeft; }
-
-        IDeckLinkVideoFrame* GetRightFrame() const { return m_frameRight; }
-
-        bool IsStereo() const { return m_frameRight != nullptr; }
+        IDeckLinkVideoFrame* GetRightFrame() const { return m_rightFrame; }
 
     private:
-        IDeckLinkMutableVideoFrame* m_frameLeft;
-        IDeckLinkMutableVideoFrame* m_frameRight;
-        int32_t m_refCount;
-        mutable Mutex m_refMutex;
+        IDeckLinkMutableVideoFrame* m_parentFrame;
+        IDeckLinkMutableVideoFrame* m_rightFrame;
+        std::atomic<ULONG> m_refCount;
     };
+
+private:
+    StereoVideoFrame(IDeckLinkMutableVideoFrame* parent,
+                     IDeckLinkMutableVideoFrame* right);
+
+    IDeckLinkMutableVideoFrame* m_frameLeft;
+    IDeckLinkMutableVideoFrame* m_frameRight;
+    std::atomic<ULONG> m_refCount;
 };
