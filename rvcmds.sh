@@ -246,19 +246,19 @@ fi
 
 # Single set of aliases using current build variables
 # Note: Single quotes preserve variables for expansion at execution time
-alias rvenv='__rv_env_shell'
+alias rvappdir='cd ${RV_APP_DIR}'
+alias rvhomedir='cd ${RV_HOME}'
+alias rvenv='rvhomedir && __rv_env_shell'
 alias rvsetup='rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt'
-alias rvcfg='rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
+alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
 alias rvbuildt='rvenv && cmake --build ${RV_BUILD_DIR} --config ${RV_BUILD_TYPE} -v --parallel=${RV_BUILD_PARALLELISM} --target '
 alias rvbuild='rvenv && rvbuildt main_executable'
 alias rvtest='rvenv && ctest --test-dir ${RV_BUILD_DIR} --extra-verbose'
 alias rvinst='rvenv && cmake --install ${RV_BUILD_DIR} --prefix ${RV_INST_DIR} --config ${RV_BUILD_TYPE}'
-alias rvclean='__rv_clean_build'
-alias rvappdir='cd ${RV_APP_DIR}'
-alias rvhomedir='cd ${RV_HOME}'
-alias rvhome='cd ${RV_HOME}'
+alias rvclean='rvhomedir && __rv_clean_build'
 alias rvmk='rvcfg && rvbuild'
 alias rvbootstrap='rvsetup && rvmk'
+alias rvrun='rvappdir && ./rv'
 
 echo "Please ensure you have installed any required dependencies from doc/build_system/config_[os]"
 echo
