@@ -57,8 +57,8 @@ typedef __int32 int32_t;
  * An example class which may be used to output a frame or pair of frames to
  * a 3D capable output.
  *
- * This class implements the IDeckLinkVideoFrame3DExtensions interface following
- * the BMD provider pattern.
+ * This class implements the IDeckLinkVideoFrame3DExtensions interface which can
+ * be used to operate on the left frame following the BMD provider pattern
  *
  * The Provider class manages the relationship between the video frame and
  * the 3D extensions, and is associated with the video frame using
@@ -67,9 +67,10 @@ typedef __int32 int32_t;
  * Access to the right frame through the IDeckLinkVideoFrame3DExtensions
  * interface:
  *
- * 	IDeckLinkVideoFrame3DExtensions *extensions;
- * 	hr = leftEyeFrame->QueryInterface(IID_IDeckLinkVideoFrame3DExtensions,
- * (void**)&extensions); hr = extensions->GetFrameForRightEye(&rightEyeFrame);
+ * IDeckLinkVideoFrame3DExtensions *threeDimensionalFrame;
+ * result = leftEyeFrame->QueryInterface(IID_IDeckLinkVideoFrame3DExtensions,
+ * reinterpret_cast<void**>(&threeDimensionalFrame);
+ * result = threeDimensionalFrame->GetFrameForRightEye(&rightEyeFrame);
  *
  * After which IDeckLinkVideoFrame operations are performed directly
  * on the rightEyeFrame object.
@@ -81,6 +82,13 @@ public:
     using ScopedLock = boost::mutex::scoped_lock;
     using Mutex = boost::mutex;
     using Condition = boost::condition_variable;
+
+    virtual ~StereoVideoFrame();
+
+    StereoVideoFrame(const StereoVideoFrame&) = delete;
+    StereoVideoFrame& operator=(const StereoVideoFrame&) = delete;
+    StereoVideoFrame(StereoVideoFrame&&) = delete;
+    StereoVideoFrame& operator=(StereoVideoFrame&&) = delete;
 
     // IUnknown methods
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv) override;
@@ -97,7 +105,12 @@ public:
     public:
         Provider(IDeckLinkMutableVideoFrame* parent,
                  IDeckLinkMutableVideoFrame* right);
-        virtual ~Provider() = default;
+        virtual ~Provider();
+
+        Provider(const Provider&) = delete;
+        Provider& operator=(const Provider&) = delete;
+        Provider(Provider&&) = delete;
+        Provider& operator=(Provider&&) = delete;
 
         // IUnknown methods
         HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid,
@@ -107,8 +120,6 @@ public:
 
         IDeckLinkVideoFrame* GetLeftFrame() const { return m_parentFrame; }
 
-        IDeckLinkVideoFrame* GetRightFrame() const { return m_rightFrame; }
-
     private:
         IDeckLinkMutableVideoFrame* m_parentFrame;
         IDeckLinkMutableVideoFrame* m_rightFrame;
@@ -116,7 +127,9 @@ public:
     };
 
 private:
-    StereoVideoFrame(IDeckLinkMutableVideoFrame* parent,
+    friend class Provider;
+
+    StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
                      IDeckLinkMutableVideoFrame* right);
 
     IDeckLinkMutableVideoFrame* m_frameLeft;

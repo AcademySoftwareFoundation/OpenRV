@@ -56,49 +56,26 @@ StereoVideoFrame::Provider::Provider(IDeckLinkMutableVideoFrame* parent,
 {
     if (m_parentFrame == nullptr)
     {
-        throw std::invalid_argument(
-            "At least a parent frame should be defined");
+        throw std::invalid_argument("At least a left frame should be defined");
     }
-    m_parentFrame->AddRef();
     if (m_rightFrame != nullptr)
     {
         m_rightFrame->AddRef();
     }
 }
 
+StereoVideoFrame::Provider::~Provider()
+{
+    if (m_rightFrame != nullptr)
+    {
+        m_rightFrame->Release();
+    }
+}
+
 HRESULT StereoVideoFrame::Provider::QueryInterface(REFIID iid, LPVOID* ppv)
 {
-    if (ppv == nullptr)
-    {
-        return E_POINTER;
-    }
-
-    *ppv = nullptr;
-
-#ifdef PLATFORM_DARWIN
-    CFUUIDBytes iunknown = CFUUIDGetUUIDBytes(IUnknownUUID);
-#else
-    REFIID iunknown = IID_IUnknown;
-#endif
-
-    if (CompareREFIID(iid, iunknown))
-    {
-        *ppv = static_cast<IUnknown*>(this);
-        AddRef();
-        return S_OK;
-    }
-
-    if (CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
-    {
-        std::unique_ptr<StereoVideoFrame> stereoFrame(
-            new StereoVideoFrame(m_parentFrame, m_rightFrame));
-        *ppv = static_cast<IDeckLinkVideoFrame3DExtensions*>(
-            stereoFrame.release());
-
-        return S_OK;
-    }
-
-    return m_parentFrame->QueryInterface(iid, ppv);
+    return (new StereoVideoFrame(m_parentFrame, m_rightFrame))
+        ->QueryInterface(iid, ppv);
 }
 
 ULONG StereoVideoFrame::Provider::AddRef()
@@ -127,12 +104,34 @@ ULONG StereoVideoFrame::Provider::Release()
 #endif
 }
 
-StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* parent,
+StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
                                    IDeckLinkMutableVideoFrame* right)
-    : m_frameLeft(parent)
+    : m_frameLeft(owner)
     , m_frameRight(right)
     , m_refCount(1)
 {
+    if (m_frameLeft == nullptr)
+    {
+        throw std::invalid_argument("At minimum a left frame must be defined");
+    }
+
+    m_frameLeft->AddRef();
+    if (m_frameRight != nullptr)
+    {
+        m_frameRight->AddRef();
+    }
+}
+
+StereoVideoFrame::~StereoVideoFrame()
+{
+    if (m_frameLeft != nullptr)
+    {
+        m_frameLeft->Release();
+    }
+    if (m_frameRight != nullptr)
+    {
+        m_frameRight->Release();
+    }
 }
 
 HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
@@ -147,15 +146,12 @@ HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
         || CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
     {
         *ppv = static_cast<IDeckLinkVideoFrame3DExtensions*>(this);
-    }
-    else
-    {
-        *ppv = nullptr;
-        return E_NOINTERFACE;
+        AddRef();
+        return S_OK;
     }
 
-    AddRef();
-    return S_OK;
+    *ppv = nullptr;
+    return E_NOINTERFACE;
 }
 
 ULONG StereoVideoFrame::AddRef()
