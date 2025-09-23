@@ -550,11 +550,16 @@ namespace Rv
             d->width() - m.left - m.right, d->height() - m.bottom - m.top, 4,
             TwkFB::FrameBuffer::UCHAR);
 
-        const ImageRenderer::GLFBO* fbo =
-            renderer->newOutputOnlyImageFBO(GL_RGBA8)->fbo();
+        // Get current framebuffer id.
+        GLuint qtDefaultFBO;
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, (GLint*)&qtDefaultFBO);
+
         renderer->render(s->currentFrame(), s->displayImage());
 
         glFinish();
+
+        // Ensure we're reading from Qt's default framebuffer.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, d->fboID());
 
         glReadPixels(m.left, m.bottom, d->width() - m.left - m.right,
                      d->height() - m.bottom - m.top, GL_RGBA, GL_UNSIGNED_BYTE,
@@ -562,8 +567,8 @@ namespace Rv
 
         glFinish();
 
-        fbo->unbind();
-        renderer->releaseImageFBO(fbo);
+        // Restore original framebuffer.
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, qtDefaultFBO);
 
         TwkFB::FrameBufferIO::WriteRequest request;
         TwkFB::FrameBufferIO::ConstFrameBufferVector fbs(1);
@@ -1296,16 +1301,48 @@ namespace Rv
         const StringType* stype = c->stringType();
 
         vector<string> filesAndOptions;
+        vector<string> filesAndOptionsRemote;
         filesAndOptions.reserve(array->size());
-        for (size_t i = 0; i < array->size(); i++)
-            filesAndOptions.emplace_back(
-                array->element<StringType::String*>(i)->c_str());
+        filesAndOptionsRemote.reserve(array->size());
 
-        IPGraph::GraphEdit edit(s->graph());
+        for (size_t i = 0; i < array->size(); i++)
+        {
+
+            string arg = IPCore::Application::mapFromVar(
+                array->element<StringType::String*>(i)->c_str());
+            filesAndOptions.emplace_back(arg);
+            filesAndOptionsRemote.emplace_back(
+                IPCore::Application::mapToVar(arg));
+        }
+
+        // silences broadcasting events below this constructor
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
+                                              filesAndOptionsRemote, tag);
+
+        // Now that we've broadcast the remote event, complete the work without
+        // broadcasting anything else.
 
         if (Options::sharedOptions().delaySessionLoading)
         {
-            s->userGenericEvent("before-progressive-loading", "");
+            // Note: It was decided to trigger the before-progressive-loading
+            // event even when progressive source loading is disabled as per the
+            // documentation. When progressive source loading is enabled, we
+            // have to check that some media is not already loading before
+            // triggering the event because the after-progressive-loading event
+            // is triggered when all the media are loaded, and we don't want to
+            // trigger it if some media is still loading, otherwise we would end
+            // up with an imbalance between the before-progressive-loading and
+            // after-progressive-loading events. This is the reason why we check
+            // if the graph isMediaLoading() before triggering the
+            // before-progressive-loading event.
+            // If progressive source loading is disabled, we don't have to check
+            // if the graph isMediaLoading() because this mechanism is not used
+            // in that case.
+            if (!Options::sharedOptions().progressiveSourceLoading
+                || !s->graph().isMediaLoading())
+            {
+                s->userGenericEvent("before-progressive-loading", "");
+            }
 
             // Note: It was decided to trigger the
             // before-progressive-proxy-loading event even when progressive
@@ -1352,15 +1389,18 @@ namespace Rv
         string tag = (muTag) ? muTag->c_str() : "";
 
         vector<string> sargs;
+        vector<string> sargsRemote;
 
         for (size_t i = 0; i < array->size(); i++)
         {
-            string arg = array->element<StringType::String*>(i)->c_str();
-            sargs.push_back(IPCore::Application::mapFromVar(arg));
+            string arg = IPCore::Application::mapFromVar(
+                array->element<StringType::String*>(i)->c_str());
+            sargs.push_back(arg);
+            sargsRemote.push_back(IPCore::Application::mapToVar(arg));
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargs, tag,
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargsRemote, tag,
                                               processOpts, merge);
 
         //
@@ -1387,42 +1427,63 @@ namespace Rv
         names->resize(array->size());
         IPGraph::GraphEdit edit(s->graph());
 
-        if (Options::sharedOptions().delaySessionLoading)
-        {
-            s->userGenericEvent("before-progressive-loading", "");
-
-            // Note: It was decided to trigger the
-            // before-progressive-proxy-loading event even when progressive
-            // source loading is disabled
-            s->userGenericEvent("before-progressive-proxy-loading", "");
-        }
-
         vector<vector<string>> allFilesAndOptions;
+        vector<vector<string>> allFilesAndOptionsRemote;
 
         for (size_t i = 0; i < array->size(); i++)
         {
             DynamicArray* currentSource = array->element<DynamicArray*>(i);
 
             vector<string> filesAndOptions;
+            vector<string> filesAndOptionsRemote;
             filesAndOptions.reserve(currentSource->size());
             for (size_t j = 0; j < currentSource->size(); j++)
             {
-                string arg =
-                    currentSource->element<StringType::String*>(j)->c_str();
-
-                filesAndOptions.emplace_back(
-                    IPCore::Application::mapFromVar(arg));
+                string arg = IPCore::Application::mapFromVar(
+                    currentSource->element<StringType::String*>(j)->c_str());
+                filesAndOptions.emplace_back(arg);
+                filesAndOptionsRemote.emplace_back(
+                    IPCore::Application::mapToVar(arg));
             }
 
             allFilesAndOptions.push_back(filesAndOptions);
+            allFilesAndOptionsRemote.push_back(filesAndOptionsRemote);
         }
 
         // silences broadcasting events below this constructor
         IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
-                                              allFilesAndOptions, tag);
+                                              allFilesAndOptionsRemote, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.
+
+        if (Options::sharedOptions().delaySessionLoading)
+        {
+            // Note: It was decided to trigger the before-progressive-loading
+            // event even when progressive source loading is disabled as per the
+            // documentation. When progressive source loading is enabled, we
+            // have to check that some media is not already loading before
+            // triggering the event because the after-progressive-loading event
+            // is triggered when all the media are loaded, and we don't want to
+            // trigger it if some media is still loading, otherwise we would end
+            // up with an imbalance between the before-progressive-loading and
+            // after-progressive-loading events. This is the reason why we check
+            // if the graph isMediaLoading() before triggering the
+            // before-progressive-loading event.
+            // If progressive source loading is disabled, we don't have to check
+            // if the graph isMediaLoading() because this mechanism is not used
+            // in that case.
+            if (!Options::sharedOptions().progressiveSourceLoading
+                || !s->graph().isMediaLoading())
+            {
+                s->userGenericEvent("before-progressive-loading", "");
+            }
+
+            // Note: It was decided to trigger the
+            // before-progressive-proxy-loading event even when progressive
+            // source loading is disabled
+            s->userGenericEvent("before-progressive-proxy-loading", "");
+        }
 
         for (size_t i = 0; i < allFilesAndOptions.size(); i++)
         {

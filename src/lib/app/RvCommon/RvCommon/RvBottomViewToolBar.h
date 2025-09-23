@@ -12,6 +12,8 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QSlider>
 #include <TwkApp/EventNode.h>
+#include <QAction>
+#include <unordered_map>
 
 namespace IPCore
 {
@@ -68,6 +70,7 @@ namespace Rv
         template <class T> void setVolumeLevel(T& inst, int level);
 
         void setVolumeIcon();
+        void setLiveReviewFilteredActions(bool isDisabled);
 
         IPCore::Session* m_session;
         QAction* m_smAction;
@@ -100,6 +103,8 @@ namespace Rv
         QIcon m_volumeMediumIcon;
         QIcon m_volumeHighIcon;
         QIcon m_volumeHighMutedIcon;
+
+        std::unordered_map<QAction*, QString> m_liveReviewFilteredActions;
     };
 
     template <class T>
