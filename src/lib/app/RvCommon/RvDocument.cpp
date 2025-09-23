@@ -180,7 +180,7 @@ namespace Rv
                 opts.dispAlphaBits, !m_startupResize);
         }
 
-        // Create DiagnosticsView as a dockable widget.
+        // Create DiagnosticsView as a dockable widget (lazy initialization).
         m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
 
         // Dockable to QMainWindow, not centralwidget.
@@ -1743,6 +1743,29 @@ namespace Rv
             QList<QAction*> actionsMinusFirstOne = mb()->actions().mid(1);
             disconnectActions(actionsMinusFirstOne);
         }
+
+#ifdef PLATFORM_DARWIN
+        // Before clearing the menu bar, ensure shared actions are properly
+        // removed to prevent Qt 6 menu duplication issues on macOS.
+        QList<QAction*> allActions = mb()->actions();
+        for (QAction* action : allActions)
+        {
+            if (QMenu* menu = action->menu())
+            {
+                QList<QAction*> menuActions = menu->actions();
+                for (QAction* menuAction : menuActions)
+                {
+                    if (menuAction == RvApp()->aboutAction()
+                        || menuAction == RvApp()->prefAction()
+                        || menuAction == RvApp()->networkAction()
+                        || menuAction == RvApp()->quitAction())
+                    {
+                        menu->removeAction(menuAction);
+                    }
+                }
+            }
+        }
+#endif
 
         mb()->clear();
 

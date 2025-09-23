@@ -124,7 +124,7 @@ LIST(APPEND _byproducts "${_pyocio_lib}")
 # Assemble CMake configure options
 #
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-LIST(APPEND _configure_options "-DOCIO_BUILD_TESTS=ON")
+LIST(APPEND _configure_options "-DOCIO_BUILD_TESTS=OFF")
 LIST(APPEND _configure_options "-DOCIO_BUILD_GPU_TESTS=OFF")
 LIST(APPEND _configure_options "-DOCIO_BUILD_PYTHON=ON") # This build PyOpenColorIO
 

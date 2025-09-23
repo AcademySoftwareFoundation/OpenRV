@@ -34,9 +34,12 @@ ENDIF()
 LIST(APPEND _configure_options "-S ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle-pyimplot/external/implot")
 LIST(APPEND _configure_options "-B ${_build_dir}")
 
-SET(_libname
-    "pyimplot${CMAKE_SHARED_MODULE_SUFFIX}"
-)
+# Set the correct library name - Windows needs .pyd extension for Python modules
+IF(RV_TARGET_WINDOWS)
+  SET(_libname "pyimplot.pyd")
+ELSE()
+  SET(_libname "pyimplot${CMAKE_SHARED_MODULE_SUFFIX}")
+ENDIF()
 
 # The built library will be at the root of the build directory.
 SET(_build_output_path
@@ -71,6 +74,7 @@ EXTERNALPROJECT_ADD(
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
                     -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file} -Dnanobind_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_NANOBIND/install/nanobind
+                    -DRV_TARGET_WINDOWS=${RV_TARGET_WINDOWS}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_BYPRODUCTS ${_build_output_path}
@@ -80,15 +84,21 @@ EXTERNALPROJECT_ADD(
 )
 
 # Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
+IF (RV_TARGET_WINDOWS)
+  SET(_pybindings_location "${RV_STAGE_LIB_DIR}/site-packages")
+ELSE()
+  SET(_pybindings_location "${RV_STAGE_LIB_DIR}/${_PYTHON_LIB_DIR}")
+ENDIF()
+
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into ${_PYTHON_LIB_DIR}"
-  OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}/${_PYTHON_LIB_DIR}
+  COMMENT "Installing ${_target}'s libs into site-packages"
+  OUTPUT ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_libpath} ${_pybindings_location}/${_libname}
   DEPENDS ${_target}
 )
 ADD_CUSTOM_TARGET(
   ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
+  DEPENDS ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
 )
 
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
