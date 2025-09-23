@@ -1355,8 +1355,6 @@ namespace BlackMagicDevices
         {
             m_readyStereoFrame =
                 m_rightEyeToStereoFrameMap[outputVideoFrame].get();
-            m_readyStereoFrame =
-                m_rightEyeToStereoFrameMap[outputVideoFrame].get();
         }
 
         return true;
