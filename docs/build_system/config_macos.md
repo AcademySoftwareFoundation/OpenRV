@@ -29,7 +29,11 @@ From macOS System Settings > Privacy & Security > App Management, allow Terminal
 (install_xcode)=
 ## Install Xcode
 
-From the App Store, download Xcode. Make sure that it is the source of the active developer directory.
+**Heads Up:**
+Xcode 26 isn't supported yet because it needs the fix for [QTBUG-137687](https://bugreports.qt.io/browse/QTBUG-137687). This fix is available in Qt 6.5.10, but there isn't a PySide6 version that matches this Qt version as of now.
+In the meantime, you can use Xcode 16.4 on the latest macOS Tahoe 26 to build Open RV.
+
+From the App Store, download Xcode 16.4. Make sure that it is the source of the active developer directory.
 
 `xcode-select -p` should return `/Applications/Xcode.app/Contents/Developer`. If that is not the case, run `sudo xcode-select -s /Applications/Xcode.app`
 

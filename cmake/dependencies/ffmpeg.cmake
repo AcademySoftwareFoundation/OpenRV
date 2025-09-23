@@ -337,6 +337,7 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
       "aac_at"
       "aac_fixed"
       "aac_latm"
+      "ac3"
       "bink"
       "binkaudio_dct"
       "binkaudio_rdft"

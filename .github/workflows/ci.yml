@@ -503,7 +503,7 @@ jobs:
           until [ $retry_count -ge $max_retries ]; do
             echo "Attempt $((retry_count + 1)) of $max_retries"
             
-            if brew install --formula cmake ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew && \
+            if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew && \
                brew install --formula icu4c; then
               echo "Homebrew dependencies installed successfully"
               break
@@ -562,12 +562,14 @@ jobs:
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
         run: |
+          which cmake
           cmake --version
           cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT5_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2024' }}
         run: |
+          which cmake
           cmake --version
           cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT6_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
 
@@ -656,7 +658,7 @@ jobs:
           $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
           $componentsToRemove= @(
             "Microsoft.VisualStudio.Component.VC.${{ matrix.msvc-component }}"
-            "Microsoft.VisualStudio.Component.VC.1${{ matrix.msvc-component }}.Spectre"
+            "Microsoft.VisualStudio.Component.VC.${{ matrix.msvc-component }}.Spectre"
           )
           [string]$workloadArgs = $componentsToRemove | ForEach-Object {" --add " +  $_}
           $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')

@@ -37,6 +37,7 @@ ENDIF()
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 LIST(APPEND _configure_options "-DPNG_EXECUTABLES=OFF")
 LIST(APPEND _configure_options "-DPNG_TESTS=OFF")
+LIST(APPEND _configure_options "-DPNG_FRAMEWORK=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}

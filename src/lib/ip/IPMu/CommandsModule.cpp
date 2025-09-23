@@ -1805,6 +1805,49 @@ namespace IPMu
         NODE_RETURN(mp);
     }
 
+    NODE_IMPLEMENTATION(ndc2event, Mu::Vector2f)
+    {
+        // Convert from Normalized Device Coordinates (NDC) space [-1, 1] to
+        // event space coordinates.
+        // This bypasses image transforms and works purely in viewport space.
+        // Height spans 2 NDC units, and assumes the viewport fully contains the
+        // height of the image (eg: has vertical bars, no horizontal bars).
+        //
+        // When that is not the case (eg: we have horizontal bars) the
+        // scale of the drawing end up not being "quite" the same, but, since
+        // this functionality (at least for now) is purely to test concurrent
+        // annotation drawing on multiple computers in live review scenarios,
+        // this doesn't matter one bit.
+        //
+        Session* s = Session::currentSession();
+        Vector2f inp = NODE_ARG(0, Vector2f);
+        float x = inp[0];
+        float y = inp[1];
+
+        Vector2f mp;
+        try
+        {
+            Box2f vp = s->renderer()->viewport();
+            float vpWidth = vp.size().x;
+            float vpHeight = vp.size().y;
+            // Map from NDC space to viewport space using the smaller dimension
+            // This ensures square coordinate space regardless of viewport
+            // aspect ratio
+            float minDimension = min(vpWidth, vpHeight);
+            mp[0] = (x + 1.0f) * 0.5f * minDimension + vp.min.x
+                    + (vpWidth - minDimension) * 0.5f;
+            mp[1] = (y + 1.0f) * 0.5f * minDimension + vp.min.y
+                    + (vpHeight - minDimension) * 0.5f;
+        }
+        catch (...)
+        {
+            // If viewport is not available, return the input coordinates
+            mp[0] = x;
+            mp[1] = y;
+        }
+        NODE_RETURN(mp);
+    }
+
     NODE_IMPLEMENTATION(imagesAtPixel, Pointer)
     {
         Process* p = NODE_THREAD.process();
@@ -5128,6 +5171,14 @@ namespace IPMu
         NODE_RETURN(stype->allocate(idstr));
     }
 
+    NODE_IMPLEMENTATION(refreshOutputVideoDevice, void)
+    {
+        Session* s = Session::currentSession();
+        auto outputDevice = s->outputVideoDevice();
+
+        s->setOutputVideoDevice(outputDevice);
+    }
+
     NODE_IMPLEMENTATION(audioTextureID, int)
     {
         Session* s = Session::currentSession();
@@ -6075,6 +6126,10 @@ namespace IPMu
                          new Param(c, "sourceName", "string"),
                          new Param(c, "point", "vector float[2]"), End),
 
+            new Function(c, "ndcToEventSpace", ndc2event, None, Return,
+                         "vector float[2]", Parameters,
+                         new Param(c, "point", "vector float[2]"), End),
+
             new Function(c, "imagesAtPixel", imagesAtPixel, None, Return,
                          "PixelImageInfo[]", Parameters,
                          new Param(c, "point", "vector float[2]"),
@@ -6449,6 +6504,9 @@ namespace IPMu
                          new Param(c, "moduleName", "string"),
                          new Param(c, "deviceName", "string"),
                          new Param(c, "idtype", "int"), End),
+
+            new Function(c, "refreshOutputVideoDevice",
+                         refreshOutputVideoDevice, None, Return, "void", End),
 
             new Function(c, "licensingState", licensingState, None, Return,
                          "int", End),

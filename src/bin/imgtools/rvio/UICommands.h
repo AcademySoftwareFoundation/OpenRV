@@ -60,6 +60,7 @@ namespace RVIO
     NODE_DECLARATION(javascriptMuExport, void);
     NODE_DECLARATION(openUrl, void);
     NODE_DECLARATION(myNetworkHost, Mu::Pointer);
+    NODE_DECLARATION(devicePixelRatio, float);
 
 } // namespace RVIO
 

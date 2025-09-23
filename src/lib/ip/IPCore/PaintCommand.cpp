@@ -889,8 +889,14 @@ namespace IPCore
                 // so will cause the last cmd to be rendered twice, and in
                 // case of alpha not 0, or 1, it will not be correct
                 //
+                // Note: There is no cache to update when there is only 1
+                // command to render as the context.cachedfbo is already up to
+                // date. In other words when the last command is also the first
+                // command, we don't update the cache.
+                //
 
                 if (context.updateCache && context.cachedfbo
+                    && (context.commands.size() > 1)
                     && (context.commands[i] == context.lastCommand))
                 {
                     if (i > 0)

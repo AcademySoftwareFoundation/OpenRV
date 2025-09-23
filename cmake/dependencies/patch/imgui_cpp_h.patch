@@ -1,5 +1,5 @@
 diff --git a/imgui.cpp b/imgui.cpp
-index da33e7ff..cbea017b 100644
+index da33e7ffc..cbea017b7 100644
 --- a/imgui.cpp
 +++ b/imgui.cpp
 @@ -3018,7 +3018,6 @@ bool ImGuiTextFilter::PassFilter(const char* text, const char* text_end) const
@@ -11,7 +11,7 @@ index da33e7ff..cbea017b 100644
  void ImGuiTextBuffer::append(const char* str, const char* str_end)
  {
 diff --git a/imgui.h b/imgui.h
-index 26cf9ea6..13b48490 100644
+index 26cf9ea69..4b113de7a 100644
 --- a/imgui.h
 +++ b/imgui.h
 @@ -2858,18 +2858,17 @@ struct ImGuiTextFilter
@@ -36,3 +36,12 @@ index 26cf9ea6..13b48490 100644
      IMGUI_API void      append(const char* str, const char* str_end = NULL);
      IMGUI_API void      appendf(const char* fmt, ...) IM_FMTARGS(2);
      IMGUI_API void      appendfv(const char* fmt, va_list args) IM_FMTLIST(2);
+@@ -3229,7 +3228,7 @@ struct ImGuiSelectionExternalStorage
+ // - To use 16-bit indices + allow large meshes: backend need to set 'io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset' and handle ImDrawCmd::VtxOffset (recommended).
+ // - To use 32-bit indices: override with '#define ImDrawIdx unsigned int' in your imconfig.h file.
+ #ifndef ImDrawIdx
+-typedef unsigned short ImDrawIdx;   // Default: 16-bit (for maximum compatibility with renderer backends)
++typedef unsigned int ImDrawIdx;   // Default: 16-bit (for maximum compatibility with renderer backends)
+ #endif
+ 
+ // ImDrawCallback: Draw callbacks for advanced uses [configurable type: override in imconfig.h]
