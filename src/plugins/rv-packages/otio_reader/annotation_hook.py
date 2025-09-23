@@ -17,14 +17,27 @@ def hook_function(
 ) -> None:
     """A hook for the annotation schema"""
 
-    metadata = argument_map.get("effect_metadata")
-    is_hold = metadata.get("hold")
-    is_ghost = metadata.get("ghost")
+    try:
+        if argument_map["effect_metadata"]:
+            effect_metadata = argument_map["effect_metadata"]
+            commands.setIntProperty(
+                "#Session.paintEffects.hold", [effect_metadata.get("hold", 0)]
+            )
+            commands.setIntProperty(
+                "#Session.paintEffects.ghost", [effect_metadata.get("ghost", 0)]
+            )
+        else:
+            commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
+            commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
 
-    commands.setIntProperty("#Session.paintEffects.hold", [is_hold])
-    commands.setIntProperty("#Session.paintEffects.ghost", [is_ghost])
-    commands.setIntProperty("#Session.paintEffects.ghostBefore", [5])
-    commands.setIntProperty("#Session.paintEffects.ghostAfter", [5])
+        commands.setIntProperty(
+            "#Session.paintEffects.ghostBefore", [in_timeline.ghost_before]
+        )
+        commands.setIntProperty(
+            "#Session.paintEffects.ghostAfter", [in_timeline.ghost_after]
+        )
+    except Exception:
+        logging.exception("Unable to set Hold and Ghost properties")
 
     for layer in in_timeline.layers:
         if layer.name == "Paint":
@@ -84,7 +97,9 @@ def hook_function(
                 try:
                     media_switch = commands.nodeConnections("MediaTrack")[0][0]
                     media_source_group = commands.nodeConnections(media_switch)[0][0]
-                    first_source_node = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
+                    first_source_node = extra_commands.nodesInGroupOfType(
+                        media_source_group, "RVFileSource"
+                    )[0]
                     media_info = commands.sourceMediaInfo(first_source_node)
                     height = media_info["height"]
                     aspect_ratio = media_info["width"] / height

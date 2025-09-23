@@ -280,6 +280,7 @@ all_mu_commands = [
     "writeAllNodeDefinitions",
     "writeNodeDefinition",
     "videoDeviceIDString",
+    "refreshOutputVideoDevice",
     "readProfile",
     "writeProfile",
     "editProfiles",

@@ -5,12 +5,14 @@
 
 namespace Rv
 {
+    static bool s_shuttingDown = false;
+
     void ImGuiPythonBridge::PyObjectDeleter::operator()(PyObject* obj) const
     {
-        // seems to crash on exit if we have a callback registered.
-        // so patching this out for now.
-        // if (obj)
-        //     Py_DECREF(obj);
+        if (obj && !s_shuttingDown && Py_IsInitialized())
+        {
+            Py_DECREF(obj);
+        }
     }
 
     std::vector<ImGuiPythonBridge::PyObjectPtr> ImGuiPythonBridge::s_callbacks;
@@ -30,8 +32,8 @@ namespace Rv
         {
             if (PyObject_RichCompareBool(it->get(), callable, Py_EQ))
             {
-                it = s_callbacks.erase(it);
-                Py_DECREF(callable);
+                // Deleter will handle Py_DECREF automatically.
+                it = s_callbacks.erase(it); 
                 return;
             }
             else
@@ -43,6 +45,12 @@ namespace Rv
 
     void ImGuiPythonBridge::callCallbacks()
     {
+        // Early exit optimization - avoid Python overhead if no callbacks registered
+        if (s_callbacks.empty())
+        {
+            return;
+        }
+        
         for (auto& cb : s_callbacks)
         {
             PyGILState_STATE gstate = PyGILState_Ensure();
@@ -58,7 +66,20 @@ namespace Rv
 
     void ImGuiPythonBridge::clearCallbacks()
     {
+        s_shuttingDown = true;
+        
+        // During shutdown, we cannot safely call Py_DECREF, so we just release
+        // the smart pointers without calling their deleters and let Python
+        // handle cleanup during interpreter shutdown.
+        for (auto& ptr : s_callbacks)
+        {
+            if (ptr)
+            {
+                // Release without calling Py_DECREF.
+                ptr.release(); 
+            }
+        }
+        
         s_callbacks.clear();
-        // CAll DECREF for each element if we're not using the deleter for this?
     }
 } // namespace Rv
