@@ -10,15 +10,15 @@ SET(_target
 
 IF(RV_VFX_PLATFORM STREQUAL CY2024)
   SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
-    "
+      "
        // Get available screen geometry for the screen containing the window\n \
        let screen = qt.QGuiApplication.screenAt(globalPos);\n \
        if (screen eq nil) screen = qt.QGuiApplication.primaryScreen();\n \
-       let usedRect = screen.availableGeometry();\n \
+       let usedRect = if (screen eq nil) then mainRect else screen.availableGeometry();\n \
     "
   )
   SET(MU_DPI_SCALING_ADJUSTMENT
-    "
+      "
        // Check for DPI/scaling on the current screen\n \
        let globalPos = mainWin.mapToGlobal(qt.QPoint(0, 0));\n \
        let dpiScreen = qt.QGuiApplication.screenAt(globalPos);\n \
@@ -42,7 +42,9 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
       "let usedRect = qt.QApplication.desktop().availableGeometry(mainWin);\n"
   )
-  SET(MU_DPI_SCALING_ADJUSTMENT "")
+  SET(MU_DPI_SCALING_ADJUSTMENT
+      ""
+  )
 ENDIF()
 SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
     "${MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY}"
