@@ -139,9 +139,9 @@ __rv_env_shell() {
 __rv_update_paths() {
   RV_BUILD_DIR="${RV_HOME}/_build${RV_PATH_SUFFIX}"
   RV_INST_DIR="${RV_HOME}/_install${RV_PATH_SUFFIX}"
-  RV_APP_DIR="${RV_BUILD_DIR}/stage/app"
+  RV_APP_DIR="${RV_BUILD_DIR}/stage/app/bin"
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    RV_APP_DIR="${RV_APP_DIR}/RV.app/Contents/MacOS"
+    RV_APP_DIR="${RV_BUILD_DIR}/stage/app/RV.app/Contents/MacOS"
   fi
 }
 
