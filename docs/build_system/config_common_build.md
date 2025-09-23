@@ -72,7 +72,7 @@ rvbootstrap
 
 Note 1: launch the default optimized build unless you have a reason to want the unoptimized debug build.
 
-Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call rvmk (Release) or rvmkd (Debug) to complete the build.
+Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call rvmk to complete the build.
 
 
 ### 2. Building Open RV after the first time
@@ -95,9 +95,9 @@ rvmk
 ```
 ```{code-tab} bash Debug
 # Produces incremental unoptimized debug build in OpenRV/_build_debug
-rvmkd
+rvmk
 
-# Note: rvmkd is just an alias to these two commands:
+# Note: rvmk is just an alias to these two commands:
 # rvcfg       # sets environment variables
 # rvbuild     # launches the build process
 ```
