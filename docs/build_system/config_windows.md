@@ -1,5 +1,28 @@
 # Preparing Open RV on Windows
 
+Open RV 2025 can be built for Windows using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.9
+Cmake               : 3.31.X+
+Visual Studio       : 2022 (MSVC v143 14.40.X)
+
+```
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.15.2
+Python              : 3.10.13
+Cmake               : 3.27.X+
+Visual Studio       : 2022 (MSVC v143 14.40.X)
+
+```
+````
+
+All other dependencies are shared across variations.
+
 ## Summary
 
 1. [Microsoft Visual Studio](mvs)
@@ -103,19 +126,26 @@ If the version is different, change it to `14.40.33807` in the file.
 (install_python)=
 ## 3. Install Python 3
 
-### 3.1 VFX Reference Platform 2023
-You must install Python 3.10 using the official Python installer. The latest version with an installer is **3.10.11**.
-On the [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
-the correct version will be **Windows installer (64-bit)**.
+You must install the Python version corresponding to your chosen VFX reference platform using the official Python installer.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Install Python 3.11.9 using the official Python installer.
+On the [Python 3.11.9 page](https://www.python.org/downloads/release/python-3119), scroll down and download the correct version for your Windows. Typically, the correct version will be **Windows installer (64-bit)**.
+
+It is highly recommended that you install this Python in C:\Python311
+```
+```{code-tab} bash VFX-CY2023
+Install Python 3.10.13 using the official Python installer.
+On the [Python 3.10.13 page](https://www.python.org/downloads/release/python-31013), scroll down and download the correct version for your Windows. Typically, the correct version will be **Windows installer (64-bit)**.
 
 It is highly recommended that you install this Python in C:\Python310
+```
+````
 
-### 3.2 VFX Reference Platform 2024
-Same as VFX 2023 but download and install the latest [Python 3.11 with binaries](https://www.python.org/downloads/release/python-3119/).
+### Installation
 
-### 3.3 Installation
-
-The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
+The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but for VFX-CY2023 the path should be `C:\Python310` instead of `C:\Python311`.
 
 
 
@@ -153,7 +183,9 @@ Click on Disable path length limit
 
 ````{note}
 Take note of the installation path for Python 3, as it will be required in a subsequent step.\
-The **recommended** path is `C:\Python310` for VFX 2023 and `C:\Python311` for VFX 2024.
+The **recommended** path is:
+- `C:\Python311` for VFX-CY2024
+- `C:\Python310` for VFX-CY2023
 ````
 
 (copy_python3)=
@@ -189,9 +221,49 @@ When obtaining Qt from a third-party source, ensure it includes **OpenSSL** supp
 For example, Qt from MSYS2 is missing QtWebEngine.
 ````
 
-Download the latest version of Qt 5.15.x from the [official Qt website](https://www.qt.io/download-open-source) using the online installer. It is **recommended** to install Qt in a location with a **short path length**. (e.g. `C:\Qt`)
+Download the Qt version corresponding to your chosen VFX reference platform from the [official Qt website](https://www.qt.io/download-open-source) using the online installer. It is **recommended** to install Qt in a location with a **short path length**. (e.g. `C:\Qt`)
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Download Qt 6.5.3.
+This version should be available in the regular Qt installer without needing archives.
+```
+```{code-tab} bash VFX-CY2023
+Download Qt 5.15.2 from the Qt archives.
+You will need to enable archive packages in the Qt installer to access Qt 5.15.2.
+```
+````
 
 Additionally, ensure you have jom, which is included with Qt Creator, available through the Qt online installer. If you prefer not to install Qt Creator, you can download jom separately from the official Qt repository and copy the executable and supporting files to the Tools/QtCreator/bin/jom directory within your Qt installation.
+
+### Installation Steps
+
+````{tabs}
+```{code-tab} bash VFX-CY2024 (Qt 6.5.3)
+For Qt 6.5.3, the installation is more straightforward:
+
+1. **After log in**: Open the setup, log in with your credentials, and proceed through the prompts
+2. **Select Qt 6.5.3**: Qt 6.5.3 should be available in the main installer without needing archive packages
+3. **Choose components**: Select the MSVC 2019 64-bit component for Qt 6.5.3
+4. **Uncheck optional packages**: Uncheck any optional packages you don't need (Android, iOS, WebAssembly, etc.)
+5. **Complete installation**: Click 'Next' to proceed with the installation
+```
+```{code-tab} bash VFX-CY2023 (Qt 5.15.2)
+For Qt 5.15.2, you need to access the archive packages:
+
+1. **After log in**: Open the setup, log in with your credentials, and proceed through the prompts
+2. **Enable archive packages**: Select the 'Archives' checkbox on the right-hand side to enable and display the archive packages
+3. **Filter and load archive packages**: Click the Filter button to load the archive packages and view available options
+4. **Check Qt 5.15.2**: Once the archive packages are loaded, scroll down to Qt 5.15.2, select the checkbox, and click the small arrow icon beside it to expand the options
+5. **Uncheck optional packages**: Uncheck all optional packages and click the 'Next' button to proceed
+```
+````
+
+````{warning}
+The screenshot below represent the installation for Qt 5, but the steps
+are the same for Qt 6. The only difference is the selection of Qt 6.5.3
+instead of Qt 5.15.2 in the fourth screenshot.
+````
 
 ````{carousel}
 :show_controls:
@@ -210,31 +282,32 @@ Open the setup, log in with your credentials, and proceed through the prompts un
 
 ```{figure} ../images/windows/qt/qt2.png
 
-Step 2 - Enable archive packages
+Step 2 - Enable archive packages (VFX-CY2023 only)
 
-Select the 'Archives' checkbox on the right-hand side to enable and display the archive packages.
+For Qt 5.15.2, select the 'Archives' checkbox on the right-hand side to enable and display the archive packages.
 
 ```
 
 ```{figure} ../images/windows/qt/qt3.png
 
-Step 3 - Filter and load archive packages
+Step 3 - Filter and load archive packages (VFX-CY2023 only)
 
-Click the Filter button to load the archive packages and view available options.
+For Qt 5.15.2, click the Filter button to load the archive packages and view available options.
 
 ```
 
 ```{figure} ../images/windows/qt/qt4.png
 
-Step 4 - Check Qt 5.15.2
+Step 4 - Check Qt version
 
-Once the archive packages are loaded, scroll down to Qt 5.15.2, select the checkbox, and click the small arrow icon beside it to expand the options.
+For VFX-CY2024: select Qt 6.5.3 from the main list.
+For VFX-CY2023: scroll down to Qt 5.15.2, select the checkbox, and expand the options.
 
 ```
 
 ```{figure} ../images/windows/qt/qt5.png
 
-Step 5 - Uncheck optional packages and install Qt 5.15.2
+Step 5 - Uncheck optional packages and install
 
 Uncheck all optional packages (as shown in the image above) and click the 'Next' button to proceed.
 
@@ -242,8 +315,10 @@ Uncheck all optional packages (as shown in the image above) and click the 'Next'
 ````
 
 ````{note}
-Take note of the installation path for Qt 5.15.2, as it will be required in a subsequent step.\
-Based on the recommendation above, the path would be `C:\Qt`.
+Take note of the installation path for Qt, as it will be required in a subsequent step.\
+Based on the recommendation above, the path would be:
+- `C:\Qt\6.5.3\msvc2019_64` for VFX-CY2024
+- `C:\Qt\5.15.2\msvc2019_64` for VFX-CY2023
 ````
 
 (install_strawberry_perl)=
@@ -343,9 +418,14 @@ The following paths **must** be added to the PATH environment variable within MS
 
 **The order is important**. Do not put Strawberry perl location before MSYS2's `mingw64/bin` directory.
 
-```shell
+````{tabs}
+```{code-tab} bash VFX-CY2024
+echo 'export PATH="/c/Program Files/CMake/bin:/c/Python311:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
+```
+```{code-tab} bash VFX-CY2023
 echo 'export PATH="/c/Program Files/CMake/bin:/c/Python310:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
 ```
+````
 
 #### ACLOCAL_PATH
 
@@ -357,12 +437,17 @@ echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
 
 ````{note}
 Update the Qt location to reflect your installation path, using forward slashes (/) for a Unix-style path 
-(e.g., C:\Qt\5.15.2\mingw_64 becomes /c/Qt/5.15.2/mingw_64).
+(e.g., C:\Qt\5.15.2\msvc2019_64 becomes /c/Qt/5.15.2/msvc2019_64).
 ````
 
-```shell
+````{tabs}
+```{code-tab} bash VFX-CY2024
+echo "export QT_HOME=/c/Qt/6.5.3/msvc2019_64" >> ~/.bash_profile
+```
+```{code-tab} bash VFX-CY2023
 echo "export QT_HOME=/c/Qt/5.15.2/msvc2019_64" >> ~/.bash_profile
 ```
+````
 
 #### Apply changes to MSYS2 MINGW64
 
