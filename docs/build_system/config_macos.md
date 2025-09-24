@@ -1,4 +1,4 @@
-# Building Open RV on macOS
+# Preparing Open RV on macOS
 
 Open RV 2025 can be built for macOS using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
 
@@ -118,85 +118,11 @@ You will need to enable archive packages in the Qt installer to access Qt 5.15.2
 (build_openrv)=
 ## Build Open RV
 
-(build_openrv1)=
-### Before executing any commands
+Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
 
-To maximize your chances of successfully building Open RV, you must:
-- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
-- Fix all conflicts due to updating the code.
-- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
+### macOS-Specific Build Notes
 
-(build_openrv2)=
-### Get Open RV source code
-
-Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
-
-Using a password-protected SSH key:
-```shell
-git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-Using the web URL:
-```shell
-git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-(build_openrv3)=
-### Load aliases for Open RV
-
-From the Open RV directory:
-```shell
-source rvcmds.sh
-```
-
-The aliases for the release and debug builds have been merged together. To control if the aliases operate on a release or debug build, call "rvdebug" or "rvrelease" from the command prompt.
-
-
-(build_openrv4)=
-### Install Python dependencies
-
-````{note}
-This section needs to be done only once when a fresh Open RV repository is cloned. 
-The first time `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
-````
-
-From the Open RV directory, the following command will download and install the Python dependencies.
-```shell
-rvsetup
-```
-
-(build_openrv5)=
-### Configure the project
-
-From the Open RV directory, the following command will configure CMake for the build:
-
-````{tabs}
-```{code-tab} bash Release
-rvcfg
-```
-```{code-tab} bash Debug
-rvcfg
-```
-````
-
-(build_openrv6)=
-### Build Open RV
-
-From the Open RV directory, the following command will build the main executable:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuild
-```
-```{code-tab} bash Debug
-rvbuild
-```
-````
-
-(build_openrv7)=
-### Opening Open RV executable
+#### Executable Location
 
 ````{tabs}
 ```{tab} Release
