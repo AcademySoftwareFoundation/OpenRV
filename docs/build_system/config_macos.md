@@ -23,6 +23,29 @@ Xcode               : See XCode section
 
 All other dependencies are shared across variations.
 
+Open RV 2025 can be built for macOS using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.9
+Cmake               : 3.31.X+
+Xcode               : See XCode section
+
+```
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.15.2
+Python              : 3.10.13
+Cmake               : 3.31.7
+Xcode               : See XCode section
+
+```
+````
+
+All other dependencies are shared across variations.
+
 (summary)=
 ## Summary
 
