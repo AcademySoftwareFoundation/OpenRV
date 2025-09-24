@@ -35,7 +35,8 @@ All other dependencies are shared across variations.
 2. [Install Pyenv / Python](rocky_install_pyenv_and_python)
 3. [Install CMake](rocky_install_cmake)
 4. [Install Qt](rocky_install_qt)
-5. [Building with Docker (Optional)](rocky_building_with_docker)
+5. [Build Open RV](rocky_build_openrv)
+6. [Building with Docker (Optional)](rocky_building_with_docker)
 
 
 (rocky_install_tools_and_dependencies)=
@@ -152,8 +153,13 @@ Note 1: If you install Qt at a different installation path, you will need to man
 
 Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build Open RV. 
 
+(rocky_build_openrv)=
+### 5. Build Open RV
+
+Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
+
 (rocky_building_with_docker)=
-### 5. Building with Docker (Optional)
+### 6. Building with Docker (Optional)
 
 To build Open RV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 
 

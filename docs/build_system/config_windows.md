@@ -461,21 +461,14 @@ source ~/.bash_profile
 (build_windows_openrv)=
 ## 9. Build Open RV
 
+Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
+
+### Windows-Specific Build Notes
+
 ````{warning}
 Even as of Windows 11, for legacy reasons, a default system path length is still limited to 254 bytes long.
 For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
 ````
-
-(build_windows_openrv1)=
-### Before executing any commands
-
-To maximize your chances of successfully building Open RV, you must:
-- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
-- Fix all conflicts due to updating the code.
-- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
-
-(build_windows_openrv2)=
-### Get Open RV source code
 
 ````{warning}
 Open RV repository **should** be cloned into the root of a drive (e.g. ````c:````).\
@@ -483,114 +476,12 @@ Open RV repository **should** be cloned into the root of a drive (e.g. ````c:```
 Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look 
 at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.
 ````
-Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
-
-Using a password-protected SSH key:
-```shell
-git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-Using the web URL:
-```shell
-git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-(build_windows_openrv3)=
-### Load aliases for Open RV
-
-From the Open RV directory:
-```shell
-source rvcmds.sh
-```
-
-The aliases for the release and debug builds have been merged together. To control if the aliases operate on a release or debug build, call "rvdebug" or "rvrelease" from the command prompt.
-
-
-(build_windows_openrv4)=
-### Install Python dependencies
 
 
 
-````{note}
-This section need to be done only one time when a fresh Open RV repository is cloned. 
-The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
-````
 
-Note that on Windows, use the following command to install the python requirements from an MSYS2-MinGW64 shell:
-```bash
-SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
-```
 
-From the Open RV directory, the following command will download and install the Python dependencies.
-```shell
-rvsetup
-```
 
-(build_windows_openrv5)=
-### Configure the project
 
-````{note}
-After executing the ````rvcfg```` command, make sure that you see those lines at the begining for the logs:
-
-```
--- The CXX compiler identification is MSVC 19.40.33815.0
--- The C compiler identification is MSVC 19.40.33815.0
-```
-
-It **must** use **MSVC 19.40.X** (not 19.41.X).
-````
-
-From the Open RV directory, the following command will configure CMake for the build:
-
-````{tabs}
-```{code-tab} bash Release
-rvcfg
-```
-```{code-tab} bash Debug
-rvcfg
-```
-````
-
-(build_windows_openrv6)=
-### Build the dependencies
-
-From the Open RV directory, the following command will build the dependencies:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuildt dependencies
-```
-```{code-tab} bash Debug
-rvbuildt dependencies
-```
-````
-
-(build_windows_openrv7)=
-### Build the main executable
-
-From the Open RV directory, the following command will build the main executable:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuildt main_executable
-```
-```{code-tab} bash Debug
-rvbuildt main_executable
-```
-````
-
-(build_windows_openrv8)=
-### Opening Open RV executable
-
-````{tabs}
-```{tab} Release
-Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/bin/rv.exe`.
-```
-```{tab} Debug
-Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/bin/rv.exe`.
-```
-````
 
 
