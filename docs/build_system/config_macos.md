@@ -1,5 +1,28 @@
 # Building Open RV on macOS
 
+Open RV 2025 can be built for macOS using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.9
+Cmake               : 3.31.X+
+Xcode               : See XCode section
+
+```
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.15.2
+Python              : 3.10.13
+Cmake               : 3.31.7
+Xcode               : See XCode section
+
+```
+````
+
+All other dependencies are shared across variations.
+
 (summary)=
 ## Summary
 
@@ -60,22 +83,37 @@ Make sure Homebrew's binary directory is in your PATH and that `brew` can be res
 
 Most of the build requirements can be installed by running the following brew install command:
 
-```bash
+````{tabs}
+```{code-tab} bash VFX-CY2024
 brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.11 yasm clang-format black meson nasm pkg-config glew
 ```
+```{code-tab} bash VFX-CY2023
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.10 yasm clang-format black meson nasm pkg-config glew
+```
+````
 
 Make sure `xcode-select -p` still returns `/Applications/Xcode.app/Contents/Developer`. If that is not the case, run `sudo xcode-select -s /Applications/Xcode.app`
 
 (install_qt)=
 ## Install Qt
 
-Download the last version of Qt 6.5.x using the online installer on the [Qt page](https://www.qt.io/download-open-source). Qt logs, Android, iOS, and WebAssembly are not required to build Open RV.
+Download the Qt version corresponding to your chosen VFX reference platform using the online installer on the [Qt page](https://www.qt.io/download-open-source). Qt logs, Android, iOS, and WebAssembly are not required to build Open RV.
 
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Download Qt 6.5.3 using the online installer.
+This version should be available in the regular Qt installer without needing archives.
+The CI build agents are currently using Qt 6.5.3.
+```
+```{code-tab} bash VFX-CY2023
+Download Qt 5.15.2 from the Qt archives.
+You will need to enable archive packages in the Qt installer to access Qt 5.15.2.
+```
+````
 
-WARNING: If you fetch Qt from another source, make sure it is built with SSL support, contains everything required to build PySide6, and that the file structure is similar to the official package.
+**WARNING**: If you fetch Qt from another source, make sure it is built with SSL support, contains everything required to build PySide6 (for VFX-CY2024) or PySide2 (for VFX-CY2023), and that the file structure is similar to the official package.
 
-Note: Qt6 from homebrew is known to not work well with Open RV.
-Note: The CI build agents are currently using Qt 6.5.3
+**Note**: Qt from homebrew is known to not work well with Open RV.
 
 (build_openrv)=
 ## Build Open RV
