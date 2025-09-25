@@ -465,6 +465,10 @@ class SourceSetupMode(rvtypes.MinorMode):
             logT = 2
         elif tf == "Red Log":
             logT = 6
+        elif tf == "SMPTE-2084":
+            logT = 8
+        elif tf == "Hybrid Log-Gamma":
+            logT = 9
         elif tf == "Linear":
             pass
         elif tf == "Rec709":
