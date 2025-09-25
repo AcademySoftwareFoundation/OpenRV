@@ -1,5 +1,28 @@
 # Preparing Open RV on Windows
 
+Open RV 2025 can be built for Windows using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.9
+Cmake               : 3.31.X+
+Visual Studio       : 2022 (MSVC v143 14.40.X)
+
+```
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.15.2
+Python              : 3.10.13
+Cmake               : 3.27.X+
+Visual Studio       : 2022 (MSVC v143 14.40.X)
+
+```
+````
+
+All other dependencies are shared across variations.
+
 ## Summary
 
 1. [Microsoft Visual Studio](mvs)
@@ -103,19 +126,26 @@ If the version is different, change it to `14.40.33807` in the file.
 (install_python)=
 ## 3. Install Python 3
 
-### 3.1 VFX Reference Platform 2023
-You must install Python 3.10 using the official Python installer. The latest version with an installer is **3.10.11**.
-On the [Python 3.10 page](https://www.python.org/downloads/release/python-31011), scroll down and download the correct version for your Windows. Typically,
-the correct version will be **Windows installer (64-bit)**.
+You must install the Python version corresponding to your chosen VFX reference platform using the official Python installer.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Install Python 3.11.9 using the official Python installer.
+On the [Python 3.11.9 page](https://www.python.org/downloads/release/python-3119), scroll down and download the correct version for your Windows. Typically, the correct version will be **Windows installer (64-bit)**.
+
+It is highly recommended that you install this Python in C:\Python311
+```
+```{code-tab} bash VFX-CY2023
+Install Python 3.10.13 using the official Python installer.
+On the [Python 3.10.13 page](https://www.python.org/downloads/release/python-31013), scroll down and download the correct version for your Windows. Typically, the correct version will be **Windows installer (64-bit)**.
 
 It is highly recommended that you install this Python in C:\Python310
+```
+````
 
-### 3.2 VFX Reference Platform 2024
-Same as VFX 2023 but download and install the latest [Python 3.11 with binaries](https://www.python.org/downloads/release/python-3119/).
+### Installation
 
-### 3.3 Installation
-
-The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but the only difference is the path. (`C:\Python310` instead of `C:\Python311`)
+The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but for VFX-CY2023 the path should be `C:\Python310` instead of `C:\Python311`.
 
 
 
@@ -153,7 +183,9 @@ Click on Disable path length limit
 
 ````{note}
 Take note of the installation path for Python 3, as it will be required in a subsequent step.\
-The **recommended** path is `C:\Python310` for VFX 2023 and `C:\Python311` for VFX 2024.
+The **recommended** path is:
+- `C:\Python311` for VFX-CY2024
+- `C:\Python310` for VFX-CY2023
 ````
 
 (copy_python3)=
@@ -189,9 +221,49 @@ When obtaining Qt from a third-party source, ensure it includes **OpenSSL** supp
 For example, Qt from MSYS2 is missing QtWebEngine.
 ````
 
-Download the latest version of Qt 5.15.x from the [official Qt website](https://www.qt.io/download-open-source) using the online installer. It is **recommended** to install Qt in a location with a **short path length**. (e.g. `C:\Qt`)
+Download the Qt version corresponding to your chosen VFX reference platform from the [official Qt website](https://www.qt.io/download-open-source) using the online installer. It is **recommended** to install Qt in a location with a **short path length**. (e.g. `C:\Qt`)
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Download Qt 6.5.3.
+This version should be available in the regular Qt installer without needing archives.
+```
+```{code-tab} bash VFX-CY2023
+Download Qt 5.15.2 from the Qt archives.
+You will need to enable archive packages in the Qt installer to access Qt 5.15.2.
+```
+````
 
 Additionally, ensure you have jom, which is included with Qt Creator, available through the Qt online installer. If you prefer not to install Qt Creator, you can download jom separately from the official Qt repository and copy the executable and supporting files to the Tools/QtCreator/bin/jom directory within your Qt installation.
+
+### Installation Steps
+
+````{tabs}
+```{code-tab} bash VFX-CY2024 (Qt 6.5.3)
+For Qt 6.5.3, the installation is more straightforward:
+
+1. **After log in**: Open the setup, log in with your credentials, and proceed through the prompts
+2. **Select Qt 6.5.3**: Qt 6.5.3 should be available in the main installer without needing archive packages
+3. **Choose components**: Select the MSVC 2019 64-bit component for Qt 6.5.3
+4. **Uncheck optional packages**: Uncheck any optional packages you don't need (Android, iOS, WebAssembly, etc.)
+5. **Complete installation**: Click 'Next' to proceed with the installation
+```
+```{code-tab} bash VFX-CY2023 (Qt 5.15.2)
+For Qt 5.15.2, you need to access the archive packages:
+
+1. **After log in**: Open the setup, log in with your credentials, and proceed through the prompts
+2. **Enable archive packages**: Select the 'Archives' checkbox on the right-hand side to enable and display the archive packages
+3. **Filter and load archive packages**: Click the Filter button to load the archive packages and view available options
+4. **Check Qt 5.15.2**: Once the archive packages are loaded, scroll down to Qt 5.15.2, select the checkbox, and click the small arrow icon beside it to expand the options
+5. **Uncheck optional packages**: Uncheck all optional packages and click the 'Next' button to proceed
+```
+````
+
+````{warning}
+The screenshot below represent the installation for Qt 5, but the steps
+are the same for Qt 6. The only difference is the selection of Qt 6.5.3
+instead of Qt 5.15.2 in the fourth screenshot.
+````
 
 ````{carousel}
 :show_controls:
@@ -210,31 +282,32 @@ Open the setup, log in with your credentials, and proceed through the prompts un
 
 ```{figure} ../images/windows/qt/qt2.png
 
-Step 2 - Enable archive packages
+Step 2 - Enable archive packages (VFX-CY2023 only)
 
-Select the 'Archives' checkbox on the right-hand side to enable and display the archive packages.
+For Qt 5.15.2, select the 'Archives' checkbox on the right-hand side to enable and display the archive packages.
 
 ```
 
 ```{figure} ../images/windows/qt/qt3.png
 
-Step 3 - Filter and load archive packages
+Step 3 - Filter and load archive packages (VFX-CY2023 only)
 
-Click the Filter button to load the archive packages and view available options.
+For Qt 5.15.2, click the Filter button to load the archive packages and view available options.
 
 ```
 
 ```{figure} ../images/windows/qt/qt4.png
 
-Step 4 - Check Qt 5.15.2
+Step 4 - Check Qt version
 
-Once the archive packages are loaded, scroll down to Qt 5.15.2, select the checkbox, and click the small arrow icon beside it to expand the options.
+For VFX-CY2024: select Qt 6.5.3 from the main list.
+For VFX-CY2023: scroll down to Qt 5.15.2, select the checkbox, and expand the options.
 
 ```
 
 ```{figure} ../images/windows/qt/qt5.png
 
-Step 5 - Uncheck optional packages and install Qt 5.15.2
+Step 5 - Uncheck optional packages and install
 
 Uncheck all optional packages (as shown in the image above) and click the 'Next' button to proceed.
 
@@ -242,8 +315,10 @@ Uncheck all optional packages (as shown in the image above) and click the 'Next'
 ````
 
 ````{note}
-Take note of the installation path for Qt 5.15.2, as it will be required in a subsequent step.\
-Based on the recommendation above, the path would be `C:\Qt`.
+Take note of the installation path for Qt, as it will be required in a subsequent step.\
+Based on the recommendation above, the path would be:
+- `C:\Qt\6.5.3\msvc2019_64` for VFX-CY2024
+- `C:\Qt\5.15.2\msvc2019_64` for VFX-CY2023
 ````
 
 (install_strawberry_perl)=
@@ -343,9 +418,14 @@ The following paths **must** be added to the PATH environment variable within MS
 
 **The order is important**. Do not put Strawberry perl location before MSYS2's `mingw64/bin` directory.
 
-```shell
+````{tabs}
+```{code-tab} bash VFX-CY2024
+echo 'export PATH="/c/Program Files/CMake/bin:/c/Python311:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
+```
+```{code-tab} bash VFX-CY2023
 echo 'export PATH="/c/Program Files/CMake/bin:/c/Python310:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
 ```
+````
 
 #### ACLOCAL_PATH
 
@@ -357,12 +437,17 @@ echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
 
 ````{note}
 Update the Qt location to reflect your installation path, using forward slashes (/) for a Unix-style path 
-(e.g., C:\Qt\5.15.2\mingw_64 becomes /c/Qt/5.15.2/mingw_64).
+(e.g., C:\Qt\5.15.2\msvc2019_64 becomes /c/Qt/5.15.2/msvc2019_64).
 ````
 
-```shell
+````{tabs}
+```{code-tab} bash VFX-CY2024
+echo "export QT_HOME=/c/Qt/6.5.3/msvc2019_64" >> ~/.bash_profile
+```
+```{code-tab} bash VFX-CY2023
 echo "export QT_HOME=/c/Qt/5.15.2/msvc2019_64" >> ~/.bash_profile
 ```
+````
 
 #### Apply changes to MSYS2 MINGW64
 
@@ -376,21 +461,14 @@ source ~/.bash_profile
 (build_windows_openrv)=
 ## 9. Build Open RV
 
+Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
+
+### Windows-Specific Build Notes
+
 ````{warning}
 Even as of Windows 11, for legacy reasons, a default system path length is still limited to 254 bytes long.
 For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
 ````
-
-(build_windows_openrv1)=
-### Before executing any commands
-
-To maximize your chances of successfully building Open RV, you must:
-- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
-- Fix all conflicts due to updating the code.
-- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
-
-(build_windows_openrv2)=
-### Get Open RV source code
 
 ````{warning}
 Open RV repository **should** be cloned into the root of a drive (e.g. ````c:````).\
@@ -398,111 +476,12 @@ Open RV repository **should** be cloned into the root of a drive (e.g. ````c:```
 Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look 
 at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.
 ````
-Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
-
-Using a password-protected SSH key:
-```shell
-git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-Using the web URL:
-```shell
-git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-(build_windows_openrv3)=
-### Load aliases for Open RV
-
-From the Open RV directory:
-```shell
-source rvcmds.sh
-```
-
-(build_windows_openrv4)=
-### Install Python dependencies
 
 
 
-````{note}
-This section need to be done only one time when a fresh Open RV repository is cloned. 
-The first time the `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
-````
 
-Note that on Windows, use the following command to install the python requirements from an MSYS2-MinGW64 shell:
-```bash
-SETUPTOOLS_USE_DISTUTILS=stdlib python3 -m pip install --user --upgrade -r requirements.txt
-```
 
-From the Open RV directory, the following command will download and install the Python dependencies.
-```shell
-rvsetup
-```
 
-(build_windows_openrv5)=
-### Configure the project
 
-````{note}
-After executing the ````rvcfg```` command, make sure that you see those lines at the begining for the logs:
-
-```
--- The CXX compiler identification is MSVC 19.40.33815.0
--- The C compiler identification is MSVC 19.40.33815.0
-```
-
-It **must** use **MSVC 19.40.X** (not 19.41.X).
-````
-
-From the Open RV directory, the following command will configure CMake for the build:
-
-````{tabs}
-```{code-tab} bash Release
-rvcfg
-```
-```{code-tab} bash Debug
-rvcfgd
-```
-````
-
-(build_windows_openrv6)=
-### Build the dependencies
-
-From the Open RV directory, the following command will build the dependencies:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuildt dependencies
-```
-```{code-tab} bash Debug
-rvbuildtd dependencies
-```
-````
-
-(build_windows_openrv7)=
-### Build the main executable
-
-From the Open RV directory, the following command will build the main executable:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuildt main_executable
-```
-```{code-tab} bash Debug
-rvbuildtd main_executable
-```
-````
-
-(build_windows_openrv8)=
-### Opening Open RV executable
-
-````{tabs}
-```{tab} Release
-Once the build is completed, the Open RV application can be found in the Open RV directory under `_build/stage/bin/rv.exe`.
-```
-```{tab} Debug
-Once the build is completed, the Open RV application can be found in the Open RV directory under `_build_debug/stage/bin/rv.exe`.
-```
-````
 
 
