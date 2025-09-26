@@ -6495,6 +6495,7 @@ namespace TwkMovie
         // Video
         formats["avi"] = make_pair("Audio Video Interleave", vidcap);
         formats["flv"] = make_pair("Flash Video", vidcap);
+        formats["gif"] = make_pair("Graphics Interchange Format", vidcap);
         formats["m3u8"] = make_pair("M3U8 Stream Metadata", vidcap);
         formats["m4v"] = make_pair("iTunes Video Format (from MPEG-4)", vidcap);
         formats["mkv"] = make_pair("Matroska Video", vidcap);
