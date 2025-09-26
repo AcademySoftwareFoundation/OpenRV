@@ -725,7 +725,7 @@ namespace IPCore
         m_filterLiveReviewRole = role;
     }
 
-    bool Session::filterLiveReviewEvents(bool is_media_event)
+    bool Session::filterLiveReviewEvents(bool isMediaEvent)
     {
         // allow flow-through because not in live review mode
         if (m_filterLiveReviewRole == Off)
@@ -738,7 +738,7 @@ namespace IPCore
         // cases below are for modes participant passive or active.
 
         // prevent flow through of media events for non-presenters, always.
-        if (is_media_event == true)
+        if (isMediaEvent == true)
             return true;
 
         // prevent flow through because only presenters are allowed to

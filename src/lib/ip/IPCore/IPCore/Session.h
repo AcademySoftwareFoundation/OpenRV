@@ -823,7 +823,7 @@ namespace IPCore
         void setGlobalSwapEyes(bool);
 
         void setFilterLiveReviewEvents(LiveReviewRole role = Off);
-        bool filterLiveReviewEvents(bool is_media_event = false);
+        bool filterLiveReviewEvents(bool isMediaEvent = false);
 
         //
         //  Marks

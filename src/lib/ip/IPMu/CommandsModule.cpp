@@ -4155,12 +4155,12 @@ namespace IPMu
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
     {
         Session* s = Session::currentSession();
-        bool is_media_event = false;
+        bool isMediaEvent = false;
         if (NODE_NUM_ARGS() > 0)
         {
-            is_media_event = NODE_ARG(0, bool);
+            isMediaEvent = NODE_ARG(0, bool);
         }
-        NODE_RETURN(s->filterLiveReviewEvents(is_media_event));
+        NODE_RETURN(s->filterLiveReviewEvents(isMediaEvent));
     }
 
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
@@ -6430,7 +6430,7 @@ namespace IPMu
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", Parameters,
-                         new Param(c, "is_media_event", "bool", Value(false)),
+                         new Param(c, "isMediaEvent", "bool", Value(false)),
                          End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
