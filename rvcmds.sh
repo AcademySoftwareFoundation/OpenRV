@@ -105,12 +105,17 @@ else
 fi
 
 # Must be executed in a function as it changes the shell environment
-rvenv_shell() {
+__rv_env_shell() {
   local activate_path=".venv/bin/activate"
 
   # Using msys2/cygwin as a way to detect if the script is running on Windows.
   if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
     activate_path=".venv/Scripts/activate"
+  fi
+
+  # Deactivate first if already in a virtual environment to ensure fresh activation
+  if [ -n "$VIRTUAL_ENV" ]; then
+    deactivate 2>/dev/null || true
   fi
 
   if [ -d ".venv" ]; then
@@ -119,41 +124,141 @@ rvenv_shell() {
     python3 -m venv .venv
     source "$activate_path"
   fi
+  
+  # Customize prompt based on build type
+  if [ -n "$RV_BUILD_TYPE" ]; then
+    if [ "$RV_BUILD_TYPE" = "Release" ]; then
+      export PS1="rel (.venv) $RV_CLEAN_PROMPT"
+    elif [ "$RV_BUILD_TYPE" = "Debug" ]; then
+      export PS1="dbg (.venv) $RV_CLEAN_PROMPT"
+    fi
+  fi
 }
+
+# Update all path variables based on current RV_PATH_SUFFIX
+__rv_update_paths() {
+  RV_BUILD_DIR="${RV_HOME}/_build${RV_PATH_SUFFIX}"
+  RV_INST_DIR="${RV_HOME}/_install${RV_PATH_SUFFIX}"
+  RV_APP_DIR="${RV_BUILD_DIR}/stage/app/bin"
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    RV_APP_DIR="${RV_BUILD_DIR}/stage/app/RV.app/Contents/MacOS"
+  fi
+}
+
+
+# Set initial prompt when not in virtual environment
+__rv_set_first_prompt() {
+  if [ -z "$VIRTUAL_ENV" ]; then
+    local build_prefix=""
+    if [ "$RV_BUILD_TYPE" = "Debug" ]; then
+      build_prefix="dbg"
+    elif [ "$RV_BUILD_TYPE" = "Release" ]; then
+      build_prefix="rel"
+    fi
+    
+    if [ -d "${RV_BUILD_DIR}" ]; then
+      export PS1="${build_prefix} (run rvcfg/rvmk) $RV_CLEAN_PROMPT"
+    else
+      export PS1="${build_prefix} (run rvbootstrap) $RV_CLEAN_PROMPT"
+    fi
+  fi
+}
+
+# Clean build directory and virtual environment
+__rv_clean_build() {
+  # Deactivate virtual environment if active
+  if [ -n "$VIRTUAL_ENV" ]; then
+    deactivate
+  fi
+  
+  # Remove build directory and virtual environment
+  rm -rf "${RV_BUILD_DIR}" && rm -rf .venv
+  
+  # Reset prompt to show current build state
+  __rv_set_first_prompt
+}
+
+# Internal function to handle configuration switching logic
+__rv_switch_config() {
+  if [ -z "$VIRTUAL_ENV" ]; then
+    # First time (venv wasn't activated): set first prompt
+    __rv_set_first_prompt
+  else
+    # venv was activated and we're switching config
+    if [ -d "${RV_BUILD_DIR}" ]; then
+      # Build dir exists: call rvcfg
+      rvcfg
+    else
+      # Build dir doesn't exist: exit venv and set first prompt
+      deactivate
+      __rv_set_first_prompt
+    fi
+  fi
+}
+
+# Switch to debug build mode
+rvdebug() {
+  RV_BUILD_TYPE="Debug"
+  RV_PATH_SUFFIX="_debug"
+  
+  # Update all path variables
+  __rv_update_paths
+  
+  __rv_switch_config
+}
+
+# Switch to release build mode
+rvrelease() {
+  RV_BUILD_TYPE="Release"
+  RV_PATH_SUFFIX=""
+  
+  # Update all path variables
+  __rv_update_paths
+  
+  __rv_switch_config
+}
+
 
 # VARIABLES
 RV_HOME="${RV_HOME:-$SCRIPT_HOME}"
-RV_BUILD="${RV_BUILD:-${RV_HOME}/_build}"
-RV_BUILD_DEBUG="${RV_BUILD_DEBUG:-${RV_HOME}/_build_debug}"
-RV_INST="${RV_INST:-${RV_HOME}/_install}"
-RV_INST_DEBUG="${RV_INST_DEBUG:-${RV_HOME}/_install_debug}"
 RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.cpu_count())')}"
 
-# ALIASES: Basic commands
-alias rvenv="rvenv_shell"
-alias rvsetup="rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt"
-alias rvcfg="rvenv && cmake -B ${RV_BUILD} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Release -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvcfgd="rvenv && cmake -B ${RV_BUILD_DEBUG} -G \"${CMAKE_GENERATOR}\" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=Debug -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}"
-alias rvbuildt="rvenv && cmake --build ${RV_BUILD} --config Release -v --parallel=${RV_BUILD_PARALLELISM} --target "
-alias rvbuildtd="rvenv && cmake --build ${RV_BUILD_DEBUG} --config Debug -v --parallel=${RV_BUILD_PARALLELISM} --target "
-alias rvbuild="rvenv && rvbuildt main_executable"
-alias rvbuildd="rvenv && rvbuildtd main_executable"
-alias rvtest="rvenv && ctest --test-dir ${RV_BUILD} --extra-verbose"
-alias rvtestd="rvenv && ctest --test-dir ${RV_BUILD_DEBUG} --extra-verbose"
-alias rvinst="rvenv && cmake --install ${RV_BUILD} --prefix ${RV_INST} --config Release"
-alias rvinstd="rvenv && cmake --install ${RV_BUILD_DEBUG} --prefix ${RV_INST_DEBUG} --config Debug"
-alias rvclean="rm -rf ${RV_BUILD} && rm -rf .venv"
-alias rvcleand="rm -rf ${RV_BUILD_DEBUG} && rm -rf .venv"
+# Capture current build type before any variable declarations
+INIT_BUILD_TYPE="$RV_BUILD_TYPE"
 
-# ALIASES: Config and Build
+# Build configuration variables (initialized by rvrelease at end of script)
+RV_BUILD_TYPE=""
+RV_BUILD_DIR=""
+RV_INST_DIR=""
+RV_APP_DIR=""
+RV_PATH_SUFFIX=""
 
-alias rvmk="rvcfg && rvbuild"
-alias rvmkd="rvcfgd && rvbuildd"
 
-# ALIASES: Setup, Config and Build
+# Deactivate virtual environment if active when sourcing
+if [ -n "$VIRTUAL_ENV" ]; then
+  deactivate
+fi
 
-alias rvbootstrap="rvsetup && rvmk"
-alias rvbootstrapd="rvsetup && rvmkd"
+# Capture clean prompt before any RV modifications (only if not already set)
+if [ -z "$RV_CLEAN_PROMPT" ]; then
+  RV_CLEAN_PROMPT="$PS1"
+fi
+
+# Single set of aliases using current build variables
+# Note: Single quotes preserve variables for expansion at execution time
+alias rvappdir='cd ${RV_APP_DIR}'
+alias rvhomedir='cd ${RV_HOME}'
+alias rvenv='rvhomedir && __rv_env_shell'
+alias rvsetup='rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt'
+alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -D${RV_DEPS_QT_LOCATION}=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
+alias rvbuildt='rvenv && cmake --build ${RV_BUILD_DIR} --config ${RV_BUILD_TYPE} -v --parallel=${RV_BUILD_PARALLELISM} --target '
+alias rvbuild='rvenv && rvbuildt main_executable'
+alias rvtest='rvenv && ctest --test-dir ${RV_BUILD_DIR} --extra-verbose'
+alias rvinst='rvenv && cmake --install ${RV_BUILD_DIR} --prefix ${RV_INST_DIR} --config ${RV_BUILD_TYPE}'
+alias rvclean='rvhomedir && __rv_clean_build'
+alias rvmk='rvcfg && rvbuild'
+alias rvbootstrap='rvsetup && rvmk'
+alias rvrun='rvappdir && ./rv'
 
 echo "Please ensure you have installed any required dependencies from doc/build_system/config_[os]"
 echo
@@ -161,13 +266,28 @@ echo "CMake parameters:"
 
 echo "RV_BUILD_PARALLELISM is $RV_BUILD_PARALLELISM"
 echo "RV_HOME is $RV_HOME"
-echo "RV_BUILD is $RV_BUILD"
-echo "RV_INST is $RV_INST"
+echo "RV_BUILD_DIR is $RV_BUILD_DIR"
+echo "RV_INST_DIR is $RV_INST_DIR"
 echo "CMAKE_GENERATOR is $CMAKE_GENERATOR"
 echo "QT_HOME is $QT_HOME"
 if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then echo "WIN_PERL is $WIN_PERL"; fi
 
 echo "To override any of them do unset [name]; export [name]=value; source $SCRIPT"
 echo
-echo "If this is your first time building RV try rvbootstrap (release) or rvbootstrapd (debug)"
-echo "To build quickly after bootstraping try rvmk (release) or rvmkd (debug)"
+echo "Use 'rvrelease' (default) or 'rvdebug' to switch between build configurations."
+echo
+echo "Call 'rvbootstrap' if its your first time building or after calling rvclean."
+echo "After 'rvbootstrap', use 'rvbuild' or 'rvmk' for incremental builds."
+echo
+
+# Initialize with appropriate build mode
+if [ "$INIT_BUILD_TYPE" = "Debug" ]; then
+  rvdebug
+else
+  # Check for existing build directories to determine best default
+  if [ -d "${RV_HOME}/_build_debug" ] && [ ! -d "${RV_HOME}/_build" ]; then
+    rvdebug
+  else
+    rvrelease
+  fi
+fi
