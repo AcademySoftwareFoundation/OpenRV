@@ -184,6 +184,14 @@ namespace IPCore
             PlayPingPong = 2
         };
 
+        enum LiveReviewRole
+        {
+            Off = 0,
+            Presenter = 1,
+            ParticipantPassive = 2,
+            ParticipantActive = 3
+        };
+
         struct CacheStats : public FBCache::CacheStats
         {
             Time audioSecondsCached;
@@ -814,8 +822,8 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(bool shouldFilterEvents = false);
-        bool filterLiveReviewEvents();
+        void setFilterLiveReviewEvents(LiveReviewRole role = Off);
+        bool filterLiveReviewEvents(bool is_media_event = false);
 
         //
         //  Marks
@@ -1294,7 +1302,7 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        bool m_filterLiveReviewEvents{false};
+        LiveReviewRole m_filterLiveReviewRole{Off};
 
         class FpsCalculator;
         struct FBStatusCheck;

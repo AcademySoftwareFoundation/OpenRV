@@ -4146,15 +4146,21 @@ namespace IPMu
     NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
     {
         Session* s = Session::currentSession();
-        bool shouldFilterEvents = NODE_ARG(0, bool);
+        int role = NODE_ARG(0, int);
 
-        s->setFilterLiveReviewEvents(shouldFilterEvents);
+        s->setFilterLiveReviewEvents(
+            static_cast<Session::LiveReviewRole>(role));
     }
 
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
     {
         Session* s = Session::currentSession();
-        NODE_RETURN(s->filterLiveReviewEvents());
+        bool is_media_event = false;
+        if (NODE_NUM_ARGS() > 0)
+        {
+            is_media_event = NODE_ARG(0, bool);
+        }
+        NODE_RETURN(s->filterLiveReviewEvents(is_media_event));
     }
 
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
@@ -5830,6 +5836,15 @@ namespace IPMu
             new SymbolicConstant(c, "PlayOnce", "int", Value(1)),
             new SymbolicConstant(c, "PlayPingPong", "int", Value(2)),
 
+            new SymbolicConstant(c, "LiveReviewOff", "int",
+                                 Value(Session::Off)),
+            new SymbolicConstant(c, "LiveReviewPresenter", "int",
+                                 Value(Session::Presenter)),
+            new SymbolicConstant(c, "LiveReviewParticipantPassive", "int",
+                                 Value(Session::ParticipantPassive)),
+            new SymbolicConstant(c, "LiveReviewParticipantActive", "int",
+                                 Value(Session::ParticipantActive)),
+
             new SymbolicConstant(c, "OkImageStatus", "int",
                                  Value(Session::OkStatus)),
             new SymbolicConstant(c, "ErrorImageStatus", "int",
@@ -6411,11 +6426,12 @@ namespace IPMu
 
             new Function(c, "setFilterLiveReviewEvents",
                          setFilterLiveReviewEvents, None, Return, "void",
-                         Parameters, new Param(c, "shouldFilterEvents", "bool"),
-                         End),
+                         Parameters, new Param(c, "role", "int"), End),
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
-                         None, Return, "bool", End),
+                         None, Return, "bool", Parameters,
+                         new Param(c, "is_media_event", "bool", Value(false)),
+                         End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
                          "string", End),

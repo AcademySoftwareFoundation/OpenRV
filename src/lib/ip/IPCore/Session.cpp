@@ -720,12 +720,40 @@ namespace IPCore
         }
     }
 
-    void Session::setFilterLiveReviewEvents(bool shouldFilterEvents)
+    void Session::setFilterLiveReviewEvents(LiveReviewRole role)
     {
-        m_filterLiveReviewEvents = shouldFilterEvents;
+        m_filterLiveReviewRole = role;
     }
 
-    bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
+    bool Session::filterLiveReviewEvents(bool is_media_event)
+    {
+        // allow flow-through because not in live review mode
+        if (m_filterLiveReviewRole == Off)
+            return false;
+
+        // allow flow-through because presenters can always do anything
+        if (m_filterLiveReviewRole == Presenter)
+            return false;
+
+        // cases below are for modes participant passive or active.
+
+        // prevent flow through of media events for non-presenters, always.
+        if (is_media_event == true)
+            return true;
+
+        // prevent flow through because only presenters are allowed to
+        // do things in single user mode
+        if (m_filterLiveReviewRole == ParticipantPassive)
+            return true;
+
+        // allow flow-through in multi-user mode, where participants can
+        // also do things.
+        if (m_filterLiveReviewRole == ParticipantActive)
+            return false;
+
+        // final case, but should never get here.
+        return false;
+    }
 
     void Session::setName(const string& n) { m_name = n; }
 
@@ -4620,7 +4648,8 @@ namespace IPCore
         if (m_beingDeleted)
             return "";
 
-        if (m_filterLiveReviewEvents
+        // use new method with default is_media_event=false
+        if (filterLiveReviewEvents(false)
             && (eventName == "mode-manager-toggle-mode"
                 || (eventName == "remote-eval"
                     && (contents == "commands.stop()"
