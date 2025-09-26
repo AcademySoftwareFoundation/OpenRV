@@ -450,6 +450,11 @@ global Configuration globalConfig =
 
 \: setRangeOffsetValue (void; string v)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     if (v != "")
     {
         setIntProperty("#RVSource.group.rangeOffset", int[] { int(v) });
@@ -737,7 +742,7 @@ global Configuration globalConfig =
 
 \: sourcesExistState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterLiveReviewEvents(true))
     {
         return DisabledMenuState;
     }
@@ -747,6 +752,11 @@ global Configuration globalConfig =
 
 \: singleSourceState (int;)
 {
+    if (filterLiveReviewEvents(true))
+    {
+        return DisabledMenuState;
+    }
+
     try
     {
         return if sourcesRendered().size() == 1 then
@@ -761,7 +771,7 @@ global Configuration globalConfig =
 
 \: videoSourcesExistState (int;)
 {
-    if (filterLiveReviewEvents())
+    if (filterLiveReviewEvents(true))
     {
         return DisabledMenuState;
     }
@@ -784,6 +794,16 @@ global Configuration globalConfig =
     if (!noexp && vidOK) return NeutralMenuState;
 
     DisabledMenuState;
+}
+
+\: mediaState (int;)
+{
+    if (filterLiveReviewEvents(true))
+    {
+        return DisabledMenuState;
+    }
+
+    return NeutralMenuState;
 }
 
 \: videoSourcesAndNodeExistState (MenuStateFunc; string nodeType)
@@ -978,7 +998,7 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
+        if (filterLiveReviewEvents(true))
         {
             return DisabledMenuState;
         }
@@ -1502,6 +1522,11 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setSourceFPSValue (void; string v)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     let f = float(v);
 
     if (f > 0)
@@ -3897,6 +3922,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: clearEverything (void;)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     let mode = cacheMode(),
         presMode = presentationMode();
 
@@ -3955,6 +3985,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: addMovieOrImageSources (void; Event ev, bool mark, bool merge)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
 
     let files = getMediaFilesFromBrowser();
@@ -4080,6 +4115,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: replaceSourceMedia(void; Event event)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
 
     try
@@ -4123,6 +4163,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: openMovieOrImage (void; Event ev)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
 
     try
@@ -4445,6 +4490,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: openSimpleEDL (void;)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     State state = data();
 
     try
@@ -4496,6 +4546,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cloneSession (void; Event ev)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     let target = tmpSessionCopyName();
     saveSession(target, true, true);
     newSession(string[] {target});
@@ -4504,6 +4559,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cloneRV (void; Event ev)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     let target = tmpSessionCopyName(),
         rv     = system.getenv ("RV_APP_RV");
 
@@ -4516,6 +4576,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cloneSyncedRV (void; Event ev)
 {
+    if (filterLiveReviewEvents(true)) {
+        sendInternalEvent("live-review-blocked-event");
+        return;
+    }
+
     //  Turn on network
     remoteNetwork(true);
 
@@ -4973,6 +5038,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: newSessionState (int;)
 {
+    if (filterLiveReviewEvents(true))
+    {
+        return DisabledMenuState;
+    }
+
     if presentationMode() then DisabledMenuState else UncheckedMenuState;
 }
 
@@ -6430,14 +6500,14 @@ global bool debugGC = false;
     Menu mainMenu_part1 = {
         {"File", Menu {
             {"New Session", \: (void; Event ev) { newSession(nil); }, "control n", newSessionState},
-            {"Open...",  addMovieOrImageSources(,true,false), "control o", nil},
-            {"Merge...",  addMovieOrImageSources(,true,true), nil, nil},
+            {"Open...",  addMovieOrImageSources(,true,false), "control o", mediaState},
+            {"Merge...",  addMovieOrImageSources(,true,true), nil, mediaState},
             {"Open into Layer...",  addMovieOrImage(,addToClosestSource(,"explicit"),false), nil, sourcesExistState},
-            {"Open in New Session...",  openMovieOrImage, "control O", newSessionState},
+            {"Open in New Session...",  openMovieOrImage, "control O", mediaState},
             {"_", nil},
-            {"Clone Session", cloneSession, nil, newSessionState},
-            {"Clone RV", cloneRV, nil, nil},
-            {"Clone Synced RV", cloneSyncedRV, nil, nil},
+            {"Clone Session", cloneSession, nil, mediaState},
+            {"Clone RV", cloneRV, nil, mediaState},
+            {"Clone Synced RV", cloneSyncedRV, nil, mediaState},
             {"_", nil},
             {"Relocate Movie or Image Sequence...",  relocateMovieOrImage, nil, singleSourceState},
             {"Replace Source Media...", replaceSourceMedia, nil, singleSourceState},
@@ -6453,10 +6523,10 @@ global bool debugGC = false;
                 {"Look LUT...",  openLUTFile("#RVLookLUT"), nil, videoSourcesAndNodeExistState("RVLookLUT")},
                 {"Look CDL...",  openCDLFile("#RVColor"), nil, videoSourcesAndNodeExistState("RVColor")},
                 {"File OTIO...",  openOTIOFile(), nil, checkForOTIOFile()},
-                {"Simple EDL...",  ~openSimpleEDL, nil, nil}}},
+                {"Simple EDL...",  ~openSimpleEDL, nil, mediaState}}},
             {"Export", exportMenu},
             {"_", nil},
-            {"Clear",           ~clearEverything, "control N", nil},
+            {"Clear",           ~clearEverything, "control N", mediaState},
             {"Close Session",    queryClose, "control w", nil}
             }},
         {"Edit", Menu {
