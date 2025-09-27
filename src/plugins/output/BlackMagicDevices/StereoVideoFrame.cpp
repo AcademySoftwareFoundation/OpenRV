@@ -44,22 +44,79 @@
 
 #include <BlackMagicDevices/StereoVideoFrame.h>
 #include <stdexcept>
-#include <string.h>
+#include <cstring>
 
 #define CompareREFIID(iid1, iid2) (memcmp(&iid1, &iid2, sizeof(REFIID)) == 0)
 
-StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* left,
+StereoVideoFrame::Provider::Provider(IDeckLinkMutableVideoFrame* parent,
+                                     IDeckLinkMutableVideoFrame* right)
+    : m_parentFrame(parent)
+    , m_rightFrame(right)
+    , m_refCount(1)
+{
+    if (m_parentFrame == nullptr)
+    {
+        throw std::invalid_argument("At least a left frame should be defined");
+    }
+    if (m_rightFrame != nullptr)
+    {
+        m_rightFrame->AddRef();
+    }
+}
+
+StereoVideoFrame::Provider::~Provider()
+{
+    if (m_rightFrame != nullptr)
+    {
+        m_rightFrame->Release();
+    }
+}
+
+HRESULT StereoVideoFrame::Provider::QueryInterface(REFIID iid, LPVOID* ppv)
+{
+    return (new StereoVideoFrame(m_parentFrame, m_rightFrame))
+        ->QueryInterface(iid, ppv);
+}
+
+ULONG StereoVideoFrame::Provider::AddRef()
+{
+#ifdef PLATFORM_WINDOWS
+    return _InterlockedIncrement((volatile long*)&m_refCount);
+#else
+    return ++m_refCount;
+#endif
+}
+
+ULONG StereoVideoFrame::Provider::Release()
+{
+#ifdef PLATFORM_WINDOWS
+    ULONG newRefValue = _InterlockedDecrement((volatile long*)&m_refCount);
+    if (!newRefValue)
+        delete this;
+    return newRefValue;
+#else
+    ULONG refCount = --m_refCount;
+    if (refCount == 0)
+    {
+        delete this;
+    }
+    return refCount;
+#endif
+}
+
+StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
                                    IDeckLinkMutableVideoFrame* right)
-    : m_frameLeft(left)
+    : m_frameLeft(owner)
     , m_frameRight(right)
     , m_refCount(1)
 {
-    if (!m_frameLeft)
+    if (m_frameLeft == nullptr)
     {
-        throw std::invalid_argument("at minimum a left frame must be defined");
+        throw std::invalid_argument("At minimum a left frame must be defined");
     }
+
     m_frameLeft->AddRef();
-    if (m_frameRight)
+    if (m_frameRight != nullptr)
     {
         m_frameRight->AddRef();
     }
@@ -67,8 +124,14 @@ StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* left,
 
 StereoVideoFrame::~StereoVideoFrame()
 {
-    // do not release the left right frames. the frames will be freed later by
-    // DeckLinkVideoDevice
+    if (m_frameLeft != nullptr)
+    {
+        m_frameLeft->Release();
+    }
+    if (m_frameRight != nullptr)
+    {
+        m_frameRight->Release();
+    }
 }
 
 HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
@@ -79,92 +142,56 @@ HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
     REFIID iunknown = IID_IUnknown;
 #endif
 
-    if (CompareREFIID(iid, iunknown))
-        *ppv = static_cast<IDeckLinkVideoFrame*>(this);
-    else if (CompareREFIID(iid, IID_IDeckLinkVideoFrame))
-        *ppv = static_cast<IDeckLinkVideoFrame*>(this);
-    else if (CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
-        *ppv = static_cast<IDeckLinkVideoFrame3DExtensions*>(this);
-    else
+    if (CompareREFIID(iid, iunknown)
+        || CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
     {
-        *ppv = NULL;
-        return E_NOINTERFACE;
+        *ppv = static_cast<IDeckLinkVideoFrame3DExtensions*>(this);
+        AddRef();
+        return S_OK;
     }
 
-    AddRef();
-    return S_OK;
+    *ppv = nullptr;
+    return E_NOINTERFACE;
 }
 
-ULONG StereoVideoFrame::AddRef(void)
+ULONG StereoVideoFrame::AddRef()
 {
 #ifdef PLATFORM_WINDOWS
     return _InterlockedIncrement((volatile long*)&m_refCount);
 #else
-    ScopedLock lock(m_refMutex);
-    m_refCount++;
-    return m_refCount;
+    return ++m_refCount;
 #endif
 }
 
-ULONG StereoVideoFrame::Release(void)
+ULONG StereoVideoFrame::Release()
 {
 #ifdef PLATFORM_WINDOWS
     ULONG newRefValue = _InterlockedDecrement((volatile long*)&m_refCount);
-
     if (!newRefValue)
         delete this;
     return newRefValue;
 #else
-    ScopedLock lock(m_refMutex);
-    m_refCount--;
-    return m_refCount;
+    ULONG refCount = --m_refCount;
+    if (refCount == 0)
+    {
+        delete this;
+    }
+    return refCount;
 #endif
 }
 
-long StereoVideoFrame::GetWidth(void) { return m_frameLeft->GetWidth(); }
-
-long StereoVideoFrame::GetHeight(void) { return m_frameLeft->GetHeight(); }
-
-long StereoVideoFrame::GetRowBytes(void) { return m_frameLeft->GetRowBytes(); }
-
-BMDPixelFormat StereoVideoFrame::GetPixelFormat(void)
-{
-    return m_frameLeft->GetPixelFormat();
-}
-
-BMDFrameFlags StereoVideoFrame::GetFlags(void)
-{
-    return m_frameLeft->GetFlags();
-}
-
-HRESULT StereoVideoFrame::GetBytes(/* out */ void** buffer)
-{
-    return m_frameLeft->GetBytes(buffer);
-}
-
-HRESULT StereoVideoFrame::GetTimecode(/* in */ BMDTimecodeFormat format,
-                                      /* out */ IDeckLinkTimecode** timecode)
-{
-    return m_frameLeft->GetTimecode(format, timecode);
-}
-
-HRESULT StereoVideoFrame::GetAncillaryData(
-    /* out */ IDeckLinkVideoFrameAncillary** ancillary)
-{
-    return m_frameLeft->GetAncillaryData(ancillary);
-}
-
-BMDVideo3DPackingFormat StereoVideoFrame::Get3DPackingFormat(void)
+BMDVideo3DPackingFormat StereoVideoFrame::Get3DPackingFormat()
 {
     return bmdVideo3DPackingLeftOnly;
 }
 
-HRESULT StereoVideoFrame::GetFrameForRightEye(
-    /* out */ IDeckLinkVideoFrame** rightEyeFrame)
+HRESULT
+StereoVideoFrame::GetFrameForRightEye(IDeckLinkVideoFrame** rightEyeFrame)
 {
-    if (m_frameRight)
-        return m_frameRight->QueryInterface(IID_IDeckLinkVideoFrame,
-                                            (void**)rightEyeFrame);
-    else
-        return S_FALSE;
+    if (m_frameRight != nullptr)
+    {
+        return m_frameRight->QueryInterface(
+            IID_IDeckLinkVideoFrame, reinterpret_cast<void**>(rightEyeFrame));
+    }
+    return S_FALSE;
 }

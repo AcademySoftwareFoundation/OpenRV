@@ -51,64 +51,88 @@ typedef __int32 int32_t;
 #endif
 
 #include <boost/thread.hpp>
+#include <atomic>
 
 /*
  * An example class which may be used to output a frame or pair of frames to
  * a 3D capable output.
  *
- * This class implements the IDeckLinkVideoFrame interface which can
- * be used to operate on the left frame.
+ * This class implements the IDeckLinkVideoFrame3DExtensions interface which can
+ * be used to operate on the left frame following the BMD provider pattern
+ *
+ * The Provider class manages the relationship between the video frame and
+ * the 3D extensions, and is associated with the video frame using
+ * SetInterfaceProvider().
  *
  * Access to the right frame through the IDeckLinkVideoFrame3DExtensions
  * interface:
  *
- * 	IDeckLinkVideoFrame *rightEyeFrame;
- * 	hr = threeDimensionalFrame->GetFrameForRightEye(&rightEyeFrame);
+ * IDeckLinkVideoFrame3DExtensions *threeDimensionalFrame;
+ * result = leftEyeFrame->QueryInterface(IID_IDeckLinkVideoFrame3DExtensions,
+ * reinterpret_cast<void**>(&threeDimensionalFrame);
+ * result = threeDimensionalFrame->GetFrameForRightEye(&rightEyeFrame);
  *
  * After which IDeckLinkVideoFrame operations are performed directly
  * on the rightEyeFrame object.
  */
 
-class StereoVideoFrame
-    : public IDeckLinkVideoFrame
-    , public IDeckLinkVideoFrame3DExtensions
+class StereoVideoFrame : public IDeckLinkVideoFrame3DExtensions
 {
 public:
-    typedef boost::mutex::scoped_lock ScopedLock;
-    typedef boost::mutex Mutex;
-    typedef boost::condition_variable Condition;
+    using ScopedLock = boost::mutex::scoped_lock;
+    using Mutex = boost::mutex;
+    using Condition = boost::condition_variable;
 
-    // IUnknown methods
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv);
-    virtual ULONG STDMETHODCALLTYPE AddRef(void);
-    virtual ULONG STDMETHODCALLTYPE Release(void);
-
-    // IDeckLinkVideoFrame methods
-    virtual long STDMETHODCALLTYPE GetWidth(void);
-    virtual long STDMETHODCALLTYPE GetHeight(void);
-    virtual long STDMETHODCALLTYPE GetRowBytes(void);
-    virtual BMDPixelFormat STDMETHODCALLTYPE GetPixelFormat(void);
-    virtual BMDFrameFlags STDMETHODCALLTYPE GetFlags(void);
-    virtual HRESULT STDMETHODCALLTYPE GetBytes(/* out */ void** buffer);
-
-    virtual HRESULT STDMETHODCALLTYPE
-    GetTimecode(/* in */ BMDTimecodeFormat format,
-                /* out */ IDeckLinkTimecode** timecode);
-    virtual HRESULT STDMETHODCALLTYPE
-    GetAncillaryData(/* out */ IDeckLinkVideoFrameAncillary** ancillary);
-
-    // IDeckLinkVideoFrame3DExtensions methods
-    virtual BMDVideo3DPackingFormat STDMETHODCALLTYPE Get3DPackingFormat(void);
-    virtual HRESULT STDMETHODCALLTYPE
-    GetFrameForRightEye(/* out */ IDeckLinkVideoFrame** rightEyeFrame);
-
-    StereoVideoFrame(IDeckLinkMutableVideoFrame* left,
-                     IDeckLinkMutableVideoFrame* right = 0);
     virtual ~StereoVideoFrame();
 
-protected:
+    StereoVideoFrame(const StereoVideoFrame&) = delete;
+    StereoVideoFrame& operator=(const StereoVideoFrame&) = delete;
+    StereoVideoFrame(StereoVideoFrame&&) = delete;
+    StereoVideoFrame& operator=(StereoVideoFrame&&) = delete;
+
+    // IUnknown methods
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv) override;
+    ULONG STDMETHODCALLTYPE AddRef() override;
+    ULONG STDMETHODCALLTYPE Release() override;
+
+    // IDeckLinkVideoFrame3DExtensions methods
+    BMDVideo3DPackingFormat STDMETHODCALLTYPE Get3DPackingFormat() override;
+    HRESULT STDMETHODCALLTYPE
+    GetFrameForRightEye(/* out */ IDeckLinkVideoFrame** rightEyeFrame) override;
+
+    class Provider : public IUnknown
+    {
+    public:
+        Provider(IDeckLinkMutableVideoFrame* parent,
+                 IDeckLinkMutableVideoFrame* right);
+        virtual ~Provider();
+
+        Provider(const Provider&) = delete;
+        Provider& operator=(const Provider&) = delete;
+        Provider(Provider&&) = delete;
+        Provider& operator=(Provider&&) = delete;
+
+        // IUnknown methods
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid,
+                                                 LPVOID* ppv) override;
+        ULONG STDMETHODCALLTYPE AddRef() override;
+        ULONG STDMETHODCALLTYPE Release() override;
+
+        IDeckLinkVideoFrame* GetLeftFrame() const { return m_parentFrame; }
+
+    private:
+        IDeckLinkMutableVideoFrame* m_parentFrame;
+        IDeckLinkMutableVideoFrame* m_rightFrame;
+        std::atomic<ULONG> m_refCount;
+    };
+
+private:
+    friend class Provider;
+
+    StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
+                     IDeckLinkMutableVideoFrame* right);
+
     IDeckLinkMutableVideoFrame* m_frameLeft;
     IDeckLinkMutableVideoFrame* m_frameRight;
-    int32_t m_refCount;
-    Mutex m_refMutex;
+    std::atomic<ULONG> m_refCount;
 };
