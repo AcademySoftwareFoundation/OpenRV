@@ -1,0 +1,19 @@
+line-length = 120
+target-version = 'py311'
+exclude = [
+    "src/pub/*",
+    "src/plugins/rv-packages/webview2/webview2.py",
+    "src/plugins/rv-packages/source_setup/source_setup.py",
+    "src/plugins/rv-packages/rvnuke/rvNuke.py",
+    "src/plugins/rv-packages/rvnuke/menu.py",
+    "src/plugins/rv-packages/pyside_example/pyside_example.py",
+    "src/plugins/rv-packages/pymystuff/pymystuff.py",
+    "src/plugins/rv-packages/lat_long_viewer/lat_long_viewer.py",
+    "src/plugins/rv-packages/data_display_indicators/data_display_indicator_mode.py",
+    "src/plugins/rv-packages/custom_lut_menu_mode/custom_lut_menu_mode.py",
+    "src/plugins/python/gtoContainer/gtoContainer.py",
+    "src/lib/mu/MuQt6",
+    "src/lib/mu/MuQt5",
+    "src/lib/app/py_rvui/rv_commands_setup.py",
+    "src/lib/app/py_rvui/rv/qtutils.py"
+]
