@@ -1,15 +1,15 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
 #
-from rv import rvtypes, commands, rvui
-import platform, re
+# SPDX-License-Identifier: Apache-2.0
+#
+from rv import rvtypes
+import platform
+import re
 
 
 class OSDependentPathConversionModeMinorMode(rvtypes.MinorMode):
     def fixpath(self, event):
-
         #
         #  The contents of the "incoming-source-path" looks like
         #  "filename;;tag".
@@ -21,7 +21,7 @@ class OSDependentPathConversionModeMinorMode(rvtypes.MinorMode):
             try:
                 remainder = m1.group(2) if m1 and m1.group(1) != "" else m2.group(2)
                 final = prefix + remainder
-            except:
+            except Exception:
                 final = path
             return final
 
@@ -45,17 +45,11 @@ class OSDependentPathConversionModeMinorMode(rvtypes.MinorMode):
 
         if len(parts) > 1 and parts[1] == "session":
             if os == "Darwin":
-                outpath = choosePath(
-                    self._macPrefix, self._windowsRE, self._linuxRE, inpath
-                )
+                outpath = choosePath(self._macPrefix, self._windowsRE, self._linuxRE, inpath)
             elif os == "Linux":
-                outpath = choosePath(
-                    self._linuxPrefix, self._windowsRE, self._macRE, inpath
-                )
+                outpath = choosePath(self._linuxPrefix, self._windowsRE, self._macRE, inpath)
             elif os == "Windows":
-                outpath = choosePath(
-                    self._windowsPrefix, self._linuxRE, self._macRE, inpath
-                )
+                outpath = choosePath(self._windowsPrefix, self._linuxRE, self._macRE, inpath)
 
         event.setReturnContent(outpath)
 
@@ -83,20 +77,14 @@ class OSDependentPathConversionModeMinorMode(rvtypes.MinorMode):
         self._windowsRE = re.compile("(%s)(.*)" % self._windowsPrefix)
         self._macRE = re.compile("(%s)(.*)" % self._macPrefix)
 
-        initBindings = [
-            ("incoming-source-path", self.fixpath, "Change path for this platform")
-        ]
+        initBindings = [("incoming-source-path", self.fixpath, "Change path for this platform")]
 
         #
         #  NOTE: All prefix values must be set for any translation
         #  to occur.
         #
 
-        if (
-            self._linuxPrefix == None
-            or self._windowsPrefix == None
-            or self._macPrefix == None
-        ):
+        if self._linuxPrefix is None or self._windowsPrefix is None or self._macPrefix is None:
             initBindings = None
 
         self.init("os-dependent-path-conversion", initBindings, None, None)
