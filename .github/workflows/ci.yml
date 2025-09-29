@@ -582,6 +582,16 @@ jobs:
       - name: Build OpenRV main executable
         run: |
           cmake --build _build --config ${{ matrix.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+
+      - name: Lint Python code with ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check
+          
+      - name: Format Python code with ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check
       
       - name: Tests
         run: |
