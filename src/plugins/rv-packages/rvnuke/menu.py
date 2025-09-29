@@ -1,4 +1,5 @@
 import rvNuke
+import nuke
 
 menubar = nuke.menu("Nuke")
 

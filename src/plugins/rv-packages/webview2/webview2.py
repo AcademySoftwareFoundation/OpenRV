@@ -4,6 +4,13 @@
 # SPDX-License-Identifier: Apache-2.0 
 #
 
+import sys
+import os
+
+
+from rv import rvtypes
+from rv import qtutils
+
 try:
     from PySide2 import QtCore
     from PySide2 import QtWidgets
@@ -31,14 +38,6 @@ except ImportError:
     pass
 
 print(QtWebEngineWidgets.__file__)
-
-import sys, os
-
-import rv.commands
-from shiboken2 import getCppPointer
-
-from rv import rvtypes
-from rv import qtutils
 
 
 class WebView2(rvtypes.MinorMode):

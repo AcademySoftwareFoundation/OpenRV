@@ -7,7 +7,9 @@ from rv import rvtypes
 from rv import commands
 from rv import extra_commands
 
-import os, re, platform
+import os
+import re
+import platform
 from six.moves.urllib.parse import urlparse
 
 
@@ -57,16 +59,16 @@ class SourceSetupMode(rvtypes.MinorMode):
         group = args[0]
         fileSource = groupMemberOfType(group, "RVFileSource")
         imageSource = groupMemberOfType(group, "RVImageSource")
-        source = fileSource if imageSource == None else imageSource
+        source = fileSource if imageSource is None else imageSource
         linPipeNode = groupMemberOfType(group, "RVLinearizePipelineGroup")
         linNode = groupMemberOfType(linPipeNode, "RVLinearize")
         ICCNode = groupMemberOfType(linPipeNode, "ICCLinearizeTransform")
         lensNode = groupMemberOfType(linPipeNode, "RVLensWarp")
-        fmtNode = groupMemberOfType(group, "RVFormat")
+        _fmtNode = groupMemberOfType(group, "RVFormat")
         tformNode = groupMemberOfType(group, "RVTransform2D")
         lookPipeNode = groupMemberOfType(group, "RVLookPipelineGroup")
-        lookNode = groupMemberOfType(lookPipeNode, "RVLookLUT")
-        typeName = commands.nodeType(source)
+        _lookNode = groupMemberOfType(lookPipeNode, "RVLookLUT")
+        _typeName = commands.nodeType(source)
         fileNames = commands.getStringProperty("%s.media.movie" % source, 0, 1000)
         fileName = fileNames[0]
         ext = fileName.split(".")[-1].upper()
@@ -105,10 +107,10 @@ class SourceSetupMode(rvtypes.MinorMode):
         try:
             srcAttrs = commands.sourceAttributes(source, fileName)
             srcData = commands.sourceDataAttributes(source, fileName)
-        except:
+        except Exception:
             return
 
-        if srcAttrs == None:
+        if srcAttrs is None:
             print(
                 (
                     "ERROR: SourceSetup: source %s/%s has no attributes"
@@ -398,9 +400,9 @@ class SourceSetupMode(rvtypes.MinorMode):
                 commands.setIntProperty(dICCNode + ".node.active", [0], True)
 
             if (
-                dgroup != None
+                dgroup is not None
                 and commands.nodeType(dgroup) == "RVDisplayGroup"
-                and not dgroup in dnodesWithProfile
+                and dgroup not in dnodesWithProfile
             ):
 
                 dICC = commands.getStringProperty(dgroup + ".device.systemProfileURL")
@@ -536,11 +538,11 @@ class SourceSetupMode(rvtypes.MinorMode):
 
         val = commands.commandLineFlag(varSpecific, None)
 
-        if val == None:
+        if val is None:
             val = commands.commandLineFlag(varGeneral, None)
-        if val == None:
+        if val is None:
             val = os.getenv(varSpecific, None)
-        if val == None:
+        if val is None:
             val = os.getenv(varGeneral, transfer)
 
         return val

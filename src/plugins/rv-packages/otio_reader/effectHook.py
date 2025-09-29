@@ -23,8 +23,8 @@ ADD_NODE_TYPE_MAP = {
 }
 
 if sys.version_info < (3,):
-    SET_NODE_TYPE_MAP[unicode] = commands.StringType
-    ADD_NODE_TYPE_MAP[unicode] = commands.StringType
+    SET_NODE_TYPE_MAP[unicode] = commands.StringType  # noqa: F821
+    ADD_NODE_TYPE_MAP[unicode] = commands.StringType  # noqa: F821
 
 
 class NoMappingForRvNode(Exception):
@@ -63,9 +63,7 @@ def add_rv_effect_props(node_component, prop_map):
             prop_name = "{}.{}".format(node_component, prop)
             rv_value = _get_rv_value(value)
 
-            commands.newProperty(
-                prop_name, ADD_NODE_TYPE_MAP[type(rv_value[0])], len(rv_value)
-            )
+            commands.newProperty(prop_name, ADD_NODE_TYPE_MAP[type(rv_value[0])], len(rv_value))
             _set_rv_prop(prop_name, rv_value)
 
 
@@ -84,11 +82,7 @@ def add_otio_metadata(node_component, otio_node):
     if otio_node.metadata:
         add_rv_effect_props(
             node_component,
-            {
-                "otio_metadata": otio.core.serialize_json_to_string(
-                    otio_node.metadata, indent=-1
-                )
-            },
+            {"otio_metadata": otio.core.serialize_json_to_string(otio_node.metadata, indent=-1)},
         )
 
 
@@ -110,7 +104,7 @@ def get_otio_metadata(node_component):
 
 
 def _get_rv_value(value):
-    if type(value) == bool:
+    if type(value) is bool:
         return [1] if value is True else [0]
 
     # OTIO returns AnyVector, so ensure anything iterable is a list

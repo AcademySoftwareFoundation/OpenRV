@@ -1,4 +1,7 @@
-import argparse, shutil, pathlib, re, sys
+import argparse
+import shutil
+import pathlib
+import re
 
 
 def patch_execute(filename):

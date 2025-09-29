@@ -24,8 +24,6 @@ except ImportError:
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
-import types
-import math
 import rv
 import rv.qtutils
 
@@ -106,7 +104,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
                     if self.rvSessionQObject is not None:
                         self.rvSessionQObject.setWindowOpacity(0.5)
                     rv.commands.setIntProperty(prop, [0], True)
-            except:
+            except Exception:
                 pass
 
         return F
@@ -129,7 +127,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
                     p[0] = spins[index].minimum()
                 spins[index].setValue(p[0])
                 rv.commands.setFloatProperty(prop, p, True)
-            except:
+            except Exception:
                 pass
 
         return F
@@ -138,14 +136,14 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         def F(value):
             try:
                 rv.commands.setFloatProperty(prop, [p], True)
-            except:
+            except Exception:
                 pass
 
         def F():
             try:
                 p = spins[index].value()
                 rv.commands.setFloatProperty(prop, [p], True)
-            except:
+            except Exception:
                 pass
 
         return F
@@ -154,7 +152,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         array = []
         for n in names:
             array.append(self.dialog.findChild(typeObj, n))
-            if array[-1] == None:
+            if array[-1] is None:
                 print("Can't find", n)
         return array
 

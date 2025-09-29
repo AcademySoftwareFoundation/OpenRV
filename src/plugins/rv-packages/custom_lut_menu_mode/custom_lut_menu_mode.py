@@ -208,7 +208,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                     searchType = self.lutNodes[lut][1:]
                     xfrmNodes = commands.closestNodesOfType(searchType, source, 0)
                     xfrmNode = xfrmNodes[0]
-                except:
+                except Exception:
                     continue
 
                 try:
@@ -222,13 +222,13 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                         and power == [1, 1, 1]
                         and sat == 1
                     )
-                except:
+                except Exception:
                     defCDL = True
 
                 try:
                     lut = commands.getStringProperty(xfrmNode + ".lut.file")[0]
                     defLUT = lut == ""
-                except:
+                except Exception:
                     defLUT = True
 
                 if not defLUT or not defCDL:
@@ -236,7 +236,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                         commands.setIntProperty(
                             xfrmNode + ".CDL.active", [int(not self._activeCXfrm)], True
                         )
-                    except:
+                    except Exception:
                         pass
                     if self._activeCXfrm:
                         self.restoreDefaultProps(xfrmNode)
@@ -260,7 +260,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
             try:
                 xfrmFile = self._autoLUT[lut]
                 xfrmExt = xfrmFile.split(".")[-1]
-            except:
+            except Exception:
                 print(("ERROR: Unable to determine extension from '%s'" % xfrmFile))
         else:
             dirUp = 0
@@ -272,7 +272,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                     xfrmFile = containing + os.sep + entry
                     break
 
-        if xfrmFile == None:
+        if xfrmFile is None:
             extra_commands.displayFeedback(
                 "Unable to find accompanying color"
                 + " transform with extension '%s'" % self._autoFormat[lut],
@@ -289,7 +289,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
         try:
             searchType = self.lutNodes[lut][1:]
             xfrmNode = extra_commands.associatedNode(searchType, srcNode)
-        except:
+        except Exception:
             print(("ERROR: Unable to find transform node from '%s'" % searchType))
             return
 
@@ -366,17 +366,17 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                     return commands.CheckedMenuState
                 else:
                     return commands.UncheckedMenuState
-            except:
+            except Exception:
                 return commands.DisabledMenuState
 
         return loaded
 
     def setAutoFormat(self, lut, ext):
         def saveSetting(event):
-            if (ext != None and self._autoLevel[lut] < 0) or (ext == None):
+            if (ext is not None and self._autoLevel[lut] < 0) or (ext is None):
                 self.setAutoFormatLevel(lut, 0)(None)
             self._autoFormat[lut] = ext
-            self._autoLoadCXfrm[lut] = ext != None
+            self._autoLoadCXfrm[lut] = ext is not None
             commands.writeSettings(
                 "CUSTOM_LUTS", lut + "loadColorTransform", self._autoLoadCXfrm[lut]
             )
@@ -394,7 +394,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
 
     def isAutoFormat(self, lut, ext):
         def checkFormat():
-            if (ext == None and not self._autoLoadCXfrm[lut]) or (
+            if (ext is None and not self._autoLoadCXfrm[lut]) or (
                 self._autoLoadCXfrm[lut] and self._autoFormat[lut] == ext
             ):
                 return commands.CheckedMenuState
@@ -414,7 +414,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                         "CUSTOM_LUTS", lut + "AutoLut", self._autoLUT[lut]
                     )
                     self.setAutoFormat(lut, "")(None)
-                except:
+                except Exception:
                     return
             self._autoLevel[lut] = level
             commands.writeSettings(
@@ -529,7 +529,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                 commands.writeSettings(
                     "CUSTOM_LUTS", "custom%sDir" % typeStr, self._dirs[typeStr]
                 )
-            except:
+            except Exception:
                 pass
 
         return changeSpecificLUTDir

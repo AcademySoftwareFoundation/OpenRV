@@ -58,9 +58,7 @@ def create_timeline_from_node(root_node_name):
 
     if commands.nodeType(root_node_name) == "RVStackGroup":
         # check if the OTIO import saved any timeline properties to the stack
-        timeline.metadata.update(
-            get_node_otio_metadata(root_node_name, "timeline_metadata")
-        )
+        timeline.metadata.update(get_node_otio_metadata(root_node_name, "timeline_metadata"))
         name_prop = "{}.otio.timeline_name".format(root_node_name)
         if commands.propertyExists(name_prop):
             timeline.name = commands.getStringProperty(name_prop)[0]
@@ -110,11 +108,7 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
     node_type = commands.nodeType(node_name)
     if node_type in create_type_map:
         process_node = _run_hook(
-            "pre_export_hook_{}".format(node_type),
-            rv_node_name=node_name,
-            optional=True,
-            *args,
-            **kwargs
+            "pre_export_hook_{}".format(node_type), rv_node_name=node_name, optional=True, *args, **kwargs
         )
         if process_node is False:
             return None
@@ -126,16 +120,10 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
             post_node=result,
             optional=True,
             *args,
-            **kwargs
+            **kwargs,
         )
     else:
-        result = _run_hook(
-            "export_{}".format(node_type),
-            rv_node_name=node_name,
-            optional=False,
-            *args,
-            **kwargs
-        )
+        result = _run_hook("export_{}".format(node_type), rv_node_name=node_name, optional=False, *args, **kwargs)
 
     if not isinstance(result, otio.schema.Effect):
         return result
@@ -146,9 +134,7 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
     # Each effect should have one input (another effect or something that
     # results in an otio item).  If not, we don't know how to handle it
     if num_effect_inputs != 1:
-        raise UnhandledEffectInput(
-            "{} effect ({}) should have 1 input".format(node_type, node_name)
-        )
+        raise UnhandledEffectInput("{} effect ({}) should have 1 input".format(node_type, node_name))
 
     # Since we are iterate through inputs, we will find effects before we find
     # the items they belong to. So recurse, keeping track of the effects we've
@@ -188,9 +174,7 @@ def _create_track(node_name, *args, **kwargs):
 
     transition = None
     for edl_index, rv_node in enumerate(
-        [input_node_names[i] for i in edl["source"][:-1]]
-        if has_edl
-        else input_node_names
+        [input_node_names[i] for i in edl["source"][:-1]] if has_edl else input_node_names
     ):
         # We need the item after the transition to correctly process it,
         # so delay this until the next input
@@ -217,9 +201,7 @@ def _create_track(node_name, *args, **kwargs):
             # If we couldn't create an item, add a gap to preserve the
             # EDL times in the subsequent OTIO items
             if not item:
-                item = otio.schema.Gap(
-                    source_range=frames_to_time_range(edl_in, edl_out, fps)
-                )
+                item = otio.schema.Gap(source_range=frames_to_time_range(edl_in, edl_out, fps))
 
         # Now that we have the items surrounding the transition, create it
         if transition:
@@ -248,9 +230,7 @@ def _create_stack(node_name, *args, **kwargs):
 
     input_node_names, _ = commands.nodeConnections(node_name)
 
-    stack = otio.schema.Stack(
-        extra_commands.uiName(node_name), metadata=get_node_otio_metadata(node_name)
-    )
+    stack = otio.schema.Stack(extra_commands.uiName(node_name), metadata=get_node_otio_metadata(node_name))
     stack.markers.extend(_create_markers(node_name, fps))
 
     for input_node_name in input_node_names:
@@ -271,7 +251,6 @@ def _create_item(node_name, *args, **kwargs):
 
     in_frame = kwargs.get("in_frame")
     out_frame = kwargs.get("out_frame")
-    cut_in_frame = kwargs.get("cut_in_frame")
 
     active_source = get_source_node(node_name)
     active_source_group = node_name
@@ -296,16 +275,8 @@ def _create_item(node_name, *args, **kwargs):
 
     # Create TimeRange
     start_time, duration = frames_to_rational_times(
-        start_frame=(
-            in_frame
-            if in_frame is not None
-            else get_source_start_frame(active_source_group)
-        ),
-        end_frame=(
-            out_frame
-            if out_frame is not None
-            else get_source_end_frame(active_source_group)
-        ),
+        start_frame=(in_frame if in_frame is not None else get_source_start_frame(active_source_group)),
+        end_frame=(out_frame if out_frame is not None else get_source_end_frame(active_source_group)),
         fps=fps,
     )
     if start_time or duration:
@@ -344,7 +315,6 @@ def _create_item(node_name, *args, **kwargs):
 
 
 def _create_media_reference(node_name, source_node):
-
     source_path = get_source_path(node_name)
     source_name = get_source_name(node_name)
 
@@ -367,9 +337,7 @@ def _create_media_reference(node_name, source_node):
                 generator_kind="SMPTEBars", metadata=get_node_otio_metadata(source_node)
             )
         else:
-            media_reference = otio.schema.MissingReference(
-                metadata=get_node_otio_metadata(source_node)
-            )
+            media_reference = otio.schema.MissingReference(metadata=get_node_otio_metadata(source_node))
     elif len(image_seq_pattern) == 1:
         media_reference = otio.schema.ImageSequenceReference(
             os.path.dirname(source_path),
@@ -408,9 +376,7 @@ def _create_transition(rv_trx, *args, **kwargs):
     pre_item = kwargs.get("pre_item")[0]
     post_item = kwargs.get("post_item")
 
-    transition_type = TRANSITION_TYPE_MAP.get(
-        commands.nodeType(rv_trx), otio.schema.TransitionTypes.Custom
-    )
+    transition_type = TRANSITION_TYPE_MAP.get(commands.nodeType(rv_trx), otio.schema.TransitionTypes.Custom)
 
     trx_inputs, _ = commands.nodeConnections(rv_trx)
     if len(trx_inputs) != 2:
@@ -478,7 +444,6 @@ def _create_markers(node_name, fps):
     """
 
     def get_marker_color(rgba, defaultColor=otio.schema.MarkerColor.PURPLE):
-
         if is_equal(rgba, PINK):
             return otio.schema.MarkerColor.PINK
         if is_equal(rgba, RED):
@@ -630,9 +595,7 @@ def get_source_node(node_name):
     :return: `str`
     """
 
-    return group_member_of_type(node_name, "RVFileSource") or group_member_of_type(
-        node_name, "RVImageSource"
-    )
+    return group_member_of_type(node_name, "RVFileSource") or group_member_of_type(node_name, "RVImageSource")
 
 
 def get_source_path(node_name):
@@ -715,7 +678,7 @@ def get_movie_first_frame(node_name):
     """
     try:
         return commands.sourceMediaInfo(get_source_node(node_name)).get("startFrame")
-    except:
+    except Exception:
         return None
 
 
@@ -727,7 +690,7 @@ def get_movie_last_frame(node_name):
     """
     try:
         return commands.sourceMediaInfo(get_source_node(node_name)).get("endFrame")
-    except:
+    except Exception:
         return None
 
 
@@ -738,10 +701,8 @@ def get_movie_fps(node_name):
     :return: `int`
     """
     try:
-        return commands.sourceMediaInfo(get_source_node(node_name)).get(
-            "fps", DEFAULT_FPS
-        )
-    except:
+        return commands.sourceMediaInfo(get_source_node(node_name)).get("fps", DEFAULT_FPS)
+    except Exception:
         return None
 
 

@@ -11,9 +11,7 @@ from rv import rvtypes as rvt
 
 import rv.runtime
 
-import os
 import sys
-import re
 
 
 def deb(s):

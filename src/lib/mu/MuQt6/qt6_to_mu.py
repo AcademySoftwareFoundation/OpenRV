@@ -937,8 +937,6 @@ exclusionMap = {
     "QPixmap::NoAlpha": None,
     "QPixmap::PremultipliedAlpha": None,
     "QPixmap::Alpha": None,
-    "QPixmap::HBitmapFormat": None,
-    "QPixmap::ShareMode": None,
     "QPixmap::ImplicitlyShared": None,
     "QPixmap::ExplicitlyShared": None,
     "QPixmap::fromImage": [
@@ -994,7 +992,6 @@ exclusionMap = {
     "QFileDialog::getSaveFileName": None,
     "QFileDialog::getExistingDirectoryUrl": None,
     "QFileDialog::getOpenFileUrls": None,
-    "QFileDialog::getSaveFileName": None,
     "QFileDialog::getSaveFileUrl": None,
     # Issue with std::function
     "QFileDialog::getOpenFileContent": None,
@@ -1309,7 +1306,6 @@ exclusionMap = {
     "QTextDocument::resourceProvider": None,
     "QTextDocument::setResourceProvider": None,
     "QTextDocument::defaultResourceProvider": None,
-    "QTextDocument::setDefaultResourceProvider": None,
     "QTextEdit::extraSelections": None,
     # Issue with const QList<QTextOption::Tab>  arg1 = (&)(param_tabStops);
     "QTextOption::setTabs": None,
@@ -1494,13 +1490,13 @@ excludedDefaultValues = [
 
 
 def isFunctionExcluded(qtnamespace, qtfunc):
-    if qtnamespace != None:
+    if qtnamespace is not None:
         cppname = qtnamespace.name + "::" + qtfunc[0]
     else:
         cppname = qtfunc[0]
     if cppname in exclusionMap:
         e = exclusionMap[cppname]
-        if e == None:
+        if e is None:
             return True
         inname = str(qtfunc)
         for f in e:
@@ -1510,7 +1506,7 @@ def isFunctionExcluded(qtnamespace, qtfunc):
 
 
 def doesFunctionAllowDefaultValues(qtnamespace, funcname):
-    if qtnamespace != None:
+    if qtnamespace is not None:
         cppname = qtnamespace.name + "::" + funcname
     else:
         cppname = qtfunc[0]
@@ -1751,7 +1747,7 @@ class API:
         # an enum in the class not qualified
         # test whether the type name needs to be fully qualified
         # e.g. "InsertPolicy" -> "QComboBox::InsertPolicy"
-        # if inclass != None:
+        # if inclass is not None:
         # for e in inclass.enums:
         #    if e.name == cpptype or e.flags == cpptype:
         #        return "flags %s::%s" % (inclass.name, cpptype)
@@ -1798,8 +1794,8 @@ def parseType(t):
 
 def indexInList(el, list):
     i = 0
-    for l in list:
-        if l == el:
+    for list in list:
+        if list == el:
             return i
         i += 1
     return i
@@ -1833,7 +1829,7 @@ def parseParameter(param, n):
     else:
         name = parts[-1]
         del parts[-1]
-    if parts == [] and name == None and default == None:
+    if parts == [] and name is None and default is None:
         return None
     else:
         type = parseType(parts[:])
@@ -1988,7 +1984,7 @@ def parseFunction(func, qtnamespace):
                 return v
             else:
                 message("WARNING: Nameproto empty for " + func)
-    except:
+    except Exception:
         # Skip any function that has issue with the simple parsing above.
         print("Error parsing function.. skipping: {0}".format(orig_func))
         return None
@@ -2046,7 +2042,7 @@ class NamespaceInfo:
         if self.properties:
             print("--props--")
             for i in self.properties:
-                if i != None:
+                if i is not None:
                     print(i)
         if self.enums:
             print("--enums--")
@@ -2058,37 +2054,37 @@ class NamespaceInfo:
         if self.publicfuncs:
             print("--public member functions--")
             for i in self.publicfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.protectedfuncs:
             print("--protected member functions--")
             for i in self.protectedfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.signals:
             print("--signals functions--")
             for i in self.signals:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.slots:
             print("--slot functions--")
             for i in self.slots:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.staticfuncs:
             print("--static functions--")
             for i in self.staticfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.globalfuncs:
             print("--global functions--")
             for i in self.globalfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
     def enumInHierarchy(self, name):
@@ -2121,7 +2117,7 @@ class NamespaceInfo:
             ):
                 return i.name
             for p in self.inherits:
-                if not p in api.classes.keys():
+                if p not in api.classes.keys():
                     print(
                         "WARNING:",
                         p,
@@ -2224,7 +2220,7 @@ class MuEnum:
                 if self.protected:
                     # for protected enums use actual value instead of symbolic
                     val = e.value
-                if not xmap or (not val in xmap):
+                if not xmap or (val not in xmap):
                     self.symbols.append((n, val))
 
     def aliasDeclation(self):
@@ -2319,7 +2315,7 @@ class MuFunction:
         for aname, atype, aval in args:
             message("Trying to translate (%s, %s) for %s" % (atype, c, name))
             mutype = api.translate(atype, c)
-            if mutype == None:
+            if mutype is None:
                 self.failed = True
                 message(
                     "%s failed because api.translate(%s,%s) return None"
@@ -2334,7 +2330,7 @@ class MuFunction:
             self.rtype = name
             if len(self.args) == 2:
                 if self.args[1][1] == self.name:
-                    if not "*" in qtfunc[2][0][1]:  # not a pointer
+                    if "*" not in qtfunc[2][0][1]:  # not a pointer
                         self.iscopyconstructor = True
         else:
             self.rtype = api.translate(rtype, c)
@@ -2343,7 +2339,7 @@ class MuFunction:
             self.failed = True
             message("%s failed because its a copy constructor" % name)
 
-        if self.rtype == None:
+        if self.rtype is None:
             self.failed = True
             self.rtype = '"%s"' % rtype
             message("%s failed because rtype == %s" % (name, rtype))
@@ -2395,7 +2391,7 @@ class MuFunction:
     def unpackReturnValue(self, expr):
         rtype = conditionType(self.rtype)
         rep = repMapFind(rtype)
-        if rep != None:
+        if rep is not None:
             (repType, instType) = rep
             return expr + "._" + repType
         else:
@@ -2433,7 +2429,7 @@ class MuFunction:
                 # this for some value types. Generally Qt rarely used
                 # default parameter values before Qt 5
                 # right now only ints, flags, and enums are supported
-                if aval != None and doesFunctionAllowDefaultValues(
+                if aval is not None and doesFunctionAllowDefaultValues(
                     self.muclass, self.name
                 ):
                     if atype == "int":
@@ -2451,7 +2447,7 @@ class MuFunction:
         if self.isprotected and self.isconstructor:
             return "// NO NODE: CONSTRUCTOR IS PROTECTED: %s" % self.muDeclaration()
         rep = repMapFind(self.rtype)
-        if rep == None:
+        if rep is None:
             return None
         (repType, instType) = rep
         out = "static NODE_IMPLEMENTATION(%s, %s)\n{\n    " % (self.node, repType)
@@ -2651,7 +2647,7 @@ class MuFunction:
             if i == 0 and self.ismember and muclass.iscopyonwrite:
                 if ntype[-1] != "&":
                     ntype += "&"
-                if self.isconst and not "const" in ntype:
+                if self.isconst and "const" not in ntype:
                     ntype = "const " + ntype
             elif ntype[-1] == "&":
                 ntype = ntype[0:-1]
@@ -2691,8 +2687,8 @@ class MuFunction:
         rtypeLayoutItem = muapi.isAByName(self.rtype, "QLayoutItem")
         rtypePaintDevice = (
             muapi.isAByName(self.rtype, "QPaintDevice")
-            and not self.rtype.split(".")[-1] in pointerTypes
-            and not self.rtype.split(".")[-1] in primitiveTypes
+            and self.rtype.split(".")[-1] not in pointerTypes
+            and self.rtype.split(".")[-1] not in primitiveTypes
         )
         rtypeIODeviceBase = muapi.isAByName(self.rtype, "QIODeviceBase")
         rmaker = None
@@ -2930,7 +2926,7 @@ class MuClass:
             qtnamespace = api.classes[qtname]
             for f in qtnamespace.functions:
                 if "virtual" in f[3]:
-                    if not self.hasFunction(f[0]) and not "~" in f[0]:
+                    if not self.hasFunction(f[0]) and "~" not in f[0]:
                         # if self.name == "QLayout":
                         #    print " -> ",str(f)
                         self.inheritedVirtuals.append(
@@ -3143,7 +3139,7 @@ class MuClass:
 
     def hasFlagType(self, flagName):
         for e in self.enums:
-            if e.flags != None and flagName == e.flags:
+            if e.flags is not None and flagName == e.flags:
                 return True
         return False
 
@@ -3158,7 +3154,7 @@ class MuClass:
         return False
 
     def needsLocalQualification(self, name):
-        if name == None or intRE.match(name):
+        if name is None or intRE.match(name):
             return False
         return self.hasEnumType(name) or self.hasFlagType(name)
 
@@ -3169,7 +3165,7 @@ class MuClass:
                 value.replace("(", " ").replace(")", " ").replace("|", " ").split(" ")
             )
             for p in parts:
-                if p != "" and p != None:
+                if p != "" and p is not None:
                     if self.needsLocalQualification(p):
                         newvalue = newvalue.replace(p, "%s::%s" % (self.name, p))
             return newvalue
@@ -3417,7 +3413,7 @@ class MuClass:
                                 out += ptype + " " + pname
                             out += ") " + fconst
                             out += " { "
-                            if not "void" in rtype:
+                            if "void" not in rtype:
                                 out += "return "
                             if parent:
                                 out += self.name + "::"
@@ -3568,7 +3564,7 @@ class MuClass:
         cppout.writelines(cpplines)
         cppout.close()
 
-        if not (self.name in noHFileOutput):
+        if self.name not in noHFileOutput:
             hfile = open(templateH, "r")
             hlines = []
             while True:
@@ -3695,7 +3691,7 @@ class MuAPI:
             isQIODeviceBase = c.isAByName("QIODeviceBase")
             c.inheritable = (
                 (isQObject or isQLayoutItem or isQPaintDevice or isQIODeviceBase)
-                and (not c.name in notInheritableTypes)
+                and (c.name not in notInheritableTypes)
                 and allowInheritance
             )
 
@@ -3819,9 +3815,6 @@ class QtDocParser(SGMLParser):
 
     def end_span(self):
         self.modulespan = False
-
-    def end_table(self):
-        self.defenum = False
 
     def start_pre(self, attrs):
         self.precount += 1
@@ -3956,7 +3949,7 @@ class QtDocParser(SGMLParser):
                 self.enums[-1].flags = c + n
             elif self.defenum:
                 n = self.enums[-1].name
-                if n == None:
+                if n is None:
                     self.enums[-1].name = data
                 elif n[-2:] == "::":
                     self.enums[-1].name = n + data
@@ -4039,7 +4032,7 @@ class QtDocParser(SGMLParser):
                 self.buffer += data
 
     def convertFunctions(self):
-        F = lambda x: x != None
+        F = lambda x: x is not None
         P = lambda x: parseFunction(x, self.qtnamespace)
         self.qtnamespace.publicfuncs = filter(F, map(P, self.public))
         self.qtnamespace.slots = filter(F, map(P, self.slots))
@@ -4137,7 +4130,7 @@ def recursiveParse(url):
             recursiveParse(absPath)
     except IOError:
         print("FAILED: (IOError)", url)
-    except:
+    except Exception:
         sys.stdout.flush()
         print("FAILED:", url)
         print(traceback.print_exc())

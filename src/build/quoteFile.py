@@ -3,12 +3,11 @@
 # Copyright (c) 2001, Tweak Films
 # Copyright (c) 2008, Tweak Software
 #
-# SPDX-License-Identifier: Apache-2.0 
+# SPDX-License-Identifier: Apache-2.0
 #
 # Quote a text file in C++ form for inclusion into a C++ source file
 #
 import sys
-import string
 
 index = 1
 varlist = []
@@ -36,10 +35,10 @@ outfile.write("//\n")
 outfile.write("const char* " + cppname + " = ")
 
 for line in lines:
-    l = line.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+    line = line.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
     for subst in varlist:
-        l = l.replace(subst[0], subst[1])
-    outfile.write('"' + l + '"\n')
+        line = line.replace(subst[0], subst[1])
+    outfile.write('"' + line + '"\n')
 
 outfile.write(";\n")
 outfile.close()
