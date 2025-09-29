@@ -3927,6 +3927,20 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         return;
     }
 
+    // Check if we're a presenter with multi-user control who can save sessions
+    if (filterLiveReviewRole() == LiveReviewPresenterMUC)
+    {
+        let answer = alertPanel(true, InfoAlert, "Clear Session", "Save the session before clearing it?", "Save", "Cancel", "Don't save");
+
+        if (answer == 0) { // save
+            if (_save() == false)
+                return;
+        }
+        else if (answer == 1) { // cancel
+            return;
+        }
+    }
+
     let mode = cacheMode(),
         presMode = presentationMode();
 
@@ -4596,19 +4610,28 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: save (void; Event ev)
 {
+    _save();
+}
+
+\: _save(bool;)
+{
     string n = sessionFileName();
 
     if (n == "Untitled" || path.extension(n) != "rv")
     {
-        saveAs(ev);
+        return _saveAs();
     }
-    else
-    {
-        saveSession(n);
-    }
+    
+    saveSession(n);
+    return true;
 }
 
 \: saveAs (void; Event ev)
+{
+    _saveAs();
+}
+
+\: _saveAs(bool;)
 {
     State state = data();
 
@@ -4628,9 +4651,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     catch (...)
     {
         displayFeedback("Cancelled");
+        return false;
     }
 
     redraw();
+
+    return true;
 }
 
 \: exportMarked (void; Event event)

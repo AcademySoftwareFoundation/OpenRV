@@ -4143,13 +4143,12 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
-    NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
+    NODE_IMPLEMENTATION(setFilterLiveReviewRole, void)
     {
         Session* s = Session::currentSession();
         int role = NODE_ARG(0, int);
 
-        s->setFilterLiveReviewEvents(
-            static_cast<Session::LiveReviewRole>(role));
+        s->setFilterLiveReviewRole(static_cast<Session::LiveReviewRole>(role));
     }
 
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
@@ -4161,6 +4160,12 @@ namespace IPMu
             isMediaEvent = NODE_ARG(0, bool);
         }
         NODE_RETURN(s->filterLiveReviewEvents(isMediaEvent));
+    }
+
+    NODE_IMPLEMENTATION(filterLiveReviewRole, int)
+    {
+        Session* s = Session::currentSession();
+        NODE_RETURN(static_cast<int>(s->filterLiveReviewRole()));
     }
 
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
@@ -5837,13 +5842,16 @@ namespace IPMu
             new SymbolicConstant(c, "PlayPingPong", "int", Value(2)),
 
             new SymbolicConstant(c, "LiveReviewOff", "int",
-                                 Value(Session::Off)),
+                                 Value(Session::LiveReviewRole::Off)),
             new SymbolicConstant(c, "LiveReviewPresenter", "int",
-                                 Value(Session::Presenter)),
-            new SymbolicConstant(c, "LiveReviewParticipantPassive", "int",
-                                 Value(Session::ParticipantPassive)),
-            new SymbolicConstant(c, "LiveReviewParticipantActive", "int",
-                                 Value(Session::ParticipantActive)),
+                                 Value(Session::LiveReviewRole::Presenter)),
+            new SymbolicConstant(c, "LiveReviewPresenterMUC", "int",
+                                 Value(Session::LiveReviewRole::PresenterMUC)),
+            new SymbolicConstant(c, "LiveReviewParticipant", "int",
+                                 Value(Session::LiveReviewRole::Participant)),
+            new SymbolicConstant(
+                c, "LiveReviewParticipantMUC", "int",
+                Value(Session::LiveReviewRole::ParticipantMUC)),
 
             new SymbolicConstant(c, "OkImageStatus", "int",
                                  Value(Session::OkStatus)),
@@ -6424,14 +6432,17 @@ namespace IPMu
                 new Param(c, "contents", "string", Value(Pointer(0))),
                 new Param(c, "senderName", "string", Value(Pointer(0))), End),
 
-            new Function(c, "setFilterLiveReviewEvents",
-                         setFilterLiveReviewEvents, None, Return, "void",
-                         Parameters, new Param(c, "role", "int"), End),
+            new Function(c, "setFilterLiveReviewRole", setFilterLiveReviewRole,
+                         None, Return, "void", Parameters,
+                         new Param(c, "role", "int"), End),
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", Parameters,
                          new Param(c, "isMediaEvent", "bool", Value(false)),
                          End),
+
+            new Function(c, "filterLiveReviewRole", filterLiveReviewRole, None,
+                         Return, "int", End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
                          "string", End),

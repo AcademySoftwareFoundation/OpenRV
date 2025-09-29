@@ -720,9 +720,14 @@ namespace IPCore
         }
     }
 
-    void Session::setFilterLiveReviewEvents(LiveReviewRole role)
+    void Session::setFilterLiveReviewRole(LiveReviewRole role)
     {
         m_filterLiveReviewRole = role;
+    }
+
+    Session::LiveReviewRole Session::filterLiveReviewRole() const
+    {
+        return m_filterLiveReviewRole;
     }
 
     bool Session::filterLiveReviewEvents(bool isMediaEvent)
@@ -732,7 +737,8 @@ namespace IPCore
             return false;
 
         // allow flow-through because presenters can always do anything
-        if (m_filterLiveReviewRole == Presenter)
+        if (m_filterLiveReviewRole == Presenter
+            || m_filterLiveReviewRole == PresenterMUC)
             return false;
 
         // cases below are for modes participant passive or active.
@@ -743,12 +749,12 @@ namespace IPCore
 
         // prevent flow through because only presenters are allowed to
         // do things in single user mode
-        if (m_filterLiveReviewRole == ParticipantPassive)
+        if (m_filterLiveReviewRole == Participant)
             return true;
 
         // allow flow-through in multi-user mode, where participants can
         // also do things.
-        if (m_filterLiveReviewRole == ParticipantActive)
+        if (m_filterLiveReviewRole == ParticipantMUC)
             return false;
 
         // final case, but should never get here.

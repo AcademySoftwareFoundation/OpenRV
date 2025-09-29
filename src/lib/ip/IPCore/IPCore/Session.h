@@ -188,8 +188,9 @@ namespace IPCore
         {
             Off = 0,
             Presenter = 1,
-            ParticipantPassive = 2,
-            ParticipantActive = 3
+            PresenterMUC = 2,
+            Participant = 3,
+            ParticipantMUC = 4
         };
 
         struct CacheStats : public FBCache::CacheStats
@@ -822,8 +823,9 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(LiveReviewRole role = Off);
+        void setFilterLiveReviewRole(LiveReviewRole role = Off);
         bool filterLiveReviewEvents(bool isMediaEvent = false);
+        LiveReviewRole filterLiveReviewRole() const;
 
         //
         //  Marks
