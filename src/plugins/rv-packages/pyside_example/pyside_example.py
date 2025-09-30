@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import os
 
@@ -12,14 +12,14 @@ try:
     from PySide2.QtWidgets import *
     from PySide2.QtUiTools import QUiLoader
 except ImportError:
-  try:
-    from PySide6 import QtGui, QtCore, QtWidgets
-    from PySide6.QtGui import *
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from PySide6.QtUiTools import QUiLoader
-  except ImportError:
-    pass
+    try:
+        from PySide6 import QtGui, QtCore, QtWidgets
+        from PySide6.QtGui import *
+        from PySide6.QtCore import *
+        from PySide6.QtWidgets import *
+        from PySide6.QtUiTools import QUiLoader
+    except ImportError:
+        pass
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -157,9 +157,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         return array
 
     def hookup(self, checkbox, spins, dials, prop, last):
-        checkbox.released.connect(
-            self.checkBoxPressed(checkbox, "%s.node.active" % prop)
-        )
+        checkbox.released.connect(self.checkBoxPressed(checkbox, "%s.node.active" % prop))
         for i in range(0, 3):
             dial = dials[i]
             spin = spins[i]
@@ -173,11 +171,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         self.init("pyside_example", None, None)
 
         self.loader = QUiLoader()
-        uifile = QFile(
-            os.path.join(
-                self.supportPath(pyside_example, "pyside_example"), "control.ui"
-            )
-        )
+        uifile = QFile(os.path.join(self.supportPath(pyside_example, "pyside_example"), "control.ui"))
         uifile.open(QFile.ReadOnly)
         self.dialog = self.loader.load(uifile)
         uifile.close()
@@ -192,9 +186,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         # have to hold refs here so they don't get deleted
         self.radialDistortDials = self.findSet(QDial, ["k1Dial", "k2Dial", "k3Dial"])
 
-        self.radialDistortSpins = self.findSet(
-            QDoubleSpinBox, ["k1SpinBox", "k2SpinBox", "k3SpinBox"]
-        )
+        self.radialDistortSpins = self.findSet(QDoubleSpinBox, ["k1SpinBox", "k2SpinBox", "k3SpinBox"])
 
         self.lastRadialDistort = [0, 0, 0]
 

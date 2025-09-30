@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from rv import rvtypes, commands, extra_commands
 import os
@@ -56,9 +56,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
 
     def toggleDefaultDisplayLUT(self, event):
         self._autoLoadDLUT = not self._autoLoadDLUT
-        commands.writeSettings(
-            "CUSTOM_LUTS", "loadDefaultDisplayLut", int(self._autoLoadDLUT)
-        )
+        commands.writeSettings("CUSTOM_LUTS", "loadDefaultDisplayLut", int(self._autoLoadDLUT))
         if self._autoLoadDLUT:
             deflut = commands.getStringProperty(self.lutNodes["DLUT"] + ".lut.file")[0]
             extra_commands.displayFeedback("Default Display LUT: %s" % (deflut), 5.0)
@@ -125,9 +123,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
             fltProps = linFltProps
         if linNode in self._setups.keys():
             for prop in intProps:
-                commands.setIntProperty(
-                    linNode + ".color." + prop, [int(self._setups[linNode][prop])], True
-                )
+                commands.setIntProperty(linNode + ".color." + prop, [int(self._setups[linNode][prop])], True)
             for prop in fltProps:
                 commands.setFloatProperty(
                     linNode + ".color." + prop,
@@ -148,18 +144,10 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
             else:
                 self.restoreDefaultProps(lutNode, display)
         except Exception as inst:
-            extra_commands.displayFeedback(
-                "LUT File Failed to Read: Check File %s" % path, 5.0
-            )
-            print(
-                (
-                    "ERROR: Failed to set LUT '%s' for %s: %s"
-                    % (path, lutNode, str(inst))
-                )
-            )
+            extra_commands.displayFeedback("LUT File Failed to Read: Check File %s" % path, 5.0)
+            print(("ERROR: Failed to set LUT '%s' for %s: %s" % (path, lutNode, str(inst))))
 
     def sourceColorSetup(self, event):
-
         # IF No Linearization is set, turn off all To->Linear Conversions
         if self._noLinConv:
             source = event.contents().split(";")[0]
@@ -171,12 +159,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
         for lut in self.lutNodes.keys():
             if self.lutNodes[lut].startswith("#") and self._autoLoadCXfrm[lut]:
                 if self._autoFormat[lut] != "":
-                    print(
-                        (
-                            "INFO: Searching for accompanying '%s'"
-                            % self._autoFormat[lut]
-                        )
-                    )
+                    print(("INFO: Searching for accompanying '%s'" % self._autoFormat[lut]))
                 self.loadColorXfrm(lut, event)
 
         event.reject()
@@ -187,7 +170,6 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
             dnodes = commands.nodesOfType("RVDisplayColor")
 
         for dnode in dnodes:
-
             # IF No Display is set, turn off all Linear->To Display settings
             if self._noDispCor:
                 self.saveDefaultProps(dnode, True)
@@ -216,12 +198,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                     offset = commands.getFloatProperty(xfrmNode + ".CDL.offset")
                     power = commands.getFloatProperty(xfrmNode + ".CDL.power")
                     sat = commands.getFloatProperty(xfrmNode + ".CDL.saturation")[0]
-                    defCDL = (
-                        slope == [1, 1, 1]
-                        and offset == [0, 0, 0]
-                        and power == [1, 1, 1]
-                        and sat == 1
-                    )
+                    defCDL = slope == [1, 1, 1] and offset == [0, 0, 0] and power == [1, 1, 1] and sat == 1
                 except Exception:
                     defCDL = True
 
@@ -233,9 +210,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
 
                 if not defLUT or not defCDL:
                     try:
-                        commands.setIntProperty(
-                            xfrmNode + ".CDL.active", [int(not self._activeCXfrm)], True
-                        )
+                        commands.setIntProperty(xfrmNode + ".CDL.active", [int(not self._activeCXfrm)], True)
                     except Exception:
                         pass
                     if self._activeCXfrm:
@@ -274,16 +249,10 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
 
         if xfrmFile is None:
             extra_commands.displayFeedback(
-                "Unable to find accompanying color"
-                + " transform with extension '%s'" % self._autoFormat[lut],
+                "Unable to find accompanying color" + " transform with extension '%s'" % self._autoFormat[lut],
                 5.0,
             )
-            print(
-                (
-                    "WARNING: No '%s' file found in '%s' for '%s'"
-                    % (self._autoFormat[lut], containing, movie)
-                )
-            )
+            print(("WARNING: No '%s' file found in '%s' for '%s'" % (self._autoFormat[lut], containing, movie)))
             return
 
         try:
@@ -297,15 +266,8 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
             try:
                 commands.readCDL(xfrmFile, xfrmNode, True)
             except Exception as inst:
-                extra_commands.displayFeedback(
-                    "CDL File Failed to Read: Check File %s" % xfrmFile, 5.0
-                )
-                print(
-                    (
-                        "ERROR: Failed to set CDL '%s' for %s: %s"
-                        % (xfrmFile, xfrmNode, str(inst))
-                    )
-                )
+                extra_commands.displayFeedback("CDL File Failed to Read: Check File %s" % xfrmFile, 5.0)
+                print(("ERROR: Failed to set CDL '%s' for %s: %s" % (xfrmFile, xfrmNode, str(inst))))
 
         elif xfrmExt in LUTS:
             self.setLUT(xfrmFile, xfrmNode)
@@ -377,16 +339,10 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                 self.setAutoFormatLevel(lut, 0)(None)
             self._autoFormat[lut] = ext
             self._autoLoadCXfrm[lut] = ext is not None
-            commands.writeSettings(
-                "CUSTOM_LUTS", lut + "loadColorTransform", self._autoLoadCXfrm[lut]
-            )
+            commands.writeSettings("CUSTOM_LUTS", lut + "loadColorTransform", self._autoLoadCXfrm[lut])
             if self._autoLoadCXfrm[lut]:
-                extra_commands.displayFeedback(
-                    "Autoload shot CDL/Look LUT: %s" % (ext), 5.0
-                )
-                commands.writeSettings(
-                    "CUSTOM_LUTS", lut + "autoColorTransform", self._autoFormat[lut]
-                )
+                extra_commands.displayFeedback("Autoload shot CDL/Look LUT: %s" % (ext), 5.0)
+                commands.writeSettings("CUSTOM_LUTS", lut + "autoColorTransform", self._autoFormat[lut])
             else:
                 extra_commands.displayFeedback("Disabled Autoload CDL/Look LUT", 5.0)
 
@@ -407,19 +363,13 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
         def saveAutoDirLevel(event):
             if level < 0:
                 try:
-                    self._autoLUT[lut] = commands.openFileDialog(
-                        True, False, False, None, self._dirs[lut]
-                    )[0]
-                    commands.writeSettings(
-                        "CUSTOM_LUTS", lut + "AutoLut", self._autoLUT[lut]
-                    )
+                    self._autoLUT[lut] = commands.openFileDialog(True, False, False, None, self._dirs[lut])[0]
+                    commands.writeSettings("CUSTOM_LUTS", lut + "AutoLut", self._autoLUT[lut])
                     self.setAutoFormat(lut, "")(None)
                 except Exception:
                     return
             self._autoLevel[lut] = level
-            commands.writeSettings(
-                "CUSTOM_LUTS", lut + "autoFormatDirLevel", self._autoLevel[lut]
-            )
+            commands.writeSettings("CUSTOM_LUTS", lut + "autoFormatDirLevel", self._autoLevel[lut])
 
         return saveAutoDirLevel
 
@@ -465,9 +415,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
         fmtOpts.append(("LUT", None, "", lambda: commands.DisabledMenuState))
         for ext in LUTS:
             title = "  " + ext.upper()
-            fmtOpts.append(
-                (title, self.setAutoFormat(lut, ext), "", self.isAutoFormat(lut, ext))
-            )
+            fmtOpts.append((title, self.setAutoFormat(lut, ext), "", self.isAutoFormat(lut, ext)))
 
         fmtOpts += [
             ("_", None),
@@ -522,13 +470,9 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
     def changeLUTDir(self, typeStr):
         def changeSpecificLUTDir(event):
             try:
-                self._dirs[typeStr] = commands.openFileDialog(
-                    True, False, True, None, None
-                )[0]
+                self._dirs[typeStr] = commands.openFileDialog(True, False, True, None, None)[0]
                 commands.defineModeMenu("custom-luts-mode", self.createMenu(), True)
-                commands.writeSettings(
-                    "CUSTOM_LUTS", "custom%sDir" % typeStr, self._dirs[typeStr]
-                )
+                commands.writeSettings("CUSTOM_LUTS", "custom%sDir" % typeStr, self._dirs[typeStr])
             except Exception:
                 pass
 
@@ -607,40 +551,20 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
     def __init__(self):
         rvtypes.MinorMode.__init__(self)
 
-        self._autoLoadDLUT = commands.readSettings(
-            "CUSTOM_LUTS", "loadDefaultDisplayLut", self._autoLoadDLUT
-        )
+        self._autoLoadDLUT = commands.readSettings("CUSTOM_LUTS", "loadDefaultDisplayLut", self._autoLoadDLUT)
         for lut in self.lutNodes.keys():
-            self._autoLoadCXfrm[lut] = commands.readSettings(
-                "CUSTOM_LUTS", lut + "loadColorTransform", False
-            )
-            self._autoFormat[lut] = commands.readSettings(
-                "CUSTOM_LUTS", lut + "autoColorTransform", ""
-            )
-            self._autoLevel[lut] = commands.readSettings(
-                "CUSTOM_LUTS", lut + "autoFormatDirLevel", 0
-            )
-            self._autoLUT[lut] = commands.readSettings(
-                "CUSTOM_LUTS", lut + "AutoLut", "NONE"
-            )
-        self._noLinConv = commands.readSettings(
-            "CUSTOM_LUTS", "linearNoConversion", self._noLinConv
-        )
-        self._noDispCor = commands.readSettings(
-            "CUSTOM_LUTS", "displayNoCorrection", self._noDispCor
-        )
-        self._preferEnv = commands.readSettings(
-            "CUSTOM_LUTS", "preferEnvironment", self._preferEnv
-        )
-        self._onAllDisplays = commands.readSettings(
-            "CUSTOM_LUTS", "onAllDisplays", self._onAllDisplays
-        )
+            self._autoLoadCXfrm[lut] = commands.readSettings("CUSTOM_LUTS", lut + "loadColorTransform", False)
+            self._autoFormat[lut] = commands.readSettings("CUSTOM_LUTS", lut + "autoColorTransform", "")
+            self._autoLevel[lut] = commands.readSettings("CUSTOM_LUTS", lut + "autoFormatDirLevel", 0)
+            self._autoLUT[lut] = commands.readSettings("CUSTOM_LUTS", lut + "AutoLut", "NONE")
+        self._noLinConv = commands.readSettings("CUSTOM_LUTS", "linearNoConversion", self._noLinConv)
+        self._noDispCor = commands.readSettings("CUSTOM_LUTS", "displayNoCorrection", self._noDispCor)
+        self._preferEnv = commands.readSettings("CUSTOM_LUTS", "preferEnvironment", self._preferEnv)
+        self._onAllDisplays = commands.readSettings("CUSTOM_LUTS", "onAllDisplays", self._onAllDisplays)
 
         for typeStr in self._dirs.keys():
             customEnvDir = os.environ.get("RV_CUSTOM_%s_DIR" % typeStr, "")
-            customSettingDir = commands.readSettings(
-                "CUSTOM_LUTS", "custom%sDir" % typeStr, customEnvDir
-            )
+            customSettingDir = commands.readSettings("CUSTOM_LUTS", "custom%sDir" % typeStr, customEnvDir)
             self._dirs[typeStr] = customSettingDir
             if self._preferEnv and customEnvDir != "":
                 self._dirs[typeStr] = customEnvDir

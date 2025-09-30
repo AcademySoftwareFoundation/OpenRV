@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import rv.commands
 
@@ -12,14 +12,14 @@ try:
     from shiboken2 import wrapInstance
     from shiboken2 import getCppPointer
 except ImportError:
-  try:
-    from PySide6 import QtGui, QtWidgets
-    from PySide6.QtGui import *
-    from PySide6.QtWidgets import *
-    from shiboken6 import wrapInstance
-    from shiboken6 import getCppPointer
-  except ImportError:
-    pass
+    try:
+        from PySide6 import QtGui, QtWidgets
+        from PySide6.QtGui import *
+        from PySide6.QtWidgets import *
+        from shiboken6 import wrapInstance
+        from shiboken6 import getCppPointer
+    except ImportError:
+        pass
 
 
 def sessionWindow():

@@ -8,7 +8,7 @@
 # agreement to the ShotGrid Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by ShotGrid Software Inc.
 
-""" 
+"""
 This module defines a generic gtoContainer class.  This class can be used to
 work with GTO data at an extremely high level, without the need to derive a new
 reader class or change your workflow to accomodate the somewhat restrictive GTO
@@ -53,11 +53,11 @@ until runtime?  No problem:
     print myGtoFile[someObject][someComponent][someProperty].name()
 
 
-or mix and match:    
+or mix and match:
 
-    
+
     myGtoFile[someObject].surface.texture.setData( "foo.tex" )
-    
+
 
 Let's say we want to start fresh and make a really simple gto file.  Here we
 illustrate three different ways to create and add Objects, Components, and
@@ -65,14 +65,14 @@ Properties to a gtoContainer:
 
 
     #!/usr/bin/env python
-    
+
     import gto
     from gtoContainer import *
 
     myGtoFile = gtoContainer()
     myGtoFile.myobj = Object( "myobj", "objprotocol", 1 )
     myGtoFile.myobj.append( Component( "mycomponent", "compinterp" ) )
-    
+
     prop = Property( "myprop", gto.STRING, size = 2, width = 1,
                      data = ["Hello","world"] )
     myGtoFile.myobj.mycomponent.append( prop )
@@ -111,6 +111,7 @@ import gto
 import operator
 from functools import reduce
 import six
+
 
 #############################################
 class Property:
@@ -827,9 +828,7 @@ class gtoContainer(gto.Reader):
                 # Create the Property itself.
                 objName = pi.component.object.name
                 compName = pi.component.name
-                newProp = Property(
-                    pi.name, pi.type, pi.size, pi.width, interp=pi.interpretation
-                )
+                newProp = Property(pi.name, pi.type, pi.size, pi.width, interp=pi.interpretation)
                 newProp._Property__deferRead = (self, pi)
                 self[objName][compName].append(newProp)
 
@@ -895,7 +894,7 @@ class gtoContainer(gto.Reader):
         for obj in self.__objects:
             if obj.name() == name:
                 return obj
-        raise AttributeError("gtoContainer instance has no " "attribute '%s'" % name)
+        raise AttributeError("gtoContainer instance has no attribute '%s'" % name)
 
     def __setattr__(self, name, value):
         if isinstance(value, Object):
@@ -1017,9 +1016,7 @@ class gtoContainer(gto.Reader):
         if not self.__deferredRead:
             objName = six.ensure_str(pinfo.component.object.name)
             compName = six.ensure_str(pinfo.component.name)
-            newProp = Property(
-                propName, pinfo.type, pinfo.size, pinfo.width, interp=interp
-            )
+            newProp = Property(propName, pinfo.type, pinfo.size, pinfo.width, interp=interp)
             self[objName][compName].append(newProp)
         return True
 
@@ -1094,9 +1091,7 @@ class gtoContainer(gto.Reader):
                     if propType == gto.STRING:
                         writer.intern(prop())
                     if propInterp:
-                        writer.property(
-                            propName, propType, propSize, propWidth, propInterp
-                        )
+                        writer.property(propName, propType, propSize, propWidth, propInterp)
                     else:
                         writer.property(propName, propType, propSize, propWidth)
                 writer.endComponent()
