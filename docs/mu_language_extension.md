@@ -6,19 +6,19 @@ This directory contains a VS Code/Cursor extension that provides syntax highligh
 
 ### For VS Code:
 ```bash
-cd vscode_extensions/mu-language
+cd mu_language_extension/mu-language
 ./install_vscode.sh
 ```
 
 ### For Cursor:
 ```bash
-cd vscode_extensions/mu-language
+cd mu_language_extension/mu-language
 ./install_cursor.sh
 ```
 
 ### Using the main script:
 ```bash
-cd vscode_extensions/mu-language
+cd mu_language_extension/mu-language
 ./_install.sh vscode    # For VS Code
 ./_install.sh cursor    # For Cursor
 ```
@@ -46,13 +46,13 @@ Once properly configured, `.mu` files will automatically be recognized as "Mu" l
 If you prefer to install manually:
 
 ### For VS Code:
-Copy the entire `vscode_extensions/mu-language` folder to your VS Code extensions directory:
+Copy the entire `mu_language_extension/mu-language` folder to your VS Code extensions directory:
 - **Windows**: `%USERPROFILE%\.vscode\extensions\`
 - **macOS**: `~/.vscode/extensions/`
 - **Linux**: `~/.vscode/extensions/`
 
 ### For Cursor:
-Copy the entire `vscode_extensions/mu-language` folder to your Cursor extensions directory:
+Copy the entire `mu_language_extension/mu-language` folder to your Cursor extensions directory:
 - **Windows**: `%USERPROFILE%\.cursor\extensions\`
 - **macOS**: `~/.cursor/extensions/`
 - **Linux**: `~/.cursor/extensions/`
