@@ -4157,6 +4157,41 @@ namespace IPMu
         NODE_RETURN(s->filterLiveReviewEvents());
     }
 
+    NODE_IMPLEMENTATION(enableActionCategory, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (s && category)
+        {
+            s->enableActionCategory(category->c_str());
+        }
+    }
+
+    NODE_IMPLEMENTATION(disableActionCategory, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (s && category)
+        {
+            s->disableActionCategory(category->c_str());
+        }
+    }
+
+    NODE_IMPLEMENTATION(isActionCategoryEnabled, bool)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (s && category)
+        {
+            return s->isActionCategoryEnabled(category->c_str());
+        }
+
+        return true; // Default to enabled if no session or category
+    }
+
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
     {
         Session* s = Session::currentSession();
@@ -6416,6 +6451,18 @@ namespace IPMu
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", End),
+
+            new Function(c, "enableActionCategory", enableActionCategory, None,
+                         Return, "void", Parameters,
+                         new Param(c, "category", "string"), End),
+
+            new Function(c, "disableActionCategory", disableActionCategory,
+                         None, Return, "void", Parameters,
+                         new Param(c, "category", "string"), End),
+
+            new Function(c, "isActionCategoryEnabled", isActionCategoryEnabled,
+                         None, Return, "bool", Parameters,
+                         new Param(c, "category", "string"), End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
                          "string", End),

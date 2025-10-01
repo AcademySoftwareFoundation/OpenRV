@@ -727,6 +727,61 @@ namespace IPCore
 
     bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
 
+    //----------------------------------------------------------------------
+    // Action Category Blocking
+    //----------------------------------------------------------------------
+
+    void Session::enableActionCategory(const std::string& category)
+    {
+        // Don't enable empty category (legacy commands)
+        if (category.empty())
+            return;
+
+        // Remove category from disallowed list if it exists
+        auto it = std::find(m_disabledActionCategories.begin(),
+                            m_disabledActionCategories.end(), category);
+        if (it != m_disabledActionCategories.end())
+        {
+            m_disabledActionCategories.erase(it);
+        }
+    }
+
+    void Session::disableActionCategory(const std::string& category)
+    {
+        // Don't disable empty category (legacy commands)
+        if (category.empty())
+            return;
+
+        // Don't add duplicates
+        if (std::find(m_disabledActionCategories.begin(),
+                      m_disabledActionCategories.end(), category)
+            == m_disabledActionCategories.end())
+        {
+            m_disabledActionCategories.push_back(category);
+        }
+    }
+
+    bool Session::isActionCategoryDisabled(const std::string& category) const
+    {
+        // Empty category (legacy commands) is never disabled
+        if (category.empty())
+            return false;
+
+        return std::find(m_disabledActionCategories.begin(),
+                         m_disabledActionCategories.end(), category)
+               != m_disabledActionCategories.end();
+    }
+
+    bool Session::isActionCategoryEnabled(const std::string& category) const
+    {
+        return !isActionCategoryDisabled(category);
+    }
+
+    const std::vector<std::string>& Session::disabledActionCategories() const
+    {
+        return m_disabledActionCategories;
+    }
+
     void Session::setName(const string& n) { m_name = n; }
 
     string Session::name() const { return m_name; }
