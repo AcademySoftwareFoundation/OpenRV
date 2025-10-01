@@ -779,7 +779,11 @@
           </widget>
          </item>
          <item row="6" column="1">
-          <widget class="QCheckBox" name="cacheOutsideRegionToggle"/>
+          <widget class="QCheckBox" name="cacheOutsideRegionToggle">
+           <property name="styleSheet">
+            <string>margin-top: 2px;</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -1700,6 +1704,9 @@
              <property name="text">
               <string>Incorporate Video Latency into Audio Offset</string>
              </property>
+             <property name="styleSheet">
+              <string>margin-top: -3px; margin-left: -2px;</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -2503,7 +2510,7 @@
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_5">
                   <property name="text">
-                   <string>Asyn I/O Chunk Size in Bytes</string>
+                   <string>Async I/O Chunk Size in Bytes</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2529,7 +2536,7 @@
                 <item row="3" column="0">
                  <widget class="QLabel" name="exrMaxInFlightLabel">
                   <property name="text">
-                   <string>Max Asyn Requests</string>
+                   <string>Max Async Requests</string>
                   </property>
                  </widget>
                 </item>

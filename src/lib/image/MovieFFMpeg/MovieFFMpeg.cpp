@@ -1582,6 +1582,43 @@ namespace TwkMovie
         return true;
     }
 
+    void MovieFFMpegReader::populateTimecodeMetadata(
+        const AVDictionaryEntry* tcEntry, const AVTimecode& avTimecode)
+    {
+        ostringstream tcStart, tcFR, tcFlags;
+        tcStart << tcEntry->value << " (" << avTimecode.start << ")";
+        m_info.proxy.newAttribute("Timecode/Start", tcStart.str());
+        tcFR << avTimecode.fps;
+        m_info.proxy.newAttribute("Timecode/FrameRate", tcFR.str());
+        if (avTimecode.flags & AV_TIMECODE_FLAG_DROPFRAME)
+        {
+            tcFlags << "Drop ";
+        }
+        if (avTimecode.flags & AV_TIMECODE_FLAG_24HOURSMAX)
+        {
+            tcFlags << "24-Hour Max Counter ";
+        }
+        if (avTimecode.flags & AV_TIMECODE_FLAG_ALLOWNEGATIVE)
+        {
+            tcFlags << "Allow Negative";
+        }
+        m_info.proxy.newAttribute("Timecode/Flags", tcFlags.str());
+    }
+
+    AVRational
+    MovieFFMpegReader::getTimecodeRate(AVStream* tsStream,
+                                       AVFormatContext* formatContext)
+    {
+        AVRational tcRate = {tsStream->time_base.den, tsStream->time_base.num};
+
+        if (isMOVformat(formatContext))
+        {
+            tcRate = tsStream->avg_frame_rate;
+        }
+
+        return tcRate;
+    }
+
     int64_t MovieFFMpegReader::getFirstFrame(AVRational rate)
     {
         //
@@ -1598,17 +1635,11 @@ namespace TwkMovie
                               / double(AV_TIME_BASE)));
         int64_t firstFrame = max(int64_t(m_formatStartFrame), int64_t(1));
 
+        bool foundTimecode = false;
         for (int i = 0; i < m_avFormatContext->nb_streams; i++)
         {
             AVStream* tsStream = m_avFormatContext->streams[i];
-
-            AVRational tcRate = {tsStream->time_base.den,
-                                 tsStream->time_base.num};
-
-            if (isMOVformat(m_avFormatContext))
-            {
-                tcRate = tsStream->avg_frame_rate;
-            }
+            AVRational tcRate = getTimecodeRate(tsStream, m_avFormatContext);
 
             AVDictionaryEntry* tcrEntry;
             tcrEntry = av_dict_get(tsStream->metadata, "reel_name", NULL, 0);
@@ -1633,29 +1664,37 @@ namespace TwkMovie
                 AVTimecode avTimecode;
                 av_timecode_init_from_string(&avTimecode, tcRate,
                                              tcEntry->value, m_avFormatContext);
-
                 // Add the timecode attributes to the movie info
-                ostringstream tcStart, tcFR, tcFlags;
-                tcStart << tcEntry->value << " (" << avTimecode.start << ")";
-                m_info.proxy.newAttribute("Timecode/Start", tcStart.str());
-                tcFR << avTimecode.fps;
-                m_info.proxy.newAttribute("Timecode/FrameRate", tcFR.str());
-                if (avTimecode.flags & AV_TIMECODE_FLAG_DROPFRAME)
-                {
-                    tcFlags << "Drop ";
-                }
-                if (avTimecode.flags & AV_TIMECODE_FLAG_24HOURSMAX)
-                {
-                    tcFlags << "24-Hour Max Counter ";
-                }
-                if (avTimecode.flags & AV_TIMECODE_FLAG_ALLOWNEGATIVE)
-                {
-                    tcFlags << "Allow Negative";
-                }
-                m_info.proxy.newAttribute("Timecode/Flags", tcFlags.str());
+                populateTimecodeMetadata(tcEntry, avTimecode);
                 m_timecodeTrack = i;
-
                 firstFrame = avTimecode.start;
+                foundTimecode = true;
+            }
+        }
+
+        // Fallback: check format-level metadata for timecode if not found in
+        // any stream
+        if (!foundTimecode && m_avFormatContext->metadata)
+        {
+            AVDictionaryEntry* fmtTcEntry =
+                av_dict_get(m_avFormatContext->metadata, "timecode", NULL, 0);
+            if (fmtTcEntry && fmtTcEntry->value)
+            {
+                // Try to get a valid frame rate the same way as the standard
+                // mechanism above.
+                AVRational tcRate = {24, 1}; // Default to 24fps
+                for (unsigned int s = 0; s < m_avFormatContext->nb_streams; ++s)
+                {
+                    AVStream* tsStream = m_avFormatContext->streams[s];
+                    tcRate = getTimecodeRate(tsStream, m_avFormatContext);
+                }
+                AVTimecode avTimecode;
+                av_timecode_init_from_string(
+                    &avTimecode, tcRate, fmtTcEntry->value, m_avFormatContext);
+                // Add the timecode attributes to the movie info
+                populateTimecodeMetadata(fmtTcEntry, avTimecode);
+                firstFrame = avTimecode.start;
+                foundTimecode = true;
             }
         }
         return firstFrame;
@@ -1943,6 +1982,16 @@ namespace TwkMovie
             case AVCOL_PRI_FILM: // = 8
                 cspace << "FILM (8)";
                 break;
+            case AVCOL_PRI_BT2020: // = 9
+                cspace << "ITU-R BT2020 (9)";
+                red[0] = 0.708;
+                red[1] = 0.292;
+                green[0] = 0.170;
+                green[1] = 0.797;
+                blue[0] = 0.131;
+                blue[1] = 0.046;
+                track->fb.setPrimaryColorSpace(ColorSpace::Rec2020());
+                break;
             default:
                 cspace << "UNKNOWN (" << videoCodecContext->color_primaries
                        << ")";
@@ -1976,6 +2025,14 @@ namespace TwkMovie
             case AVCOL_TRC_SMPTE240M: // = 7
                 transfer << "SMPTE-240M (7)";
                 track->fb.setTransferFunction(ColorSpace::SMPTE240M());
+                break;
+            case AVCOL_TRC_SMPTE2084: // = 16
+                transfer << "SMPTE-2084 (16)";
+                track->fb.setTransferFunction(ColorSpace::SMPTE2084());
+                break;
+            case AVCOL_TRC_ARIB_STD_B67: // = 18
+                transfer << "ARIB STD-B67 (18)";
+                track->fb.setTransferFunction(ColorSpace::HybridLogGamma());
                 break;
             default:
                 transfer << "UNKNOWN (" << videoCodecContext->color_trc << ")";
@@ -2026,6 +2083,14 @@ namespace TwkMovie
             case AVCOL_SPC_YCOCG: // = 8
                 // Used by Dirac, VC-2 and H.264 FRext, see ITU-T SG16
                 matrix << "YCoCg (8)";
+                break;
+            case AVCOL_SPC_BT2020_NCL: // 9
+                matrix << "ITU-R BT2020 NCL (9)";
+                track->fb.setConversion(ColorSpace::Rec2020());
+                break;
+            case AVCOL_SPC_BT2020_CL: // 10
+                matrix << "ITU-R BT2020 CL (10)";
+                track->fb.setConversion(ColorSpace::Rec2020());
                 break;
             default:
                 matrix << "UNKNOWN (" << videoCodecContext->colorspace << ")";
