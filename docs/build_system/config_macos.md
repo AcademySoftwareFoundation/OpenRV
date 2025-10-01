@@ -1,4 +1,50 @@
-# Building Open RV on macOS
+# Preparing Open RV on macOS
+
+Open RV 2025 can be built for macOS using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.9
+Cmake               : 3.31.X+
+Xcode               : See XCode section
+
+```
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.15.2
+Python              : 3.10.13
+Cmake               : 3.31.7
+Xcode               : See XCode section
+
+```
+````
+
+All other dependencies are shared across variations.
+
+Open RV 2025 can be built for macOS using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+
+Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
+
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.9
+Cmake               : 3.31.X+
+Xcode               : See XCode section
+
+```
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.15.2
+Python              : 3.10.13
+Cmake               : 3.31.7
+Xcode               : See XCode section
+
+```
+````
+
+All other dependencies are shared across variations.
 
 (summary)=
 ## Summary
@@ -60,102 +106,46 @@ Make sure Homebrew's binary directory is in your PATH and that `brew` can be res
 
 Most of the build requirements can be installed by running the following brew install command:
 
-```bash
+````{tabs}
+```{code-tab} bash VFX-CY2024
 brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.11 yasm clang-format black meson nasm pkg-config glew
 ```
+```{code-tab} bash VFX-CY2023
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.10 yasm clang-format black meson nasm pkg-config glew
+```
+````
 
 Make sure `xcode-select -p` still returns `/Applications/Xcode.app/Contents/Developer`. If that is not the case, run `sudo xcode-select -s /Applications/Xcode.app`
 
 (install_qt)=
 ## Install Qt
 
-Download the last version of Qt 6.5.x using the online installer on the [Qt page](https://www.qt.io/download-open-source). Qt logs, Android, iOS, and WebAssembly are not required to build Open RV.
+Download the Qt version corresponding to your chosen VFX reference platform using the online installer on the [Qt page](https://www.qt.io/download-open-source). Qt logs, Android, iOS, and WebAssembly are not required to build Open RV.
 
+````{tabs}
+```{code-tab} bash VFX-CY2024
+Download Qt 6.5.3 using the online installer.
+This version should be available in the regular Qt installer without needing archives.
+The CI build agents are currently using Qt 6.5.3.
+```
+```{code-tab} bash VFX-CY2023
+Download Qt 5.15.2 from the Qt archives.
+You will need to enable archive packages in the Qt installer to access Qt 5.15.2.
+```
+````
 
-WARNING: If you fetch Qt from another source, make sure it is built with SSL support, contains everything required to build PySide6, and that the file structure is similar to the official package.
+**WARNING**: If you fetch Qt from another source, make sure it is built with SSL support, contains everything required to build PySide6 (for VFX-CY2024) or PySide2 (for VFX-CY2023), and that the file structure is similar to the official package.
 
-Note: Qt6 from homebrew is known to not work well with Open RV.
-Note: The CI build agents are currently using Qt 6.5.3
+**Note**: Qt from homebrew is known to not work well with Open RV.
 
 (build_openrv)=
 ## Build Open RV
 
-(build_openrv1)=
-### Before executing any commands
+Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
 
-To maximize your chances of successfully building Open RV, you must:
-- Fully update your code base to the latest version (or the version you want to use) with a command like `git pull`.
-- Fix all conflicts due to updating the code.
-- Revisit all modified files to ensure they aren't using old code that changed during the update such as when the Visual Studio version changes.
+### macOS-Specific Build Notes
 
-(build_openrv2)=
-### Get Open RV source code
-
-Clone the Open RV repository and change directory into the newly created folder. Typically, the command would be:
-
-Using a password-protected SSH key:
-```shell
-git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-Using the web URL:
-```shell
-git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
-```
-
-(build_openrv3)=
-### Load aliases for Open RV
-
-From the Open RV directory:
-```shell
-source rvcmds.sh
-```
-
-(build_openrv4)=
-### Install Python dependencies
-
-````{note}
-This section needs to be done only once when a fresh Open RV repository is cloned. 
-The first time `rvsetup` is executed, it will create a Python virtual environment in the current directory under `.venv`.
-````
-
-From the Open RV directory, the following command will download and install the Python dependencies.
-```shell
-rvsetup
-```
-
-(build_openrv5)=
-### Configure the project
-
-From the Open RV directory, the following command will configure CMake for the build:
-
-````{tabs}
-```{code-tab} bash Release
-rvcfg
-```
-```{code-tab} bash Debug
-rvcfgd
-```
-````
-
-(build_openrv6)=
-### Build Open RV
-
-From the Open RV directory, the following command will build the main executable:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuild
-```
-```{code-tab} bash Debug
-rvbuildd
-```
-````
-
-(build_openrv7)=
-### Opening Open RV executable
+#### Executable Location
 
 ````{tabs}
 ```{tab} Release
