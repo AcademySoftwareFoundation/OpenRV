@@ -321,7 +321,6 @@ namespace IPCore
             blendMode = IPImage::Replace;
         else if (!strcmp(blendModeString, "topmost"))
             blendMode = IPImage::Replace;
-
         return blendMode;
     }
 

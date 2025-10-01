@@ -11,6 +11,7 @@
 #include <IPCore/ShaderFunction.h>
 #include <IPCore/ShaderSymbol.h>
 #include <IPCore/IPImage.h>
+#include <IPBaseNodes/StackIPNode.h>
 #include <TwkGLF/GL.h>
 #include <TwkFB/Operations.h>
 #include <TwkMath/MatrixColor.h>
@@ -138,6 +139,9 @@ extern const char* Difference4_glsl;
 extern const char* ReverseDifference2_glsl;
 extern const char* ReverseDifference3_glsl;
 extern const char* ReverseDifference4_glsl;
+extern const char* Dissolve2_glsl;
+extern const char* Dissolve3_glsl;
+extern const char* Dissolve4_glsl;
 extern const char* InlineDissolve2_glsl;
 extern const char* BoxFilter_glsl;
 extern const char* ConstantBG_glsl;
@@ -831,6 +835,30 @@ namespace IPCore
                 params.push_back(new Symbol(Symbol::ParameterConstIn, str.str(),
                                             Symbol::Vec4fType));
             }
+
+            return new Shader::Function(
+                funcName, shaderCode, Shader::Function::Color, params, globals);
+        }
+
+        Function* dissolveBlend(int no, const char* funcName, const char* shaderCode)
+        {
+            assert(no >= 2);
+            assert(no <= MAX_TEXTURE_PER_SHADER);
+
+            SymbolVector params, globals;
+            
+            // Add input texture parameters (i0, i1, i2, i3)
+            for (int i = 0; i < no; ++i)
+            {
+                ostringstream str;
+                str << "i" << i;
+                params.push_back(new Symbol(Symbol::ParameterConstIn, str.str(),
+                                            Symbol::Vec4fType));
+            }
+            
+            // Add dissolve amount parameter
+            params.push_back(new Symbol(Symbol::ParameterConstIn, "dissolveAmount",
+                                        Symbol::FloatType));
 
             return new Shader::Function(
                 funcName, shaderCode, Shader::Function::Color, params, globals);
@@ -2971,6 +2999,8 @@ namespace IPCore
         const char* reverseDifferenceShaders[] = {ReverseDifference2_glsl,
                                                   ReverseDifference3_glsl,
                                                   ReverseDifference4_glsl};
+        const char* dissolveShaders[] = {Dissolve2_glsl, Dissolve3_glsl, 
+                                         Dissolve4_glsl};
 
         // generate a blend expr of a certain mode
         // with the input Expressions as input to the blend shaders (over, add,
@@ -3015,7 +3045,6 @@ namespace IPCore
                 F = blend(size, name,
                           overShaders[size - 2]); //*2_glsl is at position 0
                 break;
-                // TODO: dissolve
             }
 
             ArgumentVector args(F->parameters().size());
@@ -3026,6 +3055,43 @@ namespace IPCore
             }
 
             return new Expression(F, args, image);
+        }
+
+        // Overloaded newBlend function that accepts dissolveAmount parameter
+        Expression* newDissolveBlend(const IPImage* image,
+                             const vector<Expression*>& FA1,
+                             const IPImage::BlendMode mode,
+                             float dissolveAmount)
+        {
+            if (mode == IPImage::Dissolve)
+            {
+                int size = FA1.size();
+                assert(size <= MAX_TEXTURE_PER_SHADER);
+                if (size == 1)
+                {
+                    return FA1[0];
+                }
+
+                // Create dissolve blend function
+                Function* F = dissolveBlend(size, "main", dissolveShaders[size - 2]);
+                ArgumentVector args(F->parameters().size());
+
+                // Bind input expressions
+                for (size_t i = 0; i < size; ++i)
+                {
+                    args[i] = new BoundExpression(F->parameters()[i], FA1[i]);
+                }
+
+                // Bind the dissolveAmount parameter
+                args[size] = new BoundFloat(F->parameters()[size], dissolveAmount);
+
+                return new Expression(F, args, image);
+            }
+            else
+            {
+                // For non-dissolve modes, use the original function
+                return newBlend(image, FA1, mode);
+            }
         }
 
         Expression* newHistogram(const IPImage* image,

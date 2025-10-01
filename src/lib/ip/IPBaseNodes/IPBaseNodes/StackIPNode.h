@@ -70,6 +70,8 @@ namespace IPCore
 
         IntProperty* autoSizeProperty() const { return m_autoSize; }
 
+        // float dissolveAmount() const { return m_dissolveAmount->front(); }
+
         virtual void propagateFlushToInputs(const FlushContext&);
 
         void invalidate();
@@ -112,6 +114,7 @@ namespace IPCore
         IntProperty* m_autoSize;
         IntProperty* m_interactiveSize;
         IntProperty* m_supportReversedOrderBlending;
+        FloatProperty* m_dissolveAmount;
 
     private:
         static std::string m_defaultCompType;

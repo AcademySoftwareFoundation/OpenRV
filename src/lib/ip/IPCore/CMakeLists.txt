@@ -151,6 +151,9 @@ SET(_shaders
     ReverseDifference2
     ReverseDifference3
     ReverseDifference4
+    Dissolve2
+    Dissolve3
+    Dissolve4
     InlineDissolve2
     ColorCDL_SAT_noClamp
     ColorPremultLight

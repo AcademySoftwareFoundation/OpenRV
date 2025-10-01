@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>GroupBox</class>
  <widget class="QGroupBox" name="GroupBox">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>207</width>
-    <height>83</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>GroupBox</string>
   </property>
@@ -27,6 +19,11 @@
      <item>
       <property name="text">
        <string>Add</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Dissolve</string>
       </property>
      </item>
      <item>
@@ -51,7 +48,56 @@
      </item>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="dissolveLabel">
+     <property name="text">
+      <string>Dissolve Amount</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1">
+    <layout class="QHBoxLayout" name="dissolveLayout">
+     <item>
+      <widget class="QSlider" name="dissolveSlider">
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="toolTip">
+        <string>Dissolve amount (0-100%)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="dissolveLineEdit">
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>0.5</string>
+       </property>
+       <property name="toolTip">
+        <string>Dissolve amount (0.0 to 1.0)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
