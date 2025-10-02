@@ -249,7 +249,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     }
     
     // Generate accelerator from event pattern
-    let menuKeyText = ""; _eventNameToKeyShortcut(eventPattern);
+    let menuKeyText = _eventNameToKeyShortcut(eventPattern);
 //        menuKeyText = 
 //    }
     

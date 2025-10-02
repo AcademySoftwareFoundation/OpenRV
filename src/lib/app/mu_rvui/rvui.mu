@@ -6319,11 +6319,11 @@ global bool debugGC = false;
             //{"Direct", setToRenderer("Direct"), nil, isSetToRenderer("Direct")}
         //  }},
         menuSeparator(),
-        menuItem("Presentation Mode", "", "", ~togglePresentationMode, presentationModeState),
-        menuItem("Presentation Settings", "", "", noop, enabledItem),
+        menuItem("Presentation Mode", "key-down--control--p", "", ~togglePresentationMode, presentationModeState),
+        menuItem("Presentation Settings", "key-down--alt--alt", "", noop, enabledItem),
         menuSeparator(),
-        menuItem("Frame", "", "", ~frameImage, frameState),
-        menuItem("Frame Width", "", "", frameWidth, frameState),
+        menuItem("Frame", "key-down--f", "", ~frameImage, frameState),
+        menuItem("Frame Width", "key-down--control--f", "", frameWidth, frameState),
         menuSeparator(),
         menuText("Linear to Display Correction"),
         menuItem("   No Correction", "", "", setDispConvert(""), hasDispConversion("")),
@@ -6331,12 +6331,12 @@ global bool debugGC = false;
         menuItem("   Rec709", "", "", setDispConvert("Rec709"), hasDispConversion("Rec709")),
         menuItem("   Display Gamma 2.2", "", "", setDispConvert("Gamma 2.2"), hasDispConversion("Gamma 2.2")),
         menuItem("   Display Gamma 2.4", "", "", setDispConvert("Gamma 2.4"), hasDispConversion("Gamma 2.4")),
-        menuItem("   Display Gamma...", "", "", enterDispGamma, dispGammaState),
+        menuItem("   Display Gamma...", "key-down--v", "", enterDispGamma, dispGammaState),
         menuSeparator(),
-        menuItem("Display LUT Active", "", "", ~toggleDisplayLUT, isDisplayLUTActiveState),
+        menuItem("Display LUT Active", "key-down--D", "", ~toggleDisplayLUT, isDisplayLUTActiveState),
         menuItem("Display ICC Active", "", "", ~toggleDisplayICC, isDisplayICCActiveState),
         menuSeparator(),
-        menuItem("Display Brightness (Interactive)", "", "", brightnessMode, checkForDisplayColor()),
+        menuItem("Display Brightness (Interactive)", "key-down--B", "", brightnessMode, checkForDisplayColor()),
         menuSeparator(),
         subMenu("Matte", MenuItem[] {
             menuItem("No Matte", "", "", ~setMatte(0), matteAspectState(0)),
@@ -6358,13 +6358,13 @@ global bool debugGC = false;
         }),
         menuSeparator(),
         subMenu("Channel Display", MenuItem[] {
-            menuItem("Color (All Channels)", "", "", ~showChannel(0), channelState(0)),
-            menuItem("Red", "", "", ~showChannel(1), channelState(1)),
-            menuItem("Green", "", "", ~showChannel(2), channelState(2)),
-            menuItem("Blue", "", "", ~showChannel(3), channelState(3)),
-            menuItem("Alpha", "", "", ~showChannel(4), channelState(4)),
+            menuItem("Color (All Channels)", "key-down--c", "", ~showChannel(0), channelState(0)),
+            menuItem("Red", "key-down--r", "", ~showChannel(1), channelState(1)),
+            menuItem("Green", "key-down--g", "", ~showChannel(2), channelState(2)),
+            menuItem("Blue", "key-down--b", "", ~showChannel(3), channelState(3)),
+            menuItem("Alpha", "key-down--a", "", ~showChannel(4), channelState(4)),
             menuSeparator(),
-            menuItem("Luminance", "", "", ~showChannel(5), channelState(5))
+            menuItem("Luminance", "key-down--l", "", ~showChannel(5), channelState(5))
         }),
         subMenu("Channel Order", MenuItem[] {
             menuItem("RGBA", "", "", ~channelOrder("RGBA"), channelOrderState("RGBA")),
@@ -6403,7 +6403,7 @@ global bool debugGC = false;
         menuSeparator(),
         menuItem("Create/Edit Display Profiles...", "", "", ~editProfiles, displayProfilesState),
         menuSeparator(),
-        menuItem("Linear Filter", "", "", ~toggleFilter, filterState),
+        menuItem("Linear Filter", "key-down--n", "", ~toggleFilter, filterState),
         menuItem("Lock Pixel Scale During Resize", "", "", toggleLockResizeScale, lockResizeScaleState),
         menuItem("Preserve Image Height in Pixel Aspect Scaling", "", "", toggleExpandWidth, isExpandedWidth)
     };
@@ -6417,7 +6417,7 @@ global bool debugGC = false;
 
     try {
     Menu exportMenu = MenuItem[] {
-        menuItem("Quicktime Movie...", "", "", exportAs(, "mov", "Quicktime Export"), videoSourcesExistAndExportOKState),
+        menuItem("Quicktime Movie...", "key-down--control--e", "", exportAs(, "mov", "Quicktime Export"), videoSourcesExistAndExportOKState),
         menuItem("Image Sequence...", "", "", exportAs(, "*", "Image Sequence Export"), videoSourcesExistAndExportOKState),
         menuItem("Marked Frames...", "", "", exportMarked, hasMarksState),
         menuItem("Annotated Frames...", "", "", exportAnnotatedFrames, videoSourcesExistState),
@@ -6438,10 +6438,10 @@ global bool debugGC = false;
     Menu mainMenu_part1 = MenuItem[] {
         subMenu("File", MenuItem[] {
             menuItem("New Session", "", "", \: (void; Event ev) { newSession(nil); }, newSessionState),
-            menuItem("Open...", "", "", addMovieOrImageSources(,true,false), enabledItem),
-            menuItem("Merge...", "", "", addMovieOrImageSources(,true,true), enabledItem),
+            menuItem("Open...", "key-down--control--i", "", addMovieOrImageSources(,true,false), enabledItem),
+            menuItem("Merge...", "key-down--control--o", "", addMovieOrImageSources(,true,true), enabledItem),
             menuItem("Open into Layer...", "", "", addMovieOrImage(,addToClosestSource(,"explicit"),false), sourcesExistState),
-            menuItem("Open in New Session...", "", "", openMovieOrImage, newSessionState),
+            menuItem("Open in New Session...", "key-down--control--O", "", openMovieOrImage, newSessionState),
             menuSeparator(),
             menuItem("Clone Session", "", "", cloneSession, newSessionState),
             menuItem("Clone RV", "", "", cloneRV, enabledItem),
@@ -6450,8 +6450,8 @@ global bool debugGC = false;
             menuItem("Relocate Movie or Image Sequence...", "", "", relocateMovieOrImage, singleSourceState),
             menuItem("Replace Source Media...", "", "", replaceSourceMedia, singleSourceState),
             menuSeparator(),
-            menuItem("Save Session", "", "", save, enabledItem),
-            menuItem("Save Session As...", "", "", saveAs, enabledItem),
+            menuItem("Save Session", "key-down--control--s", "", save, enabledItem),
+            menuItem("Save Session As...", "key-down--control--S", "", saveAs, enabledItem),
             menuSeparator(),
             subMenu("Import", MenuItem[] {
                 menuItem("Display LUT...", "", "", openLUTFile("@RVDisplayColor"), checkForDisplayColor()),
@@ -6465,8 +6465,8 @@ global bool debugGC = false;
             }),
             subMenu("Export", exportMenu),
             menuSeparator(),
-            menuItem("Clear", "", "", ~clearEverything, enabledItem),
-            menuItem("Close Session", "", "", queryClose, enabledItem)
+            menuItem("Clear", "key-down--control--N", "", ~clearEverything, enabledItem),
+            menuItem("Close Session", "key-down--control--q", "", queryClose, enabledItem)
         }),
         subMenu("Edit", MenuItem[] {
             //{"Undo",              nil,     nil,   inactiveState},
@@ -6476,42 +6476,42 @@ global bool debugGC = false;
             //{"Copy",              nil,     nil,   inactiveState},
             //{"Paste",             nil,     nil,   inactiveState},
             //{"_", nil},
-            menuItem("Mark Frame", "", "", ~toggleMark, markedState),
+            menuItem("Mark Frame", "key-down--m", "", ~toggleMark, markedState),
             menuItem("Mark Sequence Boundaries", "", "", ~markSequence, sequenceState),
             menuItem("Mark Annotated Frames", "", "", ~markAnnotatedFrames, rangeState),
             menuItem("Clear All Marks", "", "", ~clearAllMarks, hasMarksState),
             subMenu("Mark in Range", MenuItem[] {
                 menuItem("Clear Range", "", "", ~clearMarksInRange, hasMarksState),
                 menuSeparator(),
-                menuItem("Set Range In Point", "", "", ~frameFunc(setInPoint), rangeState),
-                menuItem("Set Range Out Point", "", "", ~frameFunc(setOutPoint), rangeState),
-                menuItem("Reset Range", "", "", ~resetInOutPoints, rangeState),
+                menuItem("Set Range In Point", "key-down--[", "", ~frameFunc(setInPoint), rangeState),
+                menuItem("Set Range Out Point", "key-down--]", "", ~frameFunc(setOutPoint), rangeState),
+                menuItem("Reset Range", "key-down--\\", "", ~resetInOutPoints, rangeState),
                 /*
                 {"_", nil},
                 {"Narrow to Range",            ~narrowToInOut,  nil,     nil},
                 {"Widen to Full Range",        ~resetRange,  nil,     nil},
                 */
                 menuSeparator(),
-                menuItem("Set Range From Marks/Boundaries", "", "", ~setInOutMarkedRange, rangeState),
-                menuItem("Next Range From Marks/Boundaries", "", "", ~nextMarkedRange, rangeState),
-                menuItem("Prev Range From Marks/Boundaries", "", "", ~previousMarkedRange, rangeState),
-                menuItem("Expand Range From Marks/Boundaries", "", "", ~expandMarkedRange, rangeState),
-                menuItem("Contract Range From Marks/Boundaries", "", "", ~contractMarkedRange, rangeState)
+                menuItem("Set Range From Marks/Boundaries", "key-down--|", "", ~setInOutMarkedRange, rangeState),
+                menuItem("Next Range From Marks/Boundaries", "key-down--control--right", "", ~nextMarkedRange, rangeState),
+                menuItem("Prev Range From Marks/Boundaries", "key-down--control--left", "", ~previousMarkedRange, rangeState),
+                menuItem("Expand Range From Marks/Boundaries", "key-down--control--up", "", ~expandMarkedRange, rangeState),
+                menuItem("Contract Range From Marks/Boundaries", "key-down--control--down", "", ~contractMarkedRange, rangeState)
             }),
             menuItem("Set Range Offset", "", "", setRangeOffset, sourcesExistState)
         }),
         subMenu("Control", MenuItem[] {
-            menuItem("Play", "", "", ~togglePlayFunc, playState),
+            menuItem("Play", "key-down-- ", "", ~togglePlayFunc, playState),
             menuItem("Stop", "", "", ~stopFunc, rangeState),
-            menuItem("PingPong", "", "", ~togglePingPong, pingPongState),
+            menuItem("PingPong", "key-down--P", "", ~togglePingPong, pingPongState),
             menuItem("Play Once", "", "", ~togglePlayOnce, playOnceState),
-            menuItem("Step Forward", "", "", ~stepForward1, rangeState),
-            menuItem("Step Backward", "", "", ~stepBackward1, rangeState),
-            menuItem("Reverse", "", "", ~toggleForwardsBackwards, rangeState),
+            menuItem("Step Forward", "key-down--right", "", ~stepForward1, rangeState),
+            menuItem("Step Backward", "key-down--left", "", ~stepBackward1, rangeState),
+            menuItem("Reverse", "key-down--up", "", ~toggleForwardsBackwards, rangeState),
             menuSeparator(),
-            menuItem("Go To Frame...", "", "", enterFrame, rangeState),
+            menuItem("Go To Frame...", "key-down--G", "", enterFrame, rangeState),
             menuSeparator(),
-            menuItem("Play All Frames", "", "", ~toggleRealtime, realtimeState),
+            menuItem("Play All Frames", "key-down--A", "", ~toggleRealtime, realtimeState),
                 subMenu("FPS", MenuItem[] {
                     menuItem("24", "", "", ~setFPSFunc(24.0), rangeState),
                     menuItem("25", "", "", ~setFPSFunc(25.0), rangeState),
@@ -6519,18 +6519,18 @@ global bool debugGC = false;
                     menuItem("30", "", "", ~setFPSFunc(30.0), rangeState),
                     menuItem("29.97", "", "", ~setFPSFunc(29.97), rangeState),
                     menuSeparator(),
-                    menuItem("Custom...", "", "", enterFPS, rangeState)
+                    menuItem("Custom...", "key-down--F", "", enterFPS, rangeState)
                 }),
                 menuSeparator(),
-                menuItem("Play Forward", "", "", ~incN(1), forwardState),
-                menuItem("Play Backward", "", "", ~incN(-1), backwardState),
+                menuItem("Play Forward", "key-down--.", "", ~incN(1), forwardState),
+                menuItem("Play Backward", "key-down--,", "", ~incN(-1), backwardState),
                 menuSeparator(),
-                menuItem("Jump To Beginning", "", "", ~beginning, rangeState),
-                menuItem("Jump To Ending", "", "", ~ending, rangeState),
-                menuItem("Next Marked Frame", "", "", ~nextMarkedFrame, rangeState),
-                menuItem("Prev Marked Frame", "", "", ~previousMarkedFrame, rangeState),
-                menuItem("Matching Frame Of Next Source", "", "", ~nextMatchedFrame, rangeState),
-                menuItem("Matching Frame Of Previous Source", "", "", ~previousMatchedFrame, rangeState)
+                menuItem("Jump To Beginning", "key-down--home", "", ~beginning, rangeState),
+                menuItem("Jump To Ending", "key-down--end", "", ~ending, rangeState),
+                menuItem("Next Marked Frame", "key-down--alt--right", "", ~nextMarkedFrame, rangeState),
+                menuItem("Prev Marked Frame", "key-down--alt--left", "", ~previousMarkedFrame, rangeState),
+                menuItem("Matching Frame Of Next Source", "key-down-->", "", ~nextMatchedFrame, rangeState),
+                menuItem("Matching Frame Of Previous Source", "key-down--<", "", ~previousMatchedFrame, rangeState)
             }),
             /*  
              * Moved to prefs GUI
@@ -6551,22 +6551,22 @@ global bool debugGC = false;
                 // MenuItem {"   Picture in Picture", setCompModeAndView("pip","defaultStack"), nil, isStackAndCompMode("pip")},
                 menuItem("   Tile", "", "", setCompModeAndView(nil,"defaultLayout"), viewNodeState("defaultLayout")),
                 menuSeparator(),
-                menuItem("Timeline", "", "", ~toggleTimeline, timelineShown),
-                menuItem("Timeline Magnifier", "", "", ~toggleMotionScope, motionScopeShown),
-                menuItem("Image Info", "", "", ~toggleInfo, infoShown),
-                menuItem("Color Inspector", "", "", ~toggleColorInspector, colorInspectorShown),
-                menuItem("Wipes", "", "", ~toggleWipe, wipeShown),
-                menuItem("Info Strip", "", "", ~toggleInfoStrip, infoStripShown),
-                menuItem("Process Info", "", "", ~toggleProcessInfo, processInfoShown),
-                menuItem("Source Details", "", "", ~toggleSourceDetails, sourceDetailsShown),
+                menuItem("Timeline", "key-down--f2", "", ~toggleTimeline, timelineShown),
+                menuItem("Timeline Magnifier", "key-down--f3", "", ~toggleMotionScope, motionScopeShown),
+                menuItem("Image Info", "key-down--f4", "", ~toggleInfo, infoShown),
+                menuItem("Color Inspector", "key-down--f5", "", ~toggleColorInspector, colorInspectorShown),
+                menuItem("Wipes", "key-down--f6", "", ~toggleWipe, wipeShown),
+                menuItem("Info Strip", "key-down--f7", "", ~toggleInfoStrip, infoStripShown),
+                menuItem("Process Info", "key-down--f8", "", ~toggleProcessInfo, processInfoShown),
+                menuItem("Source Details", "key-down--f11", "", ~toggleSourceDetails, sourceDetailsShown),
                 menuSeparator(),
-                menuItem("Menu Bar", "", "", ~toggleMenuBar, menuBarShown),
+                menuItem("Menu Bar", "key-down--f1", "", ~toggleMenuBar, menuBarShown),
                 menuItem("Top View Toolbar", "", "", toggleTopViewToolbar, topTBShown),
                 menuItem("Bottom View Toolbar", "", "", toggleBottomViewToolbar, botTBShown),
                 menuSeparator(),
-                menuItem("Force Reload Current Frame", "", "", ~reload, sourcesExistState),
-                menuItem("Force Reload Region", "", "", ~reloadInOut, sourcesExistState),
-                menuItem("Reload Changed Frames", "", "", ~loadCurrentSourcesChangedFrames, sourcesExistState),
+                menuItem("Force Reload Current Frame", "key-down--R", "", ~reload, sourcesExistState),
+                menuItem("Force Reload Region", "key-down--control--R", "", ~reloadInOut, sourcesExistState),
+                menuItem("Reload Changed Frames", "key-down--control--C", "", ~loadCurrentSourcesChangedFrames, sourcesExistState),
                 menuSeparator(),
                 menuText("Cache Mode"),
                 menuItem("   Look-Ahead Cache", "", "", cacheModeFunc(CacheBuffer), cacheStateFunc(CacheBuffer)),
@@ -6582,7 +6582,7 @@ global bool debugGC = false;
             menuItem("Scrubbing", "", "", toggleAudioScrub, scrubAudioState),
             menuSeparator(),
             menuText("Global"),
-            menuItem("   Volume", "", "", globalVolumeMode, enabledItem),
+            menuItem("   Volume", "key-down--control--v", "", globalVolumeMode, enabledItem),
             menuItem("   Offset (seconds)", "", "", globalAudioOffsetMode, enabledItem),
             menuItem("   Offset (frames)", "", "", globalAudioOffsetFramesMode, enabledItem),
             menuItem("   Balance", "", "", globalBalanceMode, enabledItem),
@@ -6611,15 +6611,15 @@ global bool debugGC = false;
                 menuItem("Custom...", "", "", enterRes, videoSourcesAndNodeExistState("RVFormat"))
             }),
             subMenu("Scale", MenuItem[] {
-                menuItem("1:1", "", "", ~pixelRelativeScale(1.0), videoSourcesExistState),
+                menuItem("1:1", "key-down--1", "", ~pixelRelativeScale(1.0), videoSourcesExistState),
                 menuSeparator(),
-                menuItem("2:1", "", "", ~pixelRelativeScale(2.0), videoSourcesExistState),
-                menuItem("4:1", "", "", ~pixelRelativeScale(4.0), videoSourcesExistState),
-                menuItem("8:1", "", "", ~pixelRelativeScale(8.0), videoSourcesExistState),
+                menuItem("2:1", "key-down--2", "", ~pixelRelativeScale(2.0), videoSourcesExistState),
+                menuItem("4:1", "key-down--4", "", ~pixelRelativeScale(4.0), videoSourcesExistState),
+                menuItem("8:1", "key-down--8", "", ~pixelRelativeScale(8.0), videoSourcesExistState),
                 menuSeparator(),
-                menuItem("1:2", "", "", ~pixelRelativeScale(1.0/2.0), videoSourcesExistState),
-                menuItem("1:4", "", "", ~pixelRelativeScale(1.0/4.0), videoSourcesExistState),
-                menuItem("1:8", "", "", ~pixelRelativeScale(1.0/8.0), videoSourcesExistState)
+                menuItem("1:2", "key-down--control--2", "", ~pixelRelativeScale(1.0/2.0), videoSourcesExistState),
+                menuItem("1:4", "key-down--control--4", "", ~pixelRelativeScale(1.0/4.0), videoSourcesExistState),
+                menuItem("1:8", "key-down--control--8", "", ~pixelRelativeScale(1.0/8.0), videoSourcesExistState)
             }),
             subMenu("Rotation", MenuItem[] {
                 menuItem("No Rotation", "", "", ~rotateImage(0.0, false), rotateState(0.0)),
@@ -6660,19 +6660,19 @@ global bool debugGC = false;
                 menuItem("    Right Eye Only Offset (%)", "", "", sourceStereoROffsetMode, eyeOffsetState)
             }),
             menuSeparator(),
-            menuItem("Flip", "", "", ~toggleFlip, toggleFlipState),
-            menuItem("Flop", "", "", ~toggleFlop, toggleFlopState),
+            menuItem("Flip", "key-down--Y", "", ~toggleFlip, toggleFlipState),
+            menuItem("Flop", "key-down--X", "", ~toggleFlop, toggleFlopState),
             menuSeparator(),
             menuItem("Remap Source Image Channels...", "", "", enterChanMap, videoSourcesAndNodeExistState("RVChannelMap")),
             menuSeparator(),
             menuItem("Set Source FPS...", "", "", enterSourceFPS, sourcesExistState),
             menuSeparator(),
-            menuItem("Cycle Stack Forward", "", "", cycleStackForward, isStackMode),
-            menuItem("Cycle Stack Backward", "", "", cycleStackBackward, isStackMode)
+            menuItem("Cycle Stack Forward", "key-down--)", "", cycleStackForward, isStackMode),
+            menuItem("Cycle Stack Backward", "key-down--(", "", cycleStackBackward, isStackMode)
         }),
         subMenu("Color", MenuItem[] {
             subMenu("Luminance Look Up Table", MenuItem[] {
-                menuItem("Active", "", "", ~toggleLuminanceLUT, isLuminanceLUTActiveState),
+                menuItem("Active", "key-down--T", "", ~toggleLuminanceLUT, isLuminanceLUTActiveState),
                 menuSeparator(),
                 menuText("Luminance LUTS"),
                 menuItem("   HSV ", "", "", ~HSVLUT, luminanceLUTState("HSV")),
@@ -6682,7 +6682,7 @@ global bool debugGC = false;
                 menuItem("   Contour 10", "", "", ~contourLUT(10), luminanceLUTState("Contour 10")),
                 menuItem("   Contour 20", "", "", ~contourLUT(20), luminanceLUTState("Contour 20")),
                 menuItem("   Contour 100", "", "", ~contourLUT(100), luminanceLUTState("Contour 100")),
-                menuItem("   Random", "", "", ~randomLUT, luminanceLUTState("Random"))
+                menuItem("   Random", "key-down--*", "", ~randomLUT, luminanceLUTState("Random"))
             }),
                     //
                     // XXX I am not sure what this is supposed to do but it only generates errors right now (jon)
@@ -6748,7 +6748,7 @@ global bool debugGC = false;
             menuSeparator(),
             menuText("File Nonlinear to Linear Conversion"),
             menuItem("   No Conversion", "", "", setLinConvert(""), hasLinConversion("")),
-            menuItem("   Cineon/DPX Log", "", "", setLinConvert("Cineon Log"), hasLinConversion("Cineon Log")),
+            menuItem("   Cineon/DPX Log", "key-down--L", "", setLinConvert("Cineon Log"), hasLinConversion("Cineon Log")),
             menuItem("   ALEXA LogC", "", "", setLinConvert("ALEXA LogC"), hasLinConversion("ALEXA LogC")),
             menuItem("   ALEXA LogC Film", "", "", setLinConvert("ALEXA LogC Film"), hasLinConversion("ALEXA LogC Film")),
             // MenuItem {"   SONY S-Log",       setLinConvert("SONY S-Log"), nil, hasLinConversion("SONY S-Log")},
@@ -6767,17 +6767,17 @@ global bool debugGC = false;
             menuItem("Look LUT", "", "", ~toggleLookLUT, isLookLUTActiveState),
             menuItem("Look CDL", "", "", ~toggleLookCDL, isLookCDLActiveState),
             menuSeparator(),
-            menuItem("Invert", "", "", ~toggleInvert, isInvert),
+            menuItem("Invert", "key-down--I", "", ~toggleInvert, isInvert),
             //  RVHistogram node deprecated to remove from GUI for now
             // MenuItem {"Normalize", toggleNormalizeColor, nil, isNormalizingColor},
             menuSeparator(),
             menuText("Interactive Edit"),
-            menuItem("    Gamma", "", "", gammaMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Gamma", "key-down--y", "", gammaMode, videoSourcesAndNodeExistState("RVColor")),
             menuItem("    Color Offset", "", "", colorOffsetMode, videoSourcesAndNodeExistState("RVColor")),
-            menuItem("    Exposure", "", "", exposureMode, videoSourcesAndNodeExistState("RVColor")),
-            menuItem("    Saturation", "", "", saturationMode, videoSourcesAndNodeExistState("RVColor")),
-            menuItem("    Hue", "", "", hueMode, videoSourcesAndNodeExistState("RVColor")),
-            menuItem("    Contrast", "", "", contrastMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Exposure", "key-down--e", "", exposureMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Saturation", "key-down--S", "", saturationMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Hue", "key-down--h", "", hueMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Contrast", "key-down--k", "", contrastMode, videoSourcesAndNodeExistState("RVColor")),
             menuSeparator(),
             subMenu("Range", MenuItem[] {
                 menuItem("From Image", "", "", ~setColorSpaceAttr("Range","From Image"), matchesColorSpaceAttr("Range","From Image")),
@@ -6787,7 +6787,7 @@ global bool debugGC = false;
             }),
             menuSeparator(),
             menuItem("Ignore File Primaries", "", "", ~toggleChromaticities, isIgnoringChromaticies),
-            menuItem("Reset All Color", "", "", ~resetAllColorParameters, videoSourcesAndNodeExistState("RVColor"))
+            menuItem("Reset All Color", "key-down--shift--home", "", ~resetAllColorParameters, videoSourcesAndNodeExistState("RVColor"))
         }),
         subMenu("View", buildViewMenu())
 >>>>>>> d87ccd39 (FINALLY converted menu)
@@ -7063,105 +7063,105 @@ global bool debugGC = false;
     bind("pointer--enter", pointerEnterSession);
     bind("pointer--activate", windowActivate);
     bind("pointer--leave", pointerLeaveSession);
-    bind("key-down-- ", togglePlayFunc, "Toggle Play");
-    bind("key-down--(", cycleStackBackward, "Cycle Image Stack Backwards");
-    bind("key-down--)", cycleStackForward, "Cycle Image Stack Forwards");
-    bind("key-down--*", randomLUT, "Apply Random Luminance LUT");
-    bind("key-down--,", incN(-1), "Set Frame Increment to -1 (reverse)");
-    bind("key-down--.", incN(1), "Set Frame Increment to 1 (forward)");
-    bind("key-down--1", pixelRelativeScale(1.0), "Scale 1:1");
-    bind("key-down--2", pixelRelativeScale(2.0), "Scale 2:1");
+    // bound by menuItem("Play") // bind("key-down-- ", togglePlayFunc, "Toggle Play");
+    // bound by menuItem("Cycle Stack Backward") // bind("key-down--(", cycleStackBackward, "Cycle Image Stack Backwards");
+    // bound by menuItem("Cycle Stack Forward") // bind("key-down--)", cycleStackForward, "Cycle Image Stack Forwards");
+    // bound by menuItem("   Random") // bind("key-down--*", randomLUT, "Apply Random Luminance LUT");
+    // bound by menuItem("Play Backward") // bind("key-down--,", incN(-1), "Set Frame Increment to -1 (reverse)");
+    // bound by menuItem("Play Forward") // bind("key-down--.", incN(1), "Set Frame Increment to 1 (forward)");
+    // bound by menuItem("1:1") // bind("key-down--1", pixelRelativeScale(1.0), "Scale 1:1");
+    // bound by menuItem("2:1") // bind("key-down--2", pixelRelativeScale(2.0), "Scale 2:1");
     bind("key-down--3", pixelRelativeScale(3.0), "Scale 3:1");
-    bind("key-down--4", pixelRelativeScale(4.0), "Scale 4:1");
+    // bound by menuItem("4:1") // bind("key-down--4", pixelRelativeScale(4.0), "Scale 4:1");
     bind("key-down--5", pixelRelativeScale(5.0), "Scale 5:1");
     bind("key-down--6", pixelRelativeScale(6.0), "Scale 6:1");
     bind("key-down--7", pixelRelativeScale(7.0), "Scale 7:1");
-    bind("key-down--8", pixelRelativeScale(8.0), "Scale 8:1");
-    bind("key-down--A", toggleRealtime, "Toggle Real-Time Playback");
+    // bound by menuItem("8:1") // bind("key-down--8", pixelRelativeScale(8.0), "Scale 8:1");
+    // bound by menuItem("Play All Frames") // bind("key-down--A", toggleRealtime, "Toggle Real-Time Playback");
     bind("key-down--C", toggleCacheModeFunc(CacheGreedy), "Toggle Region Caching");
-    bind("key-down--D", toggleDisplayLUT, "Toggle Display LUT");
-    bind("key-down--F", enterFPS, "Enter FPS Value From Keyboard");
-    bind("key-down--G", enterFrame, "Set Frame Number Using Keyboard");
-    bind("key-down--I", toggleInvert, "Toggle Color Invert");
-    bind("key-down--L", setLinConvert("Cineon Log"), "Toggle Cineon Log to Linear Conversion");
+    // bound by menuItem("Display LUT Active") // bind("key-down--D", toggleDisplayLUT, "Toggle Display LUT");
+    // bound by menuItem("Custom...") // bind("key-down--F", enterFPS, "Enter FPS Value From Keyboard");
+    // bound by menuItem("Go To Frame...") // bind("key-down--G", enterFrame, "Set Frame Number Using Keyboard");
+    // bound by menuItem("Invert") // bind("key-down--I", toggleInvert, "Toggle Color Invert");
+    // bound by menuItem("   Cineon/DPX Log") // bind("key-down--L", setLinConvert("Cineon Log"), "Toggle Cineon Log to Linear Conversion");
     bind("key-down--M", cycleMatteOpacity, "Cycle Matte Opacity");
-    bind("key-down--P", togglePingPong, "Toggle Ping/Pong Playback");
-    bind("key-down--R", ~reload, "Force Reload of Current Source");
-    bind("key-down--T", toggleLuminanceLUT, "Toggle Current Luminance LUT");
-    bind("key-down--X", toggleFlop, "Flop Image");
-    bind("key-down--Y", toggleFlip, "Flip Image");
-    bind("key-down--[", frameFunc(setInPoint), "Set In Point");
-    bind("key-down--\\", resetInOutPoints, "Reset In/Out Points");
-    bind("key-down--]", frameFunc(setOutPoint), "Set Out Point");
-    bind("key-down--a", showChannel(4), "Show Alpha Channel");
-    bind("key-down--b", showChannel(3), "Show Blue Channel");
-    bind("key-down--c", showChannel(0), "Normal Color Channel Display");
+    // bound by menuItem("PingPong") // bind("key-down--P", togglePingPong, "Toggle Ping/Pong Playback");
+    // bound by menuItem("Force Reload Current Frame") // bind("key-down--R", ~reload, "Force Reload of Current Source");
+    // bound by menuItem("Active") // bind("key-down--T", toggleLuminanceLUT, "Toggle Current Luminance LUT");
+    // bound by menuItem("Flop") // bind("key-down--X", toggleFlop, "Flop Image");
+    // bound by menuItem("Flip") // bind("key-down--Y", toggleFlip, "Flip Image");
+    // bound by menuItem("Set Range In Point") // bind("key-down--[", frameFunc(setInPoint), "Set In Point");
+    // bound by menuItem("Reset Range") // bind("key-down--\\", resetInOutPoints, "Reset In/Out Points");
+    // bound by menuItem("Set Range Out Point") // bind("key-down--]", frameFunc(setOutPoint), "Set Out Point");
+    // bound by menuItem("Alpha") // bind("key-down--a", showChannel(4), "Show Alpha Channel");
+    // bound by menuItem("Blue") // bind("key-down--b", showChannel(3), "Show Blue Channel");
+    // bound by menuItem("Color (All Channels)") // bind("key-down--c", showChannel(0), "Normal Color Channel Display");
     bind("key-down--alt--l", ~rotateImage(-90, true), "Rotate Image 90deg Counter-Clockwise");
     bind("key-down--alt--r", ~rotateImage(90, true), "Rotate Image 90deg Clockwise");
-    bind("key-down--alt--left", previousMarkedFrame, "Go to Previous Marked Frame");
-    bind("key-down--alt--right", nextMarkedFrame, "Go to Next Marked Frame");
-    bind("key-down--<", previousMatchedFrame, "Go to Matching Frame of Previous Source");
-    bind("key-down-->", nextMatchedFrame, "Go to Matching Frame of Next Source");
+    // bound by menuItem("Prev Marked Frame") // bind("key-down--alt--left", previousMarkedFrame, "Go to Previous Marked Frame");
+    // bound by menuItem("Next Marked Frame") // bind("key-down--alt--right", nextMarkedFrame, "Go to Next Marked Frame");
+    // bound by menuItem("Matching Frame Of Previous Source") // bind("key-down--<", previousMatchedFrame, "Go to Matching Frame of Previous Source");
+    // bound by menuItem("Matching Frame Of Next Source") // bind("key-down-->", nextMatchedFrame, "Go to Matching Frame of Next Source");
     bind("key-down--shift--left", prevView, "Go to Previous View");
     bind("key-down--shift--right", nextView, "Go to Next View");
-    bind("key-down--control--e", exportAs(, "mov", "Quicktime Export"), "Export Quicktime Movie");
-    bind("key-down--control--q", queryClose, "Close Session");
-    bind("key-down--control--N", clearEverything, "Clear Session");
-    bind("key-down--control--S", saveAs, "Save Session As");
-    bind("key-down--control--i", addMovieOrImageSources(,true,false), "Add Source");
-    bind("key-down--control--s", save, "Save Session");
+    // bound by menuItem("Quicktime Movie...") // bind("key-down--control--e", exportAs(, "mov", "Quicktime Export"), "Export Quicktime Movie");
+    // bound by menuItem("Close Session") // bind("key-down--control--q", queryClose, "Close Session");
+    // bound by menuItem("Clear") // bind("key-down--control--N", clearEverything, "Clear Session");
+    // bound by menuItem("Save Session As...") // bind("key-down--control--S", saveAs, "Save Session As");
+    // bound by menuItem("Open...") // bind("key-down--control--i", addMovieOrImageSources(,true,false), "Add Source");
+    // bound by menuItem("Save Session") // bind("key-down--control--s", save, "Save Session");
     bind("key-down--control--w", queryClose, "Close Session");
-    bind("key-down--control--o", addMovieOrImageSources(,true,false), "Open File");
-    bind("key-down--control--O", openMovieOrImage, "Open in New Session");
+    // bound by menuItem("Merge...") // bind("key-down--control--o", addMovieOrImageSources(,true,false), "Open File");
+    // bound by menuItem("Open in New Session...") // bind("key-down--control--O", openMovieOrImage, "Open in New Session");
     bind("key-down--control--1", pixelRelativeScale(1.0/1.0), "Scale 1:1");
-    bind("key-down--control--2", pixelRelativeScale(1.0/2.0), "Scale 1:2");
+    // bound by menuItem("1:2") // bind("key-down--control--2", pixelRelativeScale(1.0/2.0), "Scale 1:2");
     bind("key-down--control--3", pixelRelativeScale(1.0/3.0), "Scale 1:3");
-    bind("key-down--control--4", pixelRelativeScale(1.0/4.0), "Scale 1:4");
+    // bound by menuItem("1:4") // bind("key-down--control--4", pixelRelativeScale(1.0/4.0), "Scale 1:4");
     bind("key-down--control--5", pixelRelativeScale(1.0/5.0), "Scale 1:5");
     bind("key-down--control--6", pixelRelativeScale(1.0/6.0), "Scale 1:6");
     bind("key-down--control--7", pixelRelativeScale(1.0/7.0), "Scale 1:7");
-    bind("key-down--control--8", pixelRelativeScale(1.0/8.0), "Scale 1:8");
+    // bound by menuItem("1:8") // bind("key-down--control--8", pixelRelativeScale(1.0/8.0), "Scale 1:8");
     bind("key-down--control--l", toggleCacheModeFunc(CacheBuffer), "Toggle Look-Ahead Caching");
     bind("key-down--control--m", cycleMatte, "Cycle Mattes");
-    bind("key-down--control--left", previousMarkedRange, "Set In/Out to Previous Marked Range");
-    bind("key-down--control--right", nextMarkedRange, "Set In/Out to Next Marked Range");
-    bind("key-down--control--up", expandMarkedRange, "Expand In/Out to Neighboring Marked Ranges");
-    bind("key-down--control--down", contractMarkedRange, "Contract In/Out from Neighboring Marked Ranges");
-    bind("key-down--control--v", globalVolumeMode, "Edit Global Audio Volume");
-    bind("key-down--control--R", ~reloadInOut, "Reload In/Out Region");
-    bind("key-down--control--C", ~loadCurrentSourcesChangedFrames, "Load Changed Frames of Current Sources");
-    bind("key-down--control--f", frameWidth, "Frame Image Width");
+    // bound by menuItem("Prev Range From Marks/Boundaries") // bind("key-down--control--left", previousMarkedRange, "Set In/Out to Previous Marked Range");
+    // bound by menuItem("Next Range From Marks/Boundaries") // bind("key-down--control--right", nextMarkedRange, "Set In/Out to Next Marked Range");
+    // bound by menuItem("Expand Range From Marks/Boundaries") // bind("key-down--control--up", expandMarkedRange, "Expand In/Out to Neighboring Marked Ranges");
+    // bound by menuItem("Contract Range From Marks/Boundaries") // bind("key-down--control--down", contractMarkedRange, "Contract In/Out from Neighboring Marked Ranges");
+    // bound by menuItem("   Volume") // bind("key-down--control--v", globalVolumeMode, "Edit Global Audio Volume");
+    // bound by menuItem("Force Reload Region") // bind("key-down--control--R", ~reloadInOut, "Reload In/Out Region");
+    // bound by menuItem("Reload Changed Frames") // bind("key-down--control--C", ~loadCurrentSourcesChangedFrames, "Load Changed Frames of Current Sources");
+    // bound by menuItem("Frame Width") // bind("key-down--control--f", frameWidth, "Frame Image Width");
     bind("key-down--down", togglePlayFunc, "Toggle Play");
-    bind("key-down--end", ending, "Go to End of In/Out Region");
-    bind("key-down--f", frameImage, "Frame Image in View");
-    bind("key-down--f1", toggleMenuBar, "Toggle Menu Bar Visibility");
-    bind("key-down--f2", toggleTimeline, "Toggle Heads-Up Timeline");
-    bind("key-down--f3", toggleMotionScope, "Toggle Timeline Magnifier");
-    bind("key-down--f4", toggleInfo, "Toggle Heads-Up Image Info");
-    bind("key-down--f5", toggleColorInspector, "Toggle Heads-Up Color Inspector");
-    bind("key-down--f6", toggleWipe, "Toggle Wipes");
-    bind("key-down--f7", toggleInfoStrip, "Toggle Heads-Up Info Strip");
-    bind("key-down--f8", toggleProcessInfo, "Toggle Heads-Up External Process Progress");
-    bind("key-down--f11", toggleSourceDetails, "Toggle Heads-Up Source Details");
-    bind("key-down--g", showChannel(2), "Show Green Channel");
-    bind("key-down--home", beginning, "Go to Beginning of In/Out Range");
-    bind("key-down--shift--home", resetAllColorParameters, "Reset All Color");
+    // bound by menuItem("Jump To Ending") // bind("key-down--end", ending, "Go to End of In/Out Region");
+    // bound by menuItem("Frame") // bind("key-down--f", frameImage, "Frame Image in View");
+    // bound by menuItem("Menu Bar") // bind("key-down--f1", toggleMenuBar, "Toggle Menu Bar Visibility");
+    // bound by menuItem("Timeline") // bind("key-down--f2", toggleTimeline, "Toggle Heads-Up Timeline");
+    // bound by menuItem("Timeline Magnifier") // bind("key-down--f3", toggleMotionScope, "Toggle Timeline Magnifier");
+    // bound by menuItem("Image Info") // bind("key-down--f4", toggleInfo, "Toggle Heads-Up Image Info");
+    // bound by menuItem("Color Inspector") // bind("key-down--f5", toggleColorInspector, "Toggle Heads-Up Color Inspector");
+    // bound by menuItem("Wipes") // bind("key-down--f6", toggleWipe, "Toggle Wipes");
+    // bound by menuItem("Info Strip") // bind("key-down--f7", toggleInfoStrip, "Toggle Heads-Up Info Strip");
+    // bound by menuItem("Process Info") // bind("key-down--f8", toggleProcessInfo, "Toggle Heads-Up External Process Progress");
+    // bound by menuItem("Source Details") // bind("key-down--f11", toggleSourceDetails, "Toggle Heads-Up Source Details");
+    // bound by menuItem("Green") // bind("key-down--g", showChannel(2), "Show Green Channel");
+    // bound by menuItem("Jump To Beginning") // bind("key-down--home", beginning, "Go to Beginning of In/Out Range");
+    // bound by menuItem("Reset All Color") // bind("key-down--shift--home", resetAllColorParameters, "Reset All Color");
     bind("key-down--i", toggleInfo, "Toggle Heads-Up Image Info");
-    bind("key-down--l", showChannel(5), "Show Image Luminance");
-    bind("key-down--left", stepBackward1, "Move Back One Frame");
-    bind("key-down--m", toggleMark, "Toggle Mark At Frame");
-    bind("key-down--n", toggleFilter, "Toggle Nearest Neighbor/Linear Filter");
+    // bound by menuItem("Luminance") // bind("key-down--l", showChannel(5), "Show Image Luminance");
+    // bound by menuItem("Step Backward") // bind("key-down--left", stepBackward1, "Move Back One Frame");
+    // bound by menuItem("Mark Frame") // bind("key-down--m", toggleMark, "Toggle Mark At Frame");
+    // bound by menuItem("Linear Filter") // bind("key-down--n", toggleFilter, "Toggle Nearest Neighbor/Linear Filter");
     bind("key-down--p", togglePremult, "Toggle Premult Display");
     bind("key-down--page-down", previousMarkedRange, "Set In/Out to Previous Marked Range");
     bind("key-down--page-up", nextMarkedRange, "Set In/Out to Next Marked Range");
-    bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
-    bind("key-down--r", showChannel(1), "Show Red Channel");
-    bind("key-down--right", stepForward1, "Step Forward 1 Frame");
+    // bound by menuItem("Presentation Mode") // bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
+    // bound by menuItem("Red") // bind("key-down--r", showChannel(1), "Show Red Channel");
+    // bound by menuItem("Step Forward") // bind("key-down--right", stepForward1, "Step Forward 1 Frame");
     bind("key-down--t", toggleTimeline, "Toggle Heads-Up Timeline");
     bind("key-down--tab", toggleTimeline, "Toggle Heads-Up Timeline");
-    bind("key-down--up", toggleForwardsBackwards, "Toggle Forward/Backward Playback");
-    bind("key-down--v", enterDispGamma, "Enter Display Gamma");
-    bind("key-down--|", setInOutMarkedRange, "Set In/Out Range From Surrounding Marks");
+    // bound by menuItem("Reverse") // bind("key-down--up", toggleForwardsBackwards, "Toggle Forward/Backward Playback");
+    // bound by menuItem("   Display Gamma...") // bind("key-down--v", enterDispGamma, "Enter Display Gamma");
+    // bound by menuItem("Set Range From Marks/Boundaries") // bind("key-down--|", setInOutMarkedRange, "Set In/Out Range From Surrounding Marks");
     bind("key-down--~", toggleTimeline, "Toggle Timeline");
     bind("pointer--wheeldown", stepForward1, "Step Forward 1 Frame");
     bind("pointer--wheelup", stepBackward1, "Step Backward 1 Frame");
@@ -7251,7 +7251,7 @@ global bool debugGC = false;
     bind("stylus-pen--release", releaseScrub);
     bind("stylus-eraser--push", popupMenu(,nil), "Popup Menu");
 
-    bind("key-down--alt--alt", noop, "Intercept Menu Navigation");
+    // bound by menuItem("Presentation Settings") // bind("key-down--alt--alt", noop, "Intercept Menu Navigation");
     bind("key-up--alt--alt", noop, "Intercept Menu Navigation");
 
     bind("remote-connection-start", ~activateSync, "Auto start sync mode");
@@ -7274,12 +7274,12 @@ global bool debugGC = false;
     //  Hack to "scrub" float parameters
     //
 
-    bind("key-down--e", exposureMode, "Edit Current Source Relative Exposure");
-    bind("key-down--S", saturationMode, "Edit Current Source Saturation");
-    bind("key-down--h", hueMode, "Edit Current Source Hue");
-    bind("key-down--y", gammaMode, "Edit Current Source Gamma");
-    bind("key-down--k", contrastMode, "Edit Current Source Contrast");
-    bind("key-down--B", brightnessMode, "Edit Display Brightness");
+    // bound by menuItem("    Exposure") // bind("key-down--e", exposureMode, "Edit Current Source Relative Exposure");
+    // bound by menuItem("    Saturation") // bind("key-down--S", saturationMode, "Edit Current Source Saturation");
+    // bound by menuItem("    Hue") // bind("key-down--h", hueMode, "Edit Current Source Hue");
+    // bound by menuItem("    Gamma") // bind("key-down--y", gammaMode, "Edit Current Source Gamma");
+    // bound by menuItem("    Contrast") // bind("key-down--k", contrastMode, "Edit Current Source Contrast");
+    // bound by menuItem("Display Brightness (Interactive)") // bind("key-down--B", brightnessMode, "Edit Display Brightness");
     bind("default", "paramscrub", "pointer-1--push", beginParamScrub);
     bind("default", "paramscrub", "pointer-1--drag", dragParamScrub, "Scrub Modify");
     bind("default", "paramscrub", "pointer-1--release", releaseParam);
