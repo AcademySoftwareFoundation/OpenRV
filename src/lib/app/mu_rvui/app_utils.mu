@@ -141,13 +141,6 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
         print("MENU DEBUG: (%s) %s\n" % (prefix, text));
 }
 
-\: _withCategoryValidator (int; string categoryName, (int;)stateFunc) 
-{
-    if (commands.isActionCategoryEnabled(categoryName))
-        return stateFunc();
-    return DisabledMenuState;
-}
-
 //
 //  Default action blocked callback
 //
