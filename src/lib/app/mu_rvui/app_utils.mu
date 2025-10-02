@@ -207,22 +207,25 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 
 \: menuSeparator (MenuItem;)
 {
-    return MenuItem {"_", nil};
+    print(">> menuSeparator ");
+    let ms = MenuItem {"_", nil};
+    print("<<\n");
+    return ms;
 }
 
 \: subMenu (MenuItem; string label, MenuItem[] subMenu)
 {
-    print("subMenu1\n");
+    print("subMenu start %s\n" % label);
     let sm = MenuItem {label, nil, "", enabledItem, subMenu};
-    print("subMenu2\n");
+    print("subMenu end %s\n" % label);
     return sm;
 }
 
 \: menuText (MenuItem; string text)
 {
-    print("menuText1\n");
+    print(">> menuText %s" % text);
     let mt = MenuItem {text, nil, "", disabledItem, nil};
-    print("menuText2\n");
+    print("<<\n");
     return mt;
 }
  
@@ -230,7 +233,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
                 MenuStateFunc stateFunc, string description = "")
 {
 
-    print("menuItem1\n");
+    print(">> menuItem %s " % menuText);
         /*
     // Create composite validator that combines category validation with state validation
     let compositeStateFunc = \: (int;) {
@@ -264,7 +267,9 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     
     // Return MenuItem object
 //    return MenuItem {menuText, compositeFunc, menuKeyText, compositeStateFunc, nil};
-    return MenuItem {menuText, func, menuKeyText, stateFunc, nil};
+    let mi = MenuItem {menuText, func, menuKeyText, stateFunc, nil};
+    print("<<\n");
+    return mi;
 }
 
 }
