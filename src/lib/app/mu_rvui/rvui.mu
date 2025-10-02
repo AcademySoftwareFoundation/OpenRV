@@ -6614,11 +6614,19 @@ global bool debugGC = false;
                 menuItem("1:1", "key-down--1", "", ~pixelRelativeScale(1.0), videoSourcesExistState),
                 menuSeparator(),
                 menuItem("2:1", "key-down--2", "", ~pixelRelativeScale(2.0), videoSourcesExistState),
+                menuItem("3:1", "key-down--3", "", ~pixelRelativeScale(3.0), videoSourcesExistState),
                 menuItem("4:1", "key-down--4", "", ~pixelRelativeScale(4.0), videoSourcesExistState),
+                menuItem("5:1", "key-down--5", "", ~pixelRelativeScale(5.0), videoSourcesExistState),
+                menuItem("6:1", "key-down--6", "", ~pixelRelativeScale(6.0), videoSourcesExistState),
+                menuItem("7:1", "key-down--7", "", ~pixelRelativeScale(7.0), videoSourcesExistState),
                 menuItem("8:1", "key-down--8", "", ~pixelRelativeScale(8.0), videoSourcesExistState),
                 menuSeparator(),
                 menuItem("1:2", "key-down--control--2", "", ~pixelRelativeScale(1.0/2.0), videoSourcesExistState),
+                menuItem("1:3", "key-down--control--3", "", ~pixelRelativeScale(1.0/3.0), videoSourcesExistState),
                 menuItem("1:4", "key-down--control--4", "", ~pixelRelativeScale(1.0/4.0), videoSourcesExistState),
+                menuItem("1:5", "key-down--control--5", "", ~pixelRelativeScale(1.0/5.0), videoSourcesExistState),
+                menuItem("1:6", "key-down--control--6", "", ~pixelRelativeScale(1.0/6.0), videoSourcesExistState),
+                menuItem("1:7", "key-down--control--7", "", ~pixelRelativeScale(1.0/7.0), videoSourcesExistState),
                 menuItem("1:8", "key-down--control--8", "", ~pixelRelativeScale(1.0/8.0), videoSourcesExistState)
             }),
             subMenu("Rotation", MenuItem[] {
@@ -7071,11 +7079,11 @@ global bool debugGC = false;
     // bound by menuItem("Play Forward") // bind("key-down--.", incN(1), "Set Frame Increment to 1 (forward)");
     // bound by menuItem("1:1") // bind("key-down--1", pixelRelativeScale(1.0), "Scale 1:1");
     // bound by menuItem("2:1") // bind("key-down--2", pixelRelativeScale(2.0), "Scale 2:1");
-    bind("key-down--3", pixelRelativeScale(3.0), "Scale 3:1");
+    // bound by menuItem("3:1") // bind("key-down--3", pixelRelativeScale(3.0), "Scale 3:1");
     // bound by menuItem("4:1") // bind("key-down--4", pixelRelativeScale(4.0), "Scale 4:1");
-    bind("key-down--5", pixelRelativeScale(5.0), "Scale 5:1");
-    bind("key-down--6", pixelRelativeScale(6.0), "Scale 6:1");
-    bind("key-down--7", pixelRelativeScale(7.0), "Scale 7:1");
+    // bound by menuItem("5:1") // bind("key-down--5", pixelRelativeScale(5.0), "Scale 5:1");
+    // bound by menuItem("6:1") // bind("key-down--6", pixelRelativeScale(6.0), "Scale 6:1");
+    // bound by menuItem("7:1") // bind("key-down--7", pixelRelativeScale(7.0), "Scale 7:1");
     // bound by menuItem("8:1") // bind("key-down--8", pixelRelativeScale(8.0), "Scale 8:1");
     // bound by menuItem("Play All Frames") // bind("key-down--A", toggleRealtime, "Toggle Real-Time Playback");
     bind("key-down--C", toggleCacheModeFunc(CacheGreedy), "Toggle Region Caching");
@@ -7113,13 +7121,13 @@ global bool debugGC = false;
     bind("key-down--control--w", queryClose, "Close Session");
     // bound by menuItem("Merge...") // bind("key-down--control--o", addMovieOrImageSources(,true,false), "Open File");
     // bound by menuItem("Open in New Session...") // bind("key-down--control--O", openMovieOrImage, "Open in New Session");
-    bind("key-down--control--1", pixelRelativeScale(1.0/1.0), "Scale 1:1");
+    bind("key-down--control--1", pixelRelativeScale(1.0/1.0), "Scale 1:1"); // same as just "1"
     // bound by menuItem("1:2") // bind("key-down--control--2", pixelRelativeScale(1.0/2.0), "Scale 1:2");
-    bind("key-down--control--3", pixelRelativeScale(1.0/3.0), "Scale 1:3");
+    // bound by menuItem("1:3") // bind("key-down--control--3", pixelRelativeScale(1.0/3.0), "Scale 1:3");
     // bound by menuItem("1:4") // bind("key-down--control--4", pixelRelativeScale(1.0/4.0), "Scale 1:4");
-    bind("key-down--control--5", pixelRelativeScale(1.0/5.0), "Scale 1:5");
-    bind("key-down--control--6", pixelRelativeScale(1.0/6.0), "Scale 1:6");
-    bind("key-down--control--7", pixelRelativeScale(1.0/7.0), "Scale 1:7");
+    // bound by menuItem("1:5") // bind("key-down--control--5", pixelRelativeScale(1.0/5.0), "Scale 1:5");
+    // bound by menuItem("1:6") // bind("key-down--control--6", pixelRelativeScale(1.0/6.0), "Scale 1:6");
+    // bound by menuItem("1:7") // bind("key-down--control--7", pixelRelativeScale(1.0/7.0), "Scale 1:7");
     // bound by menuItem("1:8") // bind("key-down--control--8", pixelRelativeScale(1.0/8.0), "Scale 1:8");
     bind("key-down--control--l", toggleCacheModeFunc(CacheBuffer), "Toggle Look-Ahead Caching");
     bind("key-down--control--m", cycleMatte, "Cycle Mattes");
