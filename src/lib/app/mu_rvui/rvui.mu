@@ -6765,6 +6765,8 @@ global bool debugGC = false;
             menuItem("   Red Log Film", "", "", setLinConvert("Red Log Film"), hasLinConversion("Red Log Film")),
             menuItem("   sRGB", "", "", setLinConvert("sRGB"), hasLinConversion("sRGB")),
             menuItem("   Rec709", "", "", setLinConvert("Rec709"), hasLinConversion("Rec709")),
+            menuItem("   SMPTE 2084", "", "", setLinConvert("SMPTE 2084"), hasLinConversion("SMPTE 2084")),
+            menuItem("   Hybrid Log-Gamma", "", "", setLinConvert("Hybrid Log-Gamma"), hasLinConversion("Hybrid Log-Gamma")),
             menuItem("   File Gamma 2.2", "", "", setLinConvert("Gamma 2.2"), hasLinConversion("Gamma 2.2")),
             menuItem("   File Gamma...", "", "", enterFileGamma, fileGammaState),
             menuSeparator(),
@@ -6787,11 +6789,19 @@ global bool debugGC = false;
             menuItem("    Hue", "key-down--h", "", hueMode, videoSourcesAndNodeExistState("RVColor")),
             menuItem("    Contrast", "key-down--k", "", contrastMode, videoSourcesAndNodeExistState("RVColor")),
             menuSeparator(),
-            subMenu("Range", MenuItem[] {
+            menuText("File YCbCr to RGB Conversion"),
+            subMenu("    Range", MenuItem[] {
                 menuItem("From Image", "", "", ~setColorSpaceAttr("Range","From Image"), matchesColorSpaceAttr("Range","From Image")),
                 menuSeparator(),
                 menuItem("Video Range", "", "", ~setColorSpaceAttr("Range","Video Range"), matchesColorSpaceAttr("Range","Video Range")),
                 menuItem("Full Range", "", "", ~setColorSpaceAttr("Range","Full Range"), matchesColorSpaceAttr("Range","Full Range"))
+            }),
+            subMenu("    Color Space", MenuItem[] {
+                menuItem("From Image", "", "", ~setColorSpaceAttr("Conversion","From Image"), matchesColorSpaceAttr("Conversion","From Image")),
+                menuSeparator(),
+                menuItem("Rec. 601", "", "", ~setColorSpaceAttr("Conversion","Rec601"), matchesColorSpaceAttr("Conversion","Rec601")),
+                menuItem("Rec. 709", "", "", ~setColorSpaceAttr("Conversion","Rec709"), matchesColorSpaceAttr("Conversion","Rec709")),
+                menuItem("Rec. 2020", "", "", ~setColorSpaceAttr("Conversion","Rec2020"), matchesColorSpaceAttr("Conversion","Rec2020"))
             }),
             menuSeparator(),
             menuItem("Ignore File Primaries", "", "", ~toggleChromaticities, isIgnoringChromaticies),
