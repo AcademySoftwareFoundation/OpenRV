@@ -6697,62 +6697,6 @@ global bool debugGC = false;
                     //
                     //{"_", nil},
                     //{"output LUT to shell",   ~outputLUT,    nil, nil}}},
-<<<<<<< HEAD
-            {"_", nil},
-            {"File Nonlinear to Linear Conversion", nil, nil, inactiveState},
-            {"   No Conversion",    setLinConvert(""), nil, hasLinConversion("")},
-            {"   Cineon/DPX Log",   setLinConvert("Cineon Log"), "L", hasLinConversion("Cineon Log")},
-            {"   ALEXA LogC",       setLinConvert("ALEXA LogC"), nil, hasLinConversion("ALEXA LogC")},
-            {"   ALEXA LogC Film",  setLinConvert("ALEXA LogC Film"), nil, hasLinConversion("ALEXA LogC Film")},
-            //{"   SONY S-Log",       setLinConvert("SONY S-Log"), nil, hasLinConversion("SONY S-Log")},
-            {"   Viper Log",        setLinConvert("Viper Log"), nil, hasLinConversion("Viper Log")},
-            {"   Red Log",          setLinConvert("Red Log"), nil, hasLinConversion("Red Log")},
-            {"   Red Log Film",     setLinConvert("Red Log Film"), nil, hasLinConversion("Red Log Film")},
-            {"   sRGB",             setLinConvert("sRGB"), nil, hasLinConversion("sRGB")},
-            {"   Rec709",           setLinConvert("Rec709"), nil, hasLinConversion("Rec709")},
-            {"   SMPTE 2084",       setLinConvert("SMPTE 2084"), nil, hasLinConversion("SMPTE 2084")},
-            {"   Hybrid Log-Gamma", setLinConvert("Hybrid Log-Gamma"), nil, hasLinConversion("Hybrid Log-Gamma")},
-            {"   File Gamma 2.2",        setLinConvert("Gamma 2.2"), nil, hasLinConversion("Gamma 2.2")},
-            {"   File Gamma...",         enterFileGamma, nil, fileGammaState},
-            {"_", nil},
-            {"Pre-Cache LUT", ~toggleCacheLUT, nil, isCacheLUTActiveState},
-            {"File LUT",      ~toggleFileLUT, nil, isFileLUTActiveState},
-            {"File CDL",      ~toggleFileCDL, nil, isFileCDLActiveState},
-            {"File ICC",      ~toggleFileICC, nil, isFileICCActiveState},
-            {"Look LUT",      ~toggleLookLUT, nil, isLookLUTActiveState},
-            {"Look CDL",      ~toggleLookCDL, nil, isLookCDLActiveState},
-            {"_", nil},
-            {"Invert", ~toggleInvert, "I", isInvert},
-            //  RVHistogram node deprecated to remove from GUI for now
-            //{"Normalize", toggleNormalizeColor, nil, isNormalizingColor},
-            {"_", nil},
-            {"Interactive Edit",      nil, nil, inactiveState },
-            {"    Gamma",      gammaMode,      "y", videoSourcesAndNodeExistState("RVColor")},
-            {"    Color Offset", colorOffsetMode,  nil,  videoSourcesAndNodeExistState("RVColor")},
-            {"    Exposure",   exposureMode,   "e", videoSourcesAndNodeExistState("RVColor")},
-            {"    Saturation", saturationMode, "S", videoSourcesAndNodeExistState("RVColor")},
-            {"    Hue",        hueMode,        "h", videoSourcesAndNodeExistState("RVColor")},
-            {"    Contrast",   contrastMode,   "k", videoSourcesAndNodeExistState("RVColor")},
-            {"_", nil},
-            {"File YCbCr to RGB Conversion", nil, nil, inactiveState },
-            {"    Range", Menu {
-                {"From Image", ~setColorSpaceAttr("Range","From Image"), nil, matchesColorSpaceAttr("Range","From Image")},
-                {"_", nil},
-                {"Video Range", ~setColorSpaceAttr("Range","Video Range"), nil, matchesColorSpaceAttr("Range","Video Range")},
-                {"Full Range", ~setColorSpaceAttr("Range","Full Range"), nil, matchesColorSpaceAttr("Range","Full Range")}}},
-            {"    Color Space", Menu {
-                {"From Image", ~setColorSpaceAttr("Conversion","From Image"), nil, matchesColorSpaceAttr("Conversion","From Image")},
-                {"_", nil},
-                {"Rec. 601", ~setColorSpaceAttr("Conversion","Rec601"), nil, matchesColorSpaceAttr("Conversion","Rec601")},
-                {"Rec. 709", ~setColorSpaceAttr("Conversion","Rec709"), nil, matchesColorSpaceAttr("Conversion","Rec709")},
-                {"Rec. 2020", ~setColorSpaceAttr("Conversion","Rec2020"), nil, matchesColorSpaceAttr("Conversion","Rec2020")}}},
-            {"_", nil},
-            {"Ignore File Primaries", ~toggleChromaticities, nil, isIgnoringChromaticies},
-            {"Reset All Color", ~resetAllColorParameters, "shift Home", videoSourcesAndNodeExistState("RVColor")}
-            }},
-        {"View", buildViewMenu() }
-        //{"Debug", buildDebugMenu() }
-=======
             menuSeparator(),
             menuText("File Nonlinear to Linear Conversion"),
             menuItem("   No Conversion", "", "", setLinConvert(""), hasLinConversion("")),
@@ -6808,7 +6752,6 @@ global bool debugGC = false;
             menuItem("Reset All Color", "key-down--shift--home", "", ~resetAllColorParameters, videoSourcesAndNodeExistState("RVColor"))
         }),
         subMenu("View", buildViewMenu())
->>>>>>> d87ccd39 (FINALLY converted menu)
     };
         //{"Debug", buildDebugMenu() }
 
