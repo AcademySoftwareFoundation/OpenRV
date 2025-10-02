@@ -6320,7 +6320,7 @@ global bool debugGC = false;
         //  }},
         menuSeparator(),
         menuItem("Presentation Mode", "key-down--control--p", "", ~togglePresentationMode, presentationModeState),
-        menuItem("Presentation Settings", "key-down--alt--alt", "", noop, enabledItem),
+        subMenu("Presentation Settings", Menu{} ),
         menuSeparator(),
         menuItem("Frame", "key-down--f", "", ~frameImage, frameState),
         menuItem("Frame Width", "key-down--control--f", "", frameWidth, frameState),

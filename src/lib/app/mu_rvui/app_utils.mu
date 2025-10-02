@@ -134,6 +134,13 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 //
 //  Standard action category validator - checks if category is enabled
 //
+
+\: menu_debug(void; string prefix, string text)
+{
+    if (false)
+        print("MENU DEBUG: (%s) %s\n" % (prefix, text));
+}
+
 \: _withCategoryValidator (int; string categoryName, (int;)stateFunc) 
 {
     if (commands.isActionCategoryEnabled(categoryName))
@@ -157,37 +164,30 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 {
 
     let key = eventName;
-    print("original key %s\n" % key);
 
     // check if it starts with "key-down--"
     if (string.contains(key, "key-down--") != 0)
         return "";
-        
+
     key = string.replace(key, "key-down--", "");
-    print(">> key: %s " % key);
     // start with space since we will add spaces later for the modifiers.
     key = key.replace(" ", "space");
-    print("%s " % key);
     
     // Convert double-dash format to space-separated format for RvDocument::buildShortcutString
     key = key.replace("control--", "control ");
-    print("%s " % key);
     key = key.replace("alt--", "alt ");
-    print("%s " % key);
     key = key.replace("shift--", "shift ");
-    print("%s " % key);
     key = key.replace("meta--", "meta ");
-    print("%s " % key);
     key = key.replace("command--", "command ");
-    print("%s <<\n" % key);
     
     // Convert arrow keys to match buildShortcutString expectations
-    // these already match what is expected in the menu key shortcut
+    // these in the event pattern already match what is expected in the menu key shortcut
     // key = key.replace("left", "left");
     // key = key.replace("right", "right");
     // key = key.replace("up", "up");
     // key = key.replace("down", "down");
-    
+
+    menu_debug("key shortcut", "[\"%s\" -> \"%s\"]" % (eventName, key));
     
     return key;
 }
@@ -199,33 +199,29 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 
 \: menuSeparator (MenuItem;)
 {
-    print(">> menuSeparator ");
+    menu_debug("menuSeparator", "");
     let ms = MenuItem {"_", nil};
-    print("<<\n");
     return ms;
 }
 
 \: subMenu (MenuItem; string label, MenuItem[] subMenu)
 {
-    print("subMenu start %s\n" % label);
+    menu_debug("subMenu", "\"%s\"" % label);
     let sm = MenuItem {label, nil, "", enabledItem, subMenu};
-    print("subMenu end %s\n" % label);
     return sm;
-}
+}   
 
 \: menuText (MenuItem; string text)
 {
-    print(">> menuText %s" % text);
+    menu_debug("menuText", "\"%s\"" % text);
     let mt = MenuItem {text, nil, "", disabledItem, nil};
-    print("<<\n");
     return mt;
 }
  
 \: menuItem (MenuItem; string menuText, string eventPattern, string category, EventFunc func, 
                 MenuStateFunc stateFunc, string description = "")
 {
-
-    print(">> menuItem %s " % menuText);
+    menu_debug("menuItem", "\"%s\"" % menuText);
 
     // Create composite validator that combines category validation with state validation
     let compositeStateFunc = \: (int;) {
@@ -235,6 +231,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
             return stateFunc();
     };
 
+    // create composite function that checks if the category is enabled and then calls the function
     let compositeFunc = \: (void; Event ev) {
         if (compositeStateFunc() == DisabledMenuState)
             sendInternalEvent("action-blocked");
@@ -250,13 +247,8 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     
     // Generate accelerator from event pattern
     let menuKeyText = _eventNameToKeyShortcut(eventPattern);
-//        menuKeyText = 
-//    }
-    
-    // Return MenuItem object
-//    return MenuItem {menuText, compositeFunc, menuKeyText, compositeStateFunc, nil};
+
     let mi = MenuItem {menuText, func, menuKeyText, stateFunc, nil};
-    print("<<\n");
     return mi;
 }
 
