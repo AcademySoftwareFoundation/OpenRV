@@ -6414,6 +6414,8 @@ global bool debugGC = false;
 
 \: buildMainMenu (Menu; [MenuItem] userMenus = nil)
 {
+
+    try {
     Menu exportMenu = MenuItem[] {
         menuItem("Quicktime Movie...", "", "", exportAs(, "mov", "Quicktime Export"), videoSourcesExistAndExportOKState),
         menuItem("Image Sequence...", "", "", exportAs(, "*", "Image Sequence Export"), videoSourcesExistAndExportOKState),
@@ -6799,6 +6801,13 @@ global bool debugGC = false;
         c = combine(b, userMenus);
 
     return c;
+    }
+
+    catch (exception exc)
+    {
+        print("ERROR: failed to build main menu: %s\n" % exc);
+        return Menu{};
+    }
 }
 
 //

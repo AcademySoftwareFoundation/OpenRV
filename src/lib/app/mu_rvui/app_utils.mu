@@ -155,47 +155,39 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 
 \: _eventNameToKeyShortcut (string; string eventName)
 {
-    if (eventName == "")
-    {
-        return "";
-    }
-    
-    // Remove "key-down--" prefix
-    let key = eventName;
 
-/*    
-    if (key.startsWith("key-down--"))
-    {
-        key = key.substring(10);  // Remove "key-down--"
-    }
-    // Convert modifiers
-    key = key.replace("control--", "Ctrl+");
-    key = key.replace("alt--", "Alt+");
-    key = key.replace("shift--", "Shift+");
+    let key = eventName;
+    print("original key %s\n" % key);
+
+    // check if it starts with "key-down--"
+    if (string.contains(key, "key-down--") != 0)
+        return "";
+        
+    key = string.replace(key, "key-down--", "");
+    print(">> key: %s " % key);
+    // start with space since we will add spaces later for the modifiers.
+    key = key.replace(" ", "space");
+    print("%s " % key);
     
-    // Convert special keys
-    key = key.replace("left", "Left");
-    key = key.replace("right", "Right");
-    key = key.replace("up", "Up");
-    key = key.replace("down", "Down");
-    key = key.replace("home", "Home");
-    key = key.replace("end", "End");
-    key = key.replace("pageup", "Page Up");
-    key = key.replace("pagedown", "Page Down");
-    key = key.replace("space", "Space");
-    key = key.replace("tab", "Tab");
-    key = key.replace("enter", "Enter");
-    key = key.replace("return", "Return");
-    key = key.replace("escape", "Escape");
-    key = key.replace("backspace", "Backspace");
-    key = key.replace("delete", "Delete");
+    // Convert double-dash format to space-separated format for RvDocument::buildShortcutString
+    key = key.replace("control--", "control ");
+    print("%s " % key);
+    key = key.replace("alt--", "alt ");
+    print("%s " % key);
+    key = key.replace("shift--", "shift ");
+    print("%s " % key);
+    key = key.replace("meta--", "meta ");
+    print("%s " % key);
+    key = key.replace("command--", "command ");
+    print("%s <<\n" % key);
     
-    // Convert single characters to uppercase
-    if (key.length() == 1)
-    {
-        key = key.toUpper();
-    }
-*/    
+    // Convert arrow keys to match buildShortcutString expectations
+    // these already match what is expected in the menu key shortcut
+    // key = key.replace("left", "left");
+    // key = key.replace("right", "right");
+    // key = key.replace("up", "up");
+    // key = key.replace("down", "down");
+    
     
     return key;
 }
@@ -257,10 +249,8 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     }
     
     // Generate accelerator from event pattern
-    let menuKeyText = "";
-//    if (eventPattern != nil && eventPattern.startsWith("key-down--"))
-//    {
-//        menuKeyText = _eventNameToKeyShortcut(eventPattern);
+    let menuKeyText = ""; _eventNameToKeyShortcut(eventPattern);
+//        menuKeyText = 
 //    }
     
     // Return MenuItem object
