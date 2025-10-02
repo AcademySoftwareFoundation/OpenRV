@@ -212,21 +212,26 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 
 \: subMenu (MenuItem; string label, MenuItem[] subMenu)
 {
-    return MenuItem {label, nil, "", enabledItem, subMenu};
+    print("subMenu1\n");
+    let sm = MenuItem {label, nil, "", enabledItem, subMenu};
+    print("subMenu2\n");
+    return sm;
 }
 
 \: menuText (MenuItem; string text)
 {
-    return MenuItem {text, nil, "", disabledItem, nil};
+    print("menuText1\n");
+    let mt = MenuItem {text, nil, "", disabledItem, nil};
+    print("menuText2\n");
+    return mt;
 }
  
 \: menuItem (MenuItem; string menuText, string eventPattern, string category, EventFunc func, 
                 MenuStateFunc stateFunc, string description = "")
 {
-    if (category == nil) category = "";
-    if (eventPattern == nil) eventPattern = "";
-    if (description == nil) description = "";
-/*
+
+    print("menuItem1\n");
+        /*
     // Create composite validator that combines category validation with state validation
     let compositeStateFunc = \: (int;) {
         if (!commands.isActionCategoryEnabled(category))
