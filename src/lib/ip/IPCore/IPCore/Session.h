@@ -818,13 +818,13 @@ namespace IPCore
         bool filterLiveReviewEvents();
 
         //
-        //  Action Category Blocking
+        //  Event Category Blocking
         //
-        void enableActionCategory(const std::string& category);
-        void disableActionCategory(const std::string& category);
-        bool isActionCategoryDisabled(const std::string& category) const;
-        bool isActionCategoryEnabled(const std::string& category) const;
-        const std::vector<std::string>& disabledActionCategories() const;
+        void enableEventCategory(const std::string& category);
+        void disableEventCategory(const std::string& category);
+        bool isEventCategoryDisabled(const std::string& category) const;
+        bool isEventCategoryEnabled(const std::string& category) const;
+        const std::vector<std::string>& disabledEventCategories() const;
 
         //
         //  Marks
@@ -1305,7 +1305,7 @@ namespace IPCore
         double m_lastDrawingTime;
         bool m_filterLiveReviewEvents{false};
         std::vector<std::string>
-            m_disabledActionCategories; // List of blocked action categories
+            m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;
         struct FBStatusCheck;

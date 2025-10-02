@@ -728,58 +728,58 @@ namespace IPCore
     bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
 
     //----------------------------------------------------------------------
-    // Action Category Blocking
+    // Event Category Blocking
     //----------------------------------------------------------------------
 
-    void Session::enableActionCategory(const std::string& category)
+    void Session::enableEventCategory(const std::string& category)
     {
         // Don't enable empty category (legacy commands)
         if (category.empty())
             return;
 
         // Remove category from disallowed list if it exists
-        auto it = std::find(m_disabledActionCategories.begin(),
-                            m_disabledActionCategories.end(), category);
-        if (it != m_disabledActionCategories.end())
+        auto it = std::find(m_disabledEventCategories.begin(),
+                            m_disabledEventCategories.end(), category);
+        if (it != m_disabledEventCategories.end())
         {
-            m_disabledActionCategories.erase(it);
+            m_disabledEventCategories.erase(it);
         }
     }
 
-    void Session::disableActionCategory(const std::string& category)
+    void Session::disableEventCategory(const std::string& category)
     {
         // Don't disable empty category (legacy commands)
         if (category.empty())
             return;
 
         // Don't add duplicates
-        if (std::find(m_disabledActionCategories.begin(),
-                      m_disabledActionCategories.end(), category)
-            == m_disabledActionCategories.end())
+        if (std::find(m_disabledEventCategories.begin(),
+                      m_disabledEventCategories.end(), category)
+            == m_disabledEventCategories.end())
         {
-            m_disabledActionCategories.push_back(category);
+            m_disabledEventCategories.push_back(category);
         }
     }
 
-    bool Session::isActionCategoryDisabled(const std::string& category) const
+    bool Session::isEventCategoryDisabled(const std::string& category) const
     {
         // Empty category (legacy commands) is never disabled
         if (category.empty())
             return false;
 
-        return std::find(m_disabledActionCategories.begin(),
-                         m_disabledActionCategories.end(), category)
-               != m_disabledActionCategories.end();
+        return std::find(m_disabledEventCategories.begin(),
+                         m_disabledEventCategories.end(), category)
+               != m_disabledEventCategories.end();
     }
 
-    bool Session::isActionCategoryEnabled(const std::string& category) const
+    bool Session::isEventCategoryEnabled(const std::string& category) const
     {
-        return !isActionCategoryDisabled(category);
+        return !isEventCategoryDisabled(category);
     }
 
-    const std::vector<std::string>& Session::disabledActionCategories() const
+    const std::vector<std::string>& Session::disabledEventCategories() const
     {
-        return m_disabledActionCategories;
+        return m_disabledEventCategories;
     }
 
     void Session::setName(const string& n) { m_name = n; }

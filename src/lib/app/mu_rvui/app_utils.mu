@@ -27,7 +27,7 @@ MenuStateFunc   := (int;);
 
 \: makeCategoryEventFunc (EventFunc; string category, EventFunc f) {
     \: (void; Event ev) {
-        if (!commands.isActionCategoryEnabled(category))
+        if (!commands.isEventCategoryEnabled(category))
             sendInternalEvent("action-blocked");
         else
             f(ev);
@@ -132,21 +132,13 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 }
 
 //
-//  Standard action category validator - checks if category is enabled
+//  Standard event category validator - checks if category is enabled
 //
 
 \: menu_debug(void; string prefix, string text)
 {
     if (false)
         print("MENU DEBUG: (%s) %s\n" % (prefix, text));
-}
-
-//
-//  Default action blocked callback
-//
-\: _defaultActionBlockedFunc(void;)
-{
-    sendInternalEvent("action-blocked");
 }
 
 //
@@ -218,7 +210,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 
     // Create composite validator that combines category validation with state validation
     let compositeStateFunc = \: (int;) {
-        if (!commands.isActionCategoryEnabled(category))
+        if (!commands.isEventCategoryEnabled(category))
             return DisabledMenuState;
         else
             return stateFunc();
