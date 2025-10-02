@@ -234,7 +234,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 {
 
     print(">> menuItem %s " % menuText);
-        /*
+
     // Create composite validator that combines category validation with state validation
     let compositeStateFunc = \: (int;) {
         if (!commands.isActionCategoryEnabled(category))
@@ -249,14 +249,12 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
         else
             func(ev);
     };
-*/
+
     // Perform the bind action
-    /*
     if (eventPattern != "")
     {
         commands.bind("default", "global", eventPattern, compositeFunc, description);
     }
-    */
     
     // Generate accelerator from event pattern
     let menuKeyText = "";
