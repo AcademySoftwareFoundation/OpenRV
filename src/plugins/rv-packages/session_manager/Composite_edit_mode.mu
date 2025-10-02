@@ -47,6 +47,10 @@ class: CompositeEditMode : MinorMode
         }
 
         set("#RVStack.composite.type", name);
+        
+        // Force UI update immediately after changing blend mode
+        updateUI();
+        
         redraw();
     }
 
@@ -122,7 +126,22 @@ class: CompositeEditMode : MinorMode
         _dissolveSlider.setVisible(showDissolve);
         
         // Resize UI to fit the visible controls
-        _ui.adjustSize();
+        if (_ui neq nil)
+        {
+            _ui.adjustSize();
+            _ui.updateGeometry();
+            
+            // Force a repaint to ensure layout updates are visible
+            _ui.update();
+            
+            // Try to trigger parent layout update
+            QWidget parent = _ui.parentWidget();
+            if (parent neq nil)
+            {
+                parent.adjustSize();
+                parent.update();
+            }
+        }
 
         // Update dissolve amount value
         if (showDissolve)

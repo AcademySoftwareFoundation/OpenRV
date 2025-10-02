@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>GroupBox</class>
  <widget class="QGroupBox" name="GroupBox">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>272</width>
+    <height>140</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>GroupBox</string>
   </property>
@@ -11,6 +19,18 @@
   <layout class="QFormLayout" name="formLayout">
    <item row="0" column="1">
     <widget class="QComboBox" name="comboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>22</height>
+      </size>
+     </property>
      <item>
       <property name="text">
        <string>Over</string>
@@ -54,7 +74,7 @@
       <string>Dissolve Amount</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
    </item>
@@ -62,6 +82,9 @@
     <layout class="QHBoxLayout" name="dissolveLayout">
      <item>
       <widget class="QSlider" name="dissolveSlider">
+       <property name="toolTip">
+        <string>Dissolve amount (0-100%)</string>
+       </property>
        <property name="minimum">
         <number>0</number>
        </property>
@@ -72,10 +95,7 @@
         <number>50</number>
        </property>
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="toolTip">
-        <string>Dissolve amount (0-100%)</string>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -87,11 +107,11 @@
          <height>16777215</height>
         </size>
        </property>
-       <property name="text">
-        <string>0.5</string>
-       </property>
        <property name="toolTip">
         <string>Dissolve amount (0.0 to 1.0)</string>
+       </property>
+       <property name="text">
+        <string>0.5</string>
        </property>
       </widget>
      </item>
@@ -100,7 +120,7 @@
    <item row="2" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Orientation::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -116,7 +136,7 @@
       <string>Operation</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
    </item>

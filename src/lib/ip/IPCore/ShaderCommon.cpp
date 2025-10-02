@@ -140,8 +140,6 @@ extern const char* ReverseDifference2_glsl;
 extern const char* ReverseDifference3_glsl;
 extern const char* ReverseDifference4_glsl;
 extern const char* Dissolve2_glsl;
-extern const char* Dissolve3_glsl;
-extern const char* Dissolve4_glsl;
 extern const char* InlineDissolve2_glsl;
 extern const char* BoxFilter_glsl;
 extern const char* ConstantBG_glsl;
@@ -2999,8 +2997,7 @@ namespace IPCore
         const char* reverseDifferenceShaders[] = {ReverseDifference2_glsl,
                                                   ReverseDifference3_glsl,
                                                   ReverseDifference4_glsl};
-        const char* dissolveShaders[] = {Dissolve2_glsl, Dissolve3_glsl, 
-                                         Dissolve4_glsl};
+        const char* dissolveShaders[] = {Dissolve2_glsl};
 
         // generate a blend expr of a certain mode
         // with the input Expressions as input to the blend shaders (over, add,
@@ -3057,7 +3054,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        // Overloaded newBlend function that accepts dissolveAmount parameter
+        // Dissolve blend function for exactly 2 inputs with dissolveAmount parameter
         Expression* newDissolveBlend(const IPImage* image,
                              const vector<Expression*>& FA1,
                              const IPImage::BlendMode mode,
@@ -3066,24 +3063,18 @@ namespace IPCore
             if (mode == IPImage::Dissolve)
             {
                 int size = FA1.size();
-                assert(size <= MAX_TEXTURE_PER_SHADER);
-                if (size == 1)
-                {
-                    return FA1[0];
-                }
-
-                // Create dissolve blend function
-                Function* F = dissolveBlend(size, "main", dissolveShaders[size - 2]);
+                assert(size == 2); // Dissolve only works with exactly 2 inputs
+                
+                // Create dissolve blend function for 2 inputs
+                Function* F = dissolveBlend(2, "main", dissolveShaders[0]);
                 ArgumentVector args(F->parameters().size());
 
-                // Bind input expressions
-                for (size_t i = 0; i < size; ++i)
-                {
-                    args[i] = new BoundExpression(F->parameters()[i], FA1[i]);
-                }
+                // Bind the 2 input expressions
+                args[0] = new BoundExpression(F->parameters()[0], FA1[0]);
+                args[1] = new BoundExpression(F->parameters()[1], FA1[1]);
 
                 // Bind the dissolveAmount parameter
-                args[size] = new BoundFloat(F->parameters()[size], dissolveAmount);
+                args[2] = new BoundFloat(F->parameters()[2], dissolveAmount);
 
                 return new Expression(F, args, image);
             }
