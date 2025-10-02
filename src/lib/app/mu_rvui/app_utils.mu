@@ -219,7 +219,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     // create composite function that checks if the category is enabled and then calls the function
     let compositeFunc = \: (void; Event ev) {
         if (compositeStateFunc() == DisabledMenuState)
-            sendInternalEvent("action-blocked");
+            sendInternalEvent("category-event-blocked");
         else
             func(ev);
     };
