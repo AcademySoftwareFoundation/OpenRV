@@ -44,30 +44,17 @@ HRESULT StereoVideoFrame::Provider::QueryInterface(REFIID iid, LPVOID* ppv)
         ->QueryInterface(iid, ppv);
 }
 
-ULONG StereoVideoFrame::Provider::AddRef()
-{
-#ifdef PLATFORM_WINDOWS
-    return _InterlockedIncrement((volatile long*)&m_refCount);
-#else
-    return ++m_refCount;
-#endif
-}
+ULONG StereoVideoFrame::Provider::AddRef() { return ++m_refCount; }
 
-ULONG StereoVideoFrame::Provider::Release()
+ULONG
+StereoVideoFrame::Provider::Release()
 {
-#ifdef PLATFORM_WINDOWS
-    ULONG newRefValue = _InterlockedDecrement((volatile long*)&m_refCount);
-    if (!newRefValue)
-        delete this;
-    return newRefValue;
-#else
     ULONG refCount = --m_refCount;
     if (refCount == 0)
     {
         delete this;
     }
     return refCount;
-#endif
 }
 
 StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
@@ -120,30 +107,16 @@ HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
     return E_NOINTERFACE;
 }
 
-ULONG StereoVideoFrame::AddRef()
-{
-#ifdef PLATFORM_WINDOWS
-    return _InterlockedIncrement((volatile long*)&m_refCount);
-#else
-    return ++m_refCount;
-#endif
-}
+ULONG StereoVideoFrame::AddRef() { return ++m_refCount; }
 
 ULONG StereoVideoFrame::Release()
 {
-#ifdef PLATFORM_WINDOWS
-    ULONG newRefValue = _InterlockedDecrement((volatile long*)&m_refCount);
-    if (!newRefValue)
-        delete this;
-    return newRefValue;
-#else
     ULONG refCount = --m_refCount;
     if (refCount == 0)
     {
         delete this;
     }
     return refCount;
-#endif
 }
 
 BMDVideo3DPackingFormat StereoVideoFrame::Get3DPackingFormat()

@@ -100,7 +100,8 @@ namespace BlackMagicDevices
         using ThreadGroup = stl_ext::thread_group;
         using AudioBuffer = std::vector<int>;
         using StereoFrameMap =
-            std::map<void*, std::unique_ptr<StereoVideoFrame::Provider>>;
+            std::map<IDeckLinkMutableVideoFrame*,
+                     std::unique_ptr<StereoVideoFrame::Provider>>;
         using DLVideoFrameDeque = std::deque<IDeckLinkMutableVideoFrame*>;
 
         struct PBOData
