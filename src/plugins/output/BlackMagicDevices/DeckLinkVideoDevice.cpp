@@ -952,8 +952,6 @@ namespace BlackMagicDevices
         m_totalPlayoutFrames = 0;
         m_lastPboData = nullptr;
         m_secondLastPboData = nullptr;
-        m_lastPboData = nullptr;
-        m_secondLastPboData = nullptr;
 
         IDeckLinkDisplayModeIterator* pDLDisplayModeIterator = NULL;
         IDeckLinkDisplayMode* pDLDisplayMode = NULL;
