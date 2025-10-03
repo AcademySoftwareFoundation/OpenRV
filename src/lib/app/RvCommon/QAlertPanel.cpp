@@ -268,11 +268,8 @@ bool QAlertPanel::event(QEvent* event)
     {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 
-        bool isAcceptKey = keyEvent->key() == Qt::Key_Enter
-                           || keyEvent->key() == Qt::Key_Return;
-        bool isRejectKey = keyEvent->key() == Qt::Key_Escape;
-
-        if (isAcceptKey)
+        if (keyEvent->key() == Qt::Key_Enter
+            || keyEvent->key() == Qt::Key_Return)
         {
             event->accept();
 
@@ -282,7 +279,7 @@ bool QAlertPanel::event(QEvent* event)
             return true;
         }
 
-        if (isRejectKey)
+        if (keyEvent->key() == Qt::Key_Escape)
         {
             event->accept();
 
