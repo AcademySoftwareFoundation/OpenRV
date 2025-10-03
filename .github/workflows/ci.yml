@@ -49,8 +49,11 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install ruff
       - name: Run Ruff check
+        # Check if all the files are linted correctly
+        # Output errors as inline annotations
         run: ruff check --output-format=github
       - name: Run Ruff format
+        # Check if all the files are formatted correctly
         run: ruff format --check
   rocky-linux:
     if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
