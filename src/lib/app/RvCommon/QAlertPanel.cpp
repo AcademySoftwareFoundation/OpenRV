@@ -22,7 +22,7 @@ QAlertPanel::QAlertPanel(QWidget* parent)
     , m_mainLayout(nullptr)
     , m_buttonLayout(nullptr)
     , m_contentLayout(nullptr)
-    , m_icon(NoIcon)
+    , m_iconType(NoIcon)
 {
     setupUI();
 }
@@ -206,7 +206,7 @@ void QAlertPanel::updateIcon()
     QStyle* style = QApplication::style();
     QIcon icon;
 
-    switch (m_icon)
+    switch (m_iconType)
     {
     case Information:
         icon = style->standardIcon(QStyle::SP_MessageBoxInformation);
