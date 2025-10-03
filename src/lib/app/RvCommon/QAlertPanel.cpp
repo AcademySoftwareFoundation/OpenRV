@@ -1,5 +1,5 @@
 //******************************************************************************
-// Copyright (c) 2024 Autodesk.
+// Copyright (c) 2025 Autodesk.
 // All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -75,12 +75,6 @@ void QAlertPanel::setupUI()
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-void QAlertPanel::setWindowTitle(const QString& title)
-{
-    m_title = title;
-    QDialog::setWindowTitle(title);
-}
-
 void QAlertPanel::setText(const QString& text)
 {
     m_text = text;
@@ -89,15 +83,10 @@ void QAlertPanel::setText(const QString& text)
     // Don't resize here - let exec() handle the sizing
 }
 
-void QAlertPanel::setIcon(Icon icon)
+void QAlertPanel::setIcon(IconType icon)
 {
-    m_icon = icon;
+    m_iconType = icon;
     updateIcon();
-}
-
-void QAlertPanel::setWindowModality(Qt::WindowModality modality)
-{
-    QDialog::setWindowModality(modality);
 }
 
 QPushButton* QAlertPanel::addButton(const QString& text, ButtonRole role)
@@ -115,6 +104,8 @@ QPushButton* QAlertPanel::addButton(const QString& text, ButtonRole role)
     }
 
     m_buttonLayout->addWidget(button);
+
+    m_roleToButton[role] = button;
 
     // Connect button click to our handler
     connect(button, &QPushButton::clicked, this, &QAlertPanel::onButtonClicked);
@@ -283,28 +274,12 @@ void QAlertPanel::keyPressEvent(QKeyEvent* event)
 
     if (event->key() == Qt::Key_Escape)
     {
-        // Find the reject button (usually Cancel) or the last button
-        QList<QPushButton*> buttons = findChildren<QPushButton*>();
-        QPushButton* rejectButton = nullptr;
-
-        for (QPushButton* button : buttons)
-        {
-            if (button->text().toLower().contains("cancel")
-                || button->text().toLower().contains("no"))
-            {
-                rejectButton = button;
-                break;
-            }
-        }
-
-        if (!rejectButton && !buttons.isEmpty())
-        {
-            rejectButton = buttons.last();
-        }
+        QPushButton* rejectButton = m_roleToButton.value(RejectRole, nullptr);
 
         if (rejectButton)
         {
-            rejectButton->click();
+            rejectButton
+                ->click(); // This will set m_clickedButton and call accept()
             event->accept();
             return;
         }

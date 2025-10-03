@@ -14,13 +14,14 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMessageBox>
+#include <QMap>
 
 class QAlertPanel : public QDialog
 {
     Q_OBJECT
 
 public:
-    enum Icon
+    enum IconType
     {
         NoIcon = 0,
         Information = 1,
@@ -39,13 +40,12 @@ public:
     virtual ~QAlertPanel();
 
     // QMessageBox-compatible interface
-    void setWindowTitle(const QString& title);
     void setText(const QString& text);
-    void setIcon(Icon icon);
-    void setWindowModality(Qt::WindowModality modality);
+    void setIcon(IconType icon);
 
     QPushButton* addButton(const QString& text, ButtonRole role);
     QPushButton* clickedButton() const;
+    ButtonRole buttonRole(QPushButton* button) const;
 
     int exec();
 
@@ -67,9 +67,10 @@ private:
     QHBoxLayout* m_buttonLayout;
     QHBoxLayout* m_contentLayout;
 
-    Icon m_icon;
+    IconType m_iconType;
     QString m_text;
-    QString m_title;
+
+    QMap<ButtonRole, QPushButton*> m_roleToButton;
 };
 
 #endif // __RvCommon__QAlertPanel__h__
