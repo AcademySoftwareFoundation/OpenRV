@@ -14,7 +14,6 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMessageBox>
-#include <QMap>
 
 class QAlertPanel : public QDialog
 {
@@ -45,6 +44,9 @@ public:
 
     QPushButton* addButton(const QString& text, ButtonRole role);
     QPushButton* clickedButton() const;
+    QPushButton* defaultButton() const;
+    QPushButton* rejectButton() const;
+    QPushButton* nextPrevButton(QPushButton* fromButton, bool next) const;
 
     int exec() override;
 
@@ -70,7 +72,7 @@ private:
     IconType m_iconType;
     QString m_text;
 
-    QMap<ButtonRole, QPushButton*> m_roleToButton;
+    QPushButton* m_rejectButton;
 };
 
 #endif // __RvCommon__QAlertPanel__h__
