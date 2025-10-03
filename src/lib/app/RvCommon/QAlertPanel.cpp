@@ -189,7 +189,6 @@ void QAlertPanel::adjustBestFitDimensions()
         int bestWidth = 100; // Start with a reasonable width
         int bestHeight = 50;
 
-        // float targetBestFitRatio = 8.0/2.0;
         float targetBestFitRatio = 2.0;
 
         // Test widths from 100 to 1000 pixels to find optimal wrapping
