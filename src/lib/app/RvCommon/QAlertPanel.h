@@ -49,7 +49,8 @@ public:
     int exec() override;
 
 protected:
-    void keyPressEvent(QKeyEvent* event) override;
+    bool event(QEvent* event) override;
+    bool focusNextPrevChild(bool next) override;
 
 private slots:
     void onButtonClicked();

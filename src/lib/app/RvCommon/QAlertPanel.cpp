@@ -56,7 +56,8 @@ void QAlertPanel::setupUI()
     m_textLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     m_textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_textLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_textLabel->setMinimumSize(0, 0); // Allow it to shrink
+    m_textLabel->setMinimumSize(0, 0);        // Allow it to shrink
+    m_textLabel->setFocusPolicy(Qt::NoFocus); // Prevent text from taking focus
     m_contentLayout->addWidget(m_textLabel, 1);
 
     m_mainLayout->addLayout(m_contentLayout);
@@ -92,16 +93,14 @@ void QAlertPanel::setIcon(IconType icon)
 QPushButton* QAlertPanel::addButton(const QString& text, ButtonRole role)
 {
     QPushButton* button = new QPushButton(text);
+    button->setObjectName(QString("Button_%1").arg(text)); // For debugging
     button->setFocusPolicy(Qt::StrongFocus);
+
+    // Don't set any button as default initially - we'll set the first button as
+    // default in exec() This prevents Qt from intercepting ENTER key presses
+    // during construction
     button->setDefault(false);
     button->setAutoDefault(false);
-
-    // Set button as default based on role
-    if (role == AcceptRole)
-    {
-        button->setDefault(true);
-        button->setAutoDefault(true);
-    }
 
     m_buttonLayout->addWidget(button);
 
@@ -130,11 +129,12 @@ int QAlertPanel::exec()
         move(parentWidget()->geometry().center() - rect().center());
     }
 
-    // Make sure buttons are focusable and the first button gets focus
+    // Set first button as default for visual indication (our "focus" indicator)
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
     if (!buttons.isEmpty())
     {
         buttons.first()->setFocus();
+        buttons.first()->setDefault(true);
     }
 
     return QDialog::exec();
@@ -227,35 +227,87 @@ void QAlertPanel::updateIcon()
     m_iconLabel->setVisible(true);
 }
 
-void QAlertPanel::keyPressEvent(QKeyEvent* event)
+bool QAlertPanel::event(QEvent* event)
 {
-
-    // Handle Enter and Escape keys
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    if (event->type() == QEvent::KeyPress)
     {
-        QPushButton* currentButton = qobject_cast<QPushButton*>(focusWidget());
-        if (currentButton)
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+
+        bool isAcceptKey = keyEvent->key() == Qt::Key_Enter
+                           || keyEvent->key() == Qt::Key_Return;
+        bool isRejectKey = keyEvent->key() == Qt::Key_Escape;
+
+        if (isAcceptKey)
         {
-            currentButton->click();
+            // Find the default button (our visual focus indicator) and click it
+            QList<QPushButton*> buttons = findChildren<QPushButton*>();
+            for (QPushButton* button : buttons)
+            {
+                if (button->isDefault())
+                {
+                    button->click();
+                    event->accept();
+                    return true;
+                }
+            }
+        }
+
+        if (isRejectKey)
+        {
+            // Find button with RejectRole and click it
+            QPushButton* rejectBtn = m_roleToButton.value(RejectRole, nullptr);
+            if (rejectBtn)
+            {
+                rejectBtn->click();
+                event->accept();
+                return true;
+            }
+            // If no RejectRole button, still consume the event
             event->accept();
-            return;
+            return true;
         }
     }
 
-    if (event->key() == Qt::Key_Escape)
-    {
-        QPushButton* rejectButton = m_roleToButton.value(RejectRole, nullptr);
+    // Let Qt handle other events
+    return QDialog::event(event);
+}
 
-        if (rejectButton)
+bool QAlertPanel::focusNextPrevChild(bool next)
+{
+    QList<QPushButton*> btns = findChildren<QPushButton*>();
+    if (btns.size() > 1)
+    {
+        // Find which button is currently default (our "focused" button)
+        int curIdx = -1;
+        for (int i = 0; i < btns.size(); ++i)
         {
-            rejectButton
-                ->click(); // This will set m_clickedButton and call accept()
-            event->accept();
-            return;
+            if (btns[i]->isDefault())
+            {
+                curIdx = i;
+                break;
+            }
+        }
+
+        if (curIdx >= 0)
+        {
+            int newDefIdx = next ? (curIdx + 1) % btns.size()
+                                 : (curIdx - 1 + btns.size()) % btns.size();
+
+            // Clear default from all buttons
+            for (QPushButton* btn : btns)
+            {
+                btn->setDefault(false);
+            }
+
+            // Set new default button (our visual focus indicator)
+            btns[newDefIdx]->setDefault(true);
+
+            return true; // We handled the focus change
         }
     }
 
-    QDialog::keyPressEvent(event);
+    // Fall back to default behavior
+    return QDialog::focusNextPrevChild(next);
 }
 
 #include "QAlertPanel.moc"
