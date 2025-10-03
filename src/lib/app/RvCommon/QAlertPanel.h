@@ -45,9 +45,8 @@ public:
 
     QPushButton* addButton(const QString& text, ButtonRole role);
     QPushButton* clickedButton() const;
-    ButtonRole buttonRole(QPushButton* button) const;
 
-    int exec();
+    int exec() override;
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

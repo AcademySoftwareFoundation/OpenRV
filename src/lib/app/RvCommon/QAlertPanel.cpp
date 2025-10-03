@@ -229,36 +229,6 @@ void QAlertPanel::updateIcon()
 
 void QAlertPanel::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab)
-    {
-        // Handle Tab navigation between buttons
-        QList<QPushButton*> buttons = findChildren<QPushButton*>();
-        if (buttons.size() <= 1)
-        {
-            QDialog::keyPressEvent(event);
-            return;
-        }
-
-        QPushButton* currentButton = qobject_cast<QPushButton*>(focusWidget());
-        int currentIndex = buttons.indexOf(currentButton);
-
-        if (event->key() == Qt::Key_Tab)
-        {
-            // Forward tab
-            int nextIndex = (currentIndex + 1) % buttons.size();
-            buttons[nextIndex]->setFocus();
-        }
-        else
-        {
-            // Backward tab
-            int nextIndex =
-                (currentIndex - 1 + buttons.size()) % buttons.size();
-            buttons[nextIndex]->setFocus();
-        }
-
-        event->accept();
-        return;
-    }
 
     // Handle Enter and Escape keys
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
