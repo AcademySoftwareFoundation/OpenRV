@@ -28,7 +28,7 @@ MenuStateFunc   := (int;);
 \: makeCategoryEventFunc (EventFunc; string category, EventFunc f) {
     \: (void; Event ev) {
         if (!commands.isEventCategoryEnabled(category))
-            sendInternalEvent("action-blocked");
+            sendInternalEvent("category-event-blocked", category);
         else
             f(ev);
     };
@@ -219,7 +219,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     // create composite function that checks if the category is enabled and then calls the function
     let compositeFunc = \: (void; Event ev) {
         if (compositeStateFunc() == DisabledMenuState)
-            sendInternalEvent("category-event-blocked");
+            sendInternalEvent("category-event-blocked", category);
         else
             func(ev);
     };
@@ -233,7 +233,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     // Generate accelerator from event pattern
     let menuKeyText = _eventNameToKeyShortcut(eventPattern);
 
-    let mi = MenuItem {menuText, func, menuKeyText, stateFunc, nil};
+    let mi = MenuItem {menuText, compositeFunc, menuKeyText, compositeStateFunc, nil};
     return mi;
 }
 
