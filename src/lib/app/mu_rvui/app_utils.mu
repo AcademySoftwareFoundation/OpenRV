@@ -204,7 +204,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 }
  
 \: menuItem (MenuItem; string menuText, string eventPattern, string category, EventFunc func, 
-                MenuStateFunc stateFunc, string description = "")
+                MenuStateFunc stateFunc)
 {
     menu_debug("menuItem", "\"%s\"" % menuText);
 
@@ -227,6 +227,7 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     // Perform the bind action
     if (eventPattern != "")
     {
+        string description = ("menuItem: %s" % menuText);
         commands.bind("default", "global", eventPattern, compositeFunc, description);
     }
     
