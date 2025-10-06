@@ -126,19 +126,19 @@ namespace Mu
     //  throw a C++ exception that carries the return value, which mu__try
     //  can catch and handle properly.
     //
-    class MuReturnFromCatchException : public std::exception
+    class MuReturnFromCatchException final : public std::exception
     {
     public:
-        MuReturnFromCatchException(const Value& returnValue) throw()
-            : _returnValue(returnValue)
+        explicit MuReturnFromCatchException(Value&& returnValue) noexcept
+            : _returnValue(std::move(returnValue))
         {
         }
 
-        virtual ~MuReturnFromCatchException() throw() {}
+        virtual ~MuReturnFromCatchException() noexcept {}
 
-        const Value& returnValue() const throw() { return _returnValue; }
+        const Value& returnValue() const noexcept { return _returnValue; }
 
-        virtual const char* what() const throw()
+        virtual const char* what() const noexcept override
         {
             return "return from Mu catch block";
         }
