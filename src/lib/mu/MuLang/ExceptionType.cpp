@@ -144,9 +144,9 @@ namespace Mu
     NODE_IMPLEMENTATION(ExceptionType::mu__try, void)
     {
         // Optional to store return value if a return from catch occurs.
-        // We can't do longjmp inside the catch handler (that's the UB we're
-        // avoiding!), so we store it and do the longjmp after exiting the
-        // try-catch.
+        // We can't do longjmp inside the catch handler (that's the
+        // undefined behavior we're trying to avoid!), so store it
+        // and do the longjmp after exiting the try-catch.
         bool hasReturnFromCatch = false;
         Value returnValueFromCatch;
 
