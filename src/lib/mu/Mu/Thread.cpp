@@ -176,6 +176,13 @@ namespace Mu
         {
             _returnValue = _rootNode->eval(*this);
         }
+        catch (Mu::MuReturnFromCatchException& retExc)
+        {
+            // This is not a real exception - it's our mechanism to properly
+            // propagate return values from catch blocks through C++ code.
+            // Rethrow it so Thread::call() can convert it to a longjmp.
+            throw;
+        }
         catch (Mu::Exception& exc)
         {
             if (!_exception)
@@ -358,8 +365,17 @@ namespace Mu
 
                 if (rv == JumpReturnCode::NoJump)
                 {
-                    run(body, true);
-                    // v = body->eval(*thread);
+                    try
+                    {
+                        run(body, true);
+                        // v = body->eval(*thread);
+                    }
+                    catch (Mu::MuReturnFromCatchException& retExc)
+                    {
+                        // A return from a catch block was propagated here.
+                        // Convert it to a proper longjmp.
+                        jump(JumpReturnCode::Return, 1, retExc.returnValue());
+                    }
                 }
                 else
                 {

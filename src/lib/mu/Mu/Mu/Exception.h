@@ -118,6 +118,36 @@ namespace Mu
     MU_BASIC_EXC(GenericPosix, "posix exception")
 
     //
+    //  MuReturnFromCatchException
+    //
+    //  This exception is thrown when a return statement occurs inside a Mu
+    //  catch block. Using longjmp in this case causes undefined behavior
+    //  because it jumps through C++ exception handling code. Instead, we
+    //  throw a C++ exception that carries the return value, which mu__try
+    //  can catch and handle properly.
+    //
+    class MuReturnFromCatchException : public std::exception
+    {
+    public:
+        MuReturnFromCatchException(const Value& returnValue) throw()
+            : _returnValue(returnValue)
+        {
+        }
+
+        virtual ~MuReturnFromCatchException() throw() {}
+
+        const Value& returnValue() const throw() { return _returnValue; }
+
+        virtual const char* what() const throw()
+        {
+            return "return from Mu catch block";
+        }
+
+    private:
+        Value _returnValue;
+    };
+
+    //
     //  Codes returned by setjmp and longjmp
     //
 

@@ -151,6 +151,15 @@ namespace Mu
             NODE_ARG(0, int);
 #endif
         }
+        catch (Mu::MuReturnFromCatchException& retExc)
+        {
+            // BUG FIX: A return statement occurred in a catch block.
+            // We caught it as a C++ exception (to avoid undefined behavior from
+            // longjmp through C++ exception handling). Now convert it back to
+            // a longjmp that will be caught by the enclosing function's setjmp.
+            NODE_THREAD.jump(JumpReturnCode::Return, 1, retExc.returnValue());
+            return; // Never reached
+        }
         catch (Mu::ProgramException& exc)
         {
             Object* e = exc.object();
@@ -231,8 +240,31 @@ namespace Mu
                     if (rval = t->match(e->type()))
                     {
                         NODE_ARG(0, Pointer);
-                        NODE_ARG(1, void);
-                        NODE_THREAD.setException(0);
+
+                        // BUG FIX: Install a setjmp to catch return statements
+                        // from the catch block body. If a return occurs, we
+                        // throw a C++ exception instead of doing a longjmp,
+                        // because longjmp through C++ exception handling is
+                        // undefined behavior.
+                        NODE_THREAD.jumpPointBegin(JumpReturnCode::Return);
+                        int returnCode = SETJMP(NODE_THREAD.jumpPoint());
+
+                        if (returnCode == JumpReturnCode::NoJump)
+                        {
+                            NODE_ARG(1, void);
+                            NODE_THREAD.setException(0);
+                            NODE_THREAD.jumpPointEnd();
+                        }
+                        else if (returnCode == JumpReturnCode::Return)
+                        {
+                            // A return statement occurred in the catch block
+                            // body. Get the return value and throw a C++
+                            // exception to propagate it.
+                            NODE_THREAD.jumpPointRestore();
+                            Value v = NODE_THREAD.returnValue();
+                            NODE_THREAD.jumpPointEnd();
+                            throw MuReturnFromCatchException(v);
+                        }
                     }
                 }
             }
@@ -243,8 +275,26 @@ namespace Mu
 
     NODE_IMPLEMENTATION(ExceptionType::mu__catch_all, bool)
     {
-        NODE_ARG(0, void);
-        NODE_THREAD.setException(0);
+        // Install a setjmp to catch return statements from the catch block
+        // body.
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Return);
+        int returnCode = SETJMP(NODE_THREAD.jumpPoint());
+
+        if (returnCode == JumpReturnCode::NoJump)
+        {
+            NODE_ARG(0, void);
+            NODE_THREAD.setException(0);
+            NODE_THREAD.jumpPointEnd();
+        }
+        else if (returnCode == JumpReturnCode::Return)
+        {
+            // A return statement occurred in the catch block body.
+            NODE_THREAD.jumpPointRestore();
+            Value v = NODE_THREAD.returnValue();
+            NODE_THREAD.jumpPointEnd();
+            throw MuReturnFromCatchException(v);
+        }
+
         NODE_RETURN(true);
     }
 
