@@ -138,7 +138,7 @@ namespace Mu
 
         const Value& returnValue() const noexcept { return _returnValue; }
 
-        const char* what() const noexcept
+        const char* what() override const noexcept
         {
             return "return from Mu catch block";
         }
