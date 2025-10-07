@@ -5,3 +5,4 @@
 #
 
 ADD_SUBDIRECTORY(RV)
+ADD_SUBDIRECTORY(rvlinklauncher)
