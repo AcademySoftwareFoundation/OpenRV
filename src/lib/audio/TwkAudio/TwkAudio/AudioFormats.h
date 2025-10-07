@@ -66,8 +66,32 @@ namespace TwkAudio
         SDDS_7_1, // Surround_5_1   | FrontLeftOfCenter | FrontRightOfCenter,
         Surround_7_1, // Surround_5_1   | BackLeft          | BackRight,
         Back_7_1,     // Back_5_1       | SideLeft          | SideRight,
+        Generic_9,    // Surround_7_1   | BackCenter,
         Surround_9_1, // Surround_7_1   | LeftHeight        | RightHeight,
-        Generic_16,
+        Generic_11,   // Base8+Heights  | Channel14,
+        Generic_12,   // Base8+Heights  | FrontLeftOfCenter | Channel14,
+        Generic_13,   // Base8+Heights  | FrontL/ROfCenter | Channel14,
+        Generic_14, // Base8+Heights  | FrontL/ROfCenter+BackCenter | Channel14,
+        Generic_15, // Base8+Heights  | FrontL/ROfCenter+BackCenter |
+                    // Channel14+15,
+        Generic_16, // Base8+Heights  | FrontL/ROfCenter+BackCenter |
+                    // Channel14-16,
+        Generic_17, // Generic_16     | Channel17,
+        Generic_18, // Generic_17     | Channel18,
+        Generic_19, // Generic_18     | Channel19,
+        Generic_20, // Generic_19     | Channel20,
+        Generic_21, // Generic_20     | Channel21,
+        Generic_22, // Generic_21     | Channel22,
+        Generic_23, // Generic_22     | Channel23,
+        Generic_24, // Generic_23     | Channel24,
+        Generic_25, // Generic_24     | Channel25,
+        Generic_26, // Generic_25     | Channel26,
+        Generic_27, // Generic_26     | Channel27,
+        Generic_28, // Generic_27     | Channel28,
+        Generic_29, // Generic_28     | Channel29,
+        Generic_30, // Generic_29     | Channel30,
+        Generic_31, // Generic_30     | Channel31,
+        Generic_32, // Generic_31     | Channel32,
 
         AC3_5_1,  // FrontLeft   | FrontCenter | FrontRight | SideLeft |
                   // SideRight | LowFrequency
@@ -139,7 +163,23 @@ namespace TwkAudio
         Channel14 = SET_CHANNEL_VALUE(14, 10, 10) | Center,
         Channel15 = SET_CHANNEL_VALUE(15, 10, 10) | Center,
         Channel16 =
-            SET_CHANNEL_VALUE(16, 10, 10) | Center // SDI has 16 channels
+            SET_CHANNEL_VALUE(16, 10, 10) | Center, // SDI has 16 channels
+        Channel17 = SET_CHANNEL_VALUE(17, 10, 10) | Center,
+        Channel18 = SET_CHANNEL_VALUE(18, 10, 10) | Center,
+        Channel19 = SET_CHANNEL_VALUE(19, 10, 10) | Center,
+        Channel20 = SET_CHANNEL_VALUE(20, 10, 10) | Center,
+        Channel21 = SET_CHANNEL_VALUE(21, 10, 10) | Center,
+        Channel22 = SET_CHANNEL_VALUE(22, 10, 10) | Center,
+        Channel23 = SET_CHANNEL_VALUE(23, 10, 10) | Center,
+        Channel24 = SET_CHANNEL_VALUE(24, 10, 10) | Center,
+        Channel25 = SET_CHANNEL_VALUE(25, 10, 10) | Center,
+        Channel26 = SET_CHANNEL_VALUE(26, 10, 10) | Center,
+        Channel27 = SET_CHANNEL_VALUE(27, 10, 10) | Center,
+        Channel28 = SET_CHANNEL_VALUE(28, 10, 10) | Center,
+        Channel29 = SET_CHANNEL_VALUE(29, 10, 10) | Center,
+        Channel30 = SET_CHANNEL_VALUE(30, 10, 10) | Center,
+        Channel31 = SET_CHANNEL_VALUE(31, 10, 10) | Center,
+        Channel32 = SET_CHANNEL_VALUE(32, 10, 10) | Center
     };
 
     class TWKAUDIO_EXPORT ChannelsVector : public std::vector<Channels>

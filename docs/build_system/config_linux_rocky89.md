@@ -5,19 +5,19 @@ Open RV 2025 can be built for Rocky 8 and Rocky 9, using the VFX reference platf
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
 ````{tabs}
-```{code-tab} bash VFX-CY2023
-Qt                  : 5.12.2
-Python              : 3.10
-Cmake               : 3.31.6
+```{code-tab} bash VFX-CY2024
+Qt                  : 6.5.3
+Python              : 3.11.8
+Cmake               : 3.31.X+
 
 Config manager repo : powertools  (Rocky 8)
 Config manager repo : crb         (Rocky 9)
 Perl-CPAN           : 2.36+       (Rocky 9)
 
 ```
-```{code-tab} bash VFX-CY2024
-Qt                  : 6.5.3
-Python              : 3.11.8
+```{code-tab} bash VFX-CY2023
+Qt                  : 5.12.2
+Python              : 3.10
 Cmake               : 3.31.6
 
 Config manager repo : powertools  (Rocky 8)
@@ -35,7 +35,8 @@ All other dependencies are shared across variations.
 2. [Install Pyenv / Python](rocky_install_pyenv_and_python)
 3. [Install CMake](rocky_install_cmake)
 4. [Install Qt](rocky_install_qt)
-5. [Building with Docker (Optional)](rocky_building_with_docker)
+5. [Build Open RV](rocky_build_openrv)
+6. [Building with Docker (Optional)](rocky_building_with_docker)
 
 
 (rocky_install_tools_and_dependencies)=
@@ -96,13 +97,13 @@ source ~/.bashrc
 
 #### 2.2 Install the Python version associated with the VFX reference platform
 ````{tabs}
-```{code-tab} bash VFX-CY2023
-pyenv install 3.10
-pyenv global 3.10
-```
 ```{code-tab} bash VFX-CY2024
 pyenv install 3.11.8
 pyenv global 3.11.8
+```
+```{code-tab} bash VFX-CY2023
+pyenv install 3.10
+pyenv global 3.10
 ```
 ````
 
@@ -130,19 +131,19 @@ cmake version 3.31.6
 Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recommend that you install Qt from other installable sources as it may introduce build issues.
 
 ````{tabs}
-```{code-tab} bash VFX-CY2023
-- Start the Qt installer
-- Installation path: ~/Qt
-- Click "Archive" in the hard-to-find dropbown box in the top right side of the window
-- Select Qt 5.12.2
-# Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2
-```
 ```{code-tab} bash VFX-CY2024
 - Start the Qt installer
 - Installation path: ~/Qt
 - Click "Archive" in the hard-to-find dropbown box in the top right side of the window
 - Select Qt 6.5.3
 # Any 6.5.3+ should work, but Autodesk's RV is build against 6.5.3
+```
+```{code-tab} bash VFX-CY2023
+- Start the Qt installer
+- Installation path: ~/Qt
+- Click "Archive" in the hard-to-find dropbown box in the top right side of the window
+- Select Qt 5.12.2
+# Any 5.12.2+ should work, but Autodesk's RV is build against 5.12.2
 ```
 ````
 
@@ -152,8 +153,13 @@ Note 1: If you install Qt at a different installation path, you will need to man
 
 Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build Open RV. 
 
+(rocky_build_openrv)=
+### 5. Build Open RV
+
+Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
+
 (rocky_building_with_docker)=
-### 5. Building with Docker (Optional)
+### 6. Building with Docker (Optional)
 
 To build Open RV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 
 
@@ -163,16 +169,16 @@ Please go through the cloning procedure found in the [common build process](conf
 #### 5.1. Build the image and run
 
 ````{tabs}
-```{code-tab} bash Rocky 8
-cd dockerfiles
-docker build -t openrv-rocky8 -f Dockerfile.Linux-Rocky8 .
-docker run -d openrv-rocky8 /bin/bash -c "sleep infinity"
-```
-
 ```{code-tab} bash Rocky 9
 cd dockerfiles
 docker build -t openrv-rocky9 -f Dockerfile.Linux-Rocky9 .
 docker run -d openrv-rocky9 /bin/bash -c "sleep infinity"
+```
+
+```{code-tab} bash Rocky 8
+cd dockerfiles
+docker build -t openrv-rocky8 -f Dockerfile.Linux-Rocky8 .
+docker run -d openrv-rocky8 /bin/bash -c "sleep infinity"
 ```
 ````
 

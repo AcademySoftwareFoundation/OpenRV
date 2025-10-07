@@ -763,7 +763,12 @@ int utf8Main(int argc, char* argv[])
     if (opts.qtcss)
     {
         string s = scarfFile(opts.qtcss);
-        csstext = s.c_str();
+        QString qcss = QString(s.c_str());
+        // Always apply font size parameters - Qt handles missing placeholders
+        // safely
+        csstext = qcss.arg(opts.fontSize1)
+                      .arg(opts.fontSize2)
+                      .arg(opts.fontSize2 - 1);
     }
     else
     {
