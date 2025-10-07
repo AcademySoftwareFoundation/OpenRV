@@ -193,9 +193,9 @@ class Property:
         if not self.__data and self.__deferRead:
             self.__deferredRead()
         self.__data = value
-        if size != None:
+        if size is not None:
             self.__size = size
-        if width != None:
+        if width is not None:
             self.__width = width
 
     def component(self):
@@ -797,9 +797,9 @@ class gtoContainer(gto.Reader):
         """
         self.__objects = []
         self.__filename = filename
-        self.__deferredRead = deferredRead and filename != None
+        self.__deferredRead = deferredRead and filename is not None
 
-        if filename == None:
+        if filename is None:
             return
 
         if self.__deferredRead:
@@ -1041,12 +1041,12 @@ class gtoContainer(gto.Reader):
         given filename.  If no filename is given, the filename given to
         the constructor is used.
         """
-        if filename == None:
+        if filename is None:
             filename = self.__filename
         else:
             self.__filename = filename
 
-        if filename == None:
+        if filename is None:
             raise ValueError("No filename specified")
 
         if self.__deferredRead:
@@ -1063,7 +1063,7 @@ class gtoContainer(gto.Reader):
             for o in self.objects():
                 try:
                     o[0][0][0]
-                except:
+                except Exception:
                     # Must have an object with no components or a
                     # component with no properties.
                     pass

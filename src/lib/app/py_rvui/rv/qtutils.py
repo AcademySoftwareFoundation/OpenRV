@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0 
 #
 import rv.commands
-import os
 
 try:
     from PySide2 import QtGui, QtWidgets

@@ -1,12 +1,13 @@
 #!/usr/bin/python
-# 
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+#
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 # by Daniel Rosengren
 
-import sys, time
+import sys
+import time
 
 stdout = sys.stdout
 

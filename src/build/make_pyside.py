@@ -23,7 +23,6 @@ from utils import (
     download_file,
     extract_7z_archive,
     verify_7z_archive,
-    source_widows_msvc_env,
     update_env_path,
 )
 from make_python import get_python_interpreter_args
@@ -142,12 +141,8 @@ def prepare() -> None:
     print(f"Installing numpy with {install_numpy_args}")
     subprocess.run(install_numpy_args).check_returncode()
 
-    cmakelist_path = os.path.join(
-        SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt"
-    )
-    old_cmakelist_path = os.path.join(
-        SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt.old"
-    )
+    cmakelist_path = os.path.join(SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt")
+    old_cmakelist_path = os.path.join(SOURCE_DIR, "sources", "shiboken2", "ApiExtractor", "CMakeLists.txt.old")
     if os.path.exists(old_cmakelist_path):
         os.remove(old_cmakelist_path)
 
@@ -222,15 +217,13 @@ def build() -> None:
     # We force Visual Studio 2017 here to make it build without errors.
     if platform.system() == "Windows":
         # Add Qt jom to the path to build in parallel
-        jom_path = os.path.abspath(
-            os.path.join(QT_OUTPUT_DIR, "..", "..", "Tools", "QtCreator", "bin", "jom")
-        )
+        jom_path = os.path.abspath(os.path.join(QT_OUTPUT_DIR, "..", "..", "Tools", "QtCreator", "bin", "jom"))
         if os.path.exists(os.path.join(jom_path, "jom.exe")):
             print(f"jom.exe was successfully located at: {jom_path}")
             update_env_path([jom_path])
         else:
             print(f"Could not find jom.exe at the expected location: {jom_path}")
-            print(f"Build performance might be impacted")
+            print("Build performance might be impacted")
 
         # Add the debug switch to match build type but only on Windows
         # (on other platforms, PySide2 is built in release)
@@ -270,9 +263,7 @@ def build() -> None:
     subprocess.run(generator_cleanup_args).check_returncode()
 
     if OPENSSL_OUTPUT_DIR and platform.system() == "Windows":
-        pyside_folder = glob.glob(
-            os.path.join(python_home, "**", "site-packages", "PySide2"), recursive=True
-        )[0]
+        pyside_folder = glob.glob(os.path.join(python_home, "**", "site-packages", "PySide2"), recursive=True)[0]
         openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "bin", "lib*"))
 
         for lib in openssl_libs:
@@ -292,14 +283,11 @@ if __name__ == "__main__":
     parser.add_argument("--source-dir", dest="source", type=pathlib.Path, required=True)
     parser.add_argument("--python-dir", dest="python", type=pathlib.Path, required=True)
     parser.add_argument("--qt-dir", dest="qt", type=pathlib.Path, required=True)
-    parser.add_argument(
-        "--openssl-dir", dest="openssl", type=pathlib.Path, required=False
-    )
+    parser.add_argument("--openssl-dir", dest="openssl", type=pathlib.Path, required=False)
     parser.add_argument("--temp-dir", dest="temp", type=pathlib.Path, required=True)
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)
 
     parser.add_argument("--variant", dest="variant", type=str, required=True)
-
 
     # Major and minor version with dots.
     parser.add_argument("--python-version", dest="python_version", type=str, required=True, default="")
@@ -316,7 +304,7 @@ if __name__ == "__main__":
     QT_OUTPUT_DIR = args.qt
     VARIANT = args.variant
     PYTHON_VERSION = args.python_version
-    
+
     print(args)
 
     if args.prepare:

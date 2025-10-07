@@ -3,7 +3,8 @@
 # 
 # SPDX-License-Identifier: Apache-2.0 
 #
-import re, math
+import re
+import math
 
 import rv.rvtypes as rvt
 import rv.commands as rvc

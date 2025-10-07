@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import rv.commands
 import os
@@ -75,9 +75,7 @@ class Mode(object):
             rv.commands.deactivateMode(self._modeName)
 
         rv.commands.redraw()
-        rv.commands.sendInternalEvent(
-            "mode-toggled", "%s|%s" % (self._modeName, self._active), "Mode"
-        )
+        rv.commands.sendInternalEvent("mode-toggled", "%s|%s" % (self._modeName, self._active), "Mode")
 
     def layout(self, event):
         "Layout any margins or precompute anything necessary for rendering"
@@ -88,7 +86,7 @@ class Mode(object):
         pass
 
     def supportPath(self, module, packageName=None):
-        if packageName == None:
+        if packageName is None:
             packageName = module.__name__
         return os.path.join(
             os.path.dirname(os.path.dirname(module.__file__)),
@@ -97,18 +95,14 @@ class Mode(object):
         )
 
     def qmlPath(self, module, packageName=None):
-        if packageName == None:
+        if packageName is None:
             packageName = module.__name__
-        return os.path.join(
-            os.path.dirname(os.path.dirname(module.__file__)), "QML", packageName
-        )
+        return os.path.join(os.path.dirname(os.path.dirname(module.__file__)), "QML", packageName)
 
     def configPath(self, packageName):
         """Returns a path to a writable directory where temporary, and
         configuration files specific to a package are/should be located. The
         directory will be created if it does not yet exist."""
-
-        import platform
 
         envvar = os.getenv("TWK_APP_SUPPORT_PATH")
         userDir = envvar.split(concat_seperator())[0]
@@ -117,7 +111,7 @@ class Mode(object):
         try:
             if not os.path.exists(directory):
                 sys.mkdir(directory, 0x1FF)
-        except:
+        except Exception:
             print("ERROR: mode config path failed to create directory %s" % directory)
 
         return directory
@@ -158,13 +152,13 @@ class MinorMode(Mode):
         self.setMenu(menu)
 
     def setMenu(self, menu):
-        if menu == None:
+        if menu is None:
             menu = []
         self._menu = menu
         rv.commands.defineModeMenu(self._modeName, self._menu, False)
 
     def setMenuStrict(self, menu):
-        if menu == None:
+        if menu is None:
             menu = []
         self._menu = menu
         rv.commands.defineModeMenu(self._modeName, self._menu, True)
@@ -217,9 +211,7 @@ class Widget(MinorMode):
         self._inCloseArea = False
         self._containsPointer = False
         self._whichMargin = -1
-        MinorMode.init(
-            self, name, globalBindings, overrideBindings, menu, sortKey, ordering
-        )
+        MinorMode.init(self, name, globalBindings, overrideBindings, menu, sortKey, ordering)
 
     def toggle(self):
         self._active = not self._active
@@ -233,9 +225,7 @@ class Widget(MinorMode):
 
         rv.commands.redraw()
 
-        rv.commands.sendInternalEvent(
-            "mode-toggled", "%s|%s" % (self._modeName, self._active), "Mode"
-        )
+        rv.commands.sendInternalEvent("mode-toggled", "%s|%s" % (self._modeName, self._active), "Mode")
 
     def updateMargins(self, activated):
         #
@@ -278,12 +268,7 @@ class Widget(MinorMode):
             self.updateMargins(True)
 
     def contains(self, p):
-        if (
-            p[0] >= self._x
-            and p[0] <= self._x + self._w
-            and p[1] >= self._y
-            and p[1] <= self._y + self._h
-        ):
+        if p[0] >= self._x and p[0] <= self._x + self._w and p[1] >= self._y and p[1] <= self._y + self._h:
             return True
 
         return False
