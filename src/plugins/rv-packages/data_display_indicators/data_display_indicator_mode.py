@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import re
 import math
@@ -59,7 +59,6 @@ class EXRWindowIndicatorMode(rvt.MinorMode):
         dataH = 0.0
         pa = 1.0
         for a in attrs:
-
             if a[0] == "EXR/dataWindow":
                 clean = re.sub("[\(\)]", " ", a[1])
                 parts = clean.split(" ")
@@ -120,7 +119,6 @@ class EXRWindowIndicatorMode(rvt.MinorMode):
         #
 
         if dataW != dispW or dataH != dispH:
-
             #
             #   Find the angle/radians of rotation
             #
@@ -204,7 +202,6 @@ class EXRWindowIndicatorMode(rvt.MinorMode):
         return array3
 
     def render(self, event):
-
         sources = rvc.sourcesAtFrame(rvc.frame())
 
         if len(sources) == 0:
@@ -219,7 +216,6 @@ class EXRWindowIndicatorMode(rvt.MinorMode):
             box.render()
 
     def __init__(self):
-
         rvt.MinorMode.__init__(self)
 
         self.init(

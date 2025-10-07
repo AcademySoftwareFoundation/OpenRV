@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from __future__ import print_function
 
@@ -63,19 +63,13 @@ class LatLongViewerMode(rvt.MinorMode):
             rv.runtime.eval(code, ["sync", "rvtypes", "commands"])
 
     def readPrefs(self):
-
-        self.adjustAllowed = bool(
-            rvc.readSettings("lat_long_viewer", "adjustAllowed", True)
-        )
+        self.adjustAllowed = bool(rvc.readSettings("lat_long_viewer", "adjustAllowed", True))
 
     def writePrefs(self):
-
         rvc.writeSettings("lat_long_viewer", "adjustAllowed", self.adjustAllowed)
 
     def addViewer(self, event):
-
         for pg in colorPipeGroups():
-
             deb("addViewer: checking g %s hasViewer %s" % (pg, str(groupHasViewer(pg))))
 
             if not groupHasViewer(pg):
@@ -97,13 +91,8 @@ class LatLongViewerMode(rvt.MinorMode):
             """
 
     def removeDisNode(self, event):
-
         for pg in linPipeGroups():
-
-            deb(
-                "removeDisNode: checking g %s hasSD %s"
-                % (pg, str(groupHasStereoDis(pg)))
-            )
+            deb("removeDisNode: checking g %s hasSD %s" % (pg, str(groupHasStereoDis(pg))))
 
             if groupHasStereoDis(pg):
                 nodes = rvc.getStringProperty(pg + ".pipeline.nodes")
@@ -114,25 +103,20 @@ class LatLongViewerMode(rvt.MinorMode):
                 rvc.setStringProperty(pg + ".pipeline.nodes", newNodes, True)
 
     def toggleTopBotPref(self, event):
-
         self._expectTopBot = not self._expectTopBot
         self.writePrefs()
 
     def toggleSwapEyesPref(self, event):
-
         self._swapEyes = not self._swapEyes
         self.writePrefs()
 
     def disabledMenuState(self):
-
         return rvc.DisabledMenuState
 
     def uncheckedMenuState(self):
-
         return rvc.UncheckedMenuState
 
     def haveDisNodesState(self):
-
         for pg in linPipeGroups():
             if groupHasStereoDis(pg):
                 return rvc.UncheckedMenuState
@@ -140,14 +124,12 @@ class LatLongViewerMode(rvt.MinorMode):
         return rvc.DisabledMenuState
 
     def expectTopBotState(self):
-
         if self._expectTopBot:
             return rvc.CheckedMenuState
 
         return rvc.UncheckedMenuState
 
     def swapEyesState(self):
-
         if self._swapEyes:
             return rvc.CheckedMenuState
 
@@ -180,7 +162,6 @@ class LatLongViewerMode(rvt.MinorMode):
         pass
 
     def toggleAdjust(self, event):
-
         self.adjustAllowed = not self.adjustAllowed
         self.writePrefs()
 
@@ -226,17 +207,11 @@ class LatLongViewerMode(rvt.MinorMode):
         dy = dy / domain[1]
         deb("dx %s dy %s" % (str(dx), str(dy)))
 
-        rvc.setFloatProperty(
-            "#LatLongViewer.parameters.rotateX", [self.downRotateX + -dy * 180.0], True
-        )
-        rvc.setFloatProperty(
-            "#LatLongViewer.parameters.rotateY", [self.downRotateY + dx * 360.0], True
-        )
+        rvc.setFloatProperty("#LatLongViewer.parameters.rotateX", [self.downRotateX + -dy * 180.0], True)
+        rvc.setFloatProperty("#LatLongViewer.parameters.rotateY", [self.downRotateY + dx * 360.0], True)
 
     def missingState(self):
-
         for pg in colorPipeGroups():
-
             deb("checking g %s hasViewer %s" % (pg, str(groupHasViewer(pg))))
 
             if not groupHasViewer(pg):
@@ -277,7 +252,6 @@ class LatLongViewerMode(rvt.MinorMode):
         return rvc.UncheckedMenuState
 
     def __init__(self):
-
         deb("__init__")
         rvt.MinorMode.__init__(self)
 
@@ -349,5 +323,4 @@ class LatLongViewerMode(rvt.MinorMode):
 
 
 def createMode():
-
     return LatLongViewerMode()

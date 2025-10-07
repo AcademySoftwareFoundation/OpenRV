@@ -34,9 +34,7 @@ def get_openssl_args(root) -> List[str]:
 
     :return: Path to the openssl binary
     """
-    openssl_bins = glob.glob(
-        os.path.join(root, "**", "bin", "openssl*"), recursive=True
-    )
+    openssl_bins = glob.glob(os.path.join(root, "**", "bin", "openssl*"), recursive=True)
 
     print(openssl_bins)
 
@@ -136,9 +134,7 @@ def test_openssl_distribution() -> None:
         openssl_bin = get_openssl_args(tmp_openssl_dir)
 
         subprocess_env = os.environ.copy()
-        subprocess_env.update(
-            {"LD_LIBRARY_PATH": os.path.join(tmp_openssl_dir, LIB_DIR)}
-        )
+        subprocess_env.update({"LD_LIBRARY_PATH": os.path.join(tmp_openssl_dir, LIB_DIR)})
 
         print(f"Executing {openssl_bin}")
         subprocess.run(
@@ -242,9 +238,7 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)
 
     parser.add_argument("--arch", dest="arch", type=str, required=False, default="")
-    parser.add_argument(
-        "--perlroot", dest="perlroot", type=str, required=False, default=""
-    )
+    parser.add_argument("--perlroot", dest="perlroot", type=str, required=False, default="")
 
     parser.add_argument("--vfx_platform", dest="vfx_platform", type=int, required=True)
 

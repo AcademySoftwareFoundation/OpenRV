@@ -83,9 +83,7 @@ def _run_hook(hook_name, otio_obj, context={}, optional=True):
         return otio.hooks.run(hook_name, otio_obj, context)
     except KeyError:
         if not optional:
-            raise NoMappingForOtioTypeError(
-                str(type(otio_obj)) + " on object: {}".format(otio_obj)
-            )
+            raise NoMappingForOtioTypeError(str(type(otio_obj)) + " on object: {}".format(otio_obj))
 
 
 def create_rv_node_from_otio(otio_obj, context=None):
@@ -100,9 +98,7 @@ def create_rv_node_from_otio(otio_obj, context=None):
     }
 
     if type(otio_obj) in WRITE_TYPE_MAP:
-        process_schema = _run_hook(
-            "pre_hook_{}".format(otio_obj.schema_name()), otio_obj, context
-        )
+        process_schema = _run_hook("pre_hook_{}".format(otio_obj.schema_name()), otio_obj, context)
         if process_schema is False:
             return None
 
@@ -111,9 +107,7 @@ def create_rv_node_from_otio(otio_obj, context=None):
             _run_hook("post_hook_{}".format(otio_obj.schema_name()), otio_obj, context)
         return result
 
-    return _run_hook(
-        "{}_to_rv".format(otio_obj.schema_name()), otio_obj, context, optional=False
-    )
+    return _run_hook("{}_to_rv".format(otio_obj.schema_name()), otio_obj, context, optional=False)
 
 
 def _retime_trx_input(pre_item, post_item, context=None):
@@ -152,9 +146,7 @@ def _create_dissolve(in_dissolve, context=None):
 def _create_custom(in_transition, context=None):
     rv_trx = _run_hook("CustomTransition_to_rv", in_transition, context)
     if not rv_trx:
-        raise NoNodeFromHook(
-            "Custom Transition found but no node was returned from the hook"
-        )
+        raise NoNodeFromHook("Custom Transition found but no node was returned from the hook")
     return rv_trx
 
 
@@ -173,23 +165,15 @@ def _create_transition(pre_item, in_trx, post_item, context=None):
 
     commands.setFloatProperty(rv_trx + ".parameters.startFrame", [1.0], True)
 
-    num_frames = (
-        (in_trx.in_offset + in_trx.out_offset)
-        .rescaled_to(pre_item.trimmed_range().duration.rate)
-        .value
-    )
+    num_frames = (in_trx.in_offset + in_trx.out_offset).rescaled_to(pre_item.trimmed_range().duration.rate).value
 
     in_offset_prop = "{}.otio.in_offset".format(rv_trx)
     commands.newProperty(in_offset_prop, commands.IntType, 1)
     commands.setIntProperty(in_offset_prop, [in_trx.in_offset.to_frames()], True)
 
-    commands.setFloatProperty(
-        rv_trx + ".parameters.numFrames", [float(num_frames)], True
-    )
+    commands.setFloatProperty(rv_trx + ".parameters.numFrames", [float(num_frames)], True)
 
-    commands.setFloatProperty(
-        rv_trx + ".output.fps", [float(pre_item.trimmed_range().duration.rate)], True
-    )
+    commands.setFloatProperty(rv_trx + ".output.fps", [float(pre_item.trimmed_range().duration.rate)], True)
 
     trx_inputs = []
     with set_context(context, transition=rv_trx):
@@ -221,9 +205,7 @@ def _create_stack(in_stack, context=None):
 
     # disable reversed order blending so the top node is on top
     stack_node = extra_commands.nodesInGroupOfType(new_stack, "RVStack")[0]
-    commands.setIntProperty(
-        "{}.mode.supportReversedOrderBlending".format(stack_node), [0]
-    )
+    commands.setIntProperty("{}.mode.supportReversedOrderBlending".format(stack_node), [0])
 
     return new_stack
 
@@ -241,9 +223,7 @@ def _create_track(in_seq, context=None):
 
         edl_time = context.get("global_start_time")
         if not edl_time and len(items_to_serialize) > 0:
-            edl_time = otio.opentime.RationalTime(
-                0, items_to_serialize[0].trimmed_range().start_time.rate
-            )
+            edl_time = otio.opentime.RationalTime(0, items_to_serialize[0].trimmed_range().start_time.rate)
         edl = {
             "in": [],
             "out": [],
@@ -281,9 +261,7 @@ def _create_track(in_seq, context=None):
         _add_metadata_to_node(in_seq, new_seq)
 
         # disable reversed order blending so the top node is on top
-        commands.setIntProperty(
-            "{}.mode.supportReversedOrderBlending".format(seq_node), [0]
-        )
+        commands.setIntProperty("{}.mode.supportReversedOrderBlending".format(seq_node), [0])
 
     return new_seq
 
@@ -297,9 +275,7 @@ def _get_global_transform(tl, context) -> dict:
             try:
                 # get active clip and start prelodaing the movie in the background
                 if isinstance(clip.media_reference, otio.schema.ExternalReference):
-                    media_path = _get_media_path(
-                        str(clip.media_reference.target_url), context
-                    )
+                    media_path = _get_media_path(str(clip.media_reference.target_url), context)
                     # print("PRELOADING MOVIE: {}".format(media_path))
                     commands.startPreloadingMedia(media_path)
 
@@ -365,9 +341,7 @@ def _set_sequence_edl(sequence, edl_time, edl):
     commands.setIntProperty("{}.edl.in".format(sequence), edl["in"])
     commands.setIntProperty("{}.edl.out".format(sequence), edl["out"])
     commands.setIntProperty("{}.edl.frame".format(sequence), edl["frame"])
-    commands.setIntProperty(
-        "{}.edl.source".format(sequence), list(range(len(edl["frame"])))
-    )
+    commands.setIntProperty("{}.edl.source".format(sequence), list(range(len(edl["frame"]))))
     commands.setIntProperty("{}.mode.autoEDL".format(sequence), [0])
 
 
@@ -375,22 +349,13 @@ def _get_in_out_frame(it, range_to_read, seq_rate=None):
     in_frame = out_frame = None
 
     if hasattr(it, "media_reference") and it.media_reference:
-        if (
-            isinstance(it.media_reference, otio.schema.ImageSequenceReference)
-            and it.media_reference.available_range
-        ):
-            in_frame, out_frame = it.media_reference.frame_range_for_time_range(
-                range_to_read
-            )
+        if isinstance(it.media_reference, otio.schema.ImageSequenceReference) and it.media_reference.available_range:
+            in_frame, out_frame = it.media_reference.frame_range_for_time_range(range_to_read)
 
     if not in_frame and not out_frame:
         rate = seq_rate if seq_rate is not None else range_to_read.duration.rate
-        in_frame = otio.opentime.to_frames(
-            range_to_read.start_time.rescaled_to(rate), rate=rate
-        )
-        out_frame = otio.opentime.to_frames(
-            range_to_read.end_time_inclusive().rescaled_to(rate), rate=rate
-        )
+        in_frame = otio.opentime.to_frames(range_to_read.start_time.rescaled_to(rate), rate=rate)
+        out_frame = otio.opentime.to_frames(range_to_read.end_time_inclusive().rescaled_to(rate), rate=rate)
     return (in_frame, out_frame)
 
 
@@ -444,11 +409,7 @@ def _create_media(media_ref, trimmed_range, context=None):
     elif isinstance(media_ref, otio.schema.ImageSequenceReference):
         return [
             _get_media_path(
-                str(
-                    media_ref.abstract_target_url(
-                        symbol="%0{n}d".format(n=media_ref.frame_zero_padding)
-                    )
-                ),
+                str(media_ref.abstract_target_url(symbol="%0{n}d".format(n=media_ref.frame_zero_padding))),
                 context,
             )
         ]
@@ -486,9 +447,7 @@ def _create_sources(item, context=None):
             error_media = _create_movieproc(item.trimmed_range(), "smptebars")
             src = commands.addSourceVerbose([error_media])
 
-        commands.setFloatProperty(
-            src + ".group.fps", [item.trimmed_range().duration.rate]
-        )
+        commands.setFloatProperty(src + ".group.fps", [item.trimmed_range().duration.rate])
 
         _add_metadata_to_node(media_ref, src)
         active_src = cmd_args[0] if cmd_args else src
@@ -498,17 +457,11 @@ def _create_sources(item, context=None):
         return src
 
     if isinstance(item, otio.schema.Gap):
-        src = commands.addSourceVerbose(
-            [_create_movieproc(item.trimmed_range(), "blank")]
-        )
+        src = commands.addSourceVerbose([_create_movieproc(item.trimmed_range(), "blank")])
         return commands.nodeGroup(src), src
 
     active_source = None
-    active_key = (
-        item.active_media_reference_key
-        if hasattr(item, "active_media_reference_key")
-        else None
-    )
+    active_key = item.active_media_reference_key if hasattr(item, "active_media_reference_key") else None
     if hasattr(item, "media_reference") and item.media_reference:
         active_source = add_media(
             item.media_reference,
@@ -587,11 +540,7 @@ def _create_item(it, context=None):
         context,
         src=active_src,
         source_group=commands.nodeGroup(active_src),
-        switch_group=(
-            src_or_switch_group
-            if commands.nodeType(src_or_switch_group) == "RVSwitchGroup"
-            else None
-        ),
+        switch_group=(src_or_switch_group if commands.nodeType(src_or_switch_group) == "RVSwitchGroup" else None),
     ):
         if context.get("transition"):
             _add_transition_timings(it, range_to_read, src_or_switch_group)
@@ -641,12 +590,8 @@ def _add_markers(it, node):
             [color for rgba in colors for color in rgba],
             True,
         )
-        commands.newProperty(
-            "{}.markers.otio_metadata".format(node), commands.StringType, 1
-        )
-        commands.setStringProperty(
-            "{}.markers.otio_metadata".format(node), metadata, True
-        )
+        commands.newProperty("{}.markers.otio_metadata".format(node), commands.StringType, 1)
+        commands.setStringProperty("{}.markers.otio_metadata".format(node), metadata, True)
 
 
 def _get_color_from_name(name, defaultColor="PURPLE"):
@@ -695,9 +640,7 @@ def _add_source_bounds(media_ref, src, active_src, context=None):
         height = media_info["height"]
         aspect_ratio = media_info["width"] / height
     except Exception:
-        logging.exception(
-            "Unable to determine aspect ratio, using default value of 16:9"
-        )
+        logging.exception("Unable to determine aspect ratio, using default value of 16:9")
         aspect_ratio = 1920 / 1080
 
     translate = bounds.center() * global_scale - global_translate
@@ -705,21 +648,13 @@ def _add_source_bounds(media_ref, src, active_src, context=None):
 
     transform_node = extra_commands.associatedNode("RVTransform2D", src)
 
-    commands.setFloatProperty(
-        "{}.transform.scale".format(transform_node), [scale.x / aspect_ratio, scale.y]
-    )
-    commands.setFloatProperty(
-        "{}.transform.translate".format(transform_node), [translate.x, translate.y]
-    )
+    commands.setFloatProperty("{}.transform.scale".format(transform_node), [scale.x / aspect_ratio, scale.y])
+    commands.setFloatProperty("{}.transform.translate".format(transform_node), [translate.x, translate.y])
 
     # write the bounds global_scale and global_translate to the node so we can
     # preserve the original values if we round-trip
-    commands.newProperty(
-        "{}.otio.global_scale".format(transform_node), commands.FloatType, 2
-    )
-    commands.newProperty(
-        "{}.otio.global_translate".format(transform_node), commands.FloatType, 2
-    )
+    commands.newProperty("{}.otio.global_scale".format(transform_node), commands.FloatType, 2)
+    commands.newProperty("{}.otio.global_translate".format(transform_node), commands.FloatType, 2)
     commands.setFloatProperty(
         "{}.otio.global_scale".format(transform_node),
         [global_scale.x, global_scale.y],

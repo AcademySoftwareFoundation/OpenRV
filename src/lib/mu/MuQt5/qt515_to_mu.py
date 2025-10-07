@@ -1292,9 +1292,7 @@ exclusionMap = {
     "QEvent::LeaveEditFocus": None,  # ????
     "QAbstractSpinBox::fixup": None,  # return val is arg
     "QTouchEvent::QTouchEvent": None,
-    "QStyle::polish": [
-        ("polish", "", [("palette", "QPalette &", None)], "virtual void", False)
-    ],
+    "QStyle::polish": [("polish", "", [("palette", "QPalette &", None)], "virtual void", False)],
     "QTextDocument::undo": None,  # Takes a TextCursor* needs manual imp
     "QTextDocument::redo": None,  # same
     "QSlider::sliderChange": None,  # protected
@@ -1812,9 +1810,7 @@ def parseParameter(param, n):
         return ("", param, None)
     if "=" in parts:
         index = indexInList("=", parts)
-        default = sstrip(
-            reduce(lambda x, y: str(x) + " " + str(y), parts[index + 1 :], "")
-        )
+        default = sstrip(reduce(lambda x, y: str(x) + " " + str(y), parts[index + 1 :], ""))
         name = parts[index - 1]
         del parts[index - 1 :]
     elif "*" in parts or "&" in parts:
@@ -2091,12 +2087,7 @@ class NamespaceInfo:
         global api
         for i in self.enums:
             fullname = "%s::%s" % (self.name, name)
-            if (
-                i.name == name
-                or i.name == fullname
-                or i.flags == name
-                or i.flags == fullname
-            ):
+            if i.name == name or i.name == fullname or i.flags == name or i.flags == fullname:
                 return True
             for p in self.inherits:
                 if api.classes.has_key(p):
@@ -2109,12 +2100,7 @@ class NamespaceInfo:
         global api
         for i in self.enums:
             fullname = "%s::%s" % (self.name, name)
-            if (
-                i.name == name
-                or i.name == fullname
-                or i.flags == name
-                or i.flags == fullname
-            ):
+            if i.name == name or i.name == fullname or i.flags == name or i.flags == fullname:
                 return i.name
             for p in self.inherits:
                 if p not in api.classes.keys():
@@ -2317,10 +2303,7 @@ class MuFunction:
             mutype = api.translate(atype, c)
             if mutype is None:
                 self.failed = True
-                message(
-                    "%s failed because api.translate(%s,%s) return None"
-                    % (name, atype, c)
-                )
+                message("%s failed because api.translate(%s,%s) return None" % (name, atype, c))
                 mutype = '"%s"' % atype
             self.args.append((aname, mutype, aval))
 
@@ -2344,9 +2327,7 @@ class MuFunction:
             self.rtype = '"%s"' % rtype
             message("%s failed because rtype == %s" % (name, rtype))
 
-        self.compiled = mangleName(
-            "qt_%s_%s_%s" % (muclass.name, name, conditionType(self.rtype))
-        )
+        self.compiled = mangleName("qt_%s_%s_%s" % (muclass.name, name, conditionType(self.rtype)))
 
         #
         #   Test for functions that were already successfully translated
@@ -2429,9 +2410,7 @@ class MuFunction:
                 # this for some value types. Generally Qt rarely used
                 # default parameter values before Qt 5
                 # right now only ints, flags, and enums are supported
-                if aval is not None and doesFunctionAllowDefaultValues(
-                    self.muclass, self.name
-                ):
+                if aval is not None and doesFunctionAllowDefaultValues(self.muclass, self.name):
                     if atype == "int":
                         out += ", Value((int)%s)" % self.muclass.qualifyValue(aval)
                 out += "), "
@@ -2569,10 +2548,7 @@ class MuFunction:
                 expr = "%s(" % self.name
             else:
                 if inheritable:
-                    expr = (
-                        "new MuQt_%s(param_this, NODE_THREAD.process()->callEnv()"
-                        % self.name
-                    )
+                    expr = "new MuQt_%s(param_this, NODE_THREAD.process()->callEnv()" % self.name
                     if len(self.args) > 1:
                         expr += ", "
                 else:
@@ -2759,9 +2735,7 @@ class MuFunction:
                         body += "    return %s;\n" % convertTo(expr, qtrtype)
         elif muclass.pointertype:
             if self.isconstructor:
-                body += "    %s;\n    return param_this;\n" % setExpr(
-                    "param_this", expr, muclass.name
-                )
+                body += "    %s;\n    return param_this;\n" % setExpr("param_this", expr, muclass.name)
             elif self.rtype == "void":
                 body += "    %s;\n" % expr
                 if self.ismember:
@@ -2824,11 +2798,7 @@ class MuClass:
         self.globalfuncs = []
         self.castoperators = []
         self.enums = []
-        self.F_trans = (
-            lambda f: not f.failed
-            and not f.isprop
-            and (self.inheritable or not f.isprotected)
-        )
+        self.F_trans = lambda f: not f.failed and not f.isprop and (self.inheritable or not f.isprotected)
         self.funcCount = {}
         self.inherits = []
         self.inheritedby = []
@@ -2844,10 +2814,7 @@ class MuClass:
             fname = f[0]
             rtype = f[3]
             cppname = qtnamespace.name + "::" + fname
-            message(
-                "functions fname = %s, rtype = %s, cppname = %s"
-                % (fname, rtype, cppname)
-            )
+            message("functions fname = %s, rtype = %s, cppname = %s" % (fname, rtype, cppname))
             exclude = isFunctionExcluded(qtnamespace, f)
             if exclude and verbose:
                 print("EXCLUDED:", str(f))
@@ -2861,9 +2828,7 @@ class MuClass:
                     mufunc = MuFunction(api, self, newqtfunc, True, False, True)
                     self.castoperators.append(mufunc)
             elif not fname.startswith("~") and not exclude:
-                mufunc = MuFunction(
-                    api, self, f, True, f in qtnamespace.protectedfuncs, False
-                )
+                mufunc = MuFunction(api, self, f, True, f in qtnamespace.protectedfuncs, False)
                 if mufunc.virtual and not mufunc.failed:
                     mufunc.virtualSlot = len(self.virtuals)
                     self.virtuals.append(mufunc)
@@ -2882,9 +2847,7 @@ class MuClass:
             for ft in self.inheritedVirtuals:
                 (f, protected, origin) = ft
                 fhere = self.name + "::" + f[0]
-                if not self.hasFunction(f[0]) and not isFunctionExcluded(
-                    qtnamespace, f
-                ):
+                if not self.hasFunction(f[0]) and not isFunctionExcluded(qtnamespace, f):
                     mufunc = MuFunction(api, self, f, True, protected, False)
                     if mufunc.virtual and not mufunc.failed:
                         mufunc.virtualSlot = len(self.virtuals)
@@ -2898,16 +2861,9 @@ class MuClass:
             cppname = qtnamespace.name + "::" + fname
             exclude = isFunctionExcluded(qtnamespace, f)
             print(qtnamespace)
-            message(
-                "staticfuncs fname = %s, cppname = %s, exclude = %s"
-                % (fname, cppname, str(exclude))
-            )
+            message("staticfuncs fname = %s, cppname = %s, exclude = %s" % (fname, cppname, str(exclude)))
             if not exclude:
-                self.statics.append(
-                    MuFunction(
-                        api, self, f, False, f in qtnamespace.protectedfuncs, False
-                    )
-                )
+                self.statics.append(MuFunction(api, self, f, False, f in qtnamespace.protectedfuncs, False))
 
         for e in qtnamespace.enums:
             cppname = qtnamespace.name + "::" + e.name.split(":")[-1]
@@ -2929,9 +2885,7 @@ class MuClass:
                     if not self.hasFunction(f[0]) and "~" not in f[0]:
                         # if self.name == "QLayout":
                         #    print " -> ",str(f)
-                        self.inheritedVirtuals.append(
-                            (f, f in qtnamespace.protectedfuncs, qtnamespace)
-                        )
+                        self.inheritedVirtuals.append((f, f in qtnamespace.protectedfuncs, qtnamespace))
             for p in qtnamespace.parents:
                 self.collectVirtuals(p)
 
@@ -3003,9 +2957,7 @@ class MuClass:
 
     def outputCompiledNodes(self):
         out = ""
-        for f in filter(
-            self.F_trans, self.functions + self.statics + self.castoperators
-        ):
+        for f in filter(self.F_trans, self.functions + self.statics + self.castoperators):
             out += f.compiledFunction()
             out += "\n"
         return out
@@ -3014,9 +2966,7 @@ class MuClass:
         out = ""
         print("self.statics for {0}".format(self.name))
 
-        for f in filter(
-            self.F_trans, self.functions + self.statics + self.castoperators
-        ):
+        for f in filter(self.F_trans, self.functions + self.statics + self.castoperators):
             out += f.nodeImplementation()
             out += "\n"
         return out
@@ -3161,9 +3111,7 @@ class MuClass:
     def qualifyValue(self, value):
         if "(" in value or "|" in value:
             newvalue = value
-            parts = (
-                value.replace("(", " ").replace(")", " ").replace("|", " ").split(" ")
-            )
+            parts = value.replace("(", " ").replace(")", " ").replace("|", " ").split(" ")
             for p in parts:
                 if p != "" and p is not None:
                     if self.needsLocalQualification(p):
@@ -3218,13 +3166,7 @@ class MuClass:
                     # rtype_clean = rtype
                     # output the function rtype name and args
                     if f.isconstructor:
-                        out += (
-                            "MuQt_"
-                            + name
-                            + "::MuQt_"
-                            + name
-                            + "(Pointer muobj, const CallEnvironment* ce"
-                        )
+                        out += "MuQt_" + name + "::MuQt_" + name + "(Pointer muobj, const CallEnvironment* ce"
                     else:
                         out += rtype_clean + " MuQt_" + self.name + "::" + name + "("
 
@@ -3262,9 +3204,7 @@ class MuClass:
                         out += "    _env = ce;\n"
                         out += "    _obj = reinterpret_cast<ClassInstance*>(muobj);\n"
                         out += "    _obj->retainExternal();\n"
-                        out += (
-                            "    MuLangContext* c = (MuLangContext*)_env->context();\n"
-                        )
+                        out += "    MuLangContext* c = (MuLangContext*)_env->context();\n"
                         out += (
                             '    _baseType = c->findSymbolOfTypeByQualifiedName<%sType>(c->internName("qt.%s"));\n'
                             % (self.name, self.name)
@@ -3292,18 +3232,11 @@ class MuClass:
                             if rtype_clean == "void":
                                 out += " return; }"
                             out += "\n"
-                        out += (
-                            "    MuLangContext* c = (MuLangContext*)_env->context();\n"
-                        )
-                        out += (
-                            "    const MemberFunction* F0 = _baseType->_func[%d];\n"
-                            % f.virtualSlot
-                        )
+                        out += "    MuLangContext* c = (MuLangContext*)_env->context();\n"
+                        out += "    const MemberFunction* F0 = _baseType->_func[%d];\n" % f.virtualSlot
                         out += "    const MemberFunction* F = _obj->classType()->dynamicLookup(F0);\n"
                         out += "    if (F != F0) \n    {\n"
-                        out += "        Function::ArgumentVector args(%d);\n" % (
-                            len(params) + 1
-                        )
+                        out += "        Function::ArgumentVector args(%d);\n" % (len(params) + 1)
                         # if f.name == "splitPath":
                         #   print str(parms)
                         out += "        args[0] = Value(Pointer(_obj));\n"
@@ -3316,10 +3249,7 @@ class MuClass:
                             )
                         out += "        Value rval = _env->call(F, args);\n"
                         if f.rtype != "void":
-                            out += (
-                                "        return %s;\n"
-                                % f.derefExp(f.unpackReturnValue("rval"), f.rtype)[0]
-                            )
+                            out += "        return %s;\n" % f.derefExp(f.unpackReturnValue("rval"), f.rtype)[0]
                         out += "    }\n"
                         out += "    else\n"
                         out += "    {\n        "
@@ -3372,12 +3302,7 @@ class MuClass:
                         protected = False
                         out += "  public:\n"
                     if f.isconstructor:
-                        out += (
-                            "    "
-                            + "MuQt_"
-                            + name
-                            + "(Pointer muobj, const CallEnvironment*"
-                        )
+                        out += "    " + "MuQt_" + name + "(Pointer muobj, const CallEnvironment*"
                     else:
                         out += "    " + rtype + " " + name + "("
                     for i in range(0, len(params)):
@@ -3400,9 +3325,7 @@ class MuClass:
                             nameSuffix = ""
                             if parent:
                                 nameSuffix = "_parent"
-                            out += (
-                                "    " + nvrtype + " " + name + "_pub%s(" % nameSuffix
-                            )
+                            out += "    " + nvrtype + " " + name + "_pub%s(" % nameSuffix
                             for i in range(0, len(params)):
                                 p = params[i]
                                 (pname, ptype, pval) = p
@@ -3442,7 +3365,6 @@ class MuClass:
         return out
 
     def outputSourceFiles(self):
-
         name = self.name
         if name == "":
             name = "Global"
@@ -3529,9 +3451,7 @@ class MuClass:
                     cpplines.append("    const char** propExclusions = 0;")
             elif line.find("{%%nativeObject%%}") != -1:
                 if self.name == "QObject":
-                    cpplines.append(
-                        '   new MemberVariable(c, "native", "qt.NativeObject"),'
-                    )
+                    cpplines.append('   new MemberVariable(c, "native", "qt.NativeObject"),')
             elif line.find("{%%addHandRolledSymbols%%}") != -1:
                 if hsyms:
                     cpplines.extend(hsyms)
@@ -3576,17 +3496,11 @@ class MuClass:
                     hlines.append("\n")
                 elif line.find("{%%isInheritableFunc%%}") != -1:
                     if self.inheritable:
-                        hlines.append(
-                            "    static bool isInheritable() { return true; }\n"
-                        )
+                        hlines.append("    static bool isInheritable() { return true; }\n")
                     else:
-                        hlines.append(
-                            "    static bool isInheritable() { return false; }\n"
-                        )
+                        hlines.append("    static bool isInheritable() { return false; }\n")
                 elif line.find("{%%virtualArray%%}") != -1:
-                    hlines.append(
-                        "    MemberFunction* _func[%d];\n" % len(self.virtuals)
-                    )
+                    hlines.append("    MemberFunction* _func[%d];\n" % len(self.virtuals))
                 elif line.find("{%%cachedInstanceFunc%%}") != -1:
                     if self.inheritable:
                         hlines.append(
@@ -3989,16 +3903,10 @@ class QtDocParser(SGMLParser):
                     self.inherits.append(data)
             elif self.h2:
                 self.intypes = False
-                if (
-                    data == "Public Functions"
-                    or data == "Reimplemented Public Functions"
-                ):
+                if data == "Public Functions" or data == "Reimplemented Public Functions":
                     self.bucket = self.public
                     self.functable = True
-                elif (
-                    data == "Protected Functions"
-                    or data == "Reimplemented Protected Functions"
-                ):
+                elif data == "Protected Functions" or data == "Reimplemented Protected Functions":
                     self.bucket = self.protected
                     self.functable = True
                 elif data == "Static Public Members":
@@ -4039,9 +3947,7 @@ class QtDocParser(SGMLParser):
         self.qtnamespace.staticfuncs = filter(F, map(P, self.staticPublic))
         self.qtnamespace.signals = filter(F, map(P, self.signals))
         self.qtnamespace.protectedfuncs = filter(F, map(P, self.protected))
-        self.qtnamespace.functions = (
-            self.qtnamespace.publicfuncs + self.qtnamespace.protectedfuncs
-        )
+        self.qtnamespace.functions = self.qtnamespace.publicfuncs + self.qtnamespace.protectedfuncs
 
         rootnamespace.staticfuncs += filter(F, map(P, self.globaldefs))
 
