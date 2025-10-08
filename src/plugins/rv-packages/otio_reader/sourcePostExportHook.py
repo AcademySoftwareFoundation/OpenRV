@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from rv import commands, extra_commands
-from effectHook import *
+from effectHook import get_otio_metadata
 import opentimelineio as otio
 
 
@@ -24,9 +24,7 @@ def hook_function(in_timeline, argument_map):
             slope=commands.getFloatProperty("{}.CDL.slope".format(linearize)),
             power=commands.getFloatProperty("{}.CDL.power".format(linearize)),
             offset=commands.getFloatProperty("{}.CDL.offset".format(linearize)),
-            saturation=commands.getFloatProperty("{}.CDL.saturation".format(linearize))[
-                0
-            ],
+            saturation=commands.getFloatProperty("{}.CDL.saturation".format(linearize))[0],
             visible=True,
         )
 
@@ -40,18 +38,12 @@ def hook_function(in_timeline, argument_map):
             global_translate_vec = otio.schema.V2d(0.0, 0.0)
             global_scale_vec = otio.schema.V2d(1.0, 1.0)
 
-            if commands.propertyExists(
-                "{}.otio.global_translate".format(transform)
-            ) and commands.propertyExists("{}.otio.global_scale".format(transform)):
-                global_translate = commands.getFloatProperty(
-                    "{}.otio.global_translate".format(transform)
-                )
-                global_scale = commands.getFloatProperty(
-                    "{}.otio.global_scale".format(transform)
-                )
-                global_translate_vec = otio.schema.V2d(
-                    global_translate[0], global_translate[1]
-                )
+            if commands.propertyExists("{}.otio.global_translate".format(transform)) and commands.propertyExists(
+                "{}.otio.global_scale".format(transform)
+            ):
+                global_translate = commands.getFloatProperty("{}.otio.global_translate".format(transform))
+                global_scale = commands.getFloatProperty("{}.otio.global_scale".format(transform))
+                global_translate_vec = otio.schema.V2d(global_translate[0], global_translate[1])
                 global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
 
             translate = commands.getFloatProperty(

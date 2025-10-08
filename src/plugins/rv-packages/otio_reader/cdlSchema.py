@@ -45,13 +45,9 @@ class CDL(otio.schema.Effect):
         self.power = power
         self.saturation = saturation
 
-    visible = otio.core.serializable_field(
-        "visible", required_type=bool, doc=("Visible: expects either true or false")
-    )
+    visible = otio.core.serializable_field("visible", required_type=bool, doc=("Visible: expects either true or false"))
 
-    _slope = otio.core.serializable_field(
-        "slope", required_type=list, doc=("Slope: expects a list of three floats")
-    )
+    _slope = otio.core.serializable_field("slope", required_type=list, doc=("Slope: expects a list of three floats"))
 
     @property
     def slope(self):
@@ -66,9 +62,7 @@ class CDL(otio.schema.Effect):
                 raise Exception("Invalid slope element type")
         self._slope = val
 
-    _offset = otio.core.serializable_field(
-        "offset", required_type=list, doc=("Offset: expects a list of three floats")
-    )
+    _offset = otio.core.serializable_field("offset", required_type=list, doc=("Offset: expects a list of three floats"))
 
     @property
     def offset(self):
@@ -83,9 +77,7 @@ class CDL(otio.schema.Effect):
                 raise Exception("Invalid offset element type")
         self._offset = val
 
-    _power = otio.core.serializable_field(
-        "power", required_type=list, doc=("Visible: expects a list of three floats")
-    )
+    _power = otio.core.serializable_field("power", required_type=list, doc=("Visible: expects a list of three floats"))
 
     @property
     def power(self):
@@ -100,9 +92,7 @@ class CDL(otio.schema.Effect):
                 raise Exception("Invalid power element type")
         self._power = val
 
-    saturation = otio.core.serializable_field(
-        "saturation", required_type=float, doc=("Saturation: expects a float")
-    )
+    saturation = otio.core.serializable_field("saturation", required_type=float, doc=("Saturation: expects a float"))
 
     def __str__(self):
         return 'CDL("{}", "{}", "{}", "{}", "{}", "{}", "{}")'.format(

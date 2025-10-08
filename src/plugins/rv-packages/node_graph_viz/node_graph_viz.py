@@ -17,9 +17,7 @@ try:
     import matplotlib.pyplot as plt
 except:
     print("Exception occurred while importing and initializing matplotlib.")
-    print(
-        "'py-interp -m pip install matplotlib networkx' to install it into RV's environment."
-    )
+    print("'py-interp -m pip install matplotlib networkx' to install it into RV's environment.")
     raise
 
 import itertools
@@ -77,9 +75,7 @@ class RVNodeGraphViz(rv.rvtypes.MinorMode):
 
     def _show_graph(self):
         """Draw and display the graph."""
-        nx.draw_networkx(
-            self.dag, pos=nx.spring_layout(self.dag), with_labels=True, font_size=6
-        )
+        nx.draw_networkx(self.dag, pos=nx.spring_layout(self.dag), with_labels=True, font_size=6)
         plt.axis("off")
         plt.show()
 

@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from __future__ import print_function
 
@@ -9,11 +9,8 @@ from rv import commands as rvc
 from rv import extra_commands as rve
 from rv import rvtypes as rvt
 
-import rv.runtime
 
-import os
 import sys
-import re
 
 
 def deb(s):
@@ -46,23 +43,17 @@ class StereoDisMode(rvt.MinorMode):
         return nodeType
 
     def readPrefs(self):
-
-        self._expectTopBot = rvc.readSettings(
-            "stereo_disassembly", "expectTopBot", True
-        )
+        self._expectTopBot = rvc.readSettings("stereo_disassembly", "expectTopBot", True)
         self._swapEyes = rvc.readSettings("stereo_disassembly", "swapEyes", True)
         self._squeezed = rvc.readSettings("stereo_disassembly", "squeezed", True)
 
     def writePrefs(self):
-
         rvc.writeSettings("stereo_disassembly", "expectTopBot", self._expectTopBot)
         rvc.writeSettings("stereo_disassembly", "swapEyes", self._swapEyes)
         rvc.writeSettings("stereo_disassembly", "squeezed", self._squeezed)
 
     def addDisNode(self, event):
-
         for pg in linPipeGroups():
-
             deb("addDisNode: checking g %s hasSD %s" % (pg, str(groupHasStereoDis(pg))))
 
             if not groupHasStereoDis(pg):
@@ -102,13 +93,8 @@ class StereoDisMode(rvt.MinorMode):
                     rvc.setIntProperty(sd + ".output.size", size, True)
 
     def removeDisNode(self, event):
-
         for pg in linPipeGroups():
-
-            deb(
-                "removeDisNode: checking g %s hasSD %s"
-                % (pg, str(groupHasStereoDis(pg)))
-            )
+            deb("removeDisNode: checking g %s hasSD %s" % (pg, str(groupHasStereoDis(pg))))
 
             if groupHasStereoDis(pg):
                 sd = stereoDisOfGroup(pg)
@@ -120,28 +106,22 @@ class StereoDisMode(rvt.MinorMode):
                 rvc.setStringProperty(pg + ".pipeline.nodes", newNodes, True)
 
     def toggleTopBotPref(self, event):
-
         self._expectTopBot = not self._expectTopBot
         self.writePrefs()
 
     def toggleSwapEyesPref(self, event):
-
         self._swapEyes = not self._swapEyes
         self.writePrefs()
 
     def toggleSqueezed(self, event):
-
         self._squeezed = not self._squeezed
         self.writePrefs()
 
     def disabledMenuState(self):
-
         return rvc.DisabledMenuState
 
     def noDisNodesState(self):
-
         for pg in linPipeGroups():
-
             deb("checking g %s hasSD %s" % (pg, str(groupHasStereoDis(pg))))
 
             if not groupHasStereoDis(pg):
@@ -150,7 +130,6 @@ class StereoDisMode(rvt.MinorMode):
         return rvc.DisabledMenuState
 
     def haveDisNodesState(self):
-
         for pg in linPipeGroups():
             if groupHasStereoDis(pg):
                 return rvc.UncheckedMenuState
@@ -158,28 +137,24 @@ class StereoDisMode(rvt.MinorMode):
         return rvc.DisabledMenuState
 
     def expectTopBotState(self):
-
         if self._expectTopBot:
             return rvc.CheckedMenuState
 
         return rvc.UncheckedMenuState
 
     def swapEyesState(self):
-
         if self._swapEyes:
             return rvc.CheckedMenuState
 
         return rvc.UncheckedMenuState
 
     def squeezedState(self):
-
         if not self._squeezed:
             return rvc.CheckedMenuState
 
         return rvc.UncheckedMenuState
 
     def __init__(self):
-
         deb("__init__")
         rvt.MinorMode.__init__(self)
 
@@ -243,5 +218,4 @@ class StereoDisMode(rvt.MinorMode):
 
 
 def createMode():
-
     return StereoDisMode()

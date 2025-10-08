@@ -1,0 +1,21 @@
+line-length = 120
+target-version = 'py311'
+exclude = [
+    "src/pub", # Ruff shouldn't run on the pub submodule
+]
+
+# TODO: Fix linting issues that are temporarily ignore in the following files for the linter check to pass
+[lint.per-file-ignores]
+"src/plugins/rv-packages/webview2/webview2.py" = ["F401"]
+"src/plugins/rv-packages/pyside_example/pyside_example.py" = ["F401", "F403", "F405", "F811"]
+"src/plugins/rv-packages/lat_long_viewer/lat_long_viewer.py" = ["F821"]
+"src/plugins/rv-packages/data_display_indicators/data_display_indicator_mode.py" = ["F403", "F405"]
+"src/plugins/rv-packages/custom_lut_menu_mode/custom_lut_menu_mode.py" = ["F821"]
+"src/plugins/python/gtoContainer/gtoContainer.py" = ["F403", "F405"]
+"src/lib/mu/MuQt6/qt6_to_mu.py" = ["E731", "F821", "F841"]
+"src/lib/mu/MuQt6/qt2mu.py" = ["E731", "F821", "F841"]
+"src/lib/mu/MuQt5/qt515_to_mu.py" = ["E731", "F821", "F841"]
+"src/lib/mu/MuQt5/qt512_to_mu.py" = ["E731", "F821", "F841"]
+"src/lib/mu/MuQt5/qt2mu.py" = ["E731", "F821", "F841"]
+"src/lib/app/py_rvui/rv_commands_setup.py" = ["F821"]
+"src/lib/app/py_rvui/rv/qtutils.py" = ["F401", "F403", "F405"]
