@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import rv.commands
 import rv.rvtypes
@@ -43,9 +43,9 @@ def remotePyEval(event):
     "python eval() event contents"
     try:
         val = eval(event.contents())
-        if val != None:
+        if val is not None:
             event.setReturnContent(str(val))
-    except:
+    except Exception:
         import sys
 
         e = sys.exc_info()

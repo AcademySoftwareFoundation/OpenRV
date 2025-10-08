@@ -40,6 +40,7 @@
     <file>images/radio_button.png</file>
     <file>images/radio_button_dark.png</file>
     <file>images/radio_button_on.png</file>
+    <file>images/radio_button_on_default.png</file>
     <file>images/radio_button_blue_on.png</file>
     <file>images/RV_icon.png</file>
     <file>images/add_48x48.png</file>
@@ -53,6 +54,10 @@
     <file>images/check_box_checked.png</file>
     <file>images/check_box_checked2.png</file>
     <file>images/check_box_not_checked.png</file>
+    <file>images/checkbox_on_default.png</file>
+    <file>images/checkbox_off_disabled.png</file>
+    <file>images/checkbox_off_default.png</file>
+    <file>images/checkbox_off_hover.png</file>
     <file>images/combo_updown_arrows.png</file>
     <file>images/confg_32x32.png</file>
     <file>images/confg_48x48.png</file>

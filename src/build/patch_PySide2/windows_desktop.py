@@ -20,9 +20,7 @@ def prepare_packages_win32(self, vars):
     # For now, debug symbols will not be shipped into the package.
     copy_pdbs = False
     pdbs = []
-    if (
-        self.debug or OPTION["DEBUG"] or self.build_type == "RelWithDebInfo"
-    ) and copy_pdbs:
+    if (self.debug or OPTION["DEBUG"] or self.build_type == "RelWithDebInfo") and copy_pdbs:
         pdbs = ["*.pdb"]
 
     # <install>/lib/site-packages/{st_package_name}/* ->
@@ -115,10 +113,7 @@ def prepare_packages_win32(self, vars):
             vars=vars,
         )
 
-    if (
-        config.is_internal_shiboken_generator_build()
-        or config.is_internal_pyside_build()
-    ):
+    if config.is_internal_shiboken_generator_build() or config.is_internal_pyside_build():
         # <install>/include/* -> <setup>/{st_package_name}/include
         copydir(
             "{install_dir}/include/{cmake_package_name}",
@@ -224,14 +219,10 @@ def prepare_packages_win32(self, vars):
             # Re-generate examples Qt resource files for Python 3
             # compatibility
             if sys.version_info[0] == 3:
-                examples_path = "{st_build_dir}/{st_package_name}/examples".format(
-                    **vars
-                )
+                examples_path = "{st_build_dir}/{st_package_name}/examples".format(**vars)
                 pyside_rcc_path = "{install_dir}/bin/rcc.exe".format(**vars)
                 pyside_rcc_options = ["-g", "python"]
-                regenerate_qt_resources(
-                    examples_path, pyside_rcc_path, pyside_rcc_options
-                )
+                regenerate_qt_resources(examples_path, pyside_rcc_path, pyside_rcc_options)
 
         if vars["ssl_libs_dir"]:
             # <ssl_libs>/* -> <setup>/{st_package_name}/openssl
@@ -248,10 +239,7 @@ def prepare_packages_win32(self, vars):
         # shiboken module, because libshiboken uses C++ code.
         copy_msvc_redist_files(vars, "{build_dir}/msvc_redist".format(**vars))
 
-    if (
-        config.is_internal_pyside_build()
-        or config.is_internal_shiboken_generator_build()
-    ):
+    if config.is_internal_pyside_build() or config.is_internal_shiboken_generator_build():
         copy_qt_artifacts(self, copy_pdbs, vars)
         copy_msvc_redist_files(vars, "{build_dir}/msvc_redist".format(**vars))
 
@@ -418,9 +406,7 @@ def copy_qt_artifacts(self, copy_pdbs, vars):
                 return os.path.exists(path)
 
         # e.g. "/home/work/qt/qtbase/bin/Qt5Coredd.dll"
-        other_config_path = os.path.join(
-            file_path_dir_name, maybe_debug_name + file_ext
-        )
+        other_config_path = os.path.join(file_path_dir_name, maybe_debug_name + file_ext)
 
         if filter_match(file_name, filter) and predicate(other_config_path):
             return True
@@ -441,9 +427,7 @@ def copy_qt_artifacts(self, copy_pdbs, vars):
         pdb_pattern = "*{}.pdb"
         if copy_pdbs:
             plugin_dll_patterns += [pdb_pattern]
-        plugin_dll_filter = functools.partial(
-            qt_build_config_filter, plugin_dll_patterns
-        )
+        plugin_dll_filter = functools.partial(qt_build_config_filter, plugin_dll_patterns)
         copydir(
             "{qt_plugins_dir}",
             "{st_build_dir}/{st_package_name}/plugins",
@@ -500,9 +484,7 @@ def copy_qt_artifacts(self, copy_pdbs, vars):
             vars=vars,
         )
 
-        filter = "QtWebEngineProcess{}.exe".format(
-            "d" if (self.debug or OPTION["DEBUG"]) else ""
-        )
+        filter = "QtWebEngineProcess{}.exe".format("d" if (self.debug or OPTION["DEBUG"]) else "")
         copydir(
             "{qt_bin_dir}",
             "{st_build_dir}/{st_package_name}",

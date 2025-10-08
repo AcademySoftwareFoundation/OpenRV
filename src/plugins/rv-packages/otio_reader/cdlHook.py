@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
 #
-from rv import extra_commands
-from effectHook import *
+# SPDX-License-Identifier: Apache-2.0
+#
+from rv import extra_commands, commands
+from effectHook import set_rv_effect_props, add_otio_metadata
 
 
 def modify_source(source, otio_cdl):

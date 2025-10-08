@@ -12,30 +12,20 @@ import opentimelineio as otio
 from rv import commands, extra_commands
 
 
-def hook_function(
-    in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None
-) -> None:
+def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None) -> None:
     """A hook for the annotation schema"""
 
     try:
         if argument_map["effect_metadata"]:
             effect_metadata = argument_map["effect_metadata"]
-            commands.setIntProperty(
-                "#Session.paintEffects.hold", [effect_metadata.get("hold", 0)]
-            )
-            commands.setIntProperty(
-                "#Session.paintEffects.ghost", [effect_metadata.get("ghost", 0)]
-            )
+            commands.setIntProperty("#Session.paintEffects.hold", [effect_metadata.get("hold", 0)])
+            commands.setIntProperty("#Session.paintEffects.ghost", [effect_metadata.get("ghost", 0)])
         else:
             commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
             commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
 
-        commands.setIntProperty(
-            "#Session.paintEffects.ghostBefore", [in_timeline.ghost_before]
-        )
-        commands.setIntProperty(
-            "#Session.paintEffects.ghostAfter", [in_timeline.ghost_after]
-        )
+        commands.setIntProperty("#Session.paintEffects.ghostBefore", [in_timeline.ghost_before])
+        commands.setIntProperty("#Session.paintEffects.ghostAfter", [in_timeline.ghost_after])
     except Exception:
         logging.exception("Unable to set Hold and Ghost properties")
 
@@ -44,9 +34,7 @@ def hook_function(
             if isinstance(layer.layer_range, otio.opentime.TimeRange):
                 time_range = layer.layer_range
             else:
-                time_range = otio.opentime.TimeRange(
-                    layer.layer_range["start_time"], layer.layer_range["duration"]
-                )
+                time_range = otio.opentime.TimeRange(layer.layer_range["start_time"], layer.layer_range["duration"])
 
             relative_time = time_range.end_time_inclusive()
             frame = relative_time.to_frames()
@@ -85,28 +73,20 @@ def hook_function(
             if not commands.propertyExists(f"{frame_component}.order"):
                 commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
 
-            commands.insertStringProperty(
-                f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"]
-            )
+            commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])
 
             global_scale = argument_map.get("global_scale")
             if global_scale is None:
-                logging.warning(
-                    "Unable to get the global scale, using the aspect ratio of the first media file"
-                )
+                logging.warning("Unable to get the global scale, using the aspect ratio of the first media file")
                 try:
                     media_switch = commands.nodeConnections("MediaTrack")[0][0]
                     media_source_group = commands.nodeConnections(media_switch)[0][0]
-                    first_source_node = extra_commands.nodesInGroupOfType(
-                        media_source_group, "RVFileSource"
-                    )[0]
+                    first_source_node = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
                     media_info = commands.sourceMediaInfo(first_source_node)
                     height = media_info["height"]
                     aspect_ratio = media_info["width"] / height
                 except Exception:
-                    logging.exception(
-                        "Unable to determine aspect ratio, using default value of 16:9"
-                    )
+                    logging.exception("Unable to determine aspect ratio, using default value of 16:9")
                     aspect_ratio = 1920 / 1080
                 finally:
                     scale = aspect_ratio / 16
@@ -127,6 +107,4 @@ def hook_function(
                     points_property,
                     [point.x * global_scale.x, point.y * global_scale.y],
                 )
-                commands.insertFloatProperty(
-                    width_property, [point.width * global_width]
-                )
+                commands.insertFloatProperty(width_property, [point.width * global_width])

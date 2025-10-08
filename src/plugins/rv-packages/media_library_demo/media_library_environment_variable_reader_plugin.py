@@ -23,26 +23,26 @@ from urllib.parse import urlparse
 # If you want to enable this package to play around it, you can set the following environment variable.
 #
 # !!!!! W A R N I N G !!!!!
-ENABLED_ENV = 'RV_MEDIA_LIBRARY_UNSECURE_DEMO_ENABLED'
+ENABLED_ENV = "RV_MEDIA_LIBRARY_UNSECURE_DEMO_ENABLED"
 
 # The environment variables is used to set the cookies for the media library.
 # The cookies are set as a string of the form:
 #   cookie1=value1; [Domain=domain1; Path=path1;] cookie2=value2; [Domain=domain1; Path=path2;]...
 # The cookies are set for all urls. However, the cookies can be set for specific urls
 # by using the url parameter in the get_http_cookies function and your own logic.
-COOKIES_ENV = 'RV_MEDIA_LIBRARY_UNSECURE_DEMO_COOKIES'
+COOKIES_ENV = "RV_MEDIA_LIBRARY_UNSECURE_DEMO_COOKIES"
 
 # The environment variables that is used to set the headers for the media library.
 # The headers are set as a string of the form:
 #   header1: value1; header2: value2; ...
 # The headers are set for all urls. However, the headers can be set for specific urls
 # by using the url parameter in the get_http_headers function and your own logic.
-HEADERS_ENV = 'RV_MEDIA_LIBRARY_UNSECURE_DEMO_HEADERS'
+HEADERS_ENV = "RV_MEDIA_LIBRARY_UNSECURE_DEMO_HEADERS"
 
 
 # The environment variables that is used to enable the redirection of the urls to disk.
 # The redirection is enabled if the environment variable is set.
-DOWNLOAD_ENV = 'RV_MEDIA_LIBRARY_UNSECURE_DEMO_FORCE_LOCAL_CACHE'
+DOWNLOAD_ENV = "RV_MEDIA_LIBRARY_UNSECURE_DEMO_FORCE_LOCAL_CACHE"
 
 
 def is_plugin_enabled() -> bool:
@@ -111,15 +111,9 @@ def get_http_cookies(url: str) -> Iterable[Dict]:
     for cookie in cookies.values():
         print(cookie)
 
-        yield {
-            "name": cookie.key,
-            "value": cookie.value,
-            "domain": cookie["domain"],
-            "path": cookie["path"]
-        }
+        yield {"name": cookie.key, "value": cookie.value, "domain": cookie["domain"], "path": cookie["path"]}
 
     yield from ()
-
 
 
 def get_http_headers(url: str) -> Iterable[Dict]:
@@ -144,12 +138,10 @@ def get_http_headers(url: str) -> Iterable[Dict]:
         print(header)
 
         name, value = header.split(":", 1)
-        yield {
-            "name": name.strip(),
-            "value": value.strip()
-        }
+        yield {"name": name.strip(), "value": value.strip()}
 
     yield from ()
+
 
 redirection_cache = {}
 

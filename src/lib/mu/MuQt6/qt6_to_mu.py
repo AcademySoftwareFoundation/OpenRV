@@ -937,8 +937,6 @@ exclusionMap = {
     "QPixmap::NoAlpha": None,
     "QPixmap::PremultipliedAlpha": None,
     "QPixmap::Alpha": None,
-    "QPixmap::HBitmapFormat": None,
-    "QPixmap::ShareMode": None,
     "QPixmap::ImplicitlyShared": None,
     "QPixmap::ExplicitlyShared": None,
     "QPixmap::fromImage": [
@@ -994,7 +992,6 @@ exclusionMap = {
     "QFileDialog::getSaveFileName": None,
     "QFileDialog::getExistingDirectoryUrl": None,
     "QFileDialog::getOpenFileUrls": None,
-    "QFileDialog::getSaveFileName": None,
     "QFileDialog::getSaveFileUrl": None,
     # Issue with std::function
     "QFileDialog::getOpenFileContent": None,
@@ -1295,9 +1292,7 @@ exclusionMap = {
     "QEvent::LeaveEditFocus": None,  # ????
     "QAbstractSpinBox::fixup": None,  # return val is arg
     "QTouchEvent::QTouchEvent": None,
-    "QStyle::polish": [
-        ("polish", "", [("palette", "QPalette &", None)], "virtual void", False)
-    ],
+    "QStyle::polish": [("polish", "", [("palette", "QPalette &", None)], "virtual void", False)],
     "QTextDocument::undo": None,  # Takes a TextCursor* needs manual imp
     "QTextDocument::redo": None,  # same
     "QSlider::sliderChange": None,  # protected
@@ -1309,7 +1304,6 @@ exclusionMap = {
     "QTextDocument::resourceProvider": None,
     "QTextDocument::setResourceProvider": None,
     "QTextDocument::defaultResourceProvider": None,
-    "QTextDocument::setDefaultResourceProvider": None,
     "QTextEdit::extraSelections": None,
     # Issue with const QList<QTextOption::Tab>  arg1 = (&)(param_tabStops);
     "QTextOption::setTabs": None,
@@ -1494,13 +1488,13 @@ excludedDefaultValues = [
 
 
 def isFunctionExcluded(qtnamespace, qtfunc):
-    if qtnamespace != None:
+    if qtnamespace is not None:
         cppname = qtnamespace.name + "::" + qtfunc[0]
     else:
         cppname = qtfunc[0]
     if cppname in exclusionMap:
         e = exclusionMap[cppname]
-        if e == None:
+        if e is None:
             return True
         inname = str(qtfunc)
         for f in e:
@@ -1510,7 +1504,7 @@ def isFunctionExcluded(qtnamespace, qtfunc):
 
 
 def doesFunctionAllowDefaultValues(qtnamespace, funcname):
-    if qtnamespace != None:
+    if qtnamespace is not None:
         cppname = qtnamespace.name + "::" + funcname
     else:
         cppname = qtfunc[0]
@@ -1751,7 +1745,7 @@ class API:
         # an enum in the class not qualified
         # test whether the type name needs to be fully qualified
         # e.g. "InsertPolicy" -> "QComboBox::InsertPolicy"
-        # if inclass != None:
+        # if inclass is not None:
         # for e in inclass.enums:
         #    if e.name == cpptype or e.flags == cpptype:
         #        return "flags %s::%s" % (inclass.name, cpptype)
@@ -1798,8 +1792,8 @@ def parseType(t):
 
 def indexInList(el, list):
     i = 0
-    for l in list:
-        if l == el:
+    for list in list:
+        if list == el:
             return i
         i += 1
     return i
@@ -1816,9 +1810,7 @@ def parseParameter(param, n):
         return ("", param, None)
     if "=" in parts:
         index = indexInList("=", parts)
-        default = sstrip(
-            reduce(lambda x, y: str(x) + " " + str(y), parts[index + 1 :], "")
-        )
+        default = sstrip(reduce(lambda x, y: str(x) + " " + str(y), parts[index + 1 :], ""))
         name = parts[index - 1]
         del parts[index - 1 :]
     elif "*" in parts or "&" in parts:
@@ -1833,7 +1825,7 @@ def parseParameter(param, n):
     else:
         name = parts[-1]
         del parts[-1]
-    if parts == [] and name == None and default == None:
+    if parts == [] and name is None and default is None:
         return None
     else:
         type = parseType(parts[:])
@@ -1988,7 +1980,7 @@ def parseFunction(func, qtnamespace):
                 return v
             else:
                 message("WARNING: Nameproto empty for " + func)
-    except:
+    except Exception:
         # Skip any function that has issue with the simple parsing above.
         print("Error parsing function.. skipping: {0}".format(orig_func))
         return None
@@ -2046,7 +2038,7 @@ class NamespaceInfo:
         if self.properties:
             print("--props--")
             for i in self.properties:
-                if i != None:
+                if i is not None:
                     print(i)
         if self.enums:
             print("--enums--")
@@ -2058,49 +2050,44 @@ class NamespaceInfo:
         if self.publicfuncs:
             print("--public member functions--")
             for i in self.publicfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.protectedfuncs:
             print("--protected member functions--")
             for i in self.protectedfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.signals:
             print("--signals functions--")
             for i in self.signals:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.slots:
             print("--slot functions--")
             for i in self.slots:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.staticfuncs:
             print("--static functions--")
             for i in self.staticfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
         if self.globalfuncs:
             print("--global functions--")
             for i in self.globalfuncs:
-                if i != None:
+                if i is not None:
                     print(i)
 
     def enumInHierarchy(self, name):
         global api
         for i in self.enums:
             fullname = "%s::%s" % (self.name, name)
-            if (
-                i.name == name
-                or i.name == fullname
-                or i.flags == name
-                or i.flags == fullname
-            ):
+            if i.name == name or i.name == fullname or i.flags == name or i.flags == fullname:
                 return True
             for p in self.inherits:
                 if api.classes.has_key(p):
@@ -2113,15 +2100,10 @@ class NamespaceInfo:
         global api
         for i in self.enums:
             fullname = "%s::%s" % (self.name, name)
-            if (
-                i.name == name
-                or i.name == fullname
-                or i.flags == name
-                or i.flags == fullname
-            ):
+            if i.name == name or i.name == fullname or i.flags == name or i.flags == fullname:
                 return i.name
             for p in self.inherits:
-                if not p in api.classes.keys():
+                if p not in api.classes.keys():
                     print(
                         "WARNING:",
                         p,
@@ -2224,7 +2206,7 @@ class MuEnum:
                 if self.protected:
                     # for protected enums use actual value instead of symbolic
                     val = e.value
-                if not xmap or (not val in xmap):
+                if not xmap or (val not in xmap):
                     self.symbols.append((n, val))
 
     def aliasDeclation(self):
@@ -2319,12 +2301,9 @@ class MuFunction:
         for aname, atype, aval in args:
             message("Trying to translate (%s, %s) for %s" % (atype, c, name))
             mutype = api.translate(atype, c)
-            if mutype == None:
+            if mutype is None:
                 self.failed = True
-                message(
-                    "%s failed because api.translate(%s,%s) return None"
-                    % (name, atype, c)
-                )
+                message("%s failed because api.translate(%s,%s) return None" % (name, atype, c))
                 mutype = '"%s"' % atype
             self.args.append((aname, mutype, aval))
 
@@ -2334,7 +2313,7 @@ class MuFunction:
             self.rtype = name
             if len(self.args) == 2:
                 if self.args[1][1] == self.name:
-                    if not "*" in qtfunc[2][0][1]:  # not a pointer
+                    if "*" not in qtfunc[2][0][1]:  # not a pointer
                         self.iscopyconstructor = True
         else:
             self.rtype = api.translate(rtype, c)
@@ -2343,14 +2322,12 @@ class MuFunction:
             self.failed = True
             message("%s failed because its a copy constructor" % name)
 
-        if self.rtype == None:
+        if self.rtype is None:
             self.failed = True
             self.rtype = '"%s"' % rtype
             message("%s failed because rtype == %s" % (name, rtype))
 
-        self.compiled = mangleName(
-            "qt_%s_%s_%s" % (muclass.name, name, conditionType(self.rtype))
-        )
+        self.compiled = mangleName("qt_%s_%s_%s" % (muclass.name, name, conditionType(self.rtype)))
 
         #
         #   Test for functions that were already successfully translated
@@ -2395,7 +2372,7 @@ class MuFunction:
     def unpackReturnValue(self, expr):
         rtype = conditionType(self.rtype)
         rep = repMapFind(rtype)
-        if rep != None:
+        if rep is not None:
             (repType, instType) = rep
             return expr + "._" + repType
         else:
@@ -2433,9 +2410,7 @@ class MuFunction:
                 # this for some value types. Generally Qt rarely used
                 # default parameter values before Qt 5
                 # right now only ints, flags, and enums are supported
-                if aval != None and doesFunctionAllowDefaultValues(
-                    self.muclass, self.name
-                ):
+                if aval is not None and doesFunctionAllowDefaultValues(self.muclass, self.name):
                     if atype == "int":
                         out += ", Value((int)%s)" % self.muclass.qualifyValue(aval)
                 out += "), "
@@ -2451,7 +2426,7 @@ class MuFunction:
         if self.isprotected and self.isconstructor:
             return "// NO NODE: CONSTRUCTOR IS PROTECTED: %s" % self.muDeclaration()
         rep = repMapFind(self.rtype)
-        if rep == None:
+        if rep is None:
             return None
         (repType, instType) = rep
         out = "static NODE_IMPLEMENTATION(%s, %s)\n{\n    " % (self.node, repType)
@@ -2573,10 +2548,7 @@ class MuFunction:
                 expr = "%s(" % self.name
             else:
                 if inheritable:
-                    expr = (
-                        "new MuQt_%s(param_this, NODE_THREAD.process()->callEnv()"
-                        % self.name
-                    )
+                    expr = "new MuQt_%s(param_this, NODE_THREAD.process()->callEnv()" % self.name
                     if len(self.args) > 1:
                         expr += ", "
                 else:
@@ -2651,7 +2623,7 @@ class MuFunction:
             if i == 0 and self.ismember and muclass.iscopyonwrite:
                 if ntype[-1] != "&":
                     ntype += "&"
-                if self.isconst and not "const" in ntype:
+                if self.isconst and "const" not in ntype:
                     ntype = "const " + ntype
             elif ntype[-1] == "&":
                 ntype = ntype[0:-1]
@@ -2691,8 +2663,8 @@ class MuFunction:
         rtypeLayoutItem = muapi.isAByName(self.rtype, "QLayoutItem")
         rtypePaintDevice = (
             muapi.isAByName(self.rtype, "QPaintDevice")
-            and not self.rtype.split(".")[-1] in pointerTypes
-            and not self.rtype.split(".")[-1] in primitiveTypes
+            and self.rtype.split(".")[-1] not in pointerTypes
+            and self.rtype.split(".")[-1] not in primitiveTypes
         )
         rtypeIODeviceBase = muapi.isAByName(self.rtype, "QIODeviceBase")
         rmaker = None
@@ -2763,9 +2735,7 @@ class MuFunction:
                         body += "    return %s;\n" % convertTo(expr, qtrtype)
         elif muclass.pointertype:
             if self.isconstructor:
-                body += "    %s;\n    return param_this;\n" % setExpr(
-                    "param_this", expr, muclass.name
-                )
+                body += "    %s;\n    return param_this;\n" % setExpr("param_this", expr, muclass.name)
             elif self.rtype == "void":
                 body += "    %s;\n" % expr
                 if self.ismember:
@@ -2828,11 +2798,7 @@ class MuClass:
         self.globalfuncs = []
         self.castoperators = []
         self.enums = []
-        self.F_trans = (
-            lambda f: not f.failed
-            and not f.isprop
-            and (self.inheritable or not f.isprotected)
-        )
+        self.F_trans = lambda f: not f.failed and not f.isprop and (self.inheritable or not f.isprotected)
         self.funcCount = {}
         self.inherits = []
         self.inheritedby = []
@@ -2848,10 +2814,7 @@ class MuClass:
             fname = f[0]
             rtype = f[3]
             cppname = qtnamespace.name + "::" + fname
-            message(
-                "functions fname = %s, rtype = %s, cppname = %s"
-                % (fname, rtype, cppname)
-            )
+            message("functions fname = %s, rtype = %s, cppname = %s" % (fname, rtype, cppname))
             exclude = isFunctionExcluded(qtnamespace, f)
             if exclude and verbose:
                 print("EXCLUDED:", str(f))
@@ -2865,9 +2828,7 @@ class MuClass:
                     mufunc = MuFunction(api, self, newqtfunc, True, False, True)
                     self.castoperators.append(mufunc)
             elif not fname.startswith("~") and not exclude:
-                mufunc = MuFunction(
-                    api, self, f, True, f in qtnamespace.protectedfuncs, False
-                )
+                mufunc = MuFunction(api, self, f, True, f in qtnamespace.protectedfuncs, False)
                 if mufunc.virtual and not mufunc.failed:
                     mufunc.virtualSlot = len(self.virtuals)
                     self.virtuals.append(mufunc)
@@ -2886,9 +2847,7 @@ class MuClass:
             for ft in self.inheritedVirtuals:
                 (f, protected, origin) = ft
                 fhere = self.name + "::" + f[0]
-                if not self.hasFunction(f[0]) and not isFunctionExcluded(
-                    qtnamespace, f
-                ):
+                if not self.hasFunction(f[0]) and not isFunctionExcluded(qtnamespace, f):
                     mufunc = MuFunction(api, self, f, True, protected, False)
                     if mufunc.virtual and not mufunc.failed:
                         mufunc.virtualSlot = len(self.virtuals)
@@ -2902,16 +2861,9 @@ class MuClass:
             cppname = qtnamespace.name + "::" + fname
             exclude = isFunctionExcluded(qtnamespace, f)
             print(qtnamespace)
-            message(
-                "staticfuncs fname = %s, cppname = %s, exclude = %s"
-                % (fname, cppname, str(exclude))
-            )
+            message("staticfuncs fname = %s, cppname = %s, exclude = %s" % (fname, cppname, str(exclude)))
             if not exclude:
-                self.statics.append(
-                    MuFunction(
-                        api, self, f, False, f in qtnamespace.protectedfuncs, False
-                    )
-                )
+                self.statics.append(MuFunction(api, self, f, False, f in qtnamespace.protectedfuncs, False))
 
         for e in qtnamespace.enums:
             cppname = qtnamespace.name + "::" + e.name.split(":")[-1]
@@ -2930,12 +2882,10 @@ class MuClass:
             qtnamespace = api.classes[qtname]
             for f in qtnamespace.functions:
                 if "virtual" in f[3]:
-                    if not self.hasFunction(f[0]) and not "~" in f[0]:
+                    if not self.hasFunction(f[0]) and "~" not in f[0]:
                         # if self.name == "QLayout":
                         #    print " -> ",str(f)
-                        self.inheritedVirtuals.append(
-                            (f, f in qtnamespace.protectedfuncs, qtnamespace)
-                        )
+                        self.inheritedVirtuals.append((f, f in qtnamespace.protectedfuncs, qtnamespace))
             for p in qtnamespace.parents:
                 self.collectVirtuals(p)
 
@@ -3007,9 +2957,7 @@ class MuClass:
 
     def outputCompiledNodes(self):
         out = ""
-        for f in filter(
-            self.F_trans, self.functions + self.statics + self.castoperators
-        ):
+        for f in filter(self.F_trans, self.functions + self.statics + self.castoperators):
             out += f.compiledFunction()
             out += "\n"
         return out
@@ -3018,9 +2966,7 @@ class MuClass:
         out = ""
         print("self.statics for {0}".format(self.name))
 
-        for f in filter(
-            self.F_trans, self.functions + self.statics + self.castoperators
-        ):
+        for f in filter(self.F_trans, self.functions + self.statics + self.castoperators):
             out += f.nodeImplementation()
             out += "\n"
         return out
@@ -3143,7 +3089,7 @@ class MuClass:
 
     def hasFlagType(self, flagName):
         for e in self.enums:
-            if e.flags != None and flagName == e.flags:
+            if e.flags is not None and flagName == e.flags:
                 return True
         return False
 
@@ -3158,18 +3104,16 @@ class MuClass:
         return False
 
     def needsLocalQualification(self, name):
-        if name == None or intRE.match(name):
+        if name is None or intRE.match(name):
             return False
         return self.hasEnumType(name) or self.hasFlagType(name)
 
     def qualifyValue(self, value):
         if "(" in value or "|" in value:
             newvalue = value
-            parts = (
-                value.replace("(", " ").replace(")", " ").replace("|", " ").split(" ")
-            )
+            parts = value.replace("(", " ").replace(")", " ").replace("|", " ").split(" ")
             for p in parts:
-                if p != "" and p != None:
+                if p != "" and p is not None:
                     if self.needsLocalQualification(p):
                         newvalue = newvalue.replace(p, "%s::%s" % (self.name, p))
             return newvalue
@@ -3222,13 +3166,7 @@ class MuClass:
                     # rtype_clean = rtype
                     # output the function rtype name and args
                     if f.isconstructor:
-                        out += (
-                            "MuQt_"
-                            + name
-                            + "::MuQt_"
-                            + name
-                            + "(Pointer muobj, const CallEnvironment* ce"
-                        )
+                        out += "MuQt_" + name + "::MuQt_" + name + "(Pointer muobj, const CallEnvironment* ce"
                     else:
                         out += rtype_clean + " MuQt_" + self.name + "::" + name + "("
 
@@ -3266,9 +3204,7 @@ class MuClass:
                         out += "    _env = ce;\n"
                         out += "    _obj = reinterpret_cast<ClassInstance*>(muobj);\n"
                         out += "    _obj->retainExternal();\n"
-                        out += (
-                            "    MuLangContext* c = (MuLangContext*)_env->context();\n"
-                        )
+                        out += "    MuLangContext* c = (MuLangContext*)_env->context();\n"
                         out += (
                             '    _baseType = c->findSymbolOfTypeByQualifiedName<%sType>(c->internName("qt.%s"));\n'
                             % (self.name, self.name)
@@ -3296,18 +3232,11 @@ class MuClass:
                             if rtype_clean == "void":
                                 out += " return; }"
                             out += "\n"
-                        out += (
-                            "    MuLangContext* c = (MuLangContext*)_env->context();\n"
-                        )
-                        out += (
-                            "    const MemberFunction* F0 = _baseType->_func[%d];\n"
-                            % f.virtualSlot
-                        )
+                        out += "    MuLangContext* c = (MuLangContext*)_env->context();\n"
+                        out += "    const MemberFunction* F0 = _baseType->_func[%d];\n" % f.virtualSlot
                         out += "    const MemberFunction* F = _obj->classType()->dynamicLookup(F0);\n"
                         out += "    if (F != F0) \n    {\n"
-                        out += "        Function::ArgumentVector args(%d);\n" % (
-                            len(params) + 1
-                        )
+                        out += "        Function::ArgumentVector args(%d);\n" % (len(params) + 1)
                         # if f.name == "splitPath":
                         #   print str(parms)
                         out += "        args[0] = Value(Pointer(_obj));\n"
@@ -3320,10 +3249,7 @@ class MuClass:
                             )
                         out += "        Value rval = _env->call(F, args);\n"
                         if f.rtype != "void":
-                            out += (
-                                "        return %s;\n"
-                                % f.derefExp(f.unpackReturnValue("rval"), f.rtype)[0]
-                            )
+                            out += "        return %s;\n" % f.derefExp(f.unpackReturnValue("rval"), f.rtype)[0]
                         out += "    }\n"
                         out += "    else\n"
                         out += "    {\n        "
@@ -3376,12 +3302,7 @@ class MuClass:
                         protected = False
                         out += "  public:\n"
                     if f.isconstructor:
-                        out += (
-                            "    "
-                            + "MuQt_"
-                            + name
-                            + "(Pointer muobj, const CallEnvironment*"
-                        )
+                        out += "    " + "MuQt_" + name + "(Pointer muobj, const CallEnvironment*"
                     else:
                         out += "    " + rtype + " " + name + "("
                     for i in range(0, len(params)):
@@ -3404,9 +3325,7 @@ class MuClass:
                             nameSuffix = ""
                             if parent:
                                 nameSuffix = "_parent"
-                            out += (
-                                "    " + nvrtype + " " + name + "_pub%s(" % nameSuffix
-                            )
+                            out += "    " + nvrtype + " " + name + "_pub%s(" % nameSuffix
                             for i in range(0, len(params)):
                                 p = params[i]
                                 (pname, ptype, pval) = p
@@ -3417,7 +3336,7 @@ class MuClass:
                                 out += ptype + " " + pname
                             out += ") " + fconst
                             out += " { "
-                            if not "void" in rtype:
+                            if "void" not in rtype:
                                 out += "return "
                             if parent:
                                 out += self.name + "::"
@@ -3446,7 +3365,6 @@ class MuClass:
         return out
 
     def outputSourceFiles(self):
-
         name = self.name
         if name == "":
             name = "Global"
@@ -3533,9 +3451,7 @@ class MuClass:
                     cpplines.append("    const char** propExclusions = 0;")
             elif line.find("{%%nativeObject%%}") != -1:
                 if self.name == "QObject":
-                    cpplines.append(
-                        '   new MemberVariable(c, "native", "qt.NativeObject"),'
-                    )
+                    cpplines.append('   new MemberVariable(c, "native", "qt.NativeObject"),')
             elif line.find("{%%addHandRolledSymbols%%}") != -1:
                 if hsyms:
                     cpplines.extend(hsyms)
@@ -3568,7 +3484,7 @@ class MuClass:
         cppout.writelines(cpplines)
         cppout.close()
 
-        if not (self.name in noHFileOutput):
+        if self.name not in noHFileOutput:
             hfile = open(templateH, "r")
             hlines = []
             while True:
@@ -3580,17 +3496,11 @@ class MuClass:
                     hlines.append("\n")
                 elif line.find("{%%isInheritableFunc%%}") != -1:
                     if self.inheritable:
-                        hlines.append(
-                            "    static bool isInheritable() { return true; }\n"
-                        )
+                        hlines.append("    static bool isInheritable() { return true; }\n")
                     else:
-                        hlines.append(
-                            "    static bool isInheritable() { return false; }\n"
-                        )
+                        hlines.append("    static bool isInheritable() { return false; }\n")
                 elif line.find("{%%virtualArray%%}") != -1:
-                    hlines.append(
-                        "    MemberFunction* _func[%d];\n" % len(self.virtuals)
-                    )
+                    hlines.append("    MemberFunction* _func[%d];\n" % len(self.virtuals))
                 elif line.find("{%%cachedInstanceFunc%%}") != -1:
                     if self.inheritable:
                         hlines.append(
@@ -3695,7 +3605,7 @@ class MuAPI:
             isQIODeviceBase = c.isAByName("QIODeviceBase")
             c.inheritable = (
                 (isQObject or isQLayoutItem or isQPaintDevice or isQIODeviceBase)
-                and (not c.name in notInheritableTypes)
+                and (c.name not in notInheritableTypes)
                 and allowInheritance
             )
 
@@ -3819,9 +3729,6 @@ class QtDocParser(SGMLParser):
 
     def end_span(self):
         self.modulespan = False
-
-    def end_table(self):
-        self.defenum = False
 
     def start_pre(self, attrs):
         self.precount += 1
@@ -3956,7 +3863,7 @@ class QtDocParser(SGMLParser):
                 self.enums[-1].flags = c + n
             elif self.defenum:
                 n = self.enums[-1].name
-                if n == None:
+                if n is None:
                     self.enums[-1].name = data
                 elif n[-2:] == "::":
                     self.enums[-1].name = n + data
@@ -3996,16 +3903,10 @@ class QtDocParser(SGMLParser):
                     self.inherits.append(data)
             elif self.h2:
                 self.intypes = False
-                if (
-                    data == "Public Functions"
-                    or data == "Reimplemented Public Functions"
-                ):
+                if data == "Public Functions" or data == "Reimplemented Public Functions":
                     self.bucket = self.public
                     self.functable = True
-                elif (
-                    data == "Protected Functions"
-                    or data == "Reimplemented Protected Functions"
-                ):
+                elif data == "Protected Functions" or data == "Reimplemented Protected Functions":
                     self.bucket = self.protected
                     self.functable = True
                 elif data == "Static Public Members":
@@ -4039,16 +3940,14 @@ class QtDocParser(SGMLParser):
                 self.buffer += data
 
     def convertFunctions(self):
-        F = lambda x: x != None
+        F = lambda x: x is not None
         P = lambda x: parseFunction(x, self.qtnamespace)
         self.qtnamespace.publicfuncs = filter(F, map(P, self.public))
         self.qtnamespace.slots = filter(F, map(P, self.slots))
         self.qtnamespace.staticfuncs = filter(F, map(P, self.staticPublic))
         self.qtnamespace.signals = filter(F, map(P, self.signals))
         self.qtnamespace.protectedfuncs = filter(F, map(P, self.protected))
-        self.qtnamespace.functions = (
-            self.qtnamespace.publicfuncs + self.qtnamespace.protectedfuncs
-        )
+        self.qtnamespace.functions = self.qtnamespace.publicfuncs + self.qtnamespace.protectedfuncs
 
         rootnamespace.staticfuncs += filter(F, map(P, self.globaldefs))
 
@@ -4137,7 +4036,7 @@ def recursiveParse(url):
             recursiveParse(absPath)
     except IOError:
         print("FAILED: (IOError)", url)
-    except:
+    except Exception:
         sys.stdout.flush()
         print("FAILED:", url)
         print(traceback.print_exc())

@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import sys
 
 from rv import commands
-from effectHook import *
+from effectHook import set_rv_effect_props
 
 
 def hook_function(in_timeline, argument_map=None):
