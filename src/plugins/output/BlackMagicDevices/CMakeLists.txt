@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-
 IF(NOT RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH)
   # Warning message if the Blackmagic Decklink SDK path is not specified should already have been reported in bmd.cmake
   RETURN()
@@ -15,13 +14,7 @@ SET(_target
 )
 
 SET(_sources
-    BlackMagicModule.cpp
-    DeckLinkVideoDevice.cpp
-    BlackMagicOutput.cpp
-    HDRVideoFrame.cpp
-    StereoVideoFrame.cpp
-    DeckLinkSDKAPIDispatch.cpp
-    DeckLinkProfileCallback.cpp
+    BlackMagicModule.cpp DeckLinkVideoDevice.cpp BlackMagicOutput.cpp StereoVideoFrame.cpp DeckLinkSDKAPIDispatch.cpp DeckLinkProfileCallback.cpp
 )
 
 ADD_LIBRARY(
