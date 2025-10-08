@@ -12,7 +12,7 @@ import time
 import os
 
 doDebug = False
-if os.getenv("RV_NUKE_DEBUG") != None:
+if os.getenv("RV_NUKE_DEBUG") is not None:
     doDebug = True
 
 
@@ -74,9 +74,7 @@ class RvCommunicator:
 
         try:
             greeting = "%s rvController" % self.name
-            self.sock.sendall(
-                b"NEWGREETING %d %s" % (len(greeting), greeting.encode("utf-8"))
-            )
+            self.sock.sendall(b"NEWGREETING %d %s" % (len(greeting), greeting.encode("utf-8")))
             if self.noPingPong:
                 self.sock.sendall(b"PINGPONGCONTROL 1 0")
         except socket.error as msg:
@@ -151,8 +149,7 @@ class RvCommunicator:
         except socket.error as msg:
             if (
                 msg.strerror != "Resource temporarily unavailable"
-                and msg.strerror
-                != "A non-blocking socket operation could not be completed immediately"
+                and msg.strerror != "A non-blocking socket operation could not be completed immediately"
                 and msg.errno != 10035
             ):
                 print("ERROR: peek for messages failed: %s\n" % msg, file=sys.stderr)
@@ -174,7 +171,6 @@ class RvCommunicator:
         return field
 
     def _receiveSingleMessage(self):
-
         messType = 0
         messContents = 0
 
@@ -260,7 +256,6 @@ class RvCommunicator:
         self._processEvents()
 
     def _processEvents(self, processReturnOnly=False):
-
         while 1:
             noMessage = True
             while noMessage:
@@ -283,7 +278,7 @@ class RvCommunicator:
                     try:
                         self.sock.shutdown(socket.SHUT_RDWR)
                         self.sock.close()
-                    except:
+                    except Exception:
                         pass
                     self.connected = False
                     return ""
@@ -299,20 +294,13 @@ class RvCommunicator:
                             file=sys.stderr,
                         )
                         return ""
-                elif (
-                    len(self.eventQueue) == 0
-                    or (event, contents) != self.eventQueue[-1:]
-                ):
+                elif len(self.eventQueue) == 0 or (event, contents) != self.eventQueue[-1:]:
                     self.eventQueue.append((event, contents))
 
             elif messType == "PING":
                 self.sock.sendall(b"PONG 1 p")
 
-            elif (
-                messType == "GREETING"
-                or messType == "NEWGREETING"
-                or messType == "PONG"
-            ):
+            elif messType == "GREETING" or messType == "NEWGREETING" or messType == "PONG":
                 #   ignore
                 pass
             else:

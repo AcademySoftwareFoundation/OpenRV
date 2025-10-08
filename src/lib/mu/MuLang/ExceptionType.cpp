@@ -143,6 +143,13 @@ namespace Mu
 
     NODE_IMPLEMENTATION(ExceptionType::mu__try, void)
     {
+        // Optional to store return value if a return from catch occurs.
+        // We can't do longjmp inside the catch handler (that's the
+        // undefined behavior we're trying to avoid!), so store it
+        // and do the longjmp after exiting the try-catch.
+        bool hasReturnFromCatch = false;
+        Value returnValueFromCatch;
+
         try
         {
 #if MU_SAFE_ARGUMENTS
@@ -150,6 +157,15 @@ namespace Mu
 #else
             NODE_ARG(0, int);
 #endif
+        }
+        catch (const Mu::MuReturnFromCatchException& retExc)
+        {
+            // BUG FIX: A return statement occurred in a catch block.
+            // We caught it as a C++ exception (to avoid undefined behavior from
+            // longjmp through C++ exception handling). Store the return value
+            // and defer the longjmp until after we exit this catch handler.
+            hasReturnFromCatch = true;
+            returnValueFromCatch = retExc.returnValue();
         }
         catch (Mu::ProgramException& exc)
         {
@@ -214,6 +230,13 @@ namespace Mu
             NODE_THREAD.setException(e);
             throw ProgramException(NODE_THREAD, e);
         }
+
+        // Now that we've exited all C++ exception handling, it's safe to do
+        // the longjmp if a return from catch occurred.
+        if (hasReturnFromCatch)
+        {
+            NODE_THREAD.jump(JumpReturnCode::Return, 1, returnValueFromCatch);
+        }
     }
 
     NODE_IMPLEMENTATION(ExceptionType::mu__catch, bool)
@@ -231,8 +254,31 @@ namespace Mu
                     if (rval = t->match(e->type()))
                     {
                         NODE_ARG(0, Pointer);
-                        NODE_ARG(1, void);
-                        NODE_THREAD.setException(0);
+
+                        // BUG FIX: Install a setjmp to catch return statements
+                        // from the catch block body. If a return occurs, we
+                        // throw a C++ exception instead of doing a longjmp,
+                        // because longjmp through C++ exception handling is
+                        // undefined behavior.
+                        NODE_THREAD.jumpPointBegin(JumpReturnCode::Return);
+                        const int returnCode = SETJMP(NODE_THREAD.jumpPoint());
+
+                        if (returnCode == JumpReturnCode::NoJump)
+                        {
+                            NODE_ARG(1, void);
+                            NODE_THREAD.setException(0);
+                            NODE_THREAD.jumpPointEnd();
+                        }
+                        else if (returnCode == JumpReturnCode::Return)
+                        {
+                            // A return statement occurred in the catch block
+                            // body. Get the return value and throw a C++
+                            // exception to propagate it.
+                            NODE_THREAD.jumpPointRestore();
+                            Value v = NODE_THREAD.returnValue();
+                            NODE_THREAD.jumpPointEnd();
+                            throw MuReturnFromCatchException(std::move(v));
+                        }
                     }
                 }
             }
@@ -243,8 +289,26 @@ namespace Mu
 
     NODE_IMPLEMENTATION(ExceptionType::mu__catch_all, bool)
     {
-        NODE_ARG(0, void);
-        NODE_THREAD.setException(0);
+        // Install a setjmp to catch return statements from the catch block
+        // body.
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Return);
+        const int returnCode = SETJMP(NODE_THREAD.jumpPoint());
+
+        if (returnCode == JumpReturnCode::NoJump)
+        {
+            NODE_ARG(0, void);
+            NODE_THREAD.setException(0);
+            NODE_THREAD.jumpPointEnd();
+        }
+        else if (returnCode == JumpReturnCode::Return)
+        {
+            // A return statement occurred in the catch block body.
+            NODE_THREAD.jumpPointRestore();
+            Value v = NODE_THREAD.returnValue();
+            NODE_THREAD.jumpPointEnd();
+            throw MuReturnFromCatchException(std::move(v));
+        }
+
         NODE_RETURN(true);
     }
 
