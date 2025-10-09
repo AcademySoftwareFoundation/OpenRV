@@ -1719,7 +1719,11 @@
           </widget>
          </item>
          <item row="19" column="1">
-          <widget class="QTextEdit" name="additionalOptionsEdit"/>
+          <widget class="QTextEdit" name="additionalOptionsEdit">
+           <property name="acceptRichText">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_22">
