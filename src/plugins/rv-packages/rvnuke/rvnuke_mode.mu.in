@@ -2009,35 +2009,30 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
 
     method: buildMenu (rvtypes.Menu; )
     {
-        rvtypes.Menu m1 = rvtypes.Menu {
-            {"Create Nuke Read Node", createNukeReadNodes, nil, sourceSelected},
-            {"Wipe Selected Views", compareSelected(, "wipe"), nil, viewsSelected},
-            {"Tile Selected Views", compareSelected(, "tile"), nil, viewsSelected},
-            {"Restore Checkpoint", restoreCheckpoint, nil, checkpointSelected},
-            {"Create Full Checkpoint", createCheckpoint (, true, nil), nil, renderSelected},
-            //{"Run Render", runRender, nil, nil},
-            {"_", nil},
-            {"Preferences", nil, nil, disabledFunc},
-            {"    Update View During Render", toggleUpdateViewDuringRender, nil, showingUpdateViewDuringRender},
+        MenuItem[] m1 = MenuItem[] {
+            menuItem("Create Nuke Read Node", "", "", createNukeReadNodes, sourceSelected),
+            menuItem("Wipe Selected Views", "", "", compareSelected(, "wipe"), viewsSelected),
+            menuItem("Tile Selected Views", "", "", compareSelected(, "tile"), viewsSelected),
+            menuItem("Restore Checkpoint", "", "", restoreCheckpoint, checkpointSelected),
+            menuItem("Create Full Checkpoint", "", "", createCheckpoint (, true, nil), renderSelected),
+            //menuItem("Run Render", "", "", runRender, enabledItem),
+            menuSeparator(),
+            menuText("Preferences"),
+            menuItem("    Update View During Render", "", "", toggleUpdateViewDuringRender, showingUpdateViewDuringRender)
         };
 
-        rvtypes.Menu m2 = nil;
         if (system.getenv ("RV_NUKE_HIDE_INSTALL_OPTION", nil) eq nil)
         {
-            m2 = rvtypes.Menu {
-                {"_", nil},
-                {"Install Nuke Support Files", installPython, nil, doNothingState},
-            };
+            m1.push_back(menuSeparator());
+            m1.push_back(menuItem("Install Nuke Support Files", "", "", installPython, doNothingState));
         }
 
-        rvtypes.Menu m3 = rvtypes.Menu {
-            {"_", nil},
-            {"Help ...", showHelpFile, nil, doNothingState},
-        };
+        m1.push_back(menuSeparator());
+        m1.push_back(menuItem("Help ...", "", "", showHelpFile, doNothingState));
 
-        rvtypes.Menu m = rvtypes.Menu {
-            {"Nuke", combineMenus (combineMenus (m1, m2), m3)}
-        };
+        rvtypes.Menu m = newMenu(MenuItem[] {
+            subMenu("Nuke", m1)
+        });
 
         return m;
     }

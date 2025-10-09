@@ -721,31 +721,31 @@ class: MotionScope : Widget
 
         _pointerInMotionScope = false;
 
-        Menu lastHalf = Menu { 
-            {"_", nil},
-            {"Time/Frame Display", nil, nil, disabledItem},
-            {"  Global Frame Numbers", setFrameDisplay(2,), nil, isDisplayFormat(2)},
-            {"  Source Frame Numbers", setFrameDisplay(0,), nil, isDisplayFormat(0)},
-            {"  Global Time Code Display", setFrameDisplay(1,), nil, isDisplayFormat(1)},
-            {"  Source Time Code Display", setFrameDisplay(4,), nil, isDisplayFormat(4)},
-            {"  Global Seconds", setFrameDisplay(5,), nil, isDisplayFormat(5)},
-            {"  Footage Display", setFrameDisplay(3,), nil, isDisplayFormat(3)},
-            {"_", nil},
-            {"Audio", nil, nil, disabledItem},
-            {"  No Audio Display", setAudioSize(0,), nil, isAudioSize(0)},
-            {"  Small", setAudioSize(AudioSmall,), nil, isAudioSize(AudioSmall)},
-            {"  Medium", setAudioSize(AudioMedium,), nil, isAudioSize(AudioMedium)},
-            {"  Large", setAudioSize(AudioLarge,), nil, isAudioSize(AudioLarge)},
-            {"_", nil},
-            {"Configure", Menu {
-                {"Draw Magnifier Over Imagery", optDrawMotionScopeOverImagery, nil, isDrawingMotionScopeOverImagery},
-                {"Position Magnifier At Top", optDrawMotionScopeAtTopOfView, nil, isDrawingMotionScopeAtTopOfView},
-                {"Step Wraps At In/Out", optStepWraps, nil, isStepWrapping},
-                //{"Show Play Direction Indicator", optShowFrameDirection, nil, isShowingFrameDirection},
-                }
-            }};
+        Menu lastHalf = newMenu(MenuItem[] { 
+            menuSeparator(),
+            menuText("Time/Frame Display"),
+            menuItem("  Global Frame Numbers", "", "", setFrameDisplay(2,), isDisplayFormat(2)),
+            menuItem("  Source Frame Numbers", "", "", setFrameDisplay(0,), isDisplayFormat(0)),
+            menuItem("  Global Time Code Display", "", "", setFrameDisplay(1,), isDisplayFormat(1)),
+            menuItem("  Source Time Code Display", "", "", setFrameDisplay(4,), isDisplayFormat(4)),
+            menuItem("  Global Seconds", "", "", setFrameDisplay(5,), isDisplayFormat(5)),
+            menuItem("  Footage Display", "", "", setFrameDisplay(3,), isDisplayFormat(3)),
+            menuSeparator(),
+            menuText("Audio"),
+            menuItem("  No Audio Display", "", "", setAudioSize(0,), isAudioSize(0)),
+            menuItem("  Small", "", "", setAudioSize(AudioSmall,), isAudioSize(AudioSmall)),
+            menuItem("  Medium", "", "", setAudioSize(AudioMedium,), isAudioSize(AudioMedium)),
+            menuItem("  Large", "", "", setAudioSize(AudioLarge,), isAudioSize(AudioLarge)),
+            menuSeparator(),
+            subMenu("Configure", MenuItem[] {
+                menuItem("Draw Magnifier Over Imagery", "", "", optDrawMotionScopeOverImagery, isDrawingMotionScopeOverImagery),
+                menuItem("Position Magnifier At Top", "", "", optDrawMotionScopeAtTopOfView, isDrawingMotionScopeAtTopOfView),
+                menuItem("Step Wraps At In/Out", "", "", optStepWraps, isStepWrapping),
+                //menuItem("Show Play Direction Indicator", "", "", optShowFrameDirection, isShowingFrameDirection),
+            })
+        });
 
-        Menu mbpsMenu = Menu {{"Reset MBPS", doResetMbps}};
+        Menu mbpsMenu = newMenu(MenuItem[] {menuItem("Reset MBPS", "", "", doResetMbps, enabledItem)});
 
         if ( pointerWasInMotionScope && 
             _phantomFrame >= fs && 
@@ -755,15 +755,16 @@ class: MotionScope : Widget
                 title = "Magnifier at %s" % fname,
                 media = inputNodeUserNameAtFrame(_phantomFrame);
 
-            Menu firstHalfA = Menu {
-                {title, nil, nil, disabledItem},
-                {media, nil, nil, disabledItem},
-                {"_", nil},
-                {"Set In Frame to %s" % fname, phantomSetInPoint},
-                {"Set Out Frame to %s" % fname, phantomSetOutPoint},
-                {"Clear In/Out Frames", clearInOut},
-                {"Mark Frame %s" % fname, phantomMarkFrame},
-                {"Clear Marks", doClearAllMarks}};
+            Menu firstHalfA = newMenu(MenuItem[] {
+                menuText(title),
+                menuText(media),
+                menuSeparator(),
+                menuItem("Set In Frame to %s" % fname, "", "", phantomSetInPoint, enabledItem),
+                menuItem("Set Out Frame to %s" % fname, "", "", phantomSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
+                menuItem("Mark Frame %s" % fname, "", "", phantomMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+            });
 
             Menu all;
             if (_displayMbps) all = combine (firstHalfA, combine (mbpsMenu, lastHalf));
@@ -773,14 +774,15 @@ class: MotionScope : Widget
         }
         else
         {
-            Menu firstHalfB = Menu {
-                {"Timeline Magnifier", nil, nil, \: (int;) { DisabledMenuState; }},
-                {"_", nil},
-                {"Set In Frame to Current", currentSetInPoint},
-                {"Set Out Frame to Current", currentSetOutPoint},
-                {"Clear In/Out Frames", clearInOut},
-                {"Mark Current Frame", currentMarkFrame},
-                {"Clear Marks", doClearAllMarks}};
+            Menu firstHalfB = newMenu(MenuItem[] {
+                menuText("Timeline Magnifier"),
+                menuSeparator(),
+                menuItem("Set In Frame to Current", "", "", currentSetInPoint, enabledItem),
+                menuItem("Set Out Frame to Current", "", "", currentSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
+                menuItem("Mark Current Frame", "", "", currentMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+            });
 
             Menu all;
             if (_displayMbps) all = combine (firstHalfB, combine (mbpsMenu, lastHalf));

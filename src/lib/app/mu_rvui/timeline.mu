@@ -839,29 +839,29 @@ class: Timeline : Widget
 
         _pointerInTimeline = false;
 
-        Menu lastHalf = Menu {
-            {"_", nil},
-            {"Time/Frame Display", nil, nil, disabledItem},
-            {"   Global Frame Numbers", setFrameDisplay(2,), nil, isDisplayFormat(2)},
-            {"   Source Frame Numbers", setFrameDisplay(0,), nil, isDisplayFormat(0)},
-            {"   Global Time Code Display", setFrameDisplay(1,), nil, isDisplayFormat(1)},
-            {"   Source Time Code Display", setFrameDisplay(4,), nil, isDisplayFormat(4)},
-            {"   Global Seconds", setFrameDisplay(5,), nil, isDisplayFormat(5)},
-            {"   Footage Display", setFrameDisplay(3,), nil, isDisplayFormat(3)},
-            {"_", nil},
-            {"Configure", Menu {
-                {"Show Play Controls", optShowVCRButtons, nil, isShowingVCRButtons},
-                {"Draw Timeline Over Imagery", optDrawTimelineOverImagery, nil, isDrawingTimelineOverImagery},
-                {"Position Timeline At Top", optDrawTimelineAtTopOfView, nil, isDrawingTimelineAtTopOfView},
-                {"Show In/Out Frame Numbers", optShowInOutTime, nil, isShowingInOutTime},
-                {"Step Wraps At In/Out", optStepWraps, nil, isStepWrapping},
-                {"Scrub Stops At In/Out", optScrubClamps, nil, isScrubClamping},
-                {"Show Source/Input at Frame", optInputName, nil, isShowingInputName},
-                {"Show Play Direction Indicator", optShowFrameDirection, nil, isShowingFrameDirection},
-                }
-            }};
+        Menu lastHalf = newMenu(MenuItem[] {
+            menuSeparator(),
+            menuText("Time/Frame Display"),
+            menuItem("   Global Frame Numbers", "", "", setFrameDisplay(2,), isDisplayFormat(2)),
+            menuItem("   Source Frame Numbers", "", "", setFrameDisplay(0,), isDisplayFormat(0)),
+            menuItem("   Global Time Code Display", "", "", setFrameDisplay(1,), isDisplayFormat(1)),
+            menuItem("   Source Time Code Display", "", "", setFrameDisplay(4,), isDisplayFormat(4)),
+            menuItem("   Global Seconds", "", "", setFrameDisplay(5,), isDisplayFormat(5)),
+            menuItem("   Footage Display", "", "", setFrameDisplay(3,), isDisplayFormat(3)),
+            menuSeparator(),
+            subMenu("Configure", MenuItem[] {
+                menuItem("Show Play Controls", "", "", optShowVCRButtons, isShowingVCRButtons),
+                menuItem("Draw Timeline Over Imagery", "", "", optDrawTimelineOverImagery, isDrawingTimelineOverImagery),
+                menuItem("Position Timeline At Top", "", "", optDrawTimelineAtTopOfView, isDrawingTimelineAtTopOfView),
+                menuItem("Show In/Out Frame Numbers", "", "", optShowInOutTime, isShowingInOutTime),
+                menuItem("Step Wraps At In/Out", "", "", optStepWraps, isStepWrapping),
+                menuItem("Scrub Stops At In/Out", "", "", optScrubClamps, isScrubClamping),
+                menuItem("Show Source/Input at Frame", "", "", optInputName, isShowingInputName),
+                menuItem("Show Play Direction Indicator", "", "", optShowFrameDirection, isShowingFrameDirection)
+            })
+        });
 
-        Menu mbpsMenu = Menu {{"Reset MBPS", doResetMbps}};
+        Menu mbpsMenu = newMenu(MenuItem[] {menuItem("Reset MBPS", "", "", doResetMbps, enabledItem)});
 
         if ( pointerWasInTimeline &&
             _phantomFrame >= fs &&
@@ -871,15 +871,16 @@ class: Timeline : Widget
                 title = "Timeline at %s" % fname,
                 media = sourceAtFrame(_phantomFrame);
 
-            Menu firstHalfA = Menu {
-                {title, nil, nil, disabledItem},
-                {media, nil, nil, disabledItem},
-                {"_", nil},
-                {"Set In Frame to %s" % fname, phantomSetInPoint},
-                {"Set Out Frame to %s" % fname, phantomSetOutPoint},
-                {"Clear In/Out Frames", clearInOut},
-                {"Mark Frame %s" % fname, phantomMarkFrame},
-                {"Clear Marks", doClearAllMarks}};
+            Menu firstHalfA = newMenu(MenuItem[] {
+                menuText(title),
+                menuText(media),
+                menuSeparator(),
+                menuItem("Set In Frame to %s" % fname, "", "", phantomSetInPoint, enabledItem),
+                menuItem("Set Out Frame to %s" % fname, "", "", phantomSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
+                menuItem("Mark Frame %s" % fname, "", "", phantomMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+            });
 
             Menu all;
             if (_displayMbps) all = combine (firstHalfA, combine (mbpsMenu, lastHalf));
@@ -889,14 +890,15 @@ class: Timeline : Widget
         }
         else
         {
-            Menu firstHalfB = Menu {
-                {"Timeline", nil, nil, \: (int;) { DisabledMenuState; }},
-                {"_", nil},
-                {"Set In Frame to Current", currentSetInPoint},
-                {"Set Out Frame to Current", currentSetOutPoint},
-                {"Clear In/Out Frames", clearInOut},
-                {"Mark Current Frame", currentMarkFrame},
-                {"Clear Marks", doClearAllMarks}};
+            Menu firstHalfB = newMenu(MenuItem[] {
+                menuText("Timeline"),
+                menuSeparator(),
+                menuItem("Set In Frame to Current", "", "", currentSetInPoint, enabledItem),
+                menuItem("Set Out Frame to Current", "", "", currentSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
+                menuItem("Mark Current Frame", "", "", currentMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+            });
 
             Menu all;
             if (_displayMbps) all = combine (firstHalfB, combine (mbpsMenu, lastHalf));
