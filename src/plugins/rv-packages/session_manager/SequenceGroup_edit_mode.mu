@@ -228,13 +228,13 @@ class: SequenceGroupEditMode : MinorMode
 
     method: menu (Menu;)
     {
-        Menu {
-            {"Sequence", Menu {
-                {"_", nil, nil, nil},
-                {"Auto EDL", autoEDL, nil, stateFunc("autoEDL")},
-                {"Use Source Cut Info", useCutInfo, nil, stateFunc("useCutInfo")}
-            }
-        }};
+        newMenu(MenuItem[] {
+            subMenu("Sequence", MenuItem[] {
+                menuSeparator(),
+                menuItem("Auto EDL", "", "", autoEDL, stateFunc("autoEDL")),
+                menuItem("Use Source Cut Info", "", "", useCutInfo, stateFunc("useCutInfo"))
+            })
+        });
     }
 
    

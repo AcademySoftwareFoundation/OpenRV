@@ -234,7 +234,14 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
     // Perform the bind action
     if (eventPattern != "")
     {
-        string description = ("menuItem: %s" % menuText);
+        string description = menuText;
+
+        // strip description of all leading spaces
+        while (description.contains(" ") == 0)
+        {
+            description = description.substr(1, -1);
+        }
+
         commands.bind("default", "global", eventPattern, compositeFunc, description);
     }
     

@@ -17,7 +17,6 @@ use glyph;
 use app_utils;
 use io;
 use system;
-use app_utils;
 use extra_commands;
 use qt;
 
@@ -291,18 +290,18 @@ class: LayoutGroupEditMode : MinorMode
              [ ("session-manager-load-ui", loadUI, "Load UI into Session Manager"),
                ("graph-state-change", propertyChanged,  "Maybe update session UI")],
              nil,
-             Menu {
-                 {"Layout", Menu {
-                     {"Layout Method", noop, nil, disabledItem},
-                     {"    Packed", layoutPackedEvent, nil, isLayoutMode("packed")},
-                     {"    Packed With Fluid Layout", layoutPacked2Event, nil, isLayoutMode("packed2")},
-                     {"    Row", layoutInRowEvent, nil, isLayoutMode("row")},
-                     {"    Column", layoutInColumnEvent, nil, isLayoutMode("column")},
-                     {"    Grid", layoutInGridEvent, nil, isLayoutMode("grid")},
-                     {"    Manual", layoutManuallyEvent, nil, isLayoutMode("manual")},
-                     {"    Static", layoutStaticEvent, nil, isLayoutMode("static")},
-                     }
-                 }},
+             newMenu(MenuItem[] {
+                 subMenu("Layout", MenuItem[] {
+                     menuText("Layout Method"),
+                     menuItem("    Packed", "", "", layoutPackedEvent, isLayoutMode("packed")),
+                     menuItem("    Packed With Fluid Layout", "", "", layoutPacked2Event, isLayoutMode("packed2")),
+                     menuItem("    Row", "", "", layoutInRowEvent, isLayoutMode("row")),
+                     menuItem("    Column", "", "", layoutInColumnEvent, isLayoutMode("column")),
+                     menuItem("    Grid", "", "", layoutInGridEvent, isLayoutMode("grid")),
+                     menuItem("    Manual", "", "", layoutManuallyEvent, isLayoutMode("manual")),
+                     menuItem("    Static", "", "", layoutStaticEvent, isLayoutMode("static"))
+                 })
+             }),
              "a"
              );
 

@@ -17,7 +17,6 @@ use glyph;
 use app_utils;
 use io;
 use system;
-use app_utils;
 
 class: CompositeEditMode : MinorMode
 {
@@ -137,21 +136,21 @@ class: CompositeEditMode : MinorMode
              nil,
              [("session-manager-load-ui", loadUI, "Load UI into Session Manager"),
               ("graph-state-change", propertyChanged,  "Maybe update session UI")],
-             Menu {
-                 {"Stack", Menu {
-                     {"Composite Operation", nil, nil, inactiveState},
-                     {"   Over", setOpEvent(,0), nil, opState("over")},
-                     {"   Add", setOpEvent(,1), nil, opState("add")},
-                     //{"   Dissolve", setOpEvent(,2), nil, opState("dissolve")},
-                     {"   Difference", setOpEvent(,2), nil, opState("difference")},
-                     {"   Inverted Difference", setOpEvent(,3), nil, opState("-difference")},
-                     {"   Replace", setOpEvent(,4), nil, opState("replace")},
-                     {"   Topmost", setOpEvent(,5), nil, opState("topmost")},
-                     {"_", nil, nil, nil},
-                     {"Cycle Forward", cycleStackForward, nil, isStackMode},
-                     {"Cycle Backward", cycleStackBackward, nil, isStackMode}
-                     }
-                 }},
+             newMenu(MenuItem[] {
+                 subMenu("Stack", MenuItem[] {
+                     menuText("Composite Operation"),
+                     menuItem("   Over", "", "", setOpEvent(,0), opState("over")),
+                     menuItem("   Add", "", "", setOpEvent(,1), opState("add")),
+                     //menuItem("   Dissolve", "", "", setOpEvent(,2), opState("dissolve")),
+                     menuItem("   Difference", "", "", setOpEvent(,2), opState("difference")),
+                     menuItem("   Inverted Difference", "", "", setOpEvent(,3), opState("-difference")),
+                     menuItem("   Replace", "", "", setOpEvent(,4), opState("replace")),
+                     menuItem("   Topmost", "", "", setOpEvent(,5), opState("topmost")),
+                     menuSeparator(),
+                     menuItem("Cycle Forward", "", "", cycleStackForward, isStackMode),
+                     menuItem("Cycle Backward", "", "", cycleStackBackward, isStackMode)
+                 })
+             }),
              "b");
     }
 }

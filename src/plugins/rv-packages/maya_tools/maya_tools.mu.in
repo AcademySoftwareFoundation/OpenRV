@@ -8,6 +8,7 @@ module: maya_tools {
 
 use rvtypes;
 use commands;
+use app_utils;
 
 require io;
 require extra_commands;
@@ -383,32 +384,27 @@ class: MayaTools : MinorMode
 
     method: buildMenu (Menu; )
     {
-        Menu m1 = Menu {
-            {"Wipe Selected Playblasts",   compareSelected(, "wipe"), nil, viewsSelected},
-            {"Tile Selected Playblasts",   compareSelected(, "tile"), nil, viewsSelected},
-            {"Mark Selected as Target",   markCurrentAsTarget, nil, oneViewSelected},
-            {"_", nil},
-            {"Preferences", nil, nil, disabledFunc},
-            {"    View Latest Playblast", toggleViewLatestPlayblast, nil, showingViewLatestPlayblast},
+        MenuItem[] m1 = MenuItem[] {
+            menuItem("Wipe Selected Playblasts", "", "", compareSelected(, "wipe"), viewsSelected),
+            menuItem("Tile Selected Playblasts", "", "", compareSelected(, "tile"), viewsSelected),
+            menuItem("Mark Selected as Target", "", "", markCurrentAsTarget, oneViewSelected),
+            menuSeparator(),
+            menuText("Preferences"),
+            menuItem("    View Latest Playblast", "", "", toggleViewLatestPlayblast, showingViewLatestPlayblast)
         };
 
-        Menu m2 = nil;
-	if (runtime.build_os() == "DARWIN")
+        if (runtime.build_os() == "DARWIN")
         {
-            m2 = rvtypes.Menu {
-                {"_", nil},
-                {"Install Maya Support File", installMel, nil, doNothingState},
-            };
+            m1.push_back(menuSeparator());
+            m1.push_back(menuItem("Install Maya Support File", "", "", installMel, doNothingState));
         }
 
-        Menu m3 = rvtypes.Menu {
-            {"_", nil},
-            {"Help ...", showHelpFile, nil, doNothingState},
-        };
+        m1.push_back(menuSeparator());
+        m1.push_back(menuItem("Help ...", "", "", showHelpFile, doNothingState));
 
-        rvtypes.Menu m = rvtypes.Menu {
-            {"Maya", combineMenus (combineMenus (m1, m2), m3)}
-        };
+        Menu m = newMenu(MenuItem[] {
+            subMenu("Maya", m1)
+        });
 
         return m;
     }
