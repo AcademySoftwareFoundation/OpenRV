@@ -182,19 +182,26 @@ operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
 //  Global convenience functions
 //
 
+
+\: newMenu (MenuItem[]; MenuItem[] items)
+{
+    menu_debug("newMenu", "");
+    return items;
+}
+
+\: subMenu (MenuItem; string label, MenuItem[] subItems)
+{
+    menu_debug("subMenu", "\"%s\"" % label);
+    let sm = MenuItem {label, nil, "", enabledItem, subItems};
+    return sm;
+}
+
 \: menuSeparator (MenuItem;)
 {
     menu_debug("menuSeparator", "");
     let ms = MenuItem {"_", nil};
     return ms;
 }
-
-\: subMenu (MenuItem; string label, MenuItem[] subMenu)
-{
-    menu_debug("subMenu", "\"%s\"" % label);
-    let sm = MenuItem {label, nil, "", enabledItem, subMenu};
-    return sm;
-}   
 
 \: menuText (MenuItem; string text)
 {

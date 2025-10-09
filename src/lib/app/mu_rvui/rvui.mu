@@ -6288,7 +6288,7 @@ global bool debugGC = false;
 
 \: buildViewMenu (Menu;)
 {
-    Menu a = MenuItem[] {
+    Menu a = newMenu(MenuItem[] {
         subMenu("Stereo", MenuItem[] {
             menuText("Stereo Viewing Mode"),
             menuItem("   Off", "", "", setStereo("off"), isStereo("off")),
@@ -6406,7 +6406,7 @@ global bool debugGC = false;
         menuItem("Linear Filter", "key-down--n", "", ~toggleFilter, filterState),
         menuItem("Lock Pixel Scale During Resize", "", "", toggleLockResizeScale, lockResizeScaleState),
         menuItem("Preserve Image Height in Pixel Aspect Scaling", "", "", toggleExpandWidth, isExpandedWidth)
-    };
+    });
 
     return a;
 }
@@ -6416,7 +6416,7 @@ global bool debugGC = false;
 {
 
     try {
-    Menu exportMenu = MenuItem[] {
+    Menu exportMenu = newMenu(MenuItem[] {
         menuItem("Quicktime Movie...", "key-down--control--e", "", exportAs(, "mov", "Quicktime Export"), videoSourcesExistAndExportOKState),
         menuItem("Image Sequence...", "", "", exportAs(, "*", "Image Sequence Export"), videoSourcesExistAndExportOKState),
         menuItem("Marked Frames...", "", "", exportMarked, hasMarksState),
@@ -6427,7 +6427,7 @@ global bool debugGC = false;
         menuItem("Image Attributes...", "", "", exportAttrs, videoSourcesExistState),
         menuItem("RVIO Ready Session...", "", "", exportAs(, "rv", "Session Export"), videoSourcesExistState),
         menuItem("OTIO File...", "", "", exportOtio, canExportOTIOState)
-    };
+    });
 
     if (true || shortAppName() == "rvx")
     {
@@ -6435,7 +6435,7 @@ global bool debugGC = false;
          exportMenu.push_back (menuItem("All Node Definitions ...", "", "", exportNodeDefinition(true,), videoSourcesExistState));
     }
 
-    Menu mainMenu_part1 = MenuItem[] {
+    Menu mainMenu_part1 = newMenu(MenuItem[] {
         subMenu("File", MenuItem[] {
             menuItem("New Session", "", "", \: (void; Event ev) { newSession(nil); }, newSessionState),
             menuItem("Open...", "key-down--control--i", "", addMovieOrImageSources(,true,false), enabledItem),
@@ -6752,7 +6752,7 @@ global bool debugGC = false;
             menuItem("Reset All Color", "key-down--shift--home", "", ~resetAllColorParameters, videoSourcesAndNodeExistState("RVColor"))
         }),
         subMenu("View", buildViewMenu())
-    };
+    });
         //{"Debug", buildDebugMenu() }
 
 
