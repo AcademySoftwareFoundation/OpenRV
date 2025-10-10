@@ -41,6 +41,7 @@
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>
+#include "QAlertPanel.h"
 
 #if defined(RV_VFX_CY2023)
 #include <MuQt5/QNetworkAccessManagerType.h>
@@ -1134,7 +1135,7 @@ namespace Rv
         const StringType::String* b2 = NODE_ARG_OBJECT(5, StringType::String);
         const StringType::String* b3 = NODE_ARG_OBJECT(6, StringType::String);
 
-        QMessageBox box(doc);
+        QAlertPanel box(doc);
         QString temp = UTF8::qconvert(title->c_str());
 
         if (msg && *msg != *title)
@@ -1155,29 +1156,29 @@ namespace Rv
 #endif
 
         QPushButton* q1 =
-            box.addButton(UTF8::qconvert(b1->c_str()), QMessageBox::AcceptRole);
+            box.addButton(UTF8::qconvert(b1->c_str()), QAlertPanel::AcceptRole);
         QPushButton* q2 = b2 ? box.addButton(UTF8::qconvert(b2->c_str()),
-                                             QMessageBox::RejectRole)
+                                             QAlertPanel::RejectRole)
                              : 0;
         QPushButton* q3 = b3 ? box.addButton(UTF8::qconvert(b3->c_str()),
-                                             QMessageBox::ApplyRole)
+                                             QAlertPanel::ApplyRole)
                              : 0;
 
         switch (type)
         {
         case 0:
             // Info
-            box.setIcon(QMessageBox::Information);
+            box.setIcon(QAlertPanel::Information);
             break;
 
         case 1:
             // Warning
-            box.setIcon(QMessageBox::Warning);
+            box.setIcon(QAlertPanel::Warning);
             break;
 
         case 2:
             // Error
-            box.setIcon(QMessageBox::Critical);
+            box.setIcon(QAlertPanel::Critical);
             break;
         }
 
