@@ -337,10 +337,10 @@ class: StackEditMode : MinorMode
         newMenu(MenuItem[] {
             subMenu(name, MenuItem[] {
                 menuSeparator(),
-                menuItem("Align Start Frames", "", "", alignStartFrames, stateFunc("alignStartFrames")),
-                menuItem("Use Source Cut Info", "", "", useCutInfo, stateFunc("useCutInfo")),
-                menuItem("Automatically Retime Inputs", "", "", autoRetimeInputs, retimeState),
-                menuItem("Use Strict Frame Ranges", "", "", strictFrameRanges, stateFunc("strictFrameRanges"))
+                menuItem("Align Start Frames", "", "viewmode_category", alignStartFrames, stateFunc("alignStartFrames")),
+                menuItem("Use Source Cut Info", "", "viewmode_category", useCutInfo, stateFunc("useCutInfo")),
+                menuItem("Automatically Retime Inputs", "", "viewmode_category", autoRetimeInputs, retimeState),
+                menuItem("Use Strict Frame Ranges", "", "viewmode_category", strictFrameRanges, stateFunc("strictFrameRanges"))
             })
         });
     }

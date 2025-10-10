@@ -139,16 +139,16 @@ class: CompositeEditMode : MinorMode
              newMenu(MenuItem[] {
                  subMenu("Stack", MenuItem[] {
                      menuText("Composite Operation"),
-                     menuItem("   Over", "", "", setOpEvent(,0), opState("over")),
-                     menuItem("   Add", "", "", setOpEvent(,1), opState("add")),
-                     //menuItem("   Dissolve", "", "", setOpEvent(,2), opState("dissolve")),
-                     menuItem("   Difference", "", "", setOpEvent(,2), opState("difference")),
-                     menuItem("   Inverted Difference", "", "", setOpEvent(,3), opState("-difference")),
-                     menuItem("   Replace", "", "", setOpEvent(,4), opState("replace")),
-                     menuItem("   Topmost", "", "", setOpEvent(,5), opState("topmost")),
+                     menuItem("   Over", "", "viewmode_category", setOpEvent(,0), opState("over")),
+                     menuItem("   Add", "", "viewmode_category", setOpEvent(,1), opState("add")),
+                     menuItem("   Dissolve", "", "viewmode_category", setOpEvent(,2), opState("dissolve")),
+                     menuItem("   Difference", "", "viewmode_category", setOpEvent(,2), opState("difference")),
+                     menuItem("   Inverted Difference", "", "viewmode_category", setOpEvent(,3), opState("-difference")),
+                     menuItem("   Replace", "", "viewmode_category", setOpEvent(,4), opState("replace")),
+                     menuItem("   Topmost", "", "viewmode_category", setOpEvent(,5), opState("topmost")),
                      menuSeparator(),
-                     menuItem("Cycle Forward", "", "", cycleStackForward, isStackMode),
-                     menuItem("Cycle Backward", "", "", cycleStackBackward, isStackMode)
+                     menuItem("Cycle Forward", "", "???_category", cycleStackForward, isStackMode),
+                     menuItem("Cycle Backward", "", "???_category", cycleStackBackward, isStackMode)
                  })
              }),
              "b");

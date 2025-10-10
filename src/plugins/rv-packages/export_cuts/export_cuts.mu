@@ -152,7 +152,7 @@ class: ExportCutsMode : MinorMode
                subMenu("File", MenuItem[] {
                   subMenu("Export", MenuItem[] {
                      menuSeparator(),
-                     menuItem("Marked Regions as Movie/Audio/Sequences...", "", "", exportFiles, videoSourcesExistState)
+                     menuItem("Marked Regions as Movie/Audio/Sequences...", "", "export_category", exportFiles, videoSourcesExistState)
                   })
                })
            }));

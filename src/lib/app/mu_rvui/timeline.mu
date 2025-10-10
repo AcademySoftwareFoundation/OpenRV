@@ -842,22 +842,22 @@ class: Timeline : Widget
         Menu lastHalf = newMenu(MenuItem[] {
             menuSeparator(),
             menuText("Time/Frame Display"),
-            menuItem("   Global Frame Numbers", "", "", setFrameDisplay(2,), isDisplayFormat(2)),
-            menuItem("   Source Frame Numbers", "", "", setFrameDisplay(0,), isDisplayFormat(0)),
-            menuItem("   Global Time Code Display", "", "", setFrameDisplay(1,), isDisplayFormat(1)),
-            menuItem("   Source Time Code Display", "", "", setFrameDisplay(4,), isDisplayFormat(4)),
-            menuItem("   Global Seconds", "", "", setFrameDisplay(5,), isDisplayFormat(5)),
-            menuItem("   Footage Display", "", "", setFrameDisplay(3,), isDisplayFormat(3)),
+            menuItem("   Global Frame Numbers", "", "info_category", setFrameDisplay(2,), isDisplayFormat(2)),
+            menuItem("   Source Frame Numbers", "", "info_category", setFrameDisplay(0,), isDisplayFormat(0)),
+            menuItem("   Global Time Code Display", "", "info_category", setFrameDisplay(1,), isDisplayFormat(1)),
+            menuItem("   Source Time Code Display", "", "info_category", setFrameDisplay(4,), isDisplayFormat(4)),
+            menuItem("   Global Seconds", "", "info_category", setFrameDisplay(5,), isDisplayFormat(5)),
+            menuItem("   Footage Display", "", "info_category", setFrameDisplay(3,), isDisplayFormat(3)),
             menuSeparator(),
             subMenu("Configure", MenuItem[] {
-                menuItem("Show Play Controls", "", "", optShowVCRButtons, isShowingVCRButtons),
-                menuItem("Draw Timeline Over Imagery", "", "", optDrawTimelineOverImagery, isDrawingTimelineOverImagery),
-                menuItem("Position Timeline At Top", "", "", optDrawTimelineAtTopOfView, isDrawingTimelineAtTopOfView),
-                menuItem("Show In/Out Frame Numbers", "", "", optShowInOutTime, isShowingInOutTime),
-                menuItem("Step Wraps At In/Out", "", "", optStepWraps, isStepWrapping),
-                menuItem("Scrub Stops At In/Out", "", "", optScrubClamps, isScrubClamping),
-                menuItem("Show Source/Input at Frame", "", "", optInputName, isShowingInputName),
-                menuItem("Show Play Direction Indicator", "", "", optShowFrameDirection, isShowingFrameDirection)
+                menuItem("Show Play Controls", "", "info_category", optShowVCRButtons, isShowingVCRButtons),
+                menuItem("Draw Timeline Over Imagery", "", "info_category", optDrawTimelineOverImagery, isDrawingTimelineOverImagery),
+                menuItem("Position Timeline At Top", "", "info_category", optDrawTimelineAtTopOfView, isDrawingTimelineAtTopOfView),
+                menuItem("Show In/Out Frame Numbers", "", "info_category", optShowInOutTime, isShowingInOutTime),
+                menuItem("Step Wraps At In/Out", "", "info_category", optStepWraps, isStepWrapping),
+                menuItem("Scrub Stops At In/Out", "", "info_category", optScrubClamps, isScrubClamping),
+                menuItem("Show Source/Input at Frame", "", "info_category", optInputName, isShowingInputName),
+                menuItem("Show Play Direction Indicator", "", "info_category", optShowFrameDirection, isShowingFrameDirection)
             })
         });
 
@@ -875,11 +875,11 @@ class: Timeline : Widget
                 menuText(title),
                 menuText(media),
                 menuSeparator(),
-                menuItem("Set In Frame to %s" % fname, "", "", phantomSetInPoint, enabledItem),
-                menuItem("Set Out Frame to %s" % fname, "", "", phantomSetOutPoint, enabledItem),
-                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
-                menuItem("Mark Frame %s" % fname, "", "", phantomMarkFrame, enabledItem),
-                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+                menuItem("Set In Frame to %s" % fname, "", "mark_category", phantomSetInPoint, enabledItem),
+                menuItem("Set Out Frame to %s" % fname, "", "mark_category", phantomSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "mark_category", clearInOut, enabledItem),
+                menuItem("Mark Frame %s" % fname, "", "mark_category", phantomMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "mark_category", doClearAllMarks, enabledItem)
             });
 
             Menu all;
@@ -893,11 +893,11 @@ class: Timeline : Widget
             Menu firstHalfB = newMenu(MenuItem[] {
                 menuText("Timeline"),
                 menuSeparator(),
-                menuItem("Set In Frame to Current", "", "", currentSetInPoint, enabledItem),
-                menuItem("Set Out Frame to Current", "", "", currentSetOutPoint, enabledItem),
-                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
-                menuItem("Mark Current Frame", "", "", currentMarkFrame, enabledItem),
-                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+                menuItem("Set In Frame to Current", "", "mark_category", currentSetInPoint, enabledItem),
+                menuItem("Set Out Frame to Current", "", "mark_category", currentSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "mark_category", clearInOut, enabledItem),
+                menuItem("Mark Current Frame", "", "mark_category", currentMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "mark_category", doClearAllMarks, enabledItem)
             });
 
             Menu all;

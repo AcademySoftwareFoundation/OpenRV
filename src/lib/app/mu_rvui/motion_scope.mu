@@ -724,24 +724,24 @@ class: MotionScope : Widget
         Menu lastHalf = newMenu(MenuItem[] { 
             menuSeparator(),
             menuText("Time/Frame Display"),
-            menuItem("  Global Frame Numbers", "", "", setFrameDisplay(2,), isDisplayFormat(2)),
-            menuItem("  Source Frame Numbers", "", "", setFrameDisplay(0,), isDisplayFormat(0)),
-            menuItem("  Global Time Code Display", "", "", setFrameDisplay(1,), isDisplayFormat(1)),
-            menuItem("  Source Time Code Display", "", "", setFrameDisplay(4,), isDisplayFormat(4)),
-            menuItem("  Global Seconds", "", "", setFrameDisplay(5,), isDisplayFormat(5)),
-            menuItem("  Footage Display", "", "", setFrameDisplay(3,), isDisplayFormat(3)),
+            menuItem("  Global Frame Numbers", "", "info_category", setFrameDisplay(2,), isDisplayFormat(2)),
+            menuItem("  Source Frame Numbers", "", "info_category", setFrameDisplay(0,), isDisplayFormat(0)),
+            menuItem("  Global Time Code Display", "", "info_category", setFrameDisplay(1,), isDisplayFormat(1)),
+            menuItem("  Source Time Code Display", "", "info_category", setFrameDisplay(4,), isDisplayFormat(4)),
+            menuItem("  Global Seconds", "", "info_category", setFrameDisplay(5,), isDisplayFormat(5)),
+            menuItem("  Footage Display", "", "info_category", setFrameDisplay(3,), isDisplayFormat(3)),
             menuSeparator(),
             menuText("Audio"),
-            menuItem("  No Audio Display", "", "", setAudioSize(0,), isAudioSize(0)),
-            menuItem("  Small", "", "", setAudioSize(AudioSmall,), isAudioSize(AudioSmall)),
-            menuItem("  Medium", "", "", setAudioSize(AudioMedium,), isAudioSize(AudioMedium)),
-            menuItem("  Large", "", "", setAudioSize(AudioLarge,), isAudioSize(AudioLarge)),
+            menuItem("  No Audio Display", "", "info_category", setAudioSize(0,), isAudioSize(0)),
+            menuItem("  Small", "", "info_category", setAudioSize(AudioSmall,), isAudioSize(AudioSmall)),
+            menuItem("  Medium", "", "info_category", setAudioSize(AudioMedium,), isAudioSize(AudioMedium)),
+            menuItem("  Large", "", "info_category", setAudioSize(AudioLarge,), isAudioSize(AudioLarge)),
             menuSeparator(),
             subMenu("Configure", MenuItem[] {
-                menuItem("Draw Magnifier Over Imagery", "", "", optDrawMotionScopeOverImagery, isDrawingMotionScopeOverImagery),
-                menuItem("Position Magnifier At Top", "", "", optDrawMotionScopeAtTopOfView, isDrawingMotionScopeAtTopOfView),
-                menuItem("Step Wraps At In/Out", "", "", optStepWraps, isStepWrapping),
-                //menuItem("Show Play Direction Indicator", "", "", optShowFrameDirection, isShowingFrameDirection),
+                menuItem("Draw Magnifier Over Imagery", "", "info_category", optDrawMotionScopeOverImagery, isDrawingMotionScopeOverImagery),
+                menuItem("Position Magnifier At Top", "", "info_category", optDrawMotionScopeAtTopOfView, isDrawingMotionScopeAtTopOfView),
+                menuItem("Step Wraps At In/Out", "", "info_category", optStepWraps, isStepWrapping),
+                menuItem("Show Play Direction Indicator", "", "info_category", optShowFrameDirection, isShowingFrameDirection),
             })
         });
 
@@ -759,11 +759,11 @@ class: MotionScope : Widget
                 menuText(title),
                 menuText(media),
                 menuSeparator(),
-                menuItem("Set In Frame to %s" % fname, "", "", phantomSetInPoint, enabledItem),
-                menuItem("Set Out Frame to %s" % fname, "", "", phantomSetOutPoint, enabledItem),
-                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
-                menuItem("Mark Frame %s" % fname, "", "", phantomMarkFrame, enabledItem),
-                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+                menuItem("Set In Frame to %s" % fname, "", "mark_category", phantomSetInPoint, enabledItem),
+                menuItem("Set Out Frame to %s" % fname, "", "mark_category", phantomSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "mark_category", clearInOut, enabledItem),
+                menuItem("Mark Frame %s" % fname, "", "mark_category", phantomMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "mark_category", doClearAllMarks, enabledItem)
             });
 
             Menu all;
@@ -777,11 +777,11 @@ class: MotionScope : Widget
             Menu firstHalfB = newMenu(MenuItem[] {
                 menuText("Timeline Magnifier"),
                 menuSeparator(),
-                menuItem("Set In Frame to Current", "", "", currentSetInPoint, enabledItem),
-                menuItem("Set Out Frame to Current", "", "", currentSetOutPoint, enabledItem),
-                menuItem("Clear In/Out Frames", "", "", clearInOut, enabledItem),
-                menuItem("Mark Current Frame", "", "", currentMarkFrame, enabledItem),
-                menuItem("Clear Marks", "", "", doClearAllMarks, enabledItem)
+                menuItem("Set In Frame to Current", "", "mark_category", currentSetInPoint, enabledItem),
+                menuItem("Set Out Frame to Current", "", "mark_category", currentSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "mark_category", clearInOut, enabledItem),
+                menuItem("Mark Current Frame", "", "mark_category", currentMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "mark_category", doClearAllMarks, enabledItem)
             });
 
             Menu all;

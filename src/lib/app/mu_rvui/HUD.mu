@@ -46,7 +46,7 @@ class: ImageInfo : Widget
             newMenu(MenuItem[] {
                 menuText("Image Info"),
                 menuSeparator(),
-                menuItem("Wrap Long Fields", "", "", optWrap, isWrapping)
+                menuItem("Wrap Long Fields", "", "info_category", optWrap, isWrapping)
             })
         );
     }
@@ -324,9 +324,9 @@ class: InfoStrip : Widget
             newMenu(MenuItem[] {
                 menuText("Info Strip"),
                 menuSeparator(),
-                menuItem("Show Filename", "", "", showFilename(true), isFilename(true)),
-                menuItem("Show UI Name", "", "", showFilename(false), isFilename(false)),
-                menuItem("Scale with Resolution", "", "", toggleScaleWithResolution, isScaling)
+                menuItem("Show Filename", "", "info_category", showFilename(true), isFilename(true)),
+                menuItem("Show UI Name", "", "info_category", showFilename(false), isFilename(false)),
+                menuItem("Scale with Resolution", "", "info_category", toggleScaleWithResolution, isScaling)
             })
         );
     }

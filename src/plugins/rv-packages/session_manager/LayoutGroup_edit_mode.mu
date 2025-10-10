@@ -293,13 +293,13 @@ class: LayoutGroupEditMode : MinorMode
              newMenu(MenuItem[] {
                  subMenu("Layout", MenuItem[] {
                      menuText("Layout Method"),
-                     menuItem("    Packed", "", "", layoutPackedEvent, isLayoutMode("packed")),
-                     menuItem("    Packed With Fluid Layout", "", "", layoutPacked2Event, isLayoutMode("packed2")),
-                     menuItem("    Row", "", "", layoutInRowEvent, isLayoutMode("row")),
-                     menuItem("    Column", "", "", layoutInColumnEvent, isLayoutMode("column")),
-                     menuItem("    Grid", "", "", layoutInGridEvent, isLayoutMode("grid")),
-                     menuItem("    Manual", "", "", layoutManuallyEvent, isLayoutMode("manual")),
-                     menuItem("    Static", "", "", layoutStaticEvent, isLayoutMode("static"))
+                     menuItem("    Packed", "", "viewmode_category", layoutPackedEvent, isLayoutMode("packed")),
+                     menuItem("    Packed With Fluid Layout", "", "viewmode_category", layoutPacked2Event, isLayoutMode("packed2")),
+                     menuItem("    Row", "", "viewmode_category", layoutInRowEvent, isLayoutMode("row")),
+                     menuItem("    Column", "", "viewmode_category", layoutInColumnEvent, isLayoutMode("column")),
+                     menuItem("    Grid", "", "viewmode_category", layoutInGridEvent, isLayoutMode("grid")),
+                     menuItem("    Manual", "", "viewmode_category", layoutManuallyEvent, isLayoutMode("manual")),
+                     menuItem("    Static", "", "viewmode_category", layoutStaticEvent, isLayoutMode("static"))
                  })
              }),
              "a"

@@ -196,7 +196,7 @@ class: LayerSelect : Widget
         popupMenu (event, newMenu(MenuItem[] {
             menuText("Layer Selector"),
             menuSeparator(),
-            menuItem("Floating Selector", "", "", optFloatingSelector, isFloatingSelector)
+            menuItem("Floating Selector", "", "unclassified_category", optFloatingSelector, isFloatingSelector)
         }));
     }
 

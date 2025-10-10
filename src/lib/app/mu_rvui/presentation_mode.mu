@@ -501,29 +501,29 @@ class: PresentationControlMinorMode : MinorMode
                     subMenu("Scale", MenuItem[] {
                         menuSeparator(),
                         menuText("On Presentation Device"),
-                        menuItem("   1:1", "key-down--!", "", scaleOneToOne, presentationModeState),
-                        menuItem("   1:2", "", "", scaleOneToTwo, presentationModeState),
-                        menuItem("   Frame Width", "key-down--alt--f", "", scaleFrameWidth, presentationModeState)
+                        menuItem("   1:1", "key-down--!", "presentation_category", scaleOneToOne, presentationModeState),
+                        menuItem("   1:2", "", "presentation_category", scaleOneToTwo, presentationModeState),
+                        menuItem("   Frame Width", "key-down--alt--f", "presentation_category", scaleFrameWidth, presentationModeState)
                     })
                 }),
                 subMenu("View", MenuItem[] {
                     subMenu("Presentation Settings", MenuItem[] {
                         menuText("Show"),
-                        menuItem("   Pointer", "", "", togglePointer, pointerState),
+                        menuItem("   Pointer", "", "presentation_category", togglePointer, pointerState),
 			 //  XXX
 			 //  This errors in pres mode in rv4, crashes rvsdi, turn off for now
-                        //  menuItem("   Video Format", "", "", toggleFormat, formatState),
+                        menuItem("   Video Format", "", "presentation_category", toggleFormat, formatState),
                         menuSeparator(),
                         menuText("Mirror"),
-                        menuItem("   Timeline", "", "", toggleTimeline, timelineState),
-                        menuItem("   Timeline Magnitifer", "", "", toggleTimelineMag, timelineMagState),
-                        menuItem("   Image Info", "", "", toggleImageInfo, imageInfoState),
-                        menuItem("   Source Details", "", "", toggleSourceDetails, sourceDetailsState),
-                        menuItem("   Color Inspector", "", "", toggleInspector, inspectorState),
-                        menuItem("   Wipes", "", "", toggleWipes, wipesState),
-                        menuItem("   Info Strip", "", "", toggleInfoStrip, infoStripState),
-                        menuItem("   Feedback Messages", "", "", toggleFeedback, feedbackState),
-                        menuItem("   Remote Sync Pointers", "", "", toggleSync, syncState)
+                        menuItem("   Timeline", "", "presentation_category", toggleTimeline, timelineState),
+                        menuItem("   Timeline Magnitifer", "", "presentation_category", toggleTimelineMag, timelineMagState),
+                        menuItem("   Image Info", "", "presentation_category", toggleImageInfo, imageInfoState),
+                        menuItem("   Source Details", "", "presentation_category", toggleSourceDetails, sourceDetailsState),
+                        menuItem("   Color Inspector", "", "presentation_category", toggleInspector, inspectorState),
+                        menuItem("   Wipes", "", "presentation_category", toggleWipes, wipesState),
+                        menuItem("   Info Strip", "", "presentation_category", toggleInfoStrip, infoStripState),
+                        menuItem("   Feedback Messages", "", "presentation_category", toggleFeedback, feedbackState),
+                        menuItem("   Remote Sync Pointers", "", "presentation_category", toggleSync, syncState)
                     })
                 })
             })

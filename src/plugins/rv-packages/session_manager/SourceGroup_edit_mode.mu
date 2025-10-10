@@ -313,10 +313,10 @@ class: SourceGroupEditMode : MinorMode
              ("graph-state-change", propertyChanged,  "Maybe update session UI")],
             newMenu(MenuItem[] {
                 subMenu("Source", MenuItem[] {
-                    menuItem("Set Source Cut In ...", "", "", setCutInMode, sourceMenuState),
-                    menuItem("Set Source Cut Out ...", "", "", setCutOutMode, sourceMenuState),
-                    menuItem("Clear Source Cut In/Out", "", "", resetCut, sourceMenuState),
-                    menuItem("Sync GUI With Source Cut In/Out", "", "", toggleSync, syncState)
+                    menuItem("Set Source Cut In ...", "", "source_category", setCutInMode, sourceMenuState),
+                    menuItem("Set Source Cut Out ...", "", "source_category", setCutOutMode, sourceMenuState),
+                    menuItem("Clear Source Cut In/Out", "", "source_category", resetCut, sourceMenuState),
+                    menuItem("Sync GUI With Source Cut In/Out", "", "source_category", toggleSync, syncState)
                 })
             }),
             nil);

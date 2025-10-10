@@ -135,22 +135,22 @@ class: OpenRVHelpMenuMinorMode : MinorMode
     {
         Menu menuList = newMenu(MenuItem[] {
                 menuText("Online Resources"),
-                menuItem("   RV User's Manual", "", "", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), enabledItem),
-                menuItem("   RV Reference Manual", "", "", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-reference-manual/rv-reference-manual-chapter-one.html"), enabledItem),
-                menuItem("   Mu User's Manual", "", "", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), enabledItem),
+                menuItem("   RV User's Manual", "", "help_category", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), enabledItem),
+                menuItem("   RV Reference Manual", "", "help_category", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-reference-manual/rv-reference-manual-chapter-one.html"), enabledItem),
+                menuItem("   Mu User's Manual", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), enabledItem),
                 menuSeparator(),
-                menuItem("   GTO File Format (.rv files)", "", "", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), enabledItem),
+                menuItem("   GTO File Format (.rv files)", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), enabledItem),
                 menuSeparator(),
-                menuItem("   Academy Software Foundation Open RV", "", "", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV"), enabledItem),
+                menuItem("   Academy Software Foundation Open RV", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV"), enabledItem),
                 menuSeparator(),
                 menuText("Other Resource"),
-                menuItem("   Mu Command API Browser...", "", "", docbrowser, enabledItem),
+                menuItem("   Mu Command API Browser...", "", "help_category", docbrowser, enabledItem),
                 menuSeparator(),
                 menuText("Utilities"),
-                menuItem("   Describe...", "key-down--?", "", describeHelp, enabledItem),
-                menuItem("   Describe Key Binding...", "", "", describeKeyBinding, enabledItem),
-                menuItem("   Show Current Bindings", "", "", dumpBindings, enabledItem),
-                menuItem("   Show Environment", "", "", ~showEnv, enabledItem)
+                menuItem("   Describe...", "key-down--?", "help_category", describeHelp, enabledItem),
+                menuItem("   Describe Key Binding...", "", "help_category", describeKeyBinding, enabledItem),
+                menuItem("   Show Current Bindings", "", "help_category", dumpBindings, enabledItem),
+                menuItem("   Show Environment", "", "help_category", ~showEnv, enabledItem)
         });
 
         Menu menu = newMenu(MenuItem[] {

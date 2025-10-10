@@ -239,8 +239,8 @@ class: SwitchEditMode : MinorMode
     {
         newMenu(MenuItem[] {
             subMenu("Switch", MenuItem[] {
-                menuItem("Align Start Frames", "", "", alignStartFrames, stateFunc("alignStartFrames")),
-                menuItem("Use Source Cut Info", "", "", useCutInfo, stateFunc("useCutInfo"))
+                menuItem("Align Start Frames", "", "viewmode_category", alignStartFrames, stateFunc("alignStartFrames")),
+                menuItem("Use Source Cut Info", "", "viewmode_category", useCutInfo, stateFunc("useCutInfo"))
             })
         });
     }

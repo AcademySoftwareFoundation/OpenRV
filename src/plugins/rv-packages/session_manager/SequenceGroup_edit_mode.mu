@@ -231,8 +231,8 @@ class: SequenceGroupEditMode : MinorMode
         newMenu(MenuItem[] {
             subMenu("Sequence", MenuItem[] {
                 menuSeparator(),
-                menuItem("Auto EDL", "", "", autoEDL, stateFunc("autoEDL")),
-                menuItem("Use Source Cut Info", "", "", useCutInfo, stateFunc("useCutInfo"))
+                menuItem("Auto EDL", "", "viewmode_category", autoEDL, stateFunc("autoEDL")),
+                menuItem("Use Source Cut Info", "", "viewmode_category", useCutInfo, stateFunc("useCutInfo"))
             })
         });
     }

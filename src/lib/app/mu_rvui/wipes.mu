@@ -536,11 +536,11 @@ class: Wipe : MinorMode
               ("stylus-pen--release", release, "")],
              newMenu(MenuItem[] {
                  subMenu("Wipes", MenuItem[] {
-                         menuItem("Show Source List", "key-down--L", "", toggleLayerInfo, layerState), 
-                         menuItem("Reset All Wipes", "key-down--R", "", resetAll, enabledItem),
+                         menuItem("Show Source List", "key-down--L", "info_category", toggleLayerInfo, layerState),
+                         menuItem("Reset All Wipes", "key-down--R", "wipes_category", resetAll, enabledItem),
                          menuSeparator(),
-                         menuItem("Quit Wipes (without resetting)", "", "", quitWipesNoReset, enabledItem),
-                         menuItem("Quit Wipes", "", "", quitWipes, enabledItem)
+                         menuItem("Quit Wipes (without resetting)", "", "system_category", quitWipesNoReset, enabledItem),
+                         menuItem("Quit Wipes", "", "system_category", quitWipes, enabledItem)
                  })
              })
              ,

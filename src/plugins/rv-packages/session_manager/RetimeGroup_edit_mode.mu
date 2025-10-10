@@ -219,26 +219,26 @@ class: RetimeGroupEditMode : MinorMode
              newMenu(MenuItem[] {
                  subMenu("Retime", MenuItem[] {
                      subMenu("Convert to FPS", MenuItem[] {
-                             menuItem("24", "", "", convertToFPS(,24), enabledItem),
-                             menuItem("25", "", "", convertToFPS(,25), enabledItem),
-                             menuItem("23.98", "", "", convertToFPS(,23.98), enabledItem),
-                             menuItem("30", "", "", convertToFPS(,30), enabledItem),
-                             menuItem("29.97", "", "", convertToFPS(,29.97), enabledItem),
+                             menuItem("24", "", "viewmode_category", convertToFPS(,24), enabledItem),
+                             menuItem("25", "", "viewmode_category", convertToFPS(,25), enabledItem),
+                             menuItem("23.98", "", "viewmode_category", convertToFPS(,23.98), enabledItem),
+                             menuItem("30", "", "viewmode_category", convertToFPS(,30), enabledItem),
+                             menuItem("29.97", "", "viewmode_category", convertToFPS(,29.97), enabledItem),
                              menuSeparator(),
-                             menuItem("Custom...", "", "", editFPS, enabledItem)
+                             menuItem("Custom...", "", "viewmode_category", editFPS, enabledItem)
                      }),
                      menuSeparator(),
-                     menuItem("Slow Down by Factor...", "", "", slowDownFactor, enabledItem),
-                     menuItem("Speed Up By Factor...", "", "", speedUpFactor, enabledItem),
-                     menuItem("Reverse", "", "", reverseTiming, enabledItem),
+                     menuItem("Slow Down by Factor...", "", "viewmode_category", slowDownFactor, enabledItem),
+                     menuItem("Speed Up By Factor...", "", "viewmode_category", speedUpFactor, enabledItem),
+                     menuItem("Reverse", "", "viewmode_category", reverseTiming, enabledItem),
                      menuSeparator(),
                      menuText("Edit Raw"),
-                     menuItem("    Visual Scale...", "", "", editVScale, enabledItem),
-                     menuItem("    Visual Offset...", "", "", editVOffset, enabledItem),
-                     menuItem("    Audio Scale...", "", "", editAScale, enabledItem),
-                     menuItem("    Audio Offset...", "", "", editAOffset, enabledItem),
+                     menuItem("    Visual Scale...", "", "viewmode_category", editVScale, enabledItem),
+                     menuItem("    Visual Offset...", "", "viewmode_category", editVOffset, enabledItem),
+                     menuItem("    Audio Scale...", "", "viewmode_category", editAScale, enabledItem),
+                     menuItem("    Audio Offset...", "", "viewmode_category", editAOffset, enabledItem),
                      menuSeparator(),
-                     menuItem("Reset Timing", "", "", resetTiming, enabledItem)
+                     menuItem("Reset Timing", "", "viewmode_category", resetTiming, enabledItem)
                  })
              }),
              nil);

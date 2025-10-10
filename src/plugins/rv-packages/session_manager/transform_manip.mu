@@ -395,8 +395,8 @@ class: TransformManip : MinorMode
              newMenu(MenuItem[] {
                  subMenu("Layout", MenuItem[] {
                          menuSeparator(),
-                         menuItem("Fit All Images", "", "", fitAll, enabledItem),
-                         menuItem("Reset All Manips", "", "", resetAll, enabledItem)
+                         menuItem("Fit All Images", "", "viewmode_category", fitAll, enabledItem),
+                         menuItem("Reset All Manips", "", "viewmode_category", resetAll, enabledItem)
                      })
              })
              ,
