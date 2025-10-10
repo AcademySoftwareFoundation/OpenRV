@@ -426,11 +426,6 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
-        if (filterLiveReviewEvents() && (entry.name == "session_manager" || entry.name == "annotate_mode"))
-        {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         mm.toggleEntry(entry);
     }
 

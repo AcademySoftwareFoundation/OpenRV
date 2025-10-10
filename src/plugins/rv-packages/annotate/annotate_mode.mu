@@ -977,10 +977,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
+        /*
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
+        */
 
         let (name, ip) = pointerLocation(event);
         pushStrokeCommon(name, ip, event, true /*supportPressure*/);
@@ -1053,10 +1055,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
+        /*
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
+        */
 
         if (_currentDrawObject eq nil)
         {
@@ -1958,7 +1962,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onPresenterChanged(void; Event event)
     {
-        if (_active && filterLiveReviewEvents())
+        if (_active /*&& filterLiveReviewEvents()*/)
         {
             toggle();
         }

@@ -387,10 +387,6 @@ class: Timeline : Widget
             event.reject();
             return;
 	}
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         State state = data();
         let loc = renderLocations(event);
         let {d, w, h, drawControls, tlh, mxb, hm0, hm1, thm1, vm0, vm1, t, Y} = loc;
@@ -822,11 +818,6 @@ class: Timeline : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         if (isCurrentFrameIncomplete() || !_pointerInTimeline)
         {
             event.reject();
@@ -1025,10 +1016,12 @@ class: Timeline : Widget
 
     method: doubleClick (void; Event event)
     {
+        /*
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
+        */
         if (! _pointerInTimeline)
         {
             event.reject();
