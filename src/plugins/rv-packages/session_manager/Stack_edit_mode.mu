@@ -17,7 +17,6 @@ use glyph;
 use app_utils;
 use io;
 use system;
-use app_utils;
 
 class: StackEditMode : MinorMode
 {
@@ -335,15 +334,15 @@ class: StackEditMode : MinorMode
             t = nodeType(n),
             name = if t == "RVLayoutGroup" then "Layout" else "Stack";
 
-        Menu {
-            {name, Menu {
-                {"_", nil, nil, nil},
-                {"Align Start Frames", alignStartFrames, nil, stateFunc("alignStartFrames")},
-                {"Use Source Cut Info", useCutInfo, nil, stateFunc("useCutInfo")},
-                {"Automatically Retime Inputs", autoRetimeInputs, nil, retimeState},
-                {"Use Strict Frame Ranges", strictFrameRanges, nil, stateFunc("strictFrameRanges")},
-            }
-        }};
+        newMenu(MenuItem[] {
+            subMenu(name, MenuItem[] {
+                menuSeparator(),
+                menuItem("Align Start Frames", "", "viewmode_category", alignStartFrames, stateFunc("alignStartFrames")),
+                menuItem("Use Source Cut Info", "", "viewmode_category", useCutInfo, stateFunc("useCutInfo")),
+                menuItem("Automatically Retime Inputs", "", "viewmode_category", autoRetimeInputs, retimeState),
+                menuItem("Use Strict Frame Ranges", "", "viewmode_category", strictFrameRanges, stateFunc("strictFrameRanges"))
+            })
+        });
     }
 
     method: activate (void;)

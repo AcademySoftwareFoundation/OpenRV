@@ -977,10 +977,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
+        /*
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
+        */
 
         let (name, ip) = pointerLocation(event);
         pushStrokeCommon(name, ip, event, true /*supportPressure*/);
@@ -1053,10 +1055,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
+        /*
         if (filterLiveReviewEvents()) {
             sendInternalEvent("live-review-blocked-event");
             return;
         }
+        */
 
         if (_currentDrawObject eq nil)
         {
@@ -1958,7 +1962,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onPresenterChanged(void; Event event)
     {
-        if (_active && filterLiveReviewEvents())
+        if (_active /*&& filterLiveReviewEvents()*/)
         {
             toggle();
         }
@@ -2395,10 +2399,10 @@ class: AnnotateMinorMode : MinorMode
               ("pointer--leave", pointerGone, "Pointer Gone"),
               ("pointer--enter", pointerNotGone, "Pointer Back"),
               ("graph-state-change", maybeAutoMark, "Possibly Auto-mark Frames"),
-              ("key-down--meta-shift--right", nextEvent, "Next Annotated Frame"),
-              ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
-              ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
+              // bound by menuItem("   Next Annotated Frame") // ("key-down--meta-shift--right", nextEvent, "Next Annotated Frame"),
+              // bound by menuItem("   Previous Annotated Frame") // ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
+              // bound by menuItem("   Next Annotated Frame") // ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
+              // bound by menuItem("   Previous Annotated Frame") // ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
               ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
@@ -2415,34 +2419,35 @@ class: AnnotateMinorMode : MinorMode
               //("preferences-show", prefsShow, "Configure Preferences"),
               //("preferences-hide", prefsHide, "Write Preferences"),
               ],
-             Menu {
-                 {"Annotation", Menu {
-                     {"Actions on Current Frame", nil, nil, inactiveState},
-                     {"   Undo", undoEvent, nil, undoState},
-                     {"   Redo", redoEvent, nil, redoState},
-                     {"   Clear Drawings", clearEvent, nil, undoState},
-                     {"_", nil, nil, nil},
-                     {"Actions on Timeline", nil, nil, inactiveState},
-                     {"   Clear All Drawings", clearAllEvent, nil, undoState},
-                     {"   Show Drawings", showDrawingsSlot, nil, isShowingDrawings},
-                     {"   Next Annotated Frame", nextEvent, "alt shift right", nextPrevState},
-                     {"   Previous Annotated Frame", prevEvent, "alt shift left", nextPrevState},
-                     {"_", nil, nil, nil},
-                     {"Configure", Menu {
-                         {"Show Brush", showBrushSlot, nil, isShowingBrush},
-                         {"Brush Size Relative to View", scaleBrushSlot, nil, isScalingBrush},
-                         {"_", nil, nil, nil},
-                         {"Draw On Source When Possible", toggleStoreOnSrc, nil, storeOnSrc},
-                         {"Automatically Mark Annotated Frames", toggleAutoMark, nil, autoMark},
-                         {"Unique Color For Each Tool", toggleLinkToolColors, nil, unlinkToolColors},
-                         {"_", nil, nil, nil},
-                         {"Live Drawing in Sync", liveDrawingsEvent, nil, liveDrawingsState},
-                         {"Start Automatically During Sync", syncAutoStartEvent, nil, isSyncAutoStart},
-                         {"_", nil, nil, nil},
-                         {"Save Current Settings as Defaults", saveDefaults, nil, nil},
-                         {"Always Save Settings as Defaults On Exit", autoSave, nil, isAutoSaveEnabled}
-                     }}
-             }}},
+             newMenu(MenuItem[] {
+                 subMenu("Annotation", MenuItem[] {
+                     menuText("Actions on Current Frame"),
+                     menuItem("   Undo", "", "annotate_category", undoEvent, undoState),
+                     menuItem("   Redo", "", "annotate_category", redoEvent, redoState),
+                     menuItem("   Clear Drawings", "", "annotate_category", clearEvent, undoState),
+                     menuSeparator(),
+                     menuText("Actions on Timeline"),
+                     menuItem("   Clear All Drawings", "", "annotate_category", clearAllEvent, undoState),
+                     menuItem("   Show Drawings", "", "annotate_category", showDrawingsSlot, isShowingDrawings),
+                     menuItem("   Next Annotated Frame", "key-down--alt-shift--right", "annotate_category", nextEvent, nextPrevState),
+                     menuItem("   Previous Annotated Frame", "key-down--alt-shift--left", "annotate_category", prevEvent, nextPrevState),
+                     menuSeparator(),
+                     subMenu("Configure", MenuItem[] {
+                         menuItem("Show Brush", "", "annotate_category", showBrushSlot, isShowingBrush),
+                         menuItem("Brush Size Relative to View", "", "annotate_category", scaleBrushSlot, isScalingBrush),
+                         menuSeparator(),
+                         menuItem("Draw On Source When Possible", "", "annotate_category", toggleStoreOnSrc, storeOnSrc),
+                         menuItem("Automatically Mark Annotated Frames", "", "annotate_category", toggleAutoMark, autoMark),
+                         menuItem("Unique Color For Each Tool", "", "annotate_category", toggleLinkToolColors, unlinkToolColors),
+                         menuSeparator(),
+                         menuItem("Live Drawing in Sync", "", "annotate_category", liveDrawingsEvent, liveDrawingsState),
+                         menuItem("Start Automatically During Sync", "", "annotate_category", syncAutoStartEvent, isSyncAutoStart),
+                         menuSeparator(),
+                         menuItem("Save Current Settings as Defaults", "", "annotate_category", saveDefaults, enabledItem),
+                         menuItem("Always Save Settings as Defaults On Exit", "", "annotate_category", autoSave, isAutoSaveEnabled)
+                     })
+                 })
+             }),
              "z"
              );
 

@@ -202,6 +202,8 @@ namespace Mu
         static NODE_DECLARATION(split, Pointer);
         static NODE_DECLARATION(join_array, Pointer);
         static NODE_DECLARATION(compare, int);
+        static NODE_DECLARATION(contains, int);
+        static NODE_DECLARATION(replace, Pointer);
 
         static NODE_DECLARATION(formatOp, Pointer);
         static NODE_DECLARATION(formatOp_int, Pointer);
