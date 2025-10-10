@@ -563,12 +563,13 @@ namespace Rv
             {
                 bgMenuUpdate();
             }
-            else if (name == "internal-sync-presenter-changed"
-                     || name == "sync-session-ended")
-            {
-                bool isDisabled = m_session->filterLiveReviewEvents();
-                setLiveReviewFilteredActions(isDisabled);
-            }
+            // Commented out temporarily and will be reworked soon.
+            //else if (name == "internal-sync-presenter-changed"
+            //         || name == "sync-session-ended")
+            //{
+            //    bool isDisabled = m_session->filterLiveReviewEvents();
+            //    setLiveReviewFilteredActions(isDisabled);
+            //}
         }
         else if (const VideoDeviceContextChangeEvent* vevent =
                      dynamic_cast<const VideoDeviceContextChangeEvent*>(&event))
