@@ -90,26 +90,27 @@ LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}"
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
-GET_TARGET_PROPERTY(_ffmpeg_include_dir ffmpeg::avcodec INTERFACE_INCLUDE_DIRECTORIES)
-IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_IMPLIB)
-ELSE()
-  GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_LOCATION)
-ENDIF()
-LIST(APPEND _configure_options "-DFFMPEG_INCLUDE_DIR=${_ffmpeg_include_dir}")
-LIST(APPEND _configure_options "-DFFMPEG_INCLUDES=${_ffmpeg_include_dir}")
-LIST(APPEND _configure_options "-DFFMPEG_AVCODEC_INCLUDE_DIR=${_ffmpeg_include_dir}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBRARIES=${_ffmpeg_libavcodec} ${_ffmpeg_libavformat} ${_ffmpeg_libavutil} ${_ffmpeg_libswscale}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBAVCODEC=${_ffmpeg_libavcodec}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBAVFORMAT=${_ffmpeg_libavformat}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBAVUTIL=${_ffmpeg_libavutil}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
+
+# GET_TARGET_PROPERTY(_ffmpeg_include_dir ffmpeg::avcodec INTERFACE_INCLUDE_DIRECTORIES)
+# IF(RV_TARGET_WINDOWS)
+#   GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_IMPLIB)
+#   GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_IMPLIB)
+#   GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_IMPLIB)
+#   GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_IMPLIB)
+# ELSE()
+#   GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_LOCATION)
+#   GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_LOCATION)
+#   GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_LOCATION)
+#   GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_LOCATION)
+# ENDIF()
+# LIST(APPEND _configure_options "-DFFMPEG_INCLUDE_DIR=${_ffmpeg_include_dir}")
+# LIST(APPEND _configure_options "-DFFMPEG_INCLUDES=${_ffmpeg_include_dir}")
+# LIST(APPEND _configure_options "-DFFMPEG_AVCODEC_INCLUDE_DIR=${_ffmpeg_include_dir}")
+# LIST(APPEND _configure_options "-DFFMPEG_LIBRARIES=${_ffmpeg_libavcodec} ${_ffmpeg_libavformat} ${_ffmpeg_libavutil} ${_ffmpeg_libswscale}")
+# LIST(APPEND _configure_options "-DFFMPEG_LIBAVCODEC=${_ffmpeg_libavcodec}")
+# LIST(APPEND _configure_options "-DFFMPEG_LIBAVFORMAT=${_ffmpeg_libavformat}")
+# LIST(APPEND _configure_options "-DFFMPEG_LIBAVUTIL=${_ffmpeg_libavutil}")
+# LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
@@ -167,10 +168,10 @@ IF(NOT RV_TARGET_WINDOWS)
             Imath::Imath
             Webp::Webp
             Raw::Raw
-            ffmpeg::swresample
-            ffmpeg::swscale
-            ffmpeg::avcodec
-            ffmpeg::swresample
+            #ffmpeg::swresample
+            #ffmpeg::swscale
+            #ffmpeg::avcodec
+            #ffmpeg::swresample
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_cmake_build_command}
@@ -225,10 +226,10 @@ ELSE()
             Imath::Imath
             Webp::Webp
             Raw::Raw
-            ffmpeg::swresample
-            ffmpeg::swscale
-            ffmpeg::avcodec
-            ffmpeg::swresample
+            #ffmpeg::swresample
+            #ffmpeg::swscale
+            #ffmpeg::avcodec
+            #ffmpeg::swresample
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
