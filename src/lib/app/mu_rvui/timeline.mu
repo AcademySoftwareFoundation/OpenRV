@@ -1016,12 +1016,7 @@ class: Timeline : Widget
 
     method: doubleClick (void; Event event)
     {
-        /*
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-        */
+        // filtered by mark_category in the binding list.
         if (! _pointerInTimeline)
         {
             event.reject();
@@ -1063,7 +1058,7 @@ class: Timeline : Widget
                ("pointer--leave", handleLeave, "Track pointer leave"),
                ("pointer-1--shift--release", releaseDrag, ""),
                ("pointer-1--release", release, ""),
-               ("pointer-1--double",  doubleClick, ""),
+               ("pointer-1--double",  makeCategoryEventFunc("mark_category", doubleClick), ""),
                ("after-graph-view-change", updateMainNodeEvent, ""),
                ("graph-node-inputs-changed", updateMainNodeEvent, ""),
                ("stylus-pen--push", clickFunction(,setFrameAndInOut), "Set Frame On Timeline"),
