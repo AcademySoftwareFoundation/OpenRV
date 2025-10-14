@@ -131,13 +131,10 @@ class: WindowMinorMode : MinorMode
         });
 
         this.init("window",
-                    //[ 
+                  [ ("key-down--`", ~toggleFullScreen, "Toggle Fullscreen Mode") ],
                     // error? bound by two things? // ("key-down--control--F", ~toggleFullScreen, "Toggle Fullscreen Mode"),
-                    // bound by menuItem("Full Screen") // ("key-down--`", ~toggleFullScreen, "Toggle Fullscreen Mode"),
                     // bound by menuItem("Fit") // ("key-down--w", fitWindowToImage, "Resize Window to Fit"),
                     // bound by menuItem("Center Fit") // ("key-down--W", centerFit, "Fit Window to Pixels") 
-                    //],
-                  nil, 
                   nil,
                   menu,
                   "y",
