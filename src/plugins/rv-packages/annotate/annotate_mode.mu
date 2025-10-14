@@ -977,13 +977,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
-        /*
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-        */
-
         let (name, ip) = pointerLocation(event);
         pushStrokeCommon(name, ip, event, true /*supportPressure*/);
     }
@@ -1055,13 +1048,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
-        /*
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-        */
-
         if (_currentDrawObject eq nil)
         {
             //
@@ -1962,7 +1948,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onPresenterChanged(void; Event event)
     {
-        if (_active /*&& filterLiveReviewEvents()*/)
+        if (_active)
         {
             toggle();
         }
@@ -2372,8 +2358,8 @@ class: AnnotateMinorMode : MinorMode
 
         init(name,
              nil,
-             [("pointer-1--drag", drag, "Add to current stroke"),
-              ("pointer-1--push", push, "Start New Stroke"),
+             [("pointer-1--drag", makeCategoryEventFunc("annotate_category", drag), "Add to current stroke"),
+              ("pointer-1--push", makeCategoryEventFunc("annotate_category", push), "Start New Stroke"),
               ("pointer-1--release", release, "End Current Stroke"),
               ("pointer--move", move, ""),
               ("pointer--shift--move", editRadius, ""),
@@ -2385,13 +2371,13 @@ class: AnnotateMinorMode : MinorMode
               ("after-graph-view-change", afterGraphViewChange, "Update UI"),
               ("frame-changed", updateFrameDependentStateEvent, ""),
               ("play-stop", updateFrameDependentStateEvent, ""),
-              ("stylus-pen--push", penPush, "Pen Down"),
-              ("stylus-pen--drag", drag, "Pen Drag"),
+              ("stylus-pen--push", makeCategoryEventFunc("annotate_category", penPush), "Pen Down"),
+              ("stylus-pen--drag", makeCategoryEventFunc("annotate_category", drag), "Pen Drag"),
               ("stylus-pen--shift--move", editRadius, ""),
               ("stylus-pen--move", move, "Pen Move"),
               ("stylus-pen--release", release, "Pen Release"),
-              ("stylus-eraser--push", eraserPush, "Pen Down"),
-              ("stylus-eraser--drag", drag, "Pen Drag"),
+              ("stylus-eraser--push", makeCategoryEventFunc("annotate_category", eraserPush), "Pen Down"),
+              ("stylus-eraser--drag", makeCategoryEventFunc("annotate_category", drag), "Pen Drag"),
               ("stylus-eraser--move", move, "Pen Move"),
               ("stylus-eraser--shift--move", editRadius, ""),
               ("stylus-eraser--release", release, "Pen Release"),
