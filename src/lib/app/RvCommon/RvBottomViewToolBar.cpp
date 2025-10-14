@@ -483,28 +483,19 @@ namespace Rv
             {
                 bool isChecked = (contents == "1");
                 m_ghostAction->setChecked(isChecked);
-
-                if (m_session->filterLiveReviewEvents())
-                {
-                    m_ghostAction->setDisabled(true);
-                }
             }
             else if (name == "update-hold-button")
             {
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
-
-                if (m_session->filterLiveReviewEvents())
-                {
-                    m_holdAction->setDisabled(true);
-                }
             }
-            else if (name == "internal-sync-presenter-changed"
-                     || name == "sync-session-ended")
-            {
-                bool isDisabled = m_session->filterLiveReviewEvents();
-                setLiveReviewFilteredActions(isDisabled);
-            }
+            // Commented out temporarily and will be reworked soon.
+            //else if (name == "internal-sync-presenter-changed"
+            //         || name == "sync-session-ended")
+            //{
+            //    bool isDisabled = m_session->filterLiveReviewEvents();
+            //    setLiveReviewFilteredActions(isDisabled);
+            //}
         }
 
         return EventAcceptAndContinue;
