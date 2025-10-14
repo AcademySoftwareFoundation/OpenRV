@@ -13,6 +13,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
 #include <iostream>
+#include <math.h>
 
 QAlertPanel::QAlertPanel(QWidget* parent)
     : QDialog(parent)
