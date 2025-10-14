@@ -282,21 +282,11 @@ class: SourceGroupEditMode : MinorMode
 
     method: syncState (int; )
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-    
         if (syncGuiInOut()) then CheckedMenuState else UncheckedMenuState;
     }
 
     method: sourceMenuState (int; )
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         return NeutralMenuState;
     }
 
