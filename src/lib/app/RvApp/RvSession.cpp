@@ -3123,6 +3123,30 @@ namespace Rv
                 string p = protocol(pc);
                 if (isProgressionProtocol(p))
                     ++m_gtoSourceTotal;
+
+                // Optimization: Start preloading media if this is an
+                // RVFileSource with active media
+                if (p == "RVFileSource"
+                    && !Options::sharedOptions().progressiveSourceLoading)
+                {
+                    IntProperty* mediaActive =
+                        pc->property<IntProperty>("media.active");
+                    if (mediaActive && !mediaActive->empty()
+                        && mediaActive->front() == 1)
+                    {
+                        StringProperty* movie =
+                            pc->property<StringProperty>("media.movie");
+                        if (movie && !movie->empty())
+                        {
+                            // Start preloading for all movie instances in the
+                            // container
+                            for (size_t j = 0; j < movie->size(); j++)
+                            {
+                                startPreloadingMedia((*movie)[j]);
+                            }
+                        }
+                    }
+                }
             }
 
             m_gtoSourceCount = 0;
