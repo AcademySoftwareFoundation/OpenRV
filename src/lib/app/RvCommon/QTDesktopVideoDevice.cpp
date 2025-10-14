@@ -117,6 +117,17 @@ namespace Rv
 
         QGLFormat fmt = shareDevice()->widget()->format();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
+        
+        // For presentation mode on Linux with Qt5, disable alpha channel to prevent
+        // compositor transparency issues. The alpha channel can cause desktop background
+        // to show through in areas where black bars should be solid black.
+        // This is particularly important because the compositor interprets alpha=0
+        // as "show background through here".
+#ifdef PLATFORM_LINUX
+        fmt.setAlpha(false);
+        fmt.setAlphaBufferSize(0);
+#endif
+        
         ScreenView* s =
             new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
         setWidget(s);
