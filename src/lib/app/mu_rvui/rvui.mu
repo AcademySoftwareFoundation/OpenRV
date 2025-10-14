@@ -6038,9 +6038,9 @@ global bool debugGC = false;
         menuSeparator(),
         menuItem("Create/Edit Display Profiles...", "", "viewmode_category", ~editProfiles, displayProfilesState),
         menuSeparator(),
-        menuItem("Linear Filter", "key-down--n", "???_category", ~toggleFilter, filterState),
-        menuItem("Lock Pixel Scale During Resize", "", "???_category", toggleLockResizeScale, lockResizeScaleState),
-        menuItem("Preserve Image Height in Pixel Aspect Scaling", "", "???_category", toggleExpandWidth, isExpandedWidth)
+        menuItem("Linear Filter", "key-down--n", "viewmode_category", ~toggleFilter, filterState),
+        menuItem("Lock Pixel Scale During Resize", "", "viewmode_category", toggleLockResizeScale, lockResizeScaleState),
+        menuItem("Preserve Image Height in Pixel Aspect Scaling", "", "viewmode_category", toggleExpandWidth, isExpandedWidth)
     });
 
     return a;
@@ -6078,9 +6078,9 @@ global bool debugGC = false;
             menuItem("Open into Layer...", "", "media_category", addMovieOrImage(,addToClosestSource(,"explicit"),false), sourcesExistState),
             menuItem("Open in New Session...", "key-down--control--O", "media_category", openMovieOrImage, newSessionState),
             menuSeparator(),
-            menuItem("Clone Session", "", "???_category", cloneSession, newSessionState),
-            menuItem("Clone RV", "", "???_category", cloneRV, enabledItem),
-            menuItem("Clone Synced RV", "", "???_category", cloneSyncedRV, enabledItem),
+            menuItem("Clone Session", "", "media_category", cloneSession, newSessionState),
+            menuItem("Clone RV", "", "media_category", cloneRV, enabledItem),
+            menuItem("Clone Synced RV", "", "media_category", cloneSyncedRV, enabledItem),
             menuSeparator(),
             menuItem("Relocate Movie or Image Sequence...", "", "media_category", relocateMovieOrImage, singleSourceState),
             menuItem("Replace Source Media...", "", "media_category", replaceSourceMedia, singleSourceState),

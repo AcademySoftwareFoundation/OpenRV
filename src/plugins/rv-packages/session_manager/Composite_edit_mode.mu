@@ -147,8 +147,8 @@ class: CompositeEditMode : MinorMode
                      menuItem("   Replace", "", "viewmode_category", setOpEvent(,4), opState("replace")),
                      menuItem("   Topmost", "", "viewmode_category", setOpEvent(,5), opState("topmost")),
                      menuSeparator(),
-                     menuItem("Cycle Forward", "", "???_category", cycleStackForward, isStackMode),
-                     menuItem("Cycle Backward", "", "???_category", cycleStackBackward, isStackMode)
+                     menuItem("Cycle Forward", "", "viewmode_category", cycleStackForward, isStackMode),
+                     menuItem("Cycle Backward", "", "viewmode_category", cycleStackBackward, isStackMode)
                  })
              }),
              "b");
