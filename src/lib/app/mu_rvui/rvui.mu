@@ -5156,7 +5156,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                           h-textsize-sb[3] - m[2]*devicePixelRatio,
                           state.feedbackText,
                           textsize, fg, bg,
-                          state.feedbackGlyph, gc);
+                          state.feedbackGlyph, gc,
+                          state.feedbackTextSizes);
     glDisable(GL_BLEND);
 
     if (ct <= 0 || !isTimerRunning())

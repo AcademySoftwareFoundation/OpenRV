@@ -618,6 +618,7 @@ class: State
     float           feedback;
     string          feedbackText;
     Glyph           feedbackGlyph;
+    float[]         feedbackTextSizes;  // Optional per-line text sizes
 
     DefaultDirFunc  defaultOpenDir;
     DefaultDirFunc  defaultSaveDir;

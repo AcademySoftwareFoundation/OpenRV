@@ -97,12 +97,14 @@ require system;
 \: displayFeedback (void;
                     string text,
                     float duration = 2.0,
-                    Glyph g = nil)
+                    Glyph g = nil,
+                    float[] textSizes = nil)
 {
     State state         = data();
     state.feedbackText  = text;
     state.feedback      = duration;
     state.feedbackGlyph = g;
+    state.feedbackTextSizes = textSizes;
     startTimer();
     redraw();
 }
@@ -111,7 +113,32 @@ require system;
                      string text,
                      float duration)
 {
-    displayFeedback(text, duration);
+    displayFeedback(text, duration, nil, nil);
+}
+
+\: displayFeedback3 (void;
+                     string text,
+                     float duration,
+                     Glyph g)
+{
+    displayFeedback(text, duration, g, nil);
+}
+
+\: displayFeedback4 (void;
+                     string text,
+                     float duration,
+                     Glyph g,
+                     float[] textSizes)
+{
+    displayFeedback(text, duration, g, textSizes);
+}
+
+\: displayFeedbackWithSizes (void;
+                             string text,
+                             float duration,
+                             float[] textSizes)
+{
+    displayFeedback(text, duration, nil, textSizes);
 }
 
 \: isSessionEmpty (bool;)
