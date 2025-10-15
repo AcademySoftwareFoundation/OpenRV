@@ -619,6 +619,8 @@ class: State
     string          feedbackText;
     Glyph           feedbackGlyph;
     float[]         feedbackTextSizes;  // Optional per-line text sizes
+    bool            feedbackQueueEnabled; // Enable/disable message queue feature
+    (string, float, Glyph, float[])[] feedbackQueue; // Queue of pending feedback messages
 
     DefaultDirFunc  defaultOpenDir;
     DefaultDirFunc  defaultSaveDir;

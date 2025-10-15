@@ -100,12 +100,40 @@ require system;
                     Glyph g = nil,
                     float[] textSizes = nil)
 {
-    State state         = data();
-    state.feedbackText  = text;
-    state.feedback      = duration;
-    state.feedbackGlyph = g;
-    state.feedbackTextSizes = textSizes;
-    startTimer();
+    State state = data();
+    
+    // Initialize queue if needed
+    if (state.feedbackQueue eq nil) state.feedbackQueue = (string, float, Glyph, float[])[]();
+    
+    // Check if queue feature is disabled - if so, use legacy behavior (always overwrite)
+    if (!state.feedbackQueueEnabled)
+    {
+        state.feedbackText  = text;
+        state.feedback      = duration;
+        state.feedbackGlyph = g;
+        state.feedbackTextSizes = textSizes;
+        startTimer();
+        redraw();
+        return;
+    }
+    
+    // Queue feature enabled - check if a message is currently displaying
+    // If no message is currently displaying, show this one immediately
+    // Check if feedback is 0 AND timer is not running (more reliable check)
+    if (state.feedback == 0.0 && !isTimerRunning())
+    {
+        state.feedbackText  = text;
+        state.feedback      = duration;
+        state.feedbackGlyph = g;
+        state.feedbackTextSizes = textSizes;
+        startTimer();
+    }
+    else
+    {
+        // Queue this message for later display
+        state.feedbackQueue.push_back((text, duration, g, textSizes));
+    }
+    
     redraw();
 }
 

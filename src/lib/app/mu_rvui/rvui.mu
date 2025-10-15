@@ -3913,6 +3913,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     state.feedbackText  = "";
     state.feedback      = 0;
     state.feedbackGlyph = nil;
+    state.feedbackQueueEnabled = true;
+    state.feedbackQueue = (string, float, Glyph, float[])[]();
     state.pixelInfo     = nil;
     state.scrubAudio    = false;
 
@@ -5164,6 +5166,26 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     {
         state.feedback = 0.0;
         stopTimer();
+        
+        // Check if there are queued messages to display
+        if (state.feedbackQueue neq nil && state.feedbackQueue.size() > 0)
+        {
+            let nextMessage = state.feedbackQueue[0];
+            
+            // Remove first element by creating new array without it
+            (string, float, Glyph, float[])[] newQueue;
+            for_index (i; state.feedbackQueue)
+            {
+                if (i > 0) newQueue.push_back(state.feedbackQueue[i]);
+            }
+            state.feedbackQueue = newQueue;
+            
+            state.feedbackText = nextMessage._0;
+            state.feedback = nextMessage._1;
+            state.feedbackGlyph = nextMessage._2;
+            state.feedbackTextSizes = nextMessage._3;
+            startTimer();
+        }
     }
     //
     //  Redraw no matter what, because even if we're done rendering
@@ -7380,6 +7402,8 @@ global bool debugGC = false;
 {
     s.config           = globalConfig;
     s.feedback         = 0;
+    s.feedbackQueueEnabled = true;
+    s.feedbackQueue    = (string, float, Glyph, float[])[]();
     s.showMatte        = false;
     s.matteOpacity     = 0.66;
     s.matteAspect      = 1.85;
