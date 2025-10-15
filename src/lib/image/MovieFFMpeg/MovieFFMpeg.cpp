@@ -669,6 +669,7 @@ namespace TwkMovie
                                                        "mp43"sv,
                                                        "mp4s"sv,
                                                        "mp4v"sv,
+                                                       "apv"sv,
                                                        "mpeg4"sv,
                                                        "mpg1"sv,
                                                        "mpg3"sv,
@@ -4740,9 +4741,19 @@ namespace TwkMovie
             }
             else
             {
-                avCodecContext->pix_fmt = (avCodec->pix_fmts)
-                                              ? avCodec->pix_fmts[0]
-                                              : RV_OUTPUT_FFMPEG_FMT;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                    // New API (FFmpeg 7.0+)
+                    const enum AVPixelFormat *pix_fmts = NULL;
+                    int ret = avcodec_get_supported_config(avCodecContext, avCodec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, NULL);
+                    if (ret >= 0 && pix_fmts) {
+                        avCodecContext->pix_fmt = pix_fmts[0];
+                    } else {
+                        avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
+                    }
+#else
+                    // Old API (FFmpeg < 7.0)
+                    avCodecContext->pix_fmt = (avCodec->pix_fmts) ? avCodec->pix_fmts[0] : RV_OUTPUT_FFMPEG_FMT;
+#endif
 
                 if (m_request.verbose)
                 {
@@ -4839,7 +4850,17 @@ namespace TwkMovie
             }
             else
             {
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+                const enum AVSampleFormat *sample_fmts = NULL;
+                int ret = avcodec_get_supported_config(avCodecContext, NULL, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, (const void**)&sample_fmts, NULL);
+                if (ret >= 0 && sample_fmts) {
+                    avCodecContext->sample_fmt = sample_fmts[0];
+                } else {
+                    avCodecContext->sample_fmt = AV_SAMPLE_FMT_NONE;
+                }
+#else
                 avCodecContext->sample_fmt = avCodec->sample_fmts[0];
+#endif
             }
 
             AudioTrack* track = new AudioTrack;
