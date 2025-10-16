@@ -25,6 +25,32 @@ BBox                := Vec4;
 NameValueBounds     := (Vec2, float[4][], float[4][], int);
 DropFunc            := (void; int, string);
 Glyph               := (void; bool);
+
+//
+// FeedbackMessage: Encapsulates a feedback message for queue storage
+// Using a class instead of tuples properly handles nil values (Glyph, float[])
+// which cause memory corruption when stored directly in tuples
+//
+class: FeedbackMessage
+{
+    string  text;
+    float   duration;
+    Glyph   glyph;
+    float[] textSizes;
+    
+    method: FeedbackMessage (FeedbackMessage; 
+                            string t, 
+                            float d, 
+                            Glyph g, 
+                            float[] sizes)
+    {
+        text = t;
+        duration = d;
+        glyph = g;
+        textSizes = sizes;
+    }
+};
+
 StringPair          := (string, string);
 MenuStateFunc       := (int;);
 BoolFunc            := (bool;);
@@ -622,7 +648,7 @@ class: State
     float[]         feedbackTextSizes;  // Optional per-line text sizes
     bool            feedbackQueueEnabled;   // Enable/disable message queue feature
     bool            feedbackQueueTruncate;  // Truncate messages duration to 1s when queue has items
-    (string, float, Glyph, float[])[] feedbackQueue; // Queue of pending feedback messages
+    FeedbackMessage[] feedbackQueue;  // Queue of pending feedback messages (using class to handle nil values)
 
     DefaultDirFunc  defaultOpenDir;
     DefaultDirFunc  defaultSaveDir;

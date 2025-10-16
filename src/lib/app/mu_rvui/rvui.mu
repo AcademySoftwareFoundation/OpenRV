@@ -3914,8 +3914,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     state.feedback      = 0;
     state.feedbackGlyph = nil;
     state.feedbackQueueEnabled = true;   // Reset to default (enabled)
-    state.feedbackQueueTruncate = false;  // Reset to default (enabled)
-    state.feedbackQueue = (string, float, Glyph, float[])[]();
+    state.feedbackQueueTruncate = false;  // Reset to default (disabled)
+    state.feedbackQueue = FeedbackMessage[]();
     state.pixelInfo     = nil;
     state.scrubAudio    = false;
 
@@ -5203,17 +5203,18 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
             let nextMessage = state.feedbackQueue[0];
             
             // Remove first element by creating new array without it
-            (string, float, Glyph, float[])[] newQueue;
+            FeedbackMessage[] newQueue;
             for_index (i; state.feedbackQueue)
             {
                 if (i > 0) newQueue.push_back(state.feedbackQueue[i]);
             }
             state.feedbackQueue = newQueue;
             
-            state.feedbackText = nextMessage._0;
-            state.feedback = nextMessage._1;
-            state.feedbackGlyph = nextMessage._2;
-            state.feedbackTextSizes = nextMessage._3;
+            // Extract values from FeedbackMessage class
+            state.feedbackText = nextMessage.text;
+            state.feedback = nextMessage.duration;
+            state.feedbackGlyph = nextMessage.glyph;
+            state.feedbackTextSizes = nextMessage.textSizes;
             startTimer();
         }
     }
@@ -7433,8 +7434,8 @@ global bool debugGC = false;
     s.config           = globalConfig;
     s.feedback         = 0;
     s.feedbackQueueEnabled = true;   // Set to false to disable queue feature
-    s.feedbackQueueTruncate = false;  // Set to false to disable 1s truncation when queue has items
-    s.feedbackQueue    = (string, float, Glyph, float[])[]();
+    s.feedbackQueueTruncate = false;  // Set to true to enable 1.5s truncation when queue has items
+    s.feedbackQueue    = FeedbackMessage[]();
     s.showMatte        = false;
     s.matteOpacity     = 0.66;
     s.matteAspect      = 1.85;

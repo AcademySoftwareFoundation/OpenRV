@@ -103,7 +103,7 @@ require system;
     State state = data();
     
     // Initialize queue if needed
-    if (state.feedbackQueue eq nil) state.feedbackQueue = (string, float, Glyph, float[])[]();
+    if (state.feedbackQueue eq nil) state.feedbackQueue = FeedbackMessage[]();
     
     // Check if queue feature is disabled - if so, use legacy behavior (always overwrite)
     if (!state.feedbackQueueEnabled)
@@ -132,8 +132,9 @@ require system;
     {
         // A message is currently displaying - queue this message
         // When multiple message are in the queue, their duration is reduced to go through
-        // the queue faster. (see drawFeedback in extra_commands.mu)
-        state.feedbackQueue.push_back((text, duration, g, textSizes));
+        // the queue faster. (see drawFeedback in rvui.mu)
+        // Using FeedbackMessage class to properly handle nil values (Glyph, float[])
+        state.feedbackQueue.push_back(FeedbackMessage(text, duration, g, textSizes));
     }
     
     redraw();
