@@ -37,6 +37,7 @@ ConfirmFunc         := (void; string);
 Labels              := string[];
 BBoxes              := BBox[];
 BindingList         := [(string, EventFunc, string)];
+DefaultFeedbackTextSize := 20.0;
 DefaultGamma        := 1.0;
 DefaultHue          := 0.0;
 DefaultSaturation   := 1.0;

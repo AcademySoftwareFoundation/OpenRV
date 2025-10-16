@@ -214,6 +214,41 @@ operator: & (Glyph; Glyph a, Glyph b)
     glPopAttrib();
 }
 
+\: infoGlyph (void; bool outline)
+{
+    glPushAttrib(GL_ENABLE_BIT);
+    glEnable(GL_BLEND);
+    glEnable(GL_LINE_SMOOTH);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    // Draw filled black circle (background)
+    glColor(0, 0, 0, 1);
+    drawCircleFan(0, 0, 0.5, 0, 1, .3, false);
+    
+    // Draw outline if requested
+    if (outline)
+    {
+        glLineWidth(2.5);
+        glColor(0.5, 0.5, 0.5, 1);  // Dark gray outline
+        drawCircleFan(0, 0, 0.5, 0, 1, .3, true);
+    }
+    
+    // Draw "i" character in light gray/white
+    glColor(0.85, 0.85, 0.85, 1);  // Light gray
+    glLineWidth(2.5);
+    
+    // Dot on top of "i"
+    drawCircleFan(0, 0.18, 0.06, 0, 1, .3, false);
+    
+    // Vertical line (stem of "i") - starts lower for more spacing from dot
+    glBegin(GL_LINES);
+    glVertex(0, 0.02);
+    glVertex(0, -0.25);
+    glEnd();
+    
+    glPopAttrib();
+}
+
 \: circleLerpGlyph (void; float start, bool outline)
 {
     let ch = 1;
@@ -308,13 +343,54 @@ operator: & (Glyph; Glyph a, Glyph b)
                           Color gcolor = Color(.2,.2,.2,1),
                           float[] lineSizes = nil)
 {
-    gltext.size(textsize);
-    
     // Auto-detect multiline text (check before adding glyph spacing)
     // Split by newline and check if we have more than one line
     let isMultiline = string.split(text, "\n").size() > 1;
     
-    if (g neq nil) text = "   " + text;
+    // Set text size for bounds calculation
+    // For single-line: use lineSizes[0] if available
+    // For multiline: use the LARGEST size from lineSizes to ensure cartouche fits all lines
+    float boundsSize = textsize;
+    if (lineSizes neq nil && lineSizes.size() > 0)
+    {
+        if (isMultiline)
+        {
+            // Find the maximum size from lineSizes for multiline
+            float maxSize = lineSizes[0];
+            for_index (i; lineSizes)
+            {
+                if (lineSizes[i] > maxSize) maxSize = lineSizes[i];
+            }
+            boundsSize = maxSize * devicePixelRatio();
+        }
+        else
+        {
+            // Single-line: use lineSizes[0]
+            boundsSize = lineSizes[0] * devicePixelRatio();
+        }
+    }
+    gltext.size(boundsSize);
+    
+    // Add glyph spacing to text
+    // For multiline, add spacing to each line individually
+    if (g neq nil)
+    {
+        if (isMultiline)
+        {
+            let lines = string.split(text, "\n");
+            string spacedText = "";
+            for_index (i; lines)
+            {
+                if (i > 0) spacedText += "\n";
+                spacedText += "   " + lines[i];
+            }
+            text = spacedText;
+        }
+        else
+        {
+            text = "   " + text;
+        }
+    }
 
     let b = if isMultiline then gltext.boundsNL(text) else gltext.bounds(text),
         a = gltext.ascenderHeight(),
@@ -363,12 +439,16 @@ operator: & (Glyph; Glyph a, Glyph b)
 
     if (g neq nil)
     {
-        let glyphX = x + horizontalOffset;
+        // Position glyph more to the left for multiline messages only
+        let glyphOffset = if isMultiline then (mx * 6.0) else 0.0;
+        let glyphX = x + horizontalOffset - glyphOffset;
+        // Scale glyph smaller for multiline messages (60% of original size)
+        let glyphRad = if isMultiline then rad * 0.6 else rad;
         glColor(gcolor);
-        draw(g, glyphX, ymid, 0, rad, false);
+        draw(g, glyphX, ymid, 0, glyphRad, false);
         glEnable(GL_LINE_SMOOTH);
         glColor(gcolor * 0.8);
-        draw(g, glyphX, ymid, 0, rad, true);
+        draw(g, glyphX, ymid, 0, glyphRad, true);
     }
 
 
@@ -454,7 +534,19 @@ operator: & (Glyph; Glyph a, Glyph b)
         }
     }
     else 
+    {
+        // Single-line text: Use lineSizes[0] if available, otherwise use textsize
+        if (lineSizes neq nil && lineSizes.size() > 0)
+        {
+            let lineSize = lineSizes[0] * devicePixelRatio();
+            gltext.size(lineSize);
+        }
+        else
+        {
+            gltext.size(textsize);
+        }
         gltext.writeAt(x, y, text);
+    }
 
     return BBox(x0 - rad, y0, x1 + rad, y1);
 }

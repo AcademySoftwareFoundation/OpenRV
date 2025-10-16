@@ -5132,8 +5132,24 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
     if (state.feedbackText eq nil) return;
 
-    let devicePixelRatio = devicePixelRatio(),
-        textsize = 20 * devicePixelRatio;
+    let devicePixelRatio = devicePixelRatio();
+    
+    // Calculate actual text size for positioning
+    // Use the maximum from feedbackTextSizes if available, otherwise use default
+    float actualTextSize = DefaultFeedbackTextSize;
+    if (state.feedbackTextSizes neq nil && state.feedbackTextSizes.size() > 0)
+    {
+        // Find max size for positioning
+        actualTextSize = state.feedbackTextSizes[0];
+        for_index (i; state.feedbackTextSizes)
+        {
+            if (state.feedbackTextSizes[i] > actualTextSize) 
+                actualTextSize = state.feedbackTextSizes[i];
+        }
+    }
+    
+    let textsize = DefaultFeedbackTextSize * devicePixelRatio,  // Default size for rendering
+        positionSize = actualTextSize * devicePixelRatio;  // Actual size for positioning
     gltext.size(textsize);
 
     let d  = event.domain(),
@@ -5166,8 +5182,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     let m = margins();
-    drawTextWithCartouche(m[0]*devicePixelRatio + textsize,
-                          h-textsize-sb[3] - m[2]*devicePixelRatio,
+    drawTextWithCartouche(m[0]*devicePixelRatio + positionSize,
+                          h-positionSize-sb[3] - m[2]*devicePixelRatio,
                           state.feedbackText,
                           textsize, fg, bg,
                           state.feedbackGlyph, gc,
