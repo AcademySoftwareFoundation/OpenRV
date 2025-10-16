@@ -3913,7 +3913,8 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     state.feedbackText  = "";
     state.feedback      = 0;
     state.feedbackGlyph = nil;
-    state.feedbackQueueEnabled = true;
+    state.feedbackQueueEnabled = true;   // Reset to default (enabled)
+    state.feedbackQueueTruncate = false;  // Reset to default (enabled)
     state.feedbackQueue = (string, float, Glyph, float[])[]();
     state.pixelInfo     = nil;
     state.scrubAudio    = false;
@@ -5141,9 +5142,20 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         bg = state.config.bgFeedback,
         fg = state.config.fgFeedback,
         gc = bg * .7,
-        ct = state.feedback - elapsedTime(),
+        elapsed = elapsedTime(),
+        ct = state.feedback - elapsed,
         p  = if ct > 1.0 then 1.0 else (if ct < 0.0 then 0.0 else ct),
         sb = gltext.boundsNL(state.feedbackText);    // size of frame string
+
+    // Check if truncation feature is enabled and queue has messages
+    // If so, current message will be truncated to 1.5 second
+    let hasQueuedMessages = (state.feedbackQueueEnabled && 
+                            state.feedbackQueue neq nil && 
+                            state.feedbackQueue.size() > 0);
+    let shouldExpireEarly = (state.feedbackQueueEnabled && 
+                            state.feedbackQueueTruncate && 
+                            hasQueuedMessages && 
+                            elapsed >= 1.5);
 
     bg.w = p;   // animate opacity
     fg.w = p;
@@ -5162,13 +5174,15 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                           state.feedbackTextSizes);
     glDisable(GL_BLEND);
 
-    if (ct <= 0 || !isTimerRunning())
+    if (ct <= 0 || !isTimerRunning() || shouldExpireEarly)
     {
         state.feedback = 0.0;
         stopTimer();
         
-        // Check if there are queued messages to display
-        if (state.feedbackQueue neq nil && state.feedbackQueue.size() > 0)
+        // Check if queue feature is enabled and there are queued messages to display
+        if (state.feedbackQueueEnabled && 
+            state.feedbackQueue neq nil && 
+            state.feedbackQueue.size() > 0)
         {
             let nextMessage = state.feedbackQueue[0];
             
@@ -7402,7 +7416,8 @@ global bool debugGC = false;
 {
     s.config           = globalConfig;
     s.feedback         = 0;
-    s.feedbackQueueEnabled = true;
+    s.feedbackQueueEnabled = true;   // Set to false to disable queue feature
+    s.feedbackQueueTruncate = false;  // Set to false to disable 1s truncation when queue has items
     s.feedbackQueue    = (string, float, Glyph, float[])[]();
     s.showMatte        = false;
     s.matteOpacity     = 0.66;

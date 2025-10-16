@@ -130,7 +130,9 @@ require system;
     }
     else
     {
-        // Queue this message for later display
+        // A message is currently displaying - queue this message
+        // When multiple message are in the queue, their duration is reduced to go through
+        // the queue faster. (see drawFeedback in extra_commands.mu)
         state.feedbackQueue.push_back((text, duration, g, textSizes));
     }
     
