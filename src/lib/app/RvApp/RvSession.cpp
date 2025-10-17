@@ -501,7 +501,47 @@ namespace Rv
                 }
                 else // not a directory, so it's a movie, add to preloader.
                 {
-                    m_session->startPreloadingMedia(filename);
+                    if (isDir)
+                    {
+                        // If the directory contains multiple files, we
+                        // evaluate the directory-filter event to see if we
+                        // should filter out some of the files.
+                        string newfile;
+                        for (int i = 0; i < inputPatterns.size(); ++i)
+                        {
+                            string eval = m_session->userGenericEvent(
+                                "directory-filter", inputPatterns[i]);
+                            if (eval.empty())
+                            {
+                                newfile = filename;
+                                // If they dont specify a filter we assume its
+                                // the first file. and assume there isn't a
+                                // filter, so we can just skip the loop.
+                                break;
+                            }
+                            if (eval[0] == '0')
+                            {
+                                // If the filter returns a string starting with
+                                // '0', we assume that the user wants to filter
+                                // out that file. So we remove it from the list
+                                // of input patterns. We also decrement the
+                                // index to account for the removed file.
+                                inputPatterns.erase(inputPatterns.begin() + i);
+                                --i;
+                                continue;
+                            }
+                            if (i == 0)
+                                // special case for the first file in the
+                                // directory to start preloading.
+                                m_session->startPreloadingMedia(
+                                    inputPatterns[i]);
+                        }
+                    }
+                    else
+                    {
+                        // not a directory, so it's a movie, add to preloader.
+                        m_session->startPreloadingMedia(filename);
+                    }
                 }
             }
 
@@ -1381,7 +1421,7 @@ namespace Rv
             else
             {
                 TWK_THROW_STREAM(IPCore::ReadFailedExc,
-                                 "Direcory contains too many sequences");
+                                 "Directory contains too many sequences");
             }
         }
 
