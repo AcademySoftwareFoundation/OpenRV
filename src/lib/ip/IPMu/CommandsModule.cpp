@@ -4157,6 +4157,41 @@ namespace IPMu
         NODE_RETURN(s->filterLiveReviewEvents());
     }
 
+    NODE_IMPLEMENTATION(enableEventCategory, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (s && category)
+        {
+            s->enableEventCategory(category->c_str());
+        }
+    }
+
+    NODE_IMPLEMENTATION(disableEventCategory, void)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (s && category)
+        {
+            s->disableEventCategory(category->c_str());
+        }
+    }
+
+    NODE_IMPLEMENTATION(isEventCategoryEnabled, bool)
+    {
+        Session* s = Session::currentSession();
+        StringType::String* category = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (s && category)
+        {
+            return s->isEventCategoryEnabled(category->c_str());
+        }
+
+        return true; // Default to enabled if no session or category
+    }
+
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
     {
         Session* s = Session::currentSession();
@@ -6416,6 +6451,18 @@ namespace IPMu
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", End),
+
+            new Function(c, "enableEventCategory", enableEventCategory, None,
+                         Return, "void", Parameters,
+                         new Param(c, "category", "string"), End),
+
+            new Function(c, "disableEventCategory", disableEventCategory, None,
+                         Return, "void", Parameters,
+                         new Param(c, "category", "string"), End),
+
+            new Function(c, "isEventCategoryEnabled", isEventCategoryEnabled,
+                         None, Return, "bool", Parameters,
+                         new Param(c, "category", "string"), End),
 
             new Function(c, "previousViewNode", previousViewNode, None, Return,
                          "string", End),

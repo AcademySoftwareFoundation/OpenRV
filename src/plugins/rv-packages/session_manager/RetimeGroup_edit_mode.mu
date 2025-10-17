@@ -15,7 +15,6 @@ use glyph;
 use app_utils;
 use io;
 use system;
-use app_utils;
 use extra_commands;
 use session_manager;
 
@@ -217,31 +216,31 @@ class: RetimeGroupEditMode : MinorMode
              nil,
              [("session-manager-load-ui", loadUI, "Load UI into Session Manager"),
               ("graph-state-change", propertyChanged,  "Maybe update session UI")],
-             Menu {
-                 {"Retime", Menu {
-                     {"Convert to FPS", Menu {
-                             {"24", convertToFPS(,24), nil, nil},
-                             {"25", convertToFPS(,25), nil, nil},
-                             {"23.98", convertToFPS(,23.98), nil, nil},
-                             {"30", convertToFPS(,30), nil, nil},
-                             {"29.97", convertToFPS(,29.97), nil, nil},
-                             {"_", nil, nil, nil},
-                             {"Custom...", editFPS, nil, nil}
-                     }},
-                     {"_", nil, nil, nil},
-                     {"Slow Down by Factor...", slowDownFactor, nil, nil},
-                     {"Speed Up By Factor...", speedUpFactor, nil, nil},
-                     {"Reverse", reverseTiming, nil, nil},
-                     {"_", nil, nil, nil},
-                     {"Edit Raw", nil, nil, inactiveState},
-                     {"    Visual Scale...", editVScale, nil, nil},
-                     {"    Visual Offset...", editVOffset, nil, nil},
-                     {"    Audio Scale...", editAScale, nil, nil},
-                     {"    Audio Offset...", editAOffset, nil, nil},
-                     {"_", nil, nil, nil},
-                     {"Reset Timing", resetTiming, nil, nil}
-                     }
-                 }},
+             newMenu(MenuItem[] {
+                 subMenu("Retime", MenuItem[] {
+                     subMenu("Convert to FPS", MenuItem[] {
+                             menuItem("24", "", "", convertToFPS(,24), enabledItem),
+                             menuItem("25", "", "", convertToFPS(,25), enabledItem),
+                             menuItem("23.98", "", "", convertToFPS(,23.98), enabledItem),
+                             menuItem("30", "", "", convertToFPS(,30), enabledItem),
+                             menuItem("29.97", "", "", convertToFPS(,29.97), enabledItem),
+                             menuSeparator(),
+                             menuItem("Custom...", "", "", editFPS, enabledItem)
+                     }),
+                     menuSeparator(),
+                     menuItem("Slow Down by Factor...", "", "", slowDownFactor, enabledItem),
+                     menuItem("Speed Up By Factor...", "", "", speedUpFactor, enabledItem),
+                     menuItem("Reverse", "", "", reverseTiming, enabledItem),
+                     menuSeparator(),
+                     menuText("Edit Raw"),
+                     menuItem("    Visual Scale...", "", "", editVScale, enabledItem),
+                     menuItem("    Visual Offset...", "", "", editVOffset, enabledItem),
+                     menuItem("    Audio Scale...", "", "", editAScale, enabledItem),
+                     menuItem("    Audio Offset...", "", "", editAOffset, enabledItem),
+                     menuSeparator(),
+                     menuItem("Reset Timing", "", "", resetTiming, enabledItem)
+                 })
+             }),
              nil);
     }
 }

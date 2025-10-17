@@ -1087,6 +1087,68 @@ Pointer string_substr_string_string_int_int(Mu::Thread& NODE_THREAD,
     return c->stringType()->allocate(os);
 }
 
+int string_contains_int_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
+                                      Pointer bptr)
+{
+    const StringType::String* str = reinterpret_cast<StringType::String*>(aptr);
+    const StringType::String* search =
+        reinterpret_cast<StringType::String*>(bptr);
+    if (!str || !search)
+        throw NilArgumentException(NODE_THREAD);
+
+    UTF8String text = str->utf8();
+    UTF8String searchStr = search->utf8();
+
+    UTF8String::size_type pos = text.find(searchStr);
+    if (pos == UTF8String::npos)
+        return -1;
+
+    // Convert byte position to character position
+    const char* textPtr = text.c_str();
+    int charIndex = 0;
+    for (size_t i = 0; i < pos; ++charIndex)
+    {
+        int n;
+        UTF8convert(textPtr + i, n);
+        i += n;
+    }
+
+    return charIndex;
+}
+
+Pointer string_replace_string_string_string_string(Mu::Thread& NODE_THREAD,
+                                                   Pointer aptr, Pointer bptr,
+                                                   Pointer cptr)
+{
+    const StringType::String* str = reinterpret_cast<StringType::String*>(aptr);
+    const StringType::String* search =
+        reinterpret_cast<StringType::String*>(bptr);
+    const StringType::String* replacement =
+        reinterpret_cast<StringType::String*>(cptr);
+    if (!str || !search || !replacement)
+        throw NilArgumentException(NODE_THREAD);
+
+    Process* p = NODE_THREAD.process();
+    MuLangContext* c = static_cast<MuLangContext*>(p->context());
+
+    UTF8String text = str->utf8();
+    UTF8String searchStr = search->utf8();
+    UTF8String replaceStr = replacement->utf8();
+
+    UTF8String::size_type pos = text.find(searchStr);
+    if (pos == UTF8String::npos)
+    {
+        // Not found, return original string
+        return c->stringType()->allocate(text);
+    }
+
+    // Replace first occurrence
+    UTF8String result = text;
+    result.replace(pos, searchStr.length(), replaceStr);
+
+    return c->stringType()->allocate(result);
+}
+
 //----------------------------------------------------------------------
 
 namespace Mu
@@ -1692,6 +1754,18 @@ namespace Mu
                          string_hash_int_string, Return, "int", Parameters,
                          new ParameterVariable(c, "this", "string"), End),
 
+            new Function(c, "contains", StringType::contains, Mapped, Compiled,
+                         string_contains_int_string_string, Return, "int",
+                         Parameters, new ParameterVariable(c, "this", "string"),
+                         new ParameterVariable(c, "search", "string"), End),
+
+            new Function(
+                c, "replace", StringType::replace, Mapped, Compiled,
+                string_replace_string_string_string_string, Return, "string",
+                Parameters, new ParameterVariable(c, "this", "string"),
+                new ParameterVariable(c, "search", "string"),
+                new ParameterVariable(c, "replacement", "string"), End),
+
             EndArguments);
     }
 
@@ -1953,6 +2027,19 @@ namespace Mu
         NODE_RETURN(string_substr_string_string_int_int(
             NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int),
             NODE_ARG(2, int)));
+    }
+
+    NODE_IMPLEMENTATION(StringType::contains, int)
+    {
+        NODE_RETURN(string_contains_int_string_string(
+            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    }
+
+    NODE_IMPLEMENTATION(StringType::replace, Pointer)
+    {
+        NODE_RETURN(string_replace_string_string_string_string(
+            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+            NODE_ARG(2, Pointer)));
     }
 
 } // namespace Mu

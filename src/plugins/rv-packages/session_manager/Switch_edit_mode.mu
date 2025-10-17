@@ -237,12 +237,12 @@ class: SwitchEditMode : MinorMode
 
     method: menu (Menu;)
     {
-        Menu {
-            {"Switch", Menu {
-                {"Align Start Frames", alignStartFrames, nil, stateFunc("alignStartFrames")},
-                {"Use Source Cut Info", useCutInfo, nil, stateFunc("useCutInfo")}
-            }
-        }};
+        newMenu(MenuItem[] {
+            subMenu("Switch", MenuItem[] {
+                menuItem("Align Start Frames", "", "", alignStartFrames, stateFunc("alignStartFrames")),
+                menuItem("Use Source Cut Info", "", "", useCutInfo, stateFunc("useCutInfo"))
+            })
+        });
     }
 
     method: activate (void;)
