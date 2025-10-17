@@ -28,8 +28,21 @@ Glyph               := (void; bool);
 
 //
 // FeedbackMessage: Encapsulates a feedback message for queue storage
-// Using a class instead of tuples properly handles nil values (Glyph, float[])
-// which cause memory corruption when stored directly in tuples
+//
+// This must be a class, NOT a tuple or struct.
+//
+// Based on observation, not 100% sure of its exactitude:
+//
+// Problem: Mu's dynamic arrays cannot properly handle tuples containing nil 
+// function pointers (Glyph := (void; bool)) or nil arrays (float[]). When 
+// stored as tuples like (string, float, Glyph, float[])[], the nil values 
+// cause memory corruption in the dynamic array, leading to crashes when 
+// calling .size() or accessing elements.
+//
+// Solution: Classes properly handle nil member values in Mu. This class wraps
+// the feedback message data, allowing the queue (FeedbackMessage[]) to safely
+// store and retrieve messages with nil glyphs or nil textSizes without 
+// corruption.
 //
 class: FeedbackMessage
 {

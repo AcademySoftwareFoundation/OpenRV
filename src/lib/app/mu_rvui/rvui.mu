@@ -5165,9 +5165,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
     // Check if truncation feature is enabled and queue has messages
     // If so, current message will be truncated to 1.5 second
-    let hasQueuedMessages = (state.feedbackQueueEnabled && 
-                            state.feedbackQueue neq nil && 
-                            state.feedbackQueue.size() > 0);
+    bool hasQueuedMessages = false;
+    if (state.feedbackQueueEnabled && state.feedbackQueue neq nil)
+    {
+        hasQueuedMessages = (state.feedbackQueue.size() > 0);
+    }
+    
     let shouldExpireEarly = (state.feedbackQueueEnabled && 
                             state.feedbackQueueTruncate && 
                             hasQueuedMessages && 
@@ -5196,26 +5199,45 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         stopTimer();
         
         // Check if queue feature is enabled and there are queued messages to display
-        if (state.feedbackQueueEnabled && 
-            state.feedbackQueue neq nil && 
-            state.feedbackQueue.size() > 0)
+        if (state.feedbackQueueEnabled && state.feedbackQueue neq nil)
         {
-            let nextMessage = state.feedbackQueue[0];
+            let queueSize = state.feedbackQueue.size();
             
-            // Remove first element by creating new array without it
-            FeedbackMessage[] newQueue;
-            for_index (i; state.feedbackQueue)
+            if (queueSize > 0)
             {
-                if (i > 0) newQueue.push_back(state.feedbackQueue[i]);
+                let nextMessage = state.feedbackQueue[0];
+                
+                //
+                // Remove first element using in-place shifting and resizing.
+                // DO NOT create a new array and assign it back to state.feedbackQueue.
+                //
+                // Problem: Creating a local array and assigning it to a state member
+                // causes Mu's memory management to corrupt the array:
+                //
+                //   FeedbackMessage[] newQueue;           // Local variable
+                //   for_index (i; state.feedbackQueue)
+                //       if (i > 0) newQueue.push_back(...);
+                //   state.feedbackQueue = newQueue;       // Corruption?
+                //
+                // After assignment, calling .size() on state.feedbackQueue crashes
+                // because the local variable's memory is freed or invalidated.
+                //
+                // Solution: Modify the existing state.feedbackQueue array in-place
+                // by shifting elements and resizing, avoiding local variable issues.
+                //
+                for (int i = 0; i < queueSize - 1; ++i)
+                {
+                    state.feedbackQueue[i] = state.feedbackQueue[i+1];
+                }
+                state.feedbackQueue.resize(queueSize - 1);
+                
+                // Extract values from FeedbackMessage class
+                state.feedbackText = nextMessage.text;
+                state.feedback = nextMessage.duration;
+                state.feedbackGlyph = nextMessage.glyph;
+                state.feedbackTextSizes = nextMessage.textSizes;
+                startTimer();
             }
-            state.feedbackQueue = newQueue;
-            
-            // Extract values from FeedbackMessage class
-            state.feedbackText = nextMessage.text;
-            state.feedback = nextMessage.duration;
-            state.feedbackGlyph = nextMessage.glyph;
-            state.feedbackTextSizes = nextMessage.textSizes;
-            startTimer();
         }
     }
     //

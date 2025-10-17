@@ -133,7 +133,15 @@ require system;
         // A message is currently displaying - queue this message
         // When multiple message are in the queue, their duration is reduced to go through
         // the queue faster. (see drawFeedback in rvui.mu)
-        // Using FeedbackMessage class to properly handle nil values (Glyph, float[])
+        //
+        // Based on observation, not 100% sure of its exactitude:
+        //
+        // Use FeedbackMessage class instead of tuples because Mu's
+        // dynamic arrays cannot safely store tuples with nil function pointers
+        // (Glyph) or nil arrays (float[]). The class properly encapsulates these
+        // values and prevents memory corruption. See FeedbackMessage in rvtypes.mu
+        // for detailed explanation.
+        //
         state.feedbackQueue.push_back(FeedbackMessage(text, duration, g, textSizes));
     }
     
