@@ -19,7 +19,7 @@ namespace TwkFB
 {
     using namespace std;
     using namespace TwkUtil;
-    using namespace OpenImageIO_v2_4;
+    using namespace OpenImageIO_v2_5;
 
     IOoiio::IOoiio()
         : FrameBufferIO("IOoiio", "n") // OIIO after any defaults of ours
@@ -358,7 +358,7 @@ namespace TwkFB
         {
             TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \""
                                               << filename << "\" for reading. "
-                                              << OpenImageIO_v2_4::geterror());
+                                              << OpenImageIO_v2_5::geterror());
         }
     }
 
@@ -485,7 +485,7 @@ namespace TwkFB
         {
             TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \""
                                               << filename << "\" for reading. "
-                                              << OpenImageIO_v2_4::geterror());
+                                              << OpenImageIO_v2_5::geterror());
         }
     }
 
