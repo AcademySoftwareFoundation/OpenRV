@@ -1,29 +1,23 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from rv import commands as rvc
 from rv import extra_commands as rve
 from rv import rvtypes as rvt
 
-import os
-import sys
-import re
-
 
 def getColorSelectNodes():
-
     try:
         return rvc.nodesOfType("ChannelSelect")
-    except:
+    except Exception:
         pass
 
     return None
 
 
 def channelIs(node, num):
-
     active = rvc.getIntProperty(node + ".node.active")[0]
     chan = rvc.getIntProperty(node + ".parameters.channel")[0]
 
@@ -32,19 +26,12 @@ def channelIs(node, num):
 
 class ColorSelectMode(rvt.MinorMode):
     def readPrefs(self):
-
-        self._postDisplaySelect = bool(
-            rvc.readSettings("channel_select", "postDisplaySelect", False)
-        )
+        self._postDisplaySelect = bool(rvc.readSettings("channel_select", "postDisplaySelect", False))
 
     def writePrefs(self):
-
-        rvc.writeSettings(
-            "channel_select", "postDisplaySelect", self._postDisplaySelect
-        )
+        rvc.writeSettings("channel_select", "postDisplaySelect", self._postDisplaySelect)
 
     def addChannelSelect(self):
-
         if self._postDisplaySelect:
             groups = []
             for dg in rvc.nodesOfType("RVDisplayGroup"):
@@ -57,7 +44,7 @@ class ColorSelectMode(rvt.MinorMode):
         for g in groups:
             nodes = rvc.getStringProperty(g + ".pipeline.nodes")
 
-            if not ("ChannelSelect" in nodes):
+            if "ChannelSelect" not in nodes:
                 nodes += ["ChannelSelect"]
                 rvc.setStringProperty(g + ".pipeline.nodes", nodes, True)
 
@@ -70,7 +57,6 @@ class ColorSelectMode(rvt.MinorMode):
 
     def toggleChannel(self, num):
         def foo(event):
-
             self.addChannelSelect()
 
             nodes = getColorSelectNodes()
@@ -93,18 +79,15 @@ class ColorSelectMode(rvt.MinorMode):
         return foo
 
     def togglePostDisplaySelect(self, event):
-
         self._postDisplaySelect = not self._postDisplaySelect
         self.writePrefs()
 
     def postDisplaySelectState(self):
-
         if self._postDisplaySelect:
             return rvc.CheckedMenuState
         return rvc.UncheckedMenuState
 
     def __init__(self):
-
         rvt.MinorMode.__init__(self)
 
         self.readPrefs()
@@ -137,5 +120,4 @@ class ColorSelectMode(rvt.MinorMode):
 
 
 def createMode():
-
     return ColorSelectMode()

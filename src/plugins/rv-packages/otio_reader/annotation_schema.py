@@ -63,13 +63,9 @@ class Annotation(otio.schema.Effect):
     def layers(self, val: list):
         self._layers = val
 
-    hold = otio.core.serializable_field(
-        "hold", required_type=bool, doc=("hold: expects either true or false")
-    )
+    hold = otio.core.serializable_field("hold", required_type=bool, doc=("hold: expects either true or false"))
 
-    ghost = otio.core.serializable_field(
-        "ghost", required_type=bool, doc=("ghost: expects either true or false")
-    )
+    ghost = otio.core.serializable_field("ghost", required_type=bool, doc=("ghost: expects either true or false"))
 
     ghost_before = otio.core.serializable_field(
         "ghost_before", required_type=int, doc=("ghost_before: expects an integer")

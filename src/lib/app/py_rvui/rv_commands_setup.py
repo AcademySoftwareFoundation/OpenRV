@@ -453,7 +453,7 @@ def bind_symbols(symbol_list, module_name, mod):
         try:
             s = MuSymbol(module_name + "." + sym)
             setattr(mod, sym, s)
-        except:
+        except Exception:
             print("Bind to python failed:", sym)
 
 
@@ -461,7 +461,7 @@ def bind_constants(constant_list, mod):
     for const_pair in constant_list:
         try:
             setattr(mod, const_pair[0], const_pair[1])
-        except:
+        except Exception:
             print("Bind to python failed:", sym)
 
 

@@ -35,6 +35,26 @@ env:
   WINDOWS_QT6_ARCHIVES: 'd3dcompiler_47 opengl32sw qtbase qtdeclarative qtsvg qttools qttranslations'
 
 jobs:
+  lint-format:
+    name: "Lint and Format"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install ruff
+      - name: Run Ruff check
+        # Check if all the files are linted correctly
+        # Output errors as inline annotations
+        run: ruff check --output-format=github
+      - name: Run Ruff format
+        # Check if all the files are formatted correctly
+        run: ruff format --check
   rocky-linux:
     if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
@@ -202,8 +222,29 @@ jobs:
       - name: Install other system dependencies
         if: ${{ matrix.rocky-version == '9' }}
         run: |
-          dnf install -y perl-CPAN
-          cpan FindBin
+          retry_count=0
+          max_retries=5
+
+          until [ $retry_count -ge $max_retries ]; do
+            echo "Attempt $((retry_count + 1)) of $max_retries"
+
+            if dnf install -y perl-CPAN && \
+              cpan FindBin; then
+              echo "Dependencies installed successfully"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              if [ $retry_count -lt $max_retries ]; then
+                echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+                sleep 5
+              fi
+            fi
+          done
+          
+          if [ $retry_count -ge $max_retries ]; then
+            echo "Failed to install dependencies after $max_retries attempts"
+            exit 1
+          fi
 
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7

@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from __future__ import print_function
 
@@ -16,7 +16,6 @@ import time
 import sys
 import select
 import threading
-import string
 
 protocolVersion = 115
 
@@ -25,7 +24,7 @@ rvmon = None
 rvmonProc = None
 
 doDebug = False
-if os.getenv("RV_NUKE_DEBUG") != None:
+if os.getenv("RV_NUKE_DEBUG") is not None:
     doDebug = True
 
 
@@ -45,7 +44,6 @@ def encodeNL(str):
 
 
 def initRvMon():
-
     global rvmon
     if not rvmon:
         rvmon = RvMonitor()
@@ -54,12 +52,11 @@ def initRvMon():
 
 
 def pythonHandler(eventContents):
-
     try:
         log("pythonHandler exec '%s'" % eventContents)
         exec(eventContents, globals(), locals())
         # nuke.executeInMainThread (nuke.selectPattern)
-    except:
+    except Exception:
         log("Remote python exec error: %s\n" % sys.exc_info()[1])
 
 
@@ -154,7 +151,6 @@ class RvMonitor:
         nuke.addOnScriptLoad(self.onScriptLoad)
 
     def __del__(self):
-
         #   Squirrel away a ref to the Popen object because it has a bug that
         #   will print an error message when we delete it if we do it at this
         #   point.  This prevents it from getting garbage collected until later.
@@ -222,28 +218,21 @@ class RvMonitor:
         if not node or type(node).__name__ != "Node":
             return
 
-        if self.syncReadChanges and (
-            str(node.Class()) == "Read" or str(node.Class()) == "Write"
-        ):
+        if self.syncReadChanges and (str(node.Class()) == "Read" or str(node.Class()) == "Write"):
             self.queueCommand('self.viewReadsInRv(["%s"])' % node.name())
 
     def onDestroy(self):
-
         log("onDestroy")
         node = nuke.thisNode()
         if node and type(node).__name__ == "Node":
             log("destroying node of class '%s'" % str(node.Class()))
-            if self.syncReadChanges and (
-                str(node.Class()) == "Read" or str(node.Class()) == "Write"
-            ):
+            if self.syncReadChanges and (str(node.Class()) == "Read" or str(node.Class()) == "Write"):
                 self.queueCommand("self.removeObsoleteReads()")
 
     def updateAndSyncSelection(self, force=False):
-
         nodes = nuke.selectedNodes()
 
         if len(nodes) == 1:
-
             node = nodes[0]
 
             if node.Class() == "Viewer":
@@ -252,10 +241,7 @@ class RvMonitor:
             if not node:
                 return
 
-            log(
-                "updateAndSyncSelection old %s new %s"
-                % (self.selectedNode, node.name())
-            )
+            log("updateAndSyncSelection old %s new %s" % (self.selectedNode, node.name()))
             if force or node.name() != self.selectedNode:
                 self.selectedNode = node.name()
                 self.queueCommand("self.selectCurrentByNodeName()")
@@ -264,7 +250,6 @@ class RvMonitor:
             self.selectedNode = None
 
     def knobChanged(self):
-
         nname = ""
         kname = ""
         if doDebug:
@@ -273,25 +258,18 @@ class RvMonitor:
                     log("type '%s'" % type(nuke.thisNode()).__name__)
                     log("class '%s'" % nuke.thisNode().Class())
                     nname = nuke.thisNode().name()
-                except:
+                except Exception:
                     pass
             if nuke.thisKnob():
                 kname = nuke.thisKnob().name()
-            log(
-                "knobChanged node '%s' knob '%s' val '%s'\n"
-                % (nname, kname, str(nuke.thisKnob().value()))
-            )
+            log("knobChanged node '%s' knob '%s' val '%s'\n" % (nname, kname, str(nuke.thisKnob().value())))
 
         node = nuke.thisNode()
         knob = nuke.thisKnob()
         if not node or not knob:
             return
 
-        if (
-            type(node).__name__ != "Node"
-            and type(node).__name__ != "Root"
-            and type(node).__name__ != "Viewer"
-        ):
+        if type(node).__name__ != "Node" and type(node).__name__ != "Root" and type(node).__name__ != "Viewer":
             return
 
         #
@@ -304,12 +282,7 @@ class RvMonitor:
         #
         #   Track frame changes
         #
-        elif (
-            self.syncFrameChange
-            and str(node.Class()) == "Viewer"
-            and knob.name() == "frame"
-            and self.running
-        ):
+        elif self.syncFrameChange and str(node.Class()) == "Viewer" and knob.name() == "frame" and self.running:
             log("frame change")
             self.queueCommand("self.changeFrame(%d)" % knob.value())
 
@@ -402,7 +375,6 @@ class RvMonitor:
             return
 
         while self.running:
-
             if not self.rvc.connected:
                 log("not connected in spawn loop")
                 self.running = False
@@ -420,11 +392,11 @@ class RvMonitor:
                         break
                     log("running queued command '%s'" % cmd)
                     self.eval(cmd)
-            except:
+            except Exception:
                 log("can't send messages to RV, shutting down.")
                 try:
                     self.rvc.disconnect()
-                except:
+                except Exception:
                     pass
                 self.running = False
                 self.crashFlag.set()
@@ -439,7 +411,7 @@ class RvMonitor:
                 # log ("selecting")
                 select.select([self.rvc.sock], [], [], 0.1)
                 # log ("selecting done")
-            except:
+            except Exception:
                 log("rvc select/wait error: %s" % sys.exc_info()[1])
 
             #
@@ -448,11 +420,11 @@ class RvMonitor:
             try:
                 # log ("process rv events")
                 self.rvc.processEvents()
-            except:
+            except Exception:
                 log("can't process messages from the RV side, shutting down.")
                 try:
                     self.rvc.disconnect()
-                except:
+                except Exception:
                     pass
                 self.running = False
                 self.crashFlag.set()
@@ -481,7 +453,7 @@ class RvMonitor:
                 # self.rvProc.kill()
                 # self.rvProc.wait()
                 # log ("returncode %s" % self.rvProc.returncode))
-        except:
+        except Exception:
             log("error terminating RV: %s\n" % sys.exc_info()[1])
 
         self.initialized = False
@@ -517,7 +489,7 @@ class RvMonitor:
             try:
                 src = os.environ["SRC_ROOT"]
                 usingBuild = True
-            except:
+            except Exception:
                 pass
 
             cmd = [src + "/build/run", "--p", src + "/bin/nsapps/RV64"]
@@ -536,24 +508,20 @@ class RvMonitor:
         log("starting cmd %s" % str(fullcmd))
         try:
             os.remove(self.portFile)
-        except:
+        except Exception:
             pass
 
         try:
             self.rvProc = subprocess.Popen(fullcmd)
             self.rvProc.poll()
             if self.rvProc.returncode:
-                log(
-                    "ERROR: failed to start RV '%s' return: %d"
-                    % (cmd[0], self.rvProc.returncode)
-                )
+                log("ERROR: failed to start RV '%s' return: %d" % (cmd[0], self.rvProc.returncode))
                 print(
-                    "ERROR: failed to start RV '%s' return: %d\n"
-                    % (cmd[0], self.rvProc.returncode),
+                    "ERROR: failed to start RV '%s' return: %d\n" % (cmd[0], self.rvProc.returncode),
                     file=sys.stderr,
                 )
                 return
-        except:
+        except Exception:
             log("ERROR: failed to start RV '%s'" % cmd[0])
             print("ERROR: failed to start RV '%s'\n" % cmd[0], file=sys.stderr)
             return
@@ -576,7 +544,7 @@ class RvMonitor:
 
         try:
             os.remove(self.portFile)
-        except:
+        except Exception:
             pass
 
         if self.port != 0:
@@ -588,12 +556,10 @@ class RvMonitor:
             self.rvc.handlers["remote-python-eval"] = pythonHandler
 
     def queueCommand(self, cmd):
-
         log("queueCommand '%s'" % cmd)
         self.commands.append(cmd)
 
     def setSessionDir(self):
-
         #    XXX check running ?
         self.rvc.remoteEval(
             """
@@ -608,14 +574,10 @@ class RvMonitor:
             return
 
         if self.syncReadChanges:
-
             readNodes = [
                 n.name()
                 for n in nuke.allNodes()
-                if (
-                    type(n).__name__ == "Node"
-                    and (n.Class() == "Read" or n.Class() == "Write")
-                )
+                if (type(n).__name__ == "Node" and (n.Class() == "Read" or n.Class() == "Write"))
             ]
             if readNodes:
                 self.queueCommand("self.viewReadsInRv(%s)" % str(readNodes))
@@ -629,7 +591,6 @@ class RvMonitor:
             self.queueCommand("self.changeFrame(%d)" % nuke.frame())
 
     def prepForRender(self, node, renderType):
-
         log("prepForRender %s %s" % (node.name(), renderType))
 
         baseDir = self.sessionDir + "/" + renderType
@@ -651,7 +612,6 @@ class RvMonitor:
         return dateString
 
     def renderTmpFiles(self, node, seqDir, start, end, incr):
-
         log("renderTmpFiles %s %s %s %s %s" % (node.name(), seqDir, start, end, incr))
 
         """
@@ -717,7 +677,7 @@ class RvMonitor:
             log("making directory '%s'" % sessionDir)
             try:
                 os.makedirs(sessionDir)
-            except:
+            except Exception:
                 pass
 
         self.queueCommand("self.setSessionDir()")
@@ -786,10 +746,7 @@ class RvMonitor:
         readNodes = [
             n.name()
             for n in nuke.allNodes()
-            if (
-                type(n).__name__ == "Node"
-                and (n.Class() == "Read" or n.Class() == "Write")
-            )
+            if (type(n).__name__ == "Node" and (n.Class() == "Read" or n.Class() == "Write"))
         ]
         if not readNodes:
             readsStr = "string[] {}"
@@ -801,11 +758,7 @@ class RvMonitor:
 
         log("    readsStr %s" % readsStr)
 
-        remote = (
-            "require rvnuke_mode; rvnuke_mode.theMode().removeObsoleteReads ("
-            + readsStr
-            + ");"
-        )
+        remote = "require rvnuke_mode; rvnuke_mode.theMode().removeObsoleteReads (" + readsStr + ");"
 
         log("    remote %s" % remote)
         self.rvc.remoteEval(remote)
@@ -833,9 +786,7 @@ class RvMonitor:
             # lasts.append  (node["last"].value())
             firsts.append(node.firstFrame())
             lasts.append(node.lastFrame())
-            spaces.append(
-                re.sub("default \((.*)\)", "\g<1>", node["colorspace"].value())
-            )
+            spaces.append(re.sub("default \((.*)\)", "\g<1>", node["colorspace"].value()))
             labels.append(encodeNL(node["label"].value()))
             classes.append(node.Class())
             ro = "0"
@@ -876,18 +827,15 @@ class RvMonitor:
 
         log("    nameStr %s" % nameStr)
 
-        remote = (
-            "require rvnuke_mode; rvnuke_mode.theMode().viewReadNodes (%s, %s, %s, %s, %s, %s, %s, %s);"
-            % (
-                nameStr,
-                mediaStr,
-                spaceStr,
-                firstStr,
-                lastStr,
-                labelStr,
-                classStr,
-                offsetStr,
-            )
+        remote = "require rvnuke_mode; rvnuke_mode.theMode().viewReadNodes (%s, %s, %s, %s, %s, %s, %s, %s);" % (
+            nameStr,
+            mediaStr,
+            spaceStr,
+            firstStr,
+            lastStr,
+            labelStr,
+            classStr,
+            offsetStr,
         )
 
         log("    remote %s" % remote)
@@ -898,7 +846,6 @@ class RvMonitor:
         exec(s, globals(), locals())
 
     def zoomToNode(self):
-
         log("zoomToNode '%s'" % self.zoomTargetNode)
 
         if not self.zoomTargetNode:
@@ -947,7 +894,6 @@ class RvSettings:
         self.updateFromRoot()
 
     def rebuildSettingsKnobs(self, r):
-
         log("rebuilding settings knobs")
 
         #
@@ -964,7 +910,7 @@ class RvSettings:
         for k in knobList:
             try:
                 r.removeKnob(r.knob(k))
-            except:
+            except Exception:
                 pass
 
         #
@@ -976,29 +922,19 @@ class RvSettings:
         n = "rvSettings_"
 
         k = nuke.File_Knob(n + "sessionDir", "Session Directory")
-        k.setTooltip(
-            "Root directory of RV session data.  Should be unique to this Nuke script"
-        )
+        k.setTooltip("Root directory of RV session data.  Should be unique to this Nuke script")
         k.setValue(self.settings["sessionDir"])
         r.addKnob(k)
 
-        k = nuke.Enumeration_Knob(
-            n + "outputFileFormat", "Render File Format", ["rgb", "exr", "dpx", "jpg"]
-        )
+        k = nuke.Enumeration_Knob(n + "outputFileFormat", "Render File Format", ["rgb", "exr", "dpx", "jpg"])
         k.setTooltip("File format for renders, usual 'rgb' or 'exr'.")
         k.setValue(self.settings["outputFileFormat"])
         r.addKnob(k)
 
         # r.addKnob (nuke.BeginTabGroup_Knob ("rvSettings_syncOptionsBegin", "Sync Options"))
-        r.addKnob(
-            nuke.Tab_Knob(
-                "rvSettings_syncOptionsStart", "Sync Options", nuke.TABBEGINGROUP
-            )
-        )
+        r.addKnob(nuke.Tab_Knob("rvSettings_syncOptionsStart", "Sync Options", nuke.TABBEGINGROUP))
 
-        k = nuke.Boolean_Knob(
-            n + "syncSelection", "Nuke Node Selection  ->  RV Current View"
-        )
+        k = nuke.Boolean_Knob(n + "syncSelection", "Nuke Node Selection  ->  RV Current View")
         k.setTooltip("Sync RV current view to Nuke node selection.")
         k.setValue(self.settings["syncSelection"])
         k.setFlag(nuke.STARTLINE)
@@ -1010,19 +946,13 @@ class RvSettings:
         k.setFlag(nuke.STARTLINE)
         r.addKnob(k)
 
-        k = nuke.Boolean_Knob(
-            n + "syncReadChanges", "Nuke Read/Write Node Changes  ->  RV Sources"
-        )
-        k.setTooltip(
-            "Sync creation/deletion/modification of Read and Write nodes to corresponding sources in RV."
-        )
+        k = nuke.Boolean_Knob(n + "syncReadChanges", "Nuke Read/Write Node Changes  ->  RV Sources")
+        k.setTooltip("Sync creation/deletion/modification of Read and Write nodes to corresponding sources in RV.")
         k.setValue(self.settings["syncReadChanges"])
         k.setFlag(nuke.STARTLINE)
         r.addKnob(k)
 
-        r.addKnob(
-            nuke.Tab_Knob("rvSettings_syncOptionsEnd", "Sync Options", nuke.TABENDGROUP)
-        )
+        r.addKnob(nuke.Tab_Knob("rvSettings_syncOptionsEnd", "Sync Options", nuke.TABENDGROUP))
         # r.addKnob (nuke.EndTabGroup_Knob ("rvSettings_syncOptionsEnd", "Sync Options"))
 
     def updateFromRoot(self):
@@ -1034,7 +964,7 @@ class RvSettings:
         for k in self.settings.keys():
             try:
                 self.settings[k] = r.knob("rvSettings_" + k).value()
-            except:
+            except Exception:
                 log("value failed for '%s'" % k)
                 somethingMissing = True
 
@@ -1049,11 +979,11 @@ class RvPreferences:
         """
         self.prefs = {}
 
-        plat = platform.system()
+        _plat = platform.system()
         rvPath = ""
         try:
             rvPath = os.environ["RV_PATH"]
-        except:
+        except Exception:
             pass
 
         if rvPath == "":
@@ -1067,7 +997,7 @@ class RvPreferences:
                 else:
                     rvPath = rvHome + "/bin/rv.exe"
 
-            except:
+            except Exception:
                 if nuke.env["MACOS"]:
                     rvPath = "/Applications/RV64.app/Contents/MacOS/RV64"
                 elif nuke.env["LINUX"]:
@@ -1090,7 +1020,6 @@ class RvPreferences:
         self.updateFromDisk()
 
     def prefsPath(self):
-
         home = os.path.expanduser("~")
         nukeDir = home + "/.nuke"
 
@@ -1100,7 +1029,6 @@ class RvPreferences:
         return nukeDir + "/rvprefs"
 
     def updateFromDisk(self):
-
         log("RvPreferences.updateFromDisk")
 
         prefsFileName = self.prefsPath()
@@ -1116,7 +1044,6 @@ class RvPreferences:
         log("    prefs %s" % str(self.prefs))
 
     def saveToDisk(self):
-
         log("RvPreferences.saveToDisk")
 
         prefsFileName = self.prefsPath()
@@ -1135,9 +1062,7 @@ class RvPreferencesPanel(nukescripts.PythonPanel):
         """
         self._constructing = True
 
-        nukescripts.PythonPanel.__init__(
-            self, "Rv Preferences", "com.tweaksoftware.RvPreferencesPanel"
-        )
+        nukescripts.PythonPanel.__init__(self, "Rv Preferences", "com.tweaksoftware.RvPreferencesPanel")
 
         self.rvPrefs = RvPreferences()
 
@@ -1147,15 +1072,11 @@ class RvPreferencesPanel(nukescripts.PythonPanel):
         self.addKnob(self.rvExecPath)
 
         self.extraArgs = nuke.String_Knob("extraArgs", "Default Command Line Args")
-        self.extraArgs.setTooltip(
-            "Additional arguments to be added to the command line when RV is run."
-        )
+        self.extraArgs.setTooltip("Additional arguments to be added to the command line when RV is run.")
         self.extraArgs.setValue(self.rvPrefs.prefs["extraArgs"])
         self.addKnob(self.extraArgs)
 
-        self.sessionDirBase = nuke.File_Knob(
-            "sessionDirBase", "Default Session Dir Base"
-        )
+        self.sessionDirBase = nuke.File_Knob("sessionDirBase", "Default Session Dir Base")
         self.sessionDirBase.setTooltip(
             "Path to base directory from which to form sessionDirectories. $NUKE_TEMP_DIR will be used if this is not set."
         )
@@ -1214,8 +1135,8 @@ def showSettingsPanel():
     """
     log("showSettings")
     try:
-        s = str(nuke.root())
-    except:
+        _s = str(nuke.root())
+    except Exception:
         return
 
     if not nuke.root():
@@ -1223,30 +1144,24 @@ def showSettingsPanel():
 
     rvPrefs = RvPreferences()
 
-    settings = RvSettings(rvPrefs.prefs["sessionDirBase"])
+    _settings = RvSettings(rvPrefs.prefs["sessionDirBase"])
 
     nuke.showSettings()
 
 
 def startRv():
-
     rvmon = initRvMon()
     rvmon.initializeRvSide()
 
 
 def viewReadsInRv(all):
-
     if all:
         nodes = nuke.allNodes()
     else:
         nodes = nuke.selectedNodes()
 
     readNodes = [
-        n.name()
-        for n in nodes
-        if (
-            type(n).__name__ == "Node" and (n.Class() == "Read" or n.Class() == "Write")
-        )
+        n.name() for n in nodes if (type(n).__name__ == "Node" and (n.Class() == "Read" or n.Class() == "Write"))
     ]
 
     log("    reads for viewing: %s\n" % str(readNodes))
@@ -1260,7 +1175,6 @@ def viewReadsInRv(all):
 
 
 def createCheckpoint():
-
     nodes = nuke.selectedNodes()
 
     if len(nodes) != 1:
@@ -1270,16 +1184,11 @@ def createCheckpoint():
     node = nodes[0]
 
     if type(node).__name__ != "Node" and type(node).__name__ != "Viewer":
-        nuke.message(
-            "Node '%s' is not renderable, pleases select a node that can be rendered."
-            % node.name()
-        )
+        nuke.message("Node '%s' is not renderable, pleases select a node that can be rendered." % node.name())
         return
 
     if node.Class() == "Read" or node.Class() == "Write":
-        nuke.message(
-            "There's no need to checkpoint Read or Write nodes, since they can be viewed directly in RV."
-        )
+        nuke.message("There's no need to checkpoint Read or Write nodes, since they can be viewed directly in RV.")
         return
 
     log("createCheckpoint %s" % node.name())
@@ -1319,7 +1228,7 @@ def createCheckpoint():
     viewedInput = None
     viewer = None
     log ("activeViewer %s input %s" % (nuke.activeViewer(), nuke.activeViewer().activeInput()))
-    if (nuke.activeViewer() and nuke.activeViewer().activeInput() != None) :
+    if (nuke.activeViewer() and nuke.activeViewer().activeInput() is not None) :
         log("viewer and activeInput")
         n = nuke.activeViewer().node().input(nuke.activeViewer().activeInput())
         log ("n %s node %s" % (n.name(), node.name()))
@@ -1330,7 +1239,7 @@ def createCheckpoint():
             viewer.setInput(viewedInput, None)
             time.sleep(1)
 
-    if (viewedInput != None) :
+    if (viewedInput is not None) :
         log("restoring viewer")
         viewer.setInput(viewedInput, node)
     """
@@ -1345,9 +1254,7 @@ class RvRenderPanel(nukescripts.PythonPanel):
     def __init__(self):
         """RV Render UI"""
         log("RvRenderPanel init")
-        nukescripts.PythonPanel.__init__(
-            self, "RvRenderPanel", "com.tweaksoftware.RenderPanel"
-        )
+        nukescripts.PythonPanel.__init__(self, "RvRenderPanel", "com.tweaksoftware.RenderPanel")
 
         self.outputNode = nuke.String_Knob("outputNode", "Output Node")
         self.outputNode.setValue("")
@@ -1391,7 +1298,7 @@ class RvRenderPanel(nukescripts.PythonPanel):
 
     def updateFromSelection(self):
         log("updateFromSelection")
-        if self.useSelected.value() == True:
+        if self.useSelected.value():
             log("    useSelected True")
             nodes = nuke.selectedNodes()
             log("    %d selected nodes" % len(nodes))
@@ -1410,7 +1317,7 @@ class RvRenderPanel(nukescripts.PythonPanel):
         # log ("reading knobs from Root '%s'" % s)
         try:
             self.readKnobs(s)
-        except:
+        except Exception:
             pass
 
     def saveToRoot(self):
@@ -1423,12 +1330,7 @@ class RvRenderPanel(nukescripts.PythonPanel):
         else:
             k = kd["RvRenderPrefs"]
 
-        s = self.writeKnobs(
-            nuke.TO_SCRIPT
-            | nuke.TO_VALUE
-            | nuke.WRITE_ALL
-            | nuke.WRITE_NON_DEFAULT_ONLY
-        )
+        s = self.writeKnobs(nuke.TO_SCRIPT | nuke.TO_VALUE | nuke.WRITE_ALL | nuke.WRITE_NON_DEFAULT_ONLY)
         # log ("saving knobs to Root '%s'" % s)
         k.setValue(s)
         k.setVisible(False)
@@ -1535,7 +1437,6 @@ def createReadNode(infos):
     if infos:
         nuke.Undo().begin("Create Read Nodes From RV")
         try:
-
             nukescripts.misc.clear_selection_recursive()
 
             if rvmon:
@@ -1577,7 +1478,7 @@ def restoreCheckpoint(nukeScript, nodeName, date):
 
         try:
             v = nuke.activeViewer().node().name()
-        except:
+        except Exception:
             v = None
 
         if rvmon:
@@ -1607,7 +1508,6 @@ def restoreCheckpoint(nukeScript, nodeName, date):
 
 
 def killRV():
-
     if rvmon:
         # if (rvmon.rvc.connected) :
         #     rvmon.rvc.disconnect()

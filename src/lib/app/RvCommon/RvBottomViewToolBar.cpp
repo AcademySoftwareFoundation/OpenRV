@@ -165,17 +165,6 @@ namespace Rv
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setStyleSheet(R"(
-            QToolButton:checked {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0.0 rgb(70,70,255),
-                stop: .1 rgb(56,56,220),
-                stop: .5 rgb(45,45,210),
-                stop: .6 rgb(39,39,190),
-                stop: .9 rgb(36,36,220),
-                stop: 1.0 rgb(62,62,230));
-            }
-        )");
         m_ghostAction = a;
 
         a = addAction("");
@@ -185,17 +174,6 @@ namespace Rv
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setStyleSheet(R"(
-            QToolButton:checked {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                stop: 0.0 rgb(70,70,255),
-                stop: .1 rgb(56,56,220),
-                stop: .5 rgb(45,45,210),
-                stop: .6 rgb(39,39,190),
-                stop: .9 rgb(36,36,220),
-                stop: 1.0 rgb(62,62,230));
-            }
-        )");
         m_holdAction = a;
 
         connect(m_ghostAction, SIGNAL(triggered(bool)), this,
@@ -219,7 +197,8 @@ namespace Rv
         a->setToolTip("Step back one frame");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("backStepButton");
         m_backStepAction = a;
 
         a = addAction("");
@@ -227,7 +206,8 @@ namespace Rv
         a->setToolTip("Step forward one frame");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("forwardStepButton");
         m_forwardStepAction = a;
 
         a = addAction("");
@@ -253,7 +233,8 @@ namespace Rv
         a->setToolTip("Skip to start of sequence");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("firstFrameButton");
         m_backMarkAction = a;
 
         a = addAction("");
@@ -261,7 +242,8 @@ namespace Rv
         a->setToolTip("Skip to end of sequence");
         b = dynamic_cast<QToolButton*>(widgetForAction(a));
         b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("lastFrameButton");
         m_forwardMarkAction = a;
 
         connect(m_backStepAction, SIGNAL(triggered()), this,
@@ -501,28 +483,19 @@ namespace Rv
             {
                 bool isChecked = (contents == "1");
                 m_ghostAction->setChecked(isChecked);
-
-                if (m_session->filterLiveReviewEvents())
-                {
-                    m_ghostAction->setDisabled(true);
-                }
             }
             else if (name == "update-hold-button")
             {
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
-
-                if (m_session->filterLiveReviewEvents())
-                {
-                    m_holdAction->setDisabled(true);
-                }
             }
-            else if (name == "internal-sync-presenter-changed"
-                     || name == "sync-session-ended")
-            {
-                bool isDisabled = m_session->filterLiveReviewEvents();
-                setLiveReviewFilteredActions(isDisabled);
-            }
+            // Commented out temporarily and will be reworked soon.
+            //else if (name == "internal-sync-presenter-changed"
+            //         || name == "sync-session-ended")
+            //{
+            //    bool isDisabled = m_session->filterLiveReviewEvents();
+            //    setLiveReviewFilteredActions(isDisabled);
+            //}
         }
 
         return EventAcceptAndContinue;
