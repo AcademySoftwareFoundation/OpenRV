@@ -303,3 +303,22 @@ Sometimes an image is not available on disk when RV tries to read. This is often
 
 bind("missing-image", missingImage); 
 ```
+
+#### 5.6.4 Drag and Drop Filtering.
+
+Sometimes dragging in a directory into RV, the directory might contain files that RV cannot load (e.g. sidecar files), the directory-filter allows you to filter out certain file types.
+
+The Filter should return "1" if you want the file, "0" if you dont.
+
+A python example of using this is:
+
+```
+def filter_directory (event):
+  file = event.contents();
+  if file.endswith(".info"):
+    event.setReturnContent("0");
+    return
+  event.setReturnContent("1");
+
+commands.bind("default", "global", "directory-filter", filter_directory, "Doc string");
+```
