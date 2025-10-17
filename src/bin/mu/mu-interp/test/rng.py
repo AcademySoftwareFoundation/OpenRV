@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-# 
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
 #
-import sys
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 
 IM = 139968
 IA = 3877
@@ -20,7 +19,6 @@ def gen_random(max):
 
 
 def main(N):
-
     if N < 1:
         N = 1
     gr = gen_random

@@ -27,12 +27,12 @@ class MuConsole:
         while 1:
             time.sleep(0.1)
 
-            l = sys.stdin.readline()
-            if l[0] == "\n":
+            line = sys.stdin.readline()
+            if line[0] == "\n":
                 print("RETURN:", self.rvc.remoteEvalAndReturn(buf))
                 buf = ""
             else:
-                buf += l
+                buf += line
 
             self.rvc.processEvents()
 

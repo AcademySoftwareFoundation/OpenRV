@@ -60,6 +60,7 @@ SET(_sources
     RvProfileManager.cpp
     StreamConnection.cpp
     RvJavaScriptObject.cpp
+    QAlertPanel.cpp
 )
 
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()

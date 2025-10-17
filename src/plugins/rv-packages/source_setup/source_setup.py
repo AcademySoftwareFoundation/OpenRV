@@ -1,13 +1,15 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from rv import rvtypes
 from rv import commands
 from rv import extra_commands
 
-import os, re, platform
+import os
+import re
+import platform
 from six.moves.urllib.parse import urlparse
 
 
@@ -43,7 +45,6 @@ class SourceSetupMode(rvtypes.MinorMode):
     """
 
     def sourceSetup(self, event, noColorChanges=False):
-
         #
         #  event.reject() is done to allow other functions bound to
         #  this event to get a chance to modify the state as well. If
@@ -57,16 +58,16 @@ class SourceSetupMode(rvtypes.MinorMode):
         group = args[0]
         fileSource = groupMemberOfType(group, "RVFileSource")
         imageSource = groupMemberOfType(group, "RVImageSource")
-        source = fileSource if imageSource == None else imageSource
+        source = fileSource if imageSource is None else imageSource
         linPipeNode = groupMemberOfType(group, "RVLinearizePipelineGroup")
         linNode = groupMemberOfType(linPipeNode, "RVLinearize")
         ICCNode = groupMemberOfType(linPipeNode, "ICCLinearizeTransform")
         lensNode = groupMemberOfType(linPipeNode, "RVLensWarp")
-        fmtNode = groupMemberOfType(group, "RVFormat")
+        _fmtNode = groupMemberOfType(group, "RVFormat")
         tformNode = groupMemberOfType(group, "RVTransform2D")
         lookPipeNode = groupMemberOfType(group, "RVLookPipelineGroup")
-        lookNode = groupMemberOfType(lookPipeNode, "RVLookLUT")
-        typeName = commands.nodeType(source)
+        _lookNode = groupMemberOfType(lookPipeNode, "RVLookLUT")
+        _typeName = commands.nodeType(source)
         fileNames = commands.getStringProperty("%s.media.movie" % source, 0, 1000)
         fileName = fileNames[0]
         ext = fileName.split(".")[-1].upper()
@@ -105,16 +106,11 @@ class SourceSetupMode(rvtypes.MinorMode):
         try:
             srcAttrs = commands.sourceAttributes(source, fileName)
             srcData = commands.sourceDataAttributes(source, fileName)
-        except:
+        except Exception:
             return
 
-        if srcAttrs == None:
-            print(
-                (
-                    "ERROR: SourceSetup: source %s/%s has no attributes"
-                    % (source, fileName)
-                )
-            )
+        if srcAttrs is None:
+            print(("ERROR: SourceSetup: source %s/%s has no attributes" % (source, fileName)))
             return
 
         attrDict = dict(zip([i[0] for i in srcAttrs], [j[1] for j in srcAttrs]))
@@ -155,10 +151,7 @@ class SourceSetupMode(rvtypes.MinorMode):
         #
 
         if ext == "DPX":
-            if (
-                srcInfo["DPXCreator"] == "AppleComputers.libcineon"
-                or srcInfo["DPXCreator"] == "AUTODESK"
-            ):
+            if srcInfo["DPXCreator"] == "AppleComputers.libcineon" or srcInfo["DPXCreator"] == "AUTODESK":
                 #
                 #  Final Cut's "Color" and Maya write out bogus DPX
                 #  header info with the aspect ratio fields set
@@ -168,9 +161,7 @@ class SourceSetupMode(rvtypes.MinorMode):
 
                 if float(srcInfo["PixelAspectRatio"]) == 0.0:
                     self.setPixelAspect(lensNode, 1.0)
-            elif (
-                srcInfo["ColorSpace"] == "" or srcInfo["ColorSpace"] == "Other (0)"
-            ) and (
+            elif (srcInfo["ColorSpace"] == "" or srcInfo["ColorSpace"] == "Other (0)") and (
                 srcInfo["DPX0Transfer"] == "" or srcInfo["DPX0Transfer"] == "Other (0)"
             ):
                 #
@@ -190,10 +181,7 @@ class SourceSetupMode(rvtypes.MinorMode):
                 srcInfo["TransferFunction"] = "sRGB"
             else:
                 srcInfo["TransferFunction"] = "Linear"
-        elif ext == "ARI" and (
-            srcInfo["TransferFunction"] == ""
-            or srcInfo["TransferFunction"] == "ARRI LogC"
-        ):
+        elif ext == "ARI" and (srcInfo["TransferFunction"] == "" or srcInfo["TransferFunction"] == "ARRI LogC"):
             #
             #  Assume tif files are linear if there's no other indication
             #
@@ -205,19 +193,13 @@ class SourceSetupMode(rvtypes.MinorMode):
             #
 
             srcInfo["TransferFunction"] = "ALEXA LogC Film"
-        elif (
-            ext in ["JPEG", "JPG", "MOV", "AVI", "MP4"]
-            and srcInfo["TransferFunction"] == ""
-        ):
+        elif ext in ["JPEG", "JPG", "MOV", "AVI", "MP4"] and srcInfo["TransferFunction"] == "":
             #
             #  Assume jpeg/mov is in sRGB space if none is specified
             #
 
             srcInfo["TransferFunction"] = "sRGB"
-        elif (
-            ext in ["J2C", "J2K", "JPT", "JP2"]
-            and srcInfo["ColorSpacePrimaries"] == "UNSPECIFIED"
-        ):
+        elif ext in ["J2C", "J2K", "JPT", "JP2"] and srcInfo["ColorSpacePrimaries"] == "UNSPECIFIED":
             #
             #  If we're assuming XYZ primaries, but ignoring primaries just set
             #  transfer to sRGB.
@@ -247,9 +229,7 @@ class SourceSetupMode(rvtypes.MinorMode):
                     [float(srcInfo["ICCProfileVer"])],
                     True,
                 )
-                commands.setByteProperty(
-                    ICCNode + ".inProfile.data", srcInfo["ICCProfileData"], True
-                )
+                commands.setByteProperty(ICCNode + ".inProfile.data", srcInfo["ICCProfileData"], True)
                 commands.setIntProperty(ICCNode + ".node.active", [1], True)
                 srcInfo["TransferFunction"] = "Linear"
             else:
@@ -272,12 +252,7 @@ class SourceSetupMode(rvtypes.MinorMode):
             #  Get around maya bugs
             #
 
-            print(
-                (
-                    "WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n"
-                    % fileName
-                )
-            )
+            print(("WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n" % fileName))
             self.setPixelAspect(lensNode, 1.0)
 
         if srcInfo["JPEGPixelAspect"] != "" and srcInfo["JPEGDensity"] != "":
@@ -291,12 +266,7 @@ class SourceSetupMode(rvtypes.MinorMode):
                 #  Maya JPEG -- fix pixel aspect
                 #
 
-                print(
-                    (
-                        "WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n"
-                        % fileName
-                    )
-                )
+                print(("WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n" % fileName))
                 self.setPixelAspect(lensNode, 1.0)
 
         #
@@ -330,14 +300,9 @@ class SourceSetupMode(rvtypes.MinorMode):
             #
             #  Allow user to override with environment variables
             #
-            srcInfo["TransferFunction"] = self.checkEnvVar(
-                ext, mInfo["bitsPerChannel"], srcInfo["TransferFunction"]
-            )
+            srcInfo["TransferFunction"] = self.checkEnvVar(ext, mInfo["bitsPerChannel"], srcInfo["TransferFunction"])
 
-            if self.setFileColorSpace(
-                linNode, srcInfo["TransferFunction"], srcInfo["ColorSpace"]
-            ):
-
+            if self.setFileColorSpace(linNode, srcInfo["TransferFunction"], srcInfo["ColorSpace"]):
                 #
                 #  The default display correction is sRGB if the
                 #  pixels can be converted to (or are already in)
@@ -384,7 +349,6 @@ class SourceSetupMode(rvtypes.MinorMode):
         #
 
         for dnode in commands.nodesOfType("RVDisplayColor"):
-
             #
             #  If we managed to recognize a transform to linear, default
             #  to a display to a linear -> sRGB
@@ -397,41 +361,20 @@ class SourceSetupMode(rvtypes.MinorMode):
             if dICCNode:
                 commands.setIntProperty(dICCNode + ".node.active", [0], True)
 
-            if (
-                dgroup != None
-                and commands.nodeType(dgroup) == "RVDisplayGroup"
-                and not dgroup in dnodesWithProfile
-            ):
-
+            if dgroup is not None and commands.nodeType(dgroup) == "RVDisplayGroup" and dgroup not in dnodesWithProfile:
                 dICC = commands.getStringProperty(dgroup + ".device.systemProfileURL")
                 if dICCNode and len(dICC) == 1 and not dICC[0] == "":
                     dICCPath = urlparse(dICC[0].replace("%20", " ")).path
-                    if "windows" in platform.platform().lower() and re.match(
-                        "^/.:.*$", dICCPath
-                    ):
+                    if "windows" in platform.platform().lower() and re.match("^/.:.*$", dICCPath):
                         dICCPath = dICCPath[1:]
-                    commands.setStringProperty(
-                        dICCNode + ".outProfile.url", [dICCPath], True
-                    )
+                    commands.setStringProperty(dICCNode + ".outProfile.url", [dICCPath], True)
                     commands.setIntProperty(dICCNode + ".node.active", [1], True)
                 else:
-                    sRGBDisplay = (
-                        commands.getIntProperty(dnode + ".color.sRGB", 0, 20000)[0] != 0
-                    )
-                    rec709Display = (
-                        commands.getIntProperty(dnode + ".color.Rec709", 0, 20000)[0]
-                        != 0
-                    )
-                    gammaDisplay = (
-                        commands.getFloatProperty(dnode + ".color.gamma", 0, 20000)[0]
-                        != 1.0
-                    )
-                    lutDisplay = (
-                        commands.getIntProperty(dnode + ".lut.active", 0, 20000)[0] != 0
-                    )
-                    anyDisplay = (
-                        sRGBDisplay or rec709Display or gammaDisplay or lutDisplay
-                    )
+                    sRGBDisplay = commands.getIntProperty(dnode + ".color.sRGB", 0, 20000)[0] != 0
+                    rec709Display = commands.getIntProperty(dnode + ".color.Rec709", 0, 20000)[0] != 0
+                    gammaDisplay = commands.getFloatProperty(dnode + ".color.gamma", 0, 20000)[0] != 1.0
+                    lutDisplay = commands.getIntProperty(dnode + ".lut.active", 0, 20000)[0] != 0
+                    anyDisplay = sRGBDisplay or rec709Display or gammaDisplay or lutDisplay
 
                     if not anyDisplay:
                         commands.setIntProperty(dnode + ".color.sRGB", [1], True)
@@ -540,11 +483,11 @@ class SourceSetupMode(rvtypes.MinorMode):
 
         val = commands.commandLineFlag(varSpecific, None)
 
-        if val == None:
+        if val is None:
             val = commands.commandLineFlag(varGeneral, None)
-        if val == None:
+        if val is None:
             val = os.getenv(varSpecific, None)
-        if val == None:
+        if val is None:
             val = os.getenv(varGeneral, transfer)
 
         return val

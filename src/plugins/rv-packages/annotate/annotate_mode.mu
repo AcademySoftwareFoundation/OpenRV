@@ -2396,7 +2396,9 @@ class: AnnotateMinorMode : MinorMode
               ("stylus-color-hsv", setColorHSV, "Select color HSV"),
               ("ndc-pointer-1--drag", dragNDC, "Add to current stroke in NDC space"),
               ("ndc-pointer-1--push", pushNDC, "Start New Stroke in NDC space"),
-              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space")
+              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space"),
+              ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
+              ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames")
               // --------------------------------------------------------------
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
