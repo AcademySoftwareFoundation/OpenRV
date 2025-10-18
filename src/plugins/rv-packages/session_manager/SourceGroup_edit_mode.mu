@@ -14,7 +14,6 @@ use glyph;
 use app_utils;
 use io;
 use system;
-use app_utils;
 use extra_commands;
 use qt;
 use session_manager;
@@ -283,21 +282,11 @@ class: SourceGroupEditMode : MinorMode
 
     method: syncState (int; )
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-    
         if (syncGuiInOut()) then CheckedMenuState else UncheckedMenuState;
     }
 
     method: sourceMenuState (int; )
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         return NeutralMenuState;
     }
 
@@ -312,15 +301,14 @@ class: SourceGroupEditMode : MinorMode
              ("new-out-point", newOutPoint, "Update Out Point"),
              ("session-manager-load-ui", loadUI, "Load UI into Session Manager"),
              ("graph-state-change", propertyChanged,  "Maybe update session UI")],
-            Menu {
-                {"Source", Menu {
-                    {"Set Source Cut In ...",  setCutInMode,  nil, sourceMenuState},
-                    {"Set Source Cut Out ...", setCutOutMode,  nil, sourceMenuState},
-                    {"Clear Source Cut In/Out", resetCut,  nil, sourceMenuState},
-                    {"Sync GUI With Source Cut In/Out", toggleSync, nil, syncState},
-                    }
-                }
-            },
+            newMenu(MenuItem[] {
+                subMenu("Source", MenuItem[] {
+                    menuItem("Set Source Cut In ...", "", "source_category", setCutInMode, sourceMenuState),
+                    menuItem("Set Source Cut Out ...", "", "source_category", setCutOutMode, sourceMenuState),
+                    menuItem("Clear Source Cut In/Out", "", "source_category", resetCut, sourceMenuState),
+                    menuItem("Sync GUI With Source Cut In/Out", "", "source_category", toggleSync, syncState)
+                })
+            }),
             nil);
 
         _locked = false;
