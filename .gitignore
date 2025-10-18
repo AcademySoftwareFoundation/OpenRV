@@ -39,4 +39,5 @@ session_manager.mu
 # See maya_tools.mu.in
 maya_tools.mu
 # See rvnuke_mode.mu.in
-rvnuke_mode.mu
+rvnuke_mode.musrc/plugins/rv-packages/session_manager/composite_ui.py
+*_ui.py
