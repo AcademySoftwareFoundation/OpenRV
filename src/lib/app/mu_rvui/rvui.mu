@@ -815,8 +815,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -832,8 +833,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
