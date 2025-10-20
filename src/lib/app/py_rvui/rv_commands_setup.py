@@ -321,9 +321,9 @@ all_extra_commands = [
     "nodesInEvalPath",
     "setUIName",
     "displayFeedback2",
-    "displayFeedback3",
-    "displayFeedback4",
     "displayFeedbackWithSizes",
+    "displayFeedbackQueue2",
+    "displayFeedbackQueueWithSizes",
     "inputNodeUserNameAtFrame",
     "sourceMetaInfoAtFrame",
     "sourceImageStructure",
@@ -471,19 +471,27 @@ bind_symbols(all_extra_commands, "extra_commands", rv.extra_commands)
 bind_symbols(["eval"], "runtime", rv.runtime)
 bind_constants(commands_int_constants, rv.commands)
 
-# Python wrapper for displayFeedback to handle optional parameters
-def _displayFeedback_wrapper(text, duration, glyph=None, textSizes=None):
-    """Wrapper for displayFeedback that handles optional Glyph and textSizes parameters."""
-    if glyph is not None and textSizes is not None:
-        return rv.extra_commands.displayFeedback4(text, duration, glyph, textSizes)
-    elif glyph is not None:
-        return rv.extra_commands.displayFeedback3(text, duration, glyph)
-    elif textSizes is not None:
+# Python wrapper for displayFeedback to handle optional textSizes parameter
+# Note: Glyphs cannot be passed from Python as they are Mu function pointers
+def _displayFeedback_wrapper(text, duration, textSizes=None):
+    """Wrapper for displayFeedback that handles optional textSizes parameter."""
+    if textSizes is not None:
         return rv.extra_commands.displayFeedbackWithSizes(text, duration, textSizes)
     else:
         return rv.extra_commands.displayFeedback2(text, duration)
 
 rv.extra_commands.displayFeedback = _displayFeedback_wrapper
+
+# Python wrapper for displayFeedbackQueue to handle optional textSizes parameter
+# Note: Glyphs cannot be passed from Python as they are Mu function pointers
+def _displayFeedbackQueue_wrapper(text, duration, textSizes=None):
+    """Wrapper for displayFeedbackQueue that handles optional textSizes parameter."""
+    if textSizes is not None:
+        return rv.extra_commands.displayFeedbackQueueWithSizes(text, duration, textSizes)
+    else:
+        return rv.extra_commands.displayFeedbackQueue2(text, duration)
+
+rv.extra_commands.displayFeedbackQueue = _displayFeedbackQueue_wrapper
 
 if "RV_NO_CONSOLE_REDIRECT" not in os.environ:
 
