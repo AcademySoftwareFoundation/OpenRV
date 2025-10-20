@@ -463,12 +463,9 @@ class: AnnotateMinorMode : MinorMode
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
 
-        if (mode != RenderOverMode)
-        {
-            let modeName = "%s.mode" % n;
-            newProperty(modeName, IntType, 1);
-            setIntProperty(modeName, int[] {mode}, true);
-        }
+        let modeName = "%s.mode" % n;
+        newProperty(modeName, IntType, 1);
+        setIntProperty(modeName, int[] {mode}, true);
 
         bool useWidth = false;
 
@@ -586,12 +583,9 @@ class: AnnotateMinorMode : MinorMode
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
 
-        if (mode != RenderOverMode)
-        {
-            let modeName = "%s.mode" % n;
-            newProperty(modeName, IntType, 1);
-            setIntProperty(modeName, int[] {mode}, true);
-        }
+        let modeName = "%s.mode" % n;
+        newProperty(modeName, IntType, 1);
+        setIntProperty(modeName, int[] {mode}, true);
 
         setFloatProperty(posName, float[] {pos.x, pos.y}, true);
         setFloatProperty(colorName, float[] {color[0], color[1], color[2], color[3]}, true);
@@ -2400,9 +2394,7 @@ class: AnnotateMinorMode : MinorMode
               ("stylus-color-hsv", setColorHSV, "Select color HSV"),
               ("ndc-pointer-1--drag", dragNDC, "Add to current stroke in NDC space"),
               ("ndc-pointer-1--push", pushNDC, "Start New Stroke in NDC space"),
-              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space"),
-              ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
-              ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames")
+              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space")
               // --------------------------------------------------------------
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
