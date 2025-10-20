@@ -510,6 +510,7 @@ class: ModeManagerMode : MinorMode
 
         if (ext == "rvpkg")
         {
+            let error = false;
             try
             {
                 let vparts = name.split("-")[1].split(".");
@@ -518,6 +519,10 @@ class: ModeManagerMode : MinorMode
             }
             catch (...)
             {
+                error = true;
+            }
+
+            if (error) {
                 print("ERROR: bad rvpkg package name \"%s\" expecting name-X.X.rvpkg\n" % name);
                 return nil;
             }

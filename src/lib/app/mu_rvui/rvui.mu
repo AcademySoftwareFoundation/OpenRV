@@ -323,8 +323,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -340,8 +341,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -368,8 +370,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -380,19 +383,21 @@ global Configuration globalConfig =
 \: dispGammaState (int;)
 {
     float g = 1.0;
+    bool error = false;
 
     try
     {
         g = getFloatProperty("@RVDisplayColor.color.gamma").front();
+        return if (g != 1.0 && g != 2.2 && g != 2.4)
+        then CheckedMenuState
+        else UncheckedMenuState;
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
 
-    return if (g != 1.0 && g != 2.2 && g != 2.4)
-            then CheckedMenuState
-            else UncheckedMenuState;
+    return DisabledMenuState;
 }
 
 \: fileGammaState (int;)
@@ -409,8 +414,9 @@ global Configuration globalConfig =
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
+    return DisabledMenuState;
 }
 
 \: consoleState (int;)
@@ -683,8 +689,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -704,8 +711,9 @@ global Configuration globalConfig =
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
+    return DisabledMenuState;
 }
 
 \: videoSourcesExistState (int;)
@@ -903,8 +911,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
+    return DisabledMenuState;
 }
 
 \: isOtioEnabled (bool;)
@@ -971,8 +980,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -993,8 +1003,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3012,8 +3023,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3028,8 +3040,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3123,8 +3136,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3157,8 +3171,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 

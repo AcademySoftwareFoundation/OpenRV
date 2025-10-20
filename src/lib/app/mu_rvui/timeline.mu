@@ -529,8 +529,9 @@ class: Timeline : Widget
         }
         catch (...)
         {
-            return " ";
+            ; /* nothing */
         }
+        return " ";
     }
 
     method: showSourceFrame(void;)

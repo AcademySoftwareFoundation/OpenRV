@@ -507,7 +507,7 @@ class: AnnotateMinorMode : MinorMode
         insertStringProperty(orderName, string[] {n.split(".").back()});
 
         endCompoundStateChange();
-        n;
+        return n;
     }
 
     method: addToStroke (void; Point p)
@@ -617,7 +617,7 @@ class: AnnotateMinorMode : MinorMode
         insertStringProperty(orderName, string[] {n.split(".").back()});
 
         endCompoundStateChange();
-        n;
+        return n;
     }
 
     method: setText (void; char[] s)
@@ -670,8 +670,9 @@ class: AnnotateMinorMode : MinorMode
         }
         catch (...)
         {
-            return ("", Point(0,0));
+            ; /* nothing */
         }
+        return ("", Point(0,0));
     }
 
     method: pointerLocationFromNDC ((string, Point); Point point)
@@ -703,8 +704,9 @@ class: AnnotateMinorMode : MinorMode
         }
         catch (...)
         {
-            return ("", Point(0,0));
+            ; /* nothing */
         }
+        return ("", Point(0,0));
     }
 
     method: penPush (void; Event event)
@@ -1733,8 +1735,9 @@ class: AnnotateMinorMode : MinorMode
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     }
 
     method: showDrawingsSlot (void; Event event)

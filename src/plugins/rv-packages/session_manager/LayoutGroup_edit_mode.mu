@@ -43,8 +43,9 @@ class: LayoutGroupEditMode : MinorMode
         }
         catch (...)
         {
-            return "";
+            ; /* nothing */
         }
+        return "";
     }
 
     method: setLayoutMode (void; string mode)

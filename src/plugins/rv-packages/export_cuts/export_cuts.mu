@@ -85,11 +85,17 @@ class: ExportCutsMode : MinorMode
 
     method: exportFiles (void; Event event)
     {
+        let error = false;
         try
         {
             markedRegionBoundaries();
         }
         catch (...)
+        {
+            error = true;
+        }
+
+        if (error) 
         {
             alertPanel(true, InfoAlert, "No Marks", "There are no marks", "OK", nil, nil);
             return;
