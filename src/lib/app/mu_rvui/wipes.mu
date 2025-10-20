@@ -10,6 +10,7 @@
 module: wipes {
 use rvtypes;
 use glyph;
+use app_utils;
 use math;
 use math_util;
 use commands;
@@ -520,8 +521,8 @@ class: Wipe : MinorMode
         init(name, 
              nil, // no global 
              [("pointer--move", move, "Search for Nearest Wipe"), 
-              ("key-down--L", toggleLayerInfo, "Toggle Wipe Layer Info"),
-              ("key-down--R", resetAll, "Reset All Wipes"),
+              // bound by menuItem("Show Source List") // ("key-down--L", toggleLayerInfo, "Toggle Wipe Layer Info"),
+              // bound by menuItem("Reset All Wipes") // ("key-down--R", resetAll, "Reset All Wipes"),
               ("pointer-1--push", push, "Move Wipe or Popup Wipe Layers"),
               ("pointer-1--drag", drag, "Move Wipe"),
               ("pointer-1--release", release, ""),
@@ -533,13 +534,15 @@ class: Wipe : MinorMode
               ("stylus-pen--push", push, "Move Wipe or Popup Wipe Layers"),
               ("stylus-pen--drag", drag, "Move Wipe"),
               ("stylus-pen--release", release, "")],
-             Menu {
-                 {"Wipes", Menu {
-                         {"Show Source List", toggleLayerInfo, "L", layerState}, 
-                         {"Reset All Wipes", resetAll, "R", nil},
-                         {"_", nil, nil, nil},
-                      {"Quit Wipes (without resetting)", quitWipesNoReset, nil, nil},
-                      {"Quit Wipes", quitWipes, "F6", nil} }}}
+             newMenu(MenuItem[] {
+                 subMenu("Wipes", MenuItem[] {
+                         menuItem("Show Source List", "key-down--L", "", toggleLayerInfo, layerState), 
+                         menuItem("Reset All Wipes", "key-down--R", "", resetAll, enabledItem),
+                         menuSeparator(),
+                         menuItem("Quit Wipes (without resetting)", "", "", quitWipesNoReset, enabledItem),
+                         menuItem("Quit Wipes", "", "", quitWipes, enabledItem)
+                 })
+             })
              ,
              //
              //  Wipes events must be processed last, since they

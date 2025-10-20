@@ -42,11 +42,13 @@ class: ImageInfo : Widget
 
     method: popupOpts (void; Event event)
     {
-        popupMenu(event, Menu {
-                {"Image Info", nil, nil, \: (int;) { DisabledMenuState; }},
-                {"_", nil},
-                {"Wrap Long Fields", optWrap, nil, isWrapping},
-            });
+        popupMenu(event, 
+            newMenu(MenuItem[] {
+                menuText("Image Info"),
+                menuSeparator(),
+                menuItem("Wrap Long Fields", "", "", optWrap, isWrapping)
+            })
+        );
     }
 
     method: ImageInfo (ImageInfo; string name)
@@ -318,13 +320,15 @@ class: InfoStrip : Widget
 
     method: popupOpts (void; Event event)
     {
-        popupMenu(event, Menu {
-                {"Info Strip", nil, nil, \: (int;) { DisabledMenuState; }},
-                {"_", nil},
-                {"Show Filename", showFilename(true), nil, isFilename(true)},
-                {"Show UI Name", showFilename(false), nil, isFilename(false)},
-                {"Scale with Resolution", toggleScaleWithResolution, nil, isScaling},
-            });
+        popupMenu(event, 
+            newMenu(MenuItem[] {
+                menuText("Info Strip"),
+                menuSeparator(),
+                menuItem("Show Filename", "", "", showFilename(true), isFilename(true)),
+                menuItem("Show UI Name", "", "", showFilename(false), isFilename(false)),
+                menuItem("Scale with Resolution", "", "", toggleScaleWithResolution, isScaling)
+            })
+        );
     }
 
     method: InfoStrip (InfoStrip; string name)

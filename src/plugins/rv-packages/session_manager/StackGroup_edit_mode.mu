@@ -103,10 +103,11 @@ class: StackGroupEditMode : MinorMode
         init(name,  // this is init from session_manager (its new style)
              nil,
              [("graph-state-change", propertyChanged,  "Maybe update session UI")],
-             Menu {
-                 {"Stack", Menu {
-                     }
-                 }},
+             newMenu(MenuItem[] {
+                 subMenu("Stack", MenuItem[] {
+                     // Empty submenu - no items
+                 })
+             }),
              nil);
     }
 }
