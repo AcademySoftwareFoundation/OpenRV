@@ -741,7 +741,7 @@ class: MotionScope : Widget
                 menuItem("Draw Magnifier Over Imagery", "", "info_category", optDrawMotionScopeOverImagery, isDrawingMotionScopeOverImagery),
                 menuItem("Position Magnifier At Top", "", "info_category", optDrawMotionScopeAtTopOfView, isDrawingMotionScopeAtTopOfView),
                 menuItem("Step Wraps At In/Out", "", "info_category", optStepWraps, isStepWrapping),
-                menuItem("Show Play Direction Indicator", "", "info_category", optShowFrameDirection, isShowingFrameDirection),
+                menuItem("Show Play Direction Indicator", "", "info_category", optShowFrameDirection, isShowingFrameDirection)
             })
         });
 
