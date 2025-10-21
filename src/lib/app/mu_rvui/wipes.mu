@@ -92,11 +92,11 @@ class: Wipe : MinorMode
         //  Check for occlusion of the _manipPoint. If so start over
         //
 
-        let infos = imagesAtPixel(p, "wipe");
+        PixelSourceInfo[] infos = imagesAtPixel(p, "wipe");
 
         for_each (i; infos)
         {
-            let enode = editNode(tagValue(i.tags, "wipe"));
+            EditNodePair enode = editNode(tagValue(i.tags, "wipe"));
             if (manipTFormNode == enode.tformNode) break;
 
             if (i.inside && manipTFormNode != enode.tformNode)
