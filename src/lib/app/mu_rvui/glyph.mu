@@ -341,32 +341,32 @@ operator: & (Glyph; Glyph a, Glyph b)
                           Color bgcolor,
                           Glyph g = nil,
                           Color gcolor = Color(.2,.2,.2,1),
-                          float[] lineSizes = nil)
+                          float[] textSizes = nil)
 {
     // Auto-detect multiline text (check before adding glyph spacing)
     // Split by newline and check if we have more than one line
     let isMultiline = string.split(text, "\n").size() > 1;
     
     // Set text size for bounds calculation
-    // For single-line: use lineSizes[0] if available
-    // For multiline: use the LARGEST size from lineSizes to ensure cartouche fits all lines
+    // For single-line: use textSizes[0] if available
+    // For multiline: use the LARGEST size from textSizes to ensure cartouche fits all lines
     float boundsSize = textsize;
-    if (lineSizes neq nil && lineSizes.size() > 0)
+    if (textSizes neq nil && textSizes.size() > 0)
     {
         if (isMultiline)
         {
-            // Find the maximum size from lineSizes for multiline
-            float maxSize = lineSizes[0];
-            for_index (i; lineSizes)
+            // Find the maximum size from textSizes for multiline
+            float maxSize = textSizes[0];
+            for_index (i; textSizes)
             {
-                if (lineSizes[i] > maxSize) maxSize = lineSizes[i];
+                if (textSizes[i] > maxSize) maxSize = textSizes[i];
             }
             boundsSize = maxSize * devicePixelRatio();
         }
         else
         {
-            // Single-line: use lineSizes[0]
-            boundsSize = lineSizes[0] * devicePixelRatio();
+            // Single-line: use textSizes[0]
+            boundsSize = textSizes[0] * devicePixelRatio();
         }
     }
     gltext.size(boundsSize);
@@ -469,8 +469,8 @@ operator: & (Glyph; Glyph a, Glyph b)
         
         for_index (i; lines)
         {
-            let currSize = if (lineSizes neq nil && i < lineSizes.size()) 
-                          then lineSizes[i] * devicePixelRatio() 
+            let currSize = if (textSizes neq nil && i < textSizes.size()) 
+                          then textSizes[i] * devicePixelRatio() 
                           else textsize;
             gltext.size(currSize);
             let currA = gltext.ascenderHeight();
@@ -511,9 +511,9 @@ operator: & (Glyph; Glyph a, Glyph b)
             let lineY = currentY;
             
             // Set the text size for this line
-            if (lineSizes neq nil && reverseIdx < lineSizes.size())
+            if (textSizes neq nil && reverseIdx < textSizes.size())
             {
-                let lineSize = lineSizes[reverseIdx] * devicePixelRatio();
+                let lineSize = textSizes[reverseIdx] * devicePixelRatio();
                 gltext.size(lineSize);
             }
             else
@@ -535,10 +535,10 @@ operator: & (Glyph; Glyph a, Glyph b)
     }
     else 
     {
-        // Single-line text: Use lineSizes[0] if available, otherwise use textsize
-        if (lineSizes neq nil && lineSizes.size() > 0)
+        // Single-line text: Use textSizes[0] if available, otherwise use textsize
+        if (textSizes neq nil && textSizes.size() > 0)
         {
-            let lineSize = lineSizes[0] * devicePixelRatio();
+            let lineSize = textSizes[0] * devicePixelRatio();
             gltext.size(lineSize);
         }
         else
