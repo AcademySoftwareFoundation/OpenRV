@@ -39,22 +39,6 @@ operator: ~ (EventFunc; VoidFunc f)
     makeEventFunc(f);
 }
 
-operator: && (MenuStateFunc; MenuStateFunc Fa, MenuStateFunc Fb)
-{
-    \: (int;)
-    {
-        let a = Fa(),
-            b = Fb();
-        
-        return if a == b then a
-                  else if a == DisabledMenuState then a
-                  else if b == DisabledMenuState then b
-                  else if a == CheckedMenuState then a
-                  else if b == CheckedMenuState then b
-                  else a;
-    };
-}
-
 \: bind (void; string mode, string table, string event, VoidFunc F, string doc="")
 {
     bind(mode, table, event, makeEventFunc(F), doc);
