@@ -535,16 +535,7 @@ operator: & (Glyph; Glyph a, Glyph b)
     }
     else 
     {
-        // Single-line text: Use textSizes[0] if available, otherwise use textsize
-        if (textSizes neq nil && textSizes.size() > 0)
-        {
-            let lineSize = textSizes[0] * devicePixelRatio();
-            gltext.size(lineSize);
-        }
-        else
-        {
-            gltext.size(textsize);
-        }
+        // Single-line text: size already set at line 372
         gltext.writeAt(x, y, text);
     }
 
