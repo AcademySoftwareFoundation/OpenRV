@@ -691,6 +691,13 @@ nodesOfType """
 Returns all nodes of the given type. In addition to exact node type
 names, you can also use #RVSource which will match RVFileSource or
 RVImageSource.
+
+"""
+
+setCurrentAnnotateModeNode """
+Set the Paint node to use for the _currentNode in the annotate mode.
+If the node is not a valid Paint node or if it is set to an empty string
+(i.e. ""), the _currentNode value will not be overridden.
 """
 
 addSource """
