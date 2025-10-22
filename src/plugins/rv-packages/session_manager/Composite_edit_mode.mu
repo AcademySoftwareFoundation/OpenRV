@@ -17,7 +17,6 @@ use glyph;
 use app_utils;
 use io;
 use system;
-use app_utils;
 
 class: CompositeEditMode : MinorMode
 {
@@ -137,21 +136,21 @@ class: CompositeEditMode : MinorMode
              nil,
              [("session-manager-load-ui", loadUI, "Load UI into Session Manager"),
               ("graph-state-change", propertyChanged,  "Maybe update session UI")],
-             Menu {
-                 {"Stack", Menu {
-                     {"Composite Operation", nil, nil, inactiveState},
-                     {"   Over", setOpEvent(,0), nil, opState("over")},
-                     {"   Add", setOpEvent(,1), nil, opState("add")},
-                     //{"   Dissolve", setOpEvent(,2), nil, opState("dissolve")},
-                     {"   Difference", setOpEvent(,2), nil, opState("difference")},
-                     {"   Inverted Difference", setOpEvent(,3), nil, opState("-difference")},
-                     {"   Replace", setOpEvent(,4), nil, opState("replace")},
-                     {"   Topmost", setOpEvent(,5), nil, opState("topmost")},
-                     {"_", nil, nil, nil},
-                     {"Cycle Forward", cycleStackForward, nil, isStackMode},
-                     {"Cycle Backward", cycleStackBackward, nil, isStackMode}
-                     }
-                 }},
+             newMenu(MenuItem[] {
+                 subMenu("Stack", MenuItem[] {
+                     menuText("Composite Operation"),
+                     menuItem("   Over", "", "viewmode_category", setOpEvent(,0), opState("over")),
+                     menuItem("   Add", "", "viewmode_category", setOpEvent(,1), opState("add")),
+                     menuItem("   Dissolve", "", "viewmode_category", setOpEvent(,2), opState("dissolve")),
+                     menuItem("   Difference", "", "viewmode_category", setOpEvent(,2), opState("difference")),
+                     menuItem("   Inverted Difference", "", "viewmode_category", setOpEvent(,3), opState("-difference")),
+                     menuItem("   Replace", "", "viewmode_category", setOpEvent(,4), opState("replace")),
+                     menuItem("   Topmost", "", "viewmode_category", setOpEvent(,5), opState("topmost")),
+                     menuSeparator(),
+                     menuItem("Cycle Forward", "", "viewmode_category", cycleStackForward, isStackMode),
+                     menuItem("Cycle Backward", "", "viewmode_category", cycleStackBackward, isStackMode)
+                 })
+             }),
              "b");
     }
 }

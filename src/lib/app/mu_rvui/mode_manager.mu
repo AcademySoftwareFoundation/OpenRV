@@ -426,11 +426,6 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
-        if (filterLiveReviewEvents() && (entry.name == "session_manager" || entry.name == "annotate_mode"))
-        {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         mm.toggleEntry(entry);
     }
 
@@ -515,6 +510,7 @@ class: ModeManagerMode : MinorMode
 
         if (ext == "rvpkg")
         {
+            let error = false;
             try
             {
                 let vparts = name.split("-")[1].split(".");
@@ -523,6 +519,10 @@ class: ModeManagerMode : MinorMode
             }
             catch (...)
             {
+                error = true;
+            }
+
+            if (error) {
                 print("ERROR: bad rvpkg package name \"%s\" expecting name-X.X.rvpkg\n" % name);
                 return nil;
             }
