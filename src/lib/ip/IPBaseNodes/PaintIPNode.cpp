@@ -705,50 +705,6 @@ namespace IPCore
         if (showPaint)
         {
             std::lock_guard<std::mutex> commandsGuard{m_commandsMutex};
-            if (m_frameMap.count(frame) != 0)
-            {
-                Components& comps = m_frameMap[frame];
-                size_t s = comps.size();
-
-                for (size_t q = 0; q < s; q++)
-                {
-                    Component* c = comps[q];
-                    int numProps = c->properties().size();
-
-                    if (m_penStrokes.count(c) >= 1)
-                    {
-                        if (numProps == 0)
-                        {
-                            m_penStrokes.erase(c);
-                        }
-                        else
-                        {
-                            LocalPolyLine& pl = m_penStrokes[c];
-
-                            if (pl.eye == 2 || (pl.eye == context.eye))
-                            {
-                                head->commands.push_back(&pl);
-                            }
-                        }
-                    }
-                    else if (m_texts.count(c) >= 1)
-                    {
-                        if (numProps == 0)
-                        {
-                            m_texts.erase(c);
-                        }
-                        else
-                        {
-                            LocalText& t = m_texts[c];
-
-                            if (t.eye == 2 || (t.eye == context.eye))
-                            {
-                                head->commands.push_back(&t);
-                            }
-                        }
-                    }
-                }
-            }
 
             // generateVisibleCommands should only get the commands that are in
             // the order stack (e.g. m_frameMap)
