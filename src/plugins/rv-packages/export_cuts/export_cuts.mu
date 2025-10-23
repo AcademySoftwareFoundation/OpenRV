@@ -6,6 +6,7 @@
 use rvtypes;
 use extra_commands;
 use commands;
+use app_utils;
 use export_utils;
 use rvui;
 use io;
@@ -84,11 +85,17 @@ class: ExportCutsMode : MinorMode
 
     method: exportFiles (void; Event event)
     {
+        let error = false;
         try
         {
             markedRegionBoundaries();
         }
         catch (...)
+        {
+            error = true;
+        }
+
+        if (error) 
         {
             alertPanel(true, InfoAlert, "No Marks", "There are no marks", "OK", nil, nil);
             return;
@@ -147,14 +154,14 @@ class: ExportCutsMode : MinorMode
         init("export-cuts-mode",
              nil,
              nil,
-             Menu {
-               {"File", Menu {
-                  {"Export", Menu {
-                     {"_", nil, nil, nil},
-                     {"Marked Regions as Movie/Audio/Sequences...", exportFiles, nil, videoSourcesExistState}
-                  }
-               }}
-           }});
+             newMenu(MenuItem[] {
+               subMenu("File", MenuItem[] {
+                  subMenu("Export", MenuItem[] {
+                     menuSeparator(),
+                     menuItem("Marked Regions as Movie/Audio/Sequences...", "", "export_category", exportFiles, videoSourcesExistState)
+                  })
+               })
+           }));
     }
 
     //alertPanel(true,
