@@ -55,12 +55,14 @@ EXTERNALPROJECT_ADD(
   # Patch to fix the build issue with OpenGL-Registry
   # Pinning the OpenGL-Registry version to a specific commit
   # https://github.com/nigels-com/glew/issues/449
+  # Also clone the required glfixes repository
   PATCH_COMMAND 
     cd auto && 
     git clone https://github.com/KhronosGroup/OpenGL-Registry.git || true &&
     cd OpenGL-Registry && 
     git checkout a77f5b6ffd0b0b74904f755ae977fa278eac4e95 && 
     cd .. && 
+    git clone --depth=1 --branch glew https://github.com/nigels-com/glfixes glfixes || true &&
     touch OpenGL-Registry/.dummy &&
     cd ..
   CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
