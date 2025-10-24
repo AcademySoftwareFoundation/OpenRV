@@ -3,4 +3,4 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from .rvNetwork import RvCommunicator
+from .rvNetwork import RvCommunicator as RvCommunicator

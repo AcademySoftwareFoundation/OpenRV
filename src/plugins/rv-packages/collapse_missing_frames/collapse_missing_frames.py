@@ -1,9 +1,9 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
 #
-from rv import rvtypes, commands, extra_commands
+# SPDX-License-Identifier: Apache-2.0
+#
+from rv import rvtypes, commands
 
 
 def groupMemberOfType(node, memberType):
@@ -38,9 +38,7 @@ class CollapseMissingFrames(rvtypes.MinorMode):
             self.collapse(source, True)
 
     def collapse(self, source, force=False):
-        linPG = groupMemberOfType(
-            commands.nodeGroup(source), "RVLinearizePipelineGroup"
-        )
+        linPG = groupMemberOfType(commands.nodeGroup(source), "RVLinearizePipelineGroup")
         retime = groupMemberOfType(linPG, "RVRetime")
         if not force and retime is not None and isCollapsed(retime):
             commands.setIntProperty(retime + ".explicit.active", [0])
@@ -63,17 +61,13 @@ class CollapseMissingFrames(rvtypes.MinorMode):
                         [int(rangeInfo["start"])],
                         True,
                     )
-                    commands.setIntProperty(
-                        retime + ".explicit.inputFrames", partial, True
-                    )
+                    commands.setIntProperty(retime + ".explicit.inputFrames", partial, True)
                     commands.setIntProperty(retime + ".explicit.active", [1])
 
     def collapsed(self):
         sources = commands.sourcesAtFrame(commands.frame())
         for source in sources:
-            linPG = groupMemberOfType(
-                commands.nodeGroup(source), "RVLinearizePipelineGroup"
-            )
+            linPG = groupMemberOfType(commands.nodeGroup(source), "RVLinearizePipelineGroup")
             retime = groupMemberOfType(linPG, "RVRetime")
             if retime is None or not isCollapsed(retime):
                 return commands.UncheckedMenuState
@@ -90,7 +84,6 @@ class CollapseMissingFrames(rvtypes.MinorMode):
         return self._collapseAll
 
     def __init__(self):
-
         rvtypes.MinorMode.__init__(self)
 
         self.init(
@@ -119,9 +112,7 @@ class CollapseMissingFrames(rvtypes.MinorMode):
             ],
         )
 
-        self._collapseAll = commands.readSettings(
-            "COLLAPSE_MISSING", "collapseAll", False
-        )
+        self._collapseAll = commands.readSettings("COLLAPSE_MISSING", "collapseAll", False)
 
 
 def createMode():

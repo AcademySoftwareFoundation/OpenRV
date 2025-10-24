@@ -26,10 +26,10 @@ Features:
 Usage Examples:
     # Use config file (auto-detects platform template)
     python generate_theme.py --config rv_theme_variables.conf --output rv_dark.qss
-    
+
     # Override variables from command line (will prompt for missing ones)
     python generate_theme.py --config rv_theme_variables.conf --output rv_blue.qss --set ACCENT_PRIMARY=rgb(0,100,200) --set ACCENT_SECONDARY=rgb(50,150,255)
-    
+
     # No config file (will prompt for all required variables)
     python generate_theme.py --output rv_custom.qss --set PRIMARY_BACKGROUND=rgb(40,40,40)
 """
@@ -61,11 +61,7 @@ def get_platform_template() -> str:
     """Get the appropriate template file for the current platform"""
     system = platform.system().lower()
     # Windows and Linux both use the Linux template, only macOS uses the macOS template
-    template_name = (
-        "rv_mac_dark.qss.template"
-        if system == "darwin"
-        else "rv_linux_dark.qss.template"
-    )
+    template_name = "rv_mac_dark.qss.template" if system == "darwin" else "rv_linux_dark.qss.template"
 
     # Check if we're being run from OpenRV root directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -96,9 +92,7 @@ def adjust_output_path(output_file: str) -> str:
         if os.path.exists(rvcommon_path):
             # Only adjust if output path is just a filename (no directory)
             if not os.path.dirname(output_file):
-                adjusted_path = os.path.join(
-                    "src", "lib", "app", "RvCommon", output_file
-                )
+                adjusted_path = os.path.join("src", "lib", "app", "RvCommon", output_file)
                 logger.info(f"Placing output in RvCommon directory: {adjusted_path}")
                 return adjusted_path
 
@@ -121,14 +115,10 @@ def adjust_config_path(config_file: Optional[str]) -> Optional[str]:
         if os.path.exists(rvcommon_path):
             # Only adjust if config path is just a filename (no directory)
             if not os.path.dirname(config_file):
-                adjusted_path = os.path.join(
-                    "src", "lib", "app", "RvCommon", config_file
-                )
+                adjusted_path = os.path.join("src", "lib", "app", "RvCommon", config_file)
                 # Check if the adjusted path exists, if not, try the original
                 if os.path.exists(adjusted_path):
-                    logger.info(
-                        f"Using config from RvCommon directory: {adjusted_path}"
-                    )
+                    logger.info(f"Using config from RvCommon directory: {adjusted_path}")
                     return adjusted_path
 
     return config_file
@@ -162,9 +152,7 @@ def load_variables_from_config(config_file: Optional[str]) -> Dict[str, str]:
                             continue
 
                         if not value:
-                            logger.warning(
-                                f"Empty value in {config_file} line {line_num}: {key} = (empty)"
-                            )
+                            logger.warning(f"Empty value in {config_file} line {line_num}: {key} = (empty)")
                             invalid_count += 1
                             continue
 
@@ -178,21 +166,15 @@ def load_variables_from_config(config_file: Optional[str]) -> Dict[str, str]:
                         if validate_css_value(key, value):
                             variables[key] = value
                         else:
-                            logger.warning(
-                                f"Skipping invalid value in {config_file} line {line_num}: {key} = {value}"
-                            )
+                            logger.warning(f"Skipping invalid value in {config_file} line {line_num}: {key} = {value}")
                             example = get_example_value(key)
                             logger.info(f"Example: {key} = {example}")
-                            logger.info(
-                                f"Variable will remain as {{{{{key}}}}} placeholder"
-                            )
+                            logger.info(f"Variable will remain as {{{{{key}}}}} placeholder")
                             invalid_count += 1
                             # Skip invalid values - don't include them
                     else:
-                        logger.warning(
-                            f"Malformed line in {config_file} line {line_num}: {original_line.strip()}"
-                        )
-                        logger.info(f"Expected format: VARIABLE = value")
+                        logger.warning(f"Malformed line in {config_file} line {line_num}: {original_line.strip()}")
+                        logger.info("Expected format: VARIABLE = value")
                         invalid_count += 1
     except UnicodeDecodeError as e:
         logger.error(f"Config file {config_file} has encoding issues: {e}")
@@ -203,9 +185,7 @@ def load_variables_from_config(config_file: Optional[str]) -> Dict[str, str]:
         return {}
 
     if invalid_count > 0:
-        logger.warning(
-            f"Found {invalid_count} invalid value(s) in config file. Please fix them to ensure proper CSS."
-        )
+        logger.warning(f"Found {invalid_count} invalid value(s) in config file. Please fix them to ensure proper CSS.")
 
     return variables
 
@@ -246,9 +226,7 @@ def validate_css_value(var_name: str, value: str) -> bool:
         # Check for valid CSS color formats
 
         # RGB format: rgb(r, g, b) with proper range validation
-        rgb_match = re.match(
-            r"^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$", value
-        )
+        rgb_match = re.match(r"^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$", value)
         if rgb_match:
             r, g, b = map(int, rgb_match.groups())
             return 0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255
@@ -278,10 +256,7 @@ def validate_css_value(var_name: str, value: str) -> bool:
         }
 
         # Check Hex format or named colors (case insensitive)
-        return (
-            re.match(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$", value) is not None
-            or value.lower() in named_colors
-        )
+        return re.match(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$", value) is not None or value.lower() in named_colors
 
     # Non-color variables: for now all variables are colors
     return len(value.strip()) > 0
@@ -302,9 +277,7 @@ def get_example_value(var_name: str) -> str:
 def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
     """Interactive collection of missing variables with validation"""
     print("\nMissing variables detected. Please provide values:")
-    print(
-        "('quit' to abort, 'default' to use default value, 'help' for examples, Ctrl+C to cancel)"
-    )
+    print("('quit' to abort, 'default' to use default value, 'help' for examples, Ctrl+C to cancel)")
 
     # Read the config file and get the default value for the variable
     config_file = adjust_config_path("rv_theme_variables.conf")
@@ -336,9 +309,7 @@ def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
                             print(f"Set: {var_name} = {variables[var_name]}")
                             break
                         else:
-                            print(
-                                f"No default value found for {var_name}. Please provide a valid CSS value."
-                            )
+                            print(f"No default value found for {var_name}. Please provide a valid CSS value.")
                             continue
                     else:
                         # Validate the value
@@ -374,9 +345,7 @@ def process_template(template_file: str, variables: Dict[str, str]) -> str:
         with open(template_file, "r", encoding="utf-8") as f:
             content = f.read()
     except UnicodeDecodeError as e:
-        raise ValueError(
-            f"Template file {template_file} has encoding issues: {e}. Please save as UTF-8."
-        )
+        raise ValueError(f"Template file {template_file} has encoding issues: {e}. Please save as UTF-8.")
     except Exception as e:
         raise ValueError(f"Failed to read template file {template_file}: {e}")
 
@@ -389,9 +358,7 @@ def process_template(template_file: str, variables: Dict[str, str]) -> str:
     # Check for variables in config that don't exist in template
     extra_vars = set(variables.keys()) - template_vars
     if extra_vars:
-        logger.warning(
-            f"Found {len(extra_vars)} variables in config that don't exist in template:"
-        )
+        logger.warning(f"Found {len(extra_vars)} variables in config that don't exist in template:")
         for var in sorted(extra_vars):
             logger.info(f"  {var} = {variables[var]}")
         logger.info("These variables will be ignored.")
@@ -399,9 +366,7 @@ def process_template(template_file: str, variables: Dict[str, str]) -> str:
     # Check for missing variables
     missing_vars = template_vars - set(variables.keys())
     if missing_vars:
-        logger.info(
-            f"Found {len(missing_vars)} missing variables: {', '.join(sorted(missing_vars))}"
-        )
+        logger.info(f"Found {len(missing_vars)} missing variables: {', '.join(sorted(missing_vars))}")
 
         # Collect missing variables interactively
         new_vars = collect_missing_variables(missing_vars)
@@ -500,9 +465,7 @@ def main():
         help="Set variable (format: KEY=VALUE). Can be used multiple times",
     )
 
-    parser.add_argument(
-        "--list-variables", help="List all variables found in a config file"
-    )
+    parser.add_argument("--list-variables", help="List all variables found in a config file")
 
     args = parser.parse_args()
 

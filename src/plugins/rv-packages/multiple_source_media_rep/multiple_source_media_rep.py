@@ -42,16 +42,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
         # and take care of the background color.
         widget = QtWidgets.QWidget()
         widget.setStyleSheet(
-            "QWidget"
-            "{"
-            "margin: 0px;"
-            "padding: 0px;"
-            "margin-top: 5px;"
-            "}"
-            "QWidget::hover"
-            "{"
-            "background-color: rgb(62, 62, 132);"
-            "}"
+            "QWidget{margin: 0px;padding: 0px;margin-top: 5px;}QWidget::hover{background-color: rgb(62, 62, 132);}"
         )
 
         # Using a layout to position the labels.
@@ -69,13 +60,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
         policy = check_mark.sizePolicy()
         policy.setRetainSizeWhenHidden(True)
         check_mark.setSizePolicy(policy)
-        check_mark.setStyleSheet(
-            "background: none;"
-            "margin: 0px;"
-            "padding: 0px;"
-            "color: DarkGray;"
-            "font-size: 12px;"
-        )
+        check_mark.setStyleSheet("background: none;margin: 0px;padding: 0px;color: DarkGray;font-size: 12px;")
         check_mark.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
         layout.addWidget(check_mark)
         self._check_mark = check_mark
@@ -84,7 +69,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
         # No background so that it uses the parent's one.
         # Does not listen for mouse events.
         label = QtWidgets.QLabel(widget)
-        label.setStyleSheet("background: none;" "margin: 0px;" "padding: 0px;")
+        label.setStyleSheet("background: none;margin: 0px;padding: 0px;")
         label.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
         layout.addWidget(label)
         self._label = label
@@ -96,9 +81,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
         rep_txt = "<font color='DarkGray'>%s</font>" % rep
         res_txt = "<font color='DarkGray' size='0.6em'>%s</font>" % resolution
         ext_txt = "<font color='DarkGray' size='0.6em'>%s</font>" % extension
-        self._label.setText(
-            "%s<br>%s&nbsp;&nbsp;&nbsp;%s" % (rep_txt, res_txt, ext_txt)
-        )
+        self._label.setText("%s<br>%s&nbsp;&nbsp;&nbsp;%s" % (rep_txt, res_txt, ext_txt))
 
         self.setData({"rep": rep, "switch_nodes": switch_nodes})
 
@@ -172,7 +155,6 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
     # at higher resolution. If this representation is not available, then the
     # 'Movie' media representation will be selected, and so on.
     def sourceMediaUnavailable(self, event):
-
         package_logger.debug("%s in sourceMediaUnavailable" % event.name())
 
         #  event.reject() is done to allow other functions bound to
@@ -191,9 +173,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         expectedNumberOfArgs = 3
         if len(args) != expectedNumberOfArgs:
             package_logger.error(
-                "source-media-unavailable has {} parameters, expected={}".format(
-                    len(args), expectedNumberOfArgs
-                )
+                "source-media-unavailable has {} parameters, expected={}".format(len(args), expectedNumberOfArgs)
             )
             return
 
@@ -202,9 +182,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         mediaRepName = args[2]
 
         # Determine the media rep name to fall back to since this one is not available
-        fallbackMediaRepName = self._getFallbackMediaRepName(
-            sourceNodeName, mediaRepName
-        )
+        fallbackMediaRepName = self._getFallbackMediaRepName(sourceNodeName, mediaRepName)
 
         package_logger.debug(
             "sourceMediaUnavailable()-sourceNodeName={}, mediaRepName={}, fallbackMediaRepName={}".format(
@@ -327,21 +305,13 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
 
         # Media resolution.
         self._media_resolution_lbl = QtWidgets.QLabel("", self._bottomToolBar)
-        self._media_resolution_lbl.setStyleSheet(
-            "color: gray; background-color: transparent; margin-right: 5px"
-        )
-        self._bottomToolBar.insertWidget(
-            playback_style_action, self._media_resolution_lbl
-        )
+        self._media_resolution_lbl.setStyleSheet("color: gray; background-color: transparent; margin-right: 5px")
+        self._bottomToolBar.insertWidget(playback_style_action, self._media_resolution_lbl)
 
         # Media extension.
         self._media_extension_lbl = QtWidgets.QLabel("", self._bottomToolBar)
-        self._media_extension_lbl.setStyleSheet(
-            "color: gray; background-color: transparent"
-        )
-        self._bottomToolBar.insertWidget(
-            playback_style_action, self._media_extension_lbl
-        )
+        self._media_extension_lbl.setStyleSheet("color: gray; background-color: transparent")
+        self._bottomToolBar.insertWidget(playback_style_action, self._media_extension_lbl)
 
     def _populate_media_rep_menu(self, menu, switch_nodes):
         """
@@ -365,9 +335,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # The menu items are composed of the media rep name, the extension and
         # the resolution.
         for rep in reps_and_source_nodes.keys():
-            source_media_infos = utils.get_common_source_media_infos(
-                reps_and_source_nodes[rep]
-            )
+            source_media_infos = utils.get_common_source_media_infos(reps_and_source_nodes[rep])
 
             action = MediaRepresentationItem(menu)
             action.set_values(
@@ -452,9 +420,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         Note: when there are multiple sources at the current frame then the
         resolution and extension is only shown when they are common to all
         """
-        common_source_media_infos = utils.get_common_source_media_infos(
-            self._current_sources
-        )
+        common_source_media_infos = utils.get_common_source_media_infos(self._current_sources)
 
         self._media_resolution_lbl.setText(common_source_media_infos.resolution)
         self._media_extension_lbl.setText(common_source_media_infos.extension)
@@ -520,9 +486,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # source group.
         if self._current_sources is None:
             return
-        if (source_deleted in self._current_sources) or (
-            source_deleted + "_source" in self._current_sources
-        ):
+        if (source_deleted in self._current_sources) or (source_deleted + "_source" in self._current_sources):
             self._current_sources = None
 
     def _on_force_update_media_info(self, event):
@@ -553,9 +517,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
           - media-relocated, source-media-rep-activated (media not ready)
           - source-group-complete (media ready)
         """
-        package_logger.debug(
-            "%s in _on_postpone_force_update_media_info" % event.name()
-        )
+        package_logger.debug("%s in _on_postpone_force_update_media_info" % event.name())
 
         event.reject()
         self._force_update_media_info = True

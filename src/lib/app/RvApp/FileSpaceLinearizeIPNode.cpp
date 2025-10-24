@@ -410,6 +410,14 @@ namespace IPCore
                         img->shaderExpr, cinblack, cinwhite,
                         (cinwhite - cinbreakpoint));
                 }
+                else if (logtype == 8) {
+                    img->shaderExpr =
+                        Shader::newColorSMPTE2084ToLinear(img->shaderExpr);
+                }
+                else if (logtype == 9) {
+                    img->shaderExpr =
+                        Shader::newColorHLGToLinear(img->shaderExpr);
+                }
             }
         }
 

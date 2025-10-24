@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# 
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
-# 
+#
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 import sys
 
 sys.setrecursionlimit(10000)

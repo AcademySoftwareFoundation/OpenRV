@@ -2288,7 +2288,21 @@ namespace IPCore
             m_rangeStart = p;
         }
 
-        if (isMediaActive())
+        // Reload media if the media is active or if the range is not the
+        // default
+        // - If the media is active, we need to reload the media to ensure that
+        // the correct frames are loaded
+        // - If the media is NOT active, we normally don't want to reload the
+        // media because doing so would be detrimental to performances in a
+        // multiple media representations scenario where we only load the
+        // active media representation(s).
+        // - If the media is NOT active, we need to reload the media if the
+        // range is not the default range. This special case is typically for
+        // missing media.
+        const Vec2i defaultRange = Vec2i(0, 1);
+        const Vec2i range =
+            propertyValue<Vec2iProperty>("proxy.range", defaultRange);
+        if (isMediaActive() || range != defaultRange)
         {
             HOP_PROF("FileSourceIPNode::readCompleted - reloadMediaFromFiles");
             reloadMediaFromFiles();

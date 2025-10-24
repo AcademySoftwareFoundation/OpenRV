@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from rv import commands, extra_commands
 import opentimelineio as otio
@@ -24,9 +24,7 @@ def hook_function(in_timeline, argument_map):
     scalar = 1 / commands.getFloatProperty("{}.audio.scale".format(rv_node_name))[0]
 
     if is_close(scalar, 1.0):
-        scalar = (
-            1 / commands.getFloatProperty("{}.visual.scale".format(rv_node_name))[0]
-        )
+        scalar = 1 / commands.getFloatProperty("{}.visual.scale".format(rv_node_name))[0]
 
     key_frames = commands.getIntProperty("{}.warp.keyFrames".format(rv_node_name))
 
@@ -40,6 +38,4 @@ def hook_function(in_timeline, argument_map):
         return otio.schema.FreezeFrame(
             name=extra_commands.uiName(rv_node_name),
         )
-    return otio.schema.LinearTimeWarp(
-        name=extra_commands.uiName(rv_node_name), time_scalar=scalar
-    )
+    return otio.schema.LinearTimeWarp(name=extra_commands.uiName(rv_node_name), time_scalar=scalar)

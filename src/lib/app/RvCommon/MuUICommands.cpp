@@ -41,6 +41,7 @@
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>
+#include "QAlertPanel.h"
 
 #if defined(RV_VFX_CY2023)
 #include <MuQt5/QNetworkAccessManagerType.h>
@@ -474,6 +475,13 @@ namespace Rv
 
             new Function(c, "presentationMode", presentationMode, None, Return,
                          "bool", End),
+
+            new Function(c, "setPresentationDevice", setPresentationDevice,
+                         None, Return, "void", Parameters,
+                         new Param(c, "name", "string"), End),
+
+            new Function(c, "loadSettingsIntoOptions", loadSettingsIntoOptions,
+                         None, Return, "void", End),
 
             new Function(c, "packageListFromSetting", packageListFromSetting,
                          None, Return, "string[]", Parameters,
@@ -1134,7 +1142,7 @@ namespace Rv
         const StringType::String* b2 = NODE_ARG_OBJECT(5, StringType::String);
         const StringType::String* b3 = NODE_ARG_OBJECT(6, StringType::String);
 
-        QMessageBox box(doc);
+        QAlertPanel box(doc);
         QString temp = UTF8::qconvert(title->c_str());
 
         if (msg && *msg != *title)
@@ -1155,29 +1163,29 @@ namespace Rv
 #endif
 
         QPushButton* q1 =
-            box.addButton(UTF8::qconvert(b1->c_str()), QMessageBox::AcceptRole);
+            box.addButton(UTF8::qconvert(b1->c_str()), QAlertPanel::AcceptRole);
         QPushButton* q2 = b2 ? box.addButton(UTF8::qconvert(b2->c_str()),
-                                             QMessageBox::RejectRole)
+                                             QAlertPanel::RejectRole)
                              : 0;
         QPushButton* q3 = b3 ? box.addButton(UTF8::qconvert(b3->c_str()),
-                                             QMessageBox::ApplyRole)
+                                             QAlertPanel::ApplyRole)
                              : 0;
 
         switch (type)
         {
         case 0:
             // Info
-            box.setIcon(QMessageBox::Information);
+            box.setIcon(QAlertPanel::Information);
             break;
 
         case 1:
             // Warning
-            box.setIcon(QMessageBox::Warning);
+            box.setIcon(QAlertPanel::Warning);
             break;
 
         case 2:
             // Error
-            box.setIcon(QMessageBox::Critical);
+            box.setIcon(QAlertPanel::Critical);
             break;
         }
 
@@ -2258,6 +2266,57 @@ namespace Rv
     NODE_IMPLEMENTATION(presentationMode, bool)
     {
         NODE_RETURN(RvApp()->isInPresentationMode());
+    }
+
+    NODE_IMPLEMENTATION(setPresentationDevice, void)
+    {
+        StringType::String* deviceName = NODE_ARG_OBJECT(0, StringType::String);
+        Rv::Options& opts = Rv::Options::sharedOptions();
+
+        if (!deviceName)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD,
+                                      "Nil setting name.");
+
+        if (VideoDevice* d =
+                RvApp()->findPresentationDevice(deviceName->c_str()))
+        {
+            bool presenting = RvApp()->isInPresentationMode();
+            Session* s = Session::currentSession();
+            Session::CachingMode mode = s->cachingMode();
+
+            if (presenting)
+            {
+                s->setCaching(Session::NeverCache);
+                RvApp()->setPresentationMode(false);
+            }
+
+            RV_QSETTINGS;
+            settings.beginGroup("Video");
+            settings.setValue("presentationDevice",
+                              QString::fromUtf8(deviceName->c_str()));
+            settings.endGroup();
+
+            Rv::RvPreferences::loadSettingsIntoOptions(opts);
+
+            RvApp()->setVideoDeviceStateFromSettings(d);
+
+            if (presenting)
+            {
+                RvApp()->setPresentationMode(true);
+                s->setCaching(mode);
+            }
+        }
+        else
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD,
+                                      "device not found");
+        }
+    }
+
+    NODE_IMPLEMENTATION(loadSettingsIntoOptions, void)
+    {
+        Rv::Options& opts = Rv::Options::sharedOptions();
+        Rv::RvPreferences::loadSettingsIntoOptions(opts);
     }
 
     NODE_IMPLEMENTATION(packageListFromSetting, Pointer)
