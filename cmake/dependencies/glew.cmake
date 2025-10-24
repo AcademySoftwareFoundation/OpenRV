@@ -52,6 +52,17 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  # Patch to fix the build issue with OpenGL-Registry
+  # Pinning the OpenGL-Registry version to a specific commit
+  # https://github.com/nigels-com/glew/issues/449
+  PATCH_COMMAND 
+    cd auto && 
+    git clone https://github.com/KhronosGroup/OpenGL-Registry.git || true &&
+    cd OpenGL-Registry && 
+    git checkout a77f5b6ffd0b0b74904f755ae977fa278eac4e95 && 
+    cd .. && 
+    touch OpenGL-Registry/.dummy &&
+    cd ..
   CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
   INSTALL_COMMAND ${_make_command} install LIBDIR=${_lib_dir} GLEW_DEST=${_install_dir}
