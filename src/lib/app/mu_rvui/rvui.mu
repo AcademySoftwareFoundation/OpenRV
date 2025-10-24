@@ -3613,6 +3613,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     state.feedbackText  = "";
     state.feedback      = 0;
     state.feedbackGlyph = nil;
+    state.feedbackQueueEnabled = true;   // Reset to default (enabled)
+    state.feedbackQueueTruncate = false;  // Reset to default (disabled)
+    state.feedbackQueue = FeedbackMessage[]();
     state.pixelInfo     = nil;
     state.scrubAudio    = false;
 
@@ -4798,8 +4801,24 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
     if (state.feedbackText eq nil) return;
 
-    let devicePixelRatio = devicePixelRatio(),
-        textsize = 20 * devicePixelRatio;
+    let devicePixelRatio = devicePixelRatio();
+    
+    // Calculate actual text size for positioning
+    // Use the maximum from feedbackTextSizes if available, otherwise use default
+    float actualTextSize = DefaultFeedbackTextSize;
+    if (state.feedbackTextSizes neq nil && state.feedbackTextSizes.size() > 0)
+    {
+        // Find max size for positioning
+        actualTextSize = state.feedbackTextSizes[0];
+        for_index (i; state.feedbackTextSizes)
+        {
+            if (state.feedbackTextSizes[i] > actualTextSize) 
+                actualTextSize = state.feedbackTextSizes[i];
+        }
+    }
+    
+    let textsize = DefaultFeedbackTextSize * devicePixelRatio,  // Default size for rendering
+        positionSize = actualTextSize * devicePixelRatio;  // Actual size for positioning
     gltext.size(textsize);
 
     let d  = event.domain(),
@@ -4808,9 +4827,23 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         bg = state.config.bgFeedback,
         fg = state.config.fgFeedback,
         gc = bg * .7,
-        ct = state.feedback - elapsedTime(),
+        elapsed = elapsedTime(),
+        ct = state.feedback - elapsed,
         p  = if ct > 1.0 then 1.0 else (if ct < 0.0 then 0.0 else ct),
         sb = gltext.boundsNL(state.feedbackText);    // size of frame string
+
+    // Check if truncation feature is enabled and queue has messages
+    // If so, current message will be truncated to 1.5 second
+    bool hasQueuedMessages = false;
+    if (state.feedbackQueueEnabled && state.feedbackQueue neq nil)
+    {
+        hasQueuedMessages = (state.feedbackQueue.size() > 0);
+    }
+    
+    let shouldExpireEarly = (state.feedbackQueueEnabled && 
+                            state.feedbackQueueTruncate && 
+                            hasQueuedMessages && 
+                            elapsed >= 1.5);
 
     bg.w = p;   // animate opacity
     fg.w = p;
@@ -4821,17 +4854,60 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     let m = margins();
-    drawTextWithCartouche(m[0]*devicePixelRatio + textsize,
-                          h-textsize-sb[3] - m[2]*devicePixelRatio,
+    drawTextWithCartouche(m[0]*devicePixelRatio + positionSize,
+                          h-positionSize-sb[3] - m[2]*devicePixelRatio,
                           state.feedbackText,
                           textsize, fg, bg,
-                          state.feedbackGlyph, gc);
+                          state.feedbackGlyph, gc,
+                          state.feedbackTextSizes);
     glDisable(GL_BLEND);
 
-    if (ct <= 0 || !isTimerRunning())
+    if (ct <= 0 || !isTimerRunning() || shouldExpireEarly)
     {
         state.feedback = 0.0;
         stopTimer();
+        
+        // Check if queue feature is enabled and there are queued messages to display
+        if (state.feedbackQueueEnabled && state.feedbackQueue neq nil)
+        {
+            let queueSize = state.feedbackQueue.size();
+            
+            if (queueSize > 0)
+            {
+                let nextMessage = state.feedbackQueue[0];
+                
+                //
+                // Remove first element using in-place shifting and resizing.
+                // DO NOT create a new array and assign it back to state.feedbackQueue.
+                //
+                // Problem: Creating a local array and assigning it to a state member
+                // causes Mu's memory management to corrupt the array:
+                //
+                //   FeedbackMessage[] newQueue;           // Local variable
+                //   for_index (i; state.feedbackQueue)
+                //       if (i > 0) newQueue.push_back(...);
+                //   state.feedbackQueue = newQueue;       // Corruption?
+                //
+                // After assignment, calling .size() on state.feedbackQueue crashes
+                // because the local variable's memory is freed or invalidated.
+                //
+                // Solution: Modify the existing state.feedbackQueue array in-place
+                // by shifting elements and resizing, avoiding local variable issues.
+                //
+                for (int i = 0; i < queueSize - 1; ++i)
+                {
+                    state.feedbackQueue[i] = state.feedbackQueue[i+1];
+                }
+                state.feedbackQueue.resize(queueSize - 1);
+                
+                // Extract values from FeedbackMessage class
+                state.feedbackText = nextMessage.text;
+                state.feedback = nextMessage.duration;
+                state.feedbackGlyph = nextMessage.glyph;
+                state.feedbackTextSizes = nextMessage.textSizes;
+                startTimer();
+            }
+        }
     }
     //
     //  Redraw no matter what, because even if we're done rendering
@@ -7062,6 +7138,9 @@ global bool debugGC = false;
 {
     s.config           = globalConfig;
     s.feedback         = 0;
+    s.feedbackQueueEnabled = true;   // Set to false to disable queue feature
+    s.feedbackQueueTruncate = false;  // Set to true to enable 1.5s truncation when queue has items
+    s.feedbackQueue    = FeedbackMessage[]();
     s.showMatte        = false;
     s.matteOpacity     = 0.66;
     s.matteAspect      = 1.85;
