@@ -13,9 +13,7 @@ from rv import commands, extra_commands
 
 
 def _get_transform_properties():
-    """
-    Retrieve RV transform properties for coordinate transformations
-    """
+    """Retrieve RV transform properties for coordinate transformations."""
     try:
         media_switch = commands.nodeConnections("MediaTrack")[0][0]
         media_source_group = commands.nodeConnections(media_switch)[0][0]
@@ -52,10 +50,8 @@ def _get_transform_properties():
         return None
 
 
-def transform_otio_to_world_coordinate(point):
-    """
-    Transform coordinates from OTIO space to RV world coordinate space (WCS)
-    """
+def _transform_otio_to_world_coordinate(point):
+    """Transform coordinates from OTIO space to RV world coordinate space (WCS)."""
     transform_properties = _get_transform_properties()
     if transform_properties is None:
         return None
@@ -139,7 +135,7 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
             if not commands.propertyExists(width_property):
                 commands.newProperty(width_property, commands.FloatType, 1)
             for point in layer.points:
-                world_coordinate_x, world_coordinate_y, world_coordinate_width = transform_otio_to_world_coordinate(
+                world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(
                     point
                 )
 
