@@ -291,7 +291,8 @@ namespace IPCore
 
         const std::string& graphID() const;
         const std::string& renderID() const;
-        const std::string& renderIDWithPartialPaint() const;
+        const std::string&
+        renderIDWithPartialPaint(const bool force_recompute = false) const;
         HashValue fbHash() const;
         HashValue renderIDHash() const;
 

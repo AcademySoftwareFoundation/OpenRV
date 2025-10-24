@@ -5190,10 +5190,21 @@ namespace IPCore
             // only cache up to the second last command
             //
 
+            // Note: We always force a recompute of the renderID here to account
+            // for changes from potentially concurrent paint commands
+            // Example:
+            // In Live Review, multiple users could be painting on the same
+            // image, and each paint command could change the renderID which
+            // would lead to a stale render cache being used if we didn't force
+            // a recompute of the renderID which is a unique identifier
+            // associated with the render.
+
             ostringstream newRenderID;
-            newRenderID << root->renderIDWithPartialPaint() << " " << m_filter
-                        << " " << m_bgpattern << " " << fbo->width() << "x"
-                        << fbo->height() << " paintCmdNo" << curCmdNum - 1;
+            newRenderID << root->renderIDWithPartialPaint(
+                true /*force_recompute*/)
+                        << " " << m_filter << " " << m_bgpattern << " "
+                        << fbo->width() << "x" << fbo->height() << " paintCmdNo"
+                        << curCmdNum - 1;
 
             cachedFBO = m_imageFBOManager.findExistingPaintFBO(
                 fbo, newRenderID.str(), foundCachedFBO, lastCmdNum,
