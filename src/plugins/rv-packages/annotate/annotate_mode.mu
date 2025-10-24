@@ -2429,6 +2429,8 @@ class: AnnotateMinorMode : MinorMode
               // bound by menuItem("   Next Annotated Frame") // ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               // bound by menuItem("   Previous Annotated Frame") // ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
               ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
+              ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
+              ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
               ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current annotation node"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
