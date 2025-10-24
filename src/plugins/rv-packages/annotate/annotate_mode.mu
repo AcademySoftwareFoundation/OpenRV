@@ -87,6 +87,7 @@ class: AnnotateMinorMode : MinorMode
 
     MetaEvalInfo      _currentNodeInfo;
     string            _currentNode;
+    string            _userSelectedNode;
     DrawMode          _currentDrawMode;
     DrawMode[]        _drawModes;
     DrawMode          _selectDrawMode;
@@ -216,35 +217,51 @@ class: AnnotateMinorMode : MinorMode
                 _currentNodeInfo = nil;
                 _currentNode = nil;
             }
-            else if (_storeOnSrc)
+            else
             {
-                //
-                //  Find first source node:
-                //
-                let sourcePaintCount = 0;
-
-                for_each (i; infos)
+                if (_userSelectedNode != "")
                 {
-                    if (nodeType(nodeGroup(i.node)) == "RVSourceGroup")
+                    for_each (i; infos)
                     {
-                        if (sourcePaintCount == 0)
+                        if (i.node == _userSelectedNode)
                         {
                             _currentNodeInfo = i;
                             _currentNode = i.node;
+                            return;
                         }
-                        ++sourcePaintCount;
                     }
                 }
-                if (sourcePaintCount != 1)
+                
+                if (_storeOnSrc)
+                {
+                    //
+                    //  Find first source node:
+                    //
+                    let sourcePaintCount = 0;
+
+                    for_each (i; infos)
+                    {
+                        if (nodeType(nodeGroup(i.node)) == "RVSourceGroup")
+                        {
+                            if (sourcePaintCount == 0)
+                            {
+                                _currentNodeInfo = i;
+                                _currentNode = i.node;
+                            }
+                            ++sourcePaintCount;
+                        }
+                    }
+                    if (sourcePaintCount != 1)
+                    {
+                        _currentNodeInfo = infos.front();
+                        _currentNode = _currentNodeInfo.node;
+                    }
+                }
+                else
                 {
                     _currentNodeInfo = infos.front();
                     _currentNode = _currentNodeInfo.node;
                 }
-            }
-            else
-            {
-                _currentNodeInfo = infos.front();
-                _currentNode = _currentNodeInfo.node;
             }
         }
         catch (...)
@@ -462,12 +479,9 @@ class: AnnotateMinorMode : MinorMode
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
 
-        if (mode != RenderOverMode)
-        {
-            let modeName = "%s.mode" % n;
-            newProperty(modeName, IntType, 1);
-            setIntProperty(modeName, int[] {mode}, true);
-        }
+        let modeName = "%s.mode" % n;
+        newProperty(modeName, IntType, 1);
+        setIntProperty(modeName, int[] {mode}, true);
 
         bool useWidth = false;
 
@@ -585,12 +599,9 @@ class: AnnotateMinorMode : MinorMode
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
 
-        if (mode != RenderOverMode)
-        {
-            let modeName = "%s.mode" % n;
-            newProperty(modeName, IntType, 1);
-            setIntProperty(modeName, int[] {mode}, true);
-        }
+        let modeName = "%s.mode" % n;
+        newProperty(modeName, IntType, 1);
+        setIntProperty(modeName, int[] {mode}, true);
 
         setFloatProperty(posName, float[] {pos.x, pos.y}, true);
         setFloatProperty(colorName, float[] {color[0], color[1], color[2], color[3]}, true);
@@ -1958,6 +1969,29 @@ class: AnnotateMinorMode : MinorMode
         event.reject();
     }
 
+    method: setCurrentNodeEvent (void; Event event)
+    {
+        let nodeName = event.contents();
+        
+        if (nodeName != "")
+        {
+            let infos = findPaintNodes();
+            
+            for_each (info; infos)
+            {
+                if (info.node == nodeName)
+                {
+                    _userSelectedNode = nodeName;
+                    return;
+                }
+            }
+        }
+
+        _userSelectedNode = "";
+
+        event.reject();
+    }
+
     method: AnnotateMinorMode (AnnotateMinorMode; string name)
     {
         _textPlacementMode = false;
@@ -1973,6 +2007,7 @@ class: AnnotateMinorMode : MinorMode
         _cursorChar        = char(0x1);
         _autoSave          = true;
         _hideDrawPane      = 0;
+        _userSelectedNode   = "";
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
@@ -2393,15 +2428,16 @@ class: AnnotateMinorMode : MinorMode
               // bound by menuItem("   Next Annotated Frame") // ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               // bound by menuItem("   Previous Annotated Frame") // ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
               ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
+              ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
+              ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
+              ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current annotation node"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
               ("stylus-color-rgb", setColorRGB, "Select color RGB"),
               ("stylus-color-hsv", setColorHSV, "Select color HSV"),
               ("ndc-pointer-1--drag", dragNDC, "Add to current stroke in NDC space"),
               ("ndc-pointer-1--push", pushNDC, "Start New Stroke in NDC space"),
-              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space"),
-              ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
-              ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames")
+              ("ndc-pointer-1--release", releaseNDC, "End Current Stroke in NDC space")
               // --------------------------------------------------------------
               //("key-down--control--z", keyUndoEvent, "Undo"),
               //("key-down--control--Z", keyRedoEvent, "Redo"),
@@ -2542,6 +2578,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: activate (void;)
     {
+        sendInternalEvent("annotate-mode-activated");
         updateCurrentNode();
         if (_manageDock neq nil) _manageDock.show();
         if (_drawDock neq nil) _drawDock.show();

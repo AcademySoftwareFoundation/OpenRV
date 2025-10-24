@@ -67,6 +67,7 @@ all_mu_commands = [
     "updateLUT",
     "narrowedFrameStart",
     "saveFileDialog",
+    "setCurrentAnnotateModeNode",
     "setHardwareStereoMode",
     "setNodeInputs",
     "clearHistory",
