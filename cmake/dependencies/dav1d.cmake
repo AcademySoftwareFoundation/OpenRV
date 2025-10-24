@@ -12,14 +12,14 @@ SET(_target
 )
 
 SET(_version
-    "1.4.3"
+    "1.5.1"
 )
 
 SET(_download_url
     "https://github.com/videolan/dav1d/archive/refs/tags/${_version}.zip"
 )
 SET(_download_hash
-    "2c62106fda87a69122dc8709243a34e8"
+    "000f1471b725a3f4de59f099b14b533e"
 )
 
 SET(_install_dir
