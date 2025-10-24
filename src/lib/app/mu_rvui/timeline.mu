@@ -387,10 +387,6 @@ class: Timeline : Widget
             event.reject();
             return;
 	}
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         State state = data();
         let loc = renderLocations(event);
         let {d, w, h, drawControls, tlh, mxb, hm0, hm1, thm1, vm0, vm1, t, Y} = loc;
@@ -533,8 +529,9 @@ class: Timeline : Widget
         }
         catch (...)
         {
-            return " ";
+            ; /* nothing */
         }
+        return " ";
     }
 
     method: showSourceFrame(void;)
@@ -822,11 +819,6 @@ class: Timeline : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         if (isCurrentFrameIncomplete() || !_pointerInTimeline)
         {
             event.reject();
@@ -839,29 +831,29 @@ class: Timeline : Widget
 
         _pointerInTimeline = false;
 
-        Menu lastHalf = Menu {
-            {"_", nil},
-            {"Time/Frame Display", nil, nil, disabledItem},
-            {"   Global Frame Numbers", setFrameDisplay(2,), nil, isDisplayFormat(2)},
-            {"   Source Frame Numbers", setFrameDisplay(0,), nil, isDisplayFormat(0)},
-            {"   Global Time Code Display", setFrameDisplay(1,), nil, isDisplayFormat(1)},
-            {"   Source Time Code Display", setFrameDisplay(4,), nil, isDisplayFormat(4)},
-            {"   Global Seconds", setFrameDisplay(5,), nil, isDisplayFormat(5)},
-            {"   Footage Display", setFrameDisplay(3,), nil, isDisplayFormat(3)},
-            {"_", nil},
-            {"Configure", Menu {
-                {"Show Play Controls", optShowVCRButtons, nil, isShowingVCRButtons},
-                {"Draw Timeline Over Imagery", optDrawTimelineOverImagery, nil, isDrawingTimelineOverImagery},
-                {"Position Timeline At Top", optDrawTimelineAtTopOfView, nil, isDrawingTimelineAtTopOfView},
-                {"Show In/Out Frame Numbers", optShowInOutTime, nil, isShowingInOutTime},
-                {"Step Wraps At In/Out", optStepWraps, nil, isStepWrapping},
-                {"Scrub Stops At In/Out", optScrubClamps, nil, isScrubClamping},
-                {"Show Source/Input at Frame", optInputName, nil, isShowingInputName},
-                {"Show Play Direction Indicator", optShowFrameDirection, nil, isShowingFrameDirection},
-                }
-            }};
+        Menu lastHalf = newMenu(MenuItem[] {
+            menuSeparator(),
+            menuText("Time/Frame Display"),
+            menuItem("   Global Frame Numbers", "", "info_category", setFrameDisplay(2,), isDisplayFormat(2)),
+            menuItem("   Source Frame Numbers", "", "info_category", setFrameDisplay(0,), isDisplayFormat(0)),
+            menuItem("   Global Time Code Display", "", "info_category", setFrameDisplay(1,), isDisplayFormat(1)),
+            menuItem("   Source Time Code Display", "", "info_category", setFrameDisplay(4,), isDisplayFormat(4)),
+            menuItem("   Global Seconds", "", "info_category", setFrameDisplay(5,), isDisplayFormat(5)),
+            menuItem("   Footage Display", "", "info_category", setFrameDisplay(3,), isDisplayFormat(3)),
+            menuSeparator(),
+            subMenu("Configure", MenuItem[] {
+                menuItem("Show Play Controls", "", "info_category", optShowVCRButtons, isShowingVCRButtons),
+                menuItem("Draw Timeline Over Imagery", "", "info_category", optDrawTimelineOverImagery, isDrawingTimelineOverImagery),
+                menuItem("Position Timeline At Top", "", "info_category", optDrawTimelineAtTopOfView, isDrawingTimelineAtTopOfView),
+                menuItem("Show In/Out Frame Numbers", "", "info_category", optShowInOutTime, isShowingInOutTime),
+                menuItem("Step Wraps At In/Out", "", "info_category", optStepWraps, isStepWrapping),
+                menuItem("Scrub Stops At In/Out", "", "info_category", optScrubClamps, isScrubClamping),
+                menuItem("Show Source/Input at Frame", "", "info_category", optInputName, isShowingInputName),
+                menuItem("Show Play Direction Indicator", "", "info_category", optShowFrameDirection, isShowingFrameDirection)
+            })
+        });
 
-        Menu mbpsMenu = Menu {{"Reset MBPS", doResetMbps}};
+        Menu mbpsMenu = newMenu(MenuItem[] {menuItem("Reset MBPS", "", "", doResetMbps, enabledItem)});
 
         if ( pointerWasInTimeline &&
             _phantomFrame >= fs &&
@@ -871,15 +863,16 @@ class: Timeline : Widget
                 title = "Timeline at %s" % fname,
                 media = sourceAtFrame(_phantomFrame);
 
-            Menu firstHalfA = Menu {
-                {title, nil, nil, disabledItem},
-                {media, nil, nil, disabledItem},
-                {"_", nil},
-                {"Set In Frame to %s" % fname, phantomSetInPoint},
-                {"Set Out Frame to %s" % fname, phantomSetOutPoint},
-                {"Clear In/Out Frames", clearInOut},
-                {"Mark Frame %s" % fname, phantomMarkFrame},
-                {"Clear Marks", doClearAllMarks}};
+            Menu firstHalfA = newMenu(MenuItem[] {
+                menuText(title),
+                menuText(media),
+                menuSeparator(),
+                menuItem("Set In Frame to %s" % fname, "", "mark_category", phantomSetInPoint, enabledItem),
+                menuItem("Set Out Frame to %s" % fname, "", "mark_category", phantomSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "mark_category", clearInOut, enabledItem),
+                menuItem("Mark Frame %s" % fname, "", "mark_category", phantomMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "mark_category", doClearAllMarks, enabledItem)
+            });
 
             Menu all;
             if (_displayMbps) all = combine (firstHalfA, combine (mbpsMenu, lastHalf));
@@ -889,14 +882,15 @@ class: Timeline : Widget
         }
         else
         {
-            Menu firstHalfB = Menu {
-                {"Timeline", nil, nil, \: (int;) { DisabledMenuState; }},
-                {"_", nil},
-                {"Set In Frame to Current", currentSetInPoint},
-                {"Set Out Frame to Current", currentSetOutPoint},
-                {"Clear In/Out Frames", clearInOut},
-                {"Mark Current Frame", currentMarkFrame},
-                {"Clear Marks", doClearAllMarks}};
+            Menu firstHalfB = newMenu(MenuItem[] {
+                menuText("Timeline"),
+                menuSeparator(),
+                menuItem("Set In Frame to Current", "", "mark_category", currentSetInPoint, enabledItem),
+                menuItem("Set Out Frame to Current", "", "mark_category", currentSetOutPoint, enabledItem),
+                menuItem("Clear In/Out Frames", "", "mark_category", clearInOut, enabledItem),
+                menuItem("Mark Current Frame", "", "mark_category", currentMarkFrame, enabledItem),
+                menuItem("Clear Marks", "", "mark_category", doClearAllMarks, enabledItem)
+            });
 
             Menu all;
             if (_displayMbps) all = combine (firstHalfB, combine (mbpsMenu, lastHalf));
@@ -1023,10 +1017,7 @@ class: Timeline : Widget
 
     method: doubleClick (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
+        // filtered by mark_category in the binding list.
         if (! _pointerInTimeline)
         {
             event.reject();
@@ -1068,7 +1059,7 @@ class: Timeline : Widget
                ("pointer--leave", handleLeave, "Track pointer leave"),
                ("pointer-1--shift--release", releaseDrag, ""),
                ("pointer-1--release", release, ""),
-               ("pointer-1--double",  doubleClick, ""),
+               ("pointer-1--double",  makeCategoryEventFunc("mark_category", doubleClick), ""),
                ("after-graph-view-change", updateMainNodeEvent, ""),
                ("graph-node-inputs-changed", updateMainNodeEvent, ""),
                ("stylus-pen--push", clickFunction(,setFrameAndInOut), "Set Frame On Timeline"),

@@ -230,11 +230,6 @@ global Configuration globalConfig =
 
 \: randomLUT (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     float[] lut;
     int n = math_util.random(25);
     lut.resize(n * 3);
@@ -320,11 +315,6 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             return if getIntProperty("#RVLinearize.color.alphaType").front() == alphaType
@@ -333,8 +323,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -342,11 +333,6 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             return if getFloatProperty("#RVLensWarp.warp.pixelAspectRatio").front() == a
@@ -355,8 +341,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -372,11 +359,6 @@ global Configuration globalConfig =
 
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             let a = getIntProperty("%s.%s.active" % fmt).front(),
@@ -388,8 +370,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -399,34 +382,26 @@ global Configuration globalConfig =
 
 \: dispGammaState (int;)
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     float g = 1.0;
+    bool error = false;
 
     try
     {
         g = getFloatProperty("@RVDisplayColor.color.gamma").front();
+        return if (g != 1.0 && g != 2.2 && g != 2.4)
+        then CheckedMenuState
+        else UncheckedMenuState;
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
 
-    return if (g != 1.0 && g != 2.2 && g != 2.4)
-            then CheckedMenuState
-            else UncheckedMenuState;
+    return DisabledMenuState;
 }
 
 \: fileGammaState (int;)
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     try
     {
         int a = getIntProperty("#RVLinearize.color.active").front();
@@ -439,8 +414,9 @@ global Configuration globalConfig =
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
+    return DisabledMenuState;
 }
 
 \: consoleState (int;)
@@ -486,11 +462,6 @@ global Configuration globalConfig =
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         let s = getIntProperty(name).front(),
             n = string.split(name, ".").back();
 
@@ -616,12 +587,6 @@ global Configuration globalConfig =
 
 \: computePixelRelativeScale (float; float scl, bool fitWidthOnly, bool silent=false)
 {
-    if (filterLiveReviewEvents())
-    {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     require math_linear;
 
     updatePixelInfo(nil);
@@ -717,11 +682,6 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             return if getFloatProperty("#RVFormat.geometry.scale").front() == res
@@ -729,19 +689,15 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
 
 \: sourcesExistState (int;)
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     if sources().size() > 0 then NeutralMenuState else DisabledMenuState;
 }
 
@@ -755,17 +711,13 @@ global Configuration globalConfig =
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
+    return DisabledMenuState;
 }
 
 \: videoSourcesExistState (int;)
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     for_each (s; sources())
     {
         if (s eq nil) continue;
@@ -871,8 +823,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -880,11 +833,6 @@ global Configuration globalConfig =
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             return if getIntProperty(name).front() == 0
@@ -893,8 +841,9 @@ global Configuration globalConfig =
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -962,8 +911,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
     }
     catch (...)
     {
-        return DisabledMenuState;
+        ; /* nothing */
     }
+    return DisabledMenuState;
 }
 
 \: isOtioEnabled (bool;)
@@ -978,11 +928,6 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         if (metaEvaluateClosestByType(frame(),"RVDisplayColor").size() > 0)
         {
             return UncheckedMenuState;
@@ -1021,11 +966,6 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             string propertyName = "@OCIODisplay.color.channelFlood";
@@ -1040,8 +980,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -1049,11 +990,6 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
         {
             string propertyName = "@OCIODisplay.color.channelOrder";
@@ -1067,8 +1003,9 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -1076,10 +1013,6 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         F(frame());
     };
 }
@@ -1087,10 +1020,6 @@ global let toggleFlip = toggleIntProp("#RVTransform2D.transform.flip"),
 \: incN ((void;); int i)
 {
     \: (void;) {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         setInc(i);
     };
 }
@@ -1140,10 +1069,6 @@ global (string, Glyph)[] showChannelGlyphs =
 {
     \: (void; Event event)
     {
-        if (filterLiveReviewEvents() && regex.match("color", param)) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         if (!sources().empty())
         {
             State state = data();
@@ -1185,10 +1110,6 @@ global (string, Glyph)[] showChannelGlyphs =
 
 \: resetAllColorParameters (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     for_each (p; (string, float)[] {
                   ("gamma",        DefaultGamma),
                   ("exposure",     DefaultExposure),
@@ -1310,10 +1231,6 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: gotoFrame (void; string text)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     setFrame(int(text));
     redraw();
 }
@@ -1481,11 +1398,6 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setFPSValue (void; string v)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     let f = float(v);
 
     if (f > 0)
@@ -1643,11 +1555,6 @@ global let gammaMode      = startParameterMode("#RVColor.color.gamma", 4.0, Defa
 
 \: setDispGamma (void; string v)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     setFloatProperty("@RVDisplayColor.color.gamma", float[]{float(v)});
     setIntProperty("@RVDisplayColor.color.Rec709", int[] {0});
     setIntProperty("@RVDisplayColor.color.sRGB", int[] {0});
@@ -1719,19 +1626,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: rangeState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if isPlayable() then NeutralMenuState else DisabledMenuState;
 }
 
 \: forwardState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if isPlayable()
          then (if inc() > 0 then CheckedMenuState else UncheckedMenuState)
          else DisabledMenuState;
@@ -1739,10 +1638,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: backwardState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if isPlayable()
         then (if inc() < 0 then CheckedMenuState else UncheckedMenuState)
         else DisabledMenuState;
@@ -1750,19 +1645,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: hasMarksState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if markedFrames().empty() then DisabledMenuState else NeutralMenuState;
 }
 
 \: markedState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if (isPlayable())
     {
         let array = markedFrames(),
@@ -1779,29 +1666,17 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: sequenceState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if sequenceBoundaries().size() > 1 then NeutralMenuState else DisabledMenuState;
 }
 
 \: playState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if isPlaying() then CheckedMenuState else
         (if isPlayable() then UncheckedMenuState else DisabledMenuState);
 }
 
 \: pingPongState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if isPlayable() then
       (if playMode() == PlayPingPong then CheckedMenuState else UncheckedMenuState)
       else DisabledMenuState;
@@ -1809,10 +1684,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: playOnceState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if isPlayable() then
       (if playMode() == PlayOnce then CheckedMenuState else UncheckedMenuState)
       else DisabledMenuState;
@@ -1820,10 +1691,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: realtimeState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if rangeState() == DisabledMenuState then DisabledMenuState
         else (if isRealtime() then UncheckedMenuState else CheckedMenuState);
 }
@@ -1836,18 +1703,12 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: displayProfilesState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
+    return NeutralMenuState;
 }
 
 
 \: filterState (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     if getFiltering() == GL_LINEAR then CheckedMenuState else UncheckedMenuState;
 }
 
@@ -1895,10 +1756,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     //
     if (event.activationTime() > 0.0 && event.activationTime() < 0.2) return;
 
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
     state.scrubFrameOrigin = frame();
     state.playingBefore = (isPlaying());
@@ -1907,10 +1764,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: releaseScrub (void; Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
     if (!state.pushed) return;
 
@@ -1927,10 +1780,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragScrub (void; bool enable, Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
     if (!state.pushed) return;
 
@@ -2075,11 +1924,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleWipe (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     State state = data();
     let vnode = viewNode();
 
@@ -2182,19 +2026,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: togglePlayFunc (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     togglePlay();
 }
 
 \: stopFunc (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     stop();
 }
 
@@ -2268,11 +2104,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: wipeShown (int;)
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     State state = data();
     let vnode = viewNode();
 
@@ -2332,11 +2163,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragZoom (void; Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     State state = data();
 
     let dp = event.pointer() - event.reference(),
@@ -2362,11 +2188,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: dragMoveLocked (void; bool lockToAxis, Event event)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-   
     recordPixelInfo(event);
     State state = data();
     if (state.pixelInfo eq nil || state.pixelInfo.empty()) return;
@@ -2402,11 +2223,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     {
         let ret = DisabledMenuState;
 
-        if (filterLiveReviewEvents())
-        {
-            return ret;
-        }
-
         try
         {
             let s = getIntProperty("@RVDisplayColor.color.sRGB").front(),
@@ -2439,10 +2255,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     \: (int;)
     {
         let ret = DisabledMenuState;
-
-        if (filterLiveReviewEvents()) {
-            return ret;
-        }
 
         try
         {
@@ -2509,10 +2321,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void; Event ev)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         int l = 0;
         int s = 0;
         int r = 0;
@@ -2552,10 +2360,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleLUT (void; string lutType, string lutKind) // Display or Color
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
 
     string node;
@@ -2605,10 +2409,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleCDL (void; string cdlType, string cdlKind)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
 
     string node;
@@ -2650,10 +2450,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleICC (void; string iccType, string iccKind)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
 
     string node;
@@ -2695,10 +2491,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleInvert (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     State state = data();
 
     try
@@ -2738,10 +2530,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: beginning (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     if (isPlaying()) stop();
     setFrame(inPoint());
     redraw();
@@ -2749,10 +2537,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: ending (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     if (isPlaying()) stop();
     setFrame(outPoint());
     redraw();
@@ -2760,11 +2544,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: toggleMark (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     markFrame(frame(), !isMarked(frame()));
     redraw();
 }
@@ -2820,11 +2599,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setInOutMarkedRangeAtFrame (void; int f)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     let (start,end) = markedBoundariesAroundFrame(f),
         playing = (isPlaying() || isBuffering());
 
@@ -2856,10 +2630,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     try
     {
         let (_,end) = markedBoundariesAroundFrame(frame());
@@ -2874,10 +2644,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     try
     {
         let (start,_) = markedBoundariesAroundFrame(frame(), false);
@@ -2892,10 +2658,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMatchedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     try
     {
         if (nodeType(viewNode()) != "RVSequenceGroup") return;
@@ -2929,10 +2691,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMatchedFrame (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     try
     {
         if (nodeType(viewNode()) != "RVSequenceGroup") return;
@@ -2966,10 +2724,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: setMatchedFrame (void; int currentLocal, int globalStart, int globalEnd)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
     let localStart = sourceFrame(globalStart),
         localEnd   = sourceFrame(globalEnd);
 
@@ -2989,11 +2743,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: nextMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     try
     {
         let (start,end) = markedBoundariesAroundFrame(frame());
@@ -3019,11 +2768,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: previousMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     try
     {
         let (start,end) = markedBoundariesAroundFrame(frame());
@@ -3049,11 +2793,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: expandMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     try
     {
         let marks = markedFrames();
@@ -3102,11 +2841,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: contractMarkedRange (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     try
     {
         let marks = markedFrames(),
@@ -3149,11 +2883,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         State state = data();
 
         string propertyName = "OCIODisplay.color.channelFlood";
@@ -3198,11 +2927,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     // are resetting the in/out points, but if they do
     // then we are restoring the old values.
     //
-
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
 
     State state = data();
     
@@ -3283,11 +3007,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (void;)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         setFPS(rate);
         redraw();
     };
@@ -3297,10 +3016,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
-            return DisabledMenuState;
-        }
-
         try
         {
             let d = getIntProperty("#RVFormat.color.maxBitDepth").front();
@@ -3308,8 +3023,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3317,10 +3033,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
-            return DisabledMenuState;
-        }
-
         try
         {
             let r = getFloatProperty(prop);
@@ -3328,8 +3040,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3337,11 +3050,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         State state = data();
         float smaspect = state.matteAspect;
         if (!state.showMatte && maspect == 0.0) return CheckedMenuState;
@@ -3362,11 +3070,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         State state = data();
         float smop = state.matteOpacity;
         if (mop == -1.0  &&
@@ -3433,8 +3136,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -3454,11 +3158,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         try
     {
             string propertyName = "@OCIODisplay.color.dither";
@@ -3472,8 +3171,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     };
 }
 
@@ -4911,21 +4611,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: cycleStackForward (void; Event ev)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     smartCycleInputs (true);
 }
 
 \: cycleStackBackward (void; Event ev)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
-        return;
-    }
-
     smartCycleInputs (false);
 }
 
@@ -4939,9 +4629,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: isStackMode (int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
     let typeName = nodeType(viewNode());
     if typeName == "RVStackGroup" || typeName == "RVLayoutGroup" 
                then UncheckedMenuState 
@@ -4992,11 +4679,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: frameState (int;)
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     return NeutralMenuState;
 }
 
@@ -5012,11 +4694,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents())
-        {
-            return DisabledMenuState;
-        }
-
         let t = getStringProperty("@RVDisplayStereo.stereo.type").front();
 
         if (type == "any")
@@ -5036,10 +4713,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     \: (int; )
     {
-        if (filterLiveReviewEvents()) {
-            return DisabledMenuState;
-        }
-
         bool toggled = false;
         try 
         {
@@ -5066,10 +4739,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 
 \: eyeOffsetState(int;)
 {
-    if (filterLiveReviewEvents()) {
-        return DisabledMenuState;
-    }
-
     return NeutralMenuState;
 }
 
@@ -6272,10 +5941,6 @@ global bool debugGC = false;
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
-            return DisabledMenuState;
-        }
-
         let t = getStringProperty("defaultStack_stack.composite.type").front(),
             isStack = (viewNode() == "defaultStack");
 
@@ -6287,10 +5952,6 @@ global bool debugGC = false;
 {
     \: (int;)
     {
-        if (filterLiveReviewEvents()) {
-            return DisabledMenuState;
-        }
-
         let itIs = (viewNode() == name);
 
         return if (itIs) then CheckedMenuState else UncheckedMenuState;
@@ -6338,11 +5999,6 @@ global bool debugGC = false;
 
 \: lockResizeScaleState (int; )
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
-
     State state = data();
     return if (state.lockResizeScale) then CheckedMenuState else UncheckedMenuState;
 }
@@ -6355,191 +6011,192 @@ global bool debugGC = false;
 
 \: isExpandedWidth (int; )
 {
-    if (filterLiveReviewEvents())
-    {
-        return DisabledMenuState;
-    }
     return if (expandWidth) then CheckedMenuState else UncheckedMenuState;
 }
 
 \: buildViewMenu (Menu;)
 {
-    Menu a = {
-        {"Stereo", Menu {
-            {"Stereo Viewing Mode", nil, nil, inactiveState},
-            {"   Off", setStereo("off"), nil, isStereo("off")},
-            {"   Anaglyph", setStereo("anaglyph"), nil, isStereo("anaglyph")},
-            {"   Luminance Anaglyph", setStereo("lumanaglyph"), nil, isStereo("lumanaglyph")},
-            {"   Side-by-Side", setStereo("pair"), nil, isStereo("pair")},
-            {"   Mirror Side-by-Side", setStereo("mirror"), nil, isStereo("mirror")},
+    Menu a = newMenu(MenuItem[] {
+        subMenu("Stereo", MenuItem[] {
+            menuText("Stereo Viewing Mode"),
+            menuItem("   Off", "", "viewmode_category", setStereo("off"), isStereo("off")),
+            menuItem("   Anaglyph", "", "viewmode_category", setStereo("anaglyph"), isStereo("anaglyph")),
+            menuItem("   Luminance Anaglyph", "", "viewmode_category", setStereo("lumanaglyph"), isStereo("lumanaglyph")),
+            menuItem("   Side-by-Side", "", "viewmode_category", setStereo("pair"), isStereo("pair")),
+            menuItem("   Mirror Side-by-Side", "", "viewmode_category", setStereo("mirror"), isStereo("mirror")),
             //{"   Horizontal Squeezed", setStereo("hsqueezed"), nil, isStereo("hsqueezed")},
             //{"   Vertical Squeezed", setStereo("vsqueezed"), nil, isStereo("vsqueezed")},
-            {"   DLP Checker", setStereo("checker"), nil, isStereo("checker")},
-            {"   Scanline", setStereo("scanline"), nil, isStereo("scanline")},
-            {"   Left Eye Only", setStereo("left"), nil, isStereo("left")},
-            {"   Right Eye Only", setStereo("right"), nil, isStereo("right")},
-            {"   Shutter Glasses", setStereo("hardware"), nil, isStereo("hardware")},
-            {"_", nil},
-            {"Global Swap Eyes", ~toggleSwapEyes, nil, propToggledAndStereoOnState("@RVDisplayStereo.stereo.swap")},
-            {"Global Flip Right Eye", ~toggleRFlip, nil, propToggledAndStereoOnState("@RVDisplayStereo.rightTransform.flip")},
-            {"Global Flop Right Eye", ~toggleRFlop, nil, propToggledAndStereoOnState("@RVDisplayStereo.rightTransform.flop")},
-            {"_", nil},
-            {"Interactive Edit",      nil, nil, inactiveState },
-            {"    Global Relative Eye Offset (%)", stereoOffsetMode, nil, eyeOffsetState},
-            {"    Global Right Eye Only Offset (%)", stereoROffsetMode, nil, eyeOffsetState},
-            {"_", nil},
-            {"Reset All Stereo Offsets", resetStereoOffsets, nil, eyeOffsetState},
-            }},
+            menuItem("   DLP Checker", "", "viewmode_category", setStereo("checker"), isStereo("checker")),
+            menuItem("   Scanline", "", "viewmode_category", setStereo("scanline"), isStereo("scanline")),
+            menuItem("   Left Eye Only", "", "viewmode_category", setStereo("left"), isStereo("left")),
+            menuItem("   Right Eye Only", "", "viewmode_category", setStereo("right"), isStereo("right")),
+            menuItem("   Shutter Glasses", "", "viewmode_category", setStereo("hardware"), isStereo("hardware")),
+            menuSeparator(),
+            menuItem("Global Swap Eyes", "", "viewmode_category", ~toggleSwapEyes, propToggledAndStereoOnState("@RVDisplayStereo.stereo.swap")),
+            menuItem("Global Flip Right Eye", "", "viewmode_category", ~toggleRFlip, propToggledAndStereoOnState("@RVDisplayStereo.rightTransform.flip")),
+            menuItem("Global Flop Right Eye", "", "viewmode_category", ~toggleRFlop, propToggledAndStereoOnState("@RVDisplayStereo.rightTransform.flop")),
+            menuSeparator(),
+            menuText("Interactive Edit"),
+            menuItem("    Global Relative Eye Offset (%)", "", "viewmode_category", stereoOffsetMode, eyeOffsetState),
+            menuItem("    Global Right Eye Only Offset (%)", "", "viewmode_category", stereoROffsetMode, eyeOffsetState),
+            menuSeparator(),
+            menuItem("Reset All Stereo Offsets", "", "viewmode_category", resetStereoOffsets, eyeOffsetState)
+            }),
         //{"Renderer", Menu {
             //{"Composite", setToRenderer("Composite"), nil, isSetToRenderer("Composite")}
             //{"Direct", setToRenderer("Direct"), nil, isSetToRenderer("Direct")}
         //  }},
-        {"_", nil},
-        {"Presentation Mode", ~togglePresentationMode, "control p", presentationModeState},
-        {"Presentation Settings", Menu()},
-        {"_", nil},
-        {"Frame",           ~frameImage,     "f", frameState},
-        {"Frame Width",     frameWidth,     "control f", frameState},
-        {"_", nil},
-        {"Linear to Display Correction", nil, nil, inactiveState},
-        {"   No Correction", setDispConvert(""), nil, hasDispConversion("")},
-        {"   sRGB", setDispConvert("sRGB"), nil, hasDispConversion("sRGB")},
-        {"   Rec709", setDispConvert("Rec709"), nil, hasDispConversion("Rec709")},
-        {"   Display Gamma 2.2", setDispConvert("Gamma 2.2"), nil, hasDispConversion("Gamma 2.2")},
-        {"   Display Gamma 2.4", setDispConvert("Gamma 2.4"), nil, hasDispConversion("Gamma 2.4")},
-        {"   Display Gamma...", enterDispGamma, "v", dispGammaState},
-        {"_", nil},
-        {"Display LUT Active", ~toggleDisplayLUT, "D", isDisplayLUTActiveState},
-        {"Display ICC Active", ~toggleDisplayICC, "", isDisplayICCActiveState},
-        {"_", nil},
-        {"Display Brightness (Interactive)", brightnessMode, "B", checkForDisplayColor()},
-        {"_", nil},
-        {"Matte", Menu {
-            {"No Matte", ~setMatte(0),     nil, matteAspectState(0)},
-            {"1.33",     ~setMatte(1.33),  nil, matteAspectState(1.33)},
-            {"1.66",     ~setMatte(1.66),  nil, matteAspectState(1.66)},
-            {"1.77",     ~setMatte(1.77),  nil, matteAspectState(1.77)},
-            {"1.85",     ~setMatte(1.85),  nil, matteAspectState(1.85)},
-            {"2.35",     ~setMatte(2.35),  nil, matteAspectState(2.35)},
-            {"2.40",     ~setMatte(2.40),  nil, matteAspectState(2.40)},
-            {"_", nil},
-            {"Custom...",    enterMatte,   nil, matteAspectState(-1.0)}
-        }},
-        {"Matte Opacity", Menu {
-            {"33%",     ~setMatteOpacity(0.33),  nil, matteOpacityState(0.33)},
-            {"66%",     ~setMatteOpacity(0.66),  nil, matteOpacityState(0.66)},
-            {"100%",    ~setMatteOpacity(1.0),   nil, matteOpacityState(1.0)},
-            {"_", nil},
-            {"Custom...", enterMatteOpacity,   nil, matteOpacityState(-1.0)}
-        }},
-        {"_", nil},
-        {"Channel Display", Menu {
-            {"Color (All Channels)", ~showChannel(0), "c", channelState(0)},
-            {"Red",             ~showChannel(1), "r", channelState(1)},
-            {"Green",           ~showChannel(2), "g", channelState(2)},
-            {"Blue",            ~showChannel(3), "b", channelState(3)},
-            {"Alpha",           ~showChannel(4), "a", channelState(4)},
-            {"_", nil},
-            {"Luminance",       ~showChannel(5), "l", channelState(5)}}},
-        {"Channel Order", Menu {
-            {"RGBA", ~channelOrder("RGBA"), nil, channelOrderState("RGBA")},
-            {"_", nil},
-            {"Custom...", enterOrder, nil, checkForDisplayNode()},
-            {"_", nil},
-            {"RBGA", ~channelOrder("RBGA"), nil, channelOrderState("RBGA")},
-            {"GBRA", ~channelOrder("GBRA"), nil, channelOrderState("GBRA")},
-            {"GRBA", ~channelOrder("GRBA"), nil, channelOrderState("GRBA")},
-            {"BRGA", ~channelOrder("BRGA"), nil, channelOrderState("BRGA")},
-            {"BGRA", ~channelOrder("BGRA"), nil, channelOrderState("BGRA")},
-            {"_", nil},
-            {"ABGR", ~channelOrder("ABGR"), nil, channelOrderState("ABGR")},
-            {"ARGB", ~channelOrder("ARGB"), nil, channelOrderState("ARGB")},
-            {"_", nil},
-            {"R00A", ~channelOrder("R00A"), nil, channelOrderState("R00A")},
-            {"0G0A", ~channelOrder("0G0A"), nil, channelOrderState("0G0A")},
-            {"00BA", ~channelOrder("00BA"), nil, channelOrderState("00BA")}
-        }},
-        {"Background", Menu {
-            {"Black", setBGPattern(,"black"), nil,            testBGPattern("black")},
-            {"18% Grey", setBGPattern(,"grey18"), nil,        testBGPattern("grey18")},
-            {"50% Grey", setBGPattern(,"grey50"), nil,        testBGPattern("grey50")},
-            {"White", setBGPattern(,"white"), nil,            testBGPattern("white")},
-            {"Checker", setBGPattern(,"checker"), nil,        testBGPattern("checker")},
-            {"Cross Hatch", setBGPattern(,"crosshatch"), nil, testBGPattern("crosshatch")}
-        }},
-        {"_", nil},
-        {"Dither", Menu {
-            {"Off", setDither(,0), nil, testDither(0)},
-            {"8 Bit", setDither(,8), nil, testDither(8)},
-            {"10 Bit", setDither(,10), nil, testDither(10)}
-        }},
-        {"_", nil},
-        {"Show Out Of Range Colors", ~toggleOutOfRange, nil, isOutOfRange},
-        {"_", nil},
-        {"Create/Edit Display Profiles...", ~editProfiles, nil, displayProfilesState},
-        {"_", nil},
-        {"Linear Filter",   ~toggleFilter, "n", filterState},
-        {"Lock Pixel Scale During Resize",  toggleLockResizeScale, nil, lockResizeScaleState},
-        {"Preserve Image Height in Pixel Aspect Scaling",  toggleExpandWidth, nil, isExpandedWidth}
-    };
+        menuSeparator(),
+        menuItem("Presentation Mode", "key-down--control--p", "presentation_category", ~togglePresentationMode, presentationModeState),
+        subMenu("Presentation Settings", Menu{} ),
+        menuSeparator(),
+        menuItem("Frame", "key-down--f", "presentation_category", ~frameImage, frameState),
+        menuItem("Frame Width", "key-down--control--f", "presentation_category", frameWidth, frameState),
+        menuSeparator(),
+        menuText("Linear to Display Correction"),
+        menuItem("   No Correction", "", "viewmode_category", setDispConvert(""), hasDispConversion("")),
+        menuItem("   sRGB", "", "viewmode_category", setDispConvert("sRGB"), hasDispConversion("sRGB")),
+        menuItem("   Rec709", "", "viewmode_category", setDispConvert("Rec709"), hasDispConversion("Rec709")),
+        menuItem("   Display Gamma 2.2", "", "viewmode_category", setDispConvert("Gamma 2.2"), hasDispConversion("Gamma 2.2")),
+        menuItem("   Display Gamma 2.4", "", "viewmode_category", setDispConvert("Gamma 2.4"), hasDispConversion("Gamma 2.4")),
+        menuItem("   Display Gamma...", "key-down--v", "viewmode_category", enterDispGamma, dispGammaState),
+        menuSeparator(),
+        menuItem("Display LUT Active", "key-down--D", "viewmode_category", ~toggleDisplayLUT, isDisplayLUTActiveState),
+        menuItem("Display ICC Active", "", "viewmode_category", ~toggleDisplayICC, isDisplayICCActiveState),
+        menuSeparator(),
+        menuItem("Display Brightness (Interactive)", "key-down--B", "viewmode_category", brightnessMode, checkForDisplayColor()),
+        menuSeparator(),
+        subMenu("Matte", MenuItem[] {
+            menuItem("No Matte", "", "viewmode_category", ~setMatte(0), matteAspectState(0)),
+            menuItem("1.33", "", "viewmode_category", ~setMatte(1.33), matteAspectState(1.33)),
+            menuItem("1.66", "", "viewmode_category", ~setMatte(1.66), matteAspectState(1.66)),
+            menuItem("1.77", "", "viewmode_category", ~setMatte(1.77), matteAspectState(1.77)),
+            menuItem("1.85", "", "viewmode_category", ~setMatte(1.85), matteAspectState(1.85)),
+            menuItem("2.35", "", "viewmode_category", ~setMatte(2.35), matteAspectState(2.35)),
+            menuItem("2.40", "", "viewmode_category", ~setMatte(2.40), matteAspectState(2.40)),
+            menuSeparator(),
+            menuItem("Custom...", "", "viewmode_category", enterMatte, matteAspectState(-1.0))
+            }),
+        subMenu("Matte Opacity", MenuItem[] {
+            menuItem("33%", "", "viewmode_category", ~setMatteOpacity(0.33), matteOpacityState(0.33)),
+            menuItem("66%", "", "viewmode_category", ~setMatteOpacity(0.66), matteOpacityState(0.66)),
+            menuItem("100%", "", "viewmode_category", ~setMatteOpacity(1.0), matteOpacityState(1.0)),
+            menuSeparator(),
+            menuItem("Custom...", "", "viewmode_category", enterMatteOpacity, matteOpacityState(-1.0))
+        }),
+        menuSeparator(),
+        subMenu("Channel Display", MenuItem[] {
+            menuItem("Color (All Channels)", "key-down--c", "viewmode_category", ~showChannel(0), channelState(0)),
+            menuItem("Red", "key-down--r", "viewmode_category", ~showChannel(1), channelState(1)),
+            menuItem("Green", "key-down--g", "viewmode_category", ~showChannel(2), channelState(2)),
+            menuItem("Blue", "key-down--b", "viewmode_category", ~showChannel(3), channelState(3)),
+            menuItem("Alpha", "key-down--a", "viewmode_category", ~showChannel(4), channelState(4)),
+            menuSeparator(),
+            menuItem("Luminance", "key-down--l", "viewmode_category", ~showChannel(5), channelState(5))
+        }),
+        subMenu("Channel Order", MenuItem[] {
+            menuItem("RGBA", "", "viewmode_category", ~channelOrder("RGBA"), channelOrderState("RGBA")),
+            menuSeparator(),
+            menuItem("Custom...", "", "viewmode_category", enterOrder, checkForDisplayNode()),
+            menuSeparator(),
+            menuItem("RBGA", "", "viewmode_category", ~channelOrder("RBGA"), channelOrderState("RBGA")),
+            menuItem("GBRA", "", "viewmode_category", ~channelOrder("GBRA"), channelOrderState("GBRA")),
+            menuItem("GRBA", "", "viewmode_category", ~channelOrder("GRBA"), channelOrderState("GRBA")),
+            menuItem("BRGA", "", "viewmode_category", ~channelOrder("BRGA"), channelOrderState("BRGA")),
+            menuItem("BGRA", "", "viewmode_category", ~channelOrder("BGRA"), channelOrderState("BGRA")),
+            menuSeparator(),
+            menuItem("ABGR", "", "viewmode_category", ~channelOrder("ABGR"), channelOrderState("ABGR")),
+            menuItem("ARGB", "", "viewmode_category", ~channelOrder("ARGB"), channelOrderState("ARGB")),
+            menuSeparator(),
+            menuItem("R00A", "", "viewmode_category", ~channelOrder("R00A"), channelOrderState("R00A")),
+            menuItem("0G0A", "", "viewmode_category", ~channelOrder("0G0A"), channelOrderState("0G0A")),
+            menuItem("00BA", "", "viewmode_category", ~channelOrder("00BA"), channelOrderState("00BA"))
+        }),
+        subMenu("Background", MenuItem[] {
+            menuItem("Black", "", "viewmode_category", setBGPattern(,"black"), testBGPattern("black")),
+            menuItem("18% Grey", "", "viewmode_category", setBGPattern(,"grey18"), testBGPattern("grey18")),
+            menuItem("50% Grey", "", "viewmode_category", setBGPattern(,"grey50"), testBGPattern("grey50")),
+            menuItem("White", "", "viewmode_category", setBGPattern(,"white"), testBGPattern("white")),
+            menuItem("Checker", "", "viewmode_category", setBGPattern(,"checker"), testBGPattern("checker")),
+            menuItem("Cross Hatch", "", "viewmode_category", setBGPattern(,"crosshatch"), testBGPattern("crosshatch"))
+        }),
+        menuSeparator(),
+        subMenu("Dither", MenuItem[] {
+            menuItem("Off", "", "viewmode_category", setDither(,0), testDither(0)),
+            menuItem("8 Bit", "", "viewmode_category", setDither(,8), testDither(8)),
+            menuItem("10 Bit", "", "viewmode_category", setDither(,10), testDither(10))
+        }),
+        menuSeparator(),
+        menuItem("Show Out Of Range Colors", "", "viewmode_category", ~toggleOutOfRange, isOutOfRange),
+        menuSeparator(),
+        menuItem("Create/Edit Display Profiles...", "", "viewmode_category", ~editProfiles, displayProfilesState),
+        menuSeparator(),
+        menuItem("Linear Filter", "key-down--n", "viewmode_category", ~toggleFilter, filterState),
+        menuItem("Lock Pixel Scale During Resize", "", "viewmode_category", toggleLockResizeScale, lockResizeScaleState),
+        menuItem("Preserve Image Height in Pixel Aspect Scaling", "", "viewmode_category", toggleExpandWidth, isExpandedWidth)
+    });
 
     return a;
 }
 
+
 \: buildMainMenu (Menu; [MenuItem] userMenus = nil)
 {
 
-   Menu exportMenu = Menu {
-            {"Quicktime Movie...", exportAs(, "mov", "Quicktime Export"), "control e", videoSourcesExistAndExportOKState},
-            {"Image Sequence...", exportAs(, "*", "Image Sequence Export"), nil, videoSourcesExistAndExportOKState},
-            {"Marked Frames...", exportMarked, nil, hasMarksState},
-            {"Annotated Frames...", exportAnnotatedFrames, nil, videoSourcesExistState},
-            {"Audio File...", exportAs(, "*", "Audio Export"), nil, sourcesExistState},
-            {"Snapshot...", exportFrame(,exportCurrentFrame), nil, videoSourcesExistState},
-            {"Current Source Frame...", exportFrame(,exportCurrentSourceFrame), nil, videoSourcesExistState},
-            {"Image Attributes...", exportAttrs, nil, videoSourcesExistState},
-            {"RVIO Ready Session...", exportAs(, "rv", "Session Export"), nil, videoSourcesExistState},
-            {"OTIO File...", exportOtio, nil, canExportOTIOState}};
+    try {
+    Menu exportMenu = newMenu(MenuItem[] {
+        menuItem("Quicktime Movie...", "key-down--control--e", "export_category", exportAs(, "mov", "Quicktime Export"), videoSourcesExistAndExportOKState),
+        menuItem("Image Sequence...", "", "export_category", exportAs(, "*", "Image Sequence Export"), videoSourcesExistAndExportOKState),
+        menuItem("Marked Frames...", "", "export_category", exportMarked, hasMarksState),
+        menuItem("Annotated Frames...", "", "export_category", exportAnnotatedFrames, videoSourcesExistState),
+        menuItem("Audio File...", "", "export_category", exportAs(, "*", "Audio Export"), sourcesExistState),
+        menuItem("Snapshot...", "", "export_category", exportFrame(,exportCurrentFrame), videoSourcesExistState),
+        menuItem("Current Source Frame...", "", "export_category", exportFrame(,exportCurrentSourceFrame), videoSourcesExistState),
+        menuItem("Image Attributes...", "", "export_category", exportAttrs, videoSourcesExistState),
+        menuItem("RVIO Ready Session...", "", "export_category", exportAs(, "rv", "Session Export"), videoSourcesExistState),
+        menuItem("OTIO File...", "", "export_category", exportOtio, canExportOTIOState)
+    });
 
     if (true || shortAppName() == "rvx")
     {
-         exportMenu.push_back (MenuItem {"Definition of Current View Node ...", exportNodeDefinition(false,), nil, videoSourcesExistState});
-         exportMenu.push_back (MenuItem {"All Node Definitions ...", exportNodeDefinition(true,), nil, videoSourcesExistState});
+         exportMenu.push_back (menuItem("Definition of Current View Node ...", "", "export_category", exportNodeDefinition(false,), videoSourcesExistState));
+         exportMenu.push_back (menuItem("All Node Definitions ...", "", "export_category", exportNodeDefinition(true,), videoSourcesExistState));
     }
 
-    Menu mainMenu_part1 = {
-        {"File", Menu {
-            {"New Session", \: (void; Event ev) { newSession(nil); }, "control n", newSessionState},
-            {"Open...",  addMovieOrImageSources(,true,false), "control o", nil},
-            {"Merge...",  addMovieOrImageSources(,true,true), nil, nil},
-            {"Open into Layer...",  addMovieOrImage(,addToClosestSource(,"explicit"),false), nil, sourcesExistState},
-            {"Open in New Session...",  openMovieOrImage, "control O", newSessionState},
-            {"_", nil},
-            {"Clone Session", cloneSession, nil, newSessionState},
-            {"Clone RV", cloneRV, nil, nil},
-            {"Clone Synced RV", cloneSyncedRV, nil, nil},
-            {"_", nil},
-            {"Relocate Movie or Image Sequence...",  relocateMovieOrImage, nil, singleSourceState},
-            {"Replace Source Media...", replaceSourceMedia, nil, singleSourceState},
-            {"_", nil},
-            {"Save Session", save, "control s", nil},
-            {"Save Session As...", saveAs, "control S", nil},
-            {"_", nil},
-            {"Import", Menu {
-                {"Display LUT...",  openLUTFile("@RVDisplayColor"), nil, checkForDisplayColor()},
-                {"Pre-Cache LUT...",  openLUTFile("#RVCacheLUT"), nil, videoSourcesAndNodeExistState("RVCacheLUT")},
-                {"File LUT...",  openLUTFile("#RVLinearize"), nil, videoSourcesAndNodeExistState("RVLinearize")},
-                {"File CDL...",  openCDLFile("#RVLinearize"), nil, videoSourcesAndNodeExistState("RVLinearize")},
-                {"Look LUT...",  openLUTFile("#RVLookLUT"), nil, videoSourcesAndNodeExistState("RVLookLUT")},
-                {"Look CDL...",  openCDLFile("#RVColor"), nil, videoSourcesAndNodeExistState("RVColor")},
-                {"File OTIO...",  openOTIOFile(), nil, checkForOTIOFile()},
-                {"Simple EDL...",  ~openSimpleEDL, nil, nil}}},
-            {"Export", exportMenu},
-            {"_", nil},
-            {"Clear",           ~clearEverything, "control N", nil},
-            {"Close Session",    queryClose, "control w", nil}
-            }},
-        {"Edit", Menu {
+    Menu mainMenu_part1 = newMenu(MenuItem[] {
+        subMenu("File", MenuItem[] {
+            menuItem("New Session", "", "media_category", \: (void; Event ev) { newSession(nil); }, newSessionState),
+            menuItem("Open...", "key-down--control--i", "media_category", addMovieOrImageSources(,true,false), enabledItem),
+            menuItem("Merge...", "key-down--control--o", "media_category", addMovieOrImageSources(,true,true), enabledItem),
+            menuItem("Open into Layer...", "", "media_category", addMovieOrImage(,addToClosestSource(,"explicit"),false), sourcesExistState),
+            menuItem("Open in New Session...", "key-down--control--O", "media_category", openMovieOrImage, newSessionState),
+            menuSeparator(),
+            menuItem("Clone Session", "", "media_category", cloneSession, newSessionState),
+            menuItem("Clone RV", "", "media_category", cloneRV, enabledItem),
+            menuItem("Clone Synced RV", "", "media_category", cloneSyncedRV, enabledItem),
+            menuSeparator(),
+            menuItem("Relocate Movie or Image Sequence...", "", "media_category", relocateMovieOrImage, singleSourceState),
+            menuItem("Replace Source Media...", "", "media_category", replaceSourceMedia, singleSourceState),
+            menuSeparator(),
+            menuItem("Save Session", "key-down--control--s", "export_category", save, enabledItem),
+            menuItem("Save Session As...", "key-down--control--S", "export_category", saveAs, enabledItem),
+            menuSeparator(),
+            subMenu("Import", MenuItem[] {
+                menuItem("Display LUT...", "", "source_category", openLUTFile("@RVDisplayColor"), checkForDisplayColor()),
+                menuItem("Pre-Cache LUT...", "", "source_category", openLUTFile("#RVCacheLUT"), videoSourcesAndNodeExistState("RVCacheLUT")),
+                menuItem("File LUT...", "", "source_category", openLUTFile("#RVLinearize"), videoSourcesAndNodeExistState("RVLinearize")),
+                menuItem("File CDL...", "", "source_category", openCDLFile("#RVLinearize"), videoSourcesAndNodeExistState("RVLinearize")),
+                menuItem("Look LUT...", "", "source_category", openLUTFile("#RVLookLUT"), videoSourcesAndNodeExistState("RVLookLUT")),
+                menuItem("Look CDL...", "", "source_category", openCDLFile("#RVColor"), videoSourcesAndNodeExistState("RVColor")),
+                menuItem("File OTIO...", "", "source_category", openOTIOFile(), checkForOTIOFile()),
+                menuItem("Simple EDL...", "", "source_category", ~openSimpleEDL, enabledItem)
+            }),
+            subMenu("Export", exportMenu),
+            menuSeparator(),
+            menuItem("Clear", "key-down--control--N", "clear_category", ~clearEverything, enabledItem),
+            menuItem("Close Session", "key-down--control--q", "system_category", queryClose, enabledItem)
+        }),
+        subMenu("Edit", MenuItem[] {
             //{"Undo",              nil,     nil,   inactiveState},
             //{"Redo",              nil,     nil,   inactiveState},
             //{"_", nil},
@@ -6547,59 +6204,62 @@ global bool debugGC = false;
             //{"Copy",              nil,     nil,   inactiveState},
             //{"Paste",             nil,     nil,   inactiveState},
             //{"_", nil},
-            {"Mark Frame",               ~toggleMark,    "m",   markedState},
-            {"Mark Sequence Boundaries", ~markSequence,  nil,   sequenceState},
-            {"Mark Annotated Frames", ~markAnnotatedFrames,  nil,   rangeState},
-            {"Clear All Marks",          ~clearAllMarks, nil,   hasMarksState},
-            {"Mark in Range", Menu {
-                {"Clear Range",          ~clearMarksInRange,  nil,     hasMarksState},
-                {"_", nil},
-                {"Set Range In Point",    ~frameFunc(setInPoint),   "[", rangeState},
-                {"Set Range Out Point",   ~frameFunc(setOutPoint),  "]", rangeState},
-                {"Reset Range",            ~resetInOutPoints,  "\\",     rangeState},
+            menuItem("Mark Frame", "key-down--m", "mark_category", ~toggleMark, markedState),
+            menuItem("Mark Sequence Boundaries", "", "mark_category", ~markSequence, sequenceState),
+            menuItem("Mark Annotated Frames", "", "mark_category", ~markAnnotatedFrames, rangeState),
+            menuItem("Clear All Marks", "", "mark_category", ~clearAllMarks, hasMarksState),
+            subMenu("Mark in Range", MenuItem[] {
+                menuItem("Clear Range", "", "mark_category", ~clearMarksInRange, hasMarksState),
+                menuSeparator(),
+                menuItem("Set Range In Point", "key-down--[", "mark_category", ~frameFunc(setInPoint), rangeState),
+                menuItem("Set Range Out Point", "key-down--]", "mark_category", ~frameFunc(setOutPoint), rangeState),
+                menuItem("Reset Range", "key-down--\\", "mark_category", ~resetInOutPoints, rangeState),
                 /*
                 {"_", nil},
                 {"Narrow to Range",            ~narrowToInOut,  nil,     nil},
                 {"Widen to Full Range",        ~resetRange,  nil,     nil},
                 */
-                {"_", nil},
-                {"Set Range From Marks/Boundaries",  ~setInOutMarkedRange, "|",      rangeState},
-                {"Next Range From Marks/Boundaries", ~nextMarkedRange, "control right", rangeState},
-                {"Prev Range From Marks/Boundaries", ~previousMarkedRange, "control left", rangeState},
-                {"Expand Range From Marks/Boundaries", ~expandMarkedRange, "control up", rangeState},
-                {"Contract Range From Marks/Boundaries", ~contractMarkedRange, "control down", rangeState}}},
-            {"Set Range Offset", setRangeOffset, nil, sourcesExistState},
-            }},
-        {"Control", Menu {
-            {"Play",            ~togglePlayFunc,     nil, playState},
-            {"Stop",            ~stopFunc,           nil, rangeState},
-            {"PingPong",        ~togglePingPong, nil, pingPongState},
-            {"Play Once",       ~togglePlayOnce, nil, playOnceState},
-            {"Step Forward",    ~stepForward1,   nil, rangeState},
-            {"Step Backward",   ~stepBackward1,  nil, rangeState},
-            {"Reverse",         ~toggleForwardsBackwards, nil, rangeState},
-            {"_", nil},
-            {"Go To Frame...",   enterFrame, "G",  rangeState},
-            {"_", nil},
-            {"Play All Frames", ~toggleRealtime, "A",           realtimeState},
-                {"FPS", Menu {
-                    {"24",       ~setFPSFunc(24.0),  "alt 2",   rangeState},
-                    {"25",       ~setFPSFunc(25.0),  "alt 5",   rangeState},
-                    {"23.98",    ~setFPSFunc(23.98),  nil,          rangeState},
-                    {"30",       ~setFPSFunc(30.0),  "alt 3",   rangeState},
-                    {"29.97",    ~setFPSFunc(29.97),  nil,          rangeState},
-                    {"_", nil},
-                    {"Custom...", enterFPS,           "F",          rangeState}}},
-            {"_", nil},
-            {"Play Forward",    ~incN(1),       ".",            forwardState},
-            {"Play Backward",   ~incN(-1),      ",",            backwardState},
-            {"_", nil},
-            {"Jump To Beginning", ~beginning,           "home",         rangeState},
-            {"Jump To Ending",    ~ending,              "end",          rangeState},
-            {"Next Marked Frame", ~nextMarkedFrame,     "alt right", rangeState},
-            {"Prev Marked Frame", ~previousMarkedFrame, "alt left", rangeState},
-            {"Matching Frame Of Next Source", ~nextMatchedFrame,     ">", rangeState},
-            {"Matching Frame Of Previous Source", ~previousMatchedFrame, "<", rangeState},
+                menuSeparator(),
+                menuItem("Set Range From Marks/Boundaries", "key-down--|", "mark_category", ~setInOutMarkedRange, rangeState),
+                menuItem("Next Range From Marks/Boundaries", "key-down--control--right", "mark_category", ~nextMarkedRange, rangeState),
+                menuItem("Prev Range From Marks/Boundaries", "key-down--control--left", "mark_category", ~previousMarkedRange, rangeState),
+                menuItem("Expand Range From Marks/Boundaries", "key-down--control--up", "mark_category", ~expandMarkedRange, rangeState),
+                menuItem("Contract Range From Marks/Boundaries", "key-down--control--down", "mark_category", ~contractMarkedRange, rangeState)
+            }),
+            menuItem("Set Range Offset", "", "mark_category", setRangeOffset, sourcesExistState)
+        }),
+        subMenu("Control", MenuItem[] {
+            menuItem("Play", "key-down-- ", "playcontrol_category", ~togglePlayFunc, playState),
+            menuItem("Stop", "", "playcontrol_category", ~stopFunc, rangeState),
+            menuItem("PingPong", "key-down--P", "playcontrol_category", ~togglePingPong, pingPongState),
+            menuItem("Play Once", "", "playcontrol_category", ~togglePlayOnce, playOnceState),
+            menuItem("Step Forward", "key-down--right", "playcontrol_category", ~stepForward1, rangeState),
+            menuItem("Step Backward", "key-down--left", "playcontrol_category", ~stepBackward1, rangeState),
+            menuItem("Reverse", "key-down--up", "playcontrol_category", ~toggleForwardsBackwards, rangeState),
+            menuSeparator(),
+            menuItem("Go To Frame...", "key-down--G", "playcontrol_category", enterFrame, rangeState),
+            menuSeparator(),
+            menuItem("Play All Frames", "key-down--A", "playcontrol_category", ~toggleRealtime, realtimeState),
+                subMenu("FPS", MenuItem[] {
+                    menuItem("24", "", "playcontrol_category", ~setFPSFunc(24.0), rangeState),
+                    menuItem("25", "", "playcontrol_category", ~setFPSFunc(25.0), rangeState),
+                    menuItem("23.98", "", "playcontrol_category", ~setFPSFunc(23.98), rangeState),
+                    menuItem("30", "", "playcontrol_category", ~setFPSFunc(30.0), rangeState),
+                    menuItem("29.97", "", "playcontrol_category", ~setFPSFunc(29.97), rangeState),
+                    menuSeparator(),
+                    menuItem("Custom...", "key-down--F", "playcontrol_category", enterFPS, rangeState)
+                }),
+                menuSeparator(),
+                menuItem("Play Forward", "key-down--.", "playcontrol_category", ~incN(1), forwardState),
+                menuItem("Play Backward", "key-down--,", "playcontrol_category", ~incN(-1), backwardState),
+                menuSeparator(),
+                menuItem("Jump To Beginning", "key-down--home", "playcontrol_category", ~beginning, rangeState),
+                menuItem("Jump To Ending", "key-down--end", "playcontrol_category", ~ending, rangeState),
+                menuItem("Next Marked Frame", "key-down--alt--right", "playcontrol_category", ~nextMarkedFrame, rangeState),
+                menuItem("Prev Marked Frame", "key-down--alt--left", "playcontrol_category", ~previousMarkedFrame, rangeState),
+                menuItem("Matching Frame Of Next Source", "key-down-->", "playcontrol_category", ~nextMatchedFrame, rangeState),
+                menuItem("Matching Frame Of Previous Source", "key-down--<", "playcontrol_category", ~previousMatchedFrame, rangeState)
+            }),
             /*  
              * Moved to prefs GUI
              *
@@ -6607,205 +6267,221 @@ global bool debugGC = false;
             {"Disable Scrubbing in View", toggleScrubDisabled, nil, scrubDisabledState},
             {"Disable Click in View to Play", toggleClickToPlayDisabled, nil, clickToPlayDisabledState},
             */
-            }},
-        {"Tools", Menu {
-            {"Default Views", nil, nil, inactiveState},
-            {"   Sequence", setCompModeAndView(nil,"defaultSequence"), nil, viewNodeState("defaultSequence")},
-            {"   Replace", setCompModeAndView("replace","defaultStack"), nil, isStackAndCompMode("replace")},
-            {"   Over", setCompModeAndView("over","defaultStack"), nil, isStackAndCompMode("over")},
-            {"   Add", setCompModeAndView("add","defaultStack"), nil, isStackAndCompMode("add")},
-            //{"   Dissolve", setCompModeAndView("difference","defaultStack"), nil, isStackAndCompMode("dissolve")}, 
-            {"   Difference", setCompModeAndView("difference","defaultStack"), nil, isStackAndCompMode("difference")}, 
-            {"   Difference (Inverted)", setCompModeAndView("-difference","defaultStack"), nil, isStackAndCompMode("-difference")},
-            //{"   Picture in Picture", setCompModeAndView("pip","defaultStack"), nil, isStackAndCompMode("pip")},
-            {"   Tile", setCompModeAndView(nil,"defaultLayout"), nil, viewNodeState("defaultLayout")},
-            {"_", nil},
-            {"Timeline",        ~toggleTimeline, "F2", timelineShown},
-            {"Timeline Magnifier", ~toggleMotionScope, "F3", motionScopeShown},
-            {"Image Info",      ~toggleInfo,     "F4", infoShown},
-            {"Color Inspector", ~toggleColorInspector, "F5", colorInspectorShown},
-            {"Wipes",           ~toggleWipe, "F6", wipeShown},
-            {"Info Strip",      ~toggleInfoStrip, "F7", infoStripShown},
-            {"Process Info",    ~toggleProcessInfo, "F8", processInfoShown},
-            {"Source Details",  ~toggleSourceDetails, "F11", sourceDetailsShown},
-            {"_", nil},
-            {"Menu Bar",        ~toggleMenuBar,  "F1", menuBarShown},
-            {"Top View Toolbar",    toggleTopViewToolbar,  nil, topTBShown},
-            {"Bottom View Toolbar", toggleBottomViewToolbar,  nil, botTBShown},
-            {"_", nil},
-            {"Force Reload Current Frame", ~reload, "R", sourcesExistState},
-            {"Force Reload Region", ~reloadInOut, "control R", sourcesExistState},
-            {"Reload Changed Frames", ~loadCurrentSourcesChangedFrames, "control C", sourcesExistState},
-            {"_", nil},
-            {"Cache Mode",  nil,  nil, inactiveState},
-            {"   Look-Ahead Cache", cacheModeFunc(CacheBuffer), "control l", cacheStateFunc(CacheBuffer)},
-            {"   Region Cache",  cacheModeFunc(CacheGreedy), "C", cacheStateFunc(CacheGreedy)},
-            {"   Cache Off", cacheModeFunc(CacheOff),  nil, cacheStateFunc(CacheOff)},
-            {"   Release All Cached Images", ~releaseAllCachedImages,  nil, nil},
-            {"_", nil},
-            {"Diagnostics",    showDiagnosticsWindow, nil, nil},
-            {"_", nil},
-            }},
-        {"Audio", Menu {
-            {"Mute", ~toggleMute, nil, isMuted},
-            {"Scrubbing", toggleAudioScrub, nil, scrubAudioState},
-            {"_", nil},
-            {"Global",  nil,  nil, inactiveState},
-            {"   Volume",  globalVolumeMode,     "control v", nil},
-            {"   Offset (seconds)",  globalAudioOffsetMode, nil, nil},
-            {"   Offset (frames)",  globalAudioOffsetFramesMode, nil, nil},
-            {"   Balance", globalBalanceMode,   nil, nil},
-            {"Source",  nil,  nil, inactiveState},
-            {"   Volume", sourceVolumeMode, nil, sourcesExistState},
-            {"   Offset (seconds)", sourceAudioOffsetMode, nil, sourcesExistState},
-            {"   Offset (frames)",  sourceAudioOffsetFramesMode, nil, sourcesExistState},
-            {"   Balance", sourceBalanceMode,   nil, sourcesExistState},
-            {"_", nil},
-            {"   Reset All Offsets", resetAudioOffsets, nil, nil},
-        }},
-        {"Image", Menu {
-                {"Color Resolution", Menu {
-                    {"Allow Floating Point", ~toggleFloat, nil, isFloatAllowed},
-                    {"_", nil},
-                    {"Maximum Allowed", ~setBitDepthFunc(0), nil, bitDepthState(0)},
-                    {"8", ~setBitDepthFunc(8), nil, bitDepthState(8)},
-                    {"16", ~setBitDepthFunc(16), nil, bitDepthState(16)},
-                    {"32", ~setBitDepthFunc(32), nil, bitDepthState(32)}}},
-                {"Image Resolution", Menu {
-                    {"1.0",  ~setImageResolution(1.0), nil, imageResState(1.0)},
-                    {"0.5",  ~setImageResolution(0.5), nil, imageResState(0.5)},
-                    {"0.25", ~setImageResolution(0.25), nil, imageResState(0.25)},
-                    {"_", nil},
-                    {"Custom...", enterRes, nil, videoSourcesAndNodeExistState("RVFormat")}}},
-                {"Scale", Menu {
-                    {"1:1",  ~pixelRelativeScale(1.0),  "1", videoSourcesExistState},
-                    {"_", nil},
-                    {"2:1",  ~pixelRelativeScale(2.0),  "2", videoSourcesExistState},
-                    {"4:1",  ~pixelRelativeScale(4.0),  "4", videoSourcesExistState},
-                    {"8:1",  ~pixelRelativeScale(8.0),  "8", videoSourcesExistState},
-                    {"_", nil},
-                    {"1:2",  ~pixelRelativeScale(1.0/2.0),  "control 2", videoSourcesExistState},
-                    {"1:4",  ~pixelRelativeScale(1.0/4.0),  "control 4", videoSourcesExistState},
-                    {"1:8",  ~pixelRelativeScale(1.0/8.0),  "control 8", videoSourcesExistState}}},
-                {"Rotation", Menu {
-                    {"No Rotation",         ~rotateImage(0.0, false),    nil, rotateState(0.0)},
-                    {"90 Clockwise",        ~rotateImage(90.0, false),   nil, rotateState(90.0)},
-                    {"90 Counter-Clockwise",~rotateImage(-90.0, false),  nil, rotateState(-90.0)},
-                    {"180",                 ~rotateImage(180.0, true),  nil, rotateState(180.0)},
-                    {"_", nil},
-                    {"+90 Clockwise",        ~rotateImage(90.0, true),   nil, videoSourcesAndNodeExistState("RVTransform2D")},
-                    {"+90 Counter-Clockwise",~rotateImage(-90.0, true),  nil, videoSourcesAndNodeExistState("RVTransform2D")},
-                    {"_", nil},
-                    {"Arbitrary (Rotate Mode)", rotateMode,   nil, videoSourcesAndNodeExistState("RVTransform2D")}}},
-                {"Alpha Type", Menu {
-                    {"From Image",  ~alphaTypeFunc(0),  nil, alphaTypeState(0)},
-                    {"_", nil},
-                    {"Unpremultiplied",  ~alphaTypeFunc(2),  nil, alphaTypeState(2)},
-                    {"Premultiplied",  ~alphaTypeFunc(1),  nil, alphaTypeState(1)}}},
-                {"Pixel Aspect Ratio", Menu {
-                    {"From Image",  ~pixelAspectFunc(0.0),  nil, aspectState(0.0)},
-                    {"_", nil},
-                    {"Square",  ~pixelAspectFunc(1.0),  nil, aspectState(1.0)},
-                    {"NTSC D1 DV  4:3",  ~pixelAspectFunc(0.9),  nil, aspectState(0.9)},
-                    {"NTSC D1 DV  16:9", ~pixelAspectFunc(1.2), nil, aspectState(1.2)},
-                    {"PAL  4:3",         ~pixelAspectFunc(1.06666),  nil, aspectState(1.0666)},
-                    {"PAL  16:9",        ~pixelAspectFunc(1.422), nil, aspectState(1.422)},
-                    {"Anamorphic  2:1",  ~pixelAspectFunc(2.0), nil, aspectState(2.0)},
-                    {"_", nil},
-                    {"Custom...", enterPixAspect, nil, videoSourcesAndNodeExistState("RVLensWarp")}}},
-                {"Stereo", Menu {
-                    {"Swap Eyes", ~toggleSourceSwapEyes, nil, propToggledAndStereoOnState("#RVSourceStereo.stereo.swap")},
-                    {"Flip Right Eye", ~toggleSourceRFlip, nil, propToggledAndStereoOnState("#RVSourceStereo.rightTransform.flip")},
-                    {"Flop Right Eye", ~toggleSourceRFlop, nil, propToggledAndStereoOnState("#RVSourceStereo.rightTransform.flop")},
-                    {"_", nil},
-                    {"Interactive Edit",      nil, nil, inactiveState },
-                    {"    Relative Eye Offset (%)", sourceStereoOffsetMode, nil, eyeOffsetState},
-                    {"    Right Eye Only Offset (%)", sourceStereoROffsetMode, nil, eyeOffsetState},
-                    }},
-            {"_", nil},
-            {"Flip",            ~toggleFlip, "Y", toggleFlipState},
-            {"Flop",            ~toggleFlop, "X", toggleFlopState},
-            {"_", nil},
-            {"Remap Source Image Channels...", enterChanMap, nil, videoSourcesAndNodeExistState("RVChannelMap")},
-            {"_", nil},
-            {"Set Source FPS...", enterSourceFPS, nil, sourcesExistState},
-            {"_", nil},
-            {"Cycle Stack Forward", cycleStackForward, ")", isStackMode},
-            {"Cycle Stack Backward", cycleStackBackward, "(", isStackMode}
-            }},
-        {"Color", Menu {
-                {"Luminance Look Up Table", Menu {
-                    {"Active",   ~toggleLuminanceLUT, "T", isLuminanceLUTActiveState},
-                    {"_", nil},
-                    {"Luminance LUTS", nil, nil, inactiveState},
-                    {"   HSV ",   ~HSVLUT,    nil, luminanceLUTState("HSV")},
-                    {"   Contour 3",   ~contourLUT(3),    nil, luminanceLUTState("Contour 3")},
-                    {"   Contour 4",   ~contourLUT(4),    nil, luminanceLUTState("Contour 4")},
-                    {"   Contour 6",   ~contourLUT(6),    nil, luminanceLUTState("Contour 6")},
-                    {"   Contour 10",   ~contourLUT(10),    nil, luminanceLUTState("Contour 10")},
-                    {"   Contour 20",   ~contourLUT(20),    nil, luminanceLUTState("Contour 20")},
-                    {"   Contour 100",   ~contourLUT(100),  nil, luminanceLUTState("Contour 100")},
-                    {"   Random",   ~randomLUT,  "*", luminanceLUTState("Random")}}},
+            subMenu("Tools", MenuItem[] {
+                menuText("Default Views"),
+                menuItem("   Sequence", "", "viewmode_category", setCompModeAndView(nil,"defaultSequence"), viewNodeState("defaultSequence")),
+                menuItem("   Replace", "", "viewmode_category", setCompModeAndView("replace","defaultStack"), isStackAndCompMode("replace")),
+                menuItem("   Over", "", "viewmode_category", setCompModeAndView("over","defaultStack"), isStackAndCompMode("over")),
+                menuItem("   Add", "", "viewmode_category", setCompModeAndView("add","defaultStack"), isStackAndCompMode("add")),
+                // MenuItem {"   Dissolve", setCompModeAndView("difference","defaultStack"), nil, isStackAndCompMode("dissolve")}, 
+                menuItem("   Difference", "", "viewmode_category", setCompModeAndView("difference","defaultStack"), isStackAndCompMode("difference")),
+                menuItem("   Difference (Inverted)", "", "viewmode_category", setCompModeAndView("-difference","defaultStack"), isStackAndCompMode("-difference")),
+                // MenuItem {"   Picture in Picture", setCompModeAndView("pip","defaultStack"), nil, isStackAndCompMode("pip")},
+                menuItem("   Tile", "", "viewmode_category", setCompModeAndView(nil,"defaultLayout"), viewNodeState("defaultLayout")),
+                menuSeparator(),
+                menuItem("Timeline", "key-down--f2", "info_category", ~toggleTimeline, timelineShown),
+                menuItem("Timeline Magnifier", "key-down--f3", "info_category", ~toggleMotionScope, motionScopeShown),
+                menuItem("Image Info", "key-down--f4", "info_category", ~toggleInfo, infoShown),
+                menuItem("Color Inspector", "key-down--f5", "info_category", ~toggleColorInspector, colorInspectorShown),
+                menuItem("Wipes", "key-down--f6", "wipes_category", ~toggleWipe, wipeShown),
+                menuItem("Info Strip", "key-down--f7", "info_category", ~toggleInfoStrip, infoStripShown),
+                menuItem("Process Info", "key-down--f8", "info_category", ~toggleProcessInfo, processInfoShown),
+                menuItem("Source Details", "key-down--f11", "info_category", ~toggleSourceDetails, sourceDetailsShown),
+                menuSeparator(),
+                menuItem("Menu Bar", "key-down--f1", "system_category", ~toggleMenuBar, menuBarShown),
+                menuItem("Top View Toolbar", "", "system_category", toggleTopViewToolbar, topTBShown),
+                menuItem("Bottom View Toolbar", "", "system_category", toggleBottomViewToolbar, botTBShown),
+                menuSeparator(),
+                menuItem("Force Reload Current Frame", "key-down--R", "system_category", ~reload, sourcesExistState),
+                menuItem("Force Reload Region", "key-down--control--R", "system_category", ~reloadInOut, sourcesExistState),
+                menuItem("Reload Changed Frames", "key-down--control--C", "system_category", ~loadCurrentSourcesChangedFrames, sourcesExistState),
+                menuSeparator(),
+                menuText("Cache Mode"),
+                menuItem("   Look-Ahead Cache", "", "system_category", cacheModeFunc(CacheBuffer), cacheStateFunc(CacheBuffer)),
+                menuItem("   Region Cache", "", "system_category", cacheModeFunc(CacheGreedy), cacheStateFunc(CacheGreedy)),
+                menuItem("   Cache Off", "", "system_category", cacheModeFunc(CacheOff), cacheStateFunc(CacheOff)),
+                menuItem("   Release All Cached Images", "", "system_category", ~releaseAllCachedImages, enabledItem),
+                menuSeparator(),
+                menuItem("Diagnostics", "", "system_category", showDiagnosticsWindow, enabledItem),
+                menuSeparator()
+            }),
+        subMenu("Audio", MenuItem[] {
+            menuItem("Mute", "", "system_category", ~toggleMute, isMuted),
+            menuItem("Scrubbing", "", "system_category", toggleAudioScrub, scrubAudioState),
+            menuSeparator(),
+            menuText("Global"),
+            menuItem("   Volume", "key-down--control--v", "system_category", globalVolumeMode, enabledItem),
+            menuItem("   Offset (seconds)", "", "system_category", globalAudioOffsetMode, enabledItem),
+            menuItem("   Offset (frames)", "", "system_category", globalAudioOffsetFramesMode, enabledItem),
+            menuItem("   Balance", "", "system_category", globalBalanceMode, enabledItem),
+            menuText("Source"),
+            menuItem("   Volume", "", "media_category", sourceVolumeMode, sourcesExistState),
+            menuItem("   Offset (seconds)", "", "media_category", sourceAudioOffsetMode, sourcesExistState),
+            menuItem("   Offset (frames)", "", "media_category", sourceAudioOffsetFramesMode, sourcesExistState),
+            menuItem("   Balance", "", "media_category", sourceBalanceMode, sourcesExistState),
+            menuSeparator(),
+            menuItem("   Reset All Offsets", "", "media_category", resetAudioOffsets, enabledItem)
+        }),
+        subMenu("Image", MenuItem[] {
+            subMenu("Color Resolution", MenuItem[] {
+                    menuItem("Allow Floating Point", "", "source_category", ~toggleFloat, isFloatAllowed),
+                    menuSeparator(),
+                    menuItem("Maximum Allowed", "", "source_category", ~setBitDepthFunc(0), bitDepthState(0)),
+                    menuItem("8", "", "source_category", ~setBitDepthFunc(8), bitDepthState(8)),
+                    menuItem("16", "", "source_category", ~setBitDepthFunc(16), bitDepthState(16)),
+                    menuItem("32", "", "source_category", ~setBitDepthFunc(32), bitDepthState(32))
+            }),
+            subMenu("Image Resolution", MenuItem[] {
+                menuItem("1.0", "", "source_category", ~setImageResolution(1.0), imageResState(1.0)),
+                menuItem("0.5", "", "source_category", ~setImageResolution(0.5), imageResState(0.5)),
+                menuItem("0.25", "", "source_category", ~setImageResolution(0.25), imageResState(0.25)),
+                menuSeparator(),
+                menuItem("Custom...", "", "source_category", enterRes, videoSourcesAndNodeExistState("RVFormat"))
+            }),
+            subMenu("Scale", MenuItem[] {
+                menuItem("1:1", "key-down--1", "source_category", ~pixelRelativeScale(1.0), videoSourcesExistState),
+                menuSeparator(),
+                menuItem("2:1", "key-down--2", "source_category", ~pixelRelativeScale(2.0), videoSourcesExistState),
+                menuItem("3:1", "key-down--3", "source_category", ~pixelRelativeScale(3.0), videoSourcesExistState),
+                menuItem("4:1", "key-down--4", "source_category", ~pixelRelativeScale(4.0), videoSourcesExistState),
+                menuItem("5:1", "key-down--5", "source_category", ~pixelRelativeScale(5.0), videoSourcesExistState),
+                menuItem("6:1", "key-down--6", "source_category", ~pixelRelativeScale(6.0), videoSourcesExistState),
+                menuItem("7:1", "key-down--7", "source_category", ~pixelRelativeScale(7.0), videoSourcesExistState),
+                menuItem("8:1", "key-down--8", "source_category", ~pixelRelativeScale(8.0), videoSourcesExistState),
+                menuSeparator(),
+                menuItem("1:2", "key-down--control--2", "source_category", ~pixelRelativeScale(1.0/2.0), videoSourcesExistState),
+                menuItem("1:3", "key-down--control--3", "source_category", ~pixelRelativeScale(1.0/3.0), videoSourcesExistState),
+                menuItem("1:4", "key-down--control--4", "source_category", ~pixelRelativeScale(1.0/4.0), videoSourcesExistState),
+                menuItem("1:5", "key-down--control--5", "source_category", ~pixelRelativeScale(1.0/5.0), videoSourcesExistState),
+                menuItem("1:6", "key-down--control--6", "source_category", ~pixelRelativeScale(1.0/6.0), videoSourcesExistState),
+                menuItem("1:7", "key-down--control--7", "source_category", ~pixelRelativeScale(1.0/7.0), videoSourcesExistState),
+                menuItem("1:8", "key-down--control--8", "source_category", ~pixelRelativeScale(1.0/8.0), videoSourcesExistState)
+            }),
+            subMenu("Rotation", MenuItem[] {
+                menuItem("No Rotation", "", "source_category", ~rotateImage(0.0, false), rotateState(0.0)),
+                menuItem("90 Clockwise", "", "source_category", ~rotateImage(90.0, false), rotateState(90.0)),
+                menuItem("90 Counter-Clockwise", "", "source_category", ~rotateImage(-90.0, false), rotateState(-90.0)),
+                menuItem("180", "", "source_category", ~rotateImage(180.0, true), rotateState(180.0)),
+                menuSeparator(),
+                menuItem("+90 Clockwise", "", "source_category", ~rotateImage(90.0, true), videoSourcesAndNodeExistState("RVTransform2D")),
+                menuItem("+90 Counter-Clockwise", "", "source_category", ~rotateImage(-90.0, true), videoSourcesAndNodeExistState("RVTransform2D")),
+                menuSeparator(),
+                menuItem("Arbitrary (Rotate Mode)", "", "source_category", rotateMode, videoSourcesAndNodeExistState("RVTransform2D"))
+            }),
+            subMenu("Alpha Type", MenuItem[] {
+                menuItem("From Image", "", "source_category", ~alphaTypeFunc(0), alphaTypeState(0)),
+                menuSeparator(),
+                menuItem("Unpremultiplied", "", "source_category", ~alphaTypeFunc(2), alphaTypeState(2)),
+                menuItem("Premultiplied", "", "source_category", ~alphaTypeFunc(1), alphaTypeState(1))
+            }),
+            subMenu("Pixel Aspect Ratio", MenuItem[] {
+                menuItem("From Image", "", "source_category", ~pixelAspectFunc(0.0), aspectState(0.0)),
+                menuSeparator(),
+                menuItem("Square", "", "source_category", ~pixelAspectFunc(1.0), aspectState(1.0)),
+                menuItem("NTSC D1 DV  4:3", "", "source_category", ~pixelAspectFunc(0.9), aspectState(0.9)),
+                menuItem("NTSC D1 DV  16:9", "", "source_category", ~pixelAspectFunc(1.2), aspectState(1.2)),
+                menuItem("PAL  4:3", "", "source_category", ~pixelAspectFunc(1.06666), aspectState(1.0666)),
+                menuItem("PAL  16:9", "", "source_category", ~pixelAspectFunc(1.422), aspectState(1.422)),
+                menuItem("Anamorphic  2:1", "", "source_category", ~pixelAspectFunc(2.0), aspectState(2.0)),
+                menuSeparator(),
+                menuItem("Custom...", "", "source_category", enterPixAspect, videoSourcesAndNodeExistState("RVLensWwarp"))
+            }),
+            subMenu("Stereo", MenuItem[] {
+                menuItem("Swap Eyes", "", "source_category", ~toggleSourceSwapEyes, propToggledAndStereoOnState("#RVSourceStereo.stereo.swap")),
+                menuItem("Flip Right Eye", "", "source_category", ~toggleSourceRFlip, propToggledAndStereoOnState("#RVSourceStereo.rightTransform.flip")),
+                menuItem("Flop Right Eye", "", "source_category", ~toggleSourceRFlop, propToggledAndStereoOnState("#RVSourceStereo.rightTransform.flop")),
+                menuSeparator(),
+                menuText("Interactive Edit"),
+                menuItem("    Relative Eye Offset (%)", "", "source_category", sourceStereoOffsetMode, eyeOffsetState),
+                menuItem("    Right Eye Only Offset (%)", "", "source_category", sourceStereoROffsetMode, eyeOffsetState)
+            }),
+            menuSeparator(),
+            menuItem("Flip", "key-down--Y", "source_category", ~toggleFlip, toggleFlipState),
+            menuItem("Flop", "key-down--X", "source_category", ~toggleFlop, toggleFlopState),
+            menuSeparator(),
+            menuItem("Remap Source Image Channels...", "", "source_category", enterChanMap, videoSourcesAndNodeExistState("RVChannelMap")),
+            menuSeparator(),
+            menuItem("Set Source FPS...", "", "source_category", enterSourceFPS, sourcesExistState),
+            menuSeparator(),
+            menuItem("Cycle Stack Forward", "key-down--)", "viewmode_category", cycleStackForward, isStackMode),
+            menuItem("Cycle Stack Backward", "key-down--(", "viewmode_category", cycleStackBackward, isStackMode)
+        }),
+        subMenu("Color", MenuItem[] {
+            subMenu("Luminance Look Up Table", MenuItem[] {
+                menuItem("Active", "key-down--T", "source_category", ~toggleLuminanceLUT, isLuminanceLUTActiveState),
+                menuSeparator(),
+                menuText("Luminance LUTS"),
+                menuItem("   HSV ", "", "source_category", ~HSVLUT, luminanceLUTState("HSV")),
+                menuItem("   Contour 3", "", "source_category", ~contourLUT(3), luminanceLUTState("Contour 3")),
+                menuItem("   Contour 4", "", "source_category", ~contourLUT(4), luminanceLUTState("Contour 4")),
+                menuItem("   Contour 6", "", "source_category", ~contourLUT(6), luminanceLUTState("Contour 6")),
+                menuItem("   Contour 10", "", "source_category", ~contourLUT(10), luminanceLUTState("Contour 10")),
+                menuItem("   Contour 20", "", "source_category", ~contourLUT(20), luminanceLUTState("Contour 20")),
+                menuItem("   Contour 100", "", "source_category", ~contourLUT(100), luminanceLUTState("Contour 100")),
+                menuItem("   Random", "key-down--*", "source_category", ~randomLUT, luminanceLUTState("Random"))
+            }),
                     //
                     // XXX I am not sure what this is supposed to do but it only generates errors right now (jon)
                     //
                     //{"_", nil},
                     //{"output LUT to shell",   ~outputLUT,    nil, nil}}},
-            {"_", nil},
-            {"File Nonlinear to Linear Conversion", nil, nil, inactiveState},
-            {"   No Conversion",    setLinConvert(""), nil, hasLinConversion("")},
-            {"   Cineon/DPX Log",   setLinConvert("Cineon Log"), "L", hasLinConversion("Cineon Log")},
-            {"   ALEXA LogC",       setLinConvert("ALEXA LogC"), nil, hasLinConversion("ALEXA LogC")},
-            {"   ALEXA LogC Film",  setLinConvert("ALEXA LogC Film"), nil, hasLinConversion("ALEXA LogC Film")},
-            //{"   SONY S-Log",       setLinConvert("SONY S-Log"), nil, hasLinConversion("SONY S-Log")},
-            {"   Viper Log",        setLinConvert("Viper Log"), nil, hasLinConversion("Viper Log")},
-            {"   Red Log",          setLinConvert("Red Log"), nil, hasLinConversion("Red Log")},
-            {"   Red Log Film",     setLinConvert("Red Log Film"), nil, hasLinConversion("Red Log Film")},
-            {"   sRGB",             setLinConvert("sRGB"), nil, hasLinConversion("sRGB")},
-            {"   Rec709",           setLinConvert("Rec709"), nil, hasLinConversion("Rec709")},
-            {"   SMPTE 2084",       setLinConvert("SMPTE 2084"), nil, hasLinConversion("SMPTE 2084")},
-            {"   Hybrid Log-Gamma", setLinConvert("Hybrid Log-Gamma"), nil, hasLinConversion("Hybrid Log-Gamma")},
-            {"   File Gamma 2.2",        setLinConvert("Gamma 2.2"), nil, hasLinConversion("Gamma 2.2")},
-            {"   File Gamma...",         enterFileGamma, nil, fileGammaState},
-            {"_", nil},
-            {"Pre-Cache LUT", ~toggleCacheLUT, nil, isCacheLUTActiveState},
-            {"File LUT",      ~toggleFileLUT, nil, isFileLUTActiveState},
-            {"File CDL",      ~toggleFileCDL, nil, isFileCDLActiveState},
-            {"File ICC",      ~toggleFileICC, nil, isFileICCActiveState},
-            {"Look LUT",      ~toggleLookLUT, nil, isLookLUTActiveState},
-            {"Look CDL",      ~toggleLookCDL, nil, isLookCDLActiveState},
-            {"_", nil},
-            {"Invert", ~toggleInvert, "I", isInvert},
+            menuSeparator(),
+            menuText("File Nonlinear to Linear Conversion"),
+            menuItem("   No Conversion", "", "source_category", setLinConvert(""), hasLinConversion("")),
+            menuItem("   Cineon/DPX Log", "key-down--L", "source_category", setLinConvert("Cineon Log"), hasLinConversion("Cineon Log")),
+            menuItem("   ALEXA LogC", "", "source_category", setLinConvert("ALEXA LogC"), hasLinConversion("ALEXA LogC")),
+            menuItem("   ALEXA LogC Film", "", "source_category", setLinConvert("ALEXA LogC Film"), hasLinConversion("ALEXA LogC Film")),
+            // MenuItem {"   SONY S-Log",       setLinConvert("SONY S-Log"), nil, hasLinConversion("SONY S-Log")},
+            menuItem("   Viper Log", "", "source_category", setLinConvert("Viper Log"), hasLinConversion("Viper Log")),
+            menuItem("   Red Log", "", "source_category", setLinConvert("Red Log"), hasLinConversion("Red Log")),
+            menuItem("   Red Log Film", "", "source_category", setLinConvert("Red Log Film"), hasLinConversion("Red Log Film")),
+            menuItem("   sRGB", "", "source_category", setLinConvert("sRGB"), hasLinConversion("sRGB")),
+            menuItem("   Rec709", "", "source_category", setLinConvert("Rec709"), hasLinConversion("Rec709")),
+            menuItem("   SMPTE 2084", "", "source_category", setLinConvert("SMPTE 2084"), hasLinConversion("SMPTE 2084")),
+            menuItem("   Hybrid Log-Gamma", "", "source_category", setLinConvert("Hybrid Log-Gamma"), hasLinConversion("Hybrid Log-Gamma")),
+            menuItem("   File Gamma 2.2", "", "source_category", setLinConvert("Gamma 2.2"), hasLinConversion("Gamma 2.2")),
+            menuItem("   File Gamma...", "", "source_category", enterFileGamma, fileGammaState),
+            menuSeparator(),
+            menuItem("Pre-Cache LUT", "", "source_category", ~toggleCacheLUT, isCacheLUTActiveState),
+            menuItem("File LUT", "", "source_category", ~toggleFileLUT, isFileLUTActiveState),
+            menuItem("File CDL", "", "source_category", ~toggleFileCDL, isFileCDLActiveState),
+            menuItem("File ICC", "", "source_category", ~toggleFileICC, isFileICCActiveState),
+            menuItem("Look LUT", "", "source_category", ~toggleLookLUT, isLookLUTActiveState),
+            menuItem("Look CDL", "", "source_category", ~toggleLookCDL, isLookCDLActiveState),
+            menuSeparator(),
+            menuItem("Invert", "key-down--I", "source_category", ~toggleInvert, isInvert),
             //  RVHistogram node deprecated to remove from GUI for now
-            //{"Normalize", toggleNormalizeColor, nil, isNormalizingColor},
-            {"_", nil},
-            {"Interactive Edit",      nil, nil, inactiveState },
-            {"    Gamma",      gammaMode,      "y", videoSourcesAndNodeExistState("RVColor")},
-            {"    Color Offset", colorOffsetMode,  nil,  videoSourcesAndNodeExistState("RVColor")},
-            {"    Exposure",   exposureMode,   "e", videoSourcesAndNodeExistState("RVColor")},
-            {"    Saturation", saturationMode, "S", videoSourcesAndNodeExistState("RVColor")},
-            {"    Hue",        hueMode,        "h", videoSourcesAndNodeExistState("RVColor")},
-            {"    Contrast",   contrastMode,   "k", videoSourcesAndNodeExistState("RVColor")},
-            {"_", nil},
-            {"File YCbCr to RGB Conversion", nil, nil, inactiveState },
-            {"    Range", Menu {
-                {"From Image", ~setColorSpaceAttr("Range","From Image"), nil, matchesColorSpaceAttr("Range","From Image")},
-                {"_", nil},
-                {"Video Range", ~setColorSpaceAttr("Range","Video Range"), nil, matchesColorSpaceAttr("Range","Video Range")},
-                {"Full Range", ~setColorSpaceAttr("Range","Full Range"), nil, matchesColorSpaceAttr("Range","Full Range")}}},
-            {"    Color Space", Menu {
-                {"From Image", ~setColorSpaceAttr("Conversion","From Image"), nil, matchesColorSpaceAttr("Conversion","From Image")},
-                {"_", nil},
-                {"Rec. 601", ~setColorSpaceAttr("Conversion","Rec601"), nil, matchesColorSpaceAttr("Conversion","Rec601")},
-                {"Rec. 709", ~setColorSpaceAttr("Conversion","Rec709"), nil, matchesColorSpaceAttr("Conversion","Rec709")},
-                {"Rec. 2020", ~setColorSpaceAttr("Conversion","Rec2020"), nil, matchesColorSpaceAttr("Conversion","Rec2020")}}},
-            {"_", nil},
-            {"Ignore File Primaries", ~toggleChromaticities, nil, isIgnoringChromaticies},
-            {"Reset All Color", ~resetAllColorParameters, "shift Home", videoSourcesAndNodeExistState("RVColor")}
-            }},
-        {"View", buildViewMenu() }
+            // MenuItem {"Normalize", toggleNormalizeColor, nil, isNormalizingColor},
+            menuSeparator(),
+            menuText("Interactive Edit"),
+            menuItem("    Gamma", "key-down--y", "source_category", gammaMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Color Offset", "", "source_category", colorOffsetMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Exposure", "key-down--e", "source_category", exposureMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Saturation", "key-down--S", "source_category", saturationMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Hue", "key-down--h", "source_category", hueMode, videoSourcesAndNodeExistState("RVColor")),
+            menuItem("    Contrast", "key-down--k", "source_category", contrastMode, videoSourcesAndNodeExistState("RVColor")),
+            menuSeparator(),
+            menuText("File YCbCr to RGB Conversion"),
+            subMenu("    Range", MenuItem[] {
+                menuItem("From Image", "", "source_category", ~setColorSpaceAttr("Range","From Image"), matchesColorSpaceAttr("Range","From Image")),
+                menuSeparator(),
+                menuItem("Video Range", "", "source_category", ~setColorSpaceAttr("Range","Video Range"), matchesColorSpaceAttr("Range","Video Range")),
+                menuItem("Full Range", "", "source_category", ~setColorSpaceAttr("Range","Full Range"), matchesColorSpaceAttr("Range","Full Range"))
+            }),
+            subMenu("    Color Space", MenuItem[] {
+                menuItem("From Image", "", "source_category", ~setColorSpaceAttr("Conversion","From Image"), matchesColorSpaceAttr("Conversion","From Image")),
+                menuSeparator(),
+                menuItem("Rec. 601", "", "source_category", ~setColorSpaceAttr("Conversion","Rec601"), matchesColorSpaceAttr("Conversion","Rec601")),
+                menuItem("Rec. 709", "", "source_category", ~setColorSpaceAttr("Conversion","Rec709"), matchesColorSpaceAttr("Conversion","Rec709")),
+                menuItem("Rec. 2020", "", "source_category", ~setColorSpaceAttr("Conversion","Rec2020"), matchesColorSpaceAttr("Conversion","Rec2020"))
+            }),
+            menuSeparator(),
+            menuItem("Ignore File Primaries", "", "source_category", ~toggleChromaticities, isIgnoringChromaticies),
+            menuItem("Reset All Color", "key-down--shift--home", "source_category", ~resetAllColorParameters, videoSourcesAndNodeExistState("RVColor"))
+        }),
+        subMenu("View", buildViewMenu())
+    });
         //{"Debug", buildDebugMenu() }
-    };
 
 
     let F = globalConfig.menuBarCreationFunc,
@@ -6814,6 +6490,13 @@ global bool debugGC = false;
         c = combine(b, userMenus);
 
     return c;
+    }
+
+    catch (exception exc)
+    {
+        print("ERROR: failed to build main menu: %s\n" % exc);
+        return Menu{};
+    }
 }
 
 //
@@ -7069,105 +6752,105 @@ global bool debugGC = false;
     bind("pointer--enter", pointerEnterSession);
     bind("pointer--activate", windowActivate);
     bind("pointer--leave", pointerLeaveSession);
-    bind("key-down-- ", togglePlayFunc, "Toggle Play");
-    bind("key-down--(", cycleStackBackward, "Cycle Image Stack Backwards");
-    bind("key-down--)", cycleStackForward, "Cycle Image Stack Forwards");
-    bind("key-down--*", randomLUT, "Apply Random Luminance LUT");
-    bind("key-down--,", incN(-1), "Set Frame Increment to -1 (reverse)");
-    bind("key-down--.", incN(1), "Set Frame Increment to 1 (forward)");
-    bind("key-down--1", pixelRelativeScale(1.0), "Scale 1:1");
-    bind("key-down--2", pixelRelativeScale(2.0), "Scale 2:1");
-    bind("key-down--3", pixelRelativeScale(3.0), "Scale 3:1");
-    bind("key-down--4", pixelRelativeScale(4.0), "Scale 4:1");
-    bind("key-down--5", pixelRelativeScale(5.0), "Scale 5:1");
-    bind("key-down--6", pixelRelativeScale(6.0), "Scale 6:1");
-    bind("key-down--7", pixelRelativeScale(7.0), "Scale 7:1");
-    bind("key-down--8", pixelRelativeScale(8.0), "Scale 8:1");
-    bind("key-down--A", toggleRealtime, "Toggle Real-Time Playback");
+    // bound by menuItem("Play") // bind("key-down-- ", togglePlayFunc, "Toggle Play");
+    // bound by menuItem("Cycle Stack Backward") // bind("key-down--(", cycleStackBackward, "Cycle Image Stack Backwards");
+    // bound by menuItem("Cycle Stack Forward") // bind("key-down--)", cycleStackForward, "Cycle Image Stack Forwards");
+    // bound by menuItem("   Random") // bind("key-down--*", randomLUT, "Apply Random Luminance LUT");
+    // bound by menuItem("Play Backward") // bind("key-down--,", incN(-1), "Set Frame Increment to -1 (reverse)");
+    // bound by menuItem("Play Forward") // bind("key-down--.", incN(1), "Set Frame Increment to 1 (forward)");
+    // bound by menuItem("1:1") // bind("key-down--1", pixelRelativeScale(1.0), "Scale 1:1");
+    // bound by menuItem("2:1") // bind("key-down--2", pixelRelativeScale(2.0), "Scale 2:1");
+    // bound by menuItem("3:1") // bind("key-down--3", pixelRelativeScale(3.0), "Scale 3:1");
+    // bound by menuItem("4:1") // bind("key-down--4", pixelRelativeScale(4.0), "Scale 4:1");
+    // bound by menuItem("5:1") // bind("key-down--5", pixelRelativeScale(5.0), "Scale 5:1");
+    // bound by menuItem("6:1") // bind("key-down--6", pixelRelativeScale(6.0), "Scale 6:1");
+    // bound by menuItem("7:1") // bind("key-down--7", pixelRelativeScale(7.0), "Scale 7:1");
+    // bound by menuItem("8:1") // bind("key-down--8", pixelRelativeScale(8.0), "Scale 8:1");
+    // bound by menuItem("Play All Frames") // bind("key-down--A", toggleRealtime, "Toggle Real-Time Playback");
     bind("key-down--C", toggleCacheModeFunc(CacheGreedy), "Toggle Region Caching");
-    bind("key-down--D", toggleDisplayLUT, "Toggle Display LUT");
-    bind("key-down--F", enterFPS, "Enter FPS Value From Keyboard");
-    bind("key-down--G", enterFrame, "Set Frame Number Using Keyboard");
-    bind("key-down--I", toggleInvert, "Toggle Color Invert");
-    bind("key-down--L", setLinConvert("Cineon Log"), "Toggle Cineon Log to Linear Conversion");
+    // bound by menuItem("Display LUT Active") // bind("key-down--D", toggleDisplayLUT, "Toggle Display LUT");
+    // bound by menuItem("Custom...") // bind("key-down--F", enterFPS, "Enter FPS Value From Keyboard");
+    // bound by menuItem("Go To Frame...") // bind("key-down--G", enterFrame, "Set Frame Number Using Keyboard");
+    // bound by menuItem("Invert") // bind("key-down--I", toggleInvert, "Toggle Color Invert");
+    // bound by menuItem("   Cineon/DPX Log") // bind("key-down--L", setLinConvert("Cineon Log"), "Toggle Cineon Log to Linear Conversion");
     bind("key-down--M", cycleMatteOpacity, "Cycle Matte Opacity");
-    bind("key-down--P", togglePingPong, "Toggle Ping/Pong Playback");
-    bind("key-down--R", ~reload, "Force Reload of Current Source");
-    bind("key-down--T", toggleLuminanceLUT, "Toggle Current Luminance LUT");
-    bind("key-down--X", toggleFlop, "Flop Image");
-    bind("key-down--Y", toggleFlip, "Flip Image");
-    bind("key-down--[", frameFunc(setInPoint), "Set In Point");
-    bind("key-down--\\", resetInOutPoints, "Reset In/Out Points");
-    bind("key-down--]", frameFunc(setOutPoint), "Set Out Point");
-    bind("key-down--a", showChannel(4), "Show Alpha Channel");
-    bind("key-down--b", showChannel(3), "Show Blue Channel");
-    bind("key-down--c", showChannel(0), "Normal Color Channel Display");
+    // bound by menuItem("PingPong") // bind("key-down--P", togglePingPong, "Toggle Ping/Pong Playback");
+    // bound by menuItem("Force Reload Current Frame") // bind("key-down--R", ~reload, "Force Reload of Current Source");
+    // bound by menuItem("Active") // bind("key-down--T", toggleLuminanceLUT, "Toggle Current Luminance LUT");
+    // bound by menuItem("Flop") // bind("key-down--X", toggleFlop, "Flop Image");
+    // bound by menuItem("Flip") // bind("key-down--Y", toggleFlip, "Flip Image");
+    // bound by menuItem("Set Range In Point") // bind("key-down--[", frameFunc(setInPoint), "Set In Point");
+    // bound by menuItem("Reset Range") // bind("key-down--\\", resetInOutPoints, "Reset In/Out Points");
+    // bound by menuItem("Set Range Out Point") // bind("key-down--]", frameFunc(setOutPoint), "Set Out Point");
+    // bound by menuItem("Alpha") // bind("key-down--a", showChannel(4), "Show Alpha Channel");
+    // bound by menuItem("Blue") // bind("key-down--b", showChannel(3), "Show Blue Channel");
+    // bound by menuItem("Color (All Channels)") // bind("key-down--c", showChannel(0), "Normal Color Channel Display");
     bind("key-down--alt--l", ~rotateImage(-90, true), "Rotate Image 90deg Counter-Clockwise");
     bind("key-down--alt--r", ~rotateImage(90, true), "Rotate Image 90deg Clockwise");
-    bind("key-down--alt--left", previousMarkedFrame, "Go to Previous Marked Frame");
-    bind("key-down--alt--right", nextMarkedFrame, "Go to Next Marked Frame");
-    bind("key-down--<", previousMatchedFrame, "Go to Matching Frame of Previous Source");
-    bind("key-down-->", nextMatchedFrame, "Go to Matching Frame of Next Source");
+    // bound by menuItem("Prev Marked Frame") // bind("key-down--alt--left", previousMarkedFrame, "Go to Previous Marked Frame");
+    // bound by menuItem("Next Marked Frame") // bind("key-down--alt--right", nextMarkedFrame, "Go to Next Marked Frame");
+    // bound by menuItem("Matching Frame Of Previous Source") // bind("key-down--<", previousMatchedFrame, "Go to Matching Frame of Previous Source");
+    // bound by menuItem("Matching Frame Of Next Source") // bind("key-down-->", nextMatchedFrame, "Go to Matching Frame of Next Source");
     bind("key-down--shift--left", prevView, "Go to Previous View");
     bind("key-down--shift--right", nextView, "Go to Next View");
-    bind("key-down--control--e", exportAs(, "mov", "Quicktime Export"), "Export Quicktime Movie");
-    bind("key-down--control--q", queryClose, "Close Session");
-    bind("key-down--control--N", clearEverything, "Clear Session");
-    bind("key-down--control--S", saveAs, "Save Session As");
-    bind("key-down--control--i", addMovieOrImageSources(,true,false), "Add Source");
-    bind("key-down--control--s", save, "Save Session");
+    // bound by menuItem("Quicktime Movie...") // bind("key-down--control--e", exportAs(, "mov", "Quicktime Export"), "Export Quicktime Movie");
+    // bound by menuItem("Close Session") // bind("key-down--control--q", queryClose, "Close Session");
+    // bound by menuItem("Clear") // bind("key-down--control--N", clearEverything, "Clear Session");
+    // bound by menuItem("Save Session As...") // bind("key-down--control--S", saveAs, "Save Session As");
+    // bound by menuItem("Open...") // bind("key-down--control--i", addMovieOrImageSources(,true,false), "Add Source");
+    // bound by menuItem("Save Session") // bind("key-down--control--s", save, "Save Session");
     bind("key-down--control--w", queryClose, "Close Session");
-    bind("key-down--control--o", addMovieOrImageSources(,true,false), "Open File");
-    bind("key-down--control--O", openMovieOrImage, "Open in New Session");
-    bind("key-down--control--1", pixelRelativeScale(1.0/1.0), "Scale 1:1");
-    bind("key-down--control--2", pixelRelativeScale(1.0/2.0), "Scale 1:2");
-    bind("key-down--control--3", pixelRelativeScale(1.0/3.0), "Scale 1:3");
-    bind("key-down--control--4", pixelRelativeScale(1.0/4.0), "Scale 1:4");
-    bind("key-down--control--5", pixelRelativeScale(1.0/5.0), "Scale 1:5");
-    bind("key-down--control--6", pixelRelativeScale(1.0/6.0), "Scale 1:6");
-    bind("key-down--control--7", pixelRelativeScale(1.0/7.0), "Scale 1:7");
-    bind("key-down--control--8", pixelRelativeScale(1.0/8.0), "Scale 1:8");
+    // bound by menuItem("Merge...") // bind("key-down--control--o", addMovieOrImageSources(,true,false), "Open File");
+    // bound by menuItem("Open in New Session...") // bind("key-down--control--O", openMovieOrImage, "Open in New Session");
+    bind("key-down--control--1", pixelRelativeScale(1.0/1.0), "Scale 1:1"); // same as just "1"
+    // bound by menuItem("1:2") // bind("key-down--control--2", pixelRelativeScale(1.0/2.0), "Scale 1:2");
+    // bound by menuItem("1:3") // bind("key-down--control--3", pixelRelativeScale(1.0/3.0), "Scale 1:3");
+    // bound by menuItem("1:4") // bind("key-down--control--4", pixelRelativeScale(1.0/4.0), "Scale 1:4");
+    // bound by menuItem("1:5") // bind("key-down--control--5", pixelRelativeScale(1.0/5.0), "Scale 1:5");
+    // bound by menuItem("1:6") // bind("key-down--control--6", pixelRelativeScale(1.0/6.0), "Scale 1:6");
+    // bound by menuItem("1:7") // bind("key-down--control--7", pixelRelativeScale(1.0/7.0), "Scale 1:7");
+    // bound by menuItem("1:8") // bind("key-down--control--8", pixelRelativeScale(1.0/8.0), "Scale 1:8");
     bind("key-down--control--l", toggleCacheModeFunc(CacheBuffer), "Toggle Look-Ahead Caching");
     bind("key-down--control--m", cycleMatte, "Cycle Mattes");
-    bind("key-down--control--left", previousMarkedRange, "Set In/Out to Previous Marked Range");
-    bind("key-down--control--right", nextMarkedRange, "Set In/Out to Next Marked Range");
-    bind("key-down--control--up", expandMarkedRange, "Expand In/Out to Neighboring Marked Ranges");
-    bind("key-down--control--down", contractMarkedRange, "Contract In/Out from Neighboring Marked Ranges");
-    bind("key-down--control--v", globalVolumeMode, "Edit Global Audio Volume");
-    bind("key-down--control--R", ~reloadInOut, "Reload In/Out Region");
-    bind("key-down--control--C", ~loadCurrentSourcesChangedFrames, "Load Changed Frames of Current Sources");
-    bind("key-down--control--f", frameWidth, "Frame Image Width");
+    // bound by menuItem("Prev Range From Marks/Boundaries") // bind("key-down--control--left", previousMarkedRange, "Set In/Out to Previous Marked Range");
+    // bound by menuItem("Next Range From Marks/Boundaries") // bind("key-down--control--right", nextMarkedRange, "Set In/Out to Next Marked Range");
+    // bound by menuItem("Expand Range From Marks/Boundaries") // bind("key-down--control--up", expandMarkedRange, "Expand In/Out to Neighboring Marked Ranges");
+    // bound by menuItem("Contract Range From Marks/Boundaries") // bind("key-down--control--down", contractMarkedRange, "Contract In/Out from Neighboring Marked Ranges");
+    // bound by menuItem("   Volume") // bind("key-down--control--v", globalVolumeMode, "Edit Global Audio Volume");
+    // bound by menuItem("Force Reload Region") // bind("key-down--control--R", ~reloadInOut, "Reload In/Out Region");
+    // bound by menuItem("Reload Changed Frames") // bind("key-down--control--C", ~loadCurrentSourcesChangedFrames, "Load Changed Frames of Current Sources");
+    // bound by menuItem("Frame Width") // bind("key-down--control--f", frameWidth, "Frame Image Width");
     bind("key-down--down", togglePlayFunc, "Toggle Play");
-    bind("key-down--end", ending, "Go to End of In/Out Region");
-    bind("key-down--f", frameImage, "Frame Image in View");
-    bind("key-down--f1", toggleMenuBar, "Toggle Menu Bar Visibility");
-    bind("key-down--f2", toggleTimeline, "Toggle Heads-Up Timeline");
-    bind("key-down--f3", toggleMotionScope, "Toggle Timeline Magnifier");
-    bind("key-down--f4", toggleInfo, "Toggle Heads-Up Image Info");
-    bind("key-down--f5", toggleColorInspector, "Toggle Heads-Up Color Inspector");
-    bind("key-down--f6", toggleWipe, "Toggle Wipes");
-    bind("key-down--f7", toggleInfoStrip, "Toggle Heads-Up Info Strip");
-    bind("key-down--f8", toggleProcessInfo, "Toggle Heads-Up External Process Progress");
-    bind("key-down--f11", toggleSourceDetails, "Toggle Heads-Up Source Details");
-    bind("key-down--g", showChannel(2), "Show Green Channel");
-    bind("key-down--home", beginning, "Go to Beginning of In/Out Range");
-    bind("key-down--shift--home", resetAllColorParameters, "Reset All Color");
+    // bound by menuItem("Jump To Ending") // bind("key-down--end", ending, "Go to End of In/Out Region");
+    // bound by menuItem("Frame") // bind("key-down--f", frameImage, "Frame Image in View");
+    // bound by menuItem("Menu Bar") // bind("key-down--f1", toggleMenuBar, "Toggle Menu Bar Visibility");
+    // bound by menuItem("Timeline") // bind("key-down--f2", toggleTimeline, "Toggle Heads-Up Timeline");
+    // bound by menuItem("Timeline Magnifier") // bind("key-down--f3", toggleMotionScope, "Toggle Timeline Magnifier");
+    // bound by menuItem("Image Info") // bind("key-down--f4", toggleInfo, "Toggle Heads-Up Image Info");
+    // bound by menuItem("Color Inspector") // bind("key-down--f5", toggleColorInspector, "Toggle Heads-Up Color Inspector");
+    // bound by menuItem("Wipes") // bind("key-down--f6", toggleWipe, "Toggle Wipes");
+    // bound by menuItem("Info Strip") // bind("key-down--f7", toggleInfoStrip, "Toggle Heads-Up Info Strip");
+    // bound by menuItem("Process Info") // bind("key-down--f8", toggleProcessInfo, "Toggle Heads-Up External Process Progress");
+    // bound by menuItem("Source Details") // bind("key-down--f11", toggleSourceDetails, "Toggle Heads-Up Source Details");
+    // bound by menuItem("Green") // bind("key-down--g", showChannel(2), "Show Green Channel");
+    // bound by menuItem("Jump To Beginning") // bind("key-down--home", beginning, "Go to Beginning of In/Out Range");
+    // bound by menuItem("Reset All Color") // bind("key-down--shift--home", resetAllColorParameters, "Reset All Color");
     bind("key-down--i", toggleInfo, "Toggle Heads-Up Image Info");
-    bind("key-down--l", showChannel(5), "Show Image Luminance");
-    bind("key-down--left", stepBackward1, "Move Back One Frame");
-    bind("key-down--m", toggleMark, "Toggle Mark At Frame");
-    bind("key-down--n", toggleFilter, "Toggle Nearest Neighbor/Linear Filter");
+    // bound by menuItem("Luminance") // bind("key-down--l", showChannel(5), "Show Image Luminance");
+    // bound by menuItem("Step Backward") // bind("key-down--left", stepBackward1, "Move Back One Frame");
+    // bound by menuItem("Mark Frame") // bind("key-down--m", toggleMark, "Toggle Mark At Frame");
+    // bound by menuItem("Linear Filter") // bind("key-down--n", toggleFilter, "Toggle Nearest Neighbor/Linear Filter");
     bind("key-down--p", togglePremult, "Toggle Premult Display");
     bind("key-down--page-down", previousMarkedRange, "Set In/Out to Previous Marked Range");
     bind("key-down--page-up", nextMarkedRange, "Set In/Out to Next Marked Range");
-    bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
-    bind("key-down--r", showChannel(1), "Show Red Channel");
-    bind("key-down--right", stepForward1, "Step Forward 1 Frame");
+    // bound by menuItem("Presentation Mode") // bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
+    // bound by menuItem("Red") // bind("key-down--r", showChannel(1), "Show Red Channel");
+    // bound by menuItem("Step Forward") // bind("key-down--right", stepForward1, "Step Forward 1 Frame");
     bind("key-down--t", toggleTimeline, "Toggle Heads-Up Timeline");
     bind("key-down--tab", toggleTimeline, "Toggle Heads-Up Timeline");
-    bind("key-down--up", toggleForwardsBackwards, "Toggle Forward/Backward Playback");
-    bind("key-down--v", enterDispGamma, "Enter Display Gamma");
-    bind("key-down--|", setInOutMarkedRange, "Set In/Out Range From Surrounding Marks");
+    // bound by menuItem("Reverse") // bind("key-down--up", toggleForwardsBackwards, "Toggle Forward/Backward Playback");
+    // bound by menuItem("   Display Gamma...") // bind("key-down--v", enterDispGamma, "Enter Display Gamma");
+    // bound by menuItem("Set Range From Marks/Boundaries") // bind("key-down--|", setInOutMarkedRange, "Set In/Out Range From Surrounding Marks");
     bind("key-down--~", toggleTimeline, "Toggle Timeline");
     bind("pointer--wheeldown", stepForward1, "Step Forward 1 Frame");
     bind("pointer--wheelup", stepBackward1, "Step Backward 1 Frame");
@@ -7257,7 +6940,7 @@ global bool debugGC = false;
     bind("stylus-pen--release", releaseScrub);
     bind("stylus-eraser--push", popupMenu(,nil), "Popup Menu");
 
-    bind("key-down--alt--alt", noop, "Intercept Menu Navigation");
+    // bound by menuItem("Presentation Settings") // bind("key-down--alt--alt", noop, "Intercept Menu Navigation");
     bind("key-up--alt--alt", noop, "Intercept Menu Navigation");
 
     bind("remote-connection-start", ~activateSync, "Auto start sync mode");
@@ -7280,12 +6963,12 @@ global bool debugGC = false;
     //  Hack to "scrub" float parameters
     //
 
-    bind("key-down--e", exposureMode, "Edit Current Source Relative Exposure");
-    bind("key-down--S", saturationMode, "Edit Current Source Saturation");
-    bind("key-down--h", hueMode, "Edit Current Source Hue");
-    bind("key-down--y", gammaMode, "Edit Current Source Gamma");
-    bind("key-down--k", contrastMode, "Edit Current Source Contrast");
-    bind("key-down--B", brightnessMode, "Edit Display Brightness");
+    // bound by menuItem("    Exposure") // bind("key-down--e", exposureMode, "Edit Current Source Relative Exposure");
+    // bound by menuItem("    Saturation") // bind("key-down--S", saturationMode, "Edit Current Source Saturation");
+    // bound by menuItem("    Hue") // bind("key-down--h", hueMode, "Edit Current Source Hue");
+    // bound by menuItem("    Gamma") // bind("key-down--y", gammaMode, "Edit Current Source Gamma");
+    // bound by menuItem("    Contrast") // bind("key-down--k", contrastMode, "Edit Current Source Contrast");
+    // bound by menuItem("Display Brightness (Interactive)") // bind("key-down--B", brightnessMode, "Edit Display Brightness");
     bind("default", "paramscrub", "pointer-1--push", beginParamScrub);
     bind("default", "paramscrub", "pointer-1--drag", dragParamScrub, "Scrub Modify");
     bind("default", "paramscrub", "pointer-1--release", releaseParam);
