@@ -3554,22 +3554,6 @@ namespace IPMu
         NODE_RETURN(int(s->getSessionType()));
     }
 
-    NODE_IMPLEMENTATION(setCurrentAnnotateModeNode, void)
-    {
-        Session* session = Session::currentSession();
-        StringType::String* nodeName = NODE_ARG_OBJECT(0, StringType::String);
-
-        if (nodeName == nullptr)
-        {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "node name required");
-            return;
-        }
-
-        session->userGenericEvent("set-current-annotate-mode-node",
-                                  nodeName->c_str());
-    }
-
     NODE_IMPLEMENTATION(setHardwareStereoMode, void)
     {
         Session* s = Session::currentSession();
@@ -6440,10 +6424,6 @@ namespace IPMu
 
             new Function(c, "getRendererType", getRendererType, None, Return,
                          "string", End),
-
-            new Function(c, "setCurrentAnnotateModeNode",
-                         setCurrentAnnotateModeNode, None, Return, "void",
-                         Parameters, new Param(c, "nodeName", "string"), End),
 
             new Function(c, "setHardwareStereoMode", setHardwareStereoMode,
                          None, Return, "void", Parameters,

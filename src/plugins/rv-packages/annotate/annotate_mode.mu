@@ -2431,7 +2431,7 @@ class: AnnotateMinorMode : MinorMode
               ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
               ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
               ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
-              ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current annotation node"),
+              ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current paint node"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
               ("stylus-color-rgb", setColorRGB, "Select color RGB"),
@@ -2579,13 +2579,13 @@ class: AnnotateMinorMode : MinorMode
 
     method: activate (void;)
     {
-        sendInternalEvent("annotate-mode-activated");
         updateCurrentNode();
         if (_manageDock neq nil) _manageDock.show();
         if (_drawDock neq nil) _drawDock.show();
         setCursor(_currentDrawMode.cursor);
         updateDrawModeUI();
         setTags();
+        sendInternalEvent("annotate-mode-activated");
     }
 
     method: render (void; Event event)
