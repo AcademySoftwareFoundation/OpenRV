@@ -29,10 +29,27 @@ def _get_transform_properties():
             global_translate_vec = otio.schema.V2d(0.0, 0.0)
             global_scale_vec = otio.schema.V2d(1.0, 1.0)
 
-            global_translate = commands.getFloatProperty(f"{transform_node}.otio.global_translate")
-            global_scale = commands.getFloatProperty(f"{transform_node}.otio.global_scale")
-            global_translate_vec = otio.schema.V2d(global_translate[0], global_translate[1])
-            global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
+            if commands.propertyExists(f"{transform_node}.otio.global_translate") and commands.propertyExists(
+                f"{transform_node}.otio.global_scale"
+            ):
+                global_translate = commands.getFloatProperty(f"{transform_node}.otio.global_translate")
+                global_scale = commands.getFloatProperty(f"{transform_node}.otio.global_scale")
+                global_translate_vec = otio.schema.V2d(global_translate[0], global_translate[1])
+                global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
+            else:
+                logging.warning(
+                    "OTIO global scale and translate properties not found, using aspect ratio from the source"
+                )
+                try:
+                    media_info = commands.sourceMediaInfo(first_source_node)
+                    height = media_info["height"]
+                    aspect_ratio = media_info["width"] / height if height != 0 else 1920 / 1080
+                except Exception:
+                    logging.warning("Unable to determine aspect ratio, using default value of 16:9")
+                    aspect_ratio = 1920 / 1080
+
+                scale = aspect_ratio / 16
+                global_scale_vec = otio.schema.V2d(scale, scale)
 
             translate = commands.getFloatProperty(f"{transform_node}.transform.translate")
             scale = commands.getFloatProperty(f"{transform_node}.transform.scale")
@@ -67,7 +84,6 @@ def _transform_otio_to_world_coordinate(point):
 
 def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None) -> None:
     """A hook for the annotation schema"""
-
     try:
         if argument_map["effect_metadata"]:
             effect_metadata = argument_map["effect_metadata"]
