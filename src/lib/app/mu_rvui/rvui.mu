@@ -3604,7 +3604,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     let mode = cacheMode(),
         presMode = presentationMode();
 
-    sendInternalEvent ("before-session-clear-everything", "", "rvui");
+    let result = sendInternalEvent ("before-session-clear-everything", "", "rvui");
+    if (result == "cancel")
+        return;
 
     setPresentationMode(false);
     clearSession();
