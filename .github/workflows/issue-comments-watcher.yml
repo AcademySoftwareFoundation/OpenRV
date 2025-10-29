@@ -1,0 +1,57 @@
+name: 'Update Status on Checkbox Change'
+
+on:
+  # This event is emitted by wadackel/checkbox-workflow-action
+  workflow_run:
+    workflows: ["Create PR Checklist"]
+    types:
+      - completed
+
+  # Alternative trigger if you want to directly react to comment edits (optional)
+  issue_comment:
+    types: [edited]
+
+permissions:
+  pull-requests: read
+  statuses: write
+  issues: read
+
+jobs:
+  update-status:
+    runs-on: ubuntu-latest
+    if: github.event.issue.pull_request
+    steps:
+      - name: Update commit statuses based on checklist
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            const sha = pr.data.head.sha;
+            const body = context.payload.comment.body;
+
+            const checklist = [
+              { key: "internal-ticket", context: "Create an internal ticket" },
+              { key: "view-testing", context: "Complete view testing" },
+            ];
+
+            for (const item of checklist) {
+              const regex = new RegExp(`- \\[x\\] .*${item.context}`, "i");
+              const isChecked = regex.test(body);
+              const state = isChecked ? "success" : "pending";
+
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state,
+                context: item.context,
+                description: isChecked
+                  ? "Completed via checklist"
+                  : "Awaiting manual approval via checklist",
+              });
+            }
