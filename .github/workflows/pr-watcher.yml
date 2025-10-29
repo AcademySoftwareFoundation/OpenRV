@@ -1,6 +1,6 @@
 name: 'Create PR Checklist'
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -8,47 +8,51 @@ permissions:
   statuses: write
   issues: write  # needed to add labels
   contents: read # needed to get collaborators
-
-# Security guidelines
-# Do not checkout code from the PR
-# Do not run scripts or commands from the PR
+  members: read  # needed to check team membership
 
 jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if PR author is a maintainer
-        id: check_maintainer
+      - name: Check if PR author is a team member
+        id: check_team_member
         uses: actions/github-script@v6
         with:
           script: |
-            // Fetch the PR author
             const prUser = context.payload.pull_request.user.login;
             console.log(`PR author: ${prUser}`);
 
-            // Check if author is a collaborator (maintainer)
-            try {
-              const { status } = await github.rest.repos.checkCollaborator({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                username: prUser,
-              });
-              console.log(`Collaborator check status: ${status}`);
-              console.log(`${prUser} is a maintainer.`);
-              core.setOutput("is_maintainer", true);
-            } catch (error) {
-              if (error.status === 404) {
-                console.log(`${prUser} is NOT a maintainer.`);
-                core.setOutput("is_maintainer", false);
-              } else {
-                console.log(`Error checking collaborator: ${error}`);
-                throw error;
+            // List of team slugs to check (update these with your actual team names)
+            const teamSlugs = ['rvos-committers'];
+            
+            let isTeamMember = false;
+
+            // Check if author is a member of any of the specified teams
+            for (const teamSlug of teamSlugs) {
+              try {
+                await github.rest.teams.getMembershipForUserInOrg({
+                  org: context.repo.owner,
+                  team_slug: teamSlug,
+                  username: prUser,
+                });
+                console.log(`${prUser} is a member of team: ${teamSlug}`);
+                isTeamMember = true;
+                break;
+              } catch (error) {
+                if (error.status === 404) {
+                  console.log(`${prUser} is NOT a member of team: ${teamSlug}`);
+                } else {
+                  console.log(`Error checking team membership for ${teamSlug}: ${error.message}`);
+                }
               }
             }
             
+            core.setOutput("is_team_member", isTeamMember);
+            console.log(`Final result - is_team_member: ${isTeamMember}`);
             
-      - name: Add labels
-        #if: steps.check_maintainer.outputs.is_maintainer == 'false'
+            
+      - name: Add community label
+        if: steps.check_team_member.outputs.is_team_member == 'false'
         uses: actions/github-script@v6
         with:
           script: |
@@ -59,8 +63,8 @@ jobs:
               labels: ['community']
             });
             
-      - name: Create pending statuses
-        #if: steps.check_maintainer.outputs.is_maintainer == 'false'
+      - name: Create pending statuses for community PRs
+        if: steps.check_team_member.outputs.is_team_member == 'false'
         uses: actions/github-script@v6
         with:
           script: |
@@ -79,8 +83,28 @@ jobs:
               });
             }
             
-      - name: Create PR checklist comment
-        #if: steps.check_maintainer.outputs.is_maintainer == 'false'
+      - name: Auto-approve statuses for team member PRs
+        if: steps.check_team_member.outputs.is_team_member == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const checklist = [
+              { key: "internal-ticket", context: "Create an internal ticket" },
+              { key: "view-testing", context: "Complete view testing" },
+            ];
+            for (const item of checklist) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha: context.payload.pull_request.head.sha,
+                state: 'success',
+                context: item.context,
+                description: 'Auto-approved for team member',
+              });
+            }
+            
+      - name: Create PR checklist comment for community PRs
+        if: steps.check_team_member.outputs.is_team_member == 'false'
         uses: wadackel/checkbox-workflow-action@v1
         with:
           id: pr-checklist
