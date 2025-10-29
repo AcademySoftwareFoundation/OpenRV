@@ -8,7 +8,6 @@ permissions:
   statuses: write
   issues: write  # needed to add labels
   contents: read # needed to get collaborators
-  members: read  # needed to check team membership
 
 jobs:
   setup:
