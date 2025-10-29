@@ -187,7 +187,10 @@ void QAlertPanel::adjustBestFitDimensions()
 
         // Try different widths to find the best text wrapping
         float bestFitRatio = 1e100;
-        int bestWidth = 100; // Start with a reasonable width
+        // Start with a reasonable width to acount at least for margins and
+        // such: left margin (20) + icon (32) + spacing (15) + right margin (20)
+        // = 87
+        int bestWidth = 100;
         int bestHeight = 50;
 
         float targetBestFitRatio = 2.0;
@@ -215,7 +218,8 @@ void QAlertPanel::adjustBestFitDimensions()
         }
 
         // Calculate dialog size with reasonable padding
-        int dialogWidth = bestWidth + 80; // Add padding for icon and margins
+        int dialogWidth =
+            bestWidth + 100; // Add padding for icon and margins (87 + buffer)
         int dialogHeight =
             bestHeight + 80; // Add padding for buttons and margins
 
