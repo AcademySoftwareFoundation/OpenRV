@@ -17,7 +17,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Check if PR author is a team member
+      - name: Check if PR author has admin access
         id: check_team_member
         uses: actions/github-script@v6
         with:
@@ -25,29 +25,31 @@ jobs:
             const prUser = context.payload.pull_request.user.login;
             console.log(`PR author: ${prUser}`);
 
-            // List of team slugs to check (update these with your actual team names)
-            const teamSlugs = ['rvos-committers'];
-            
             let isTeamMember = false;
 
-            // Check if author is a member of any of the specified teams
-            for (const teamSlug of teamSlugs) {
-              try {
-                await github.rest.teams.getMembershipForUserInOrg({
-                  org: context.repo.owner,
-                  team_slug: teamSlug,
-                  username: prUser,
-                });
-                console.log(`${prUser} is a member of team: ${teamSlug}`);
+            try {
+              // Check the user's permission level on the repository
+              const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: prUser,
+              });
+              
+              console.log(`${prUser} has permission: ${permission.permission}`);
+              
+              // Team members typically have write, maintain, or admin access
+              // Community contributors have read or no access
+              if (['admin'].includes(permission.permission)) {
+                console.log(`${prUser} has write access or higher - treating as team member`);
                 isTeamMember = true;
-                break;
-              } catch (error) {
-                if (error.status === 404) {
-                  console.log(`${prUser} is NOT a member of team: ${teamSlug}`);
-                } else {
-                  console.log(`Error checking team membership for ${teamSlug}: ${error.message}`);
-                }
+              } else {
+                console.log(`${prUser} has ${permission.permission} access - treating as community contributor`);
+                isTeamMember = false;
               }
+            } catch (error) {
+              console.log(`Error checking permissions: ${error.message}`);
+              // If we can't determine permissions, treat as community contributor (safer default)
+              isTeamMember = false;
             }
             
             core.setOutput("is_team_member", isTeamMember);
