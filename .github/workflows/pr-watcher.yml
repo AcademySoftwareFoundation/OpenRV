@@ -1,6 +1,6 @@
 name: 'Create PR Checklist'
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -8,6 +8,10 @@ permissions:
   statuses: write
   issues: write  # needed to add labels
   contents: read # needed to get collaborators
+
+# Security guidelines
+# Do not checkout code from the PR
+# Do not run scripts or commands from the PR
 
 jobs:
   setup:
