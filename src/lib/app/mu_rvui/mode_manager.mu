@@ -426,6 +426,19 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
+        // Special handling of mode toggling if certain categories of actions are disabled.
+        if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
+        {
+            sendInternalEvent("category-event-blocked", "annotate_category");
+            return;
+        }
+
+        if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+        {
+            sendInternalEvent("category-event-blocked", "media_category");
+            return;
+        }
+            
         mm.toggleEntry(entry);
     }
 

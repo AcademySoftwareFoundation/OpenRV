@@ -1951,7 +1951,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onPresenterChanged(void; Event event)
     {
-        if (_active)
+        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
         {
             toggle();
         }

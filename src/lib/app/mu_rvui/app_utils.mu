@@ -49,6 +49,11 @@ operator: ~ (EventFunc; VoidFunc f)
     bind(mode, table, event, makeCategoryEventFunc(category, makeEventFunc(F)), doc);
 }
 
+\: bind (void; string mode, string table, string event, string category, EventFunc F, string doc="")
+{
+    bind(mode, table, event, makeCategoryEventFunc(category, F), doc);
+}
+
 \: bind (void; string ev, VoidFunc F, string doc="") 
 { 
     bind("default", "global", ev, F, doc); 
@@ -209,7 +214,7 @@ operator: ~ (EventFunc; VoidFunc f)
 
     // create composite function that checks if the category is enabled and then calls the function
     let compositeFunc = \: (void; Event ev) {
-        if (compositeStateFunc() == DisabledMenuState)
+        if (!commands.isEventCategoryEnabled(category))
             sendInternalEvent("category-event-blocked", category);
         else
             func(ev);
