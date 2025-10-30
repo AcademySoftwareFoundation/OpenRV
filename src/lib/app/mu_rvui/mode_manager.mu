@@ -213,13 +213,12 @@ class: ModeManagerMode : MinorMode
     {
         \: (int; )
         {
-            if (filterLiveReviewEvents())
-                then DisabledMenuState
-                else if entry.mode eq nil
-                     then UncheckedMenuState
-                     else if entry.mode._active
-                            then CheckedMenuState
-                            else UncheckedMenuState;
+            // TODO: NOT SURE HOW TO REPLACE FILTERLIVEREVIEWEVENTS HERE
+            if entry.mode eq nil
+                 then UncheckedMenuState
+                 else if entry.mode._active
+                        then CheckedMenuState
+                        else UncheckedMenuState;
         };
     }
 

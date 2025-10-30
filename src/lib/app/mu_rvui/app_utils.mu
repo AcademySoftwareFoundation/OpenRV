@@ -25,6 +25,17 @@ MenuStateFunc   := (int;);
     \: (void; Event ignored) { f(); };
 }
 
+
+\: checkAndBlockEventCategory(bool; string category)
+{
+    if (!commands.isEventCategoryEnabled("category"))
+    {
+        sendInternalEvent("category-event-blocked", category);
+        return false;
+    }
+    return true;
+}
+
 \: makeCategoryEventFunc (EventFunc; string category, EventFunc f) {
     \: (void; Event ev) {
         if (!commands.isEventCategoryEnabled(category))
