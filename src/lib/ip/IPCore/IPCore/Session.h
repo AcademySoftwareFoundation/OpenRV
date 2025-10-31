@@ -31,6 +31,34 @@ namespace IPCore
     class PropertyInfo;
 
     //
+    //  Event Category Constants
+    //
+    //  Central definition of all event category names used throughout RV.
+    //  These categories are used by the event filtering system to control
+    //  which UI actions are enabled/disabled.
+    //
+    namespace EventCategories
+    {
+        constexpr const char* CATEGORY_ANNOTATE = "annotate_category";
+        constexpr const char* CATEGORY_CLEAR = "clear_category";
+        constexpr const char* CATEGORY_EXPORT = "export_category";
+        constexpr const char* CATEGORY_FLOWPT = "flowpt_category";
+        constexpr const char* CATEGORY_HELP = "help_category";
+        constexpr const char* CATEGORY_INFO = "info_category";
+        constexpr const char* CATEGORY_MARK = "mark_category";
+        constexpr const char* CATEGORY_MEDIA = "media_category";
+        constexpr const char* CATEGORY_PLAYCONTROL = "playcontrol_category";
+        constexpr const char* CATEGORY_PRESENTATION = "presentation_category";
+        constexpr const char* CATEGORY_SESSIONMANAGER = "sessionmanager_category";
+        constexpr const char* CATEGORY_SOURCE = "source_category";
+        constexpr const char* CATEGORY_SYSTEM = "system_category";
+        constexpr const char* CATEGORY_SCREENINGROOM = "screeningroom_category";
+        constexpr const char* CATEGORY_UNCLASSIFIED = "unclassified_category";
+        constexpr const char* CATEGORY_VIEWMODE = "viewmode_category";
+        constexpr const char* CATEGORY_WIPES = "wipes_category";
+    }
+
+    //
     //  class Session
     //
     //  This object represents the "document" in as much as Rv has a
@@ -814,7 +842,6 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(bool shouldFilterEvents = false);
         bool filterLiveReviewEvents();
 
         //

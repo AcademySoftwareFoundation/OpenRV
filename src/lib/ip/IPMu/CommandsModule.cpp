@@ -4143,14 +4143,6 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
-    NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
-    {
-        Session* s = Session::currentSession();
-        bool shouldFilterEvents = NODE_ARG(0, bool);
-
-        s->setFilterLiveReviewEvents(shouldFilterEvents);
-    }
-
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
     {
         Session* s = Session::currentSession();
@@ -6443,11 +6435,6 @@ namespace IPMu
                 "string", Parameters, new Param(c, "eventName", "string"),
                 new Param(c, "contents", "string", Value(Pointer(0))),
                 new Param(c, "senderName", "string", Value(Pointer(0))), End),
-
-            new Function(c, "setFilterLiveReviewEvents",
-                         setFilterLiveReviewEvents, None, Return, "void",
-                         Parameters, new Param(c, "shouldFilterEvents", "bool"),
-                         End),
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", End),
