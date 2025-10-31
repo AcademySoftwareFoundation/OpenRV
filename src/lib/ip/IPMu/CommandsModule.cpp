@@ -6461,11 +6461,6 @@ namespace IPMu
                 new Param(c, "contents", "string", Value(Pointer(0))),
                 new Param(c, "senderName", "string", Value(Pointer(0))), End),
 
-            new Function(c, "setFilterLiveReviewEvents",
-                         setFilterLiveReviewEvents, None, Return, "void",
-                         Parameters, new Param(c, "shouldFilterEvents", "bool"),
-                         End),
-
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", End),
 
