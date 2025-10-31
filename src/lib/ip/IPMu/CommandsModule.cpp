@@ -4143,6 +4143,36 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
+    // This is for backwards compatibility with the old live review plugin and latest OpenRV.
+    // TODO: Remove setFilterLiveReviewEvents command in the future.
+    NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
+    {
+        Session* s = Session::currentSession();
+        bool shouldFilterEvents = NODE_ARG(0, bool);
+
+        if (s && shouldFilterEvents)
+        {
+            // Disable all event categories
+            s->disableEventCategory(EventCategories::CATEGORY_ANNOTATE);
+            s->disableEventCategory(EventCategories::CATEGORY_CLEAR);
+            s->disableEventCategory(EventCategories::CATEGORY_EXPORT);
+            s->disableEventCategory(EventCategories::CATEGORY_FLOWPT);
+            s->disableEventCategory(EventCategories::CATEGORY_HELP);
+            s->disableEventCategory(EventCategories::CATEGORY_INFO);
+            s->disableEventCategory(EventCategories::CATEGORY_MARK);
+            s->disableEventCategory(EventCategories::CATEGORY_MEDIA);
+            s->disableEventCategory(EventCategories::CATEGORY_PLAYCONTROL);
+            s->disableEventCategory(EventCategories::CATEGORY_PRESENTATION);
+            s->disableEventCategory(EventCategories::CATEGORY_SESSIONMANAGER);
+            s->disableEventCategory(EventCategories::CATEGORY_SOURCE);
+            s->disableEventCategory(EventCategories::CATEGORY_SYSTEM);
+            s->disableEventCategory(EventCategories::CATEGORY_SCREENINGROOM);
+            s->disableEventCategory(EventCategories::CATEGORY_UNCLASSIFIED);
+            s->disableEventCategory(EventCategories::CATEGORY_VIEWMODE);
+            s->disableEventCategory(EventCategories::CATEGORY_WIPES);
+        }
+    }
+
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
     {
         Session* s = Session::currentSession();
@@ -6435,6 +6465,11 @@ namespace IPMu
                 "string", Parameters, new Param(c, "eventName", "string"),
                 new Param(c, "contents", "string", Value(Pointer(0))),
                 new Param(c, "senderName", "string", Value(Pointer(0))), End),
+
+            new Function(c, "setFilterLiveReviewEvents",
+                         setFilterLiveReviewEvents, None, Return, "void",
+                         Parameters, new Param(c, "shouldFilterEvents", "bool"),
+                         End),
 
             new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents,
                          None, Return, "bool", End),
