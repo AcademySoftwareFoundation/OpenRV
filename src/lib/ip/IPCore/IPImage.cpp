@@ -994,9 +994,10 @@ namespace IPCore
     // this is used in ImageRenderer for paint FBO caching
     // in case there is one or less command, no command hash will be included
     // in renderIDWithPartialPaint
-    const string& IPImage::renderIDWithPartialPaint() const
+    const string&
+    IPImage::renderIDWithPartialPaint(const bool force_recompute) const
     {
-        if (renderIDNeedsCompute())
+        if (force_recompute || renderIDNeedsCompute())
             computeRenderIDs();
         return m_renderIDWithPartialPaint;
     }
