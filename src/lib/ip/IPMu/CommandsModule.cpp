@@ -4143,12 +4143,54 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
+    // This is for backwards compatibility with the old live review plugin and latest OpenRV.
+    // TODO: Remove setFilterLiveReviewEvents command in the future.
     NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
     {
         Session* s = Session::currentSession();
         bool shouldFilterEvents = NODE_ARG(0, bool);
 
-        s->setFilterLiveReviewEvents(shouldFilterEvents);
+        if (s && shouldFilterEvents)
+        {
+            // Disable all event categories
+            s->disableEventCategory(EventCategories::CATEGORY_ANNOTATE);
+            s->disableEventCategory(EventCategories::CATEGORY_CLEAR);
+            s->disableEventCategory(EventCategories::CATEGORY_EXPORT);
+            s->disableEventCategory(EventCategories::CATEGORY_FLOWPT);
+            s->disableEventCategory(EventCategories::CATEGORY_HELP);
+            s->disableEventCategory(EventCategories::CATEGORY_INFO);
+            s->disableEventCategory(EventCategories::CATEGORY_MARK);
+            s->disableEventCategory(EventCategories::CATEGORY_MEDIA);
+            s->disableEventCategory(EventCategories::CATEGORY_PLAYCONTROL);
+            s->disableEventCategory(EventCategories::CATEGORY_PRESENTATION);
+            s->disableEventCategory(EventCategories::CATEGORY_SESSIONMANAGER);
+            s->disableEventCategory(EventCategories::CATEGORY_SOURCE);
+            s->disableEventCategory(EventCategories::CATEGORY_SYSTEM);
+            s->disableEventCategory(EventCategories::CATEGORY_SCREENINGROOM);
+            s->disableEventCategory(EventCategories::CATEGORY_UNCLASSIFIED);
+            s->disableEventCategory(EventCategories::CATEGORY_VIEWMODE);
+            s->disableEventCategory(EventCategories::CATEGORY_WIPES);
+        }
+        else if (s && !shouldFilterEvents) {
+            // Re-enable all event categories
+            s->enableEventCategory(EventCategories::CATEGORY_ANNOTATE);
+            s->enableEventCategory(EventCategories::CATEGORY_CLEAR);
+            s->enableEventCategory(EventCategories::CATEGORY_EXPORT);
+            s->enableEventCategory(EventCategories::CATEGORY_FLOWPT);
+            s->enableEventCategory(EventCategories::CATEGORY_HELP);
+            s->enableEventCategory(EventCategories::CATEGORY_INFO);
+            s->enableEventCategory(EventCategories::CATEGORY_MARK);
+            s->enableEventCategory(EventCategories::CATEGORY_MEDIA);
+            s->enableEventCategory(EventCategories::CATEGORY_PLAYCONTROL);
+            s->enableEventCategory(EventCategories::CATEGORY_PRESENTATION);
+            s->enableEventCategory(EventCategories::CATEGORY_SESSIONMANAGER);
+            s->enableEventCategory(EventCategories::CATEGORY_SOURCE);
+            s->enableEventCategory(EventCategories::CATEGORY_SYSTEM);
+            s->enableEventCategory(EventCategories::CATEGORY_SCREENINGROOM);
+            s->enableEventCategory(EventCategories::CATEGORY_UNCLASSIFIED);
+            s->enableEventCategory(EventCategories::CATEGORY_VIEWMODE);
+            s->enableEventCategory(EventCategories::CATEGORY_WIPES);
+        }
     }
 
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)

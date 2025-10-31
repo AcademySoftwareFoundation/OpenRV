@@ -720,11 +720,6 @@ namespace IPCore
         }
     }
 
-    void Session::setFilterLiveReviewEvents(bool shouldFilterEvents)
-    {
-        m_filterLiveReviewEvents = shouldFilterEvents;
-    }
-
     bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
 
     //----------------------------------------------------------------------
@@ -4674,31 +4669,6 @@ namespace IPCore
     {
         if (m_beingDeleted)
             return "";
-
-        if (m_filterLiveReviewEvents
-            && (eventName == "mode-manager-toggle-mode"
-                || (eventName == "remote-eval"
-                    && (contents == "commands.stop()"
-                        || contents
-                               == "commands.scrubAudio(false); "
-                                  "commands.setInc(-1); commands.play();"
-                        || contents == "commands.setInc(-1); commands.play();"
-                        || contents
-                               == "commands.scrubAudio(false); "
-                                  "commands.setInc(1); commands.play();"
-                        || contents == "commands.setInc(1); commands.play();"
-                        || contents == "rvui.previousMarkedFrame()"
-                        || contents == "rvui.nextMarkedFrame()"
-                        || contents == "extra_commands.stepForward(1)"
-                        || contents == "extra_commands.stepBackward(1)"
-                        || contents == "commands.setPlayMode(PlayOnce)"
-                        || contents == "commands.setPlayMode(PlayPingPong)"
-                        || contents == "commands.setPlayMode(PlayLoop)"))))
-        {
-            GenericStringEvent event("live-review-blocked-event", this, "");
-            sendEvent(event);
-            return "";
-        }
 
         // cout << "userGenericEvent: " << eventName << " '" << contents << "'"
         // << endl;
