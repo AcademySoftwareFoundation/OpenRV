@@ -15,17 +15,17 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "2.4.6.0" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "2.5.19.1" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
-    "628c588112ce8e08f31ec3417eb6828d"
+    "5af6de5a73c6d234eed8e2874a5aed62"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
+RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "2.5.19" "SHARED" "${RV_DEBUG_POSTFIX}")
 SET(_byprojects_copy
     ${_byproducts}
 )
@@ -38,7 +38,7 @@ SET(_oiio_utils_libpath
 SET(_oiio_utils_implibpath
     ${_implibpath}
 )
-RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
+RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.5.19" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'

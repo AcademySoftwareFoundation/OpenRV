@@ -10,7 +10,7 @@ PROCESSORCOUNT(_cpu_count)
 RV_VFX_SET_VARIABLE(
   _ext_openexr_version
   CY2023 "3.1.7"
-  CY2024 "3.2.4"
+  CY2024 "3.4.2"
 )
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${_ext_openexr_version}" "" "")
@@ -22,7 +22,7 @@ SET(_download_url
 RV_VFX_SET_VARIABLE(
   _download_hash
   CY2023 "a278571601083a74415d40d2497d205c"
-  CY2024 "11e713886a0e1c6a2c147e9704bbbe68"
+  CY2024 "ae74207497b7f2231b626362f8e27c48"
 )
 
 SET(_install_dir
@@ -63,7 +63,7 @@ ENDIF()
 RV_VFX_SET_VARIABLE(
   _openexr_libname_suffix_
   CY2023 "3_1"
-  CY2024 "3_2"
+  CY2024 "3_4"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -82,7 +82,7 @@ SET(_openexr_lib
 RV_VFX_SET_VARIABLE(
   LIB_VERSION_SUFFIX
   CY2023 "30.7.1"
-  CY2024 "31.3.2.4"
+  CY2024 "33.3.4.2"
 )
 
 IF(RV_TARGET_DARWIN)
@@ -158,12 +158,13 @@ ENDIF()
 RV_VFX_SET_VARIABLE(
   _openexr_patch_name_
   CY2023 "openexr_3.1.7_invalid_to_black"
-  CY2024 "openexr_3.2.4_invalid_to_black"
+  CY2024 "openexr_3.4.2_invalid_to_black"
 )
-
+IF(_openexr_patch_name_)
 SET(_patch_command 
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/${_openexr_patch_name_}.patch
 )
+ENDIF()
 
 LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
