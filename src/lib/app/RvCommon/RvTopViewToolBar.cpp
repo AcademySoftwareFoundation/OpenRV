@@ -564,9 +564,7 @@ namespace Rv
             {
                 bgMenuUpdate();
             }
-            else if (name == "internal-sync-presenter-changed" 
-                     || name == "sync-session-mode-changed"
-                     || name == "sync-session-ended")
+            else if (name == "update-toolbar-action-availability")
             {
                 // Update action availability when presenter changes or session mode changes
                 updateActionAvailability();
