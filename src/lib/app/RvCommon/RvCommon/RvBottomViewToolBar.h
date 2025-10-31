@@ -13,7 +13,8 @@
 #include <QtWidgets/QSlider>
 #include <TwkApp/EventNode.h>
 #include <QAction>
-#include <unordered_map>
+#include <string>
+#include <vector>
 
 namespace IPCore
 {
@@ -67,10 +68,17 @@ namespace Rv
         void playModeMenuUpdate();
 
     private:
+        struct ActionCategoryMapping
+        {
+            QAction* action;
+            std::string category;
+            QString defaultTooltip;
+        };
+
         template <class T> void setVolumeLevel(T& inst, int level);
 
         void setVolumeIcon();
-        void setLiveReviewFilteredActions(bool isDisabled);
+        void updateActionAvailability();
 
         IPCore::Session* m_session;
         QAction* m_smAction;
@@ -104,7 +112,7 @@ namespace Rv
         QIcon m_volumeHighIcon;
         QIcon m_volumeHighMutedIcon;
 
-        std::unordered_map<QAction*, QString> m_liveReviewFilteredActions;
+        std::vector<ActionCategoryMapping> m_actionCategoryMappings;
     };
 
     template <class T>

@@ -720,11 +720,6 @@ namespace IPCore
         }
     }
 
-    void Session::setFilterLiveReviewEvents(bool shouldFilterEvents)
-    {
-        m_filterLiveReviewEvents = shouldFilterEvents;
-    }
-
     bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
 
     //----------------------------------------------------------------------

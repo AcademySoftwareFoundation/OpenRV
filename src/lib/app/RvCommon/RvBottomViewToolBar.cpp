@@ -361,18 +361,19 @@ namespace Rv
         connect(m_audioSlider, SIGNAL(sliderReleased()), this,
                 SLOT(audioSliderReleased()));
 
-        m_liveReviewFilteredActions = {
-            {m_smAction, m_smAction->toolTip()},
-            {m_paintAction, m_paintAction->toolTip()},
-            {m_holdAction, m_holdAction->toolTip()},
-            {m_ghostAction, m_ghostAction->toolTip()},
-            {m_backStepAction, m_backStepAction->toolTip()},
-            {m_forwardStepAction, m_forwardStepAction->toolTip()},
-            {m_backPlayAction, m_backPlayAction->toolTip()},
-            {m_forwardPlayAction, m_forwardPlayAction->toolTip()},
-            {m_backMarkAction, m_backMarkAction->toolTip()},
-            {m_forwardMarkAction, m_forwardMarkAction->toolTip()},
-            {m_playModeAction, m_playModeAction->toolTip()},
+        // Map toolbar actions to their corresponding event categories
+        m_actionCategoryMappings = {
+            {m_smAction, IPCore::EventCategories::CATEGORY_SESSIONMANAGER, m_smAction->toolTip()},
+            {m_paintAction, IPCore::EventCategories::CATEGORY_ANNOTATE, m_paintAction->toolTip()},
+            {m_holdAction, IPCore::EventCategories::CATEGORY_ANNOTATE, m_holdAction->toolTip()},
+            {m_ghostAction, IPCore::EventCategories::CATEGORY_ANNOTATE, m_ghostAction->toolTip()},
+            {m_backStepAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_backStepAction->toolTip()},
+            {m_forwardStepAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_forwardStepAction->toolTip()},
+            {m_backPlayAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_backPlayAction->toolTip()},
+            {m_forwardPlayAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_forwardPlayAction->toolTip()},
+            {m_backMarkAction, IPCore::EventCategories::CATEGORY_MARK, m_backMarkAction->toolTip()},
+            {m_forwardMarkAction, IPCore::EventCategories::CATEGORY_MARK, m_forwardMarkAction->toolTip()},
+            {m_playModeAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_playModeAction->toolTip()},
         };
 
         if (m_session)
@@ -489,13 +490,13 @@ namespace Rv
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
             }
-            // Commented out temporarily and will be reworked soon.
-            //else if (name == "internal-sync-presenter-changed"
-            //         || name == "sync-session-ended")
-            //{
-            //    bool isDisabled = m_session->filterLiveReviewEvents();
-            //    setLiveReviewFilteredActions(isDisabled);
-            //}
+            else if (name == "internal-sync-presenter-changed" 
+                     || name == "sync-session-mode-changed"
+                     || name == "sync-session-ended")
+            {
+                // Update action availability when presenter changes or session mode changes
+                updateActionAvailability();
+            }
         }
 
         return EventAcceptAndContinue;
@@ -760,18 +761,24 @@ namespace Rv
         }
     }
 
-    void RvBottomViewToolBar::setLiveReviewFilteredActions(bool isDisabled)
+    void RvBottomViewToolBar::updateActionAvailability()
     {
-        for (const auto& button : m_liveReviewFilteredActions)
-        {
-            QAction* action = button.first;
-            QString tooltipText = button.second;
+        if (!m_session)
+            return;
 
-            if (action != nullptr)
+        // Update action enabled/disabled state based on event category filtering
+        for (const auto& mapping : m_actionCategoryMappings)
+        {
+            if (mapping.action != nullptr)
             {
-                action->setDisabled(isDisabled);
-                action->setToolTip(isDisabled ? "You must be presenter to use"
-                                              : tooltipText);
+                bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
+                
+                mapping.action->setEnabled(categoryEnabled);
+                mapping.action->setToolTip(
+                    categoryEnabled 
+                        ? mapping.defaultTooltip 
+                        : QString("You must be presenter to use ") + mapping.defaultTooltip
+                );
             }
         }
     }
