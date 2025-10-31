@@ -16,6 +16,8 @@
 #include <QtGui/QIcon>
 #include <TwkApp/EventNode.h>
 #include <TwkMath/Chromaticities.h>
+#include <string>
+#include <vector>
 
 namespace TwkApp
 {
@@ -129,11 +131,18 @@ namespace Rv
         bool hasOCIODisplayPipeline();
 
     private:
+        struct ActionCategoryMapping
+        {
+            QAction* action;
+            std::string category;
+            QString defaultTooltip;
+        };
+
         void updateActionToolButton(QAction* action, const std::string& text,
                                     const std::string& icon,
                                     bool forceRepaint = false);
 
-        void setLiveReviewFilteredActions(bool isDisabled);
+        void updateActionAvailability();
 
     private:
         IPCore::Session* m_session;
@@ -200,7 +209,7 @@ namespace Rv
         QIconMap m_iconMap;
         const VideoDevice* m_device;
         const VideoDevice* m_outputDevice;
-        std::unordered_map<QAction*, QString> m_liveReviewFilteredActions;
+        std::vector<ActionCategoryMapping> m_actionCategoryMappings;
     };
 
 } // namespace Rv

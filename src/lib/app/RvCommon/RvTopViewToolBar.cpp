@@ -415,13 +415,14 @@ namespace Rv
         connect(m_dither8, SIGNAL(triggered()), this, SLOT(dither8()));
         connect(m_dither10, SIGNAL(triggered()), this, SLOT(dither10()));
 
-        m_liveReviewFilteredActions = {
-            {m_viewMenuAction, m_viewMenuAction->toolTip()},
-            {m_viewBackAction, m_viewBackAction->toolTip()},
-            {m_viewForwardAction, m_viewForwardAction->toolTip()},
-            {m_stereoMenuAction, m_stereoMenuAction->toolTip()},
-            {m_channelMenuAction, m_channelMenuAction->toolTip()},
-            {m_monitorMenuAction, m_monitorMenuAction->toolTip()}};
+        // Map toolbar actions to their corresponding event categories
+        m_actionCategoryMappings = {
+            {m_viewMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_viewMenuAction->toolTip()},
+            {m_viewBackAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_viewBackAction->toolTip()},
+            {m_viewForwardAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_viewForwardAction->toolTip()},
+            {m_stereoMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_stereoMenuAction->toolTip()},
+            {m_channelMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_channelMenuAction->toolTip()},
+            {m_monitorMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_monitorMenuAction->toolTip()}};
 
         if (m_session)
             setSession(m_session);
@@ -563,13 +564,13 @@ namespace Rv
             {
                 bgMenuUpdate();
             }
-            // Commented out temporarily and will be reworked soon.
-            //else if (name == "internal-sync-presenter-changed"
-            //         || name == "sync-session-ended")
-            //{
-            //    bool isDisabled = m_session->filterLiveReviewEvents();
-            //    setLiveReviewFilteredActions(isDisabled);
-            //}
+            else if (name == "internal-sync-presenter-changed" 
+                     || name == "sync-session-mode-changed"
+                     || name == "sync-session-ended")
+            {
+                // Update action availability when presenter changes or session mode changes
+                updateActionAvailability();
+            }
         }
         else if (const VideoDeviceContextChangeEvent* vevent =
                      dynamic_cast<const VideoDeviceContextChangeEvent*>(&event))
@@ -1523,18 +1524,24 @@ namespace Rv
                                     : ":/images/fullscreen.png"));
     }
 
-    void RvTopViewToolBar::setLiveReviewFilteredActions(bool isDisabled)
+    void RvTopViewToolBar::updateActionAvailability()
     {
-        for (const auto& button : m_liveReviewFilteredActions)
-        {
-            QAction* action = button.first;
-            QString tooltipText = button.second;
+        if (!m_session)
+            return;
 
-            if (action != nullptr)
+        // Update action enabled/disabled state based on event category filtering
+        for (const auto& mapping : m_actionCategoryMappings)
+        {
+            if (mapping.action != nullptr)
             {
-                action->setDisabled(isDisabled);
-                action->setToolTip(isDisabled ? "You must be presenter to use"
-                                              : tooltipText);
+                bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
+                
+                mapping.action->setEnabled(categoryEnabled);
+                mapping.action->setToolTip(
+                    categoryEnabled 
+                        ? mapping.defaultTooltip 
+                        : QString("You must be presenter to use ") + mapping.defaultTooltip
+                );
             }
         }
     }
