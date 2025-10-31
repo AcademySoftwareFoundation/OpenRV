@@ -1310,8 +1310,14 @@ namespace Mu
                 {
                     if (_allowUnresolved)
                     {
-                        return unresolvableCall(
-                            functions.front()->fullyQualifiedName(), nodes);
+                        // BUG FIX: Use name() instead of fullyQualifiedName()
+                        // as is used below so that when this
+                        // unresolved call is later patched, it will search
+                        // for ALL overloads of the operator in scope, not just
+                        // the first one found (which might be in a module scope
+                        // and not match the argument types).
+                        return unresolvableCall(functions.front()->name(),
+                                                nodes);
                     }
                     else
                     {
@@ -1515,6 +1521,10 @@ namespace Mu
             //  Create an unresolved call. Assuming this is a first pass,
             //  this will generate a special symbol which should later be
             //  replaced.
+            //
+            //  NOTE: Using name() instead of fullyQualifiedName() ensures that
+            //  during patching, all overloads will be considered, not just the
+            //  one from the module where it was first found in scope chain.
             //
 
             // return unresolvableCall(functions.front()->fullyQualifiedName(),
