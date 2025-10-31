@@ -91,6 +91,7 @@ use glyph;
 use gl;
 use glu;
 use io;
+use app_utils;
 use mode_manager;
 require system;
 
@@ -384,20 +385,20 @@ require system;
 
 \: toggleForwardsBackwards (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("playcontrol_category"))
+    {
         return;
     }
+
     setInc(-inc());
     redraw();
 }
 
 \: toggleRealtime (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("playcontrol_category")) 
         return;
-    }
+
     State state = data();
 
     if (isRealtime())
@@ -462,10 +463,8 @@ require system;
 
 \: toggleFilter (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("viewmode_category")) 
         return;
-    }
 
     State state = data();
     setFiltering(if getFiltering() == GL_NEAREST then GL_LINEAR else GL_NEAREST);
@@ -487,10 +486,9 @@ require system;
 
 \: stepForward (void; int n)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("playcontrol_category")) 
         return;
-    }
+
     let f = frame(),
         newFrame = frame() + n,
         inInOut = (inPoint() <= f && outPoint() >= f),
@@ -512,10 +510,9 @@ require system;
 
 \: stepBackward (void; int n)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if(!checkAndBlockEventCategory("playcontrol_category")) 
         return;
-    }
+
     let f = frame(),
         newFrame = frame() - n,
         inInOut = (inPoint() <= f && outPoint() >= f),

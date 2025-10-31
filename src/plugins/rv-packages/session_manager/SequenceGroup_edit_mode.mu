@@ -218,9 +218,6 @@ class: SequenceGroupEditMode : MinorMode
     {
         \: (int;)
         {
-            if (filterLiveReviewEvents()) {
-                return DisabledMenuState;
-            }
             let p = getIntProperty("#RVSequence.mode.%s" % name).front();
             if p == 0 then UncheckedMenuState else CheckedMenuState;
         };

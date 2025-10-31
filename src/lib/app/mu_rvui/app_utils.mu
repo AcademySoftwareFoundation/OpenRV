@@ -25,6 +25,17 @@ MenuStateFunc   := (int;);
     \: (void; Event ignored) { f(); };
 }
 
+
+\: checkAndBlockEventCategory(bool; string category)
+{
+    if (!commands.isEventCategoryEnabled("category"))
+    {
+        sendInternalEvent("category-event-blocked", category);
+        return false;
+    }
+    return true;
+}
+
 \: makeCategoryEventFunc (EventFunc; string category, EventFunc f) {
     \: (void; Event ev) {
         if (!commands.isEventCategoryEnabled(category))
@@ -47,6 +58,11 @@ operator: ~ (EventFunc; VoidFunc f)
 \: bind (void; string mode, string table, string event, string category, VoidFunc F, string doc="")
 {
     bind(mode, table, event, makeCategoryEventFunc(category, makeEventFunc(F)), doc);
+}
+
+\: bind (void; string mode, string table, string event, string category, EventFunc F, string doc="")
+{
+    bind(mode, table, event, makeCategoryEventFunc(category, F), doc);
 }
 
 \: bind (void; string ev, VoidFunc F, string doc="") 
@@ -209,7 +225,7 @@ operator: ~ (EventFunc; VoidFunc f)
 
     // create composite function that checks if the category is enabled and then calls the function
     let compositeFunc = \: (void; Event ev) {
-        if (compositeStateFunc() == DisabledMenuState)
+        if (!commands.isEventCategoryEnabled(category))
             sendInternalEvent("category-event-blocked", category);
         else
             func(ev);
