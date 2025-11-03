@@ -403,6 +403,7 @@ class: AnnotateMinorMode : MinorMode
                      "%s.join" % n,
                      "%s.cap" % n,
                      "%s.points" % n,
+                     "%s.splat" % n,
                      "%s.startFrame" % n,
                      "%s.duration" % n
                     ];
