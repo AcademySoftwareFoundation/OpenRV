@@ -564,7 +564,7 @@ namespace Rv
             {
                 bgMenuUpdate();
             }
-            else if (name == "update-toolbar-action-availability")
+            else if (name == "event-category-state-changed")
             {
                 // Update action availability when presenter changes or session mode changes
                 updateActionAvailability();
