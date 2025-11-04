@@ -4155,7 +4155,7 @@ namespace IPMu
             // Disable all event categories
             for (const auto& category : EventCategories::all_categories())
             {
-                s->disableEventCategory(std::string(category));
+                s->disableEventCategory(category);
             }
         }
         else if (s && !shouldFilterEvents)
@@ -4163,7 +4163,7 @@ namespace IPMu
             // Re-enable all event categories
             for (const auto& category : EventCategories::all_categories())
             {
-                s->enableEventCategory(std::string(category));
+                s->enableEventCategory(category);
             }
         }
     }
