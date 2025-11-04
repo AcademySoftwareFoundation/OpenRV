@@ -1131,7 +1131,7 @@ class: SessionManagerMode : MinorMode
 
     method: onCategoryStateChanged(void; Event event)
     {
-        if (!commands.isEventCategoryEnabled("sessionmanager_category") && _active)
+        if (_active && !commands.isEventCategoryEnabled("sessionmanager_category"))
         {
             toggle();
         }

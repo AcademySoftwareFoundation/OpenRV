@@ -1952,7 +1952,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: onCategoryStateChanged(void; Event event)
     {
-        if (!commands.isEventCategoryEnabled("annotate_category") && _active)
+        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
         {
             toggle();
         }
