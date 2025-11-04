@@ -417,12 +417,12 @@ namespace Rv
 
         // Map toolbar actions to their corresponding event categories
         m_actionCategoryMappings = {
-            {m_viewMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_viewMenuAction->toolTip()},
-            {m_viewBackAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_viewBackAction->toolTip()},
-            {m_viewForwardAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_viewForwardAction->toolTip()},
-            {m_stereoMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_stereoMenuAction->toolTip()},
-            {m_channelMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_channelMenuAction->toolTip()},
-            {m_monitorMenuAction, IPCore::EventCategories::CATEGORY_VIEWMODE, m_monitorMenuAction->toolTip()}};
+            {m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
+            {m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
+            {m_viewForwardAction, IPCore::EventCategories::viewmodeCategory, m_viewForwardAction->toolTip()},
+            {m_stereoMenuAction, IPCore::EventCategories::viewmodeCategory, m_stereoMenuAction->toolTip()},
+            {m_channelMenuAction, IPCore::EventCategories::viewmodeCategory, m_channelMenuAction->toolTip()},
+            {m_monitorMenuAction, IPCore::EventCategories::viewmodeCategory, m_monitorMenuAction->toolTip()}};
 
         if (m_session)
             setSession(m_session);

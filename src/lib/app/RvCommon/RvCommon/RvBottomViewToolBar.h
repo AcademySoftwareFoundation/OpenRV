@@ -14,6 +14,7 @@
 #include <TwkApp/EventNode.h>
 #include <QAction>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace IPCore
@@ -71,7 +72,7 @@ namespace Rv
         struct ActionCategoryMapping
         {
             QAction* action;
-            std::string category;
+            std::string_view category;
             QString defaultTooltip;
         };
 

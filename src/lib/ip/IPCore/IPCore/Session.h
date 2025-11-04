@@ -19,6 +19,7 @@
 #include <map>
 #include <limits>
 #include <deque>
+#include <string_view>
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -39,23 +40,48 @@ namespace IPCore
     //
     namespace EventCategories
     {
-        constexpr const char* CATEGORY_ANNOTATE = "annotate_category";
-        constexpr const char* CATEGORY_CLEAR = "clear_category";
-        constexpr const char* CATEGORY_EXPORT = "export_category";
-        constexpr const char* CATEGORY_FLOWPT = "flowpt_category";
-        constexpr const char* CATEGORY_HELP = "help_category";
-        constexpr const char* CATEGORY_INFO = "info_category";
-        constexpr const char* CATEGORY_MARK = "mark_category";
-        constexpr const char* CATEGORY_MEDIA = "media_category";
-        constexpr const char* CATEGORY_PLAYCONTROL = "playcontrol_category";
-        constexpr const char* CATEGORY_PRESENTATION = "presentation_category";
-        constexpr const char* CATEGORY_SESSIONMANAGER = "sessionmanager_category";
-        constexpr const char* CATEGORY_SOURCE = "source_category";
-        constexpr const char* CATEGORY_SYSTEM = "system_category";
-        constexpr const char* CATEGORY_SCREENINGROOM = "screeningroom_category";
-        constexpr const char* CATEGORY_UNCLASSIFIED = "unclassified_category";
-        constexpr const char* CATEGORY_VIEWMODE = "viewmode_category";
-        constexpr const char* CATEGORY_WIPES = "wipes_category";
+        inline constexpr std::string_view annotateCategory = "annotate_category";
+        inline constexpr std::string_view clearCategory = "clear_category";
+        inline constexpr std::string_view exportCategory = "export_category";
+        inline constexpr std::string_view flowptCategory = "flowpt_category";
+        inline constexpr std::string_view helpCategory = "help_category";
+        inline constexpr std::string_view infoCategory = "info_category";
+        inline constexpr std::string_view markCategory = "mark_category";
+        inline constexpr std::string_view mediaCategory = "media_category";
+        inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view presentationCategory = "presentation_category";
+        inline constexpr std::string_view sessionmanagerCategory = "sessionmanager_category";
+        inline constexpr std::string_view sourceCategory = "source_category";
+        inline constexpr std::string_view systemCategory = "system_category";
+        inline constexpr std::string_view screeningroomCategory = "screeningroom_category";
+        inline constexpr std::string_view unclassifiedCategory = "unclassified_category";
+        inline constexpr std::string_view viewmodeCategory = "viewmode_category";
+        inline constexpr std::string_view wipesCategory = "wipes_category";
+
+        // constexpr is implicitly inline for clang, but not necessarily inline for other compilers.
+        // Use inline constexpr to ensure that the function is inline.
+        inline constexpr auto all_categories()
+        {
+            return std::array{
+                annotateCategory,
+                clearCategory,
+                exportCategory,
+                flowptCategory,
+                helpCategory,
+                infoCategory,
+                markCategory,
+                mediaCategory,
+                playcontrolCategory,
+                presentationCategory,
+                sessionmanagerCategory,
+                sourceCategory,
+                systemCategory,
+                screeningroomCategory,
+                unclassifiedCategory,
+                viewmodeCategory,
+                wipesCategory
+            };
+        }
     }
 
     //
@@ -847,10 +873,10 @@ namespace IPCore
         //
         //  Event Category Blocking
         //
-        void enableEventCategory(const std::string& category);
-        void disableEventCategory(const std::string& category);
-        bool isEventCategoryDisabled(const std::string& category) const;
-        bool isEventCategoryEnabled(const std::string& category) const;
+        void enableEventCategory(std::string_view category);
+        void disableEventCategory(std::string_view category);
+        bool isEventCategoryDisabled(std::string_view category) const;
+        bool isEventCategoryEnabled(std::string_view category) const;
         const std::vector<std::string>& disabledEventCategories() const;
 
         //
