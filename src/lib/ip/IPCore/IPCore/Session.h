@@ -58,9 +58,7 @@ namespace IPCore
         inline constexpr std::string_view viewmodeCategory = "viewmode_category";
         inline constexpr std::string_view wipesCategory = "wipes_category";
 
-        // constexpr is implicitly inline for clang, but not necessarily inline for other compilers.
-        // Use inline constexpr to ensure that the function is inline.
-        inline constexpr auto all_categories()
+        constexpr auto all_categories()
         {
             return std::array{
                 annotateCategory,
