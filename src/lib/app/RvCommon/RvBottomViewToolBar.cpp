@@ -363,17 +363,17 @@ namespace Rv
 
         // Map toolbar actions to their corresponding event categories
         m_actionCategoryMappings = {
-            {m_smAction, IPCore::EventCategories::CATEGORY_SESSIONMANAGER, m_smAction->toolTip()},
-            {m_paintAction, IPCore::EventCategories::CATEGORY_ANNOTATE, m_paintAction->toolTip()},
-            {m_holdAction, IPCore::EventCategories::CATEGORY_ANNOTATE, m_holdAction->toolTip()},
-            {m_ghostAction, IPCore::EventCategories::CATEGORY_ANNOTATE, m_ghostAction->toolTip()},
-            {m_backStepAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_backStepAction->toolTip()},
-            {m_forwardStepAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_forwardStepAction->toolTip()},
-            {m_backPlayAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_backPlayAction->toolTip()},
-            {m_forwardPlayAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_forwardPlayAction->toolTip()},
-            {m_backMarkAction, IPCore::EventCategories::CATEGORY_MARK, m_backMarkAction->toolTip()},
-            {m_forwardMarkAction, IPCore::EventCategories::CATEGORY_MARK, m_forwardMarkAction->toolTip()},
-            {m_playModeAction, IPCore::EventCategories::CATEGORY_PLAYCONTROL, m_playModeAction->toolTip()},
+            {m_smAction, IPCore::EventCategories::sessionmanagerCategory, m_smAction->toolTip()},
+            {m_paintAction, IPCore::EventCategories::annotateCategory, m_paintAction->toolTip()},
+            {m_holdAction, IPCore::EventCategories::annotateCategory, m_holdAction->toolTip()},
+            {m_ghostAction, IPCore::EventCategories::annotateCategory, m_ghostAction->toolTip()},
+            {m_backStepAction, IPCore::EventCategories::playcontrolCategory, m_backStepAction->toolTip()},
+            {m_forwardStepAction, IPCore::EventCategories::playcontrolCategory, m_forwardStepAction->toolTip()},
+            {m_backPlayAction, IPCore::EventCategories::playcontrolCategory, m_backPlayAction->toolTip()},
+            {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
+            {m_backMarkAction, IPCore::EventCategories::markCategory, m_backMarkAction->toolTip()},
+            {m_forwardMarkAction, IPCore::EventCategories::markCategory, m_forwardMarkAction->toolTip()},
+            {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
         };
 
         if (m_session)

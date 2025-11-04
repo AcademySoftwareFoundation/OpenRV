@@ -726,7 +726,7 @@ namespace IPCore
     // Event Category Blocking
     //----------------------------------------------------------------------
 
-    void Session::enableEventCategory(const std::string& category)
+    void Session::enableEventCategory(std::string_view category)
     {
         // Don't enable empty category (legacy commands)
         if (category.empty())
@@ -741,7 +741,7 @@ namespace IPCore
         }
     }
 
-    void Session::disableEventCategory(const std::string& category)
+    void Session::disableEventCategory(std::string_view category)
     {
         // Don't disable empty category (legacy commands)
         if (category.empty())
@@ -752,11 +752,11 @@ namespace IPCore
                       m_disabledEventCategories.end(), category)
             == m_disabledEventCategories.end())
         {
-            m_disabledEventCategories.push_back(category);
+            m_disabledEventCategories.push_back(std::string(category));
         }
     }
 
-    bool Session::isEventCategoryDisabled(const std::string& category) const
+    bool Session::isEventCategoryDisabled(std::string_view category) const
     {
         // Empty category (legacy commands) is never disabled
         if (category.empty())
@@ -767,7 +767,7 @@ namespace IPCore
                != m_disabledEventCategories.end();
     }
 
-    bool Session::isEventCategoryEnabled(const std::string& category) const
+    bool Session::isEventCategoryEnabled(std::string_view category) const
     {
         return !isEventCategoryDisabled(category);
     }

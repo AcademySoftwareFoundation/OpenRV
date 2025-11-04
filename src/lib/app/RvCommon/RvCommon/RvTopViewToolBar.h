@@ -17,6 +17,7 @@
 #include <TwkApp/EventNode.h>
 #include <TwkMath/Chromaticities.h>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace TwkApp
@@ -134,7 +135,7 @@ namespace Rv
         struct ActionCategoryMapping
         {
             QAction* action;
-            std::string category;
+            std::string_view category;
             QString defaultTooltip;
         };
 
