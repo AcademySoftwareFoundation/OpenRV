@@ -362,7 +362,7 @@ namespace Rv
                 SLOT(audioSliderReleased()));
 
         // Map toolbar actions to their corresponding event categories
-        m_actionCategoryMappings = {
+        m_actionCategoryMappings = {{
             {m_smAction, IPCore::EventCategories::sessionmanagerCategory, m_smAction->toolTip()},
             {m_paintAction, IPCore::EventCategories::annotateCategory, m_paintAction->toolTip()},
             {m_holdAction, IPCore::EventCategories::annotateCategory, m_holdAction->toolTip()},
@@ -374,7 +374,7 @@ namespace Rv
             {m_backMarkAction, IPCore::EventCategories::markCategory, m_backMarkAction->toolTip()},
             {m_forwardMarkAction, IPCore::EventCategories::markCategory, m_forwardMarkAction->toolTip()},
             {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
-        };
+        }};
 
         if (m_session)
             setSession(m_session);

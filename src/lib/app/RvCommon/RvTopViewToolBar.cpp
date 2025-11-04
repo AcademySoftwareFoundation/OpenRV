@@ -416,13 +416,13 @@ namespace Rv
         connect(m_dither10, SIGNAL(triggered()), this, SLOT(dither10()));
 
         // Map toolbar actions to their corresponding event categories
-        m_actionCategoryMappings = {
+        m_actionCategoryMappings = {{
             {m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
             {m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
             {m_viewForwardAction, IPCore::EventCategories::viewmodeCategory, m_viewForwardAction->toolTip()},
             {m_stereoMenuAction, IPCore::EventCategories::viewmodeCategory, m_stereoMenuAction->toolTip()},
             {m_channelMenuAction, IPCore::EventCategories::viewmodeCategory, m_channelMenuAction->toolTip()},
-            {m_monitorMenuAction, IPCore::EventCategories::viewmodeCategory, m_monitorMenuAction->toolTip()}};
+            {m_monitorMenuAction, IPCore::EventCategories::viewmodeCategory, m_monitorMenuAction->toolTip()}}};
 
         if (m_session)
             setSession(m_session);
