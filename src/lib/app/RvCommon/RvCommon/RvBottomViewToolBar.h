@@ -13,9 +13,9 @@
 #include <QtWidgets/QSlider>
 #include <TwkApp/EventNode.h>
 #include <QAction>
+#include <array>
 #include <string>
 #include <string_view>
-#include <vector>
 
 namespace IPCore
 {
@@ -113,7 +113,7 @@ namespace Rv
         QIcon m_volumeHighIcon;
         QIcon m_volumeHighMutedIcon;
 
-        std::vector<ActionCategoryMapping> m_actionCategoryMappings;
+        std::array<ActionCategoryMapping, 11> m_actionCategoryMappings;
     };
 
     template <class T>

@@ -16,9 +16,9 @@
 #include <QtGui/QIcon>
 #include <TwkApp/EventNode.h>
 #include <TwkMath/Chromaticities.h>
+#include <array>
 #include <string>
 #include <string_view>
-#include <vector>
 
 namespace TwkApp
 {
@@ -210,7 +210,7 @@ namespace Rv
         QIconMap m_iconMap;
         const VideoDevice* m_device;
         const VideoDevice* m_outputDevice;
-        std::vector<ActionCategoryMapping> m_actionCategoryMappings;
+        std::array<ActionCategoryMapping, 6> m_actionCategoryMappings;
     };
 
 } // namespace Rv
