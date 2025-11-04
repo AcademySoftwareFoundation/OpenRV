@@ -213,13 +213,24 @@ class: ModeManagerMode : MinorMode
     {
         \: (int; )
         {
-            if (filterLiveReviewEvents())
-                then DisabledMenuState
-                else if entry.mode eq nil
-                     then UncheckedMenuState
-                     else if entry.mode._active
-                            then CheckedMenuState
-                            else UncheckedMenuState;
+            // Special handling of mode toggling if certain categories of actions are disabled.
+            if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
+            {
+                sendInternalEvent("category-event-blocked", "annotate_category");
+                return DisabledMenuState;
+            }
+    
+            if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+            {
+                sendInternalEvent("category-event-blocked", "media_category");
+                return DisabledMenuState;
+            }
+    
+            if entry.mode eq nil
+                 then UncheckedMenuState
+                 else if entry.mode._active
+                        then CheckedMenuState
+                        else UncheckedMenuState;
         };
     }
 
@@ -426,11 +437,19 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
-        if (filterLiveReviewEvents() && (entry.name == "session_manager" || entry.name == "annotate_mode"))
+        // Special handling of mode toggling if certain categories of actions are disabled.
+        if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
         {
-            sendInternalEvent("live-review-blocked-event");
+            sendInternalEvent("category-event-blocked", "annotate_category");
             return;
         }
+
+        if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+        {
+            sendInternalEvent("category-event-blocked", "media_category");
+            return;
+        }
+            
         mm.toggleEntry(entry);
     }
 
@@ -515,6 +534,7 @@ class: ModeManagerMode : MinorMode
 
         if (ext == "rvpkg")
         {
+            let error = false;
             try
             {
                 let vparts = name.split("-")[1].split(".");
@@ -523,6 +543,10 @@ class: ModeManagerMode : MinorMode
             }
             catch (...)
             {
+                error = true;
+            }
+
+            if (error) {
                 print("ERROR: bad rvpkg package name \"%s\" expecting name-X.X.rvpkg\n" % name);
                 return nil;
             }

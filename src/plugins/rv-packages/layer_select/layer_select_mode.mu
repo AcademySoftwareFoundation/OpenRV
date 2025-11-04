@@ -193,11 +193,11 @@ class: LayerSelect : Widget
 
     method: popupOpts (void; Event event)
     {
-        popupMenu (event, Menu {
-            {"Layer Selector", nil, nil, \: (int;) { DisabledMenuState; }},
-            {"_", nil},
-            {"Floating Selector", optFloatingSelector, nil, isFloatingSelector},
-        });
+        popupMenu (event, newMenu(MenuItem[] {
+            menuText("Layer Selector"),
+            menuSeparator(),
+            menuItem("Floating Selector", "", "unclassified_category", optFloatingSelector, isFloatingSelector)
+        }));
     }
 
     method: LayerSelect (LayerSelect; string name)
