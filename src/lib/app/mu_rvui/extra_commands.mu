@@ -91,19 +91,64 @@ use glyph;
 use gl;
 use glu;
 use io;
+use app_utils;
 use mode_manager;
 require system;
 
 \: displayFeedback (void;
                     string text,
                     float duration = 2.0,
-                    Glyph g = nil)
+                    Glyph g = nil,
+                    float[] textSizes = nil)
 {
-    State state         = data();
+    // Always display immediately, overwriting any current feedback
+    // For queueing behavior, use displayFeedbackQueue instead
+    State state = data();
     state.feedbackText  = text;
     state.feedback      = duration;
     state.feedbackGlyph = g;
+    state.feedbackTextSizes = textSizes;
     startTimer();
+    redraw();
+}
+
+\: displayFeedbackQueue (void;
+                          string text,
+                          float duration = 2.0,
+                          Glyph g = nil,
+                          float[] textSizes = nil)
+{
+    State state = data();
+    
+    // Initialize queue if needed
+    if (state.feedbackQueue eq nil) state.feedbackQueue = FeedbackMessage[]();
+    
+    // Check if a message is currently displaying
+    // If no message is currently displaying, show this one immediately
+    // Check if feedback is 0 AND timer is not running
+    if (state.feedback == 0.0 && !isTimerRunning())
+    {
+        state.feedbackText  = text;
+        state.feedback      = duration;
+        state.feedbackGlyph = g;
+        state.feedbackTextSizes = textSizes;
+        startTimer();
+    }
+    else
+    {
+        // A message is currently displaying - queue this message
+        // If feedbackQueueTruncate is enabled, when multiple messages are in the queue,
+        // their duration is reduced to go through the queue faster. (see drawFeedback in rvui.mu)
+        //
+        // Use FeedbackMessage class instead of tuples because Mu's
+        // dynamic arrays cannot safely store tuples with nil function pointers
+        // (Glyph) or nil arrays (float[]). The class properly encapsulates these
+        // values and prevents memory corruption. See FeedbackMessage in rvtypes.mu
+        // for detailed explanation.
+        //
+        state.feedbackQueue.push_back(FeedbackMessage(text, duration, g, textSizes));
+    }
+    
     redraw();
 }
 
@@ -111,7 +156,30 @@ require system;
                      string text,
                      float duration)
 {
-    displayFeedback(text, duration);
+    displayFeedback(text, duration, nil, nil);
+}
+
+\: displayFeedbackWithSizes (void;
+                             string text,
+                             float duration,
+                             float[] textSizes)
+{
+    displayFeedback(text, duration, nil, textSizes);
+}
+
+\: displayFeedbackQueue2 (void;
+                          string text,
+                          float duration)
+{
+    displayFeedbackQueue(text, duration, nil, nil);
+}
+
+\: displayFeedbackQueueWithSizes (void;
+                                  string text,
+                                  float duration,
+                                  float[] textSizes)
+{
+    displayFeedbackQueue(text, duration, nil, textSizes);
 }
 
 \: isSessionEmpty (bool;)
@@ -317,20 +385,20 @@ require system;
 
 \: toggleForwardsBackwards (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("playcontrol_category"))
+    {
         return;
     }
+
     setInc(-inc());
     redraw();
 }
 
 \: toggleRealtime (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("playcontrol_category")) 
         return;
-    }
+
     State state = data();
 
     if (isRealtime())
@@ -395,10 +463,8 @@ require system;
 
 \: toggleFilter (void;)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("viewmode_category")) 
         return;
-    }
 
     State state = data();
     setFiltering(if getFiltering() == GL_NEAREST then GL_LINEAR else GL_NEAREST);
@@ -420,10 +486,9 @@ require system;
 
 \: stepForward (void; int n)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if (!checkAndBlockEventCategory("playcontrol_category")) 
         return;
-    }
+
     let f = frame(),
         newFrame = frame() + n,
         inInOut = (inPoint() <= f && outPoint() >= f),
@@ -445,10 +510,9 @@ require system;
 
 \: stepBackward (void; int n)
 {
-    if (filterLiveReviewEvents()) {
-        sendInternalEvent("live-review-blocked-event");
+    if(!checkAndBlockEventCategory("playcontrol_category")) 
         return;
-    }
+
     let f = frame(),
         newFrame = frame() - n,
         inInOut = (inPoint() <= f && outPoint() >= f),

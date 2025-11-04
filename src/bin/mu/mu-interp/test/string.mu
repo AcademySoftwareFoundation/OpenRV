@@ -41,6 +41,23 @@
     print("words2 = %s\n" % words2);
 
     for_index(i; words) assert(words[i] == words2[i]);
+
+    // Test contains method
+    string testStr = "Hello World";
+    assert(string.contains(testStr,"World") == 6);
+    assert(string.contains(testStr,"Hello") == 0);
+    assert(string.contains(testStr,"xyz") == -1);
+    print("contains tests passed\n");
+
+    // Test replace method
+    string original = "Hello Bob";
+    string replaced = string.replace(original, "Bob", "123");
+    assert(replaced == "Hello 123");
+    assert(original == "Hello Bob"); // original should be unchanged
+    
+    string notFound = string.replace(original, "xyz", "abc");
+    assert(notFound == "Hello Bob"); // should return original if not found
+    print("replace tests passed\n");
 }
 
 doit();

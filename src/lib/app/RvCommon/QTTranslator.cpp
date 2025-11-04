@@ -1127,13 +1127,32 @@ namespace Rv
         }
 #else
 
-        // Note: In Qt6, QTabletEvent::FourDMouse and QTabletEvent::RotationStylus have been removed
-        // and replaced with QInputDevice::DeviceType::Puck and QInputDevice::DeviceType::Stylus respectively.
+        // Note: In Qt6, QTabletEvent::FourDMouse and
+        // QTabletEvent::RotationStylus have been removed and replaced with
+        // QInputDevice::DeviceType::Puck and QInputDevice::DeviceType::Stylus
+        // respectively.
 
         switch (event->deviceType())
         {
         case QInputDevice::DeviceType::Unknown:
-            n = "generic-tablet-device-";
+            // The Wacom Intuos Pro tablet on macOS is not detected properly
+            // with Qt6.5.3 and returns an Unknown device type. Since the
+            // annotate mode is listening to stylus-pen and stylus-eraser events
+            // when strokes are being drawn, if a pen or eraser pointer type is
+            // detected on an unknown device type, we map them directly to the
+            // stylus device type as a fallback.
+            switch (event->pointerType())
+            {
+            case QPointingDevice::PointerType::Pen:
+                n = "stylus-pen-";
+                break;
+            case QPointingDevice::PointerType::Eraser:
+                n = "stylus-eraser-";
+                break;
+            default:
+                n = "generic-tablet-device-";
+                break;
+            }
             break;
         case QInputDevice::DeviceType::Mouse:
             n = "mouse-";
@@ -1161,27 +1180,36 @@ namespace Rv
             break;
         }
 
-        switch (event->pointerType())
+        bool isPointerTypeHandled =
+            (event->deviceType() == QInputDevice::DeviceType::Unknown
+             && (event->pointerType() == QPointingDevice::PointerType::Pen
+                 || event->pointerType()
+                        == QPointingDevice::PointerType::Eraser));
+
+        if (!isPointerTypeHandled)
         {
-        case QPointingDevice::PointerType::Generic:
-            n += "generic-";
-            break;
-        case QPointingDevice::PointerType::Finger:
-            n += "finger-";
-            break;
-        case QPointingDevice::PointerType::Pen:
-            n += "pen-";
-            break;
-        case QPointingDevice::PointerType::Eraser:
-            n += "eraser-";
-            break;
-        case QPointingDevice::PointerType::Cursor:
-            n += "cursor-";
-            break;
-        case QPointingDevice::PointerType::Unknown:
-        case QPointingDevice::PointerType::AllPointerTypes:
-        default:
-            break;
+            switch (event->pointerType())
+            {
+            case QPointingDevice::PointerType::Generic:
+                n += "generic-";
+                break;
+            case QPointingDevice::PointerType::Finger:
+                n += "finger-";
+                break;
+            case QPointingDevice::PointerType::Pen:
+                n += "pen-";
+                break;
+            case QPointingDevice::PointerType::Eraser:
+                n += "eraser-";
+                break;
+            case QPointingDevice::PointerType::Cursor:
+                n += "cursor-";
+                break;
+            case QPointingDevice::PointerType::Unknown:
+            case QPointingDevice::PointerType::AllPointerTypes:
+            default:
+                break;
+            }
         }
 #endif
 
@@ -1219,8 +1247,8 @@ namespace Rv
         }
 
         TabletEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height,
-                      m_pushx, m_pushy, buttons(), gx, gy,
-                      pressure, tpressure, rot, xtilt, ytilt, z);
+                      m_pushx, m_pushy, buttons(), gx, gy, pressure, tpressure,
+                      rot, xtilt, ytilt, z);
 
         sendEvent(e);
         handled = e.handled;

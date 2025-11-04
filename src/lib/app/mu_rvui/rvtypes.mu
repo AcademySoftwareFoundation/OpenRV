@@ -25,6 +25,45 @@ BBox                := Vec4;
 NameValueBounds     := (Vec2, float[4][], float[4][], int);
 DropFunc            := (void; int, string);
 Glyph               := (void; bool);
+
+//
+// FeedbackMessage: Encapsulates a feedback message for queue storage
+//
+// This must be a class, NOT a tuple or struct.
+//
+// Based on observation, not 100% sure of its exactitude:
+//
+// Problem: Mu's dynamic arrays cannot properly handle tuples containing nil 
+// function pointers (Glyph := (void; bool)) or nil arrays (float[]). When 
+// stored as tuples like (string, float, Glyph, float[])[], the nil values 
+// cause memory corruption in the dynamic array, leading to crashes when 
+// calling .size() or accessing elements.
+//
+// Solution: Classes properly handle nil member values in Mu. This class wraps
+// the feedback message data, allowing the queue (FeedbackMessage[]) to safely
+// store and retrieve messages with nil glyphs or nil textSizes without 
+// corruption.
+//
+class: FeedbackMessage
+{
+    string  text;
+    float   duration;
+    Glyph   glyph;
+    float[] textSizes;
+    
+    method: FeedbackMessage (FeedbackMessage; 
+                            string t, 
+                            float d, 
+                            Glyph g, 
+                            float[] sizes)
+    {
+        text = t;
+        duration = d;
+        glyph = g;
+        textSizes = sizes;
+    }
+};
+
 StringPair          := (string, string);
 MenuStateFunc       := (int;);
 BoolFunc            := (bool;);
@@ -37,6 +76,7 @@ ConfirmFunc         := (void; string);
 Labels              := string[];
 BBoxes              := BBox[];
 BindingList         := [(string, EventFunc, string)];
+DefaultFeedbackTextSize := 20.0;
 DefaultGamma        := 1.0;
 DefaultHue          := 0.0;
 DefaultSaturation   := 1.0;
@@ -618,6 +658,10 @@ class: State
     float           feedback;
     string          feedbackText;
     Glyph           feedbackGlyph;
+    float[]         feedbackTextSizes;  // Optional per-line text sizes
+    bool            feedbackQueueEnabled;   // Enable/disable message queue feature
+    bool            feedbackQueueTruncate;  // Truncate messages duration to 1s when queue has items
+    FeedbackMessage[] feedbackQueue;  // Queue of pending feedback messages (using class to handle nil values)
 
     DefaultDirFunc  defaultOpenDir;
     DefaultDirFunc  defaultSaveDir;
