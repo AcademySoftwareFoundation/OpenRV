@@ -213,13 +213,24 @@ class: ModeManagerMode : MinorMode
     {
         \: (int; )
         {
-            if (filterLiveReviewEvents())
-                then DisabledMenuState
-                else if entry.mode eq nil
-                     then UncheckedMenuState
-                     else if entry.mode._active
-                            then CheckedMenuState
-                            else UncheckedMenuState;
+            // Special handling of mode toggling if certain categories of actions are disabled.
+            if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
+            {
+                sendInternalEvent("category-event-blocked", "annotate_category");
+                return DisabledMenuState;
+            }
+    
+            if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+            {
+                sendInternalEvent("category-event-blocked", "media_category");
+                return DisabledMenuState;
+            }
+    
+            if entry.mode eq nil
+                 then UncheckedMenuState
+                 else if entry.mode._active
+                        then CheckedMenuState
+                        else UncheckedMenuState;
         };
     }
 
@@ -426,6 +437,19 @@ class: ModeManagerMode : MinorMode
 
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
+        // Special handling of mode toggling if certain categories of actions are disabled.
+        if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
+        {
+            sendInternalEvent("category-event-blocked", "annotate_category");
+            return;
+        }
+
+        if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+        {
+            sendInternalEvent("category-event-blocked", "media_category");
+            return;
+        }
+            
         mm.toggleEntry(entry);
     }
 
