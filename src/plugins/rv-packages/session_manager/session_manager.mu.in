@@ -1129,9 +1129,9 @@ class: SessionManagerMode : MinorMode
         event.reject();
     }
 
-    method: onPresenterChanged(void; Event event)
+    method: onCategoryStateChanged(void; Event event)
     {
-        if (_active)
+        if (!commands.isEventCategoryEnabled("sessionmanager_category") && _active)
         {
             toggle();
         }
@@ -2853,7 +2853,7 @@ class: SessionManagerMode : MinorMode
                ("key-down--@", showRows, "show'em"),
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
-               ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed")
+               ("event-category-state-changed", onCategoryStateChanged, "Category state changed")
                ],
              nil,
              nil);

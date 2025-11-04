@@ -783,6 +783,18 @@ namespace Rv
         NODE_RETURN(s->loadCount());
     }
 
+    NODE_IMPLEMENTATION(setUIBlocked, void)
+    {
+        bool blocked = NODE_ARG(0, bool);
+        RvSession* s = RvSession::currentRvSession();
+        if (s)
+        {
+            // Send event that RvDocument will listen for
+            // This avoids dependency issues between RvApp and RvCommon
+            s->userGenericEvent("block-ui-overlay", blocked ? "true" : "false");
+        }
+    }
+
     NODE_IMPLEMENTATION(data, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
@@ -2378,6 +2390,9 @@ namespace Rv
             new Function(c, "loadTotal", loadTotal, None, Return, "int", End),
 
             new Function(c, "loadCount", loadCount, None, Return, "int", End),
+
+            new Function(c, "setUIBlocked", setUIBlocked, None, Return, "void",
+                         Parameters, new Param(c, "blocked", "bool"), End),
 
             new Function(c, "shortAppName", shortAppName, None, Return,
                          "string", End),

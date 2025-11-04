@@ -19,6 +19,7 @@
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvCommon/RvNetworkDialog.h>
 #include <RvCommon/TwkQTAction.h>
+#include <TwkApp/EventNode.h>
 #ifdef PLATFORM_WINDOWS
 #include <GL/glew.h>
 #endif
@@ -69,6 +70,7 @@ namespace Rv
     using namespace std;
     using namespace TwkMath;
     using namespace IPCore;
+    using namespace TwkApp;
 
 #if 0
 #define DB_ICON 0x01
@@ -92,6 +94,33 @@ namespace Rv
     }
 
     static int sessionCount = 0;
+
+    //
+    //  Helper class to listen for UI blocking events
+    //
+    class UIBlockingEventNode : public EventNode
+    {
+    public:
+        explicit UIBlockingEventNode(RvDocument* doc) : EventNode("UIBlockingEventNode"), m_doc(doc) {}
+        
+        Result receiveEvent(const Event& event) override
+        {
+            if (const auto* gevent = 
+                    dynamic_cast<const GenericStringEvent*>(&event))
+            {
+                if (event.name() == "block-ui-overlay")
+                {
+                    bool block = (gevent->stringContent() == "true");
+                    m_doc->setUIBlocked(block);
+                    return EventAccept;
+                }
+            }
+            return EventAcceptAndContinue;
+        }
+        
+    private:
+        RvDocument* m_doc;
+    };
 
     RvDocument::RvDocument()
         : QMainWindow()
@@ -119,6 +148,8 @@ namespace Rv
         , m_diagnosticsView(0)
         , m_sourceEditor(0)
         , m_displayLink(0)
+        , m_blockingOverlay(0)
+        , m_uiBlockingEventNode(0)
     {
         DB("RvDocument constructed");
 
@@ -264,6 +295,27 @@ namespace Rv
             Qt::WindowFlags flags = windowFlags();
             setWindowFlags(flags | Qt::FramelessWindowHint);
         }
+
+        //
+        //  Create UI blocking overlay - transparent widget that captures all input
+        //  Used during presenter transitions in Live Review to prevent interaction
+        //  without closing panels
+        //
+        m_blockingOverlay = new QWidget(this);
+        m_blockingOverlay->setObjectName("UIBlockingOverlay");
+        
+        // Semi-transparent dark overlay for visual feedback
+        m_blockingOverlay->setStyleSheet(
+            "QWidget#UIBlockingOverlay { background-color: rgba(0, 0, 0, 100); }"
+        );
+        
+        // Ensure it stays on top and captures input
+        m_blockingOverlay->raise();
+        m_blockingOverlay->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        m_blockingOverlay->setFocusPolicy(Qt::StrongFocus);
+        
+        // Hide by default
+        m_blockingOverlay->hide();
     }
 
     void RvDocument::initializeSession()
@@ -298,6 +350,10 @@ namespace Rv
 
             m_topViewToolBar->setSession(m_session);
             m_bottomViewToolBar->setSession(m_session);
+
+            // Create and connect UI blocking event node to listen to session events
+            m_uiBlockingEventNode = new UIBlockingEventNode(this);
+            m_uiBlockingEventNode->listenTo(m_session);
 
             // 10.5 looks better without it (no longer has the 100% white top)
             // setAttribute(Qt::WA_MacBrushedMetal);
@@ -409,6 +465,13 @@ namespace Rv
         m_session->setOutputVideoDevice(0);
         m_session->setControlVideoDevice(0);
         m_session->removeNotification(this);
+
+        if (m_uiBlockingEventNode)
+        {
+            m_session->breakConnection(m_uiBlockingEventNode);
+            delete m_uiBlockingEventNode;
+            m_uiBlockingEventNode = 0;
+        }
 
         if (m_sourceEditor)
             m_sourceEditor->hide();
@@ -2006,6 +2069,38 @@ namespace Rv
     {
         if (m_session)
             m_session->askForRedraw();
+    }
+
+    void RvDocument::resizeEvent(QResizeEvent* event)
+    {
+        QMainWindow::resizeEvent(event);
+        
+        // Keep overlay covering entire window when visible
+        if (m_blockingOverlay && m_blockingOverlay->isVisible())
+        {
+            m_blockingOverlay->setGeometry(0, 0, width(), height());
+            m_blockingOverlay->raise();
+        }
+    }
+
+    void RvDocument::setUIBlocked(bool blocked)
+    {
+        if (!m_blockingOverlay) return;
+        
+        if (blocked)
+        {
+            // Cover entire window
+            m_blockingOverlay->setGeometry(0, 0, width(), height());
+            m_blockingOverlay->raise();  // Bring to front, above everything
+            m_blockingOverlay->show();
+            
+            // Grab focus to also block keyboard input
+            m_blockingOverlay->setFocus(Qt::OtherFocusReason);
+        }
+        else
+        {
+            m_blockingOverlay->hide();
+        }
     }
 
     void RvDocument::addWatchFile(const string& path)

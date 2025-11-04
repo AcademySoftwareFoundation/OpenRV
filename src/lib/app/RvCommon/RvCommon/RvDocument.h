@@ -36,6 +36,7 @@ namespace Rv
     class RvBottomViewToolBar;
     class RvSourceEditor;
     class DisplayLink;
+    class UIBlockingEventNode;
 
     class RvDocument
         : public QMainWindow
@@ -127,6 +128,11 @@ namespace Rv
 
         void initializeSession();
 
+        //
+        //  UI Blocking - prevents user interaction without closing panels
+        //
+        void setUIBlocked(bool blocked);
+
     protected:
         // Overrides for TwkUtil::Notifier
         virtual bool receive(Notifier*, Notifier*, MessageId, MessageData*);
@@ -151,6 +157,7 @@ namespace Rv
         void changeEvent(QEvent*);
         bool event(QEvent*);
         void moveEvent(QMoveEvent*);
+        void resizeEvent(QResizeEvent*);
 
         void setBuildMenu();
 
@@ -188,6 +195,8 @@ namespace Rv
         bool m_vsyncDisabled;
         RvSourceEditor* m_sourceEditor;
         DisplayLink* m_displayLink;
+        QWidget* m_blockingOverlay;
+        UIBlockingEventNode* m_uiBlockingEventNode;
     };
 
 } // namespace Rv

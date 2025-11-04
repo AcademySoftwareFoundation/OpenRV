@@ -1950,9 +1950,9 @@ class: AnnotateMinorMode : MinorMode
     method: nextSlot (void; bool b) { nextAnnotatedFrame(); }
     method: prevSlot (void; bool b) { prevAnnotatedFrame(); }
 
-    method: onPresenterChanged(void; Event event)
+    method: onCategoryStateChanged(void; Event event)
     {
-        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
+        if (!commands.isEventCategoryEnabled("annotate_category") && _active)
         {
             toggle();
         }
@@ -2393,7 +2393,7 @@ class: AnnotateMinorMode : MinorMode
               // bound by menuItem("   Previous Annotated Frame") // ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
               // bound by menuItem("   Next Annotated Frame") // ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               // bound by menuItem("   Previous Annotated Frame") // ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
+              ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
               ("stylus-color-rgb", setColorRGB, "Select color RGB"),
