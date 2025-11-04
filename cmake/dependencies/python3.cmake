@@ -252,9 +252,23 @@ ENDIF()
 SET(_requirements_file
     "${PROJECT_SOURCE_DIR}/src/build/requirements.txt"
 )
-SET(_requirements_install_command
-    "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
-)
+
+IF(RV_TARGET_WINDOWS)
+  # On Windows, OpenTimelineIO needs to be built from source and requires
+  # CMake to find the Python libraries. Set CMAKE_ARGS to help pybind11
+  # locate the Python development files.
+  # This is required for both old and new versions of pybind11, but especially
+  # for pybind11 v2.13.6+ which has stricter Python library detection.
+  SET(_requirements_install_command
+      ${CMAKE_COMMAND} -E env
+      "CMAKE_ARGS=-DPython_LIBRARY=${_python3_implib} -DCMAKE_INCLUDE_PATH=${_include_dir} -DPython_INCLUDE_DIR=${_include_dir} -DPython_EXECUTABLE=${_python3_executable}"
+      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+  )
+ELSE()
+  SET(_requirements_install_command
+      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+  )
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_patch_python3_11_command
