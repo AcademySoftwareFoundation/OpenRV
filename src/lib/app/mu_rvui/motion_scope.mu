@@ -376,10 +376,6 @@ class: MotionScope : Widget
 
     method: clickFunction (void; Event event, (void;int,int,int) F)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
         deb ("clickFunction");
 
         //   Disregard drag events if we didn't mouse-down in this widget.
@@ -704,11 +700,6 @@ class: MotionScope : Widget
 
     method: popupOpts (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         if (isCurrentFrameIncomplete() ||!_pointerInMotionScope)
         {
             event.reject();
@@ -890,11 +881,11 @@ class: MotionScope : Widget
 
         _frameMap = int[]();
         init(name,
-             [ ("pointer-1--push", clickFunction(,setFrameOrNudge), "Set Frame On Magnifier"),
-               ("pointer-1--drag", clickFunction(,scrubSetFrame), "Drag Frame On Magnifier"),
-               ("pointer-1--shift--push", clickFunction(,setInOutPointDelayed("in",,,)), "Set In Point on Magnifier"),
-               ("pointer-1--shift--drag", clickFunction(,setInOutPointDelayed("out",,,)), "Select In/Out Region on Magnifier"),
-               ("pointer-3--push", popupOpts, "Popup Magnifier Options"),
+             [ ("pointer-1--push", makeCategoryEventFunc("playcontrol_category", clickFunction(,setFrameOrNudge)), "Set Frame On Magnifier"),
+               ("pointer-1--drag", makeCategoryEventFunc("playcontrol_category", clickFunction(,scrubSetFrame)), "Drag Frame On Magnifier"),
+               ("pointer-1--shift--push", makeCategoryEventFunc("playcontrol_category", clickFunction(,setInOutPointDelayed("in",,,))), "Set In Point on Magnifier"),
+               ("pointer-1--shift--drag", makeCategoryEventFunc("playcontrol_category", clickFunction(,setInOutPointDelayed("out",,,))), "Select In/Out Region on Magnifier"),
+               ("pointer-3--push", makeCategoryEventFunc("playcontrol_category", popupOpts), "Popup Magnifier Options"),
                ("pointer--move", handleMotion, ""),
                ("pointer--leave", handleLeave, "Track pointer leave"),
                ("pointer-1--shift--release", releaseDrag, ""),
