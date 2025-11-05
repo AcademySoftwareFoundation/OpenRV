@@ -259,9 +259,11 @@ IF(RV_TARGET_WINDOWS)
   # locate the Python development files.
   # This is required for both old and new versions of pybind11, but especially
   # for pybind11 v2.13.6+ which has stricter Python library detection.
+  # Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+  # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
   SET(_requirements_install_command
       ${CMAKE_COMMAND} -E env
-      "CMAKE_ARGS=-DPython_LIBRARY=${_python3_implib} -DCMAKE_INCLUDE_PATH=${_include_dir} -DPython_INCLUDE_DIR=${_include_dir} -DPython_EXECUTABLE=${_python3_executable}"
+      "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
       "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
   )
 ELSE()
