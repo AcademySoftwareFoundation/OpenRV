@@ -261,11 +261,23 @@ IF(RV_TARGET_WINDOWS)
   # for pybind11 v2.13.6+ which has stricter Python library detection.
   # Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
   # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
-  SET(_requirements_install_command
-      ${CMAKE_COMMAND} -E env
-      "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
-  )
+  
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    # For Debug builds, we need to tell OpenTimelineIO to build in debug mode
+    # and link against the debug Python library (python311_d.lib)
+    SET(_requirements_install_command
+        ${CMAKE_COMMAND} -E env
+        "OTIO_CXX_DEBUG_BUILD=1"
+        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+    )
+  ELSE()
+    SET(_requirements_install_command
+        ${CMAKE_COMMAND} -E env
+        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+    )
+  ENDIF()
 ELSE()
   SET(_requirements_install_command
       "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
