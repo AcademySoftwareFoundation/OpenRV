@@ -60,7 +60,10 @@ namespace IPCore
 
         constexpr auto all_categories()
         {
-            return std::array{
+            // Explicitly specify template parameters for MSVC compatibility.
+            // CTAD (Class Template Argument Deduction) works on GCC/Clang but
+            // fails on Windows MSVC, so we specify <std::string_view, 17> explicitly.
+            return std::array<std::string_view, 17>{
                 annotateCategory,
                 clearCategory,
                 exportCategory,
