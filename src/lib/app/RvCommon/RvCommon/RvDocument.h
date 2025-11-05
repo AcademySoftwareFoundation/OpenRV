@@ -14,6 +14,7 @@
 #include <TwkUtil/Notifier.h>
 #include <TwkApp/Menu.h>
 #include <RvApp/RvSession.h>
+#include <memory>
 
 class QAction;
 class QActionGroup;
@@ -128,9 +129,6 @@ namespace Rv
 
         void initializeSession();
 
-        //
-        //  UI Blocking - prevents user interaction without closing panels
-        //
         void setUIBlocked(bool blocked);
 
     protected:
@@ -153,11 +151,11 @@ namespace Rv
         void mergeMenu(const TwkApp::Menu*, bool shortcuts = true);
         void convert(QMenu*, const TwkApp::Menu*, bool shortcuts);
 
-        void closeEvent(QCloseEvent*);
-        void changeEvent(QEvent*);
-        bool event(QEvent*);
-        void moveEvent(QMoveEvent*);
-        void resizeEvent(QResizeEvent*);
+        void closeEvent(QCloseEvent*) override;
+        void changeEvent(QEvent*) override;
+        bool event(QEvent*) override;
+        void moveEvent(QMoveEvent*) override;
+        void resizeEvent(QResizeEvent*) override;
 
         void setBuildMenu();
 
@@ -196,7 +194,7 @@ namespace Rv
         RvSourceEditor* m_sourceEditor;
         DisplayLink* m_displayLink;
         QWidget* m_blockingOverlay;
-        UIBlockingEventNode* m_uiBlockingEventNode;
+        std::unique_ptr<UIBlockingEventNode> m_uiBlockingEventNode;
     };
 
 } // namespace Rv

@@ -786,12 +786,12 @@ namespace Rv
     NODE_IMPLEMENTATION(setUIBlocked, void)
     {
         bool blocked = NODE_ARG(0, bool);
-        RvSession* s = RvSession::currentRvSession();
-        if (s)
+        RvSession* session = RvSession::currentRvSession();
+        if (session)
         {
             // Send event that RvDocument will listen for
             // This avoids dependency issues between RvApp and RvCommon
-            s->userGenericEvent("block-ui-overlay", blocked ? "true" : "false");
+            session->userGenericEvent("block-ui-overlay", blocked ? "true" : "false");
         }
     }
 

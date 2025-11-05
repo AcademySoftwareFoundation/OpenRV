@@ -149,7 +149,6 @@ namespace Rv
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
-        , m_uiBlockingEventNode(0)
     {
         DB("RvDocument constructed");
 
@@ -352,7 +351,7 @@ namespace Rv
             m_bottomViewToolBar->setSession(m_session);
 
             // Create and connect UI blocking event node to listen to session events
-            m_uiBlockingEventNode = new UIBlockingEventNode(this);
+            m_uiBlockingEventNode = std::make_unique<UIBlockingEventNode>(this);
             m_uiBlockingEventNode->listenTo(m_session);
 
             // 10.5 looks better without it (no longer has the 100% white top)
@@ -468,9 +467,7 @@ namespace Rv
 
         if (m_uiBlockingEventNode)
         {
-            m_session->breakConnection(m_uiBlockingEventNode);
-            delete m_uiBlockingEventNode;
-            m_uiBlockingEventNode = 0;
+            m_session->breakConnection(m_uiBlockingEventNode.get());
         }
 
         if (m_sourceEditor)
@@ -2085,7 +2082,10 @@ namespace Rv
 
     void RvDocument::setUIBlocked(bool blocked)
     {
-        if (!m_blockingOverlay) return;
+        if (!m_blockingOverlay) 
+        {
+            return;
+        }
         
         if (blocked)
         {
