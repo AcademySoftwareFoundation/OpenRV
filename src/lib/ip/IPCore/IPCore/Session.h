@@ -16,6 +16,7 @@
 #include <TwkContainer/PropertyContainer.h>
 #include <TwkMath/Time.h>
 #include <TwkUtil/Timer.h>
+#include <array>
 #include <map>
 #include <limits>
 #include <deque>
