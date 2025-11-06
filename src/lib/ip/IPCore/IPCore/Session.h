@@ -879,7 +879,7 @@ namespace IPCore
         void disableEventCategory(std::string_view category);
         bool isEventCategoryDisabled(std::string_view category) const;
         bool isEventCategoryEnabled(std::string_view category) const;
-        const std::vector<std::string>& disabledEventCategories() const;
+        const std::vector<std::string_view>& disabledEventCategories() const;
 
         //
         //  Marks
@@ -1359,7 +1359,7 @@ namespace IPCore
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
         bool m_filterLiveReviewEvents{false};
-        std::vector<std::string>
+        std::vector<std::string_view>
             m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;

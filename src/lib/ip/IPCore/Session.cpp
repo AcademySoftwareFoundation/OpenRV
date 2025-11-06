@@ -752,8 +752,9 @@ namespace IPCore
                       m_disabledEventCategories.end(), category)
             == m_disabledEventCategories.end())
         {
-            m_disabledEventCategories.push_back(std::string(category));
+            m_disabledEventCategories.push_back(category);
         }
+        std::cout << "Disabled event category: " << category << std::endl;
     }
 
     bool Session::isEventCategoryDisabled(std::string_view category) const
@@ -772,7 +773,7 @@ namespace IPCore
         return !isEventCategoryDisabled(category);
     }
 
-    const std::vector<std::string>& Session::disabledEventCategories() const
+    const std::vector<std::string_view>& Session::disabledEventCategories() const
     {
         return m_disabledEventCategories;
     }
