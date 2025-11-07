@@ -940,10 +940,61 @@ exclusionMap = {
     "QPainter::drawPoints": None,
     "QPainter::drawPolygon": None,
     "QPainter::drawRects": None,
-    "QPainter::drawText": None,
     "QPainter::drawPolyline": None,
     "QPainter::drawTiledPixmap": None,
     #    "QPainter::QPainter": None,  # handrolled
+    "QPainter::drawText": [
+        (
+            "drawText",
+            "",
+            [
+                ("rectangle", "const QRectF &", None),
+                ("flags", "int", None),
+                ("text", "const QString &", None),
+                ("boundingRect", "QRectF *", "nullptr"),
+            ],
+            "void",
+            False,
+        ),
+        (
+            "drawText",
+            "",
+            [
+                ("rectangle", "const QRect &", None),
+                ("flags", "int", None),
+                ("text", "const QString &", None),
+                ("boundingRect", "QRect *", "nullptr"),
+            ],
+            "void",
+            False,
+        ),
+        (
+            "drawText",
+            "",
+            [
+                ("rectangle", "const QRectF &", None),
+                ("text", "const QString &", None),
+                ("option", "const QTextOption &", "QTextOption()"),
+            ],
+            "void",
+            False,
+        ),
+        (
+            "drawText",
+            "",
+            [
+                ("x", "int", None),
+                ("y", "int", None),
+                ("width", "int", None),
+                ("height", "int", None),
+                ("flags", "int", None),
+                ("text", "const QString &", None),
+                ("boundingRect", "QRect *", "nullptr"),
+            ],
+            "void",
+            False,
+        ),
+    ],
     "QPainter::QPainter": [("QPainter", "", [], "", False)],
     "QKeySequence::QVariant": None,
     "QPdfWriter::QPdfWriter": None,
@@ -1295,6 +1346,7 @@ exclusionMap = {
             False,
         )
     ],
+    # 	QFont(const QFont &font, const QPaintDevice *pd)
     "QFont::macFontID": None,
     # Trouble with QNetworkReply::RawHeaderPair (QPair<QByteArray, QByteArray>)
     "QNetworkReply::rawHeaderPairs": None,
