@@ -180,4 +180,7 @@ QTreeView \
 QColumnView \
 QListWidget \
 QTreeWidget \
-QTableWidget > ced.log 2>&1
+QTableWidget \
+QPainter \
+QPainterPath \
+QPen > ced.log 2>&1

@@ -26,7 +26,7 @@ forceParse = False
 
 pp = pprint.PrettyPrinter()
 
-htmlDir = "/home/cfuoco/Qt6.5.3/Docs/Qt-6.5.3"
+htmlDir = "/Users/pbergeron/Qt6/Docs/Qt-6.5.3"
 objectHTML = "%s/qtcore/qobject.html" % htmlDir
 qtHTML = "%s/qtcore/qt.html" % htmlDir
 qtapifile = "qt6api.p"
@@ -267,6 +267,7 @@ baseHTML = [
     "qpointerevent",
     "qtimezone",
     "qcalendar",
+    "qpen",
 ]
 
 #
@@ -309,6 +310,7 @@ primitiveTypes = set(
         "QItemSelectionRange",
         "QItemSelection",
         "QBrush",
+        "QPen",
         "QGradient",
         "QMatrix4x4",
         "QTransform",
@@ -316,7 +318,6 @@ primitiveTypes = set(
         "QLinearGradient",
         "QRadialGradient",
         "QPalette",
-        "QPainter",
         "QPainterPath",
         "QMargins",
         "QNetworkCookie",
@@ -334,6 +335,7 @@ copyOnWriteTypes = [
     "QBitArray",
     "QBitmap",
     "QBrush",
+    "QPen",
     "QByteArray",
     "QCache",
     "QContiguousCache",
@@ -394,6 +396,7 @@ interfaceTypes = set([])
 pointerTypes = set(
     [
         "QStandardItem",
+        "QPainter",
         "QListWidgetItem",
         "QTreeWidgetItem",
         "QTableWidgetItem",
@@ -680,6 +683,7 @@ includeClasses = set(
         "QItemSelectionModel",
         "QGradient",
         "QBrush",
+        "QPen",
         "QMatrix4x4",
         "QTransform",
         "QConicalGradient",
@@ -747,7 +751,8 @@ includeClasses = set(
         "QWebEngineHistory",
         "QUrlQuery",
         # "QStyleOption",           "QStyle",
-        # "QPainter", "QPainterPath",
+        "QPainter",
+        "QPainterPath",
         # "QTouchEvent",
         # "QDesktopServices",
         # "QDataStream",
@@ -925,7 +930,21 @@ exclusionMap = {
     "QPlainTextEdit::getPaintContext": None,  # something wrong w/enum convert
     "QTextBlock::textFormats": None,
     "QPainterPath::elementAt": None,
-    "QPainter::QPainter": None,  # handrolled
+    "QPainterPath::toFillPolygon": None,
+    "QPainterPath::toFillPolygons": None,
+    "QPainterPath::toSubpathPolygons": None,
+    "QPainterPath::addPolygon": None,
+    "QPainter::drawLines": None,
+    "QPainter::drawConvexPolygon": None,
+    "QPainter::drawPixmapFragments": None,
+    "QPainter::drawPoints": None,
+    "QPainter::drawPolygon": None,
+    "QPainter::drawRects": None,
+    "QPainter::drawText": None,
+    "QPainter::drawPolyline": None,
+    "QPainter::drawTiledPixmap": None,
+    #    "QPainter::QPainter": None,  # handrolled
+    "QPainter::QPainter": [("QPainter", "", [], "", False)],
     "QKeySequence::QVariant": None,
     "QPdfWriter::QPdfWriter": None,
     "QPixmap::handle": None,

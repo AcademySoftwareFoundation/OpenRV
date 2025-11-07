@@ -476,5 +476,13 @@ QWidgetType* addAllQTSymbols(MuLangContext* c, Module* qt)
     QTreeWidgetType* t_QTreeWidget =
         new QTreeWidgetType(c, "QTreeWidget", t_QTreeView);
     qt->addSymbol(t_QTreeWidget);
+
+    QPainterType* t_QPainter = new QPainterType(c, "QPainter");
+    qt->addSymbol(t_QPainter);
+    QPainterPathType* t_QPainterPath = new QPainterPathType(c, "QPainterPath");
+    qt->addSymbol(t_QPainterPath);
+    QPenType* t_QPen = new QPenType(c, "QPen");
+    qt->addSymbol(t_QPen);
+
     return t_QWidget;
 }
