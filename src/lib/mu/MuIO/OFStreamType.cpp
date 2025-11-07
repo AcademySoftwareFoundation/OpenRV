@@ -29,8 +29,7 @@ namespace Mu
 
     void OFStreamType::finalizer(void* obj, void* data)
     {
-        OFStreamType::OFStream* i =
-            reinterpret_cast<OFStreamType::OFStream*>(obj);
+        OFStreamType::OFStream* i = reinterpret_cast<OFStreamType::OFStream*>(obj);
 
         if (i->_ofstream != &cout && i->_ofstream != &cerr)
         {
@@ -58,10 +57,7 @@ namespace Mu
 
     Object* OFStreamType::newObject() const { return new OFStream(this); }
 
-    void OFStreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<OFStreamType::OFStream*>(obj);
-    }
+    void OFStreamType::deleteObject(Object* obj) const { delete static_cast<OFStreamType::OFStream*>(obj); }
 
     void OFStreamType::load()
     {
@@ -79,39 +75,29 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "ofstream&", this),
 
-                      new Function(c, "ofstream", OFStreamType::construct0,
-                                   None, Return, tn, End),
+                      new Function(c, "ofstream", OFStreamType::construct0, None, Return, tn, End),
 
-                      new Function(c, "ofstream", OFStreamType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "ofstream", OFStreamType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "ofstream", OFStreamType::construct1,
-                                   None, Return, tn, Args, "string", "int",
-                                   End),
+                      new Function(c, "ofstream", OFStreamType::construct1, None, Return, tn, Args, "string", "int", End),
 
-                      new Function(c, "ofstream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "ofstream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
-        addSymbols(new Function(c, "close", OFStreamType::close, None, Return,
-                                "void", Args, tn, End),
+        addSymbols(new Function(c, "close", OFStreamType::close, None, Return, "void", Args, tn, End),
 
-                   new Function(c, "open", OFStreamType::open, None, Return,
-                                "void", Args, tn, "string", "int", End),
+                   new Function(c, "open", OFStreamType::open, None, Return, "void", Args, tn, "string", "int", End),
 
-                   new Function(c, "is_open", OFStreamType::is_open, None,
-                                Return, "bool", Args, tn, End),
+                   new Function(c, "is_open", OFStreamType::is_open, None, Return, "bool", Args, tn, End),
 
                    EndArguments);
     }
@@ -132,8 +118,7 @@ namespace Mu
         const Class* c = static_cast<const OFStreamType*>(NODE_THIS.type());
         OFStreamType::OFStream* o = new OFStreamType::OFStream(c);
         o->setString(file->c_str());
-        o->_ios = o->_ostream = o->_ofstream =
-            new std::ofstream(UNICODE_C_STR(file->c_str()));
+        o->_ios = o->_ostream = o->_ofstream = new std::ofstream(UNICODE_C_STR(file->c_str()));
         NODE_RETURN(Pointer(o));
     }
 
@@ -146,15 +131,13 @@ namespace Mu
         const Class* c = static_cast<const OFStreamType*>(NODE_THIS.type());
         OFStreamType::OFStream* o = new OFStreamType::OFStream(c);
         o->setString(file->c_str());
-        o->_ios = o->_ostream = o->_ofstream =
-            new std::ofstream(UNICODE_C_STR(file->c_str()), mode);
+        o->_ios = o->_ostream = o->_ofstream = new std::ofstream(UNICODE_C_STR(file->c_str()), mode);
         NODE_RETURN(Pointer(o));
     }
 
     NODE_IMPLEMENTATION(OFStreamType::close, void)
     {
-        OFStreamType::OFStream* stream =
-            NODE_ARG_OBJECT(0, OFStreamType::OFStream);
+        OFStreamType::OFStream* stream = NODE_ARG_OBJECT(0, OFStreamType::OFStream);
         stream->_ofstream->close();
 
         if (stream->_ofstream != &cout && stream->_ofstream != &cerr)
@@ -166,19 +149,16 @@ namespace Mu
 
     NODE_IMPLEMENTATION(OFStreamType::is_open, bool)
     {
-        OFStreamType::OFStream* stream =
-            NODE_ARG_OBJECT(0, OFStreamType::OFStream);
+        OFStreamType::OFStream* stream = NODE_ARG_OBJECT(0, OFStreamType::OFStream);
         NODE_RETURN(stream->_ofstream->is_open());
     }
 
     NODE_IMPLEMENTATION(OFStreamType::open, void)
     {
-        OFStreamType::OFStream* stream =
-            NODE_ARG_OBJECT(0, OFStreamType::OFStream);
+        OFStreamType::OFStream* stream = NODE_ARG_OBJECT(0, OFStreamType::OFStream);
         const StringType::String* file = NODE_ARG_OBJECT(1, StringType::String);
         int flags = NODE_ARG(2, int);
-        stream->_ofstream->open(UNICODE_C_STR(file->c_str()),
-                                ios::openmode(flags));
+        stream->_ofstream->open(UNICODE_C_STR(file->c_str()), ios::openmode(flags));
     }
 
 } // namespace Mu

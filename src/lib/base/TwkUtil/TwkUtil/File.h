@@ -76,19 +76,16 @@ namespace TwkUtil
     TWKUTIL_EXPORT std::string extension(std::string path);
 
     // Expand ~
-    TWKUTIL_EXPORT void tildeExp(std::string& str); // Expands inline
-    TWKUTIL_EXPORT std::string
-    tildeExp(const std::string& str); // Returns new string
+    TWKUTIL_EXPORT void tildeExp(std::string& str);              // Expands inline
+    TWKUTIL_EXPORT std::string tildeExp(const std::string& str); // Returns new string
 
     // Expand $ environment variables
-    TWKUTIL_EXPORT void varExp(std::string& str); // Expands inline
-    TWKUTIL_EXPORT std::string
-    varExp(const std::string& str); // Returns new string
+    TWKUTIL_EXPORT void varExp(std::string& str);              // Expands inline
+    TWKUTIL_EXPORT std::string varExp(const std::string& str); // Returns new string
 
     // Expand both ~ and $ environment variables
-    TWKUTIL_EXPORT void varTildExp(std::string& str); // Expands inline
-    TWKUTIL_EXPORT std::string
-    varTildExp(const std::string& str); // Returns new string
+    TWKUTIL_EXPORT void varTildExp(std::string& str);              // Expands inline
+    TWKUTIL_EXPORT std::string varTildExp(const std::string& str); // Returns new string
 
     // Returns the username of the file's owner
     TWKUTIL_EXPORT std::string fileOwner(std::string path);
@@ -98,29 +95,20 @@ namespace TwkUtil
 
     // Searches a : separated path for filename(s) matching pattern, returns
     // list of matches with full path to each file.
-    TWKUTIL_EXPORT FileNameList findInPath(std::string filepattern,
-                                           std::string path);
+    TWKUTIL_EXPORT FileNameList findInPath(std::string filepattern, std::string path);
 
     // Returns a list of all filenames in the given directory.  The
     // full path is NOT prepended to the filenames.
-    TWKUTIL_EXPORT bool filesInDirectory(const char* directory,
-                                         FileNameList& fileList,
-                                         bool showDirs = false);
+    TWKUTIL_EXPORT bool filesInDirectory(const char* directory, FileNameList& fileList, bool showDirs = false);
 
     // Returns a list of all filenames in the given directory that match
     // the given file pattern as determined by fnmatch().  The full path
     // is NOT prepended to the filenames.
-    TWKUTIL_EXPORT bool filesInDirectory(const char* directory,
-                                         const char* pattern,
-                                         FileNameList& fileList,
-                                         bool showDirs = false);
+    TWKUTIL_EXPORT bool filesInDirectory(const char* directory, const char* pattern, FileNameList& fileList, bool showDirs = false);
 
     TWKUTIL_EXPORT bool isDirectory(const char* filename);
 
-    inline bool isDirectory(const std::string& filename)
-    {
-        return isDirectory(filename.c_str());
-    }
+    inline bool isDirectory(const std::string& filename) { return isDirectory(filename.c_str()); }
 
     // Convenience wrappers for access
     TWKUTIL_EXPORT bool isReadable(const char* path);
@@ -138,15 +126,12 @@ namespace TwkUtil
     // A function for acquiring admin privileges on Windows and executing
     // an arbitrary shell command.
     //
-    TWKUTIL_EXPORT int runAsAdministrator(std::string command,
-                                          std::string directory = "");
+    TWKUTIL_EXPORT int runAsAdministrator(std::string command, std::string directory = "");
     //
     // Accompanying convenience function for asking for admin permissions
     // to copy files.
     //
-    TWKUTIL_EXPORT int copyAsAdministrator(std::string source,
-                                           std::string destination,
-                                           bool overwrite = false);
+    TWKUTIL_EXPORT int copyAsAdministrator(std::string source, std::string destination, bool overwrite = false);
 #endif
 } // End namespace TwkUtil
 

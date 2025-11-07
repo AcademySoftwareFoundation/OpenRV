@@ -23,9 +23,7 @@ namespace IPCore
     class DispTransform2DIPNode : public IPNode
     {
     public:
-        DispTransform2DIPNode(const std::string& name,
-                              const NodeDefinition* def, IPGraph*,
-                              GroupIPNode* group = 0);
+        DispTransform2DIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group = 0);
 
         virtual ~DispTransform2DIPNode();
 

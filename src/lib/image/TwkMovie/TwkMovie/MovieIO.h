@@ -54,8 +54,7 @@ namespace TwkMovie
 
         struct Parameter
         {
-            Parameter(const std::string& n, const std::string& d,
-                      const std::string& c)
+            Parameter(const std::string& n, const std::string& d, const std::string& c)
                 : name(n)
                 , description(d)
                 , codec(c)
@@ -107,8 +106,7 @@ namespace TwkMovie
             {
             }
 
-            MovieTypeInfo(const std::string& ext, const std::string& desc,
-                          unsigned int c, const StringPairVector& cdecs,
+            MovieTypeInfo(const std::string& ext, const std::string& desc, unsigned int c, const StringPairVector& cdecs,
                           const StringPairVector& acdecs)
                 : extension(ext)
                 , description(desc)
@@ -118,11 +116,8 @@ namespace TwkMovie
             {
             }
 
-            MovieTypeInfo(const std::string& ext, const std::string& desc,
-                          unsigned int c, const StringPairVector& cdecs,
-                          const StringPairVector& acdecs,
-                          const ParameterVector& eparams,
-                          const ParameterVector& dparams)
+            MovieTypeInfo(const std::string& ext, const std::string& desc, unsigned int c, const StringPairVector& cdecs,
+                          const StringPairVector& acdecs, const ParameterVector& eparams, const ParameterVector& dparams)
                 : extension(ext)
                 , description(desc)
                 , capabilities(c)
@@ -133,10 +128,7 @@ namespace TwkMovie
             {
             }
 
-            bool operator==(const std::string& e)
-            {
-                return !strcasecmp(e.c_str(), extension.c_str());
-            }
+            bool operator==(const std::string& e) { return !strcasecmp(e.c_str(), extension.c_str()); }
 
             std::string extension;
             std::string description;
@@ -155,8 +147,7 @@ namespace TwkMovie
         //  Constructor
         //
 
-        MovieIO(const std::string& identifier = "",
-                const std::string& key = "mz");
+        MovieIO(const std::string& identifier = "", const std::string& key = "mz");
         virtual ~MovieIO();
 
         /// Initializes the plugin;
@@ -197,8 +188,7 @@ namespace TwkMovie
         /// Query whether an extension is supported by this MovieIO.
         ///
 
-        bool supportsExtension(std::string extension,
-                               unsigned int capabilities = AnyCapability) const;
+        bool supportsExtension(std::string extension, unsigned int capabilities = AnyCapability) const;
 
         //
         //  Do any of this plugins accepted formats allow for attempting
@@ -216,8 +206,7 @@ namespace TwkMovie
         /// example a quicktime movie file with the wrong extension).
         ///
 
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
 
         //
         //  Set the plugin file that created this
@@ -236,8 +225,7 @@ namespace TwkMovie
         int getIntAttribute(const std::string& name) const;
         void setIntAttribute(const std::string& name, int value);
         std::string getStringAttribute(const std::string& name) const;
-        void setStringAttribute(const std::string& name,
-                                const std::string& value);
+        void setStringAttribute(const std::string& name, const std::string& value);
         double getDoubleAttribute(const std::string& name) const;
         void setDoubleAttribute(const std::string& name, double value) const;
 
@@ -254,15 +242,10 @@ namespace TwkMovie
 
     protected:
         void addType(const std::string&, unsigned int);
-        void addType(const std::string& extension,
-                     const std::string& description, unsigned int capabilities,
-                     const StringPairVector& videoCodecs,
-                     const StringPairVector& audioCodecs);
-        void addType(const std::string& extension,
-                     const std::string& description, unsigned int capabilities,
-                     const StringPairVector& videoCodecs,
-                     const StringPairVector& audioCodecs,
-                     const ParameterVector& encodeParams,
+        void addType(const std::string& extension, const std::string& description, unsigned int capabilities,
+                     const StringPairVector& videoCodecs, const StringPairVector& audioCodecs);
+        void addType(const std::string& extension, const std::string& description, unsigned int capabilities,
+                     const StringPairVector& videoCodecs, const StringPairVector& audioCodecs, const ParameterVector& encodeParams,
                      const ParameterVector& decodeParams);
 
         MovieTypeInfos m_exts;
@@ -282,8 +265,7 @@ namespace TwkMovie
     class TWKMOVIE_EXPORT ProxyMovieIO : public MovieIO
     {
     public:
-        ProxyMovieIO(const std::string& identifier, const std::string& sortKey,
-                     const std::string& realPlugin)
+        ProxyMovieIO(const std::string& identifier, const std::string& sortKey, const std::string& realPlugin)
             : MovieIO(identifier, sortKey)
             , m_file(realPlugin)
         {
@@ -293,20 +275,16 @@ namespace TwkMovie
 
         virtual std::string about() const;
 
-        void add(const std::string& ext, const std::string& desc,
-                 unsigned int capabilities, const StringPairVector& vcodecs,
+        void add(const std::string& ext, const std::string& desc, unsigned int capabilities, const StringPairVector& vcodecs,
                  const StringPairVector& acodecs)
         {
             addType(ext, desc, capabilities, vcodecs, acodecs);
         }
 
-        void add(const std::string& ext, const std::string& desc,
-                 unsigned int capabilities, const StringPairVector& vcodecs,
-                 const StringPairVector& acodecs,
-                 const ParameterVector& eparams, const ParameterVector& dparams)
+        void add(const std::string& ext, const std::string& desc, unsigned int capabilities, const StringPairVector& vcodecs,
+                 const StringPairVector& acodecs, const ParameterVector& eparams, const ParameterVector& dparams)
         {
-            addType(ext, desc, capabilities, vcodecs, acodecs, eparams,
-                    dparams);
+            addType(ext, desc, capabilities, vcodecs, acodecs, eparams, dparams);
         }
 
         const std::string& pathToPlugin() const { return m_file; }
@@ -371,11 +349,8 @@ namespace TwkMovie
             void init();
             void shutdown();
 
-            void addReader(const std::string_view filename,
-                           const Movie::ReadRequest& request);
-            MovieReader* getReader(const std::string_view filename,
-                                   const MovieInfo& mi,
-                                   Movie::ReadRequest& request);
+            void addReader(const std::string_view filename, const Movie::ReadRequest& request);
+            MovieReader* getReader(const std::string_view filename, const MovieInfo& mi, Movie::ReadRequest& request);
 
         private:
             void finalizeCompletedThreads();
@@ -405,9 +380,9 @@ namespace TwkMovie
             // ceiling thread count. The ceiling thread count
             // may exceed m_maxThreads if somehow all readers
             // get prioritized.
-            int m_maxThreads;  // max allowable threads, unless the load is
-                               // lagging.
-            int m_threadCount; // currently running readers
+            int m_maxThreads;         // max allowable threads, unless the load is
+                                      // lagging.
+            int m_threadCount;        // currently running readers
             int m_ceilingThreadCount; // ceiling running readers
             int m_completedCount;     // done reading count
             int m_notReadyCount;      // count we had to wait to complete
@@ -424,10 +399,7 @@ namespace TwkMovie
 
         struct IOComp
         {
-            bool operator()(const MovieIO* a, const MovieIO* b) const
-            {
-                return a->sortKey().compare(b->sortKey()) < 0;
-            }
+            bool operator()(const MovieIO* a, const MovieIO* b) const { return a->sortKey().compare(b->sortKey()) < 0; }
         };
 
         typedef std::set<MovieIO*, IOComp> Plugins;
@@ -453,8 +425,7 @@ namespace TwkMovie
         ///  on error
         ///
 
-        static MovieReader* movieReader(const std::string& filename,
-                                        bool tryBruteForce = true);
+        static MovieReader* movieReader(const std::string& filename, bool tryBruteForce = true);
 
         ///
         ///  Find appropriate plugin & read image file.  Throws exception
@@ -463,9 +434,7 @@ namespace TwkMovie
         ///  given filename.
         ///
 
-        static MovieReader* openMovieReader(const std::string& filename,
-                                            const MovieInfo& mi,
-                                            Movie::ReadRequest& request,
+        static MovieReader* openMovieReader(const std::string& filename, const MovieInfo& mi, Movie::ReadRequest& request,
                                             bool tryBruteForce = true);
 
         ///
@@ -473,10 +442,8 @@ namespace TwkMovie
         ///  thread func of the Preloader.
         ///
 
-        static MovieReader*
-        preloadOpenMovieReader(const std::string& filename,
-                               const Movie::ReadRequest& request,
-                               bool tryBruteForce = true);
+        static MovieReader* preloadOpenMovieReader(const std::string& filename, const Movie::ReadRequest& request,
+                                                   bool tryBruteForce = true);
         ///
         ///  Find appropriate plugin (based on extension) & write image
         ///  file.  If format is specified, it is used INSTEAD of filename
@@ -524,18 +491,14 @@ namespace TwkMovie
         ///  Find a specific IO object
         ///
 
-        static const MovieIO*
-        findByExtension(const std::string& extension,
-                        unsigned int capabilities = MovieIO::AnyCapability);
+        static const MovieIO* findByExtension(const std::string& extension, unsigned int capabilities = MovieIO::AnyCapability);
 
         ///
         ///  Find all IO objects that report support for the given
         ///  extension/cababilities.
         ///
 
-        static int findAllByExtension(const std::string& extension,
-                                      unsigned int capabilities,
-                                      MovieIOSet& ioVector);
+        static int findAllByExtension(const std::string& extension, unsigned int capabilities, MovieIOSet& ioVector);
 
         ///
         ///  Find a specific IO object by brute force: call getMovieInfo()
@@ -543,9 +506,7 @@ namespace TwkMovie
         ///  that one.
         ///
 
-        static const MovieIO*
-        findByBruteForce(const std::string& filename,
-                         unsigned int capabilities = MovieIO::AnyCapability);
+        static const MovieIO* findByBruteForce(const std::string& filename, unsigned int capabilities = MovieIO::AnyCapability);
 
         ///
         ///  Finds a list of potential TwkFB*.so plugins
@@ -569,8 +530,7 @@ namespace TwkMovie
     private:
         GenericIO() {}
 
-        static void outputParameters(const MovieIO::ParameterVector&,
-                                     const std::string&, const std::string&);
+        static void outputParameters(const MovieIO::ParameterVector&, const std::string&, const std::string&);
 
         static Plugins& plugins();
 

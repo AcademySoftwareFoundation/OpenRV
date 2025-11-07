@@ -30,9 +30,7 @@ namespace TwkFB
         typedef TwkUtil::FileStream FileStream;
         typedef FileStream::Type Type;
 
-        FileStreamIStream(const std::string& filename,
-                          Type type = FileStream::Buffering,
-                          size_t chunkSize = 61440, int maxAsync = 16);
+        FileStreamIStream(const std::string& filename, Type type = FileStream::Buffering, size_t chunkSize = 61440, int maxAsync = 16);
 
         virtual ~FileStreamIStream();
 

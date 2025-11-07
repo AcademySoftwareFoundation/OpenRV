@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QInputDialogType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QInputDialogType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QInputDialogType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QInputDialog();
-        MuQt_QInputDialog(Pointer muobj, const CallEnvironment*,
-                          QWidget* parent, Qt::WindowFlags flags);
+        MuQt_QInputDialog(Pointer muobj, const CallEnvironment*, QWidget* parent, Qt::WindowFlags flags);
         virtual void done(int result);
         virtual QSize minimumSizeHint() const;
         virtual void setVisible(bool visible);
@@ -84,48 +82,27 @@ namespace Mu
     public:
         void closeEvent_pub(QCloseEvent* e) { closeEvent(e); }
 
-        void closeEvent_pub_parent(QCloseEvent* e)
-        {
-            QInputDialog::closeEvent(e);
-        }
+        void closeEvent_pub_parent(QCloseEvent* e) { QInputDialog::closeEvent(e); }
 
         void contextMenuEvent_pub(QContextMenuEvent* e) { contextMenuEvent(e); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* e)
-        {
-            QInputDialog::contextMenuEvent(e);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* e) { QInputDialog::contextMenuEvent(e); }
 
-        bool eventFilter_pub(QObject* o, QEvent* e)
-        {
-            return eventFilter(o, e);
-        }
+        bool eventFilter_pub(QObject* o, QEvent* e) { return eventFilter(o, e); }
 
-        bool eventFilter_pub_parent(QObject* o, QEvent* e)
-        {
-            return QInputDialog::eventFilter(o, e);
-        }
+        bool eventFilter_pub_parent(QObject* o, QEvent* e) { return QInputDialog::eventFilter(o, e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QInputDialog::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QInputDialog::keyPressEvent(e); }
 
         void resizeEvent_pub(QResizeEvent* _p15) { resizeEvent(_p15); }
 
-        void resizeEvent_pub_parent(QResizeEvent* _p15)
-        {
-            QInputDialog::resizeEvent(_p15);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* _p15) { QInputDialog::resizeEvent(_p15); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QInputDialog::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QInputDialog::showEvent(event); }
 
     public:
         const QInputDialogType* _baseType;
@@ -133,11 +110,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QInputDialogType::cachedInstance(const QInputDialogType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QInputDialogType::cachedInstance(const QInputDialogType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

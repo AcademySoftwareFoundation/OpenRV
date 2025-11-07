@@ -12,8 +12,7 @@
 namespace LUT
 {
 
-    void readNukeVectorfield(const std::string& filename,
-                             const std::string& type, LUTData& lut);
+    void readNukeVectorfield(const std::string& filename, const std::string& type, LUTData& lut);
 
 } // namespace LUT
 

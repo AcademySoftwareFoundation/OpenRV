@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QVBoxLayoutType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QVBoxLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QVBoxLayoutType();
 
@@ -64,8 +63,7 @@ namespace Mu
     public:
         virtual ~MuQt_QVBoxLayout();
         MuQt_QVBoxLayout(Pointer muobj, const CallEnvironment*);
-        MuQt_QVBoxLayout(Pointer muobj, const CallEnvironment*,
-                         QWidget* parent);
+        MuQt_QVBoxLayout(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual void addItem(QLayoutItem* item);
         virtual int count() const;
         virtual Qt::Orientations expandingDirections() const;
@@ -86,11 +84,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QVBoxLayoutType::cachedInstance(const QVBoxLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QVBoxLayoutType::cachedInstance(const QVBoxLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

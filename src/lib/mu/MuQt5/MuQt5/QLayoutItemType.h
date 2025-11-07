@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QLayoutItemType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QLayoutItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QLayoutItemType();
 
         static bool isInheritable() { return true; }
@@ -62,8 +61,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QLayoutItem();
-        MuQt_QLayoutItem(Pointer muobj, const CallEnvironment*,
-                         Qt::Alignment alignment);
+        MuQt_QLayoutItem(Pointer muobj, const CallEnvironment*, Qt::Alignment alignment);
         virtual QSizePolicy::ControlTypes controlTypes() const;
         virtual Qt::Orientations expandingDirections() const;
         virtual QRect geometry() const;
@@ -85,11 +83,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QLayoutItemType::cachedInstance(const QLayoutItemType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QLayoutItemType::cachedInstance(const QLayoutItemType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

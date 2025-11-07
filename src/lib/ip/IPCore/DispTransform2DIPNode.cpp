@@ -20,27 +20,20 @@ namespace IPCore
     using namespace TwkFB;
     using namespace std;
 
-    DispTransform2DIPNode::DispTransform2DIPNode(const std::string& name,
-                                                 const NodeDefinition* def,
-                                                 IPGraph* g, GroupIPNode* group)
+    DispTransform2DIPNode::DispTransform2DIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
     {
         setMaxInputs(1);
         setHasLinearTransform(true);
-        m_translate =
-            declareProperty<Vec2fProperty>("transform.translate", Vec2f(0, 0));
-        m_scale =
-            declareProperty<Vec2fProperty>("transform.scale", Vec2f(1, 1));
+        m_translate = declareProperty<Vec2fProperty>("transform.translate", Vec2f(0, 0));
+        m_scale = declareProperty<Vec2fProperty>("transform.scale", Vec2f(1, 1));
 
         updateTransformHash();
     }
 
     DispTransform2DIPNode::~DispTransform2DIPNode() {}
 
-    void DispTransform2DIPNode::outputDisconnect(IPNode* node)
-    {
-        IPNode::outputDisconnect(node);
-    }
+    void DispTransform2DIPNode::outputDisconnect(IPNode* node) { IPNode::outputDisconnect(node); }
 
     IPNode::Matrix DispTransform2DIPNode::localMatrix(const Context&) const
     {
@@ -72,8 +65,7 @@ namespace IPCore
 
         if (IPImage* root = IPNode::evaluate(newContext))
         {
-            if (root->destination == IPImage::IntermediateBuffer
-                && root->children)
+            if (root->destination == IPImage::IntermediateBuffer && root->children)
             {
                 IPImage* child = root->children;
                 for (; child; child = child->next)
@@ -114,8 +106,7 @@ namespace IPCore
         m_transformHash += *((size_t*)&(ty));
     }
 
-    void DispTransform2DIPNode::readCompleted(const std::string& type,
-                                              unsigned int version)
+    void DispTransform2DIPNode::readCompleted(const std::string& type, unsigned int version)
     {
         updateTransformHash();
         IPNode::readCompleted(type, version);

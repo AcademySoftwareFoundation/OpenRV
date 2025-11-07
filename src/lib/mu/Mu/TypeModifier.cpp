@@ -18,16 +18,10 @@ namespace Mu
 
     TypeModifier::~TypeModifier() {}
 
-    void TypeModifier::outputNode(std::ostream& o, const Node*) const
-    {
-        output(o);
-    }
+    void TypeModifier::outputNode(std::ostream& o, const Node*) const { output(o); }
 
     void TypeModifier::output(std::ostream& o) const { Symbol::output(o); }
 
-    const Type* TypeModifier::transform(const Type* t, Context*) const
-    {
-        return t;
-    }
+    const Type* TypeModifier::transform(const Type* t, Context*) const { return t; }
 
 } // namespace Mu

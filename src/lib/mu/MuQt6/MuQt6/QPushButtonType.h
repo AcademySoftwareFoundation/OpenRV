@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QPushButtonType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QPushButtonType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QPushButtonType();
 
@@ -66,13 +65,9 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QPushButton();
-        MuQt_QPushButton(Pointer muobj, const CallEnvironment*,
-                         QWidget* parent);
-        MuQt_QPushButton(Pointer muobj, const CallEnvironment*,
-                         const QString& text, QWidget* parent);
-        MuQt_QPushButton(Pointer muobj, const CallEnvironment*,
-                         const QIcon& icon, const QString& text,
-                         QWidget* parent);
+        MuQt_QPushButton(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QPushButton(Pointer muobj, const CallEnvironment*, const QString& text, QWidget* parent);
+        MuQt_QPushButton(Pointer muobj, const CallEnvironment*, const QIcon& icon, const QString& text, QWidget* parent);
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
 
@@ -99,45 +94,27 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QPushButton::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QPushButton::focusInEvent(e); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QPushButton::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QPushButton::focusOutEvent(e); }
 
         bool hitButton_pub(const QPoint& pos) const { return hitButton(pos); }
 
-        bool hitButton_pub_parent(const QPoint& pos) const
-        {
-            return QPushButton::hitButton(pos);
-        }
+        bool hitButton_pub_parent(const QPoint& pos) const { return QPushButton::hitButton(pos); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QPushButton::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QPushButton::keyPressEvent(e); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QPushButton::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QPushButton::mouseMoveEvent(e); }
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QPushButton::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QPushButton::paintEvent(_p14); }
 
         void checkStateSet_pub() { checkStateSet(); }
 
@@ -153,31 +130,19 @@ namespace Mu
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QPushButton::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QPushButton::keyReleaseEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QPushButton::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QPushButton::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QPushButton::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QPushButton::mouseReleaseEvent(e); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
-        void timerEvent_pub_parent(QTimerEvent* e)
-        {
-            QPushButton::timerEvent(e);
-        }
+        void timerEvent_pub_parent(QTimerEvent* e) { QPushButton::timerEvent(e); }
 
     public:
         const QPushButtonType* _baseType;
@@ -185,11 +150,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QPushButtonType::cachedInstance(const QPushButtonType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QPushButtonType::cachedInstance(const QPushButtonType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

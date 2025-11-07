@@ -25,8 +25,7 @@ namespace Mu
 
     VectorTypeModifier::~VectorTypeModifier() {}
 
-    const Type* VectorTypeModifier::transform(const Type* type,
-                                              Context* context) const
+    const Type* VectorTypeModifier::transform(const Type* type, Context* context) const
     {
         MuLangContext* c = static_cast<MuLangContext*>(context);
         Type* float4 = c->arrayType(c->floatType(), 1, 4);
@@ -37,9 +36,7 @@ namespace Mu
         {
             if (!_v4fType)
             {
-                _v4fType =
-                    new Vector4fType(c, "vector float[4]", c->floatType(),
-                                     Vector4FloatRep::rep());
+                _v4fType = new Vector4fType(c, "vector float[4]", c->floatType(), Vector4FloatRep::rep());
 
                 c->globalScope()->addSymbol(_v4fType);
             }
@@ -53,9 +50,7 @@ namespace Mu
         {
             if (!_v3fType)
             {
-                _v3fType =
-                    new Vector3fType(c, "vector float[3]", c->floatType(),
-                                     Vector3FloatRep::rep());
+                _v3fType = new Vector3fType(c, "vector float[3]", c->floatType(), Vector3FloatRep::rep());
 
                 c->globalScope()->addSymbol(_v3fType);
             }
@@ -69,9 +64,7 @@ namespace Mu
         {
             if (!_v2fType)
             {
-                _v2fType =
-                    new Vector2fType(c, "vector float[2]", c->floatType(),
-                                     Vector2FloatRep::rep());
+                _v2fType = new Vector2fType(c, "vector float[2]", c->floatType(), Vector2FloatRep::rep());
 
                 c->globalScope()->addSymbol(_v2fType);
             }

@@ -59,17 +59,11 @@ namespace IPCore
     static ENVVAR_BOOL(evApplyWasapiFix, "RV_AUDIO_APPLY_WASAPI_FIX", true);
 
     // Utility function that returns the Sample size.
-    int sampleSize(const QAudioFormat& format)
-    {
-        return format.bytesPerSample();
-    }
+    int sampleSize(const QAudioFormat& format) { return format.bytesPerSample(); }
 
     // NOTE_QT: In theory, this should be called sampleFormat for Qt6. Keep it
     // as is for now.
-    SampleFormat sampleType(const QAudioFormat& format)
-    {
-        return format.sampleFormat();
-    }
+    SampleFormat sampleType(const QAudioFormat& format) { return format.sampleFormat(); }
 
     //----------------------------------------------------------------------
     //      QTAudioThread
@@ -83,8 +77,7 @@ namespace IPCore
     //
     //----------------------------------------------------------------------
 
-    QTAudioThread::QTAudioThread(QTAudioRenderer& audioRenderer,
-                                 QObject* parent)
+    QTAudioThread::QTAudioThread(QTAudioRenderer& audioRenderer, QObject* parent)
         : QThread(parent)
         , m_parent(parent)
         , m_ioDevice(0)
@@ -104,8 +97,7 @@ namespace IPCore
 
         // Cache some format related variables so we dont have to
         // precompute them each time.
-        m_bytesPerSample = audioRenderer.m_format.channelCount()
-                           * sampleSize(audioRenderer.m_format);
+        m_bytesPerSample = audioRenderer.m_format.channelCount() * sampleSize(audioRenderer.m_format);
 
         m_preRollMode = m_audioRenderer.m_parameters.preRoll;
 
@@ -138,17 +130,12 @@ namespace IPCore
         {
             wait(300); // in ms;
             waitTime += 300;
-            QTAUDIO_DEBUG(
-                "QTAudioThread::startMe(): waiting for thread to start...")
+            QTAUDIO_DEBUG("QTAudioThread::startMe(): waiting for thread to start...")
         } while (!isRunning() && waitTime < 1000);
-        QMetaObject::invokeMethod(m_audioOutput, "setAudioOutputBufferSize",
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(m_audioOutput, "setAudioOutputBufferSize", Qt::QueuedConnection);
     }
 
-    size_t QTAudioThread::processedSamples() const
-    {
-        return m_processedSamples;
-    }
+    size_t QTAudioThread::processedSamples() const { return m_processedSamples; }
 
     void QTAudioThread::setProcessedSamples(size_t n)
     {
@@ -169,8 +156,7 @@ namespace IPCore
     void QTAudioThread::setDeviceLatency(double t)
     {
         m_mutex.lock();
-        m_audioRenderer.m_deviceState.latency =
-            t + m_audioRenderer.m_parameters.latency;
+        m_audioRenderer.m_deviceState.latency = t + m_audioRenderer.m_parameters.latency;
         m_mutex.unlock();
     }
 
@@ -197,15 +183,9 @@ namespace IPCore
 
     int QTAudioThread::bytesPerSample() const { return m_bytesPerSample; }
 
-    size_t QTAudioThread::framesPerBuffer() const
-    {
-        return m_audioRenderer.m_parameters.framesPerBuffer;
-    }
+    size_t QTAudioThread::framesPerBuffer() const { return m_audioRenderer.m_parameters.framesPerBuffer; }
 
-    bool QTAudioThread::holdOpen() const
-    {
-        return m_audioRenderer.m_parameters.holdOpen;
-    }
+    bool QTAudioThread::holdOpen() const { return m_audioRenderer.m_parameters.holdOpen; }
 
     void QTAudioThread::emitStartAudio()
     {
@@ -219,14 +199,10 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_audioOutput, "startAudio",
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(m_audioOutput, "startAudio", Qt::QueuedConnection);
     }
 
-    const AudioRenderer::DeviceState& QTAudioThread::deviceState() const
-    {
-        return m_audioRenderer.deviceState();
-    }
+    const AudioRenderer::DeviceState& QTAudioThread::deviceState() const { return m_audioRenderer.deviceState(); }
 
     void QTAudioThread::setDeviceState(AudioRenderer::DeviceState& state)
     {
@@ -247,8 +223,7 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_audioOutput, "resetAudio",
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(m_audioOutput, "resetAudio", Qt::QueuedConnection);
     }
 
     void QTAudioThread::emitStopAudio()
@@ -263,8 +238,7 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_audioOutput, "stopAudio",
-                                  Qt::BlockingQueuedConnection);
+        QMetaObject::invokeMethod(m_audioOutput, "stopAudio", Qt::BlockingQueuedConnection);
     }
 
     void QTAudioThread::emitSuspendAudio()
@@ -279,8 +253,7 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_audioOutput, "suspendAudio",
-                                  Qt::BlockingQueuedConnection);
+        QMetaObject::invokeMethod(m_audioOutput, "suspendAudio", Qt::BlockingQueuedConnection);
     }
 
     void QTAudioThread::emitSuspendAndResetAudio()
@@ -295,8 +268,7 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_audioOutput, "suspendAndResetAudio",
-                                  Qt::BlockingQueuedConnection);
+        QMetaObject::invokeMethod(m_audioOutput, "suspendAndResetAudio", Qt::BlockingQueuedConnection);
     }
 
     void QTAudioThread::emitResetDevice()
@@ -311,8 +283,7 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_ioDevice, "resetDevice",
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(m_ioDevice, "resetDevice", Qt::QueuedConnection);
     }
 
     void QTAudioThread::emitStopDevice()
@@ -327,8 +298,7 @@ namespace IPCore
         }
 #endif
 
-        QMetaObject::invokeMethod(m_ioDevice, "stopDevice",
-                                  Qt::BlockingQueuedConnection);
+        QMetaObject::invokeMethod(m_ioDevice, "stopDevice", Qt::BlockingQueuedConnection);
     }
 
     void QTAudioThread::emitPlay(IPCore::Session* s)
@@ -347,9 +317,7 @@ namespace IPCore
         // starting for real. This improves the av sync lag especially om
         // Windows.
         //
-        QMetaObject::invokeMethod(m_audioOutput, "play",
-                                  Qt::BlockingQueuedConnection,
-                                  Q_ARG(IPCore::Session*, s));
+        QMetaObject::invokeMethod(m_audioOutput, "play", Qt::BlockingQueuedConnection, Q_ARG(IPCore::Session*, s));
     }
 
     void QTAudioThread::run()
@@ -375,22 +343,18 @@ namespace IPCore
 
         // Create the QAudioOutput and QIO devices
 
-        m_bytesPerSample = m_audioRenderer.m_format.channelCount()
-                           * sampleSize(m_audioRenderer.m_format);
+        m_bytesPerSample = m_audioRenderer.m_format.channelCount() * sampleSize(m_audioRenderer.m_format);
 
         if (m_ioDevice = new QTAudioIODevice(*this))
         {
-            if (m_audioOutput = new QTAudioOutput(m_audioRenderer.m_device,
-                                                  m_audioRenderer.m_format,
-                                                  *m_ioDevice, *this))
+            if (m_audioOutput = new QTAudioOutput(m_audioRenderer.m_device, m_audioRenderer.m_format, *m_ioDevice, *this))
             {
                 m_ioDevice->start();
                 return true;
             }
             else
             {
-                m_audioRenderer.setErrorCondition(
-                    "Unable to create QIODevice for QAudioOutput.");
+                m_audioRenderer.setErrorCondition("Unable to create QIODevice for QAudioOutput.");
                 return false;
             }
         }
@@ -446,39 +410,30 @@ namespace IPCore
             setDeviceLatency(dura);
             m_lastDeviceLatency = dura;
             if (AudioRenderer::debug)
-                TwkUtil::Log("AUDIO")
-                    << "Initialization duration:" << dura << "s";
+                TwkUtil::Log("AUDIO") << "Initialization duration:" << dura << "s";
         }
 
         if (AudioRenderer::debugVerbose)
         {
-            TwkUtil::Log("AUDIO")
-                << "qIODeviceCallback: asking maxLenInBytes="
-                << (int)maxLenInBytes
-                << " isPlayingAudio=" << (int)m_audioRenderer.isPlaying()
-                << " audiooutput state=" << (int)m_audioOutput->state();
+            TwkUtil::Log("AUDIO") << "qIODeviceCallback: asking maxLenInBytes=" << (int)maxLenInBytes
+                                  << " isPlayingAudio=" << (int)m_audioRenderer.isPlaying()
+                                  << " audiooutput state=" << (int)m_audioOutput->state();
         }
 
         const AudioRenderer::DeviceState& state = deviceState();
 
-        if (data && (m_audioRenderer.isPlaying())
-            && (maxLenInBytes >= m_bytesPerSample))
+        if (data && (m_audioRenderer.isPlaying()) && (maxLenInBytes >= m_bytesPerSample))
         {
             const int bufferSize = m_audioOutput->bufferSize();
 
             // Calculate the period size based on the buffer size and bytes per
             // frame. (This calculation changed with Qt 6)
-            const int periodSize =
-                bufferSize / m_audioRenderer.m_format.bytesPerFrame();
+            const int periodSize = bufferSize / m_audioRenderer.m_format.bytesPerFrame();
 
 #ifdef PLATFORM_DARWIN
             const bool doPreRoll = false;
 #else
-            const bool doPreRoll =
-                ((m_preRollMode && !m_preRollDisable
-                  && maxLenInBytes >= bufferSize - periodSize)
-                     ? true
-                     : false);
+            const bool doPreRoll = ((m_preRollMode && !m_preRollDisable && maxLenInBytes >= bufferSize - periodSize) ? true : false);
 #endif
 
 #ifdef PLATFORM_DARWIN
@@ -487,10 +442,8 @@ namespace IPCore
             //  Only valid for OSX as processedUSecs() doesnt return
             //  anything useful on Linux/Windows.
             qint64 processedUSecs = m_audioOutput->processedUSecs();
-            TwkAudio::Time actualPlayedTime =
-                TwkAudio::Time(processedUSecs / 1000000.0);
-            TwkAudio::Time targetPlayedTime =
-                TwkAudio::samplesToTime(m_processedSamples, state.rate);
+            TwkAudio::Time actualPlayedTime = TwkAudio::Time(processedUSecs / 1000000.0);
+            TwkAudio::Time targetPlayedTime = TwkAudio::samplesToTime(m_processedSamples, state.rate);
             setDeviceLatency(targetPlayedTime - actualPlayedTime);
 #endif
 
@@ -529,21 +482,16 @@ namespace IPCore
             {
                 memset(data, 0, maxLenInBytes);
 
-                const size_t preRollSamplesWritten =
-                    (size_t)(maxLenInBytes / m_bytesPerSample);
+                const size_t preRollSamplesWritten = (size_t)(maxLenInBytes / m_bytesPerSample);
                 m_preRollSamples += preRollSamplesWritten;
                 m_processedSamples += preRollSamplesWritten;
 
                 if (AudioRenderer::debug)
                 {
-                    TwkUtil::Log("AUDIO")
-                        << "qIODeviceCallback: PreRollWrite: "
-                        << " bufferSize=" << bufferSize
-                        << " periodSize=" << periodSize
-                        << " maxLenInBytes=" << maxLenInBytes
-                        << " PreRollDelay="
-                        << TwkAudio::samplesToTime(preRollSamplesWritten,
-                                                   state.rate);
+                    TwkUtil::Log("AUDIO") << "qIODeviceCallback: PreRollWrite: "
+                                          << " bufferSize=" << bufferSize << " periodSize=" << periodSize
+                                          << " maxLenInBytes=" << maxLenInBytes
+                                          << " PreRollDelay=" << TwkAudio::samplesToTime(preRollSamplesWritten, state.rate);
                 }
 
                 return maxLenInBytes;
@@ -560,15 +508,11 @@ namespace IPCore
                 // delay in time during playback.
                 //
 #ifdef PLATFORM_LINUX
-                TwkAudio::Time writtenPreRollTime =
-                    TwkAudio::samplesToTime(
-                        m_preRollSamples - (periodSize / m_bytesPerSample),
-                        state.rate)
-                    / TwkAudio::channelsCount(state.layout);
+                TwkAudio::Time writtenPreRollTime = TwkAudio::samplesToTime(m_preRollSamples - (periodSize / m_bytesPerSample), state.rate)
+                                                    / TwkAudio::channelsCount(state.layout);
 #else
                 TwkAudio::Time writtenPreRollTime =
-                    TwkAudio::samplesToTime(m_preRollSamples, state.rate)
-                    / TwkAudio::channelsCount(state.layout);
+                    TwkAudio::samplesToTime(m_preRollSamples, state.rate) / TwkAudio::channelsCount(state.layout);
 #endif
 
                 m_audioRenderer.setPreRollDelay(writtenPreRollTime);
@@ -576,8 +520,7 @@ namespace IPCore
                 if (AudioRenderer::debug)
                 {
                     TwkUtil::Log("AUDIO") << "qIODeviceCallback: PreRollWrite: "
-                                          << " Total PreRoll Delay="
-                                          << m_audioRenderer.preRollDelay();
+                                          << " Total PreRoll Delay=" << m_audioRenderer.preRollDelay();
                 }
             }
 
@@ -585,17 +528,14 @@ namespace IPCore
 
             if (AudioRenderer::debugVerbose)
             {
-                TwkUtil::Log("AUDIO")
-                    << "qIODeviceCallback: NormalWrite: "
-                    << " m_startSample=" << m_startSample << " startSampleTime="
-                    << TwkAudio::samplesToTime(m_startSample, state.rate)
-                    << " m_deviceState.latency: "
-                    << m_audioRenderer.m_deviceState.latency
-                    << " maxLenInBytes=" << maxLenInBytes;
+                TwkUtil::Log("AUDIO") << "qIODeviceCallback: NormalWrite: "
+                                      << " m_startSample=" << m_startSample
+                                      << " startSampleTime=" << TwkAudio::samplesToTime(m_startSample, state.rate)
+                                      << " m_deviceState.latency: " << m_audioRenderer.m_deviceState.latency
+                                      << " maxLenInBytes=" << maxLenInBytes;
             }
 
-            size_t numSamplesToWrite =
-                (size_t)(maxLenInBytes / m_bytesPerSample);
+            size_t numSamplesToWrite = (size_t)(maxLenInBytes / m_bytesPerSample);
             size_t numSamplesForAbuffer = numSamplesToWrite;
             size_t bytesWrittenToDevice = 0;
 
@@ -605,10 +545,8 @@ namespace IPCore
 
                 //  Fetch the samples
                 //
-                m_abuffer.reconfigure(
-                    numSamplesForAbuffer, state.layout,
-                    TwkAudio::Time(state.rate),
-                    TwkAudio::samplesToTime(m_startSample, state.rate));
+                m_abuffer.reconfigure(numSamplesForAbuffer, state.layout, TwkAudio::Time(state.rate),
+                                      TwkAudio::samplesToTime(m_startSample, state.rate));
 
                 m_abuffer.zero();
 
@@ -618,8 +556,7 @@ namespace IPCore
                 }
                 catch (std::exception& exc)
                 {
-                    cout << "WARNING: QAudio fillBuffer exception: "
-                         << exc.what() << endl;
+                    cout << "WARNING: QAudio fillBuffer exception: " << exc.what() << endl;
                 }
 
                 switch (state.format)
@@ -635,52 +572,40 @@ namespace IPCore
                     bytesWrittenToDevice = m_abuffer.sizeInBytes();
                     m_startSample += numSamplesForAbuffer;
                     m_processedSamples += numSamplesForAbuffer;
-                    transform(m_abuffer.pointer(),
-                              m_abuffer.pointer() + m_abuffer.sizeInFloats(),
-                              (int*)data, AudioRenderer::toType<int>);
+                    transform(m_abuffer.pointer(), m_abuffer.pointer() + m_abuffer.sizeInFloats(), (int*)data, AudioRenderer::toType<int>);
                     break;
 
                 case TwkAudio::Int24Format:
                 {
-                    bytesWrittenToDevice =
-                        m_abuffer.sizeInFloats() * sizeof(char) * 3;
+                    bytesWrittenToDevice = m_abuffer.sizeInFloats() * sizeof(char) * 3;
                     m_startSample += numSamplesForAbuffer;
                     m_processedSamples += numSamplesForAbuffer;
 
                     // Assume that most consumer facing device will be little
                     // endian. Note that some mainframe or embedded system could
                     // be big endian.
-                    AudioRenderer::transformFloat32ToInt24(
-                        m_abuffer.pointer(), data, m_abuffer.sizeInFloats(),
-                        true);
+                    AudioRenderer::transformFloat32ToInt24(m_abuffer.pointer(), data, m_abuffer.sizeInFloats(), true);
 
                     break;
                 }
 
                 case TwkAudio::Int16Format:
-                    bytesWrittenToDevice =
-                        m_abuffer.sizeInFloats() * sizeof(short);
+                    bytesWrittenToDevice = m_abuffer.sizeInFloats() * sizeof(short);
                     m_startSample += numSamplesForAbuffer;
                     m_processedSamples += numSamplesForAbuffer;
-                    transform(m_abuffer.pointer(),
-                              m_abuffer.pointer() + m_abuffer.sizeInFloats(),
-                              (short*)data, AudioRenderer::toType<short>);
+                    transform(m_abuffer.pointer(), m_abuffer.pointer() + m_abuffer.sizeInFloats(), (short*)data,
+                              AudioRenderer::toType<short>);
                     break;
 
                 case TwkAudio::Int8Format:
-                    bytesWrittenToDevice =
-                        m_abuffer.sizeInFloats() * sizeof(signed char);
+                    bytesWrittenToDevice = m_abuffer.sizeInFloats() * sizeof(signed char);
                     m_startSample += numSamplesForAbuffer;
                     m_processedSamples += numSamplesForAbuffer;
 #ifdef PLATFORM_DARWIN
-                    transform(m_abuffer.pointer(),
-                              m_abuffer.pointer() + m_abuffer.sizeInFloats(),
-                              (signed char*)data,
+                    transform(m_abuffer.pointer(), m_abuffer.pointer() + m_abuffer.sizeInFloats(), (signed char*)data,
                               AudioRenderer::toType<signed char>);
 #else
-                    transform(m_abuffer.pointer(),
-                              m_abuffer.pointer() + m_abuffer.sizeInFloats(),
-                              (unsigned char*)data,
+                    transform(m_abuffer.pointer(), m_abuffer.pointer() + m_abuffer.sizeInFloats(), (unsigned char*)data,
                               AudioRenderer::toUnsignedType<unsigned char>);
 #endif
                     break;
@@ -693,11 +618,9 @@ namespace IPCore
 
             if (AudioRenderer::debugVerbose)
             {
-                TwkUtil::Log("AUDIO")
-                    << "qIODeviceCallback: NormalWrite: "
-                    << " numSamplesForAbuffer=" << numSamplesForAbuffer
-                    << " bytesWrittenToDevice=" << bytesWrittenToDevice
-                    << " m_processedSamples=" << m_processedSamples;
+                TwkUtil::Log("AUDIO") << "qIODeviceCallback: NormalWrite: "
+                                      << " numSamplesForAbuffer=" << numSamplesForAbuffer
+                                      << " bytesWrittenToDevice=" << bytesWrittenToDevice << " m_processedSamples=" << m_processedSamples;
 
                 if (bytesWrittenToDevice != maxLenInBytes)
                 {
@@ -727,10 +650,7 @@ namespace IPCore
         return (m_endOfInitialization - m_startOfInitialization);
     }
 
-    bool QTAudioThread::isInInitialization() const
-    {
-        return (m_endOfInitialization < 0);
-    }
+    bool QTAudioThread::isInInitialization() const { return (m_endOfInitialization < 0); }
 
     //----------------------------------------------------------------------
     //      QTAudioIODevice
@@ -778,10 +698,7 @@ namespace IPCore
         return 0;
     }
 
-    qint64 QTAudioIODevice::bytesAvailable() const
-    {
-        return m_thread.audioOutput()->bufferSize() + QIODevice::bytesAvailable();
-    }
+    qint64 QTAudioIODevice::bytesAvailable() const { return m_thread.audioOutput()->bufferSize() + QIODevice::bytesAvailable(); }
 
     //----------------------------------------------------------------------
     //      QTAudioOutput
@@ -789,9 +706,7 @@ namespace IPCore
     //      This is the Qt audio output class that lives
     //      with the audio thread.
     //----------------------------------------------------------------------
-    QTAudioOutput::QTAudioOutput(QAudioDevice& audioDevice,
-                                 QAudioFormat& audioFormat,
-                                 QTAudioIODevice& ioDevice,
+    QTAudioOutput::QTAudioOutput(QAudioDevice& audioDevice, QAudioFormat& audioFormat, QTAudioIODevice& ioDevice,
                                  QTAudioThread& audioThread)
         : QAudioSink(audioDevice, audioFormat)
         , m_device(audioDevice)
@@ -895,9 +810,7 @@ namespace IPCore
         }
     }
 
-    int QTAudioOutput::calcAudioBufferSize(const int channels,
-                                           const int sampleRate,
-                                           const int sampleSizeInBytes,
+    int QTAudioOutput::calcAudioBufferSize(const int channels, const int sampleRate, const int sampleSizeInBytes,
                                            const int defaultBufferSize) const
     {
         // For sample rates 8k,11k 8bit, make the bufferSize
@@ -912,15 +825,11 @@ namespace IPCore
         const float minBufferSizeInTimePerChannel = 0.1f;
 
         // Compute buffer size so it is at least minBufferSizeInTimePerChannel.
-        float defaultBufferSizeInTimePerChannel =
-            (defaultBufferSize / sampleSizeInBytes)
-            / ((float)(sampleRate * channels));
+        float defaultBufferSizeInTimePerChannel = (defaultBufferSize / sampleSizeInBytes) / ((float)(sampleRate * channels));
 
         if (defaultBufferSizeInTimePerChannel < minBufferSizeInTimePerChannel)
         {
-            return ((int)ceilf(
-                minBufferSizeInTimePerChannel
-                * ((float)(sampleRate * channels * sampleSizeInBytes))));
+            return ((int)ceilf(minBufferSizeInTimePerChannel * ((float)(sampleRate * channels * sampleSizeInBytes))));
         }
         else
         {
@@ -943,9 +852,7 @@ namespace IPCore
         if (AudioRenderer::defaultParameters().framesPerBuffer == 0)
         {
 #ifdef PLATFORM_DARWIN
-            setBufferSize(calcAudioBufferSize(
-                m_format.channelCount(), m_format.sampleRate(),
-                sampleSize(m_format), bufferSize()));
+            setBufferSize(calcAudioBufferSize(m_format.channelCount(), m_format.sampleRate(), sampleSize(m_format), bufferSize()));
 #endif
 
 #ifdef PLATFORM_WINDOWS
@@ -971,22 +878,15 @@ namespace IPCore
             // Description may contain useful information.
             const QString deviceName = m_device.description();
             const bool audioDeviceIsWASAPI =
-                deviceId.contains("wasapi", Qt::CaseInsensitive)
-                || deviceName.contains("wasapi", Qt::CaseInsensitive);
+                deviceId.contains("wasapi", Qt::CaseInsensitive) || deviceName.contains("wasapi", Qt::CaseInsensitive);
 
             if (audioDeviceIsWASAPI && evApplyWasapiFix.getValue())
             {
-                setBufferSize(calcAudioBufferSize(m_format.channelCount(),
-                                                  m_format.sampleRate(),
-                                                  sampleSize(m_format),
-                                                  bufferSize())
-                              / 10);
+                setBufferSize(calcAudioBufferSize(m_format.channelCount(), m_format.sampleRate(), sampleSize(m_format), bufferSize()) / 10);
             }
             else
             {
-                setBufferSize(calcAudioBufferSize(
-                    m_format.channelCount(), m_format.sampleRate(),
-                    sampleSize(m_format), bufferSize()));
+                setBufferSize(calcAudioBufferSize(m_format.channelCount(), m_format.sampleRate(), sampleSize(m_format), bufferSize()));
             }
 #endif
         }
@@ -1001,21 +901,17 @@ namespace IPCore
 
 #ifdef PLATFORM_LINUX
             // For linux it is in ms * 1000.
-            int targetBufferSize =
-                (1000000 * m_thread.framesPerBuffer() / m_format.sampleRate());
+            int targetBufferSize = (1000000 * m_thread.framesPerBuffer() / m_format.sampleRate());
 #else
-            int targetBufferSize =
-                m_thread.framesPerBuffer() * m_thread.bytesPerSample();
+            int targetBufferSize = m_thread.framesPerBuffer() * m_thread.bytesPerSample();
 #endif
             setBufferSize(targetBufferSize);
             if (bufferSize() != targetBufferSize)
             {
-                cout << "Warning: Audio Device Cache of size "
-                     << m_thread.framesPerBuffer()
+                cout << "Warning: Audio Device Cache of size " << m_thread.framesPerBuffer()
                      << " samples cannot be set below the device min sample "
                         "limit of "
-                     << bufferSize() / m_thread.bytesPerSample()
-                     << " samples. Using device min limit instead." << endl;
+                     << bufferSize() / m_thread.bytesPerSample() << " samples. Using device min limit instead." << endl;
             }
         }
 
@@ -1025,8 +921,7 @@ namespace IPCore
 
         if (AudioRenderer::debug)
         {
-            TwkUtil::Log("AUDIO")
-                << "setAudioOutputBufferSize: bufferSize= " << bufferSize();
+            TwkUtil::Log("AUDIO") << "setAudioOutputBufferSize: bufferSize= " << bufferSize();
         }
     }
 
@@ -1037,9 +932,7 @@ namespace IPCore
 
 #ifdef DEBUG_QTAUDIO
         if (AudioRenderer::debugVerbose)
-            TwkUtil::Log("QTAudioThread")
-                << "setup thread:" << QThread::currentThread()
-                << " isRunning=" << (int)m_thread.isRunning();
+            TwkUtil::Log("QTAudioThread") << "setup thread:" << QThread::currentThread() << " isRunning=" << (int)m_thread.isRunning();
 #endif
 
         m_thread.setDeviceLatency(m_thread.getLastDeviceLatency());
@@ -1053,14 +946,10 @@ namespace IPCore
         if (AudioRenderer::debug)
         {
             int periodSize = (int)bufferSize() / m_format.bytesPerFrame();
-            TwkUtil::Log("QTAudioOutput")
-                << "play session:setup: startSample =" << m_thread.startSample()
-                << " shift=" << s->shift()
-                << " isPlaying=" << (int)s->isPlaying()
-                << " isScrubbingAudio=" << (int)s->isScrubbingAudio()
-                << " audioOutput state=" << (int)state()
-                << " audioOutput bufferSize=" << (int)bufferSize()
-                << " audioOutput periodSize=" << (int)(periodSize);
+            TwkUtil::Log("QTAudioOutput") << "play session:setup: startSample =" << m_thread.startSample() << " shift=" << s->shift()
+                                          << " isPlaying=" << (int)s->isPlaying() << " isScrubbingAudio=" << (int)s->isScrubbingAudio()
+                                          << " audioOutput state=" << (int)state() << " audioOutput bufferSize=" << (int)bufferSize()
+                                          << " audioOutput periodSize=" << (int)(periodSize);
         }
     }
 
@@ -1071,8 +960,7 @@ namespace IPCore
     //      with the main/UI thread.
     //
     //----------------------------------------------------------------------
-    QTAudioRenderer::QTAudioRenderer(const RendererParameters& params,
-                                     QObject* parent)
+    QTAudioRenderer::QTAudioRenderer(const RendererParameters& params, QObject* parent)
         : AudioRenderer(params)
         , m_parent(parent)
         , m_codec("audio/pcm")
@@ -1089,13 +977,9 @@ namespace IPCore
         }
     }
 
-    TwkAudio::Format QTAudioRenderer::getTwkAudioFormat() const
-    {
-        return convertToTwkAudioFormat(sampleType(m_format));
-    }
+    TwkAudio::Format QTAudioRenderer::getTwkAudioFormat() const { return convertToTwkAudioFormat(sampleType(m_format)); }
 
-    TwkAudio::Format
-    QTAudioRenderer::convertToTwkAudioFormat(SampleFormat fmtType) const
+    TwkAudio::Format QTAudioRenderer::convertToTwkAudioFormat(SampleFormat fmtType) const
     {
         // Qt5
         // QAudioFormat::Unknown	    0	Not Set
@@ -1132,8 +1016,7 @@ namespace IPCore
         return TwkAudio::UnknownFormat;
     }
 
-    QAudioFormat::SampleFormat
-    QTAudioRenderer::convertToQtAudioFormat(TwkAudio::Format fmtType) const
+    QAudioFormat::SampleFormat QTAudioRenderer::convertToQtAudioFormat(TwkAudio::Format fmtType) const
     {
         switch (fmtType)
         {
@@ -1167,8 +1050,7 @@ namespace IPCore
         return QAudioFormat::Unknown;
     }
 
-    void QTAudioRenderer::availableLayouts(const Device& d,
-                                           LayoutsVector& layouts)
+    void QTAudioRenderer::availableLayouts(const Device& d, LayoutsVector& layouts)
     {
         const QAudioDevice& device = m_deviceList[d.index];
 
@@ -1177,11 +1059,9 @@ namespace IPCore
         QAudioFormat testFormat;
         // Set valid value to the parameters that we are not testing.
         testFormat.setSampleRate(AudioRenderer::defaultParameters().rate);
-        testFormat.setSampleFormat(
-            convertToQtAudioFormat(AudioRenderer::defaultParameters().format));
+        testFormat.setSampleFormat(convertToQtAudioFormat(AudioRenderer::defaultParameters().format));
 
-        for (int channelCount = device.minimumChannelCount();
-             channelCount <= device.maximumChannelCount(); ++channelCount)
+        for (int channelCount = device.minimumChannelCount(); channelCount <= device.maximumChannelCount(); ++channelCount)
         {
             testFormat.setChannelCount(channelCount);
             if (device.isFormatSupported(testFormat))
@@ -1198,8 +1078,7 @@ namespace IPCore
         }
     }
 
-    void QTAudioRenderer::availableFormats(const Device& d,
-                                           FormatVector& formats)
+    void QTAudioRenderer::availableFormats(const Device& d, FormatVector& formats)
     {
         const QAudioDevice& device = m_deviceList[d.index];
         const QList<SampleFormat> types = device.supportedSampleFormats();
@@ -1228,8 +1107,7 @@ namespace IPCore
                 // Checks every 100Hz.
                 // TODO_QT: This can be optimized or improved for faster
                 // detection.
-                for (int rate = device.minimumSampleRate();
-                     rate <= device.maximumSampleRate(); rate += 100)
+                for (int rate = device.minimumSampleRate(); rate <= device.maximumSampleRate(); rate += 100)
                 {
                     f.setSampleRate(rate);
                     if (device.isFormatSupported(f))
@@ -1246,9 +1124,7 @@ namespace IPCore
     // Sets the sample size and type in qformat for a given twkFormat.
     //
     // TODO_QT: The name is not optimal for Qt6, but could be fine.
-    void QTAudioRenderer::setSampleSizeAndType(Layout twkLayout,
-                                               Format twkFormat,
-                                               QAudioFormat& qformat) const
+    void QTAudioRenderer::setSampleSizeAndType(Layout twkLayout, Format twkFormat, QAudioFormat& qformat) const
     {
         qformat.setChannelCount(TwkAudio::channelsCount(twkLayout));
 
@@ -1281,8 +1157,7 @@ namespace IPCore
         }
     }
 
-    void QTAudioRenderer::availableRates(const Device& d, Format format,
-                                         RateVector& audiorates)
+    void QTAudioRenderer::availableRates(const Device& d, Format format, RateVector& audiorates)
     {
         QAudioFormat f;
 
@@ -1310,16 +1185,13 @@ namespace IPCore
     // Check that the device supports the number
     // of channels as specified by m_parameters.layout.
     //
-    bool
-    QTAudioRenderer::supportsRequiredChannels(const QAudioDevice& device) const
+    bool QTAudioRenderer::supportsRequiredChannels(const QAudioDevice& device) const
     {
 #ifdef PLATFORM_LINUX
         if (AudioRenderer::debug)
         {
-            TwkUtil::Log("AUDIO")
-                << device.description().toStdString() << " supports minimum "
-                << device.minimumChannelCount() << " to maximum "
-                << device.maximumChannelCount() << " channels";
+            TwkUtil::Log("AUDIO") << device.description().toStdString() << " supports minimum " << device.minimumChannelCount()
+                                  << " to maximum " << device.maximumChannelCount() << " channels";
         }
 
         // Its possible e.g. Linux that some devices hv no channel count info
@@ -1328,10 +1200,8 @@ namespace IPCore
 #else
         if (AudioRenderer::debug)
         {
-            TwkUtil::Log("AUDIO")
-                << device.description().toStdString() << " supports minimum "
-                << device.minimumChannelCount() << " to maximum "
-                << device.maximumChannelCount() << " channels";
+            TwkUtil::Log("AUDIO") << device.description().toStdString() << " supports minimum " << device.minimumChannelCount()
+                                  << " to maximum " << device.maximumChannelCount() << " channels";
         }
 
         //
@@ -1345,10 +1215,7 @@ namespace IPCore
 #endif
     }
 
-    void QTAudioRenderer::initDeviceList()
-    {
-        m_deviceList << QMediaDevices::audioOutputs();
-    }
+    void QTAudioRenderer::initDeviceList() { m_deviceList << QMediaDevices::audioOutputs(); }
 
     //  The purpose of init() is to
     //      1. Populate the AudioRenderer m_outputDevices();
@@ -1373,14 +1240,12 @@ namespace IPCore
 
         if (m_parameters.device == "Default" || m_parameters.device.empty())
         {
-            const QAudioDevice& defaultDevice =
-                QMediaDevices::defaultAudioOutput();
+            const QAudioDevice& defaultDevice = QMediaDevices::defaultAudioOutput();
             bool validDevice = false;
 
             for (size_t i = 0; i < m_deviceList.size(); ++i)
             {
-                if (m_deviceList[i].description()
-                    == defaultDevice.description())
+                if (m_deviceList[i].description() == defaultDevice.description())
                 {
                     validDevice = true;
                     break;
@@ -1394,8 +1259,7 @@ namespace IPCore
                 m_parameters.device = defaultDevice.description().toStdString();
                 if (AudioRenderer::debug)
                 {
-                    TwkUtil::Log("AUDIO")
-                        << "Using default device=" << m_parameters.device;
+                    TwkUtil::Log("AUDIO") << "Using default device=" << m_parameters.device;
                 }
 
                 QAudioFormat qformat;
@@ -1403,18 +1267,15 @@ namespace IPCore
                 qformat.setSampleRate((int)m_parameters.rate);
                 qformat.setChannelCount(channelCount);
 
-                setSampleSizeAndType(m_parameters.layout, m_parameters.format,
-                                     qformat);
+                setSampleSizeAndType(m_parameters.layout, m_parameters.format, qformat);
                 //
                 // If the default device does not support the format
                 // defined by m_parameters; we change to the
                 // preferredFormat() of the default device.
                 if (!defaultDevice.isFormatSupported(qformat))
                 {
-                    const QAudioFormat defaultFormat =
-                        defaultDevice.preferredFormat();
-                    m_parameters.format =
-                        convertToTwkAudioFormat(sampleType(defaultFormat));
+                    const QAudioFormat defaultFormat = defaultDevice.preferredFormat();
+                    m_parameters.format = convertToTwkAudioFormat(sampleType(defaultFormat));
                 }
             }
         }
@@ -1460,8 +1321,7 @@ namespace IPCore
                 // Instead we pick the first device that supports the channel
                 // count we need.
                 m_parameters.device = d.name;
-                m_parameters.format =
-                    convertToTwkAudioFormat(sampleType(defaultFormat));
+                m_parameters.format = convertToTwkAudioFormat(sampleType(defaultFormat));
             }
 
             if (m_parameters.device == d.name)
@@ -1476,15 +1336,13 @@ namespace IPCore
 
             if (AudioRenderer::debug)
             {
-                cout << "AUDIO: device=" << d.name << " with channelsCount = "
-                     << TwkAudio::channelsCount(d.layout)
+                cout << "AUDIO: device=" << d.name << " with channelsCount = " << TwkAudio::channelsCount(d.layout)
                      << " defaultSampleFormat="
                      << (int)sampleType(defaultFormat)
                      // Qt6: No custom sample size.
                      // Qt6: No custom byte orde. Qt expect the order of the
                      // host.
-                     << " defaultrate=" << (int)d.defaultRate
-                     << " isDefaultDevice=" << (int)d.isDefaultDevice << endl;
+                     << " defaultrate=" << (int)d.defaultRate << " isDefaultDevice=" << (int)d.isDefaultDevice << endl;
             }
 
             m_outputDevices.push_back(d);
@@ -1492,28 +1350,18 @@ namespace IPCore
 
         if (AudioRenderer::debug)
         {
-            cout << "AUDIO: init default device="
-                 << m_device.description().toStdString() << endl;
+            cout << "AUDIO: init default device=" << m_device.description().toStdString() << endl;
 
-            cout << "AUDIO: init m_parameters.device=" << m_parameters.device
-                 << endl;
-            cout << "AUDIO: init m_parameters.format="
-                 << (int)m_parameters.format << " ("
-                 << TwkAudio::formatString(m_parameters.format) << ")" << endl;
-            cout << "AUDIO: init m_parameters.rate=" << (int)m_parameters.rate
-                 << endl;
-            cout << "AUDIO: init m_parameters.layout="
-                 << (int)m_parameters.layout << " ("
-                 << TwkAudio::channelsCount(m_parameters.layout) << " channels)"
-                 << endl;
-            cout << "AUDIO: init m_parameters.framesPerBuffer="
-                 << (int)m_parameters.framesPerBuffer << endl;
-            cout << "AUDIO: init m_parameters.latency=" << m_parameters.latency
-                 << endl;
-            cout << "AUDIO: init m_parameters.preRoll="
-                 << (m_parameters.preRoll ? 1 : 0) << endl;
-            cout << "AUDIO: init m_parameters.hardwareLock="
-                 << (m_parameters.hardwareLock ? 1 : 0) << endl;
+            cout << "AUDIO: init m_parameters.device=" << m_parameters.device << endl;
+            cout << "AUDIO: init m_parameters.format=" << (int)m_parameters.format << " (" << TwkAudio::formatString(m_parameters.format)
+                 << ")" << endl;
+            cout << "AUDIO: init m_parameters.rate=" << (int)m_parameters.rate << endl;
+            cout << "AUDIO: init m_parameters.layout=" << (int)m_parameters.layout << " (" << TwkAudio::channelsCount(m_parameters.layout)
+                 << " channels)" << endl;
+            cout << "AUDIO: init m_parameters.framesPerBuffer=" << (int)m_parameters.framesPerBuffer << endl;
+            cout << "AUDIO: init m_parameters.latency=" << m_parameters.latency << endl;
+            cout << "AUDIO: init m_parameters.preRoll=" << (m_parameters.preRoll ? 1 : 0) << endl;
+            cout << "AUDIO: init m_parameters.hardwareLock=" << (m_parameters.hardwareLock ? 1 : 0) << endl;
         }
 
         if (!m_outputDevices.empty())
@@ -1535,16 +1383,14 @@ namespace IPCore
             {
                 if (m_parameters.device == "Default")
                 {
-                    cout << "ERROR: audio default device is NOT available."
-                         << endl;
+                    cout << "ERROR: audio default device is NOT available." << endl;
                 }
                 else
                 {
                     // The device that was picked and registered in the
                     // preferences might no longer be available because its
                     // unplugged.
-                    cout << "WARNING: audio device '" << m_parameters.device
-                         << "' is unavailable: Using default." << endl;
+                    cout << "WARNING: audio device '" << m_parameters.device << "' is unavailable: Using default." << endl;
                     m_parameters.device = "Default";
                     m_parameters.layout = TwkAudio::Stereo_2;
                     init();
@@ -1615,37 +1461,29 @@ namespace IPCore
                     cout << "AUDIO: Default format not supported - trying to "
                             "use nearest"
                          << endl;
-                    setErrorCondition(
-                        "Default format not supported - trying to use nearest");
+                    setErrorCondition("Default format not supported - trying to use nearest");
                 }
                 else
                 {
                     if (AudioRenderer::debug)
                     {
-                        cout << "AUDIO: nearest m_format.sampleFormat()="
-                             << (int)sampleType(m_format) << endl;
-                        cout << "AUDIO: nearest m_format.sampleRate()="
-                             << (int)m_format.sampleRate() << endl;
-                        cout << "AUDIO: nearest m_format.channelCount()="
-                             << (int)m_format.channelCount() << endl;
+                        cout << "AUDIO: nearest m_format.sampleFormat()=" << (int)sampleType(m_format) << endl;
+                        cout << "AUDIO: nearest m_format.sampleRate()=" << (int)m_format.sampleRate() << endl;
+                        cout << "AUDIO: nearest m_format.channelCount()=" << (int)m_format.channelCount() << endl;
                     }
                 }
 
                 state.rate = m_parameters.rate = m_format.sampleRate();
-                state.layout = m_parameters.layout =
-                    TwkAudio::channelLayouts(m_format.channelCount()).front();
+                state.layout = m_parameters.layout = TwkAudio::channelLayouts(m_format.channelCount()).front();
                 state.format = m_parameters.format = getTwkAudioFormat();
             }
 
 #ifdef DEBUG_QTAUDIO
             if (AudioRenderer::debug)
             {
-                cout << "AUDIO: nearest m_format.sampleFormat()="
-                     << (int)sampleType(m_format) << endl;
-                cout << "AUDIO: m_format.sampleRate()="
-                     << (int)m_format.sampleRate() << endl;
-                cout << "AUDIO: m_format.channelCount()="
-                     << (int)m_format.channelCount() << endl;
+                cout << "AUDIO: nearest m_format.sampleFormat()=" << (int)sampleType(m_format) << endl;
+                cout << "AUDIO: m_format.sampleRate()=" << (int)m_format.sampleRate() << endl;
+                cout << "AUDIO: m_format.channelCount()=" << (int)m_format.channelCount() << endl;
             }
 #endif
 
@@ -1653,15 +1491,11 @@ namespace IPCore
 
             if (AudioRenderer::debug)
             {
-                cout << "AUDIO: init: state.format =" << (int)state.format
-                     << " (" << TwkAudio::formatString(state.format) << ")"
-                     << endl;
+                cout << "AUDIO: init: state.format =" << (int)state.format << " (" << TwkAudio::formatString(state.format) << ")" << endl;
                 cout << "AUDIO: init: state.rate =" << state.rate << endl;
-                cout << "AUDIO: init: state.layout =" << (int)state.layout
-                     << " (" << TwkAudio::channelsCount(state.layout)
-                     << " channels)" << endl;
-                cout << "AUDIO: init: state.framesPerBuffer ="
-                     << state.framesPerBuffer << endl;
+                cout << "AUDIO: init: state.layout =" << (int)state.layout << " (" << TwkAudio::channelsCount(state.layout) << " channels)"
+                     << endl;
+                cout << "AUDIO: init: state.framesPerBuffer =" << state.framesPerBuffer << endl;
             }
 
             // Create the audio renderer thread.
@@ -1670,8 +1504,7 @@ namespace IPCore
             m_thread = new QTAudioThread(*this, m_parent);
             if (!m_thread)
             {
-                setErrorCondition(
-                    "Unable to create QThread for Platform Audio.");
+                setErrorCondition("Unable to create QThread for Platform Audio.");
             }
             else
             {

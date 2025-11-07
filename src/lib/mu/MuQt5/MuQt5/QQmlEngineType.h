@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QQmlEngineType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QQmlEngineType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QQmlEngineType();
 
@@ -79,11 +78,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QQmlEngineType::cachedInstance(const QQmlEngineType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QQmlEngineType::cachedInstance(const QQmlEngineType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

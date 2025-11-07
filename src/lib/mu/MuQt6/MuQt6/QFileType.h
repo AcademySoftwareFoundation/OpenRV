@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFileType(Context* context, const char* name, Class* superClass = 0,
-                  Class* superClass2 = 0);
+        QFileType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QFileType();
 
@@ -69,8 +68,7 @@ namespace Mu
         MuQt_QFile(Pointer muobj, const CallEnvironment*);
         MuQt_QFile(Pointer muobj, const CallEnvironment*, const QString& name);
         MuQt_QFile(Pointer muobj, const CallEnvironment*, QObject* parent);
-        MuQt_QFile(Pointer muobj, const CallEnvironment*, const QString& name,
-                   QObject* parent);
+        MuQt_QFile(Pointer muobj, const CallEnvironment*, const QString& name, QObject* parent);
         virtual QString fileName() const;
         virtual bool open(QIODeviceBase::OpenMode mode);
         virtual QFileDevice::Permissions permissions() const;
@@ -88,11 +86,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QFileType::cachedInstance(const QFileType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QFileType::cachedInstance(const QFileType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

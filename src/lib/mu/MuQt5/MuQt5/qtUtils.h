@@ -76,8 +76,7 @@ namespace Mu
     template <class T> T* paintdevice(Pointer obj)
     {
         if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
-            return dynamic_cast<T*>(
-                i->data<QPaintDeviceType::Struct>()->object);
+            return dynamic_cast<T*>(i->data<QPaintDeviceType::Struct>()->object);
         else
             return 0;
     }
@@ -91,45 +90,34 @@ namespace Mu
     inline void setpaintdevice(Pointer obj, const QPaintDevice& object)
     {
         if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
-            i->data<QPaintDeviceType::Struct>()->object =
-                (QPaintDevice*)&object;
+            i->data<QPaintDeviceType::Struct>()->object = (QPaintDevice*)&object;
     }
 
-    template <class Type>
-    inline typename Type::ValueType* getqpointer(Pointer obj)
+    template <class Type> inline typename Type::ValueType* getqpointer(Pointer obj)
     {
         if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
-            return dynamic_cast<typename Type::ValueType*>(
-                i->data<typename Type::Struct>()->object);
+            return dynamic_cast<typename Type::ValueType*>(i->data<typename Type::Struct>()->object);
         else
             return 0;
     }
 
-    template <class Type>
-    inline void setqpointer(Pointer obj, const typename Type::ValueType* object)
+    template <class Type> inline void setqpointer(Pointer obj, const typename Type::ValueType* object)
     {
         if (ClassInstance* i = reinterpret_cast<ClassInstance*>(obj))
-            i->data<typename Type::Struct>()->object =
-                (typename Type::ValueType*)object;
+            i->data<typename Type::Struct>()->object = (typename Type::ValueType*)object;
     }
 
-    template <class Type>
-    inline ClassInstance* makeqpointer(Context* c,
-                                       const typename Type::ValueType* object,
-                                       const char* name)
+    template <class Type> inline ClassInstance* makeqpointer(Context* c, const typename Type::ValueType* object, const char* name)
     {
         if (!object)
             return 0;
-        const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName(name), false);
+        const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(c->internName(name), false);
         ClassInstance* i = ClassInstance::allocate(type);
         setqpointer<Type>(i, (typename Type::ValueType*)object);
         return i;
     }
 
-    template <class Type>
-    inline ClassInstance* makeqpointer(const Type* type,
-                                       const typename Type::ValueType* qobject)
+    template <class Type> inline ClassInstance* makeqpointer(const Type* type, const typename Type::ValueType* qobject)
     {
         if (!qobject)
             return 0;
@@ -138,110 +126,88 @@ namespace Mu
         return i;
     }
 
-    template <class Type>
-    QList<typename Type::ValueType*> qpointerlist(Pointer p)
+    template <class Type> QList<typename Type::ValueType*> qpointerlist(Pointer p)
     {
         QList<typename Type::ValueType*> list;
         DynamicArray* array = reinterpret_cast<DynamicArray*>(p);
         for (size_t i = 0; i < array->size(); i++)
         {
-            list.push_back(
-                getqpointer<Type>(array->element<ClassInstance*>(i)));
+            list.push_back(getqpointer<Type>(array->element<ClassInstance*>(i)));
         }
 
         return list;
     }
 
-    template <class Type>
-    DynamicArray* makeqpointerlist(Context* c,
-                                   const QList<typename Type::ValueType*>& list,
-                                   const char* name)
+    template <class Type> DynamicArray* makeqpointerlist(Context* c, const QList<typename Type::ValueType*>& list, const char* name)
     {
         MuLangContext* lc = static_cast<MuLangContext*>(c);
-        const Class* t = lc->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName(name), false);
-        DynamicArray* array = new DynamicArray(
-            static_cast<const Class*>(lc->arrayType(t, 1, 0)), 1);
+        const Class* t = lc->findSymbolOfTypeByQualifiedName<Class>(c->internName(name), false);
+        DynamicArray* array = new DynamicArray(static_cast<const Class*>(lc->arrayType(t, 1, 0)), 1);
         array->resize(list.size());
         for (size_t i = 0; i < list.size(); i++)
         {
-            array->element<ClassInstance*>(i) =
-                makeqpointer<Type>(c, list[i], name);
+            array->element<ClassInstance*>(i) = makeqpointer<Type>(c, list[i], name);
         }
 
         return array;
     }
 
-    template <class MuType>
-    ClassInstance* makeinstance(Context* c, const QObject* object,
-                                const char* name)
+    template <class MuType> ClassInstance* makeinstance(Context* c, const QObject* object, const char* name)
     {
         const typename MuType::MuQtType* mobj = 0;
 
-        if (MuType::isInheritable()
-            && (mobj = dynamic_cast<const typename MuType::MuQtType*>(object)))
+        if (MuType::isInheritable() && (mobj = dynamic_cast<const typename MuType::MuQtType*>(object)))
         {
             return MuType::cachedInstance(mobj);
         }
         else
         {
-            const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(
-                c->internName(name), false);
+            const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(c->internName(name), false);
             ClassInstance* i = ClassInstance::allocate(type);
             setobject(i, (QObject*)object);
             return i;
         }
     }
 
-    template <class MuType>
-    ClassInstance* makelayoutitem(Context* c, const QLayoutItem* item,
-                                  const char* name)
+    template <class MuType> ClassInstance* makelayoutitem(Context* c, const QLayoutItem* item, const char* name)
     {
         const typename MuType::MuQtType* mobj = 0;
 
-        if (MuType::isInheritable()
-            && (mobj = dynamic_cast<const typename MuType::MuQtType*>(item)))
+        if (MuType::isInheritable() && (mobj = dynamic_cast<const typename MuType::MuQtType*>(item)))
         {
             return MuType::cachedInstance(mobj);
         }
         else
         {
-            const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(
-                c->internName(name), false);
+            const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(c->internName(name), false);
             ClassInstance* i = ClassInstance::allocate(type);
             setlayoutitem(i, (QLayoutItem*)item);
             return i;
         }
     }
 
-    template <class MuType>
-    ClassInstance* makepaintdevice(Context* c, const QPaintDevice* device,
-                                   const char* name)
+    template <class MuType> ClassInstance* makepaintdevice(Context* c, const QPaintDevice* device, const char* name)
     {
         const typename MuType::MuQtType* mobj = 0;
 
-        if (MuType::isInheritable()
-            && (mobj = dynamic_cast<const typename MuType::MuQtType*>(device)))
+        if (MuType::isInheritable() && (mobj = dynamic_cast<const typename MuType::MuQtType*>(device)))
         {
             return MuType::cachedInstance(mobj);
         }
         else
         {
-            const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(
-                c->internName(name), false);
+            const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(c->internName(name), false);
             ClassInstance* i = ClassInstance::allocate(type);
             setpaintdevice(i, (QPaintDevice*)device);
             return i;
         }
     }
 
-    template <class T>
-    ClassInstance* makeinstance(const T* type, const QObject* qobject)
+    template <class T> ClassInstance* makeinstance(const T* type, const QObject* qobject)
     {
         const typename T::MuQtType* mobj = 0;
 
-        if (T::isInheritable()
-            && (mobj = dynamic_cast<const typename T::MuQtType*>(qobject)))
+        if (T::isInheritable() && (mobj = dynamic_cast<const typename T::MuQtType*>(qobject)))
         {
             return T::cachedInstance(mobj);
         }
@@ -253,13 +219,11 @@ namespace Mu
         }
     }
 
-    template <class T>
-    ClassInstance* makelayoutitem(const T* type, const QLayoutItem* qitem)
+    template <class T> ClassInstance* makelayoutitem(const T* type, const QLayoutItem* qitem)
     {
         const typename T::MuQtType* mobj = 0;
 
-        if (T::isInheritable()
-            && (mobj = dynamic_cast<const typename T::MuQtType*>(qitem)))
+        if (T::isInheritable() && (mobj = dynamic_cast<const typename T::MuQtType*>(qitem)))
         {
             return T::cachedInstance(mobj);
         }
@@ -271,13 +235,11 @@ namespace Mu
         }
     }
 
-    template <class T>
-    ClassInstance* makepaintdevice(const T* type, const QPaintDevice* device)
+    template <class T> ClassInstance* makepaintdevice(const T* type, const QPaintDevice* device)
     {
         const typename T::MuQtType* mobj = 0;
 
-        if (T::isInheritable()
-            && (mobj = dynamic_cast<const typename T::MuQtType*>(device)))
+        if (T::isInheritable() && (mobj = dynamic_cast<const typename T::MuQtType*>(device)))
         {
             return T::cachedInstance(mobj);
         }
@@ -293,8 +255,7 @@ namespace Mu
     {
         if (!p)
             return QString();
-        return QString::fromUtf8(
-            reinterpret_cast<StringType::String*>(p)->c_str());
+        return QString::fromUtf8(reinterpret_cast<StringType::String*>(p)->c_str());
     }
 
     inline StringType::String* makestring(Context* c, const QString& qstr)
@@ -322,8 +283,7 @@ namespace Mu
         DynamicArray* array = reinterpret_cast<DynamicArray*>(p);
         for (size_t i = 0; i < array->size(); i++)
         {
-            list.push_back(
-                array->element<const StringType::String*>(i)->c_str());
+            list.push_back(array->element<const StringType::String*>(i)->c_str());
         }
 
         return list;
@@ -332,9 +292,7 @@ namespace Mu
     inline DynamicArray* makestringlist(Context* c, const QStringList& list)
     {
         MuLangContext* lc = static_cast<MuLangContext*>(c);
-        DynamicArray* array = new DynamicArray(
-            static_cast<const Class*>(lc->arrayType(lc->stringType(), 1, 0)),
-            1);
+        DynamicArray* array = new DynamicArray(static_cast<const Class*>(lc->arrayType(lc->stringType(), 1, 0)), 1);
         array->resize(list.size());
         for (size_t i = 0; i < list.size(); i++)
         {
@@ -349,15 +307,12 @@ namespace Mu
         return reinterpret_cast<typename Type::Instance*>(p)->value;
     }
 
-    template <class Type>
-    inline void setqtype(Pointer p, const typename Type::ValueType& value)
+    template <class Type> inline void setqtype(Pointer p, const typename Type::ValueType& value)
     {
         reinterpret_cast<typename Type::Instance*>(p)->value = value;
     }
 
-    template <class Type>
-    inline ClassInstance* makeqtype(const Class* type,
-                                    const typename Type::ValueType& value)
+    template <class Type> inline ClassInstance* makeqtype(const Class* type, const typename Type::ValueType& value)
     {
         typename Type::Instance* i = new typename Type::Instance(type);
         Type::registerFinalizer(i);
@@ -365,47 +320,36 @@ namespace Mu
         return i;
     }
 
-    template <class Type>
-    inline ClassInstance* makeqtype(Context* c,
-                                    const typename Type::ValueType& value,
-                                    const char* muType)
+    template <class Type> inline ClassInstance* makeqtype(Context* c, const typename Type::ValueType& value, const char* muType)
     {
-        const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName(muType), false);
+        const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(c->internName(muType), false);
         typename Type::Instance* i = new typename Type::Instance(type);
         Type::registerFinalizer(i);
         setqtype<Type>(i, value);
         return i;
     }
 
-    template <class QtType, class MuType>
-    inline QList<QtType> qtypelist(Pointer p)
+    template <class QtType, class MuType> inline QList<QtType> qtypelist(Pointer p)
     {
         QList<QtType> list;
         DynamicArray* array = reinterpret_cast<DynamicArray*>(p);
         for (size_t i = 0; i < array->size(); i++)
         {
-            list.push_back(
-                array->element<typename MuType::Instance*>(i)->value);
+            list.push_back(array->element<typename MuType::Instance*>(i)->value);
         }
 
         return list;
     }
 
-    template <class QtType, class MuType>
-    inline DynamicArray* makeqtypelist(Context* c, const QList<QtType>& list,
-                                       const char* muType)
+    template <class QtType, class MuType> inline DynamicArray* makeqtypelist(Context* c, const QList<QtType>& list, const char* muType)
     {
         MuLangContext* lc = static_cast<MuLangContext*>(c);
-        const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(
-            lc->internName(muType), false);
-        DynamicArray* array = new DynamicArray(
-            static_cast<const Class*>(lc->arrayType(type, 1, 0)), 1);
+        const Class* type = c->findSymbolOfTypeByQualifiedName<Class>(lc->internName(muType), false);
+        DynamicArray* array = new DynamicArray(static_cast<const Class*>(lc->arrayType(type, 1, 0)), 1);
         array->resize(list.size());
         for (size_t i = 0; i < list.size(); i++)
         {
-            array->element<ClassInstance*>(i) =
-                makeqtype<MuType>(type, list[i]);
+            array->element<ClassInstance*>(i) = makeqtype<MuType>(type, list[i]);
         }
 
         return array;
@@ -419,25 +363,20 @@ namespace Mu
         DynamicArray* array = reinterpret_cast<DynamicArray*>(p);
         for (size_t i = 0; i < array->size(); i++)
         {
-            list.push_back(
-                array->element<QModelIndexType::Instance*>(i)->value);
+            list.push_back(array->element<QModelIndexType::Instance*>(i)->value);
         }
 
         return list;
     }
 
-    inline DynamicArray* makeqmodelindexlist(Context* c,
-                                             const QModelIndexList& list)
+    inline DynamicArray* makeqmodelindexlist(Context* c, const QModelIndexList& list)
     {
         MuLangContext* lc = static_cast<MuLangContext*>(c);
-        DynamicArray* array = new DynamicArray(
-            static_cast<const Class*>(lc->arrayType(lc->stringType(), 1, 0)),
-            1);
+        DynamicArray* array = new DynamicArray(static_cast<const Class*>(lc->arrayType(lc->stringType(), 1, 0)), 1);
         array->resize(list.size());
         for (size_t i = 0; i < list.size(); i++)
         {
-            array->element<Pointer>(i) =
-                makeqtype<QModelIndexType>(c, list[i], "qt.QModelIndex");
+            array->element<Pointer>(i) = makeqtype<QModelIndexType>(c, list[i], "qt.QModelIndex");
         }
 
         return array;
@@ -455,25 +394,20 @@ namespace Mu
         return list;
     }
 
-    inline DynamicArray* makeqfileinfolist(Context* c,
-                                           const QFileInfoList& list)
+    inline DynamicArray* makeqfileinfolist(Context* c, const QFileInfoList& list)
     {
         MuLangContext* lc = static_cast<MuLangContext*>(c);
-        DynamicArray* array = new DynamicArray(
-            static_cast<const Class*>(lc->arrayType(lc->stringType(), 1, 0)),
-            1);
+        DynamicArray* array = new DynamicArray(static_cast<const Class*>(lc->arrayType(lc->stringType(), 1, 0)), 1);
         array->resize(list.size());
         for (size_t i = 0; i < list.size(); i++)
         {
-            array->element<Pointer>(i) =
-                makeqtype<QFileInfoType>(c, list[i], "qt.QFileInfo");
+            array->element<Pointer>(i) = makeqtype<QFileInfoType>(c, list[i], "qt.QFileInfo");
         }
 
         return array;
     }
 
-#define NONNIL_NODE_ARG(N, T) \
-    assertNotNil(NODE_THREAD, NODE_THIS, NODE_ARG(N, T), N)
+#define NONNIL_NODE_ARG(N, T) assertNotNil(NODE_THREAD, NODE_THIS, NODE_ARG(N, T), N)
 
     template <typename T> inline T defaultValue() { return T(0); }
 

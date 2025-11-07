@@ -11,8 +11,7 @@
 namespace Rv
 {
 
-    TwkQTAction::TwkQTAction(const TwkApp::Menu::Item* i, RvDocument* doc,
-                             QObject* parent)
+    TwkQTAction::TwkQTAction(const TwkApp::Menu::Item* i, RvDocument* doc, QObject* parent)
         : QAction(parent)
         , m_item(i)
         , m_doc(doc)

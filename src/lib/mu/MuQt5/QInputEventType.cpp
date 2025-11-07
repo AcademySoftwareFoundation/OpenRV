@@ -47,8 +47,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QInputEvent_modifiers_int_QInputEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    int qt_QInputEvent_modifiers_int_QInputEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputEvent* arg0 = getqpointer<QInputEventType>(param_this);
@@ -57,8 +56,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_modifiers0, int)
     {
-        NODE_RETURN(qt_QInputEvent_modifiers_int_QInputEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputEvent_modifiers_int_QInputEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QInputEventType::load()
@@ -78,13 +76,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -95,9 +91,7 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "modifiers", _n_modifiers0, None, Compiled,
-                         qt_QInputEvent_modifiers_int_QInputEvent, Return,
-                         "int", Parameters,
+            new Function(c, "modifiers", _n_modifiers0, None, Compiled, qt_QInputEvent_modifiers_int_QInputEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QInputEvent"), End),
             // MISSING: timestamp ("ulong"; QInputEvent this)
             // static functions

@@ -24,8 +24,7 @@ namespace IPCore
             Rotate270
         };
 
-        RotateCanvasIPNode(const std::string& name, const NodeDefinition* def,
-                           IPGraph* graph, GroupIPNode* group = 0);
+        RotateCanvasIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~RotateCanvasIPNode();
         virtual IPImage* evaluate(const Context&);

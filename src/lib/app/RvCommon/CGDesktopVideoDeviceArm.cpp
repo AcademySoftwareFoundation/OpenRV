@@ -20,9 +20,8 @@ namespace Rv
     using namespace TwkApp;
     using namespace boost;
 
-    CGDesktopVideoDeviceArm::CGDesktopVideoDeviceArm(
-        VideoModule* m, const CGDesktopVideoDeviceArm::Display& display,
-        const QTGLVideoDevice* share)
+    CGDesktopVideoDeviceArm::CGDesktopVideoDeviceArm(VideoModule* m, const CGDesktopVideoDeviceArm::Display& display,
+                                                     const QTGLVideoDevice* share)
         : DesktopVideoDevice(m, display.name, share)
         , m_display(display)
         , m_savedMode(nullptr)
@@ -46,14 +45,12 @@ namespace Rv
 
             if (mode.ioFlags & kDisplayModeSafetyFlags)
             {
-                m_videoFormats.push_back(DesktopVideoFormat(
-                    mode.width, mode.height, 1.0, 1.0, mode.refreshRate,
-                    mode.description, (void*)(&mode)));
+                m_videoFormats.push_back(
+                    DesktopVideoFormat(mode.width, mode.height, 1.0, 1.0, mode.refreshRate, mode.description, (void*)(&mode)));
             }
             else
             {
-                std::cerr << "DesktopVideoDevice: Screen " << m_display.cgScreen
-                          << " Mode " << mode.ioModeId
+                std::cerr << "DesktopVideoDevice: Screen " << m_display.cgScreen << " Mode " << mode.ioModeId
                           << " does not have safety flags" << std::endl;
             }
         }
@@ -67,8 +64,7 @@ namespace Rv
         {
             const DesktopVideoFormat& format = m_videoFormats[i];
 
-            CGDesktopVideoDeviceArm::Mode& mode =
-                *static_cast<CGDesktopVideoDeviceArm::Mode*>(format.data);
+            CGDesktopVideoDeviceArm::Mode& mode = *static_cast<CGDesktopVideoDeviceArm::Mode*>(format.data);
             mode.videoFormatIndex = i;
 
             if (mode.ioModeId == currentIoModeId)
@@ -91,10 +87,7 @@ namespace Rv
 
     CGDesktopVideoDeviceArm::~CGDesktopVideoDeviceArm() { close(); }
 
-    void CGDesktopVideoDeviceArm::makeCurrent() const
-    {
-        m_viewDevice->makeCurrent();
-    }
+    void CGDesktopVideoDeviceArm::makeCurrent() const { m_viewDevice->makeCurrent(); }
 
     bool CGDesktopVideoDeviceArm::isSyncing() const
     {
@@ -146,20 +139,17 @@ namespace Rv
 
         // Find the mode from the format's data, and switch the screen to that
         // video mode.
-        const CGDesktopVideoDeviceArm::Mode& mode =
-            *static_cast<const CGDesktopVideoDeviceArm::Mode*>(format.data);
+        const CGDesktopVideoDeviceArm::Mode& mode = *static_cast<const CGDesktopVideoDeviceArm::Mode*>(format.data);
 
         switchToMode(mode, bounds);
 
-        m_view.setGeometry(
-            bounds); // this will place the window on the correct screen.
+        m_view.setGeometry(bounds); // this will place the window on the correct screen.
         m_view.setWindowState(Qt::WindowFullScreen);
 
         // module()
         TwkApp::VideoModule* m = const_cast<TwkApp::VideoModule*>(module());
 
-        m_viewDevice =
-            new QTGLVideoDevice(m, "AppleSilicon Presentation Device", &m_view);
+        m_viewDevice = new QTGLVideoDevice(m, "AppleSilicon Presentation Device", &m_view);
         m_viewDevice->makeCurrent();
 
         m_view.showFullScreen();
@@ -232,22 +222,13 @@ namespace Rv
         m_viewDevice = nullptr;
     }
 
-    VideoDevice::Resolution CGDesktopVideoDeviceArm::resolution() const
-    {
-        return format();
-    }
+    VideoDevice::Resolution CGDesktopVideoDeviceArm::resolution() const { return format(); }
 
     size_t CGDesktopVideoDeviceArm::width() const { return resolution().width; }
 
-    size_t CGDesktopVideoDeviceArm::height() const
-    {
-        return resolution().height;
-    }
+    size_t CGDesktopVideoDeviceArm::height() const { return resolution().height; }
 
-    float CGDesktopVideoDeviceArm::pixelScale() const
-    {
-        return resolution().pixelScale;
-    }
+    float CGDesktopVideoDeviceArm::pixelScale() const { return resolution().pixelScale; }
 
     VideoDevice::VideoFormat CGDesktopVideoDeviceArm::format() const
     {
@@ -261,8 +242,7 @@ namespace Rv
             {
                 if (IPCore::debugPlayback)
                 {
-                    cout << "WARNING: recovered from unexpected video mode "
-                         << endl;
+                    cout << "WARNING: recovered from unexpected video mode " << endl;
                 }
 
                 return m_videoFormats[mode.videoFormatIndex];
@@ -273,40 +253,30 @@ namespace Rv
         return VideoFormat();
     }
 
-    VideoDevice::Offset CGDesktopVideoDeviceArm::offset() const
-    {
-        return Offset(0, 0);
-    }
+    VideoDevice::Offset CGDesktopVideoDeviceArm::offset() const { return Offset(0, 0); }
 
-    VideoDevice::Timing CGDesktopVideoDeviceArm::timing() const
-    {
-        return format();
-    }
+    VideoDevice::Timing CGDesktopVideoDeviceArm::timing() const { return format(); }
 
-    TwkApp::VideoDevice::ColorProfile
-    CGDesktopVideoDeviceArm::colorProfile() const
+    TwkApp::VideoDevice::ColorProfile CGDesktopVideoDeviceArm::colorProfile() const
     {
         //
         //  Get the display's color sync profile
         //
 
-        if (ColorSyncProfileRef iccRef =
-                ColorSyncProfileCreateWithDisplayID(m_display.cgScreen))
+        if (ColorSyncProfileRef iccRef = ColorSyncProfileCreateWithDisplayID(m_display.cgScreen))
         {
             m_colorProfile.type = ICCProfile;
 
             CFStringRef desc = ColorSyncProfileCopyDescriptionString(iccRef);
             CFIndex n = CFStringGetLength(desc);
             vector<char> buffer(n * 4 + 1);
-            CFStringGetCString(desc, &buffer.front(), buffer.size(),
-                               kCFStringEncodingUTF8);
+            CFStringGetCString(desc, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
             m_colorProfile.description = &buffer.front();
 
             CFURLRef url = ColorSyncProfileGetURL(iccRef, NULL);
             CFStringRef urlstr = CFURLGetString(url);
             buffer.resize(CFStringGetLength(urlstr) * 4 + 1);
-            CFStringGetCString(urlstr, &buffer.front(), buffer.size(),
-                               kCFStringEncodingUTF8);
+            CFStringGetCString(urlstr, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
 
             m_colorProfile.url = &buffer.front();
         }
@@ -321,8 +291,7 @@ namespace Rv
     //
     // Static helper functions
     //
-    std::vector<CGDesktopVideoDeviceArm::Display>
-    CGDesktopVideoDeviceArm::getDisplays()
+    std::vector<CGDesktopVideoDeviceArm::Display> CGDesktopVideoDeviceArm::getDisplays()
     {
         uint32_t count = 0;
         CGDirectDisplayID ids[64] = {0};
@@ -350,28 +319,24 @@ namespace Rv
         return displays;
     }
 
-    int32_t
-    CGDesktopVideoDeviceArm::getCurrentIoModeId(CGDirectDisplayID cgScreen)
+    int32_t CGDesktopVideoDeviceArm::getCurrentIoModeId(CGDirectDisplayID cgScreen)
     {
         CGDisplayModeRef currentModeRef = CGDisplayCopyDisplayMode(cgScreen);
 
-        int32_t currentIoModeId =
-            CGDisplayModeGetIODisplayModeID(currentModeRef);
+        int32_t currentIoModeId = CGDisplayModeGetIODisplayModeID(currentModeRef);
 
         CGDisplayModeRelease(currentModeRef);
 
         return currentIoModeId;
     }
 
-    CGDisplayModeRef CGDesktopVideoDeviceArm::displayModeRefFromIoModeId(
-        CGDirectDisplayID cgScreen, int32_t ioModeId)
+    CGDisplayModeRef CGDesktopVideoDeviceArm::displayModeRefFromIoModeId(CGDirectDisplayID cgScreen, int32_t ioModeId)
     {
         CFArrayRef array = CGDisplayCopyAllDisplayModes(cgScreen, NULL);
 
         for (CFIndex i = 0, n = CFArrayGetCount(array); i < n; i++)
         {
-            const CGDisplayModeRef cgModeRef =
-                (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
+            const CGDisplayModeRef cgModeRef = (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
             const int32_t id = CGDisplayModeGetIODisplayModeID(cgModeRef);
 
             if (id == ioModeId)
@@ -390,12 +355,10 @@ namespace Rv
         return CGDisplayModeRef(0);
     }
 
-    bool CGDesktopVideoDeviceArm::switchToMode(
-        const CGDesktopVideoDeviceArm::Mode& mode, QRect& bounds)
+    bool CGDesktopVideoDeviceArm::switchToMode(const CGDesktopVideoDeviceArm::Mode& mode, QRect& bounds)
     {
         // Set the new display mode.
-        CGDisplayModeRef newDisplayModeRef =
-            displayModeRefFromIoModeId(mode.cgScreen, mode.ioModeId);
+        CGDisplayModeRef newDisplayModeRef = displayModeRefFromIoModeId(mode.cgScreen, mode.ioModeId);
         if (!newDisplayModeRef)
         {
             std::cerr << "Failed to get display modes!" << std::endl;
@@ -415,8 +378,7 @@ namespace Rv
     {
         CGRect cgBounds = CGDisplayBounds(cgScreen);
 
-        QRect qtBounds(cgBounds.origin.x, cgBounds.origin.y,
-                       cgBounds.size.width, cgBounds.size.height);
+        QRect qtBounds(cgBounds.origin.x, cgBounds.origin.y, cgBounds.size.width, cgBounds.size.height);
 
         return qtBounds;
     }
@@ -438,9 +400,8 @@ namespace Rv
         return -1;
     }
 
-    CGDesktopVideoDeviceArm::Mode
-    CGDesktopVideoDeviceArm::constructModeFromDisplayModeRef(
-        CGDirectDisplayID cgScreen, CGDisplayModeRef modeRef)
+    CGDesktopVideoDeviceArm::Mode CGDesktopVideoDeviceArm::constructModeFromDisplayModeRef(CGDirectDisplayID cgScreen,
+                                                                                           CGDisplayModeRef modeRef)
     {
         CGDesktopVideoDeviceArm::Mode dm;
 
@@ -471,14 +432,12 @@ namespace Rv
         return dm;
     }
 
-    std::vector<CGDesktopVideoDeviceArm::Mode>
-    CGDesktopVideoDeviceArm::getDisplayModes(CGDirectDisplayID cgScreen)
+    std::vector<CGDesktopVideoDeviceArm::Mode> CGDesktopVideoDeviceArm::getDisplayModes(CGDirectDisplayID cgScreen)
     {
         std::vector<CGDesktopVideoDeviceArm::Mode> dms;
 
         CGDisplayModeRef currentModeRef = CGDisplayCopyDisplayMode(cgScreen);
-        int32_t currentIoModeId =
-            CGDisplayModeGetIODisplayModeID(currentModeRef);
+        int32_t currentIoModeId = CGDisplayModeGetIODisplayModeID(currentModeRef);
         bool foundCurrentModeId = false;
 
         CFArrayRef modes = CGDisplayCopyAllDisplayModes(cgScreen, nullptr);
@@ -493,11 +452,9 @@ namespace Rv
         int index = 0;
         for (CFIndex i = 0; i < count; i++, index++)
         {
-            CGDisplayModeRef modeRef =
-                (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
+            CGDisplayModeRef modeRef = (CGDisplayModeRef)CFArrayGetValueAtIndex(modes, i);
 
-            CGDesktopVideoDeviceArm::Mode dm =
-                constructModeFromDisplayModeRef(cgScreen, modeRef);
+            CGDesktopVideoDeviceArm::Mode dm = constructModeFromDisplayModeRef(cgScreen, modeRef);
 
             dms.push_back(dm);
 
@@ -511,8 +468,7 @@ namespace Rv
         // iwe did not, if macOS uses a scaled display mode.
         if (foundCurrentModeId == false)
         {
-            CGDesktopVideoDeviceArm::Mode dm =
-                constructModeFromDisplayModeRef(cgScreen, currentModeRef);
+            CGDesktopVideoDeviceArm::Mode dm = constructModeFromDisplayModeRef(cgScreen, currentModeRef);
             dms.push_back(dm);
         }
 
@@ -523,9 +479,8 @@ namespace Rv
         return dms;
     }
 
-    std::vector<VideoDevice*>
-    CGDesktopVideoDeviceArm::createDesktopVideoDevices(
-        TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    std::vector<VideoDevice*> CGDesktopVideoDeviceArm::createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                                                                 const QTGLVideoDevice* shareDevice)
     {
         std::vector<VideoDevice*> devices;
 
@@ -535,8 +490,7 @@ namespace Rv
         {
             auto display = cgDisplays[d];
 
-            CGDesktopVideoDeviceArm* sd =
-                new CGDesktopVideoDeviceArm(module, display, shareDevice);
+            CGDesktopVideoDeviceArm* sd = new CGDesktopVideoDeviceArm(module, display, shareDevice);
             devices.push_back(sd);
         }
 

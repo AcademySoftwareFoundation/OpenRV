@@ -28,28 +28,15 @@ namespace TwkUtil
         m_checkThread = true;
     }
 
-    void Interrupt::addProgressFunc(ProgressFunc pf)
-    {
-        m_progressFuncs.push_back(pf);
-    }
+    void Interrupt::addProgressFunc(ProgressFunc pf) { m_progressFuncs.push_back(pf); }
 
-    void Interrupt::removeProgressFunc(ProgressFunc pf)
-    {
-        stl_ext::remove(m_progressFuncs, pf);
-    }
+    void Interrupt::removeProgressFunc(ProgressFunc pf) { stl_ext::remove(m_progressFuncs, pf); }
 
-    void Interrupt::addMessageFunc(MessageFuncs& funcs, MessageFunc f)
-    {
-        funcs.push_back(f);
-    }
+    void Interrupt::addMessageFunc(MessageFuncs& funcs, MessageFunc f) { funcs.push_back(f); }
 
-    void Interrupt::removeMessageFunc(MessageFuncs& funcs, MessageFunc f)
-    {
-        stl_ext::remove(funcs, f);
-    }
+    void Interrupt::removeMessageFunc(MessageFuncs& funcs, MessageFunc f) { stl_ext::remove(funcs, f); }
 
-    void Interrupt::callMessageFuncs(const MessageFuncs& funcs,
-                                     const std::string& message)
+    void Interrupt::callMessageFuncs(const MessageFuncs& funcs, const std::string& message)
     {
         for (int i = 0; i < funcs.size(); i++)
         {

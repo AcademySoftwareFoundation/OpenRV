@@ -142,8 +142,7 @@ void GLSyncObjectARBSync::waitFence() const
 {
     RV_ASSERT_INTERNAL(_fenceSet && _sync != 0);
     GLenum ret = GL_WAIT_FAILED;
-    while ((ret = glClientWaitSync(_sync, GL_SYNC_FLUSH_COMMANDS_BIT, ~0ULL))
-           == GL_TIMEOUT_EXPIRED)
+    while ((ret = glClientWaitSync(_sync, GL_SYNC_FLUSH_COMMANDS_BIT, ~0ULL)) == GL_TIMEOUT_EXPIRED)
         ;
     assert(ret == GL_CONDITION_SATISFIED || ret == GL_ALREADY_SIGNALED);
     glDeleteSync(_sync);

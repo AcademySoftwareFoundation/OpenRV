@@ -69,11 +69,8 @@ namespace Rv
         /// info. If you know the type of the file, pass it in.
         ///
 
-        QIcon fileIcon(const QString&, QFileIconProvider::IconType knownType =
-                                           QFileIconProvider::Trashcan) const;
-        virtual QIcon fileInfoIcon(const QFileInfo&,
-                                   QFileIconProvider::IconType knownType =
-                                       QFileIconProvider::Trashcan) const;
+        QIcon fileIcon(const QString&, QFileIconProvider::IconType knownType = QFileIconProvider::Trashcan) const;
+        virtual QIcon fileInfoIcon(const QFileInfo&, QFileIconProvider::IconType knownType = QFileIconProvider::Trashcan) const;
 
         ///
         /// If a preview image is available for the file indicate that and

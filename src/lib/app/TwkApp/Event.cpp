@@ -13,11 +13,7 @@ namespace TwkApp
 {
     using namespace std;
 
-    void Event::output(ostream& o) const
-    {
-        o << "Event: " << m_name << " from "
-          << ((m_sender) ? m_sender->name() : "<unknown>");
-    }
+    void Event::output(ostream& o) const { o << "Event: " << m_name << " from " << ((m_sender) ? m_sender->name() : "<unknown>"); }
 
     void ModifierEvent::output(ostream& o) const
     {
@@ -51,8 +47,7 @@ namespace TwkApp
     void PointerEvent::output(ostream& o) const
     {
         ModifierEvent::output(o);
-        o << " (" << m_x << "/" << m_w << "," << m_y << "/" << m_h
-          << ") start: (" << m_px << "," << m_py << ")";
+        o << " (" << m_x << "/" << m_w << "," << m_y << "/" << m_h << ") start: (" << m_px << "," << m_py << ")";
     }
 
 } // namespace TwkApp

@@ -46,8 +46,7 @@ namespace IPCore
             int yorigin;
         };
 
-        CropIPNode(const std::string& name, const NodeDefinition* def,
-                   IPGraph* graph, GroupIPNode* group = 0);
+        CropIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~CropIPNode();
         virtual IPImage* evaluate(const Context&);

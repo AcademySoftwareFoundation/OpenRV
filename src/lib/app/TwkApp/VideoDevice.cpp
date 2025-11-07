@@ -19,8 +19,7 @@ namespace TwkApp
     using namespace std;
     using namespace boost;
 
-    VideoDevice::VideoDevice(VideoModule* module, const string& name,
-                             unsigned int caps)
+    VideoDevice::VideoDevice(VideoModule* module, const string& name, unsigned int caps)
         : EventNode(name.c_str())
         , m_module(module)
         , m_name(name)
@@ -86,10 +85,7 @@ namespace TwkApp
 
     size_t VideoDevice::numAudioFormats() const { return 0; }
 
-    VideoDevice::AudioFormat VideoDevice::audioFormatAtIndex(size_t) const
-    {
-        return AudioFormat();
-    }
+    VideoDevice::AudioFormat VideoDevice::audioFormatAtIndex(size_t) const { return AudioFormat(); }
 
     void VideoDevice::setAudioFormat(size_t) { m_audioFrameSizes.clear(); }
 
@@ -97,10 +93,7 @@ namespace TwkApp
 
     size_t VideoDevice::numVideoFormats() const { return 0; }
 
-    VideoDevice::VideoFormat VideoDevice::videoFormatAtIndex(size_t) const
-    {
-        return VideoFormat();
-    }
+    VideoDevice::VideoFormat VideoDevice::videoFormatAtIndex(size_t) const { return VideoFormat(); }
 
     void VideoDevice::setVideoFormat(size_t) { m_audioFrameSizes.clear(); }
 
@@ -108,10 +101,7 @@ namespace TwkApp
 
     size_t VideoDevice::numDataFormats() const { return 0; }
 
-    VideoDevice::DataFormat VideoDevice::dataFormatAtIndex(size_t) const
-    {
-        return DataFormat();
-    }
+    VideoDevice::DataFormat VideoDevice::dataFormatAtIndex(size_t) const { return DataFormat(); }
 
     void VideoDevice::setDataFormat(size_t) {}
 
@@ -119,10 +109,7 @@ namespace TwkApp
 
     size_t VideoDevice::numSyncModes() const { return 0; }
 
-    VideoDevice::SyncMode VideoDevice::syncModeAtIndex(size_t) const
-    {
-        return SyncMode();
-    }
+    VideoDevice::SyncMode VideoDevice::syncModeAtIndex(size_t) const { return SyncMode(); }
 
     void VideoDevice::setSyncMode(size_t) {}
 
@@ -130,10 +117,7 @@ namespace TwkApp
 
     size_t VideoDevice::numSyncSources() const { return 0; }
 
-    VideoDevice::SyncSource VideoDevice::syncSourceAtIndex(size_t) const
-    {
-        return SyncSource();
-    }
+    VideoDevice::SyncSource VideoDevice::syncSourceAtIndex(size_t) const { return SyncSource(); }
 
     void VideoDevice::setSyncSource(size_t) {}
 
@@ -141,20 +125,13 @@ namespace TwkApp
 
     size_t VideoDevice::numVideo4KTransports() const { return 0; }
 
-    VideoDevice::Video4KTransport
-    VideoDevice::video4KTransportAtIndex(size_t) const
-    {
-        return Video4KTransport();
-    }
+    VideoDevice::Video4KTransport VideoDevice::video4KTransportAtIndex(size_t) const { return Video4KTransport(); }
 
     void VideoDevice::setVideo4KTransport(size_t) {}
 
     size_t VideoDevice::currentVideo4KTransport() const { return 0; }
 
-    VideoDevice::Time VideoDevice::outputTime() const
-    {
-        return Time(m_currentTime);
-    }
+    VideoDevice::Time VideoDevice::outputTime() const { return Time(m_currentTime); }
 
     VideoDevice::Time VideoDevice::inputTime() const { return Time(0); }
 
@@ -176,10 +153,7 @@ namespace TwkApp
         m_currentTime = Time(m_frameCount) / hz;
     }
 
-    VideoDevice::Time VideoDevice::nextFrameTime() const
-    {
-        return m_currentTime;
-    }
+    VideoDevice::Time VideoDevice::nextFrameTime() const { return m_currentTime; }
 
     size_t VideoDevice::nextFrame() const { return m_frameCount; }
 
@@ -187,43 +161,25 @@ namespace TwkApp
 
     VideoDevice::Time VideoDevice::deviceLatency() const { return Time(0); }
 
-    VideoDevice::Time VideoDevice::fixedLatency() const
-    {
-        return m_fixedLatency;
-    }
+    VideoDevice::Time VideoDevice::fixedLatency() const { return m_fixedLatency; }
 
     void VideoDevice::setFixedLatency(Time l) { m_fixedLatency = l; }
 
-    VideoDevice::Time VideoDevice::frameLatencyInFrames() const
-    {
-        return m_frameLatency;
-    }
+    VideoDevice::Time VideoDevice::frameLatencyInFrames() const { return m_frameLatency; }
 
-    VideoDevice::Time VideoDevice::frameLatencyInSeconds() const
-    {
-        return m_frameLatency / videoFormatAtIndex(currentVideoFormat()).hz;
-    }
+    VideoDevice::Time VideoDevice::frameLatencyInSeconds() const { return m_frameLatency / videoFormatAtIndex(currentVideoFormat()).hz; }
 
     void VideoDevice::setFrameLatency(Time frames) { m_frameLatency = frames; }
 
-    VideoDevice::Time VideoDevice::totalLatencyInSeconds() const
-    {
-        return deviceLatency() + frameLatencyInSeconds() + fixedLatency();
-    }
+    VideoDevice::Time VideoDevice::totalLatencyInSeconds() const { return deviceLatency() + frameLatencyInSeconds() + fixedLatency(); }
 
-    VideoDevice::Resolution VideoDevice::internalResolution() const
-    {
-        return resolution();
-    }
+    VideoDevice::Resolution VideoDevice::internalResolution() const { return resolution(); }
 
     VideoDevice::Offset VideoDevice::internalOffset() const { return offset(); }
 
     VideoDevice::Timing VideoDevice::internalTiming() const { return timing(); }
 
-    VideoDevice::VideoFormat VideoDevice::internalFormat() const
-    {
-        return format();
-    }
+    VideoDevice::VideoFormat VideoDevice::internalFormat() const { return format(); }
 
     size_t VideoDevice::internalWidth() const { return width(); }
 
@@ -298,8 +254,7 @@ namespace TwkApp
         switch (t)
         {
         case HostnameVideoAndDataFormatID:
-            str << asio::ip::host_name() << "/" << moduleName << "/" << name()
-                << "/" << vd << "/" << dd;
+            str << asio::ip::host_name() << "/" << moduleName << "/" << name() << "/" << vd << "/" << dd;
             break;
         case VideoAndDataFormatID:
             str << moduleName << "/" << name() << "/" << vd << "/" << dd;
@@ -321,9 +276,6 @@ namespace TwkApp
         return str.str();
     }
 
-    VideoDevice::ColorProfile VideoDevice::colorProfile() const
-    {
-        return ColorProfile();
-    }
+    VideoDevice::ColorProfile VideoDevice::colorProfile() const { return ColorProfile(); }
 
 } // namespace TwkApp

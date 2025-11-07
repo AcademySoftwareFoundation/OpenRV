@@ -76,28 +76,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QGroupBox::MuQt_QGroupBox(Pointer muobj, const CallEnvironment* ce,
-                                   QWidget* parent)
+    MuQt_QGroupBox::MuQt_QGroupBox(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QGroupBox(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QGroupBoxType>(
-            c->internName("qt.QGroupBox"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QGroupBoxType>(c->internName("qt.QGroupBox"));
     }
 
-    MuQt_QGroupBox::MuQt_QGroupBox(Pointer muobj, const CallEnvironment* ce,
-                                   const QString& title, QWidget* parent)
+    MuQt_QGroupBox::MuQt_QGroupBox(Pointer muobj, const CallEnvironment* ce, const QString& title, QWidget* parent)
         : QGroupBox(title, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QGroupBoxType>(
-            c->internName("qt.QGroupBox"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QGroupBoxType>(c->internName("qt.QGroupBox"));
     }
 
     QSize MuQt_QGroupBox::minimumSizeHint() const
@@ -178,8 +174,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, fe, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, fe, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -202,8 +197,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -226,8 +220,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -250,8 +243,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -274,8 +266,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -298,8 +289,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -404,8 +394,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -428,8 +417,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -452,8 +440,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -476,8 +463,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -500,8 +486,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -524,8 +509,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -569,8 +553,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -593,8 +576,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -617,8 +599,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -641,8 +622,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -688,8 +668,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -712,8 +691,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -736,8 +714,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -760,8 +737,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -784,8 +760,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -818,8 +793,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QGroupBoxType::QGroupBoxType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QGroupBoxType::QGroupBoxType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -840,9 +814,7 @@ namespace Mu
         }
         else if (QGroupBox* w = object<QGroupBox>(widget))
         {
-            QGroupBoxType* type =
-                c->findSymbolOfTypeByQualifiedName<QGroupBoxType>(
-                    c->internName("qt.QGroupBox"), false);
+            QGroupBoxType* type = c->findSymbolOfTypeByQualifiedName<QGroupBoxType>(c->internName("qt.QGroupBox"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -853,52 +825,35 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QGroupBox_QGroupBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QGroupBox_QGroupBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QGroupBox(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QGroupBox(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_title,
-        Pointer param_parent)
+    Pointer qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_title,
+                                                                      Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_title);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QGroupBox(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QGroupBox(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QGroupBox_minimumSizeHint_QSize_QGroupBox(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QGroupBox_minimumSizeHint_QSize_QGroupBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QGroupBox::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QGroupBox::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    void qt_QGroupBox_changeEvent_void_QGroupBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_ev)
+    void qt_QGroupBox_changeEvent_void_QGroupBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -909,20 +864,15 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->changeEvent_pub(arg1);
     }
 
-    bool qt_QGroupBox_event_bool_QGroupBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QGroupBox_event_bool_QGroupBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QGroupBox*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QGroupBox*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QGroupBox*)arg0)->event_pub_parent(arg1) : ((MuQt_QGroupBox*)arg0)->event_pub(arg1);
     }
 
-    void qt_QGroupBox_focusInEvent_void_QGroupBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_fe)
+    void qt_QGroupBox_focusInEvent_void_QGroupBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_fe)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -933,8 +883,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_mouseMoveEvent_void_QGroupBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_mouseMoveEvent_void_QGroupBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -945,8 +894,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_mousePressEvent_void_QGroupBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_mousePressEvent_void_QGroupBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -957,8 +905,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_mouseReleaseEvent_void_QGroupBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_mouseReleaseEvent_void_QGroupBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -969,8 +916,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_paintEvent_void_QGroupBox_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_paintEvent_void_QGroupBox_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -981,8 +927,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_resizeEvent_void_QGroupBox_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QGroupBox_resizeEvent_void_QGroupBox_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -993,53 +938,39 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->resizeEvent_pub(arg1);
     }
 
-    bool qt_QGroupBox_hasHeightForWidth_bool_QGroupBox(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QGroupBox_hasHeightForWidth_bool_QGroupBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
-        return isMuQtObject(arg0) ? arg0->QGroupBox::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QGroupBox::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QGroupBox_heightForWidth_int_QGroupBox_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_w)
+    int qt_QGroupBox_heightForWidth_int_QGroupBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QGroupBox::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QGroupBox::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QGroupBox_inputMethodQuery_QVariant_QGroupBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QGroupBox_inputMethodQuery_QVariant_QGroupBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QGroupBox::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QGroupBox::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QGroupBox_sizeHint_QSize_QGroupBox(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QGroupBox_sizeHint_QSize_QGroupBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QGroupBox::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QGroupBox::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QGroupBox_closeEvent_void_QGroupBox_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_closeEvent_void_QGroupBox_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1050,21 +981,18 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_contextMenuEvent_void_QGroupBox_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_contextMenuEvent_void_QGroupBox_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QGroupBox*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QGroupBox*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_dragEnterEvent_void_QGroupBox_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_dragEnterEvent_void_QGroupBox_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1075,8 +1003,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_dragLeaveEvent_void_QGroupBox_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_dragLeaveEvent_void_QGroupBox_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1087,8 +1014,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_dragMoveEvent_void_QGroupBox_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_dragMoveEvent_void_QGroupBox_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1099,8 +1025,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_dropEvent_void_QGroupBox_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_dropEvent_void_QGroupBox_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1111,20 +1036,16 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QGroupBox_focusNextPrevChild_bool_QGroupBox_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QGroupBox_focusNextPrevChild_bool_QGroupBox_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QGroupBox*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QGroupBox*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QGroupBox*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QGroupBox*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QGroupBox_focusOutEvent_void_QGroupBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_focusOutEvent_void_QGroupBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1135,8 +1056,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_hideEvent_void_QGroupBox_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_hideEvent_void_QGroupBox_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1147,8 +1067,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_keyPressEvent_void_QGroupBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_keyPressEvent_void_QGroupBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1159,8 +1078,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_keyReleaseEvent_void_QGroupBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_keyReleaseEvent_void_QGroupBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1171,9 +1089,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_leaveEvent_void_QGroupBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_event)
+    void qt_QGroupBox_leaveEvent_void_QGroupBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1184,8 +1100,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_mouseDoubleClickEvent_void_QGroupBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_mouseDoubleClickEvent_void_QGroupBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1196,8 +1111,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_moveEvent_void_QGroupBox_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_moveEvent_void_QGroupBox_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1208,8 +1122,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_showEvent_void_QGroupBox_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_showEvent_void_QGroupBox_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1220,8 +1133,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_tabletEvent_void_QGroupBox_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_tabletEvent_void_QGroupBox_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1232,8 +1144,7 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->tabletEvent_pub(arg1);
     }
 
-    void qt_QGroupBox_wheelEvent_void_QGroupBox_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QGroupBox_wheelEvent_void_QGroupBox_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
@@ -1244,215 +1155,178 @@ namespace Mu
             ((MuQt_QGroupBox*)arg0)->wheelEvent_pub(arg1);
     }
 
-    int qt_QGroupBox_metric_int_QGroupBox_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this, int param_m)
+    int qt_QGroupBox_metric_int_QGroupBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGroupBox* arg0 = object<QGroupBox>(param_this);
-        QPaintDevice::PaintDeviceMetric arg1 =
-            (QPaintDevice::PaintDeviceMetric)(param_m);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QGroupBox*)arg0)->metric_pub_parent(arg1)
-                   : ((MuQt_QGroupBox*)arg0)->metric_pub(arg1);
+        QPaintDevice::PaintDeviceMetric arg1 = (QPaintDevice::PaintDeviceMetric)(param_m);
+        return isMuQtObject(arg0) ? ((MuQt_QGroupBox*)arg0)->metric_pub_parent(arg1) : ((MuQt_QGroupBox*)arg0)->metric_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QGroupBox0, Pointer)
     {
-        NODE_RETURN(qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QGroupBox1, Pointer)
     {
-        NODE_RETURN(qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_string_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QGroupBox_minimumSizeHint_QSize_QGroupBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGroupBox_minimumSizeHint_QSize_QGroupBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QGroupBox_changeEvent_void_QGroupBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_changeEvent_void_QGroupBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QGroupBox_event_bool_QGroupBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QGroupBox_event_bool_QGroupBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QGroupBox_focusInEvent_void_QGroupBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_focusInEvent_void_QGroupBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QGroupBox_mouseMoveEvent_void_QGroupBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_mouseMoveEvent_void_QGroupBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QGroupBox_mousePressEvent_void_QGroupBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_mousePressEvent_void_QGroupBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QGroupBox_mouseReleaseEvent_void_QGroupBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_mouseReleaseEvent_void_QGroupBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QGroupBox_paintEvent_void_QGroupBox_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_paintEvent_void_QGroupBox_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QGroupBox_resizeEvent_void_QGroupBox_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_resizeEvent_void_QGroupBox_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QGroupBox_hasHeightForWidth_bool_QGroupBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGroupBox_hasHeightForWidth_bool_QGroupBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QGroupBox_heightForWidth_int_QGroupBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGroupBox_heightForWidth_int_QGroupBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QGroupBox_inputMethodQuery_QVariant_QGroupBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGroupBox_inputMethodQuery_QVariant_QGroupBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QGroupBox_sizeHint_QSize_QGroupBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGroupBox_sizeHint_QSize_QGroupBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QGroupBox_closeEvent_void_QGroupBox_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_closeEvent_void_QGroupBox_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QGroupBox_contextMenuEvent_void_QGroupBox_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_contextMenuEvent_void_QGroupBox_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QGroupBox_dragEnterEvent_void_QGroupBox_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_dragEnterEvent_void_QGroupBox_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QGroupBox_dragLeaveEvent_void_QGroupBox_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_dragLeaveEvent_void_QGroupBox_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QGroupBox_dragMoveEvent_void_QGroupBox_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_dragMoveEvent_void_QGroupBox_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QGroupBox_dropEvent_void_QGroupBox_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_dropEvent_void_QGroupBox_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QGroupBox_focusNextPrevChild_bool_QGroupBox_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QGroupBox_focusNextPrevChild_bool_QGroupBox_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QGroupBox_focusOutEvent_void_QGroupBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_focusOutEvent_void_QGroupBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QGroupBox_hideEvent_void_QGroupBox_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_hideEvent_void_QGroupBox_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QGroupBox_keyPressEvent_void_QGroupBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_keyPressEvent_void_QGroupBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QGroupBox_keyReleaseEvent_void_QGroupBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_keyReleaseEvent_void_QGroupBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QGroupBox_leaveEvent_void_QGroupBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_leaveEvent_void_QGroupBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QGroupBox_mouseDoubleClickEvent_void_QGroupBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_mouseDoubleClickEvent_void_QGroupBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QGroupBox_moveEvent_void_QGroupBox_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_moveEvent_void_QGroupBox_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QGroupBox_showEvent_void_QGroupBox_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_showEvent_void_QGroupBox_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QGroupBox_tabletEvent_void_QGroupBox_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_tabletEvent_void_QGroupBox_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QGroupBox_wheelEvent_void_QGroupBox_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGroupBox_wheelEvent_void_QGroupBox_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_metric0, int)
     {
-        NODE_RETURN(qt_QGroupBox_metric_int_QGroupBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGroupBox_metric_int_QGroupBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QGroupBoxType::load()
@@ -1472,17 +1346,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QGroupBox_QGroupBox_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QGroupBox_QGroupBox_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1490,18 +1360,11 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QGroupBox", _n_QGroupBox0, None, Compiled,
-                         qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_QWidget,
-                         Return, "qt.QGroupBox", Parameters,
-                         new Param(c, "this", "qt.QGroupBox"),
+            new Function(c, "QGroupBox", _n_QGroupBox0, None, Compiled, qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_QWidget, Return,
+                         "qt.QGroupBox", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QGroupBox", _n_QGroupBox1, None, Compiled, qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_string_QWidget, Return,
+                         "qt.QGroupBox", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "title", "string"),
                          new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QGroupBox", _n_QGroupBox1, None, Compiled,
-                qt_QGroupBox_QGroupBox_QGroupBox_QGroupBox_string_QWidget,
-                Return, "qt.QGroupBox", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "title", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
             // PROP: alignment (flags Qt::Alignment; QGroupBox this)
             // PROP: isCheckable (bool; QGroupBox this)
             // PROP: isChecked (bool; QGroupBox this)
@@ -1511,181 +1374,111 @@ namespace Mu
             // PROP: setFlat (void; QGroupBox this, bool flat)
             // PROP: setTitle (void; QGroupBox this, string title)
             // PROP: title (string; QGroupBox this)
-            _func[0] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QGroupBox_minimumSizeHint_QSize_QGroupBox, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                End),
+            _func[0] =
+                new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QGroupBox_minimumSizeHint_QSize_QGroupBox,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QGroupBox"), End),
             // MISSING: initStyleOption (void; QGroupBox this,
             // "QStyleOptionGroupBox *" option) // protected
-            _func[1] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QGroupBox_changeEvent_void_QGroupBox_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "ev", "qt.QEvent"), End),
+            _func[1] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QGroupBox_changeEvent_void_QGroupBox_QEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "ev", "qt.QEvent"), End),
             // MISSING: childEvent (void; QGroupBox this, "QChildEvent *" c) //
             // protected
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QGroupBox_event_bool_QGroupBox_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QGroupBox_focusInEvent_void_QGroupBox_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "fe", "qt.QFocusEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QGroupBox_mouseMoveEvent_void_QGroupBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QGroupBox_mousePressEvent_void_QGroupBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QGroupBox_mouseReleaseEvent_void_QGroupBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QGroupBox_paintEvent_void_QGroupBox_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QGroupBox_resizeEvent_void_QGroupBox_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QGroupBox_hasHeightForWidth_bool_QGroupBox, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QGroupBox"), End),
-            _func[10] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QGroupBox_heightForWidth_int_QGroupBox_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "w", "int"), End),
-            _func[11] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QGroupBox_inputMethodQuery_QVariant_QGroupBox_int, Return,
-                "qt.QVariant", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "query", "int"), End),
-            _func[12] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QGroupBox_sizeHint_QSize_QGroupBox, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QGroupBox"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QGroupBox_event_bool_QGroupBox_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "e", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QGroupBox_focusInEvent_void_QGroupBox_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), new Param(c, "fe", "qt.QFocusEvent"), End),
+            _func[4] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QGroupBox_mouseMoveEvent_void_QGroupBox_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[5] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                          qt_QGroupBox_mousePressEvent_void_QGroupBox_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[6] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                          qt_QGroupBox_mouseReleaseEvent_void_QGroupBox_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[7] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QGroupBox_paintEvent_void_QGroupBox_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[8] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                          qt_QGroupBox_resizeEvent_void_QGroupBox_QResizeEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[9] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QGroupBox_hasHeightForWidth_bool_QGroupBox, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QGroupBox"), End),
+            _func[10] =
+                new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled, qt_QGroupBox_heightForWidth_int_QGroupBox_int,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "w", "int"), End),
+            _func[11] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QGroupBox_inputMethodQuery_QVariant_QGroupBox_int, Return, "qt.QVariant", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "query", "int"), End),
+            _func[12] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QGroupBox_sizeHint_QSize_QGroupBox, Return,
+                                           "qt.QSize", Parameters, new Param(c, "this", "qt.QGroupBox"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QGroupBox this)
             // MISSING: actionEvent (void; QGroupBox this, "QActionEvent *"
             // event) // protected
-            _func[13] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QGroupBox_closeEvent_void_QGroupBox_QCloseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QGroupBox_contextMenuEvent_void_QGroupBox_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QGroupBox_dragEnterEvent_void_QGroupBox_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QGroupBox_dragLeaveEvent_void_QGroupBox_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QGroupBox_dragMoveEvent_void_QGroupBox_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QGroupBox_dropEvent_void_QGroupBox_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QDropEvent"), End),
+            _func[13] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                           qt_QGroupBox_closeEvent_void_QGroupBox_QCloseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[14] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                           qt_QGroupBox_contextMenuEvent_void_QGroupBox_QContextMenuEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[15] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QGroupBox_dragEnterEvent_void_QGroupBox_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[16] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QGroupBox_dragLeaveEvent_void_QGroupBox_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[17] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QGroupBox_dragMoveEvent_void_QGroupBox_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[18] =
+                new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled, qt_QGroupBox_dropEvent_void_QGroupBox_QDropEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QDropEvent"), End),
             // MISSING: enterEvent (void; QGroupBox this, "QEnterEvent *" event)
             // // protected
-            _func[19] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QGroupBox_focusNextPrevChild_bool_QGroupBox_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "next", "bool"), End),
-            _func[20] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QGroupBox_focusOutEvent_void_QGroupBox_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QGroupBox_hideEvent_void_QGroupBox_QHideEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QHideEvent"), End),
+            _func[19] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QGroupBox_focusNextPrevChild_bool_QGroupBox_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "next", "bool"), End),
+            _func[20] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QGroupBox_focusOutEvent_void_QGroupBox_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[21] =
+                new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled, qt_QGroupBox_hideEvent_void_QGroupBox_QHideEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QHideEvent"), End),
             // MISSING: inputMethodEvent (void; QGroupBox this,
             // "QInputMethodEvent *" event) // protected
-            _func[22] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QGroupBox_keyPressEvent_void_QGroupBox_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QGroupBox_keyReleaseEvent_void_QGroupBox_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QGroupBox_leaveEvent_void_QGroupBox_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QGroupBox_mouseDoubleClickEvent_void_QGroupBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QGroupBox_moveEvent_void_QGroupBox_QMoveEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[22] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QGroupBox_keyPressEvent_void_QGroupBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[23] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QGroupBox_keyReleaseEvent_void_QGroupBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[24] =
+                new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled, qt_QGroupBox_leaveEvent_void_QGroupBox_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QEvent"), End),
+            _func[25] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QGroupBox_mouseDoubleClickEvent_void_QGroupBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[26] =
+                new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled, qt_QGroupBox_moveEvent_void_QGroupBox_QMoveEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QGroupBox this, QByteArray eventType,
             // "void *" message, "qintptr *" result) // protected
-            _func[27] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QGroupBox_showEvent_void_QGroupBox_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QGroupBox_tabletEvent_void_QGroupBox_QTabletEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QGroupBox_wheelEvent_void_QGroupBox_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[27] =
+                new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled, qt_QGroupBox_showEvent_void_QGroupBox_QShowEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[28] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QGroupBox_tabletEvent_void_QGroupBox_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[29] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QGroupBox_wheelEvent_void_QGroupBox_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QGroupBox"), new Param(c, "event", "qt.QWheelEvent"), End),
             // MISSING: initPainter (void; QGroupBox this, "QPainter *" painter)
             // // protected
-            _func[30] = new MemberFunction(
-                c, "metric", _n_metric0, None, Compiled,
-                qt_QGroupBox_metric_int_QGroupBox_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QGroupBox"),
-                new Param(c, "m", "int"), End),
+            _func[30] = new MemberFunction(c, "metric", _n_metric0, None, Compiled, qt_QGroupBox_metric_int_QGroupBox_int, Return, "int",
+                                           Parameters, new Param(c, "this", "qt.QGroupBox"), new Param(c, "m", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

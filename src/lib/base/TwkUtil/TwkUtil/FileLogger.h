@@ -21,8 +21,7 @@ namespace TwkUtil
         FileLogger();
         ~FileLogger();
 
-        void logToFile(spdlog::level::level_enum lineLevel,
-                       const std::string& line);
+        void logToFile(spdlog::level::level_enum lineLevel, const std::string& line);
 
     private:
         spdlog::logger* m_logger;

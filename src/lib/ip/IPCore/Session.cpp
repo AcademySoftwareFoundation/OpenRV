@@ -68,14 +68,12 @@
 #endif
 
 // Flush the audio cache when stopping the playback when ON (default=OFF)
-static ENVVAR_BOOL(evFlushAudioCacheWhenStoppingPlayback,
-                   "RV_FLUSH_AUDIO_CACHE_WHEN_STOPPING_PLAYBACK", false);
+static ENVVAR_BOOL(evFlushAudioCacheWhenStoppingPlayback, "RV_FLUSH_AUDIO_CACHE_WHEN_STOPPING_PLAYBACK", false);
 
 // Disable automatic garbage collection during playback to make sure the
 // playback doesn't get interrupted which could cause skipped frames.
 // The garbage collection will resume as soon as the playback is stopped.
-static ENVVAR_BOOL(evDisableGarbageCollectionDuringPlayback,
-                   "RV_DISABLE_GARBAGE_COLLECTION_DURING_PLAYBACK", true);
+static ENVVAR_BOOL(evDisableGarbageCollectionDuringPlayback, "RV_DISABLE_GARBAGE_COLLECTION_DURING_PLAYBACK", true);
 
 template <typename T> inline T mod(const T& a, const T& by)
 {
@@ -133,40 +131,26 @@ namespace IPCore
     Session* Session::m_currentSession = 0;
     float Session::m_maxBufferedWaitSeconds = 1.0;
     float Session::m_cacheLookBehindFraction = 0.0;
-    size_t Session::m_maxGreedyCacheSize =
-        size_t(8.5 * 1024.0 * 1024.0 * 1024.0);
-    size_t Session::m_maxBufferCacheSize =
-        size_t(0.5 * 1024.0 * 1024.0 * 1024.0);
-    float Session::m_audioDrift =
-        1.0; // amount in frames audio allowed to drift before correction
+    size_t Session::m_maxGreedyCacheSize = size_t(8.5 * 1024.0 * 1024.0 * 1024.0);
+    size_t Session::m_maxBufferCacheSize = size_t(0.5 * 1024.0 * 1024.0 * 1024.0);
+    float Session::m_audioDrift = 1.0; // amount in frames audio allowed to drift before correction
     bool Session::m_usePreEval = false;
     Session::StringVector Session::m_vStrings;
     Session::StringVector Session::m_VStrings;
 
-    NOTIFIER_MESSAGE_IMP(Session, startPlayMessage,
-                         "session start play message")
+    NOTIFIER_MESSAGE_IMP(Session, startPlayMessage, "session start play message")
     NOTIFIER_MESSAGE_IMP(Session, stopPlayMessage, "session stop play message")
-    NOTIFIER_MESSAGE_IMP(Session, frameChangedMessage,
-                         "session frame changed message")
+    NOTIFIER_MESSAGE_IMP(Session, frameChangedMessage, "session frame changed message")
     NOTIFIER_MESSAGE_IMP(Session, updateMessage, "session update message")
-    NOTIFIER_MESSAGE_IMP(Session, updateLoadingMessage,
-                         "session update loading message")
-    NOTIFIER_MESSAGE_IMP(Session, forcedUpdateMessage,
-                         "session force update message")
-    NOTIFIER_MESSAGE_IMP(Session, fullScreenOnMessage,
-                         "session full screen on message")
-    NOTIFIER_MESSAGE_IMP(Session, fullScreenOffMessage,
-                         "session full screen off message")
-    NOTIFIER_MESSAGE_IMP(Session, sessionChangedMessage,
-                         "session changed message")
-    NOTIFIER_MESSAGE_IMP(Session, stereoHardwareOnMessage,
-                         "session stereo hardware on message")
-    NOTIFIER_MESSAGE_IMP(Session, stereoHardwareOffMessage,
-                         "session stereo hardware off message")
-    NOTIFIER_MESSAGE_IMP(Session, audioUnavailbleMessage,
-                         "session audio unavailable");
-    NOTIFIER_MESSAGE_IMP(Session, eventDeviceChangedMessage,
-                         "session event device changed");
+    NOTIFIER_MESSAGE_IMP(Session, updateLoadingMessage, "session update loading message")
+    NOTIFIER_MESSAGE_IMP(Session, forcedUpdateMessage, "session force update message")
+    NOTIFIER_MESSAGE_IMP(Session, fullScreenOnMessage, "session full screen on message")
+    NOTIFIER_MESSAGE_IMP(Session, fullScreenOffMessage, "session full screen off message")
+    NOTIFIER_MESSAGE_IMP(Session, sessionChangedMessage, "session changed message")
+    NOTIFIER_MESSAGE_IMP(Session, stereoHardwareOnMessage, "session stereo hardware on message")
+    NOTIFIER_MESSAGE_IMP(Session, stereoHardwareOffMessage, "session stereo hardware off message")
+    NOTIFIER_MESSAGE_IMP(Session, audioUnavailbleMessage, "session audio unavailable");
+    NOTIFIER_MESSAGE_IMP(Session, eventDeviceChangedMessage, "session event device changed");
 
     static deque<int> m_frameHistory;
 
@@ -186,15 +170,11 @@ namespace IPCore
 
         virtual ~AuxUserRender() {}
 
-        virtual void render(VideoDevice::DisplayMode mode, bool leftEye,
-                            bool rightEye, bool forController,
-                            bool forOutput) const;
+        virtual void render(VideoDevice::DisplayMode mode, bool leftEye, bool rightEye, bool forController, bool forOutput) const;
         Session* session;
     };
 
-    void AuxUserRender::render(VideoDevice::DisplayMode mode, bool leftEye,
-                               bool rightEye, bool forController,
-                               bool forOutput) const
+    void AuxUserRender::render(VideoDevice::DisplayMode mode, bool leftEye, bool rightEye, bool forController, bool forOutput) const
     {
         GLPushAttrib attr(GL_ALL_ATTRIB_BITS);
         string contents = (leftEye) ? ((rightEye) ? "both" : "left") : "right";
@@ -202,8 +182,7 @@ namespace IPCore
 
         if (debugProfile)
         {
-            Session::ProfilingRecord& trecord =
-                session->currentProfilingSample();
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
             startTime = session->profilingElapsedTime();
             if (trecord.userRenderStart == 0.0)
                 trecord.userRenderStart = startTime;
@@ -212,22 +191,19 @@ namespace IPCore
         if (forController)
         {
             session->setEventVideoDevice(session->controlVideoDevice());
-            session->userRender(session->controlVideoDevice(), "render",
-                                contents);
+            session->userRender(session->controlVideoDevice(), "render", contents);
         }
 
         if (forOutput)
         {
             session->setEventVideoDevice(session->outputVideoDevice());
-            session->userRender(session->outputVideoDevice(),
-                                "render-output-device", contents);
+            session->userRender(session->outputVideoDevice(), "render-output-device", contents);
             session->setEventVideoDevice(session->controlVideoDevice());
         }
 
         if (debugProfile)
         {
-            Session::ProfilingRecord& trecord =
-                session->currentProfilingSample();
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
             double endTime = session->profilingElapsedTime();
 
             //
@@ -265,24 +241,19 @@ namespace IPCore
         Session* session;
     };
 
-    void* AuxAudioRenderer::audioForFrame(int f, size_t seqindex,
-                                          size_t& n) const
+    void* AuxAudioRenderer::audioForFrame(int f, size_t seqindex, size_t& n) const
     {
         n = 0;
 
-        PerFrameAudioRenderer* a =
-            dynamic_cast<PerFrameAudioRenderer*>(AudioRenderer::renderer());
+        PerFrameAudioRenderer* a = dynamic_cast<PerFrameAudioRenderer*>(AudioRenderer::renderer());
 
         if (!a)
             return 0;
 
         // If we are not playing and not scrubbing then we don't expect to fill
         // the buffer
-        bool silence =
-            !session->isPlaying()
-            && !(session->audioCachingMode() == Session::GreedyCache);
-        PerFrameAudioRenderer::FrameData d =
-            a->dataForFrame(f - session->rangeStart(), seqindex, silence);
+        bool silence = !session->isPlaying() && !(session->audioCachingMode() == Session::GreedyCache);
+        PerFrameAudioRenderer::FrameData d = a->dataForFrame(f - session->rangeStart(), seqindex, silence);
         n = d.numSamples;
 
         return d.data;
@@ -447,8 +418,7 @@ namespace IPCore
         getrlimit(RLIMIT_NOFILE, &rlim);
         if (rlim.rlim_cur < target)
         {
-            cerr << "WARNING: unable to increase open file limit above "
-                 << rlim.rlim_cur << endl;
+            cerr << "WARNING: unable to increase open file limit above " << rlim.rlim_cur << endl;
         }
 #endif
 
@@ -486,16 +456,11 @@ namespace IPCore
 
             if (debugPlayback)
             {
-                cerr << "INFO: RV_VSYNC_MAX_INTERVAL " << RV_VSYNC_MAX_INTERVAL
-                     << endl;
-                cerr << "INFO: RV_VSYNC_MIN_INTERVAL " << RV_VSYNC_MIN_INTERVAL
-                     << endl;
-                cerr << "INFO: RV_VSYNC_ADD_OFFSET " << RV_VSYNC_ADD_OFFSET
-                     << endl;
-                cerr << "INFO: RV_VSYNC_RATE_FORCE " << RV_VSYNC_RATE_FORCE
-                     << endl;
-                cerr << "INFO: RV_VSYNC_IGNORE_DEVICE "
-                     << RV_VSYNC_IGNORE_DEVICE << endl;
+                cerr << "INFO: RV_VSYNC_MAX_INTERVAL " << RV_VSYNC_MAX_INTERVAL << endl;
+                cerr << "INFO: RV_VSYNC_MIN_INTERVAL " << RV_VSYNC_MIN_INTERVAL << endl;
+                cerr << "INFO: RV_VSYNC_ADD_OFFSET " << RV_VSYNC_ADD_OFFSET << endl;
+                cerr << "INFO: RV_VSYNC_RATE_FORCE " << RV_VSYNC_RATE_FORCE << endl;
+                cerr << "INFO: RV_VSYNC_IGNORE_DEVICE " << RV_VSYNC_IGNORE_DEVICE << endl;
             }
         }
 
@@ -515,8 +480,7 @@ namespace IPCore
 
         if (optionMap.count("loopMode") > 0)
         {
-            m_playMode =
-                static_cast<PlayMode>(any_cast<int>(optionMap["loopMode"]));
+            m_playMode = static_cast<PlayMode>(any_cast<int>(optionMap["loopMode"]));
         }
 
         if (getenv("RV_DEBUG_GC"))
@@ -634,8 +598,7 @@ namespace IPCore
 
         if (debugPlayback)
         {
-            cerr << "INFO: RV_AVPLAYBACK_VERSION " << m_avPlaybackVersion
-                 << endl;
+            cerr << "INFO: RV_AVPLAYBACK_VERSION " << m_avPlaybackVersion << endl;
         }
 
         //
@@ -643,12 +606,10 @@ namespace IPCore
         // the audio device is stopped during stop "turn-around" event.
         // NB: This only applies if preRoll mode is enabled.
         //
-        if (const char* enableFastTurnAroundStr =
-                getenv("RV_ENABLE_FAST_TURNAROUND"))
+        if (const char* enableFastTurnAroundStr = getenv("RV_ENABLE_FAST_TURNAROUND"))
 
         {
-            m_enableFastTurnAround =
-                (atoi(enableFastTurnAroundStr) ? true : false);
+            m_enableFastTurnAround = (atoi(enableFastTurnAroundStr) ? true : false);
         }
         else
         {
@@ -657,8 +618,7 @@ namespace IPCore
 
         if (debugPlayback)
         {
-            cerr << "INFO: RV_ENABLE_FAST_TURNAROUND "
-                 << (int)m_enableFastTurnAround << endl;
+            cerr << "INFO: RV_ENABLE_FAST_TURNAROUND " << (int)m_enableFastTurnAround << endl;
         }
 
         setRendererType("Composite");
@@ -733,8 +693,7 @@ namespace IPCore
             return;
 
         // Remove category from disallowed list if it exists
-        auto it = std::find(m_disabledEventCategories.begin(),
-                            m_disabledEventCategories.end(), category);
+        auto it = std::find(m_disabledEventCategories.begin(), m_disabledEventCategories.end(), category);
         if (it != m_disabledEventCategories.end())
         {
             m_disabledEventCategories.erase(it);
@@ -748,9 +707,7 @@ namespace IPCore
             return;
 
         // Don't add duplicates
-        if (std::find(m_disabledEventCategories.begin(),
-                      m_disabledEventCategories.end(), category)
-            == m_disabledEventCategories.end())
+        if (std::find(m_disabledEventCategories.begin(), m_disabledEventCategories.end(), category) == m_disabledEventCategories.end())
         {
             m_disabledEventCategories.push_back(category);
         }
@@ -763,20 +720,12 @@ namespace IPCore
         if (category.empty())
             return false;
 
-        return std::find(m_disabledEventCategories.begin(),
-                         m_disabledEventCategories.end(), category)
-               != m_disabledEventCategories.end();
+        return std::find(m_disabledEventCategories.begin(), m_disabledEventCategories.end(), category) != m_disabledEventCategories.end();
     }
 
-    bool Session::isEventCategoryEnabled(std::string_view category) const
-    {
-        return !isEventCategoryDisabled(category);
-    }
+    bool Session::isEventCategoryEnabled(std::string_view category) const { return !isEventCategoryDisabled(category); }
 
-    const std::vector<std::string_view>& Session::disabledEventCategories() const
-    {
-        return m_disabledEventCategories;
-    }
+    const std::vector<std::string_view>& Session::disabledEventCategories() const { return m_disabledEventCategories; }
 
     void Session::setName(const string& n) { m_name = n; }
 
@@ -844,16 +793,14 @@ namespace IPCore
 
         for (size_t i = 0; i < nodes.size(); i++)
         {
-            if (SoundTrackIPNode* snode =
-                    dynamic_cast<SoundTrackIPNode*>(nodes[i]))
+            if (SoundTrackIPNode* snode = dynamic_cast<SoundTrackIPNode*>(nodes[i]))
             {
                 if (internal)
                 {
                     if (snode->setInternalOffset(o))
                         changed = true;
                 }
-                else if (TwkContainer::FloatProperty* fp =
-                             snode->property<FloatProperty>("audio.offset"))
+                else if (TwkContainer::FloatProperty* fp = snode->property<FloatProperty>("audio.offset"))
                 {
                     if (fp->front() != o)
                     {
@@ -876,8 +823,7 @@ namespace IPCore
 
         for (size_t i = 0; i < nodes.size(); i++)
         {
-            if (TwkContainer::IntProperty* ip =
-                    nodes[i]->property<IntProperty>("stereo.swap"))
+            if (TwkContainer::IntProperty* ip = nodes[i]->property<IntProperty>("stereo.swap"))
             {
                 ip->resize(1);
                 (*ip)[0] = b ? 1 : 0;
@@ -901,10 +847,7 @@ namespace IPCore
 
     void Session::audioVarLock() { pthread_mutex_lock(&m_audioRendererMutex); }
 
-    void Session::audioVarUnLock()
-    {
-        pthread_mutex_unlock(&m_audioRendererMutex);
-    }
+    void Session::audioVarUnLock() { pthread_mutex_unlock(&m_audioRendererMutex); }
 
     void Session::setAudioTimeShift(double d, double sensitivity)
     {
@@ -917,8 +860,7 @@ namespace IPCore
         //
         if (audioTimeShiftValid() && d != std::numeric_limits<double>::max())
         {
-            m_audioTimeShift =
-                d * sensitivity + m_audioTimeShift * (1.0 - sensitivity);
+            m_audioTimeShift = d * sensitivity + m_audioTimeShift * (1.0 - sensitivity);
         }
         else
         {
@@ -938,8 +880,7 @@ namespace IPCore
     {
         if (audioRenderer())
         {
-            if (m_enableFastTurnAround && m_playMode != PlayOnce
-                && eventData == "turn-around")
+            if (m_enableFastTurnAround && m_playMode != PlayOnce && eventData == "turn-around")
             {
                 audioRenderer()->stopOnTurnAround(this);
             }
@@ -974,26 +915,19 @@ namespace IPCore
     Session::AudioRange Session::calculateAudioRange(double rate) const
     {
         bool playBackwards = (inc() < 0);
-        SampleTime sessionStartSample =
-            (playBackwards)
-                ? timeToSamples(double(m_frame - rangeStart() + 1) / fps(),
-                                rate)
-                : timeToSamples(double(m_frame - rangeStart()) / fps(), rate);
-        SampleTime sessionEndSample =
-            timeToSamples(double(rangeEnd() - rangeStart()) / fps(), rate) - 1;
+        SampleTime sessionStartSample = (playBackwards) ? timeToSamples(double(m_frame - rangeStart() + 1) / fps(), rate)
+                                                        : timeToSamples(double(m_frame - rangeStart()) / fps(), rate);
+        SampleTime sessionEndSample = timeToSamples(double(rangeEnd() - rangeStart()) / fps(), rate) - 1;
 
         return AudioRange(sessionStartSample, sessionEndSample);
     }
 
     void Session::audioConfigure()
     {
-        const AudioRenderer::DeviceState& state =
-            audioRenderer()->deviceState();
+        const AudioRenderer::DeviceState& state = audioRenderer()->deviceState();
         AudioRange range = calculateAudioRange(state.rate);
-        IPCore::IPGraph::AudioConfiguration config(
-            state.rate, state.layout,
-            state.framesPerBuffer / TwkAudio::channelsCount(state.layout),
-            fps(), (inc() < 0), range.first, range.second);
+        IPCore::IPGraph::AudioConfiguration config(state.rate, state.layout, state.framesPerBuffer / TwkAudio::channelsCount(state.layout),
+                                                   fps(), (inc() < 0), range.first, range.second);
 
         graph().audioConfigure(config);
     }
@@ -1041,8 +975,7 @@ namespace IPCore
         }
         else
         {
-            cerr << "WARNING: requested unknown renderer type " << type
-                 << " using Composite" << endl;
+            cerr << "WARNING: requested unknown renderer type " << type << " using Composite" << endl;
             m_renderer = new ImageRenderer("Composite");
         }
     }
@@ -1140,21 +1073,18 @@ namespace IPCore
 
                 graph().setDevice(m_controlVideoDevice, m_outputVideoDevice);
 
-                m_realtimeOverride =
-                    m_outputVideoDevice != m_controlVideoDevice;
+                m_realtimeOverride = m_outputVideoDevice != m_controlVideoDevice;
 
                 if (d->audioOutputEnabled())
                 {
                     if (d != old)
                     {
-                        VideoDevice::AudioFormat aformat =
-                            d->audioFormatAtIndex(d->currentAudioFormat());
+                        VideoDevice::AudioFormat aformat = d->audioFormatAtIndex(d->currentAudioFormat());
                         AudioRenderer::RendererParameters params;
 
                         VideoDevice::AudioFrameSizeVector sizes;
                         d->audioFrameSizeSequence(sizes);
-                        size_t totalFrames =
-                            accumulate(sizes.begin(), sizes.end(), 0);
+                        size_t totalFrames = accumulate(sizes.begin(), sizes.end(), 0);
 
                         params.holdOpen = true;
                         params.hardwareLock = true;
@@ -1166,21 +1096,13 @@ namespace IPCore
 
                         if (AudioRenderer::debug)
                         {
-                            cerr << "PerFrame AUDIO: init params.device="
-                                 << params.device << endl;
-                            cerr << "PerFrameAUDIO: init params.format="
-                                 << (int)params.format << " ("
-                                 << TwkAudio::formatString(params.format) << ")"
-                                 << endl;
-                            cerr << "PerFrameAUDIO: init params.rate="
-                                 << (int)params.rate << endl;
-                            cerr << "PerFrameAUDIO: init params.layout="
-                                 << (int)params.layout << " ("
-                                 << TwkAudio::channelsCount(params.layout)
-                                 << " channels)" << endl;
-                            cerr
-                                << "PerFrameAUDIO: init params.framesPerBuffer="
-                                << (int)params.framesPerBuffer << endl;
+                            cerr << "PerFrame AUDIO: init params.device=" << params.device << endl;
+                            cerr << "PerFrameAUDIO: init params.format=" << (int)params.format << " ("
+                                 << TwkAudio::formatString(params.format) << ")" << endl;
+                            cerr << "PerFrameAUDIO: init params.rate=" << (int)params.rate << endl;
+                            cerr << "PerFrameAUDIO: init params.layout=" << (int)params.layout << " ("
+                                 << TwkAudio::channelsCount(params.layout) << " channels)" << endl;
+                            cerr << "PerFrameAUDIO: init params.framesPerBuffer=" << (int)params.framesPerBuffer << endl;
                         }
 
                         AudioRenderer::pushPerFrameModule(params);
@@ -1213,8 +1135,7 @@ namespace IPCore
         ostringstream s;
         if (m_outputVideoDevice != m_controlVideoDevice && m_outputVideoDevice)
         {
-            s << m_outputVideoDevice->module()->name() << "/"
-              << m_outputVideoDevice->name();
+            s << m_outputVideoDevice->module()->name() << "/" << m_outputVideoDevice->name();
         }
 
         if (old != m_outputVideoDevice)
@@ -1261,11 +1182,9 @@ namespace IPCore
 
         if (inPoint() != rangeStart() || outPoint() != rangeEnd())
         {
-            node->declareProperty<Vec2iProperty>("session.region",
-                                                 Vec2i(inPoint(), outPoint()));
+            node->declareProperty<Vec2iProperty>("session.region", Vec2i(inPoint(), outPoint()));
         }
-        else if (Vec2iProperty* rp =
-                     node->property<Vec2iProperty>("session.region"))
+        else if (Vec2iProperty* rp = node->property<Vec2iProperty>("session.region"))
         {
             node->removeProperty(rp);
         }
@@ -1277,10 +1196,8 @@ namespace IPCore
     void Session::copyFullSessionStateToContainer(PropertyContainer& pc)
     {
         pc.declareProperty<StringProperty>("session.viewNode", viewNodeName());
-        pc.declareProperty<Vec2iProperty>("session.range",
-                                          Vec2i(rangeStart(), rangeEnd()));
-        pc.declareProperty<Vec2iProperty>("session.region",
-                                          Vec2i(inPoint(), outPoint()));
+        pc.declareProperty<Vec2iProperty>("session.range", Vec2i(rangeStart(), rangeEnd()));
+        pc.declareProperty<Vec2iProperty>("session.region", Vec2i(inPoint(), outPoint()));
         pc.declareProperty<FloatProperty>("session.fps", fps());
         pc.declareProperty<IntProperty>("session.realtime", realtime());
         pc.declareProperty<IntProperty>("session.inc", inc());
@@ -1296,10 +1213,8 @@ namespace IPCore
 
     void Session::copyConnectionsToContainer(PropertyContainer& cons)
     {
-        StringPairProperty* connections =
-            cons.createProperty<StringPairProperty>("evaluation.connections");
-        StringProperty* roots =
-            cons.createProperty<StringProperty>("evaluation.roots");
+        StringPairProperty* connections = cons.createProperty<StringPairProperty>("evaluation.connections");
+        StringProperty* roots = cons.createProperty<StringProperty>("evaluation.roots");
         StringProperty* top = cons.createProperty<StringProperty>("top.nodes");
 
         // only get top-level connections
@@ -1314,8 +1229,7 @@ namespace IPCore
                 roots->push_back(rootInputs[i]->name());
         }
 
-        for (NodeMap::const_iterator i = viewableNodes.begin();
-             i != viewableNodes.end(); ++i)
+        for (NodeMap::const_iterator i = viewableNodes.begin(); i != viewableNodes.end(); ++i)
         {
             top->push_back(i->first);
         }
@@ -1364,8 +1278,7 @@ namespace IPCore
             setFrameInternal(rangeStart());
         }
 
-        if (FloatProperty* fpsp =
-                node->createProperty<FloatProperty>("session.fps"))
+        if (FloatProperty* fpsp = node->createProperty<FloatProperty>("session.fps"))
         {
             if (fpsp->empty() || fpsp->front() == 0.0)
             {
@@ -1447,8 +1360,7 @@ namespace IPCore
 
     std::string Session::nextViewNode()
     {
-        if (m_viewStackIndex >= 0 && m_viewStackIndex < m_viewStack.size() - 1
-            && graph().findNode(m_viewStack[m_viewStackIndex + 1]))
+        if (m_viewStackIndex >= 0 && m_viewStackIndex < m_viewStack.size() - 1 && graph().findNode(m_viewStack[m_viewStackIndex + 1]))
         {
             return m_viewStack[m_viewStackIndex + 1];
         }
@@ -1458,8 +1370,7 @@ namespace IPCore
 
     std::string Session::previousViewNode()
     {
-        if (m_viewStackIndex > 0 && m_viewStackIndex <= m_viewStack.size() - 1
-            && graph().findNode(m_viewStack[m_viewStackIndex - 1]))
+        if (m_viewStackIndex > 0 && m_viewStackIndex <= m_viewStack.size() - 1 && graph().findNode(m_viewStack[m_viewStackIndex - 1]))
         {
             return m_viewStack[m_viewStackIndex - 1];
         }
@@ -1467,11 +1378,7 @@ namespace IPCore
         return "";
     }
 
-    IPNode* Session::newNode(const std::string& typeName,
-                             const std::string& nodeName)
-    {
-        return graph().newNode(typeName, nodeName);
-    }
+    IPNode* Session::newNode(const std::string& typeName, const std::string& nodeName) { return graph().newNode(typeName, nodeName); }
 
     void Session::setSessionType(SessionType type)
     {
@@ -1530,25 +1437,14 @@ namespace IPCore
 #ifdef PLATFORM_LINUX
                     if (audioRenderer()->hasHardwareLock())
                     {
-                        ts = std::floor((audioTimeShift()
-                                         - audioRenderer()->preRollDelay())
-                                        * hz)
-                                 / hz
-                             - m_timerOffset;
+                        ts = std::floor((audioTimeShift() - audioRenderer()->preRollDelay()) * hz) / hz - m_timerOffset;
                     }
                     else
                     {
-                        ts = std::floor((audioTimeShift()
-                                         - audioRenderer()->preRollDelay())
-                                        * hz)
-                             / hz;
+                        ts = std::floor((audioTimeShift() - audioRenderer()->preRollDelay()) * hz) / hz;
                     }
 #else
-                    ts = std::floor((audioTimeShift()
-                                     - audioRenderer()->preRollDelay())
-                                    * hz)
-                             / hz
-                         - m_timerOffset;
+                    ts = std::floor((audioTimeShift() - audioRenderer()->preRollDelay()) * hz) / hz - m_timerOffset;
 #endif
                 }
                 audioVarUnLock();
@@ -1584,10 +1480,7 @@ namespace IPCore
         m_playIncChangedSignal();
     }
 
-    IPNode* Session::node(const std::string& name) const
-    {
-        return graph().findNode(name);
-    }
+    IPNode* Session::node(const std::string& name) const { return graph().findNode(name); }
 
     void Session::updateRange()
     {
@@ -1598,9 +1491,7 @@ namespace IPCore
 
         // Reset the in/out points when they match the range or when they are
         // invalid
-        const bool resetInOut =
-            (inPoint() == rangeStart() && outPoint() == rangeEnd())
-            || (inPoint() >= outPoint());
+        const bool resetInOut = (inPoint() == rangeStart() && outPoint() == rangeEnd()) || (inPoint() >= outPoint());
 
         //
         //  this will cause threads to stop. Its necessary because we're going
@@ -1643,8 +1534,7 @@ namespace IPCore
                     setViewNode(previousViewNode());
                 else
                 {
-                    IPGraph::NodeMap::const_iterator i =
-                        vnodes.find(node->name());
+                    IPGraph::NodeMap::const_iterator i = vnodes.find(node->name());
                     ++i;
                     if (i == vnodes.end())
                         i = vnodes.begin();
@@ -1683,20 +1573,16 @@ namespace IPCore
 
     void Session::updateGraphInOut(bool flushAudio)
     {
-        graph().setCachingMode(graph().cachingMode(), inPoint(), outPoint(),
-                               rangeStart(), rangeEnd(), inc(), currentFrame(),
-                               fps());
+        graph().setCachingMode(graph().cachingMode(), inPoint(), outPoint(), rangeStart(), rangeEnd(), inc(), currentFrame(), fps());
 
         if (debugPlaybackVerbose)
         {
-            cout << "DEBUG: updateGraphInOut("
-                 << (flushAudio ? "flushAudio" : "") << ")" << endl;
+            cout << "DEBUG: updateGraphInOut(" << (flushAudio ? "flushAudio" : "") << ")" << endl;
         }
 
         if (flushAudio && graph().isAudioConfigured())
         {
-            const IPCore::IPGraph::AudioConfiguration& oldConfig =
-                graph().lastAudioConfiguration();
+            const IPCore::IPGraph::AudioConfiguration& oldConfig = graph().lastAudioConfiguration();
             IPCore::IPGraph::AudioConfiguration newConfig = oldConfig;
 
             AudioRange range = calculateAudioRange(oldConfig.rate);
@@ -1705,10 +1591,8 @@ namespace IPCore
             newConfig.fps = fps();
             newConfig.backwards = (inc() < 0);
 
-            if (newConfig.fps != oldConfig.fps
-                || newConfig.backwards != oldConfig.backwards
-                || newConfig.startSample != oldConfig.startSample
-                || newConfig.endSample != oldConfig.endSample)
+            if (newConfig.fps != oldConfig.fps || newConfig.backwards != oldConfig.backwards
+                || newConfig.startSample != oldConfig.startSample || newConfig.endSample != oldConfig.endSample)
             {
                 if (debugPlaybackVerbose)
                     cout << "DEBUG: audioConfigure" << endl;
@@ -2013,8 +1897,7 @@ namespace IPCore
         //
         if (eventData != "buffering")
         {
-            updateGraphInOut(
-                false); // flushAudio=false (not needed, and causes inf loop)
+            updateGraphInOut(false); // flushAudio=false (not needed, and causes inf loop)
         }
         m_preEval = m_usePreEval;
         if (isPlaying() || rangeStart() == (rangeEnd() - 1))
@@ -2022,8 +1905,7 @@ namespace IPCore
         m_bufferWait = false;
         elapsedOffset = 0.0;
 
-        bool isOutputDevice =
-            multipleVideoDevices() && outputVideoDevice()->hasClock();
+        bool isOutputDevice = multipleVideoDevices() && outputVideoDevice()->hasClock();
 
         if (m_playMode == PlayOnce)
         {
@@ -2034,8 +1916,7 @@ namespace IPCore
         }
         if (m_frame >= outPoint() || m_frame < inPoint())
         {
-            setFrameInternal((m_inc > 0) ? inPoint() : outPoint() - 1,
-                             eventData);
+            setFrameInternal((m_inc > 0) ? inPoint() : outPoint() - 1, eventData);
         }
 
         userGenericEvent("before-play-start", eventData);
@@ -2107,8 +1988,7 @@ namespace IPCore
 
         if (eventData != "buffering")
         {
-            updateGraphInOut(
-                false); // flushAudio=false (not needed, and causes inf loop)
+            updateGraphInOut(false); // flushAudio=false (not needed, and causes inf loop)
         }
 
         m_preEval = m_usePreEval;
@@ -2116,8 +1996,7 @@ namespace IPCore
             return;
         m_bufferWait = false;
 
-        bool isOutputDevice =
-            multipleVideoDevices() && outputVideoDevice()->hasClock();
+        bool isOutputDevice = multipleVideoDevices() && outputVideoDevice()->hasClock();
 
         if (m_playMode == PlayOnce)
         {
@@ -2128,8 +2007,7 @@ namespace IPCore
         }
         if (m_frame >= outPoint() || m_frame < inPoint())
         {
-            setFrameInternal((m_inc > 0) ? inPoint() : outPoint() - 1,
-                             eventData);
+            setFrameInternal((m_inc > 0) ? inPoint() : outPoint() - 1, eventData);
         }
 
         userGenericEvent("before-play-start", eventData);
@@ -2272,8 +2150,7 @@ namespace IPCore
 
         if (debugPlayback)
         {
-            cout << "Total PATTERN FAIL count = " << m_framePatternFailCount
-                 << endl;
+            cout << "Total PATTERN FAIL count = " << m_framePatternFailCount << endl;
         }
     }
 
@@ -2292,8 +2169,7 @@ namespace IPCore
 
     void Session::checkInDisplayImage()
     {
-        if (m_displayImage && m_displayImage != m_errorImage
-            && m_displayImage != m_proxyImage)
+        if (m_displayImage && m_displayImage != m_errorImage && m_displayImage != m_proxyImage)
         {
             graph().checkInImage(m_displayImage);
         }
@@ -2304,8 +2180,7 @@ namespace IPCore
 
     void Session::checkInPreDisplayImage()
     {
-        if (m_preDisplayImage && m_preDisplayImage != m_errorImage
-            && m_preDisplayImage != m_proxyImage)
+        if (m_preDisplayImage && m_preDisplayImage != m_errorImage && m_preDisplayImage != m_proxyImage)
         {
             //
             //  wait until the upload thread is done with it.
@@ -2320,8 +2195,7 @@ namespace IPCore
 
     void Session::swapDisplayImage()
     {
-        if (m_displayImage && m_displayImage != m_errorImage
-            && m_displayImage != m_proxyImage)
+        if (m_displayImage && m_displayImage != m_errorImage && m_displayImage != m_proxyImage)
         {
             graph().checkInImage(m_displayImage, true, m_preDisplayFrame);
         }
@@ -2367,8 +2241,7 @@ namespace IPCore
 
     void Session::unmarkFrame(int f)
     {
-        Frames::iterator i =
-            find(m_markedFrames.begin(), m_markedFrames.end(), f);
+        Frames::iterator i = find(m_markedFrames.begin(), m_markedFrames.end(), f);
 
         if (i != m_markedFrames.end())
         {
@@ -2383,8 +2256,7 @@ namespace IPCore
 
     bool Session::isMarked(int f)
     {
-        Frames::iterator i =
-            find(m_markedFrames.begin(), m_markedFrames.end(), f);
+        Frames::iterator i = find(m_markedFrames.begin(), m_markedFrames.end(), f);
 
         return i != m_markedFrames.end();
     }
@@ -2409,25 +2281,19 @@ namespace IPCore
 
         if (!isRendering() || force)
         {
-            if (const TwkGLF::GLVideoDevice* d =
-                    dynamic_cast<const TwkGLF::GLVideoDevice*>(
-                        controlVideoDevice()))
+            if (const TwkGLF::GLVideoDevice* d = dynamic_cast<const TwkGLF::GLVideoDevice*>(controlVideoDevice()))
             {
                 d->redraw();
             }
 
-            if (const TwkGLF::GLVideoDevice* d =
-                    dynamic_cast<const TwkGLF::GLVideoDevice*>(
-                        outputVideoDevice()))
+            if (const TwkGLF::GLVideoDevice* d = dynamic_cast<const TwkGLF::GLVideoDevice*>(outputVideoDevice()))
             {
                 d->redraw();
             }
 
-            if (outputVideoDevice()
-                && outputVideoDevice() != controlVideoDevice())
+            if (outputVideoDevice() && outputVideoDevice() != controlVideoDevice())
             {
-                if (DisplayGroupIPNode* dgroup =
-                        graph().findDisplayGroupByDevice(outputVideoDevice()))
+                if (DisplayGroupIPNode* dgroup = graph().findDisplayGroupByDevice(outputVideoDevice()))
                 {
                     dgroup->incrementRenderHashCount();
                 }
@@ -2519,10 +2385,7 @@ namespace IPCore
         }
     }
 
-    double Session::outputDeviceHz() const
-    {
-        return (m_outputVideoDevice ? m_outputVideoDevice->timing().hz : 60.0);
-    }
+    double Session::outputDeviceHz() const { return (m_outputVideoDevice ? m_outputVideoDevice->timing().hz : 60.0); }
 
     void Session::setFPS(double f)
     {
@@ -2666,8 +2529,7 @@ namespace IPCore
         const Time halfSync = Time(1.0) / (Time(2.0) * hz);
         const int direction = inc() > 0 ? 1 : -1;
         const Time epsmult = 1.00001; // precision slop when dealing with 25:10
-        const int newFrame =
-            (duration < (halfSync * epsmult)) ? (rframe + 1) : rframe;
+        const int newFrame = (duration < (halfSync * epsmult)) ? (rframe + 1) : rframe;
         const int cframe = newFrame + errorFrame;
 
         if (debugPlayback)
@@ -2689,13 +2551,10 @@ namespace IPCore
 
                     if (debugPlaybackVerbose)
                     {
-                        cout << "DEBUG: missed " << (sync - sync0 - 1)
-                             << " sync points"
+                        cout << "DEBUG: missed " << (sync - sync0 - 1) << " sync points"
                              << ", " << (elapsed - lelapsed) << "s"
                              << " at " << cframe << " (" << m_frame << ")"
-                             << " sdiff = " << (s - m_lastFData.front().s)
-                             << " rawdiff = "
-                             << (elapsedRaw - m_lastFData.front().elapsedRaw)
+                             << " sdiff = " << (s - m_lastFData.front().s) << " rawdiff = " << (elapsedRaw - m_lastFData.front().elapsedRaw)
                              << endl;
                     }
                 }
@@ -2703,9 +2562,8 @@ namespace IPCore
 
             framePatternCheck(cframe);
 
-            m_lastFData.push_front(Fdata(s, sync, elapsed, elapsedHzUnits,
-                                         elapsedRaw, rframe, frame, errorFrame,
-                                         duration, newFrame, cframe));
+            m_lastFData.push_front(
+                Fdata(s, sync, elapsed, elapsedHzUnits, elapsedRaw, rframe, frame, errorFrame, duration, newFrame, cframe));
 
 #if 0
         if (frame > 100 && m_framePatternFail)
@@ -2795,8 +2653,7 @@ namespace IPCore
             }
 
             graph().setCacheNodesActive(active);
-            graph().setCachingMode(gmode, inPoint(), outPoint(), rangeStart(),
-                                   rangeEnd(), inc(), currentFrame(), fps());
+            graph().setCachingMode(gmode, inPoint(), outPoint(), rangeStart(), rangeEnd(), inc(), currentFrame(), fps());
 
             m_cacheMode = mode;
             askForRedraw();
@@ -2854,8 +2711,7 @@ namespace IPCore
         {
             interval = 1.0 / RV_VSYNC_RATE_FORCE;
         }
-        else if (!RV_VSYNC_IGNORE_DEVICE && m_outputVideoDevice
-                 && m_outputVideoDevice->timing().hz != 0.0)
+        else if (!RV_VSYNC_IGNORE_DEVICE && m_outputVideoDevice && m_outputVideoDevice->timing().hz != 0.0)
         //
         //  Else if the device provides a rate use that.
         //
@@ -2880,8 +2736,7 @@ namespace IPCore
             {
                 m_syncTargetRefresh = hz;
                 if (debugPlayback)
-                    cerr << "INFO: new computed target refresh rate " << hz
-                         << endl;
+                    cerr << "INFO: new computed target refresh rate " << hz << endl;
             }
             interval = m_syncInterval;
         }
@@ -2927,8 +2782,7 @@ namespace IPCore
         {
             interval = 1.0 / RV_VSYNC_RATE_FORCE;
         }
-        else if (!RV_VSYNC_IGNORE_DEVICE && m_outputVideoDevice
-                 && m_outputVideoDevice->timing().hz != 0.0)
+        else if (!RV_VSYNC_IGNORE_DEVICE && m_outputVideoDevice && m_outputVideoDevice->timing().hz != 0.0)
         //
         //  Else if the device provides a rate use that.
         //
@@ -2956,8 +2810,7 @@ namespace IPCore
             {
                 m_syncTargetRefresh = hz;
                 if (debugPlayback)
-                    cout << "INFO: new computed target refresh rate " << hz
-                         << endl;
+                    cout << "INFO: new computed target refresh rate " << hz << endl;
             }
             interval = m_syncInterval;
         }
@@ -3009,8 +2862,7 @@ namespace IPCore
         if (!m_syncPredictionEnabled)
             return;
 
-        if (interval > Time(1.0 / RV_VSYNC_MIN_INTERVAL)
-            || interval < Time(1.0 / RV_VSYNC_MAX_INTERVAL))
+        if (interval > Time(1.0 / RV_VSYNC_MIN_INTERVAL) || interval < Time(1.0 / RV_VSYNC_MAX_INTERVAL))
         {
             //
             //  If the time since the last sync is unreasonable (slower
@@ -3060,9 +2912,7 @@ namespace IPCore
 
         // if (!m_syncPredictionEnabled) return;
 
-        if (!firstTime
-            && (interval > Time(1.0 / RV_VSYNC_MIN_INTERVAL)
-                || interval < Time(1.0 / RV_VSYNC_MAX_INTERVAL)))
+        if (!firstTime && (interval > Time(1.0 / RV_VSYNC_MIN_INTERVAL) || interval < Time(1.0 / RV_VSYNC_MAX_INTERVAL)))
         {
             //
             //  If the time since the last sync is unreasonable (slower
@@ -3126,9 +2976,7 @@ namespace IPCore
             {
                 // In progressive source loading, we need to wait until the
                 // first load is actually completed
-                static const bool progressiveSourceLoading =
-                    Application::optionValue<bool>("progressiveSourceLoading",
-                                                   false);
+                static const bool progressiveSourceLoading = Application::optionValue<bool>("progressiveSourceLoading", false);
                 if (!progressiveSourceLoading)
                 {
                     m_postFirstNonEmptyRender = true;
@@ -3159,8 +3007,7 @@ namespace IPCore
             break;
 
         case IPGraph::EvalError:
-            m_errorImage->fb->attribute<string>("Error") =
-                "Graph Evaluation Error";
+            m_errorImage->fb->attribute<string>("Error") = "Graph Evaluation Error";
             m_displayImage = m_errorImage;
             break;
         }
@@ -3168,10 +3015,7 @@ namespace IPCore
         m_displayFrame = m_frame;
     }
 
-    IPImage* Session::evaluate(int frame)
-    {
-        return graph().evaluateAtFrame(frame).second;
-    }
+    IPImage* Session::evaluate(int frame) { return graph().evaluateAtFrame(frame).second; }
 
     void Session::checkIn(IPImage* img) { graph().checkInImage(img); }
 
@@ -3195,8 +3039,7 @@ namespace IPCore
         if (m_preDisplayImage)
         {
 #if defined(HOP_ENABLED)
-            std::string hopMsg = std::string("Session::prefetch() - frame=")
-                                 + std::to_string(m_preDisplayFrame);
+            std::string hopMsg = std::string("Session::prefetch() - frame=") + std::to_string(m_preDisplayFrame);
             HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
 
@@ -3214,8 +3057,7 @@ namespace IPCore
             {
                 ProfilingRecord& trecord = currentProfilingSample();
                 trecord.prefetchRenderEnd = profilingElapsedTime();
-                trecord.prefetchUploadPlaneTotal =
-                    m_renderer->profilingState().uploadPlaneTime;
+                trecord.prefetchUploadPlaneTotal = m_renderer->profilingState().uploadPlaneTime;
             }
         }
 
@@ -3292,17 +3134,14 @@ namespace IPCore
         if (debugPlaybackVerbose && m_nextVSyncTime != m_renderedVSyncTime)
         {
             cout << "DEBUG: missed a render: "
-                 << "rendered = " << m_renderedVSyncTime
-                 << ", current = " << m_nextVSyncTime << endl;
+                 << "rendered = " << m_renderedVSyncTime << ", current = " << m_nextVSyncTime << endl;
         }
 
         m_nextVSyncTime = e + t;
 
-        if (debugPlaybackVerbose && m_vSyncSerial != m_vSyncSerialLast
-            && m_useExternalVSyncTiming)
+        if (debugPlaybackVerbose && m_vSyncSerial != m_vSyncSerialLast && m_useExternalVSyncTiming)
         {
-            cout << "DEBUG: DL thread missed: " << m_vSyncSerial
-                 << " != " << m_vSyncSerialLast << endl;
+            cout << "DEBUG: DL thread missed: " << m_vSyncSerial << " != " << m_vSyncSerialLast << endl;
         }
 
         m_vSyncSerial = serial;
@@ -3324,8 +3163,7 @@ namespace IPCore
             if (debugPlaybackVerbose && m_syncLastWaitTime >= t)
                 cout << "DEBUG: skipping wait on vsync" << endl;
 
-            while (m_syncLastWaitTime < t && m_nextVSyncTime != Time(0.0)
-                   && m_vSyncSerial == m_vSyncSerialLast)
+            while (m_syncLastWaitTime < t && m_nextVSyncTime != Time(0.0) && m_vSyncSerial == m_vSyncSerialLast)
             {
                 m_vSyncCond.wait(lock);
             }
@@ -3390,17 +3228,13 @@ namespace IPCore
 
         if (force || isUpdating() || m_rangeDirty)
         {
-            if (multipleVideoDevices()
-                && outputVideoDevice()->willBlockOnTransfer()
-                && (outputVideoDevice()->capabilities()
-                    & TwkApp::VideoDevice::ASyncReadBack))
+            if (multipleVideoDevices() && outputVideoDevice()->willBlockOnTransfer()
+                && (outputVideoDevice()->capabilities() & TwkApp::VideoDevice::ASyncReadBack))
             {
                 return;
             }
 
-            if (const TwkGLF::GLVideoDevice* d =
-                    dynamic_cast<const TwkGLF::GLVideoDevice*>(
-                        controlVideoDevice()))
+            if (const TwkGLF::GLVideoDevice* d = dynamic_cast<const TwkGLF::GLVideoDevice*>(controlVideoDevice()))
             {
                 double now = TwkUtil::SystemClock().now();
                 if (now >= (m_lastDrawingTime + minElapsedTime))
@@ -3462,14 +3296,12 @@ namespace IPCore
                     la = m_cacheStats.lookAheadSeconds;
 
                     if (inc() > 0)
-                        timeTillTurnaround =
-                            float(outPoint() - 1 - m_frame) / m_fps;
+                        timeTillTurnaround = float(outPoint() - 1 - m_frame) / m_fps;
                     else
                         timeTillTurnaround = float(m_frame - inPoint()) / m_fps;
                 }
 
-                if (la >= targetSeconds || m_frame >= outPoint()
-                    || m_frame < inPoint() || la >= timeTillTurnaround)
+                if (la >= targetSeconds || m_frame >= outPoint() || m_frame < inPoint() || la >= timeTillTurnaround)
                 {
                     play("buffering");
                     m_fastStart = false;
@@ -3480,8 +3312,7 @@ namespace IPCore
 
         if (m_stopTimer.isRunning())
         {
-            if (m_stopTimer.elapsed() > 2.0 && !isEvalRunning()
-                && !isBuffering() && !currentStateIsError())
+            if (m_stopTimer.elapsed() > 2.0 && !isEvalRunning() && !isBuffering() && !currentStateIsError())
             {
                 stopCompletely();
             }
@@ -3493,8 +3324,7 @@ namespace IPCore
         int frameShift = 0;
         m_skipped = 0;
 
-        bool outDeviceClock = m_realtimeOverride && multipleVideoDevices()
-                              && outputVideoDevice()->hasClock();
+        bool outDeviceClock = m_realtimeOverride && multipleVideoDevices() && outputVideoDevice()->hasClock();
 
         if (playing)
         {
@@ -3513,12 +3343,10 @@ namespace IPCore
             if (debugProfile)
             {
                 ProfilingRecord& trecord = currentProfilingSample();
-                trecord.expectedSyncTime =
-                    profilingElapsedTime() + predictedSyncTime;
+                trecord.expectedSyncTime = profilingElapsedTime() + predictedSyncTime;
                 if (outDeviceClock)
                 {
-                    trecord.deviceClockOffset =
-                        elapsed - outputVideoDevice()->nextFrameTime();
+                    trecord.deviceClockOffset = elapsed - outputVideoDevice()->nextFrameTime();
                 }
             }
 
@@ -3531,8 +3359,7 @@ namespace IPCore
             const bool tsvalid = audioTimeShiftValid();
             audioVarUnLock();
 
-            if (!audioRenderer() || (elapsed >= 0.0 && tsvalid)
-                || outDeviceClock)
+            if (!audioRenderer() || (elapsed >= 0.0 && tsvalid) || outDeviceClock)
             {
                 int newFrame = targetFrame(elapsed);
                 const int nextFrame = m_frame + inc();
@@ -3547,8 +3374,7 @@ namespace IPCore
                 {
                     // nothing
                 }
-                else if ((inc() > 0 && nextFrame < newFrame)
-                         || (inc() < 0 && nextFrame > newFrame))
+                else if ((inc() > 0 && nextFrame < newFrame) || (inc() < 0 && nextFrame > newFrame))
                 {
                     //
                     //  If the newFrame is not the next frame then the
@@ -3559,8 +3385,7 @@ namespace IPCore
 
                     if (debugPlaybackVerbose && newShift != m_shift)
                     {
-                        cout << "DEBUG: frame shift adjusted by "
-                             << (newShift - m_shift) << endl;
+                        cout << "DEBUG: frame shift adjusted by " << (newShift - m_shift) << endl;
                     }
 
                     m_shift = newShift;
@@ -3683,9 +3508,7 @@ namespace IPCore
 
         if (playing && m_cacheMode == BufferCache)
         {
-            if (m_maxBufferedWaitSeconds > 0.0
-                && !graph().cache().isFrameCached(successorFrame(m_frame))
-                && isCaching())
+            if (m_maxBufferedWaitSeconds > 0.0 && !graph().cache().isFrameCached(successorFrame(m_frame)) && isCaching())
             {
                 stop("buffering");
                 m_bufferWait = true;
@@ -3752,8 +3575,7 @@ namespace IPCore
 
         const float clockMult = fps() / currentTargetFPS();
 
-        if (hasAudio() && !outDeviceClock
-            && ((!realtime() && frameShift) || clockMult != 1.0))
+        if (hasAudio() && !outDeviceClock && ((!realtime() && frameShift) || clockMult != 1.0))
         {
             //
             //  This is the multiplier on the clock. If we're playing
@@ -3767,15 +3589,12 @@ namespace IPCore
             //     wraps backwards from frame zero. So we check against this.
             const double elapsedPlaySecs = elapsedPlaySeconds();
 
-            if (currentFrame != m_frame && audioRenderer()
-                && elapsedPlaySecs < numeric_limits<double>::max())
+            if (currentFrame != m_frame && audioRenderer() && elapsedPlaySecs < numeric_limits<double>::max())
             {
                 const bool forwards = (inc() > 0);
-                const double atime =
-                    (m_frame - rangeStart()) / fps() * clockMult;
+                const double atime = (m_frame - rangeStart()) / fps() * clockMult;
                 const double elapsed =
-                    (frameShift ? frameShift : m_shift) / fps() * clockMult
-                    + (forwards ? elapsedPlaySecs : -elapsedPlaySecs);
+                    (frameShift ? frameShift : m_shift) / fps() * clockMult + (forwards ? elapsedPlaySecs : -elapsedPlaySecs);
                 const double diff = ::fabs(atime - elapsed);
 
                 if (diff > (1 / (currentTargetFPS() * m_audioDrift)))
@@ -3813,8 +3632,7 @@ namespace IPCore
     void Session::renderState()
     {
         const bool playing = isPlaying();
-        const bool outDeviceClock = m_realtimeOverride && multipleVideoDevices()
-                                    && outputVideoDevice()->hasClock();
+        const bool outDeviceClock = m_realtimeOverride && multipleVideoDevices() && outputVideoDevice()->hasClock();
 
         try
         {
@@ -3841,13 +3659,11 @@ namespace IPCore
 
                 preEval();
 
-                m_renderer->render(m_frame, m_displayImage, &auxRender,
-                                   &auxAudio, m_preDisplayImage);
+                m_renderer->render(m_frame, m_displayImage, &auxRender, &auxAudio, m_preDisplayImage);
             }
             else
             {
-                m_renderer->render(m_frame, m_displayImage, &auxRender,
-                                   &auxAudio);
+                m_renderer->render(m_frame, m_displayImage, &auxRender, &auxAudio);
             }
 
             if (debugProfile)
@@ -3855,10 +3671,8 @@ namespace IPCore
                 ProfilingRecord& trecord = currentProfilingSample();
                 trecord.internalRenderEnd = profilingElapsedTime();
                 trecord.frame = m_frame;
-                trecord.renderUploadPlaneTotal =
-                    m_renderer->profilingState().uploadPlaneTime;
-                trecord.renderFenceWaitTotal =
-                    m_renderer->profilingState().fenceWaitTime;
+                trecord.renderUploadPlaneTotal = m_renderer->profilingState().uploadPlaneTime;
+                trecord.renderFenceWaitTotal = m_renderer->profilingState().fenceWaitTime;
             }
         }
         catch (RendererNotSupportedExc& exc)
@@ -3872,18 +3686,15 @@ namespace IPCore
         catch (...)
         {
             m_displayImage = m_errorImage;
-            m_errorImage->fb->attribute<string>("Error") =
-                "Error during rendering";
+            m_errorImage->fb->attribute<string>("Error") = "Error during rendering";
         }
     }
 
     void Session::recordRenderState()
     {
         const bool playing = isPlaying();
-        const bool outDeviceClock = m_realtimeOverride && multipleVideoDevices()
-                                    && outputVideoDevice()->hasClock();
-        const bool calcFPSWithDevClock =
-            outDeviceClock && outputVideoDevice()->timing().hz != 0.0;
+        const bool outDeviceClock = m_realtimeOverride && multipleVideoDevices() && outputVideoDevice()->hasClock();
+        const bool calcFPSWithDevClock = outDeviceClock && outputVideoDevice()->timing().hz != 0.0;
 
         if (!playing)
         {
@@ -3903,14 +3714,12 @@ namespace IPCore
             else if (abs(m_frame - m_lastViewFrame) >= 4)
             {
                 float framesSample = ::fabs(float(m_frame - m_lastViewFrame));
-                float timeSample = float(devFrame - m_lastDevFrame)
-                                   / outputVideoDevice()->timing().hz;
+                float timeSample = float(devFrame - m_lastDevFrame) / outputVideoDevice()->timing().hz;
                 float fpsSample = framesSample / timeSample;
 
                 m_fpsCalc->setTargetFps(m_fps);
                 m_fpsCalc->addSample(fpsSample);
-                m_realfps =
-                    m_fpsCalc->fps(outputVideoDevice()->nextFrameTime());
+                m_realfps = m_fpsCalc->fps(outputVideoDevice()->nextFrameTime());
                 // m_realfps = m_fpsCalc->fps (elapsedPlaySeconds());
                 if (fabs(m_realfps - m_fps) < 0.125)
                     m_realfps = m_fps;
@@ -3922,8 +3731,7 @@ namespace IPCore
         else if (abs(m_frame - m_lastCheckFrame) >= 4)
         {
             double nelapsed = elapsedPlaySeconds();
-            double fps = double(abs(m_frame - m_lastCheckFrame))
-                         / (nelapsed - m_lastCheckTime);
+            double fps = double(abs(m_frame - m_lastCheckFrame)) / (nelapsed - m_lastCheckTime);
             //  cout << "fps " << fps << " f " << m_frame << " lcf " <<
             //  m_lastCheckFrame << endl;
 
@@ -4063,14 +3871,12 @@ namespace IPCore
                     la = m_cacheStats.lookAheadSeconds;
 
                     if (inc() > 0)
-                        timeTillTurnaround =
-                            float(outPoint() - 1 - m_frame) / m_fps;
+                        timeTillTurnaround = float(outPoint() - 1 - m_frame) / m_fps;
                     else
                         timeTillTurnaround = float(m_frame - inPoint()) / m_fps;
                 }
 
-                if (la >= targetSeconds || m_frame >= outPoint()
-                    || m_frame < inPoint() || la >= timeTillTurnaround)
+                if (la >= targetSeconds || m_frame >= outPoint() || m_frame < inPoint() || la >= timeTillTurnaround)
                 {
                     play("buffering");
                     m_fastStart = false;
@@ -4081,8 +3887,7 @@ namespace IPCore
 
         if (m_stopTimer.isRunning())
         {
-            if (m_stopTimer.elapsed() > 2.0 && !isEvalRunning()
-                && !isBuffering() && !currentStateIsError())
+            if (m_stopTimer.elapsed() > 2.0 && !isEvalRunning() && !isBuffering() && !currentStateIsError())
             {
                 stopCompletely();
             }
@@ -4093,8 +3898,7 @@ namespace IPCore
         int currentFrame = m_frame;
         m_skipped = 0;
 
-        bool outDeviceClock = m_realtimeOverride && multipleVideoDevices()
-                              && outputVideoDevice()->hasClock();
+        bool outDeviceClock = m_realtimeOverride && multipleVideoDevices() && outputVideoDevice()->hasClock();
 
         // if (m_outputVideoDevice)  cerr << "ovd timing " <<
         // m_outputVideoDevice->videoFormatAtIndex(m_outputVideoDevice->currentVideoFormat()).hz
@@ -4118,12 +3922,10 @@ namespace IPCore
             if (debugProfile)
             {
                 ProfilingRecord& trecord = currentProfilingSample();
-                trecord.expectedSyncTime =
-                    profilingElapsedTime() + untilPredicted;
+                trecord.expectedSyncTime = profilingElapsedTime() + untilPredicted;
                 if (outDeviceClock)
                 {
-                    trecord.deviceClockOffset =
-                        elapsed - outputVideoDevice()->nextFrameTime();
+                    trecord.deviceClockOffset = elapsed - outputVideoDevice()->nextFrameTime();
                 }
             }
 
@@ -4136,8 +3938,7 @@ namespace IPCore
             const bool tsvalid = audioTimeShiftValid();
             audioVarUnLock();
 
-            if (!audioRenderer() || (elapsed >= 0.0 && tsvalid)
-                || outDeviceClock)
+            if (!audioRenderer() || (elapsed >= 0.0 && tsvalid) || outDeviceClock)
             {
                 newFrame = targetFrame(elapsed);
 
@@ -4146,12 +3947,9 @@ namespace IPCore
                 // fps() << " untilPred " << untilPredicted << " tsvalid " <<
                 // tsvalid << endl;
 
-                if (RV_VSYNC_ADD_OFFSET && elapsedOffset == 0.0
-                    && newFrame != m_frame)
+                if (RV_VSYNC_ADD_OFFSET && elapsedOffset == 0.0 && newFrame != m_frame)
                 {
-                    elapsedOffset =
-                        float(newFrame - rangeStart() - m_shift) / fps()
-                        - elapsedPlaySeconds();
+                    elapsedOffset = float(newFrame - rangeStart() - m_shift) / fps() - elapsedPlaySeconds();
                 }
 
                 if (m_bufferWait || realtime())
@@ -4168,8 +3966,7 @@ namespace IPCore
                 {
                     bool shiftCheck = false;
 
-                    if ((inc() > 0 && nextFrame < newFrame)
-                        || (inc() < 0 && nextFrame > newFrame))
+                    if ((inc() > 0 && nextFrame < newFrame) || (inc() < 0 && nextFrame > newFrame))
                     {
                         //
                         //  Don't allow a skip
@@ -4199,28 +3996,22 @@ namespace IPCore
 
                         if (inc() > 0)
                         {
-                            m_shift = int(newFrame - rangeStart()
-                                          - elapsed * fps() + 0.5);
+                            m_shift = int(newFrame - rangeStart() - elapsed * fps() + 0.5);
 
                             if (m_shift < lastShift)
                             {
                                 if (debugPlayback)
-                                    cout << "DEBUG: negative shift old="
-                                         << lastShift << ", new=" << m_shift
-                                         << endl;
+                                    cout << "DEBUG: negative shift old=" << lastShift << ", new=" << m_shift << endl;
                             }
                         }
                         else
                         {
-                            m_shift = int(newFrame - rangeStart()
-                                          + elapsed * fps() - 0.5);
+                            m_shift = int(newFrame - rangeStart() + elapsed * fps() - 0.5);
 
                             if (m_shift > lastShift)
                             {
                                 if (debugPlayback)
-                                    cout << "DEBUG: positive shift old="
-                                         << lastShift << ", new=" << m_shift
-                                         << endl;
+                                    cout << "DEBUG: positive shift old=" << lastShift << ", new=" << m_shift << endl;
                             }
                         }
 
@@ -4345,9 +4136,7 @@ namespace IPCore
         {
             if (playing && m_cacheMode == BufferCache)
             {
-                if (m_maxBufferedWaitSeconds > 0.0
-                    && !graph().cache().isFrameCached(successorFrame(m_frame))
-                    && isCaching())
+                if (m_maxBufferedWaitSeconds > 0.0 && !graph().cache().isFrameCached(successorFrame(m_frame)) && isCaching())
                 {
                     stop("buffering");
                     m_bufferWait = true;
@@ -4419,8 +4208,7 @@ namespace IPCore
 
             const float clockMult = fps() / currentTargetFPS();
 
-            if (hasAudio() && (!realtime() || clockMult != 1.0)
-                && !outDeviceClock)
+            if (hasAudio() && (!realtime() || clockMult != 1.0) && !outDeviceClock)
             {
                 //
                 //  This is the multiplier on the clock. If we're playing
@@ -4435,15 +4223,11 @@ namespace IPCore
                 //     wraps backwards from frame zero. So we check against
                 //     this.
                 const double elapsedPlaySecs = elapsedPlaySeconds();
-                if ((currentFrame != m_frame && audioRenderer())
-                    && (elapsedPlaySecs < numeric_limits<double>::max()))
+                if ((currentFrame != m_frame && audioRenderer()) && (elapsedPlaySecs < numeric_limits<double>::max()))
                 {
                     const bool forwards = (inc() > 0);
-                    const double atime =
-                        (m_frame - rangeStart()) / fps() * clockMult;
-                    const double elapsed =
-                        m_shift / fps() * clockMult
-                        + (forwards ? elapsedPlaySecs : -elapsedPlaySecs);
+                    const double atime = (m_frame - rangeStart()) / fps() * clockMult;
+                    const double elapsed = m_shift / fps() * clockMult + (forwards ? elapsedPlaySecs : -elapsedPlaySecs);
                     const double diff = ::fabs(atime - elapsed);
 
                     if (diff > (1 / (currentTargetFPS() * m_audioDrift)))
@@ -4490,8 +4274,7 @@ namespace IPCore
                 AuxAudioRenderer auxAudio(this);
 
                 waitForUploadToFinish();
-                m_waitForUploadThreadPrefetch =
-                    m_preEval && useThreadedUpload();
+                m_waitForUploadThreadPrefetch = m_preEval && useThreadedUpload();
 
                 if (m_waitForUploadThreadPrefetch)
                 {
@@ -4503,13 +4286,11 @@ namespace IPCore
 
                     preEval();
 
-                    m_renderer->render(m_frame, m_displayImage, &auxRender,
-                                       &auxAudio, m_preDisplayImage);
+                    m_renderer->render(m_frame, m_displayImage, &auxRender, &auxAudio, m_preDisplayImage);
                 }
                 else
                 {
-                    m_renderer->render(m_frame, m_displayImage, &auxRender,
-                                       &auxAudio);
+                    m_renderer->render(m_frame, m_displayImage, &auxRender, &auxAudio);
                 }
 
                 if (debugProfile)
@@ -4517,10 +4298,8 @@ namespace IPCore
                     ProfilingRecord& trecord = currentProfilingSample();
                     trecord.internalRenderEnd = profilingElapsedTime();
                     trecord.frame = m_frame;
-                    trecord.renderUploadPlaneTotal =
-                        m_renderer->profilingState().uploadPlaneTime;
-                    trecord.renderFenceWaitTotal =
-                        m_renderer->profilingState().fenceWaitTime;
+                    trecord.renderUploadPlaneTotal = m_renderer->profilingState().uploadPlaneTime;
+                    trecord.renderFenceWaitTotal = m_renderer->profilingState().fenceWaitTime;
                 }
 
                 HOP_CALL(glFinish();)
@@ -4536,12 +4315,10 @@ namespace IPCore
             catch (...)
             {
                 m_displayImage = m_errorImage;
-                m_errorImage->fb->attribute<string>("Error") =
-                    "Error during rendering";
+                m_errorImage->fb->attribute<string>("Error") = "Error during rendering";
             }
 
-            bool calcFPSWithDevClock =
-                (outDeviceClock && outputVideoDevice()->timing().hz != 0.0);
+            bool calcFPSWithDevClock = (outDeviceClock && outputVideoDevice()->timing().hz != 0.0);
 
             if (!playing)
             {
@@ -4559,16 +4336,13 @@ namespace IPCore
                 }
                 else if (abs(m_frame - m_lastViewFrame) >= 4)
                 {
-                    float framesSample =
-                        ::fabs(float(m_frame - m_lastViewFrame));
+                    float framesSample = ::fabs(float(m_frame - m_lastViewFrame));
                     double nelapsed = elapsedPlaySeconds();
-                    float fpsSample =
-                        framesSample / (nelapsed - m_lastCheckTime);
+                    float fpsSample = framesSample / (nelapsed - m_lastCheckTime);
 
                     m_fpsCalc->setTargetFps(m_fps);
                     m_fpsCalc->addSample(fpsSample);
-                    m_realfps =
-                        m_fpsCalc->fps(outputVideoDevice()->nextFrameTime());
+                    m_realfps = m_fpsCalc->fps(outputVideoDevice()->nextFrameTime());
                     if (fabs(m_realfps - m_fps) < 0.125)
                         m_realfps = m_fps;
 
@@ -4580,8 +4354,7 @@ namespace IPCore
             else if (abs(m_frame - m_lastCheckFrame) >= 4)
             {
                 double nelapsed = elapsedPlaySeconds();
-                double fps = double(abs(m_frame - m_lastCheckFrame))
-                             / (nelapsed - m_lastCheckTime);
+                double fps = double(abs(m_frame - m_lastCheckFrame)) / (nelapsed - m_lastCheckTime);
                 //  cerr << "fps " << fps << " f " << m_frame << " lcf " <<
                 //  m_lastCheckFrame << endl;
 
@@ -4664,9 +4437,7 @@ namespace IPCore
         }
     }
 
-    string Session::userGenericEvent(const string& eventName,
-                                     const string& contents,
-                                     const string& senderName)
+    string Session::userGenericEvent(const string& eventName, const string& contents, const string& senderName)
     {
         if (m_beingDeleted)
             return "";
@@ -4684,8 +4455,7 @@ namespace IPCore
             m_preFirstNonEmptyRender = true;
         }
 
-        if (m_preFirstNonEmptyRender && !m_postFirstNonEmptyRender
-            && eventName == "after-progressive-loading")
+        if (m_preFirstNonEmptyRender && !m_postFirstNonEmptyRender && eventName == "after-progressive-loading")
         {
             m_postFirstNonEmptyRender = true;
         }
@@ -4693,25 +4463,21 @@ namespace IPCore
         return event.returnContent();
     }
 
-    string Session::userRawDataEvent(const string& eventName,
-                                     const string& contentType,
-                                     const char* data, size_t n,
-                                     const char* utf8, const string& senderName)
+    string Session::userRawDataEvent(const string& eventName, const string& contentType, const char* data, size_t n, const char* utf8,
+                                     const string& senderName)
     {
         if (m_beingDeleted)
             return "";
 
         Session* s = currentSession();
         m_currentSession = this;
-        RawDataEvent event(eventName, this, contentType, data, n, utf8, 0,
-                           senderName);
+        RawDataEvent event(eventName, this, contentType, data, n, utf8, 0, senderName);
         sendEvent(event);
         m_currentSession = s;
         return event.returnContent();
     }
 
-    void Session::pixelBlockEvent(const string& eventName, const string& interp,
-                                  const char* data, size_t size)
+    void Session::pixelBlockEvent(const string& eventName, const string& interp, const char* data, size_t size)
     {
         if (m_beingDeleted)
             return;
@@ -4767,8 +4533,7 @@ namespace IPCore
             }
         }
 
-        PixelBlockTransferEvent event(ename, this, media, layer, view, f, x, y,
-                                      w, h, data, size, 0);
+        PixelBlockTransferEvent event(ename, this, media, layer, view, f, x, y, w, h, data, size, 0);
 
         sendEvent(event);
     }
@@ -4819,32 +4584,27 @@ namespace IPCore
         Session* s = currentSession();
         m_currentSession = this;
 
-        if (const ModifierEvent* me =
-                dynamic_cast<const ModifierEvent*>(&event))
+        if (const ModifierEvent* me = dynamic_cast<const ModifierEvent*>(&event))
         {
             m_receivingEvents = true;
             event.handled = true;
         }
-        else if (const PointerEvent* pe =
-                     dynamic_cast<const PointerEvent*>(&event))
+        else if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(&event))
         {
             m_receivingEvents = pe->name() != "pointer--leave";
             event.handled = true;
         }
-        else if (const RenderContextChangeEvent* e =
-                     dynamic_cast<const RenderContextChangeEvent*>(&event))
+        else if (const RenderContextChangeEvent* e = dynamic_cast<const RenderContextChangeEvent*>(&event))
         {
             clearVideoDeviceCaches();
             event.handled = true;
         }
-        else if (const VideoDeviceContextChangeEvent* e =
-                     dynamic_cast<const VideoDeviceContextChangeEvent*>(&event))
+        else if (const VideoDeviceContextChangeEvent* e = dynamic_cast<const VideoDeviceContextChangeEvent*>(&event))
         {
             physicalDeviceChanged(e->m_device);
         }
 
-        if (const GenericStringEvent* se =
-                dynamic_cast<const GenericStringEvent*>(&event))
+        if (const GenericStringEvent* se = dynamic_cast<const GenericStringEvent*>(&event))
         {
             if (se->name() == "graph-range-change")
             {
@@ -4888,21 +4648,14 @@ namespace IPCore
         return res;
     }
 
-    void Session::findCurrentNodesByTypeName(NodeVector& nodes,
-                                             const string& typeName)
+    void Session::findCurrentNodesByTypeName(NodeVector& nodes, const string& typeName)
     {
         graph().findNodesByTypeName(m_frame, nodes, typeName);
     }
 
-    void Session::findNodesByTypeName(NodeVector& nodes, const string& typeName)
-    {
-        graph().findNodesByTypeName(nodes, typeName);
-    }
+    void Session::findNodesByTypeName(NodeVector& nodes, const string& typeName) { graph().findNodesByTypeName(nodes, typeName); }
 
-    void Session::findProperty(PropertyVector& props, const string& name)
-    {
-        graph().findProperty(m_frame, props, name);
-    }
+    void Session::findProperty(PropertyVector& props, const string& name) { graph().findProperty(m_frame, props, name); }
 
     unsigned int Session::currentFrameState() const
     {
@@ -4963,8 +4716,7 @@ namespace IPCore
         //  frame.
         //
 
-        IPNode::ImageStructureInfo info = graph().root()->imageStructureInfo(
-            graph().contextForFrame(rangeStart()));
+        IPNode::ImageStructureInfo info = graph().root()->imageStructureInfo(graph().contextForFrame(rangeStart()));
 
         return Vec2i(info.width, info.height);
     }
@@ -4978,15 +4730,13 @@ namespace IPCore
 
 #include <TwkGLF/GL.h>
 
-    void Session::userRenderEvent(const std::string& name,
-                                  const std::string& contents)
+    void Session::userRenderEvent(const std::string& name, const std::string& contents)
     {
         if (m_beingDeleted)
             return;
 
         // const VideoDevice* d = m_outputVideoDevice;
-        const VideoDevice* d =
-            m_eventVideoDevice ? m_eventVideoDevice : m_outputVideoDevice;
+        const VideoDevice* d = m_eventVideoDevice ? m_eventVideoDevice : m_outputVideoDevice;
         VideoDevice::Resolution r = d->resolution();
         Session* s = currentSession();
         m_currentSession = this;
@@ -4999,8 +4749,7 @@ namespace IPCore
 
     struct MissingImageChecker
     {
-        MissingImageChecker(Session* _session, const VideoDevice* _d, int w,
-                            int h)
+        MissingImageChecker(Session* _session, const VideoDevice* _d, int w, int h)
             : session(_session)
             , d(_d)
             , width(w)
@@ -5031,16 +4780,14 @@ namespace IPCore
                 }
                 else
                 {
-                    RenderEvent event("missing-image", session, d, width,
-                                      height, contents.str());
+                    RenderEvent event("missing-image", session, d, width, height, contents.str());
                     session->sendEvent(event);
                 }
             }
         }
     };
 
-    void Session::userRender(const VideoDevice* d, const char* eventName,
-                             const string& contents)
+    void Session::userRender(const VideoDevice* d, const char* eventName, const string& contents)
     {
         if (ImageRenderer::reportGL())
         {
@@ -5048,8 +4795,7 @@ namespace IPCore
 
             if (GLuint err = glGetError())
             {
-                cerr << "GL ERROR: *BEFORE* userRender: event=" << eventName
-                     << " : " << TwkGLF::errorString(err) << endl;
+                cerr << "GL ERROR: *BEFORE* userRender: event=" << eventName << " : " << TwkGLF::errorString(err) << endl;
             }
         }
 
@@ -5071,17 +4817,12 @@ namespace IPCore
         {
             if (GLuint err = glGetError())
             {
-                cerr << "GL ERROR: after userRender: event=" << eventName
-                     << " : " << TwkGLF::errorString(err) << endl;
+                cerr << "GL ERROR: after userRender: event=" << eventName << " : " << TwkGLF::errorString(err) << endl;
             }
         }
     }
 
-    void Session::setAudioTime(double t)
-    {
-        m_audioStartSample =
-            timeToSamples(t, audioRenderer()->deviceState().rate);
-    }
+    void Session::setAudioTime(double t) { m_audioStartSample = timeToSamples(t, audioRenderer()->deviceState().rate); }
 
     void Session::setAudioTimeSnapped(double t)
     {
@@ -5096,10 +4837,8 @@ namespace IPCore
             setAudioTime(stime);
         }
 
-        const AudioRenderer::DeviceState& state =
-            audioRenderer()->deviceState();
-        if (size_t bufferSize =
-                state.framesPerBuffer / TwkAudio::channelsCount(state.layout))
+        const AudioRenderer::DeviceState& state = audioRenderer()->deviceState();
+        if (size_t bufferSize = state.framesPerBuffer / TwkAudio::channelsCount(state.layout))
         {
             size_t mod = m_audioStartSample % bufferSize;
             m_audioStartSample -= mod;
@@ -5156,8 +4895,7 @@ namespace IPCore
         //  " numSamples " << m_numSamples << endl;
         m_samples[m_nextSample] = fps;
         m_nextSample = (m_nextSample + 1) % m_maxNumSamples;
-        m_numSamples = (m_numSamples == m_maxNumSamples) ? m_maxNumSamples
-                                                         : m_numSamples + 1;
+        m_numSamples = (m_numSamples == m_maxNumSamples) ? m_maxNumSamples : m_numSamples + 1;
     }
 
     float Session::FpsCalculator::fps(double time)
@@ -5243,9 +4981,7 @@ namespace IPCore
     //  Set margins from new margins, except where new margin is -1.
     //
 
-    static Session::Margins
-    adjustMarginsWithDefaults(Session::Margins& newMargins,
-                              Session::Margins& oldMargins)
+    static Session::Margins adjustMarginsWithDefaults(Session::Margins& newMargins, Session::Margins& oldMargins)
     {
         Session::Margins m = oldMargins;
 
@@ -5265,8 +5001,7 @@ namespace IPCore
     //  Set margins on the eventDevice unless allDevices is true
     //
 
-    void Session::setMargins(float left, float right, float top, float bottom,
-                             bool allDevices)
+    void Session::setMargins(float left, float right, float top, float bottom, bool allDevices)
     {
         const VideoDevice* cd = m_controlVideoDevice;
         const VideoDevice* od = m_outputVideoDevice;
@@ -5284,8 +5019,7 @@ namespace IPCore
             //  Only send margins-changed for controller.
             //
             ostringstream contents;
-            contents << om.left << " " << om.right << " " << om.top << " "
-                     << om.bottom;
+            contents << om.left << " " << om.right << " " << om.top << " " << om.bottom;
             userGenericEvent("margins-changed", contents.str(), "session");
             m_marginsChangedSignal(cd);
         }
@@ -5299,10 +5033,7 @@ namespace IPCore
         }
     }
 
-    double Session::profilingElapsedTime()
-    {
-        return m_profilingTimer.elapsed();
-    }
+    double Session::profilingElapsedTime() { return m_profilingTimer.elapsed(); }
 
     Session::ProfilingRecord& Session::beginProfilingSample()
     {
@@ -5316,10 +5047,7 @@ namespace IPCore
         return m_profilingSamples.back();
     }
 
-    Session::ProfilingRecord& Session::currentProfilingSample()
-    {
-        return m_profilingSamples.back();
-    }
+    Session::ProfilingRecord& Session::currentProfilingSample() { return m_profilingSamples.back(); }
 
     void Session::endProfilingSample()
     {
@@ -5338,8 +5066,7 @@ namespace IPCore
                 "time, gc#, frame "
              << endl;
 
-        const IPGraph::ProfilingVector& graphSamples =
-            graph().profilingSamples();
+        const IPGraph::ProfilingVector& graphSamples = graph().profilingSamples();
 
         assert(graphSamples.size() == m_profilingSamples.size());
         file.precision(10);
@@ -5349,42 +5076,20 @@ namespace IPCore
             const ProfilingRecord& t = m_profilingSamples[i];
             const IPGraph::EvalProfilingRecord& gt = graphSamples[i];
 
-            file << "R0=" << t.renderStart << ",R1=" << t.renderEnd
-                 << ",S0=" << t.swapStart << ",S1=" << t.swapEnd
-                 << ",E0=" << t.evaluateStart << ",E1=" << t.evaluateEnd
-                 << ",U0=" << t.userRenderStart << ",U1=" << t.userRenderEnd
-                 << ",FC0=" << t.frameChangeEventStart
-                 << ",FC1=" << t.frameChangeEventEnd
-                 << ",IR0=" << t.internalRenderStart
-                 << ",IR1=" << t.internalRenderEnd
-                 << ",PR0=" << t.internalPrefetchStart
-                 << ",PR1=" << t.internalPrefetchEnd
-                 << ",CT0=" << gt.cacheTestStart << ",CT1=" << gt.cacheTestEnd
-                 << ",EI0=" << gt.evalInternalStart
-                 << ",EI1=" << gt.evalInternalEnd << ",ID0=" << gt.evalIDStart
-                 << ",ID1=" << gt.evalIDEnd << ",CQ0=" << gt.cacheQueryStart
-                 << ",CQ1=" << gt.cacheQueryEnd << ",CE0=" << gt.cacheEvalStart
-                 << ",CE1=" << gt.cacheEvalEnd << ",IO0=" << gt.ioStart
-                 << ",IO1=" << gt.ioEnd << ",THA0=" << gt.restartThreadsAStart
-                 << ",THA1=" << gt.restartThreadsAEnd
-                 << ",THB0=" << gt.restartThreadsBStart
-                 << ",THB1=" << gt.restartThreadsBEnd
-                 << ",CTL0=" << gt.cacheTestLockStart
-                 << ",CTL1=" << gt.cacheTestLockEnd
-                 << ",SDSP0=" << gt.setDisplayFrameStart
-                 << ",SDSP1=" << gt.setDisplayFrameEnd
-                 << ",FCT0=" << gt.frameCachedTestStart
-                 << ",FCT1=" << gt.frameCachedTestEnd
-                 << ",WAK0=" << gt.awakenThreadsStart
-                 << ",WAK1=" << gt.awakenThreadsEnd
-                 << ",PRR0=" << t.prefetchRenderStart
-                 << ",PRR1=" << t.prefetchRenderEnd
-                 << ",PRUP=" << t.prefetchUploadPlaneTotal
-                 << ",RRUP=" << t.renderUploadPlaneTotal
-                 << ",RFW=" << t.renderFenceWaitTotal
-                 << ",EST=" << t.expectedSyncTime
-                 << ",DCO=" << t.deviceClockOffset << ",GC=" << t.gccount
-                 << ",F=" << t.frame << endl;
+            file << "R0=" << t.renderStart << ",R1=" << t.renderEnd << ",S0=" << t.swapStart << ",S1=" << t.swapEnd
+                 << ",E0=" << t.evaluateStart << ",E1=" << t.evaluateEnd << ",U0=" << t.userRenderStart << ",U1=" << t.userRenderEnd
+                 << ",FC0=" << t.frameChangeEventStart << ",FC1=" << t.frameChangeEventEnd << ",IR0=" << t.internalRenderStart
+                 << ",IR1=" << t.internalRenderEnd << ",PR0=" << t.internalPrefetchStart << ",PR1=" << t.internalPrefetchEnd
+                 << ",CT0=" << gt.cacheTestStart << ",CT1=" << gt.cacheTestEnd << ",EI0=" << gt.evalInternalStart
+                 << ",EI1=" << gt.evalInternalEnd << ",ID0=" << gt.evalIDStart << ",ID1=" << gt.evalIDEnd << ",CQ0=" << gt.cacheQueryStart
+                 << ",CQ1=" << gt.cacheQueryEnd << ",CE0=" << gt.cacheEvalStart << ",CE1=" << gt.cacheEvalEnd << ",IO0=" << gt.ioStart
+                 << ",IO1=" << gt.ioEnd << ",THA0=" << gt.restartThreadsAStart << ",THA1=" << gt.restartThreadsAEnd
+                 << ",THB0=" << gt.restartThreadsBStart << ",THB1=" << gt.restartThreadsBEnd << ",CTL0=" << gt.cacheTestLockStart
+                 << ",CTL1=" << gt.cacheTestLockEnd << ",SDSP0=" << gt.setDisplayFrameStart << ",SDSP1=" << gt.setDisplayFrameEnd
+                 << ",FCT0=" << gt.frameCachedTestStart << ",FCT1=" << gt.frameCachedTestEnd << ",WAK0=" << gt.awakenThreadsStart
+                 << ",WAK1=" << gt.awakenThreadsEnd << ",PRR0=" << t.prefetchRenderStart << ",PRR1=" << t.prefetchRenderEnd
+                 << ",PRUP=" << t.prefetchUploadPlaneTotal << ",RRUP=" << t.renderUploadPlaneTotal << ",RFW=" << t.renderFenceWaitTotal
+                 << ",EST=" << t.expectedSyncTime << ",DCO=" << t.deviceClockOffset << ",GC=" << t.gccount << ",F=" << t.frame << endl;
         }
     }
 
@@ -5393,8 +5098,7 @@ namespace IPCore
     //  Session file format I/O
     //
 
-    void Session::writeProfile(const string& filename, IPNode* node,
-                               const WriteRequest& inrequest)
+    void Session::writeProfile(const string& filename, IPNode* node, const WriteRequest& inrequest)
     {
         WriteObjectVector headerObjects;
         NodeSet nodes;
@@ -5427,8 +5131,7 @@ namespace IPCore
         ostringstream profileObjName;
         profileObjName << "profile_" << hex << h32;
 
-        headerObjects.push_back(
-            WriteObject(&pc, profileObjName.str(), "Profile", 1));
+        headerObjects.push_back(WriteObject(&pc, profileObjName.str(), "Profile", 1));
 
         ostringstream newName;
         newName << hex << h32;
@@ -5448,15 +5151,10 @@ namespace IPCore
 
         string mungeName(const StringPair& replacePair, const string& name)
         {
-            return replacePair.first != ""
-                       ? algorithm::replace_all_copy(name, replacePair.first,
-                                                     replacePair.second)
-                       : name;
+            return replacePair.first != "" ? algorithm::replace_all_copy(name, replacePair.first, replacePair.second) : name;
         }
 
-        void makeTopLevelSet(PropertyContainer* connections,
-                             GTOReader::Containers& containers,
-                             Session::NameSet& topLevelSet)
+        void makeTopLevelSet(PropertyContainer* connections, GTOReader::Containers& containers, Session::NameSet& topLevelSet)
         {
             //
             //  NOTE: the RV version of this function allows all sorts of
@@ -5465,18 +5163,12 @@ namespace IPCore
             //  string pair connections.
             //
 
-            StringPairProperty* cons =
-                connections->property<StringPairProperty>(
-                    "evaluation.connections");
-            StringProperty* top =
-                connections->property<StringProperty>("top.nodes");
+            StringPairProperty* cons = connections->property<StringPairProperty>("evaluation.connections");
+            StringProperty* top = connections->property<StringProperty>("top.nodes");
 
-            std::copy(top->valueContainer().begin(),
-                      top->valueContainer().end(),
-                      std::inserter(topLevelSet, topLevelSet.begin()));
+            std::copy(top->valueContainer().begin(), top->valueContainer().end(), std::inserter(topLevelSet, topLevelSet.begin()));
 
-            const StringPairProperty::container_type& array =
-                cons->valueContainer();
+            const StringPairProperty::container_type& array = cons->valueContainer();
 
             for (size_t i = 0; i < array.size(); i++)
             {
@@ -5485,12 +5177,9 @@ namespace IPCore
             }
         }
 
-        void inputsForNode(PropertyContainer* connections, IPGraph& graph,
-                           const string& name, IPGraph::IPNodes& inputs)
+        void inputsForNode(PropertyContainer* connections, IPGraph& graph, const string& name, IPGraph::IPNodes& inputs)
         {
-            StringPairProperty* cons =
-                connections->property<StringPairProperty>(
-                    "evaluation.connections");
+            StringPairProperty* cons = connections->property<StringPairProperty>("evaluation.connections");
 
             inputs.clear();
 
@@ -5506,9 +5195,7 @@ namespace IPCore
                     }
                     else
                     {
-                        cout << "WARNING: could not find node " << arrow.first
-                             << " when trying to connect inputs for " << name
-                             << endl;
+                        cout << "WARNING: could not find node " << arrow.first << " when trying to connect inputs for " << name << endl;
                     }
                 }
             }
@@ -5524,8 +5211,7 @@ namespace IPCore
         {
             static char buf[16];
             static RegEx endRE("(.*[^0-9])([0-9]+)");
-            static RegEx midRE(
-                "(.*[^0-9])([0-9][0-9][0-9][0-9][0-9][0-9])([^0-9].*)");
+            static RegEx midRE("(.*[^0-9])([0-9][0-9][0-9][0-9][0-9][0-9])([^0-9].*)");
 
             if (disallowedNames.count(name) > 0)
             {
@@ -5587,9 +5273,7 @@ namespace IPCore
             return name;
         }
 
-        void uniqifyContainerNames(GTOReader::Containers& containers,
-                                   Session::NameSet& existingNames,
-                                   Session::NameSet& ignoreProtocols,
+        void uniqifyContainerNames(GTOReader::Containers& containers, Session::NameSet& existingNames, Session::NameSet& ignoreProtocols,
                                    Session::NameSet& topLevelSet)
         {
             Session::NameSet origNames;
@@ -5625,8 +5309,7 @@ namespace IPCore
             Session::NameSet disallowedNames = existingNames;
             disallowedNames.insert(origNames.begin(), origNames.end());
 
-            for (Session::NameSet::iterator i = conflictingNames.begin();
-                 i != conflictingNames.end(); ++i)
+            for (Session::NameSet::iterator i = conflictingNames.begin(); i != conflictingNames.end(); ++i)
             {
                 string newName = uniqueName(*i, disallowedNames);
 
@@ -5664,8 +5347,7 @@ namespace IPCore
                     if (newNameMap.count(inputName))
                         inputName = newNameMap[inputName];
 
-                    newName =
-                        groupName + nm.substr(gp, ip - gp + 1) + inputName;
+                    newName = groupName + nm.substr(gp, ip - gp + 1) + inputName;
 
                     newNameMap[nm] = newName;
                 }
@@ -5696,11 +5378,9 @@ namespace IPCore
                     Component::Container& props = comps[j]->properties();
                     for (int k = 0; k < props.size(); ++k)
                     {
-                        if (StringProperty* sp =
-                                dynamic_cast<StringProperty*>(props[k]))
+                        if (StringProperty* sp = dynamic_cast<StringProperty*>(props[k]))
                         {
-                            for (StringProperty::iterator l = sp->begin();
-                                 l != sp->end(); ++l)
+                            for (StringProperty::iterator l = sp->begin(); l != sp->end(); ++l)
                             {
                                 if (newNameMap.count(*l))
                                 {
@@ -5708,12 +5388,9 @@ namespace IPCore
                                 }
                             }
                         }
-                        else if (StringPairProperty* sp =
-                                     dynamic_cast<StringPairProperty*>(
-                                         props[k]))
+                        else if (StringPairProperty* sp = dynamic_cast<StringPairProperty*>(props[k]))
                         {
-                            for (StringPairProperty::iterator l = sp->begin();
-                                 l != sp->end(); ++l)
+                            for (StringPairProperty::iterator l = sp->begin(); l != sp->end(); ++l)
                             {
                                 if (newNameMap.count(l->first))
                                     l->first = newNameMap[l->first];
@@ -5778,8 +5455,7 @@ namespace IPCore
     {
         if (!m_notPersistent)
         {
-            m_notPersistent = new PropertyInfo(PropertyInfo::NotPersistent
-                                               | PropertyInfo::OutputOnly);
+            m_notPersistent = new PropertyInfo(PropertyInfo::NotPersistent | PropertyInfo::OutputOnly);
             //
             //  We intend for this PropInfo to never be deleted, so be sure that
             //  we ref() it once here.
@@ -5787,12 +5463,10 @@ namespace IPCore
             m_notPersistent->ref();
         }
 
-        pc->declareProperty<IntProperty>("internal.creationContext", value,
-                                         m_notPersistent);
+        pc->declareProperty<IntProperty>("internal.creationContext", value, m_notPersistent);
     }
 
-    void Session::readProfile(const string& infilename, IPNode* node,
-                              const ReadRequest& request)
+    void Session::readProfile(const string& infilename, IPNode* node, const ReadRequest& request)
     {
         Profile profile(infilename, &graph());
         profile.load();
@@ -5864,8 +5538,7 @@ namespace IPCore
             }
             else if (p == "IPNodeDefinition")
             {
-                pc->declareProperty<StringProperty>("node.origin", infilename,
-                                                    notPersistent, true);
+                pc->declareProperty<StringProperty>("node.origin", infilename, notPersistent, true);
                 NodeDefinition* def = new NodeDefinition(pc);
                 App()->nodeManager()->addDefinition(def);
             }
@@ -5887,35 +5560,28 @@ namespace IPCore
             NameSet topLevelSet;
             makeTopLevelSet(connections, containers, topLevelSet);
 
-            for (IPGraph::NodeMap::const_iterator i =
-                     graph().viewableNodes().begin();
-                 i != graph().viewableNodes().end(); ++i)
+            for (IPGraph::NodeMap::const_iterator i = graph().viewableNodes().begin(); i != graph().viewableNodes().end(); ++i)
             {
                 string n = (*i).second->name();
                 if (!graph().isDefaultView(n))
                     existingNames.insert(n);
             }
 
-            uniqifyContainerNames(containers, existingNames, ignoreProtocols,
-                                  topLevelSet);
+            uniqifyContainerNames(containers, existingNames, ignoreProtocols, topLevelSet);
         }
         else if (doClear)
         {
             clear();
         }
 
-        if (clipboard
-            && (!session
-                || session->propertyValue<IntProperty>("session.clipboard", 0)
-                       != 1))
+        if (clipboard && (!session || session->propertyValue<IntProperty>("session.clipboard", 0) != 1))
         {
             //
             //  This was intended to be a clipboard read but the GTO
             //  stream is not marked as such
             //
 
-            TWK_THROW_EXC_STREAM(
-                "ERROR: clipboard does not contain clipboard GTO format");
+            TWK_THROW_EXC_STREAM("ERROR: clipboard does not contain clipboard GTO format");
         }
 
         switch (m_inputFileVersion)
@@ -5927,17 +5593,14 @@ namespace IPCore
             m_inputFileVersion = 1;
             break;
         case 1:
-            cout << "INFO: reading version " << m_inputFileVersion
-                 << " session file format" << endl;
+            cout << "INFO: reading version " << m_inputFileVersion << " session file format" << endl;
             break;
         default:
-            cout << "WARNING: trying to read version " << m_inputFileVersion
-                 << " session file format";
+            cout << "WARNING: trying to read version " << m_inputFileVersion << " session file format";
 
             if (m_inputFileVersion > readableVersion)
             {
-                cout << " which is newer than the current version: "
-                     << readableVersion;
+                cout << " which is newer than the current version: " << readableVersion;
             }
 
             cout << endl;
@@ -5997,8 +5660,7 @@ namespace IPCore
                     }
                     else
                     {
-                        cout << "WARNING: cannot make a node of type "
-                             << fprotocol << " for node " << nodeName
+                        cout << "WARNING: cannot make a node of type " << fprotocol << " for node " << nodeName
                              << " in session file: ignoring" << endl;
                     }
                 }
@@ -6056,8 +5718,7 @@ namespace IPCore
                     //  themselves.
                     //
 
-                    if (!graph().isDefaultView(n->name())
-                        || (!merge && inputs.size()))
+                    if (!graph().isDefaultView(n->name()) || (!merge && inputs.size()))
                         n->setInputs(inputs);
 
                     try
@@ -6065,15 +5726,12 @@ namespace IPCore
                         if (n->protocol() == fprotocol)
                         {
                             n->copy(pc);
-                            readCompletedNodes.push_back(
-                                make_pair(n->name(), fprotocolVersion));
+                            readCompletedNodes.push_back(make_pair(n->name(), fprotocolVersion));
                         }
                     }
                     catch (std::exception& e)
                     {
-                        cout << "ERROR: in file, node "
-                             << TwkContainer::name(pc) << ": " << endl
-                             << e.what();
+                        cout << "ERROR: in file, node " << TwkContainer::name(pc) << ": " << endl << e.what();
                     }
                 }
                 else
@@ -6095,9 +5753,7 @@ namespace IPCore
         {
             usedContainers.clear();
 
-            for (PropertyContainerSet::const_iterator i =
-                     unusedContainers.begin();
-                 i != unusedContainers.end(); ++i)
+            for (PropertyContainerSet::const_iterator i = unusedContainers.begin(); i != unusedContainers.end(); ++i)
             {
                 PropertyContainer* pc = *i;
                 string fprotocol = protocol(pc);
@@ -6118,23 +5774,18 @@ namespace IPCore
                         {
                             n->copy(pc);
                             addNodeCreationContext(n);
-                            readCompletedNodes.push_back(
-                                make_pair(n->name(), fprotocolVersion));
+                            readCompletedNodes.push_back(make_pair(n->name(), fprotocolVersion));
                             usedContainers.insert(pc);
                         }
                     }
                     catch (std::exception& e)
                     {
-                        cout << "ERROR: in file, node "
-                             << TwkContainer::name(pc) << ": " << endl
-                             << e.what();
+                        cout << "ERROR: in file, node " << TwkContainer::name(pc) << ": " << endl << e.what();
                     }
                 }
             }
 
-            for (PropertyContainerSet::const_iterator i =
-                     usedContainers.begin();
-                 i != usedContainers.end(); ++i)
+            for (PropertyContainerSet::const_iterator i = usedContainers.begin(); i != usedContainers.end(); ++i)
             {
                 unusedContainers.erase(*i);
             }
@@ -6151,8 +5802,7 @@ namespace IPCore
             {
                 if (IPNode* n = graph().findNode(readCompletedNodes[i].first))
                 {
-                    n->readCompleted(n->protocol(),
-                                     readCompletedNodes[i].second);
+                    n->readCompleted(n->protocol(), readCompletedNodes[i].second);
                 }
             }
             readCompletedNodes.clear();
@@ -6209,12 +5859,9 @@ namespace IPCore
         const bool debug = request.optionValue<bool>("debug", false);
         const bool saveAs = request.optionValue<bool>("saveAs", false);
         const bool clipboard = request.optionValue<bool>("clipboard", false);
-        const string sessionP =
-            request.optionValue<string>("sessionProtocol", "Session");
-        const int sessionPV =
-            request.optionValue<int>("sessionProtocolVersion", 1);
-        const string sessionName =
-            request.optionValue<string>("sessionName", "session");
+        const string sessionP = request.optionValue<string>("sessionProtocol", "Session");
+        const int sessionPV = request.optionValue<int>("sessionProtocolVersion", 1);
+        const string sessionName = request.optionValue<string>("sessionName", "session");
         const int version = request.optionValue<int>("version", 1);
 
         m_beforeSessionWriteSignal(filename);
@@ -6233,14 +5880,12 @@ namespace IPCore
 
         pc.copy(sessionNode);
         if (!debug)
-            pc.remove(
-                pc.component("opengl")); // may want to keep this if debugging
+            pc.remove(pc.component("opengl")); // may want to keep this if debugging
         copyFullSessionStateToContainer(pc);
         pc.declareProperty<IntProperty>("session.version", version);
         if (clipboard)
             pc.declareProperty<IntProperty>("session.clipboard", 1);
-        headerObjects.push_back(
-            WriteObject(&pc, sessionName, sessionP, sessionPV));
+        headerObjects.push_back(WriteObject(&pc, sessionName, sessionP, sessionPV));
 
         //
         //  Top level connections
@@ -6248,8 +5893,7 @@ namespace IPCore
 
         PropertyContainer cons;
         copyConnectionsToContainer(cons);
-        headerObjects.push_back(
-            WriteObject(&cons, "connections", "connection", 2));
+        headerObjects.push_back(WriteObject(&cons, "connections", "connection", 2));
 
         string conformedPath = pathConform(filename);
 
@@ -6283,9 +5927,7 @@ namespace IPCore
                     {
                         if (m_profile)
                         {
-                            if (const IPCore::PropertyInfo* cinfo =
-                                    dynamic_cast<const IPCore::PropertyInfo*>(
-                                        info))
+                            if (const IPCore::PropertyInfo* cinfo = dynamic_cast<const IPCore::PropertyInfo*>(info))
                             {
                                 return !cinfo->excludedFromProfile();
                             }
@@ -6308,9 +5950,8 @@ namespace IPCore
 
     } // namespace
 
-    void Session::writeGTO(const string& filename,
-                           const WriteObjectVector& headerObjects,
-                           const WriteRequest& request, const bool writeSession)
+    void Session::writeGTO(const string& filename, const WriteObjectVector& headerObjects, const WriteRequest& request,
+                           const bool writeSession)
     {
         //
         //  Base options for file writing.
@@ -6318,18 +5959,15 @@ namespace IPCore
 
         const bool compressed = request.optionValue<bool>("compressed", false);
         const bool sparse = request.optionValue<bool>("sparse", false);
-        const bool binary =
-            request.optionValue<bool>("binary", false) || compressed;
+        const bool binary = request.optionValue<bool>("binary", false) || compressed;
         const bool debug = request.optionValue<bool>("debug", false);
-        const bool connections =
-            request.optionValue<bool>("connections", false);
+        const bool connections = request.optionValue<bool>("connections", false);
         const bool membership = request.optionValue<bool>("membership", false);
         const bool recursive = request.optionValue<bool>("recursive", true);
         const bool clipboard = request.optionValue<bool>("clipboard", true);
         const bool profile = request.optionValue<bool>("profile", false);
         const string writerID = request.optionValue<string>("writerID", "IP");
-        const StringPair nameReplace =
-            request.optionValue<StringPair>("nameReplace", StringPair());
+        const StringPair nameReplace = request.optionValue<StringPair>("nameReplace", StringPair());
         ostream* outStream = request.optionValue<ostream*>("stream", NULL);
         NodeSet writeNodes = request.optionValue<NodeSet>("writeNodes");
 
@@ -6341,8 +5979,7 @@ namespace IPCore
 
         if (writeNodes.empty())
         {
-            for (NodeMap::const_iterator i = nodeMap.begin();
-                 i != nodeMap.end(); ++i)
+            for (NodeMap::const_iterator i = nodeMap.begin(); i != nodeMap.end(); ++i)
             {
                 writeNodes.insert(i->second);
             }
@@ -6351,8 +5988,7 @@ namespace IPCore
         {
             NodeSet tempSet = writeNodes;
 
-            for (NodeSet::const_iterator i = tempSet.begin();
-                 i != tempSet.end(); ++i)
+            for (NodeSet::const_iterator i = tempSet.begin(); i != tempSet.end(); ++i)
             {
                 (*i)->collectMemberNodes(writeNodes);
             }
@@ -6369,8 +6005,7 @@ namespace IPCore
         {
             const WriteObject& obj = headerObjects[i];
 
-            objects.push_back(GTOWriter::Object(obj.container, obj.name,
-                                                obj.protocol, obj.version));
+            objects.push_back(GTOWriter::Object(obj.container, obj.name, obj.protocol, obj.version));
         }
 
         //
@@ -6384,8 +6019,7 @@ namespace IPCore
 
         SortedNodeSet sortedWriteNodes;
 
-        for (NodeSet::const_iterator i = writeNodes.begin();
-             i != writeNodes.end(); ++i)
+        for (NodeSet::const_iterator i = writeNodes.begin(); i != writeNodes.end(); ++i)
         {
             sortedWriteNodes.insert(*i);
         }
@@ -6397,8 +6031,7 @@ namespace IPCore
         set<const NodeDefinition*> outputDefinitions;
         vector<PropertyContainer*> tempContainers;
 
-        for (SortedNodeSet::const_iterator i = sortedWriteNodes.begin();
-             i != sortedWriteNodes.end(); ++i)
+        for (SortedNodeSet::const_iterator i = sortedWriteNodes.begin(); i != sortedWriteNodes.end(); ++i)
         {
             IPNode* n = *i;
             string ntype = n->protocol();
@@ -6416,12 +6049,10 @@ namespace IPCore
             {
                 if (membership)
                 {
-                    StringProperty* sp = n->declareProperty<StringProperty>(
-                        "membership.contains");
+                    StringProperty* sp = n->declareProperty<StringProperty>("membership.contains");
                     const NodeSet& members = group->members();
 
-                    for (NodeSet::const_iterator i = members.begin();
-                         i != members.end(); ++i)
+                    for (NodeSet::const_iterator i = members.begin(); i != members.end(); ++i)
                     {
                         string name = (*i)->name();
                         sp->push_back(mungeName(nameReplace, name));
@@ -6430,18 +6061,13 @@ namespace IPCore
 
                 if (connections)
                 {
-                    string rootName =
-                        mungeName(nameReplace, group->rootNode()->name());
+                    string rootName = mungeName(nameReplace, group->rootNode()->name());
 
-                    StringPairProperty* sp =
-                        n->declareProperty<StringPairProperty>(
-                            "evaluation.connections");
-                    StringProperty* rp = n->declareProperty<StringProperty>(
-                        "evaluation.root", rootName);
+                    StringPairProperty* sp = n->declareProperty<StringPairProperty>("evaluation.connections");
+                    StringProperty* rp = n->declareProperty<StringProperty>("evaluation.root", rootName);
                     const NodeSet& members = group->members();
 
-                    for (NodeSet::const_iterator i = members.begin();
-                         i != members.end(); ++i)
+                    for (NodeSet::const_iterator i = members.begin(); i != members.end(); ++i)
                     {
                         IPNode* member = *i;
                         const IPNode::IPNodes& inputs = member->inputs();
@@ -6454,9 +6080,7 @@ namespace IPCore
                             //
 
                             string iname = inputs[q]->name();
-                            sp->push_back(StringPair(
-                                mungeName(nameReplace, iname),
-                                mungeName(nameReplace, member->name())));
+                            sp->push_back(StringPair(mungeName(nameReplace, iname), mungeName(nameReplace, member->name())));
                         }
                     }
                 }
@@ -6466,16 +6090,14 @@ namespace IPCore
             //
             //
 
-            GTOWriter::Object obj(n, mungeName(nameReplace, n->name()),
-                                  n->protocol(), n->protocolVersion());
+            GTOWriter::Object obj(n, mungeName(nameReplace, n->name()), n->protocol(), n->protocolVersion());
 
             if (sparse)
             {
                 if (PropertyContainer* sc = graph().sparseContainer(n))
                 {
                     if (!n->group() && // top level
-                        sc->components().size() == 1
-                        && sc->components().front()->properties().size() == 3)
+                        sc->components().size() == 1 && sc->components().front()->properties().size() == 3)
                     {
                         //
                         //  In this case, the object doesn't really
@@ -6536,11 +6158,9 @@ namespace IPCore
         else if (binary)
             outType = Gto::Writer::BinaryGTO;
 
-        bool ok = outStream ? writer.write(*outStream, objects, outType)
-                            : writer.write(filename.c_str(), objects, outType);
+        bool ok = outStream ? writer.write(*outStream, objects, outType) : writer.write(filename.c_str(), objects, outType);
 
-        for (SortedNodeSet::const_iterator i = sortedWriteNodes.begin();
-             i != sortedWriteNodes.end(); ++i)
+        for (SortedNodeSet::const_iterator i = sortedWriteNodes.begin(); i != sortedWriteNodes.end(); ++i)
         {
             IPNode* n = *i;
 
@@ -6552,8 +6172,7 @@ namespace IPCore
                 }
                 if (connections)
                 {
-                    n->removeProperty<StringPairProperty>(
-                        "evaluation.connections");
+                    n->removeProperty<StringPairProperty>("evaluation.connections");
                     n->removeProperty<StringProperty>("evaluation.root");
                 }
             }
@@ -6574,10 +6193,7 @@ namespace IPCore
 
     void Session::readGTO(const string& filename, bool merge) {}
 
-    bool Session::useThreadedUpload()
-    {
-        return ImageRenderer::useThreadedUpload();
-    }
+    bool Session::useThreadedUpload() { return ImageRenderer::useThreadedUpload(); }
 
     bool Session::framePatternCheck(int frame) const
     {
@@ -6585,8 +6201,7 @@ namespace IPCore
         m_frameRuns.clear();
         m_framePatternFail = false;
 
-        const bool newFrame =
-            m_frameHistory.size() > 1 && m_frameHistory[0] != m_frameHistory[1];
+        const bool newFrame = m_frameHistory.size() > 1 && m_frameHistory[0] != m_frameHistory[1];
 
         for (size_t i = 0; i < m_frameHistory.size(); i++)
         {
@@ -6616,13 +6231,10 @@ namespace IPCore
             // count required for a successfull pattern check since there is
             // more that sufficient time.
             //
-            bool isFirstPreRollPlayFrame =
-                (m_frameRuns.size() == 3
-                 && (audioRenderer() && hasAudio()
-                     && (audioRenderer()->preRollDelay()
-                             > 1.0 / currentTargetFPS()
-                         || audioRenderer()->deviceState().latency
-                                < -1.0 / currentTargetFPS())));
+            bool isFirstPreRollPlayFrame = (m_frameRuns.size() == 3
+                                            && (audioRenderer() && hasAudio()
+                                                && (audioRenderer()->preRollDelay() > 1.0 / currentTargetFPS()
+                                                    || audioRenderer()->deviceState().latency < -1.0 / currentTargetFPS())));
             if (isFirstPreRollPlayFrame)
             {
                 if (fabsf(vsyncFPSRatio - 2.5f) < 0.1f)
@@ -6641,38 +6253,32 @@ namespace IPCore
 
             // Check for 3-2 render cycle i.e. 24fps at 60hz
             if (fabsf(vsyncFPSRatio - 2.5f) < 0.1f
-                && (!(m_frameRuns[1] == 2 && m_frameRuns[2] == 3)
-                    && !(m_frameRuns[1] == 3 && m_frameRuns[2] == 2)))
+                && (!(m_frameRuns[1] == 2 && m_frameRuns[2] == 3) && !(m_frameRuns[1] == 3 && m_frameRuns[2] == 2)))
             {
                 if (!m_framePatternFailCount)
                 {
-                    cout << "PATTERN check using a 3-2 render/refresh cycle."
-                         << endl;
+                    cout << "PATTERN check using a 3-2 render/refresh cycle." << endl;
                 }
 
                 patternFailed = true;
             }
-            else if (fabsf(vsyncFPSRatio - 2.0f) < 0.1f
-                     && (m_frameRuns[1] != 2 || m_frameRuns[2] != 2))
+            else if (fabsf(vsyncFPSRatio - 2.0f) < 0.1f && (m_frameRuns[1] != 2 || m_frameRuns[2] != 2))
             {
                 // Check for 2-2 render cycle i.e. 24fps at 48hz or
                 // 30fps at 60 Hz.
                 if (!m_framePatternFailCount)
                 {
-                    cout << "PATTERN check using a 2-2 render/refresh cycle."
-                         << endl;
+                    cout << "PATTERN check using a 2-2 render/refresh cycle." << endl;
                 }
 
                 patternFailed = true;
             }
-            else if (vsyncFPSRatio < 1.5f
-                     && (m_frameRuns[1] != 1 || m_frameRuns[2] != 1))
+            else if (vsyncFPSRatio < 1.5f && (m_frameRuns[1] != 1 || m_frameRuns[2] != 1))
             {
                 // Check for FPS = Vsync Rate pattern
                 if (!m_framePatternFailCount)
                 {
-                    cout << "PATTERN check using a 1-1 render/refresh cycle."
-                         << endl;
+                    cout << "PATTERN check using a 1-1 render/refresh cycle." << endl;
                 }
 
                 patternFailed = true;
@@ -6685,8 +6291,7 @@ namespace IPCore
                 cout << "PATTERN FAIL #" << m_framePatternFailCount << " : ";
                 for (size_t i = 1; i < m_frameRuns.size(); i++)
                     cout << " " << m_frameRuns[i];
-                cout << " // frame = " << frame << " (" << currentFrame() << ")"
-                     << endl;
+                cout << " // frame = " << frame << " (" << currentFrame() << ")" << endl;
             }
         }
 

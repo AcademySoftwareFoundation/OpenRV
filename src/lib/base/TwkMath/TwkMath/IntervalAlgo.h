@@ -88,8 +88,7 @@ namespace TwkMath
         }
         else if (a.intersects((T)0))
         {
-            return Interval<T>(
-                (T)0, std::max(Math<T>::abs(a.min), Math<T>::abs(a.max)));
+            return Interval<T>((T)0, std::max(Math<T>::abs(a.min), Math<T>::abs(a.max)));
         }
         else
         {

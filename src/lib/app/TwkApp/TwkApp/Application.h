@@ -60,18 +60,14 @@ namespace TwkApp
         void loadOutputPlugins(const std::string& envvar);
         void unloadOutputPlugins();
 
-        void addVideoModule(VideoModule* m)
-        {
-            m_videoModules.push_back(std::shared_ptr<VideoModule>(m));
-        }
+        void addVideoModule(VideoModule* m) { m_videoModules.push_back(std::shared_ptr<VideoModule>(m)); }
 
         virtual VideoModule* primaryVideoModule() const;
 
         const VideoModules& videoModules() const { return m_videoModules; }
 
     protected:
-        virtual bool receive(Notifier*, Notifier*, Notifier::MessageId,
-                             Notifier::MessageData*);
+        virtual bool receive(Notifier*, Notifier*, Notifier::MessageId, Notifier::MessageData*);
 
     protected:
         Application();

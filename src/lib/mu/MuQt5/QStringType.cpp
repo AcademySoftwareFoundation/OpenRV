@@ -50,37 +50,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QStringType::Instance* i =
-            new QStringType::Instance((Class*)NODE_THIS.type());
+        QStringType::Instance* i = new QStringType::Instance((Class*)NODE_THIS.type());
         QStringType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QStringType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QStringType::finalizer, 0, 0, 0);
-    }
+    void QStringType::registerFinalizer(void* o) { GC_register_finalizer(o, QStringType::finalizer, 0, 0, 0); }
 
     void QStringType::finalizer(void* obj, void* data)
     {
-        QStringType::Instance* i =
-            reinterpret_cast<QStringType::Instance*>(obj);
+        QStringType::Instance* i = reinterpret_cast<QStringType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QString_QString_QString_QString(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QString_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QStringType>(param_this, QString());
         return param_this;
     }
 
-    Pointer qt_QString_QString_QString_QString_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
+    Pointer qt_QString_QString_QString_QString_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg1 = getqtype<QByteArrayType>(param_ba);
@@ -88,9 +81,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QString_append_QString_QString_QString(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_str)
+    Pointer qt_QString_append_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -98,8 +89,7 @@ namespace Mu
         return makestring(c, arg0.append(arg1));
     }
 
-    Pointer qt_QString_append_QString_QString_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
+    Pointer qt_QString_append_QString_QString_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -107,9 +97,7 @@ namespace Mu
         return makestring(c, arg0.append(arg1));
     }
 
-    Pointer qt_QString_arg_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2)
+    Pointer qt_QString_arg_QString_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -118,9 +106,8 @@ namespace Mu
         return makestring(c, arg0.arg(arg1, arg2));
     }
 
-    Pointer qt_QString_arg_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
+                                                                   Pointer param_a2, Pointer param_a3)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -130,9 +117,8 @@ namespace Mu
         return makestring(c, arg0.arg(arg1, arg2, arg3));
     }
 
-    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3, Pointer param_a4)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
+                                                                           Pointer param_a2, Pointer param_a3, Pointer param_a4)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -143,10 +129,9 @@ namespace Mu
         return makestring(c, arg0.arg(arg1, arg2, arg3, arg4));
     }
 
-    Pointer
-    qt_QString_arg_QString_QString_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3, Pointer param_a4, Pointer param_a5)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_a1, Pointer param_a2, Pointer param_a3,
+                                                                                   Pointer param_a4, Pointer param_a5)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -158,11 +143,10 @@ namespace Mu
         return makestring(c, arg0.arg(arg1, arg2, arg3, arg4, arg5));
     }
 
-    Pointer
-    qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3, Pointer param_a4, Pointer param_a5,
-        Pointer param_a6)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_a1, Pointer param_a2,
+                                                                                           Pointer param_a3, Pointer param_a4,
+                                                                                           Pointer param_a5, Pointer param_a6)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -175,11 +159,11 @@ namespace Mu
         return makestring(c, arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6));
     }
 
-    Pointer
-    qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3, Pointer param_a4, Pointer param_a5,
-        Pointer param_a6, Pointer param_a7)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString(Mu::Thread& NODE_THREAD,
+                                                                                                   Pointer param_this, Pointer param_a1,
+                                                                                                   Pointer param_a2, Pointer param_a3,
+                                                                                                   Pointer param_a4, Pointer param_a5,
+                                                                                                   Pointer param_a6, Pointer param_a7)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -190,15 +174,12 @@ namespace Mu
         const QString arg5 = getqtype<QStringType>(param_a5);
         const QString arg6 = getqtype<QStringType>(param_a6);
         const QString arg7 = getqtype<QStringType>(param_a7);
-        return makestring(c,
-                          arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6, arg7));
+        return makestring(c, arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6, arg7));
     }
 
-    Pointer
-    qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3, Pointer param_a4, Pointer param_a5,
-        Pointer param_a6, Pointer param_a7, Pointer param_a8)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1, Pointer param_a2, Pointer param_a3, Pointer param_a4,
+        Pointer param_a5, Pointer param_a6, Pointer param_a7, Pointer param_a8)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -210,15 +191,12 @@ namespace Mu
         const QString arg6 = getqtype<QStringType>(param_a6);
         const QString arg7 = getqtype<QStringType>(param_a7);
         const QString arg8 = getqtype<QStringType>(param_a8);
-        return makestring(
-            c, arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
+        return makestring(c, arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
     }
 
-    Pointer
-    qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1,
-        Pointer param_a2, Pointer param_a3, Pointer param_a4, Pointer param_a5,
-        Pointer param_a6, Pointer param_a7, Pointer param_a8, Pointer param_a9)
+    Pointer qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_a1, Pointer param_a2, Pointer param_a3, Pointer param_a4,
+        Pointer param_a5, Pointer param_a6, Pointer param_a7, Pointer param_a8, Pointer param_a9)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -231,20 +209,17 @@ namespace Mu
         const QString arg7 = getqtype<QStringType>(param_a7);
         const QString arg8 = getqtype<QStringType>(param_a8);
         const QString arg9 = getqtype<QStringType>(param_a9);
-        return makestring(
-            c, arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
+        return makestring(c, arg0.arg(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9));
     }
 
-    int qt_QString_capacity_int_QString(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    int qt_QString_capacity_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.capacity();
     }
 
-    void qt_QString_chop_void_QString_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_n)
+    void qt_QString_chop_void_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_n)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -253,8 +228,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    void qt_QString_clear_void_QString(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    void qt_QString_clear_void_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -262,9 +236,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    int qt_QString_compare_int_QString_QString(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_other)
+    int qt_QString_compare_int_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -272,10 +244,7 @@ namespace Mu
         return arg0.compare(arg1);
     }
 
-    int qt_QString_compare_int_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_other,
-                                                   int param_cs)
+    int qt_QString_compare_int_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -284,10 +253,7 @@ namespace Mu
         return arg0.compare(arg1, arg2);
     }
 
-    bool qt_QString_contains_bool_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_str,
-                                                      int param_cs)
+    bool qt_QString_contains_bool_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -296,10 +262,7 @@ namespace Mu
         return arg0.contains(arg1, arg2);
     }
 
-    int qt_QString_count_int_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 Pointer param_str,
-                                                 int param_cs)
+    int qt_QString_count_int_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -308,18 +271,14 @@ namespace Mu
         return arg0.count(arg1, arg2);
     }
 
-    int qt_QString_count_int_QString(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QString_count_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.count();
     }
 
-    bool qt_QString_endsWith_bool_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_s,
-                                                      int param_cs)
+    bool qt_QString_endsWith_bool_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_s, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -328,10 +287,7 @@ namespace Mu
         return arg0.endsWith(arg1, arg2);
     }
 
-    int qt_QString_indexOf_int_QString_QString_int_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_str,
-                                                       int param_from,
+    int qt_QString_indexOf_int_QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_from,
                                                        int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -342,9 +298,8 @@ namespace Mu
         return arg0.indexOf(arg1, arg2, arg3);
     }
 
-    Pointer qt_QString_insert_QString_QString_int_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_position,
-        Pointer param_str)
+    Pointer qt_QString_insert_QString_QString_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position,
+                                                          Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -353,25 +308,22 @@ namespace Mu
         return makestring(c, arg0.insert(arg1, arg2));
     }
 
-    bool qt_QString_isEmpty_bool_QString(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    bool qt_QString_isEmpty_bool_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.isEmpty();
     }
 
-    bool qt_QString_isNull_bool_QString(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    bool qt_QString_isNull_bool_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.isNull();
     }
 
-    int qt_QString_lastIndexOf_int_QString_QString_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str,
-        int param_from, int param_cs)
+    int qt_QString_lastIndexOf_int_QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_from,
+                                                           int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -381,8 +333,7 @@ namespace Mu
         return arg0.lastIndexOf(arg1, arg2, arg3);
     }
 
-    Pointer qt_QString_left_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this, int param_n)
+    Pointer qt_QString_left_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_n)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -390,16 +341,14 @@ namespace Mu
         return makestring(c, arg0.left(arg1));
     }
 
-    int qt_QString_length_int_QString(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    int qt_QString_length_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.length();
     }
 
-    int qt_QString_localeAwareCompare_int_QString_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    int qt_QString_localeAwareCompare_int_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -407,10 +356,7 @@ namespace Mu
         return arg0.localeAwareCompare(arg1);
     }
 
-    Pointer qt_QString_mid_QString_QString_int_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_position,
-                                                   int param_n)
+    Pointer qt_QString_mid_QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position, int param_n)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -419,32 +365,24 @@ namespace Mu
         return makestring(c, arg0.mid(arg1, arg2));
     }
 
-    Pointer qt_QString_normalized_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_mode)
+    Pointer qt_QString_normalized_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
-        QString::NormalizationForm arg1 =
-            (QString::NormalizationForm)(param_mode);
+        QString::NormalizationForm arg1 = (QString::NormalizationForm)(param_mode);
         return makestring(c, arg0.normalized(arg1));
     }
 
-    Pointer qt_QString_normalized_QString_QString_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode,
-        int param_version)
+    Pointer qt_QString_normalized_QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode, int param_version)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
-        QString::NormalizationForm arg1 =
-            (QString::NormalizationForm)(param_mode);
+        QString::NormalizationForm arg1 = (QString::NormalizationForm)(param_mode);
         QChar::UnicodeVersion arg2 = (QChar::UnicodeVersion)(param_version);
         return makestring(c, arg0.normalized(arg1, arg2));
     }
 
-    Pointer qt_QString_prepend_QString_QString_QString(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_str)
+    Pointer qt_QString_prepend_QString_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -452,8 +390,7 @@ namespace Mu
         return makestring(c, arg0.prepend(arg1));
     }
 
-    Pointer qt_QString_prepend_QString_QString_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
+    Pointer qt_QString_prepend_QString_QString_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -461,9 +398,7 @@ namespace Mu
         return makestring(c, arg0.prepend(arg1));
     }
 
-    void qt_QString_push_back_void_QString_QString(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_other)
+    void qt_QString_push_back_void_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -472,9 +407,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    void qt_QString_push_front_void_QString_QString(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_other)
+    void qt_QString_push_front_void_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -483,10 +416,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    Pointer qt_QString_remove_QString_QString_int_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_position,
-                                                      int param_n)
+    Pointer qt_QString_remove_QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position, int param_n)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -495,9 +425,7 @@ namespace Mu
         return makestring(c, arg0.remove(arg1, arg2));
     }
 
-    Pointer qt_QString_remove_QString_QString_QString_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str,
-        int param_cs)
+    Pointer qt_QString_remove_QString_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -506,9 +434,7 @@ namespace Mu
         return makestring(c, arg0.remove(arg1, arg2));
     }
 
-    Pointer qt_QString_repeated_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_times)
+    Pointer qt_QString_repeated_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_times)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -516,9 +442,8 @@ namespace Mu
         return makestring(c, arg0.repeated(arg1));
     }
 
-    Pointer qt_QString_replace_QString_QString_int_int_QString(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_position,
-        int param_n, Pointer param_after)
+    Pointer qt_QString_replace_QString_QString_int_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position, int param_n,
+                                                               Pointer param_after)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -528,9 +453,8 @@ namespace Mu
         return makestring(c, arg0.replace(arg1, arg2, arg3));
     }
 
-    Pointer qt_QString_replace_QString_QString_QString_QString_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before,
-        Pointer param_after, int param_cs)
+    Pointer qt_QString_replace_QString_QString_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before,
+                                                                   Pointer param_after, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -540,8 +464,7 @@ namespace Mu
         return makestring(c, arg0.replace(arg1, arg2, arg3));
     }
 
-    void qt_QString_reserve_void_QString_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this, int param_size)
+    void qt_QString_reserve_void_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -550,8 +473,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    void qt_QString_resize_void_QString_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_size)
+    void qt_QString_resize_void_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -560,9 +482,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    Pointer qt_QString_right_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_n)
+    Pointer qt_QString_right_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_n)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -570,9 +490,8 @@ namespace Mu
         return makestring(c, arg0.right(arg1));
     }
 
-    Pointer qt_QString_section_QString_QString_QString_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sep,
-        int param_start, int param_end, int param_flags)
+    Pointer qt_QString_section_QString_QString_QString_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sep,
+                                                                   int param_start, int param_end, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -583,10 +502,7 @@ namespace Mu
         return makestring(c, arg0.section(arg1, arg2, arg3, arg4));
     }
 
-    Pointer qt_QString_setNum_QString_QString_int_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_n,
-                                                      int param_base)
+    Pointer qt_QString_setNum_QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_n, int param_base)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -595,8 +511,7 @@ namespace Mu
         return makestring(c, arg0.setNum(arg1, arg2));
     }
 
-    Pointer qt_QString_simplified_QString_QString(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QString_simplified_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -610,9 +525,8 @@ namespace Mu
         return arg0.size();
     }
 
-    Pointer qt_QString_split_stringBSB_ESB__QString_QString_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sep,
-        int param_behavior, int param_cs)
+    Pointer qt_QString_split_stringBSB_ESB__QString_QString_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sep,
+                                                                    int param_behavior, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -622,8 +536,7 @@ namespace Mu
         return makestringlist(c, arg0.split(arg1, arg2, arg3));
     }
 
-    void qt_QString_squeeze_void_QString(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    void qt_QString_squeeze_void_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -631,10 +544,7 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    bool qt_QString_startsWith_bool_QString_QString_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_s,
-                                                        int param_cs)
+    bool qt_QString_startsWith_bool_QString_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_s, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -643,90 +553,77 @@ namespace Mu
         return arg0.startsWith(arg1, arg2);
     }
 
-    Pointer qt_QString_toAscii_QByteArray_QString(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QString_toAscii_QByteArray_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.toAscii(), "qt.QByteArray");
     }
 
-    Pointer qt_QString_toCaseFolded_QString_QString(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QString_toCaseFolded_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makestring(c, arg0.toCaseFolded());
     }
 
-    Pointer qt_QString_toLatin1_QByteArray_QString(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QString_toLatin1_QByteArray_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.toLatin1(), "qt.QByteArray");
     }
 
-    Pointer qt_QString_toLocal8Bit_QByteArray_QString(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QString_toLocal8Bit_QByteArray_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
-        return makeqtype<QByteArrayType>(c, arg0.toLocal8Bit(),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.toLocal8Bit(), "qt.QByteArray");
     }
 
-    Pointer qt_QString_toLower_QString_QString(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QString_toLower_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makestring(c, arg0.toLower());
     }
 
-    int qt_QString_toStdString_int_QString(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QString_toStdString_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.toStdString();
     }
 
-    int qt_QString_toStdWString_int_QString(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int qt_QString_toStdWString_int_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return arg0.toStdWString();
     }
 
-    Pointer qt_QString_toUpper_QString_QString(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QString_toUpper_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makestring(c, arg0.toUpper());
     }
 
-    Pointer qt_QString_toUtf8_QByteArray_QString(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QString_toUtf8_QByteArray_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.toUtf8(), "qt.QByteArray");
     }
 
-    Pointer qt_QString_trimmed_QString_QString(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QString_trimmed_QString_QString(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
         return makestring(c, arg0.trimmed());
     }
 
-    void qt_QString_truncate_void_QString_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_position)
+    void qt_QString_truncate_void_QString_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = getqtype<QStringType>(param_this);
@@ -735,24 +632,21 @@ namespace Mu
         setqtype<QStringType>(param_this, arg0);
     }
 
-    Pointer qt_QString_fromStdString_QString_int(Mu::Thread& NODE_THREAD,
-                                                 int param_str)
+    Pointer qt_QString_fromStdString_QString_int(Mu::Thread& NODE_THREAD, int param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const std::string arg0 = (&)(param_str);
         return makestring(c, QString::fromStdString(arg0));
     }
 
-    Pointer qt_QString_fromStdWString_QString_int(Mu::Thread& NODE_THREAD,
-                                                  int param_str)
+    Pointer qt_QString_fromStdWString_QString_int(Mu::Thread& NODE_THREAD, int param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const std::wstring arg0 = (&)(param_str);
         return makestring(c, QString::fromStdWString(arg0));
     }
 
-    Pointer qt_QString_number_QString_int_int(Mu::Thread& NODE_THREAD,
-                                              int param_n, int param_base)
+    Pointer qt_QString_number_QString_int_int(Mu::Thread& NODE_THREAD, int param_n, int param_base)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_n);
@@ -760,8 +654,7 @@ namespace Mu
         return makestring(c, QString::number(arg0, arg1));
     }
 
-    Pointer qt_QString_number_QString_int_int(Mu::Thread& NODE_THREAD,
-                                              int param_n, int param_base)
+    Pointer qt_QString_number_QString_int_int(Mu::Thread& NODE_THREAD, int param_n, int param_base)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         uint arg0 = (int)(param_n);
@@ -771,440 +664,345 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QString0, Pointer)
     {
-        NODE_RETURN(qt_QString_QString_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_QString_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QString7, Pointer)
     {
-        NODE_RETURN(qt_QString_QString_QString_QString_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_QString_QString_QString_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_append0, Pointer)
     {
-        NODE_RETURN(qt_QString_append_QString_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_append_QString_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_append3, Pointer)
     {
-        NODE_RETURN(qt_QString_append_QString_QString_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_append_QString_QString_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg1, Pointer)
     {
-        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg2, Pointer)
     {
-        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg3, Pointer)
     {
-        NODE_RETURN(
-            qt_QString_arg_QString_QString_QString_QString_QString_QString(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, Pointer),
+                                                                                   NODE_ARG(3, Pointer), NODE_ARG(4, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg4, Pointer)
     {
-        NODE_RETURN(
-            qt_QString_arg_QString_QString_QString_QString_QString_QString_QString(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer), NODE_ARG(5, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString_QString_QString(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
+            NODE_ARG(4, Pointer), NODE_ARG(5, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg5, Pointer)
     {
-        NODE_RETURN(
-            qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer), NODE_ARG(5, Pointer),
-                NODE_ARG(6, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
+            NODE_ARG(4, Pointer), NODE_ARG(5, Pointer), NODE_ARG(6, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg6, Pointer)
     {
-        NODE_RETURN(
-            qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer), NODE_ARG(5, Pointer),
-                NODE_ARG(6, Pointer), NODE_ARG(7, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
+            NODE_ARG(4, Pointer), NODE_ARG(5, Pointer), NODE_ARG(6, Pointer), NODE_ARG(7, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg7, Pointer)
     {
-        NODE_RETURN(
-            qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer), NODE_ARG(5, Pointer),
-                NODE_ARG(6, Pointer), NODE_ARG(7, Pointer),
-                NODE_ARG(8, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
+            NODE_ARG(4, Pointer), NODE_ARG(5, Pointer), NODE_ARG(6, Pointer), NODE_ARG(7, Pointer), NODE_ARG(8, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_arg8, Pointer)
     {
-        NODE_RETURN(
-            qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer), NODE_ARG(5, Pointer),
-                NODE_ARG(6, Pointer), NODE_ARG(7, Pointer),
-                NODE_ARG(8, Pointer), NODE_ARG(9, Pointer)));
+        NODE_RETURN(qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
+            NODE_ARG(4, Pointer), NODE_ARG(5, Pointer), NODE_ARG(6, Pointer), NODE_ARG(7, Pointer), NODE_ARG(8, Pointer),
+            NODE_ARG(9, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_capacity0, int)
     {
-        NODE_RETURN(qt_QString_capacity_int_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_capacity_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_chop0, void)
     {
-        qt_QString_chop_void_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QString_chop_void_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QString_clear_void_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QString_clear_void_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_compare0, int)
     {
-        NODE_RETURN(qt_QString_compare_int_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_compare_int_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_compare1, int)
     {
-        NODE_RETURN(qt_QString_compare_int_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_compare_int_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_contains0, bool)
     {
-        NODE_RETURN(qt_QString_contains_bool_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_contains_bool_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QString_count_int_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_count_int_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_count3, int)
-    {
-        NODE_RETURN(qt_QString_count_int_QString(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_count3, int) { NODE_RETURN(qt_QString_count_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_endsWith0, bool)
     {
-        NODE_RETURN(qt_QString_endsWith_bool_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_endsWith_bool_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QString_indexOf_int_QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QString_indexOf_int_QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_insert0, Pointer)
     {
-        NODE_RETURN(qt_QString_insert_QString_QString_int_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QString_insert_QString_QString_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QString_isEmpty_bool_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_isEmpty_bool_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_isNull0, bool)
-    {
-        NODE_RETURN(qt_QString_isNull_bool_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isNull0, bool) { NODE_RETURN(qt_QString_isNull_bool_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_lastIndexOf0, int)
     {
-        NODE_RETURN(qt_QString_lastIndexOf_int_QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QString_lastIndexOf_int_QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_left0, Pointer)
     {
-        NODE_RETURN(qt_QString_left_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QString_left_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_length0, int)
-    {
-        NODE_RETURN(qt_QString_length_int_QString(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_length0, int) { NODE_RETURN(qt_QString_length_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_localeAwareCompare1, int)
     {
-        NODE_RETURN(qt_QString_localeAwareCompare_int_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_localeAwareCompare_int_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mid0, Pointer)
     {
-        NODE_RETURN(qt_QString_mid_QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QString_mid_QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_normalized0, Pointer)
     {
-        NODE_RETURN(qt_QString_normalized_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QString_normalized_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_normalized1, Pointer)
     {
-        NODE_RETURN(qt_QString_normalized_QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_normalized_QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_prepend0, Pointer)
     {
-        NODE_RETURN(qt_QString_prepend_QString_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_prepend_QString_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_prepend2, Pointer)
     {
-        NODE_RETURN(qt_QString_prepend_QString_QString_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QString_prepend_QString_QString_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_push_back0, void)
     {
-        qt_QString_push_back_void_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QString_push_back_void_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_push_front0, void)
     {
-        qt_QString_push_front_void_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QString_push_front_void_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_remove0, Pointer)
     {
-        NODE_RETURN(qt_QString_remove_QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_remove_QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_remove2, Pointer)
     {
-        NODE_RETURN(qt_QString_remove_QString_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QString_remove_QString_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                  NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_repeated0, Pointer)
     {
-        NODE_RETURN(qt_QString_repeated_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QString_repeated_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_replace0, Pointer)
     {
-        NODE_RETURN(qt_QString_replace_QString_QString_int_int_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QString_replace_QString_QString_int_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                       NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_replace3, Pointer)
     {
-        NODE_RETURN(qt_QString_replace_QString_QString_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QString_replace_QString_QString_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_reserve0, void)
     {
-        qt_QString_reserve_void_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QString_reserve_void_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_resize0, void)
     {
-        qt_QString_resize_void_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QString_resize_void_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_right0, Pointer)
     {
-        NODE_RETURN(qt_QString_right_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QString_right_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_section1, Pointer)
     {
-        NODE_RETURN(qt_QString_section_QString_QString_QString_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QString_section_QString_QString_QString_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setNum0, Pointer)
     {
-        NODE_RETURN(qt_QString_setNum_QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QString_setNum_QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_simplified0, Pointer)
     {
-        NODE_RETURN(qt_QString_simplified_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_simplified_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_size0, int)
-    {
-        NODE_RETURN(qt_QString_size_int_QString(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_size0, int) { NODE_RETURN(qt_QString_size_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_split0, Pointer)
     {
-        NODE_RETURN(qt_QString_split_stringBSB_ESB__QString_QString_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QString_split_stringBSB_ESB__QString_QString_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_squeeze0, void)
-    {
-        qt_QString_squeeze_void_QString(NODE_THREAD,
-                                        NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_squeeze0, void) { qt_QString_squeeze_void_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_startsWith0, bool)
     {
-        NODE_RETURN(qt_QString_startsWith_bool_QString_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QString_startsWith_bool_QString_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_toAscii0, Pointer)
     {
-        NODE_RETURN(qt_QString_toAscii_QByteArray_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toAscii_QByteArray_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toCaseFolded0, Pointer)
     {
-        NODE_RETURN(qt_QString_toCaseFolded_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toCaseFolded_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toLatin10, Pointer)
     {
-        NODE_RETURN(qt_QString_toLatin1_QByteArray_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toLatin1_QByteArray_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toLocal8Bit0, Pointer)
     {
-        NODE_RETURN(qt_QString_toLocal8Bit_QByteArray_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toLocal8Bit_QByteArray_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toLower0, Pointer)
     {
-        NODE_RETURN(qt_QString_toLower_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toLower_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toStdString0, int)
     {
-        NODE_RETURN(qt_QString_toStdString_int_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toStdString_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toStdWString0, int)
     {
-        NODE_RETURN(qt_QString_toStdWString_int_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toStdWString_int_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toUpper0, Pointer)
     {
-        NODE_RETURN(qt_QString_toUpper_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toUpper_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toUtf80, Pointer)
     {
-        NODE_RETURN(qt_QString_toUtf8_QByteArray_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_toUtf8_QByteArray_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_trimmed0, Pointer)
     {
-        NODE_RETURN(qt_QString_trimmed_QString_QString(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QString_trimmed_QString_QString(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_truncate0, void)
     {
-        qt_QString_truncate_void_QString_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QString_truncate_void_QString_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_fromStdString0, Pointer)
     {
-        NODE_RETURN(qt_QString_fromStdString_QString_int(NODE_THREAD,
-                                                         NODE_ARG(0, int)));
+        NODE_RETURN(qt_QString_fromStdString_QString_int(NODE_THREAD, NODE_ARG(0, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromStdWString0, Pointer)
     {
-        NODE_RETURN(qt_QString_fromStdWString_QString_int(NODE_THREAD,
-                                                          NODE_ARG(0, int)));
+        NODE_RETURN(qt_QString_fromStdWString_QString_int(NODE_THREAD, NODE_ARG(0, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_number3, Pointer)
     {
-        NODE_RETURN(qt_QString_number_QString_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QString_number_QString_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_number4, Pointer)
     {
-        NODE_RETURN(qt_QString_number_QString_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QString_number_QString_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
     }
 
     void QStringType::load()
@@ -1224,52 +1022,32 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "NormalizationForm", "int"),
-            new SymbolicConstant(c, "NormalizationForm_D", "int",
-                                 Value(int(QString::NormalizationForm_D))),
-            new SymbolicConstant(c, "NormalizationForm_C", "int",
-                                 Value(int(QString::NormalizationForm_C))),
-            new SymbolicConstant(c, "NormalizationForm_KD", "int",
-                                 Value(int(QString::NormalizationForm_KD))),
-            new SymbolicConstant(c, "NormalizationForm_KC", "int",
-                                 Value(int(QString::NormalizationForm_KC))),
-            new Alias(c, "SectionFlag", "int"),
-            new Alias(c, "SectionFlags", "int"),
-            new SymbolicConstant(c, "SectionDefault", "int",
-                                 Value(int(QString::SectionDefault))),
-            new SymbolicConstant(c, "SectionSkipEmpty", "int",
-                                 Value(int(QString::SectionSkipEmpty))),
-            new SymbolicConstant(c, "SectionIncludeLeadingSep", "int",
-                                 Value(int(QString::SectionIncludeLeadingSep))),
-            new SymbolicConstant(
-                c, "SectionIncludeTrailingSep", "int",
-                Value(int(QString::SectionIncludeTrailingSep))),
-            new SymbolicConstant(
-                c, "SectionCaseInsensitiveSeps", "int",
-                Value(int(QString::SectionCaseInsensitiveSeps))),
-            new Alias(c, "SplitBehavior", "int"),
-            new SymbolicConstant(c, "KeepEmptyParts", "int",
-                                 Value(int(QString::KeepEmptyParts))),
-            new SymbolicConstant(c, "SkipEmptyParts", "int",
-                                 Value(int(QString::SkipEmptyParts))),
-            EndArguments);
+        addSymbols(new Alias(c, "NormalizationForm", "int"),
+                   new SymbolicConstant(c, "NormalizationForm_D", "int", Value(int(QString::NormalizationForm_D))),
+                   new SymbolicConstant(c, "NormalizationForm_C", "int", Value(int(QString::NormalizationForm_C))),
+                   new SymbolicConstant(c, "NormalizationForm_KD", "int", Value(int(QString::NormalizationForm_KD))),
+                   new SymbolicConstant(c, "NormalizationForm_KC", "int", Value(int(QString::NormalizationForm_KC))),
+                   new Alias(c, "SectionFlag", "int"), new Alias(c, "SectionFlags", "int"),
+                   new SymbolicConstant(c, "SectionDefault", "int", Value(int(QString::SectionDefault))),
+                   new SymbolicConstant(c, "SectionSkipEmpty", "int", Value(int(QString::SectionSkipEmpty))),
+                   new SymbolicConstant(c, "SectionIncludeLeadingSep", "int", Value(int(QString::SectionIncludeLeadingSep))),
+                   new SymbolicConstant(c, "SectionIncludeTrailingSep", "int", Value(int(QString::SectionIncludeTrailingSep))),
+                   new SymbolicConstant(c, "SectionCaseInsensitiveSeps", "int", Value(int(QString::SectionCaseInsensitiveSeps))),
+                   new Alias(c, "SplitBehavior", "int"),
+                   new SymbolicConstant(c, "KeepEmptyParts", "int", Value(int(QString::KeepEmptyParts))),
+                   new SymbolicConstant(c, "SkipEmptyParts", "int", Value(int(QString::SkipEmptyParts))), EndArguments);
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QString", _n_QString0, None, Compiled,
-                         qt_QString_QString_QString_QString, Return,
-                         "qt.QString", Parameters,
+            new Function(c, "QString", _n_QString0, None, Compiled, qt_QString_QString_QString_QString, Return, "qt.QString", Parameters,
                          new Param(c, "this", "qt.QString"), End),
             // MISSING: QString (QString; QString this, "const QChar *" unicode,
             // int size) MISSING: QString (QString; QString this, "QChar" ch)
@@ -1277,110 +1055,53 @@ namespace Mu
             // MISSING: QString (QString; QString this, "const QLatin1String &"
             // str) MISSING: QString (QString; QString this, QString other)
             // MISSING: QString (QString; QString this, "const char *" str)
-            new Function(c, "QString", _n_QString7, None, Compiled,
-                         qt_QString_QString_QString_QString_QByteArray, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "ba", "qt.QByteArray"), End),
-            new Function(c, "append", _n_append0, None, Compiled,
-                         qt_QString_append_QString_QString_QString, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "str", "qt.QString"), End),
+            new Function(c, "QString", _n_QString7, None, Compiled, qt_QString_QString_QString_QString_QByteArray, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "ba", "qt.QByteArray"), End),
+            new Function(c, "append", _n_append0, None, Compiled, qt_QString_append_QString_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"), End),
             // MISSING: append (QString; QString this, "const QStringRef &"
             // reference) MISSING: append (QString; QString this, "const
             // QLatin1String &" str)
-            new Function(c, "append", _n_append3, None, Compiled,
-                         qt_QString_append_QString_QString_QByteArray, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "ba", "qt.QByteArray"), End),
+            new Function(c, "append", _n_append3, None, Compiled, qt_QString_append_QString_QString_QByteArray, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "ba", "qt.QByteArray"), End),
             // MISSING: append (QString; QString this, "const char *" str)
             // MISSING: append (QString; QString this, "QChar" ch)
             // MISSING: arg (QString; QString this, QString a, int fieldWidth,
             // "const QChar &" fillChar)
-            new Function(c, "arg", _n_arg1, None, Compiled,
-                         qt_QString_arg_QString_QString_QString_QString, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "a1", "qt.QString"),
-                         new Param(c, "a2", "qt.QString"), End),
-            new Function(c, "arg", _n_arg2, None, Compiled,
-                         qt_QString_arg_QString_QString_QString_QString_QString,
-                         Return, "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "a1", "qt.QString"),
-                         new Param(c, "a2", "qt.QString"),
+            new Function(c, "arg", _n_arg1, None, Compiled, qt_QString_arg_QString_QString_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"), new Param(c, "a2", "qt.QString"),
+                         End),
+            new Function(c, "arg", _n_arg2, None, Compiled, qt_QString_arg_QString_QString_QString_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"), new Param(c, "a2", "qt.QString"),
                          new Param(c, "a3", "qt.QString"), End),
-            new Function(
-                c, "arg", _n_arg3, None, Compiled,
-                qt_QString_arg_QString_QString_QString_QString_QString_QString,
-                Return, "qt.QString", Parameters,
-                new Param(c, "this", "qt.QString"),
-                new Param(c, "a1", "qt.QString"),
-                new Param(c, "a2", "qt.QString"),
-                new Param(c, "a3", "qt.QString"),
-                new Param(c, "a4", "qt.QString"), End),
-            new Function(
-                c, "arg", _n_arg4, None, Compiled,
-                qt_QString_arg_QString_QString_QString_QString_QString_QString_QString,
-                Return, "qt.QString", Parameters,
-                new Param(c, "this", "qt.QString"),
-                new Param(c, "a1", "qt.QString"),
-                new Param(c, "a2", "qt.QString"),
-                new Param(c, "a3", "qt.QString"),
-                new Param(c, "a4", "qt.QString"),
-                new Param(c, "a5", "qt.QString"), End),
-            new Function(
-                c, "arg", _n_arg5, None, Compiled,
-                qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString,
-                Return, "qt.QString", Parameters,
-                new Param(c, "this", "qt.QString"),
-                new Param(c, "a1", "qt.QString"),
-                new Param(c, "a2", "qt.QString"),
-                new Param(c, "a3", "qt.QString"),
-                new Param(c, "a4", "qt.QString"),
-                new Param(c, "a5", "qt.QString"),
-                new Param(c, "a6", "qt.QString"), End),
-            new Function(
-                c, "arg", _n_arg6, None, Compiled,
-                qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString,
-                Return, "qt.QString", Parameters,
-                new Param(c, "this", "qt.QString"),
-                new Param(c, "a1", "qt.QString"),
-                new Param(c, "a2", "qt.QString"),
-                new Param(c, "a3", "qt.QString"),
-                new Param(c, "a4", "qt.QString"),
-                new Param(c, "a5", "qt.QString"),
-                new Param(c, "a6", "qt.QString"),
-                new Param(c, "a7", "qt.QString"), End),
-            new Function(
-                c, "arg", _n_arg7, None, Compiled,
-                qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString,
-                Return, "qt.QString", Parameters,
-                new Param(c, "this", "qt.QString"),
-                new Param(c, "a1", "qt.QString"),
-                new Param(c, "a2", "qt.QString"),
-                new Param(c, "a3", "qt.QString"),
-                new Param(c, "a4", "qt.QString"),
-                new Param(c, "a5", "qt.QString"),
-                new Param(c, "a6", "qt.QString"),
-                new Param(c, "a7", "qt.QString"),
-                new Param(c, "a8", "qt.QString"), End),
-            new Function(
-                c, "arg", _n_arg8, None, Compiled,
-                qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString,
-                Return, "qt.QString", Parameters,
-                new Param(c, "this", "qt.QString"),
-                new Param(c, "a1", "qt.QString"),
-                new Param(c, "a2", "qt.QString"),
-                new Param(c, "a3", "qt.QString"),
-                new Param(c, "a4", "qt.QString"),
-                new Param(c, "a5", "qt.QString"),
-                new Param(c, "a6", "qt.QString"),
-                new Param(c, "a7", "qt.QString"),
-                new Param(c, "a8", "qt.QString"),
-                new Param(c, "a9", "qt.QString"), End),
+            new Function(c, "arg", _n_arg3, None, Compiled, qt_QString_arg_QString_QString_QString_QString_QString_QString, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"),
+                         new Param(c, "a2", "qt.QString"), new Param(c, "a3", "qt.QString"), new Param(c, "a4", "qt.QString"), End),
+            new Function(c, "arg", _n_arg4, None, Compiled, qt_QString_arg_QString_QString_QString_QString_QString_QString_QString, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"),
+                         new Param(c, "a2", "qt.QString"), new Param(c, "a3", "qt.QString"), new Param(c, "a4", "qt.QString"),
+                         new Param(c, "a5", "qt.QString"), End),
+            new Function(c, "arg", _n_arg5, None, Compiled, qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString,
+                         Return, "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"),
+                         new Param(c, "a2", "qt.QString"), new Param(c, "a3", "qt.QString"), new Param(c, "a4", "qt.QString"),
+                         new Param(c, "a5", "qt.QString"), new Param(c, "a6", "qt.QString"), End),
+            new Function(c, "arg", _n_arg6, None, Compiled,
+                         qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"), new Param(c, "a2", "qt.QString"),
+                         new Param(c, "a3", "qt.QString"), new Param(c, "a4", "qt.QString"), new Param(c, "a5", "qt.QString"),
+                         new Param(c, "a6", "qt.QString"), new Param(c, "a7", "qt.QString"), End),
+            new Function(c, "arg", _n_arg7, None, Compiled,
+                         qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"),
+                         new Param(c, "a2", "qt.QString"), new Param(c, "a3", "qt.QString"), new Param(c, "a4", "qt.QString"),
+                         new Param(c, "a5", "qt.QString"), new Param(c, "a6", "qt.QString"), new Param(c, "a7", "qt.QString"),
+                         new Param(c, "a8", "qt.QString"), End),
+            new Function(c, "arg", _n_arg8, None, Compiled,
+                         qt_QString_arg_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString_QString, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "a1", "qt.QString"),
+                         new Param(c, "a2", "qt.QString"), new Param(c, "a3", "qt.QString"), new Param(c, "a4", "qt.QString"),
+                         new Param(c, "a5", "qt.QString"), new Param(c, "a6", "qt.QString"), new Param(c, "a7", "qt.QString"),
+                         new Param(c, "a8", "qt.QString"), new Param(c, "a9", "qt.QString"), End),
             // MISSING: arg (QString; QString this, int a, int fieldWidth, int
             // base, "const QChar &" fillChar) MISSING: arg (QString; QString
             // this, int a, int fieldWidth, int base, "const QChar &" fillChar)
@@ -1401,198 +1122,125 @@ namespace Mu
             // precision, "const QChar &" fillChar) MISSING: at ("const QChar";
             // QString this, int position) MISSING: begin ("iterator"; QString
             // this) MISSING: begin ("const_iterator"; QString this)
-            new Function(c, "capacity", _n_capacity0, None, Compiled,
-                         qt_QString_capacity_int_QString, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
-            new Function(c, "chop", _n_chop0, None, Compiled,
-                         qt_QString_chop_void_QString_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "n", "int"), End),
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QString_clear_void_QString, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
-            new Function(c, "compare", _n_compare0, None, Compiled,
-                         qt_QString_compare_int_QString_QString, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "other", "qt.QString"), End),
-            new Function(c, "compare", _n_compare1, None, Compiled,
-                         qt_QString_compare_int_QString_QString_int, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "other", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "capacity", _n_capacity0, None, Compiled, qt_QString_capacity_int_QString, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "chop", _n_chop0, None, Compiled, qt_QString_chop_void_QString_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "n", "int"), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QString_clear_void_QString, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "compare", _n_compare0, None, Compiled, qt_QString_compare_int_QString_QString, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "other", "qt.QString"), End),
+            new Function(c, "compare", _n_compare1, None, Compiled, qt_QString_compare_int_QString_QString_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "other", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: compare (int; QString this, "const QLatin1String &"
             // other, flags Qt::CaseSensitivity cs) MISSING: compare (int;
             // QString this, "const QStringRef &" ref, flags Qt::CaseSensitivity
             // cs) MISSING: constBegin ("const_iterator"; QString this) MISSING:
             // constData ("const QChar *"; QString this) MISSING: constEnd
             // ("const_iterator"; QString this)
-            new Function(c, "contains", _n_contains0, None, Compiled,
-                         qt_QString_contains_bool_QString_QString_int, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "str", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "contains", _n_contains0, None, Compiled, qt_QString_contains_bool_QString_QString_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: contains (bool; QString this, "QChar" ch, flags
             // Qt::CaseSensitivity cs) MISSING: contains (bool; QString this,
             // "const QRegExp &" rx) MISSING: contains (bool; QString this,
             // "QRegExp &" rx)
-            new Function(c, "count", _n_count0, None, Compiled,
-                         qt_QString_count_int_QString_QString_int, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "str", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "count", _n_count0, None, Compiled, qt_QString_count_int_QString_QString_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: count (int; QString this, "QChar" ch, flags
             // Qt::CaseSensitivity cs) MISSING: count (int; QString this, "const
             // QRegExp &" rx)
-            new Function(c, "count", _n_count3, None, Compiled,
-                         qt_QString_count_int_QString, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
+            new Function(c, "count", _n_count3, None, Compiled, qt_QString_count_int_QString, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
             // MISSING: data ("QChar *"; QString this)
             // MISSING: data ("const QChar *"; QString this)
             // MISSING: end ("iterator"; QString this)
             // MISSING: end ("const_iterator"; QString this)
-            new Function(c, "endsWith", _n_endsWith0, None, Compiled,
-                         qt_QString_endsWith_bool_QString_QString_int, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "s", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "endsWith", _n_endsWith0, None, Compiled, qt_QString_endsWith_bool_QString_QString_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "s", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: endsWith (bool; QString this, "const QLatin1String &" s,
             // flags Qt::CaseSensitivity cs) MISSING: endsWith (bool; QString
             // this, "const QChar &" c, flags Qt::CaseSensitivity cs) MISSING:
             // fill (QString; QString this, "QChar" ch, int size)
-            new Function(c, "indexOf", _n_indexOf0, None, Compiled,
-                         qt_QString_indexOf_int_QString_QString_int_int, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "str", "qt.QString"),
-                         new Param(c, "from", "int"), new Param(c, "cs", "int"),
-                         End),
+            new Function(c, "indexOf", _n_indexOf0, None, Compiled, qt_QString_indexOf_int_QString_QString_int_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"), new Param(c, "from", "int"),
+                         new Param(c, "cs", "int"), End),
             // MISSING: indexOf (int; QString this, "const QLatin1String &" str,
             // int from, flags Qt::CaseSensitivity cs) MISSING: indexOf (int;
             // QString this, "QChar" ch, int from, flags Qt::CaseSensitivity cs)
             // MISSING: indexOf (int; QString this, "const QRegExp &" rx, int
             // from) MISSING: indexOf (int; QString this, "QRegExp &" rx, int
             // from)
-            new Function(c, "insert", _n_insert0, None, Compiled,
-                         qt_QString_insert_QString_QString_int_QString, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "position", "int"),
-                         new Param(c, "str", "qt.QString"), End),
+            new Function(c, "insert", _n_insert0, None, Compiled, qt_QString_insert_QString_QString_int_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "position", "int"), new Param(c, "str", "qt.QString"),
+                         End),
             // MISSING: insert (QString; QString this, int position, "const
             // QLatin1String &" str) MISSING: insert (QString; QString this, int
             // position, "const QChar *" unicode, int size) MISSING: insert
             // (QString; QString this, int position, "QChar" ch)
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QString_isEmpty_bool_QString, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QString_isNull_bool_QString, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
-            new Function(
-                c, "lastIndexOf", _n_lastIndexOf0, None, Compiled,
-                qt_QString_lastIndexOf_int_QString_QString_int_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "str", "qt.QString"), new Param(c, "from", "int"),
-                new Param(c, "cs", "int"), End),
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QString_isEmpty_bool_QString, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QString_isNull_bool_QString, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "lastIndexOf", _n_lastIndexOf0, None, Compiled, qt_QString_lastIndexOf_int_QString_QString_int_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"),
+                         new Param(c, "from", "int"), new Param(c, "cs", "int"), End),
             // MISSING: lastIndexOf (int; QString this, "const QLatin1String &"
             // str, int from, flags Qt::CaseSensitivity cs) MISSING: lastIndexOf
             // (int; QString this, "QChar" ch, int from, flags
             // Qt::CaseSensitivity cs) MISSING: lastIndexOf (int; QString this,
             // "const QRegExp &" rx, int from) MISSING: lastIndexOf (int;
             // QString this, "QRegExp &" rx, int from)
-            new Function(c, "left", _n_left0, None, Compiled,
-                         qt_QString_left_QString_QString_int, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "n", "int"), End),
+            new Function(c, "left", _n_left0, None, Compiled, qt_QString_left_QString_QString_int, Return, "qt.QString", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "n", "int"), End),
             // MISSING: leftJustified (QString; QString this, int width, "QChar"
             // fill, bool truncate) MISSING: leftRef ("QStringRef"; QString
             // this, int n)
-            new Function(c, "length", _n_length0, None, Compiled,
-                         qt_QString_length_int_QString, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
+            new Function(c, "length", _n_length0, None, Compiled, qt_QString_length_int_QString, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
             // MISSING: localeAwareCompare (int; QString this, "const QStringRef
             // &" other)
-            new Function(
-                c, "localeAwareCompare", _n_localeAwareCompare1, None, Compiled,
-                qt_QString_localeAwareCompare_int_QString_QString, Return,
-                "int", Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "other", "qt.QString"), End),
-            new Function(
-                c, "mid", _n_mid0, None, Compiled,
-                qt_QString_mid_QString_QString_int_int, Return, "qt.QString",
-                Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "position", "int"), new Param(c, "n", "int"), End),
+            new Function(c, "localeAwareCompare", _n_localeAwareCompare1, None, Compiled, qt_QString_localeAwareCompare_int_QString_QString,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "other", "qt.QString"), End),
+            new Function(c, "mid", _n_mid0, None, Compiled, qt_QString_mid_QString_QString_int_int, Return, "qt.QString", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "position", "int"), new Param(c, "n", "int"), End),
             // MISSING: midRef ("QStringRef"; QString this, int position, int n)
-            new Function(c, "normalized", _n_normalized0, None, Compiled,
-                         qt_QString_normalized_QString_QString_int, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "mode", "int"), End),
-            new Function(c, "normalized", _n_normalized1, None, Compiled,
-                         qt_QString_normalized_QString_QString_int_int, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "mode", "int"),
+            new Function(c, "normalized", _n_normalized0, None, Compiled, qt_QString_normalized_QString_QString_int, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "mode", "int"), End),
+            new Function(c, "normalized", _n_normalized1, None, Compiled, qt_QString_normalized_QString_QString_int_int, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "mode", "int"),
                          new Param(c, "version", "int"), End),
-            new Function(c, "prepend", _n_prepend0, None, Compiled,
-                         qt_QString_prepend_QString_QString_QString, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "str", "qt.QString"), End),
+            new Function(c, "prepend", _n_prepend0, None, Compiled, qt_QString_prepend_QString_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"), End),
             // MISSING: prepend (QString; QString this, "const QLatin1String &"
             // str)
-            new Function(c, "prepend", _n_prepend2, None, Compiled,
-                         qt_QString_prepend_QString_QString_QByteArray, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "ba", "qt.QByteArray"), End),
+            new Function(c, "prepend", _n_prepend2, None, Compiled, qt_QString_prepend_QString_QString_QByteArray, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "ba", "qt.QByteArray"), End),
             // MISSING: prepend (QString; QString this, "const char *" str)
             // MISSING: prepend (QString; QString this, "QChar" ch)
-            new Function(c, "push_back", _n_push_back0, None, Compiled,
-                         qt_QString_push_back_void_QString_QString, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "other", "qt.QString"), End),
+            new Function(c, "push_back", _n_push_back0, None, Compiled, qt_QString_push_back_void_QString_QString, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "other", "qt.QString"), End),
             // MISSING: push_back (void; QString this, "QChar" ch)
-            new Function(c, "push_front", _n_push_front0, None, Compiled,
-                         qt_QString_push_front_void_QString_QString, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "other", "qt.QString"), End),
+            new Function(c, "push_front", _n_push_front0, None, Compiled, qt_QString_push_front_void_QString_QString, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "other", "qt.QString"), End),
             // MISSING: push_front (void; QString this, "QChar" ch)
-            new Function(
-                c, "remove", _n_remove0, None, Compiled,
-                qt_QString_remove_QString_QString_int_int, Return, "qt.QString",
-                Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "position", "int"), new Param(c, "n", "int"), End),
+            new Function(c, "remove", _n_remove0, None, Compiled, qt_QString_remove_QString_QString_int_int, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "position", "int"), new Param(c, "n", "int"), End),
             // MISSING: remove (QString; QString this, "QChar" ch, flags
             // Qt::CaseSensitivity cs)
-            new Function(c, "remove", _n_remove2, None, Compiled,
-                         qt_QString_remove_QString_QString_QString_int, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "str", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "remove", _n_remove2, None, Compiled, qt_QString_remove_QString_QString_QString_int, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "str", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: remove (QString; QString this, "const QRegExp &" rx)
-            new Function(c, "repeated", _n_repeated0, None, Compiled,
-                         qt_QString_repeated_QString_QString_int, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "times", "int"), End),
-            new Function(
-                c, "replace", _n_replace0, None, Compiled,
-                qt_QString_replace_QString_QString_int_int_QString, Return,
-                "qt.QString", Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "position", "int"), new Param(c, "n", "int"),
-                new Param(c, "after", "qt.QString"), End),
+            new Function(c, "repeated", _n_repeated0, None, Compiled, qt_QString_repeated_QString_QString_int, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "times", "int"), End),
+            new Function(c, "replace", _n_replace0, None, Compiled, qt_QString_replace_QString_QString_int_int_QString, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "position", "int"),
+                         new Param(c, "n", "int"), new Param(c, "after", "qt.QString"), End),
             // MISSING: replace (QString; QString this, int position, int n,
             // "const QChar *" unicode, int size) MISSING: replace (QString;
             // QString this, int position, int n, "QChar" after)
-            new Function(c, "replace", _n_replace3, None, Compiled,
-                         qt_QString_replace_QString_QString_QString_QString_int,
-                         Return, "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "before", "qt.QString"),
-                         new Param(c, "after", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "replace", _n_replace3, None, Compiled, qt_QString_replace_QString_QString_QString_QString_int, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "before", "qt.QString"),
+                         new Param(c, "after", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: replace (QString; QString this, "const QChar *" before,
             // int blen, "const QChar *" after, int alen, flags
             // Qt::CaseSensitivity cs) MISSING: replace (QString; QString this,
@@ -1608,37 +1256,24 @@ namespace Mu
             // "QChar" c, "const QLatin1String &" after, flags
             // Qt::CaseSensitivity cs) MISSING: replace (QString; QString this,
             // "const QRegExp &" rx, QString after)
-            new Function(c, "reserve", _n_reserve0, None, Compiled,
-                         qt_QString_reserve_void_QString_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "size", "int"), End),
-            new Function(c, "resize", _n_resize0, None, Compiled,
-                         qt_QString_resize_void_QString_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "size", "int"), End),
-            new Function(c, "right", _n_right0, None, Compiled,
-                         qt_QString_right_QString_QString_int, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"),
-                         new Param(c, "n", "int"), End),
+            new Function(c, "reserve", _n_reserve0, None, Compiled, qt_QString_reserve_void_QString_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "size", "int"), End),
+            new Function(c, "resize", _n_resize0, None, Compiled, qt_QString_resize_void_QString_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "size", "int"), End),
+            new Function(c, "right", _n_right0, None, Compiled, qt_QString_right_QString_QString_int, Return, "qt.QString", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "n", "int"), End),
             // MISSING: rightJustified (QString; QString this, int width,
             // "QChar" fill, bool truncate) MISSING: rightRef ("QStringRef";
             // QString this, int n) MISSING: section (QString; QString this,
             // "QChar" sep, int start, int end, flags QString::SectionFlags
             // flags)
-            new Function(
-                c, "section", _n_section1, None, Compiled,
-                qt_QString_section_QString_QString_QString_int_int_int, Return,
-                "qt.QString", Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "sep", "qt.QString"), new Param(c, "start", "int"),
-                new Param(c, "end", "int"), new Param(c, "flags", "int"), End),
+            new Function(c, "section", _n_section1, None, Compiled, qt_QString_section_QString_QString_QString_int_int_int, Return,
+                         "qt.QString", Parameters, new Param(c, "this", "qt.QString"), new Param(c, "sep", "qt.QString"),
+                         new Param(c, "start", "int"), new Param(c, "end", "int"), new Param(c, "flags", "int"), End),
             // MISSING: section (QString; QString this, "const QRegExp &" reg,
             // int start, int end, flags QString::SectionFlags flags)
-            new Function(
-                c, "setNum", _n_setNum0, None, Compiled,
-                qt_QString_setNum_QString_QString_int_int, Return, "qt.QString",
-                Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "n", "int"), new Param(c, "base", "int"), End),
+            new Function(c, "setNum", _n_setNum0, None, Compiled, qt_QString_setNum_QString_QString_int_int, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "n", "int"), new Param(c, "base", "int"), End),
             // MISSING: setNum (QString; QString this, int n, int base)
             // MISSING: setNum (QString; QString this, "long" n, int base)
             // MISSING: setNum (QString; QString this, "ulong" n, int base)
@@ -1652,91 +1287,60 @@ namespace Mu
             // QString this, "const QChar *" unicode, int size) MISSING:
             // setUtf16 (QString; QString this, "const ushort *" unicode, int
             // size)
-            new Function(c, "simplified", _n_simplified0, None, Compiled,
-                         qt_QString_simplified_QString_QString, Return,
-                         "qt.QString", Parameters,
+            new Function(c, "simplified", _n_simplified0, None, Compiled, qt_QString_simplified_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), End),
+            new Function(c, "size", _n_size0, None, Compiled, qt_QString_size_int_QString, Return, "int", Parameters,
                          new Param(c, "this", "qt.QString"), End),
-            new Function(c, "size", _n_size0, None, Compiled,
-                         qt_QString_size_int_QString, Return, "int", Parameters,
-                         new Param(c, "this", "qt.QString"), End),
-            new Function(
-                c, "split", _n_split0, None, Compiled,
-                qt_QString_split_stringBSB_ESB__QString_QString_int_int, Return,
-                "string[]", Parameters, new Param(c, "this", "qt.QString"),
-                new Param(c, "sep", "qt.QString"),
-                new Param(c, "behavior", "int"), new Param(c, "cs", "int"),
-                End),
+            new Function(c, "split", _n_split0, None, Compiled, qt_QString_split_stringBSB_ESB__QString_QString_int_int, Return, "string[]",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "sep", "qt.QString"), new Param(c, "behavior", "int"),
+                         new Param(c, "cs", "int"), End),
             // MISSING: split (string[]; QString this, "const QChar &" sep,
             // flags QString::SplitBehavior behavior, flags Qt::CaseSensitivity
             // cs) MISSING: split (string[]; QString this, "const QRegExp &" rx,
             // flags QString::SplitBehavior behavior) MISSING: sprintf (QString;
             // QString this, "const char *" cformat, "..." _p27)
-            new Function(c, "squeeze", _n_squeeze0, None, Compiled,
-                         qt_QString_squeeze_void_QString, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
-            new Function(c, "startsWith", _n_startsWith0, None, Compiled,
-                         qt_QString_startsWith_bool_QString_QString_int, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "s", "qt.QString"),
-                         new Param(c, "cs", "int"), End),
+            new Function(c, "squeeze", _n_squeeze0, None, Compiled, qt_QString_squeeze_void_QString, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "startsWith", _n_startsWith0, None, Compiled, qt_QString_startsWith_bool_QString_QString_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QString"), new Param(c, "s", "qt.QString"), new Param(c, "cs", "int"), End),
             // MISSING: startsWith (bool; QString this, "const QLatin1String &"
             // s, flags Qt::CaseSensitivity cs) MISSING: startsWith (bool;
             // QString this, "const QChar &" c, flags Qt::CaseSensitivity cs)
-            new Function(c, "toAscii", _n_toAscii0, None, Compiled,
-                         qt_QString_toAscii_QByteArray_QString, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QString"), End),
-            new Function(c, "toCaseFolded", _n_toCaseFolded0, None, Compiled,
-                         qt_QString_toCaseFolded_QString_QString, Return,
-                         "qt.QString", Parameters,
-                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "toAscii", _n_toAscii0, None, Compiled, qt_QString_toAscii_QByteArray_QString, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QString"), End),
+            new Function(c, "toCaseFolded", _n_toCaseFolded0, None, Compiled, qt_QString_toCaseFolded_QString_QString, Return, "qt.QString",
+                         Parameters, new Param(c, "this", "qt.QString"), End),
             // MISSING: toDouble (double; QString this, "bool *" ok)
             // MISSING: toFloat ("float"; QString this, "bool *" ok)
             // MISSING: toInt (int; QString this, "bool *" ok, int base)
-            new Function(c, "toLatin1", _n_toLatin10, None, Compiled,
-                         qt_QString_toLatin1_QByteArray_QString, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QString"), End),
-            new Function(c, "toLocal8Bit", _n_toLocal8Bit0, None, Compiled,
-                         qt_QString_toLocal8Bit_QByteArray_QString, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "toLatin1", _n_toLatin10, None, Compiled, qt_QString_toLatin1_QByteArray_QString, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QString"), End),
+            new Function(c, "toLocal8Bit", _n_toLocal8Bit0, None, Compiled, qt_QString_toLocal8Bit_QByteArray_QString, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QString"), End),
             // MISSING: toLong ("long"; QString this, "bool *" ok, int base)
             // MISSING: toLongLong ("qlonglong"; QString this, "bool *" ok, int
             // base)
-            new Function(c, "toLower", _n_toLower0, None, Compiled,
-                         qt_QString_toLower_QString_QString, Return,
-                         "qt.QString", Parameters,
+            new Function(c, "toLower", _n_toLower0, None, Compiled, qt_QString_toLower_QString_QString, Return, "qt.QString", Parameters,
                          new Param(c, "this", "qt.QString"), End),
             // MISSING: toShort ("short"; QString this, "bool *" ok, int base)
-            new Function(c, "toStdString", _n_toStdString0, None, Compiled,
-                         qt_QString_toStdString_int_QString, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QString"), End),
-            new Function(c, "toStdWString", _n_toStdWString0, None, Compiled,
-                         qt_QString_toStdWString_int_QString, Return, "int",
+            new Function(c, "toStdString", _n_toStdString0, None, Compiled, qt_QString_toStdString_int_QString, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QString"), End),
+            new Function(c, "toStdWString", _n_toStdWString0, None, Compiled, qt_QString_toStdWString_int_QString, Return, "int",
                          Parameters, new Param(c, "this", "qt.QString"), End),
             // MISSING: toUInt (int; QString this, "bool *" ok, int base)
             // MISSING: toULong ("ulong"; QString this, "bool *" ok, int base)
             // MISSING: toULongLong ("qulonglong"; QString this, "bool *" ok,
             // int base) MISSING: toUShort ("ushort"; QString this, "bool *" ok,
             // int base) MISSING: toUcs4 ("QVector<uint>"; QString this)
-            new Function(c, "toUpper", _n_toUpper0, None, Compiled,
-                         qt_QString_toUpper_QString_QString, Return,
-                         "qt.QString", Parameters,
+            new Function(c, "toUpper", _n_toUpper0, None, Compiled, qt_QString_toUpper_QString_QString, Return, "qt.QString", Parameters,
                          new Param(c, "this", "qt.QString"), End),
-            new Function(c, "toUtf8", _n_toUtf80, None, Compiled,
-                         qt_QString_toUtf8_QByteArray_QString, Return,
-                         "qt.QByteArray", Parameters,
+            new Function(c, "toUtf8", _n_toUtf80, None, Compiled, qt_QString_toUtf8_QByteArray_QString, Return, "qt.QByteArray", Parameters,
                          new Param(c, "this", "qt.QString"), End),
             // MISSING: toWCharArray (int; QString this, "wchar_t *" array)
-            new Function(c, "trimmed", _n_trimmed0, None, Compiled,
-                         qt_QString_trimmed_QString_QString, Return,
-                         "qt.QString", Parameters,
+            new Function(c, "trimmed", _n_trimmed0, None, Compiled, qt_QString_trimmed_QString_QString, Return, "qt.QString", Parameters,
                          new Param(c, "this", "qt.QString"), End),
-            new Function(c, "truncate", _n_truncate0, None, Compiled,
-                         qt_QString_truncate_void_QString_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QString"),
-                         new Param(c, "position", "int"), End),
+            new Function(c, "truncate", _n_truncate0, None, Compiled, qt_QString_truncate_void_QString_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QString"), new Param(c, "position", "int"), End),
             // MISSING: unicode ("const QChar *"; QString this)
             // MISSING: utf16 ("const ushort *"; QString this)
             // MISSING: vsprintf (QString; QString this, "const char *" cformat,
@@ -1751,14 +1355,10 @@ namespace Mu
             // fromLatin1 (QString; "const char *" str, int size) MISSING:
             // fromLocal8Bit (QString; "const char *" str, int size) MISSING:
             // fromRawData (QString; "const QChar *" unicode, int size)
-            new Function(c, "fromStdString", _n_fromStdString0, None, Compiled,
-                         qt_QString_fromStdString_QString_int, Return,
-                         "qt.QString", Parameters, new Param(c, "str", "int"),
-                         End),
-            new Function(c, "fromStdWString", _n_fromStdWString0, None,
-                         Compiled, qt_QString_fromStdWString_QString_int,
-                         Return, "qt.QString", Parameters,
-                         new Param(c, "str", "int"), End),
+            new Function(c, "fromStdString", _n_fromStdString0, None, Compiled, qt_QString_fromStdString_QString_int, Return, "qt.QString",
+                         Parameters, new Param(c, "str", "int"), End),
+            new Function(c, "fromStdWString", _n_fromStdWString0, None, Compiled, qt_QString_fromStdWString_QString_int, Return,
+                         "qt.QString", Parameters, new Param(c, "str", "int"), End),
             // MISSING: fromUcs4 (QString; "const uint *" unicode, int size)
             // MISSING: fromUtf8 (QString; "const char *" str, int size)
             // MISSING: fromUtf16 (QString; "const ushort *" unicode, int size)
@@ -1768,14 +1368,10 @@ namespace Mu
             // &" s2) MISSING: number (QString; "long" n, int base) MISSING:
             // number (QString; double n, "char" format, int precision) MISSING:
             // number (QString; "ulong" n, int base)
-            new Function(c, "number", _n_number3, None, Compiled,
-                         qt_QString_number_QString_int_int, Return,
-                         "qt.QString", Parameters, new Param(c, "n", "int"),
-                         new Param(c, "base", "int"), End),
-            new Function(c, "number", _n_number4, None, Compiled,
-                         qt_QString_number_QString_int_int, Return,
-                         "qt.QString", Parameters, new Param(c, "n", "int"),
-                         new Param(c, "base", "int"), End),
+            new Function(c, "number", _n_number3, None, Compiled, qt_QString_number_QString_int_int, Return, "qt.QString", Parameters,
+                         new Param(c, "n", "int"), new Param(c, "base", "int"), End),
+            new Function(c, "number", _n_number4, None, Compiled, qt_QString_number_QString_int_int, Return, "qt.QString", Parameters,
+                         new Param(c, "n", "int"), new Param(c, "base", "int"), End),
             // MISSING: number (QString; "qlonglong" n, int base)
             // MISSING: number (QString; "qulonglong" n, int base)
             EndArguments);

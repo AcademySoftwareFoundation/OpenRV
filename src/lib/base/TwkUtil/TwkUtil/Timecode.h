@@ -35,8 +35,7 @@ namespace TwkUtil
 
     struct Timecode
     {
-        Timecode(int rf = 0.0, TCTime rfps = 0.0, unsigned int f = 0,
-                 unsigned int s = 0, unsigned int m = 0, unsigned int h = 0,
+        Timecode(int rf = 0.0, TCTime rfps = 0.0, unsigned int f = 0, unsigned int s = 0, unsigned int m = 0, unsigned int h = 0,
                  TCType t = TCResidual)
             : frames(f)
             , seconds(s)
@@ -64,23 +63,20 @@ namespace TwkUtil
     //  NOTE: the first frame should be 0 not 1
     //
 
-    TWKUTIL_EXPORT Timecode timecodeFromFrameNumber(int frame, TCTime fps,
-                                                    TCType type = TCResidual);
+    TWKUTIL_EXPORT Timecode timecodeFromFrameNumber(int frame, TCTime fps, TCType type = TCResidual);
 
     //
     //  Formatting
     //
 
-    TWKUTIL_EXPORT std::string
-    timecodeToString(const Timecode&,
-                     int maxFrame = 0, // largest possible frame number or 0
-                     char tsep = ':', char fsep = ':',
-                     bool elideHours = true); // skip showing hours if possible
+    TWKUTIL_EXPORT std::string timecodeToString(const Timecode&,
+                                                int maxFrame = 0, // largest possible frame number or 0
+                                                char tsep = ':', char fsep = ':',
+                                                bool elideHours = true); // skip showing hours if possible
 
-    TWKUTIL_EXPORT TCSeparatedString timecodeToSeparatedString(
-        const Timecode&,
-        int maxFrame = 0,        // largest possible frame number or 0
-        bool elideHours = true); // skip hours if possible
+    TWKUTIL_EXPORT TCSeparatedString timecodeToSeparatedString(const Timecode&,
+                                                               int maxFrame = 0,        // largest possible frame number or 0
+                                                               bool elideHours = true); // skip hours if possible
 
 } // namespace TwkUtil
 

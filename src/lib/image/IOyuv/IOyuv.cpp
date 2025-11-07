@@ -79,8 +79,7 @@ namespace TwkFB
             break;
 
         default:
-            TWK_THROW_STREAM(IOException,
-                             "YUV: Unsupported file size: " << filesize);
+            TWK_THROW_STREAM(IOException, "YUV: Unsupported file size: " << filesize);
         }
     }
 
@@ -102,8 +101,7 @@ namespace TwkFB
         fbi.orientation = FrameBuffer::TOPLEFT;
     }
 
-    void IOyuv::readImage(FrameBuffer& fb, const std::string& filename,
-                          const ReadRequest& request) const
+    void IOyuv::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         struct stat statbuf;
 
@@ -133,8 +131,7 @@ namespace TwkFB
         ySamplings[1] = 1;
         ySamplings[2] = 1;
 
-        fb.restructurePlanar(width, height, xSamplings, ySamplings, channels,
-                             FrameBuffer::UCHAR, FrameBuffer::TOPLEFT);
+        fb.restructurePlanar(width, height, xSamplings, ySamplings, channels, FrameBuffer::UCHAR, FrameBuffer::TOPLEFT);
 
         fb.setPrimaryColorSpace(ColorSpace::Rec601());
         fb.setConversion(ColorSpace::Rec601());

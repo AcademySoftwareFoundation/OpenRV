@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFileInfoType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QFileInfoType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QFileInfoType();
 
         //

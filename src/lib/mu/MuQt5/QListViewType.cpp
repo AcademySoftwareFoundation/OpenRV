@@ -74,16 +74,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QListView::MuQt_QListView(Pointer muobj, const CallEnvironment* ce,
-                                   QWidget* parent)
+    MuQt_QListView::MuQt_QListView(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QListView(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QListViewType>(
-            c->internName("qt.QListView"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QListViewType>(c->internName("qt.QListView"));
     }
 
     QModelIndex MuQt_QListView::indexAt(const QPoint& p) const
@@ -121,8 +119,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(hint);
             Value rval = _env->call(F, args);
         }
@@ -143,8 +140,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QRectType>(rval._Pointer);
         }
@@ -154,8 +150,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListView::currentChanged(const QModelIndex& current,
-                                        const QModelIndex& previous)
+    void MuQt_QListView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
     {
         if (!_env)
         {
@@ -169,10 +164,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
-            args[2] = Value(
-                makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
+            args[2] = Value(makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -195,8 +188,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -219,8 +211,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -243,8 +234,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, e, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, e, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -305,8 +295,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -330,8 +319,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -354,8 +342,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -378,8 +365,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -402,8 +388,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -412,8 +397,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListView::rowsAboutToBeRemoved(const QModelIndex& parent,
-                                              int start, int end)
+    void MuQt_QListView::rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -427,8 +411,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -439,8 +422,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListView::rowsInserted(const QModelIndex& parent, int start,
-                                      int end)
+    void MuQt_QListView::rowsInserted(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -454,8 +436,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -486,8 +467,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListView::selectionChanged(const QItemSelection& selected,
-                                          const QItemSelection& deselected)
+    void MuQt_QListView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
     {
         if (!_env)
         {
@@ -501,10 +481,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selected,
-                                                          "qt.QItemSelection"));
-            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selected, "qt.QItemSelection"));
+            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
         }
         else
@@ -513,9 +491,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QListView::setSelection(const QRect& rect,
-                                 QItemSelectionModel::SelectionFlags command)
+    void MuQt_QListView::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command)
     {
         if (!_env)
         {
@@ -576,8 +552,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -648,8 +623,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QListView::visualRegionForSelection(
-        const QItemSelection& selection) const
+    QRegion MuQt_QListView::visualRegionForSelection(const QItemSelection& selection) const
     {
         if (!_env)
             return QListView::visualRegionForSelection(selection);
@@ -660,8 +634,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -685,8 +658,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -732,8 +704,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QAbstractItemModelType>(
-                c, model, "qt.QAbstractItemModel"));
+            args[1] = Value(makeinstance<QAbstractItemModelType>(c, model, "qt.QAbstractItemModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -756,8 +727,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QItemSelectionModelType>(
-                c, selectionModel, "qt.QItemSelectionModel"));
+            args[1] = Value(makeinstance<QItemSelectionModelType>(c, selectionModel, "qt.QItemSelectionModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -829,9 +799,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QListView::edit(const QModelIndex& index,
-                              QAbstractItemView::EditTrigger trigger,
-                              QEvent* event)
+    bool MuQt_QListView::edit(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
     {
         if (!_env)
             return QListView::edit(index, trigger, event);
@@ -842,8 +810,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(trigger));
             args[3] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
@@ -855,9 +822,7 @@ namespace Mu
         }
     }
 
-    QItemSelectionModel::SelectionFlags
-    MuQt_QListView::selectionCommand(const QModelIndex& index,
-                                     const QEvent* event) const
+    QItemSelectionModel::SelectionFlags MuQt_QListView::selectionCommand(const QModelIndex& index, const QEvent* event) const
     {
         if (!_env)
             return QListView::selectionCommand(index, event);
@@ -868,8 +833,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (QItemSelectionModel::SelectionFlags)(rval._int);
@@ -894,8 +858,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -918,8 +881,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -963,8 +925,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -987,8 +948,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1011,8 +971,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1035,8 +994,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1069,8 +1027,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QListViewType::QListViewType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QListViewType::QListViewType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -1091,9 +1048,7 @@ namespace Mu
         }
         else if (QListView* w = object<QListView>(widget))
         {
-            QListViewType* type =
-                c->findSymbolOfTypeByQualifiedName<QListViewType>(
-                    c->internName("qt.QListView"), false);
+            QListViewType* type = c->findSymbolOfTypeByQualifiedName<QListViewType>(c->internName("qt.QListView"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -1104,34 +1059,24 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QListView_QListView_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QListView_QListView_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QListView_QListView_QListView_QListView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QListView_QListView_QListView_QListView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QListView(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QListView(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QListView_clearPropertyFlags_void_QListView(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QListView_clearPropertyFlags_void_QListView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         arg0->clearPropertyFlags();
     }
 
-    bool qt_QListView_isRowHidden_bool_QListView_int(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     int param_row)
+    bool qt_QListView_isRowHidden_bool_QListView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1139,9 +1084,7 @@ namespace Mu
         return arg0->isRowHidden(arg1);
     }
 
-    void qt_QListView_setRowHidden_void_QListView_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        bool param_hide)
+    void qt_QListView_setRowHidden_void_QListView_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row, bool param_hide)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1150,60 +1093,47 @@ namespace Mu
         arg0->setRowHidden(arg1, arg2);
     }
 
-    Pointer qt_QListView_indexAt_QModelIndex_QListView_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
+    Pointer qt_QListView_indexAt_QModelIndex_QListView_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_p);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QListView::indexAt(arg1), "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1),
-                                                "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QListView::indexAt(arg1), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1), "qt.QModelIndex");
     }
 
-    void qt_QListView_scrollTo_void_QListView_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_hint)
+    void qt_QListView_scrollTo_void_QListView_QModelIndex_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                              int param_hint)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::ScrollHint arg2 =
-            (QAbstractItemView::ScrollHint)(param_hint);
+        QAbstractItemView::ScrollHint arg2 = (QAbstractItemView::ScrollHint)(param_hint);
         if (isMuQtObject(arg0))
             arg0->QListView::scrollTo(arg1, arg2);
         else
             arg0->scrollTo(arg1, arg2);
     }
 
-    Pointer qt_QListView_visualRect_QRect_QListView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QListView_visualRect_QRect_QListView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(c, arg0->QListView::visualRect(arg1),
-                                          "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->visualRect(arg1),
-                                          "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QListView::visualRect(arg1), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->visualRect(arg1), "qt.QRect");
     }
 
-    Pointer qt_QListView_rectForIndex_QRect_QListView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QListView_rectForIndex_QRect_QListView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqtype<QRectType>(
-            c, ((MuQt_QListView*)arg0)->rectForIndex_pub(arg1), "qt.QRect");
+        return makeqtype<QRectType>(c, ((MuQt_QListView*)arg0)->rectForIndex_pub(arg1), "qt.QRect");
     }
 
-    void qt_QListView_setPositionForIndex_void_QListView_QPoint_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position,
-        Pointer param_index)
+    void qt_QListView_setPositionForIndex_void_QListView_QPoint_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_position, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1212,9 +1142,8 @@ namespace Mu
         ((MuQt_QListView*)arg0)->setPositionForIndex_pub(arg1, arg2);
     }
 
-    void qt_QListView_currentChanged_void_QListView_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_current,
-        Pointer param_previous)
+    void qt_QListView_currentChanged_void_QListView_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_current, Pointer param_previous)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1226,8 +1155,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->currentChanged_pub(arg1, arg2);
     }
 
-    void qt_QListView_dragLeaveEvent_void_QListView_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_dragLeaveEvent_void_QListView_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1238,8 +1166,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QListView_dragMoveEvent_void_QListView_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_dragMoveEvent_void_QListView_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1250,8 +1177,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QListView_dropEvent_void_QListView_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_dropEvent_void_QListView_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1262,41 +1188,32 @@ namespace Mu
             ((MuQt_QListView*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QListView_event_bool_QListView_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QListView_event_bool_QListView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QListView*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->event_pub_parent(arg1) : ((MuQt_QListView*)arg0)->event_pub(arg1);
     }
 
-    int qt_QListView_horizontalOffset_int_QListView(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QListView_horizontalOffset_int_QListView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)->horizontalOffset_pub_parent()
-                   : ((MuQt_QListView*)arg0)->horizontalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->horizontalOffset_pub_parent()
+                                  : ((MuQt_QListView*)arg0)->horizontalOffset_pub();
     }
 
-    bool qt_QListView_isIndexHidden_bool_QListView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QListView_isIndexHidden_bool_QListView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)->isIndexHidden_pub_parent(arg1)
-                   : ((MuQt_QListView*)arg0)->isIndexHidden_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->isIndexHidden_pub_parent(arg1)
+                                  : ((MuQt_QListView*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    void qt_QListView_mouseMoveEvent_void_QListView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_mouseMoveEvent_void_QListView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1307,8 +1224,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QListView_mouseReleaseEvent_void_QListView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_mouseReleaseEvent_void_QListView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1319,8 +1235,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QListView_paintEvent_void_QListView_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_paintEvent_void_QListView_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1331,8 +1246,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QListView_resizeEvent_void_QListView_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_resizeEvent_void_QListView_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1343,9 +1257,8 @@ namespace Mu
             ((MuQt_QListView*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QListView_rowsAboutToBeRemoved_void_QListView_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QListView_rowsAboutToBeRemoved_void_QListView_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_parent, int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1353,15 +1266,13 @@ namespace Mu
         int arg2 = (int)(param_start);
         int arg3 = (int)(param_end);
         if (isMuQtObject(arg0))
-            ((MuQt_QListView*)arg0)
-                ->rowsAboutToBeRemoved_pub_parent(arg1, arg2, arg3);
+            ((MuQt_QListView*)arg0)->rowsAboutToBeRemoved_pub_parent(arg1, arg2, arg3);
         else
             ((MuQt_QListView*)arg0)->rowsAboutToBeRemoved_pub(arg1, arg2, arg3);
     }
 
-    void qt_QListView_rowsInserted_void_QListView_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QListView_rowsInserted_void_QListView_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
+                                                                      int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1374,54 +1285,41 @@ namespace Mu
             ((MuQt_QListView*)arg0)->rowsInserted_pub(arg1, arg2, arg3);
     }
 
-    Pointer qt_QListView_selectedIndexes_qt__QModelIndexBSB_ESB__QListView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QListView_selectedIndexes_qt__QModelIndexBSB_ESB__QListView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(
-                         c,
-                         ((MuQt_QListView*)arg0)->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(
-                         c, ((MuQt_QListView*)arg0)->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QListView*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QListView*)arg0)->selectedIndexes_pub());
     }
 
-    void
-    qt_QListView_selectionChanged_void_QListView_QItemSelection_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selected,
-        Pointer param_deselected)
+    void qt_QListView_selectionChanged_void_QListView_QItemSelection_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_selected, Pointer param_deselected)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selected);
-        const QItemSelection arg2 =
-            getqtype<QItemSelectionType>(param_deselected);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selected);
+        const QItemSelection arg2 = getqtype<QItemSelectionType>(param_deselected);
         if (isMuQtObject(arg0))
             ((MuQt_QListView*)arg0)->selectionChanged_pub_parent(arg1, arg2);
         else
             ((MuQt_QListView*)arg0)->selectionChanged_pub(arg1, arg2);
     }
 
-    void qt_QListView_setSelection_void_QListView_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_command)
+    void qt_QListView_setSelection_void_QListView_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                            int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         if (isMuQtObject(arg0))
             ((MuQt_QListView*)arg0)->setSelection_pub_parent(arg1, arg2);
         else
             ((MuQt_QListView*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    void qt_QListView_startDrag_void_QListView_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_supportedActions)
+    void qt_QListView_startDrag_void_QListView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1432,8 +1330,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->startDrag_pub(arg1);
     }
 
-    void qt_QListView_timerEvent_void_QListView_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_timerEvent_void_QListView_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1444,8 +1341,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QListView_updateGeometries_void_QListView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    void qt_QListView_updateGeometries_void_QListView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1455,55 +1351,33 @@ namespace Mu
             ((MuQt_QListView*)arg0)->updateGeometries_pub();
     }
 
-    int qt_QListView_verticalOffset_int_QListView(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QListView_verticalOffset_int_QListView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)->verticalOffset_pub_parent()
-                   : ((MuQt_QListView*)arg0)->verticalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->verticalOffset_pub_parent() : ((MuQt_QListView*)arg0)->verticalOffset_pub();
     }
 
-    Pointer
-    qt_QListView_viewportSizeHint_QSize_QListView(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QListView_viewportSizeHint_QSize_QListView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c,
-                         ((MuQt_QListView*)arg0)->viewportSizeHint_pub_parent(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QListView*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QListView*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QListView*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    Pointer
-    qt_QListView_visualRegionForSelection_QRegion_QListView_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QListView_visualRegionForSelection_QRegion_QListView_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
         return isMuQtObject(arg0)
-                   ? makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QListView*)arg0)
-                             ->visualRegionForSelection_pub_parent(arg1),
-                         "qt.QRegion")
-                   : makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QListView*)arg0)
-                             ->visualRegionForSelection_pub(arg1),
-                         "qt.QRegion");
+                   ? makeqtype<QRegionType>(c, ((MuQt_QListView*)arg0)->visualRegionForSelection_pub_parent(arg1), "qt.QRegion")
+                   : makeqtype<QRegionType>(c, ((MuQt_QListView*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
-    void qt_QListView_wheelEvent_void_QListView_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListView_wheelEvent_void_QListView_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1514,8 +1388,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->wheelEvent_pub(arg1);
     }
 
-    void qt_QListView_keyboardSearch_void_QListView_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
+    void qt_QListView_keyboardSearch_void_QListView_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1526,8 +1399,7 @@ namespace Mu
             arg0->keyboardSearch(arg1);
     }
 
-    void qt_QListView_setModel_void_QListView_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
+    void qt_QListView_setModel_void_QListView_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1538,87 +1410,67 @@ namespace Mu
             arg0->setModel(arg1);
     }
 
-    void qt_QListView_setSelectionModel_void_QListView_QItemSelectionModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_selectionModel)
+    void qt_QListView_setSelectionModel_void_QListView_QItemSelectionModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_selectionModel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
-        QItemSelectionModel* arg1 =
-            object<QItemSelectionModel>(param_selectionModel);
+        QItemSelectionModel* arg1 = object<QItemSelectionModel>(param_selectionModel);
         if (isMuQtObject(arg0))
             arg0->QListView::setSelectionModel(arg1);
         else
             arg0->setSelectionModel(arg1);
     }
 
-    int qt_QListView_sizeHintForColumn_int_QListView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QListView_sizeHintForColumn_int_QListView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         int arg1 = (int)(param_column);
-        return isMuQtObject(arg0) ? arg0->QListView::sizeHintForColumn(arg1)
-                                  : arg0->sizeHintForColumn(arg1);
+        return isMuQtObject(arg0) ? arg0->QListView::sizeHintForColumn(arg1) : arg0->sizeHintForColumn(arg1);
     }
 
-    int qt_QListView_sizeHintForRow_int_QListView_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_row)
+    int qt_QListView_sizeHintForRow_int_QListView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         int arg1 = (int)(param_row);
-        return isMuQtObject(arg0) ? arg0->QListView::sizeHintForRow(arg1)
-                                  : arg0->sizeHintForRow(arg1);
+        return isMuQtObject(arg0) ? arg0->QListView::sizeHintForRow(arg1) : arg0->sizeHintForRow(arg1);
     }
 
-    Pointer qt_QListView_inputMethodQuery_QVariant_QListView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QListView_inputMethodQuery_QVariant_QListView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QListView::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QListView::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QListView_edit_bool_QListView_QModelIndex_int_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_trigger, Pointer param_event)
+    bool qt_QListView_edit_bool_QListView_QModelIndex_int_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                 int param_trigger, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::EditTrigger arg2 =
-            (QAbstractItemView::EditTrigger)(param_trigger);
+        QAbstractItemView::EditTrigger arg2 = (QAbstractItemView::EditTrigger)(param_trigger);
         QEvent* arg3 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
-                   : ((MuQt_QListView*)arg0)->edit_pub(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
+                                  : ((MuQt_QListView*)arg0)->edit_pub(arg1, arg2, arg3);
     }
 
-    int qt_QListView_selectionCommand_int_QListView_QModelIndex_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_event)
+    int qt_QListView_selectionCommand_int_QListView_QModelIndex_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                       Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         const QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QListView*)arg0)
-                             ->selectionCommand_pub_parent(arg1, arg2))
-                   : int(((MuQt_QListView*)arg0)
-                             ->selectionCommand_pub(arg1, arg2));
+        return isMuQtObject(arg0) ? int(((MuQt_QListView*)arg0)->selectionCommand_pub_parent(arg1, arg2))
+                                  : int(((MuQt_QListView*)arg0)->selectionCommand_pub(arg1, arg2));
     }
 
-    void qt_QListView_dragEnterEvent_void_QListView_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListView_dragEnterEvent_void_QListView_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1629,8 +1481,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QListView_focusInEvent_void_QListView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListView_focusInEvent_void_QListView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1641,20 +1492,16 @@ namespace Mu
             ((MuQt_QListView*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QListView_focusNextPrevChild_bool_QListView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QListView_focusNextPrevChild_bool_QListView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QListView*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QListView*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QListView_focusOutEvent_void_QListView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListView_focusOutEvent_void_QListView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1665,8 +1512,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QListView_keyPressEvent_void_QListView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListView_keyPressEvent_void_QListView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1677,8 +1523,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QListView_mouseDoubleClickEvent_void_QListView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListView_mouseDoubleClickEvent_void_QListView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1689,8 +1534,7 @@ namespace Mu
             ((MuQt_QListView*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QListView_mousePressEvent_void_QListView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListView_mousePressEvent_void_QListView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
@@ -1701,317 +1545,263 @@ namespace Mu
             ((MuQt_QListView*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    bool qt_QListView_viewportEvent_bool_QListView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    bool qt_QListView_viewportEvent_bool_QListView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListView* arg0 = object<QListView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListView*)arg0)->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QListView*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QListView*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QListView*)arg0)->viewportEvent_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QListView0, Pointer)
     {
-        NODE_RETURN(qt_QListView_QListView_QListView_QListView_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_QListView_QListView_QListView_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clearPropertyFlags0, void)
     {
-        qt_QListView_clearPropertyFlags_void_QListView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QListView_clearPropertyFlags_void_QListView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isRowHidden0, bool)
     {
-        NODE_RETURN(qt_QListView_isRowHidden_bool_QListView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QListView_isRowHidden_bool_QListView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowHidden0, void)
     {
-        qt_QListView_setRowHidden_void_QListView_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QListView_setRowHidden_void_QListView_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAt0, Pointer)
     {
-        NODE_RETURN(qt_QListView_indexAt_QModelIndex_QListView_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_indexAt_QModelIndex_QListView_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollTo0, void)
     {
-        qt_QListView_scrollTo_void_QListView_QModelIndex_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QListView_scrollTo_void_QListView_QModelIndex_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                             NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRect0, Pointer)
     {
-        NODE_RETURN(qt_QListView_visualRect_QRect_QListView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_visualRect_QRect_QListView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rectForIndex0, Pointer)
     {
-        NODE_RETURN(qt_QListView_rectForIndex_QRect_QListView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_rectForIndex_QRect_QListView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setPositionForIndex0, void)
     {
-        qt_QListView_setPositionForIndex_void_QListView_QPoint_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QListView_setPositionForIndex_void_QListView_QPoint_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_currentChanged0, void)
     {
-        qt_QListView_currentChanged_void_QListView_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QListView_currentChanged_void_QListView_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QListView_dragLeaveEvent_void_QListView_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_dragLeaveEvent_void_QListView_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QListView_dragMoveEvent_void_QListView_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_dragMoveEvent_void_QListView_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QListView_dropEvent_void_QListView_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_dropEvent_void_QListView_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QListView_event_bool_QListView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_event_bool_QListView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QListView_horizontalOffset_int_QListView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListView_horizontalOffset_int_QListView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(qt_QListView_isIndexHidden_bool_QListView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_isIndexHidden_bool_QListView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QListView_mouseMoveEvent_void_QListView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_mouseMoveEvent_void_QListView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QListView_mouseReleaseEvent_void_QListView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_mouseReleaseEvent_void_QListView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QListView_paintEvent_void_QListView_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_paintEvent_void_QListView_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QListView_resizeEvent_void_QListView_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_resizeEvent_void_QListView_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsAboutToBeRemoved0, void)
     {
-        qt_QListView_rowsAboutToBeRemoved_void_QListView_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QListView_rowsAboutToBeRemoved_void_QListView_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsInserted0, void)
     {
-        qt_QListView_rowsInserted_void_QListView_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QListView_rowsInserted_void_QListView_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                     NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListView_selectedIndexes_qt__QModelIndexBSB_ESB__QListView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListView_selectedIndexes_qt__QModelIndexBSB_ESB__QListView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionChanged0, void)
     {
-        qt_QListView_selectionChanged_void_QListView_QItemSelection_QItemSelection(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QListView_selectionChanged_void_QListView_QItemSelection_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QListView_setSelection_void_QListView_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QListView_setSelection_void_QListView_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                           NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_startDrag0, void)
     {
-        qt_QListView_startDrag_void_QListView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QListView_startDrag_void_QListView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QListView_timerEvent_void_QListView_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_timerEvent_void_QListView_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_updateGeometries0, void)
     {
-        qt_QListView_updateGeometries_void_QListView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QListView_updateGeometries_void_QListView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QListView_verticalOffset_int_QListView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListView_verticalOffset_int_QListView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QListView_viewportSizeHint_QSize_QListView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListView_viewportSizeHint_QSize_QListView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListView_visualRegionForSelection_QRegion_QListView_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_visualRegionForSelection_QRegion_QListView_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QListView_wheelEvent_void_QListView_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_wheelEvent_void_QListView_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyboardSearch0, void)
     {
-        qt_QListView_keyboardSearch_void_QListView_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_keyboardSearch_void_QListView_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setModel0, void)
     {
-        qt_QListView_setModel_void_QListView_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_setModel_void_QListView_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelectionModel0, void)
     {
-        qt_QListView_setSelectionModel_void_QListView_QItemSelectionModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_setSelectionModel_void_QListView_QItemSelectionModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForColumn0, int)
     {
-        NODE_RETURN(qt_QListView_sizeHintForColumn_int_QListView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QListView_sizeHintForColumn_int_QListView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForRow0, int)
     {
-        NODE_RETURN(qt_QListView_sizeHintForRow_int_QListView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QListView_sizeHintForRow_int_QListView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QListView_inputMethodQuery_QVariant_QListView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QListView_inputMethodQuery_QVariant_QListView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_edit0, bool)
     {
-        NODE_RETURN(qt_QListView_edit_bool_QListView_QModelIndex_int_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QListView_edit_bool_QListView_QModelIndex_int_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionCommand0, int)
     {
-        NODE_RETURN(
-            qt_QListView_selectionCommand_int_QListView_QModelIndex_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QListView_selectionCommand_int_QListView_QModelIndex_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QListView_dragEnterEvent_void_QListView_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_dragEnterEvent_void_QListView_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QListView_focusInEvent_void_QListView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_focusInEvent_void_QListView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QListView_focusNextPrevChild_bool_QListView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QListView_focusNextPrevChild_bool_QListView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QListView_focusOutEvent_void_QListView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_focusOutEvent_void_QListView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QListView_keyPressEvent_void_QListView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_keyPressEvent_void_QListView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QListView_mouseDoubleClickEvent_void_QListView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_mouseDoubleClickEvent_void_QListView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QListView_mousePressEvent_void_QListView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListView_mousePressEvent_void_QListView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(qt_QListView_viewportEvent_bool_QListView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListView_viewportEvent_bool_QListView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QListViewType::load()
@@ -2031,17 +1821,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QListView_QListView_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QListView_QListView_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -2049,23 +1835,15 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QListView", _n_QListView0, None, Compiled,
-                         qt_QListView_QListView_QListView_QListView_QWidget,
-                         Return, "qt.QListView", Parameters,
-                         new Param(c, "this", "qt.QListView"),
-                         new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QListView", _n_QListView0, None, Compiled, qt_QListView_QListView_QListView_QListView_QWidget, Return,
+                         "qt.QListView", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: batchSize (int; QListView this)
-            new Function(
-                c, "clearPropertyFlags", _n_clearPropertyFlags0, None, Compiled,
-                qt_QListView_clearPropertyFlags_void_QListView, Return, "void",
-                Parameters, new Param(c, "this", "qt.QListView"), End),
+            new Function(c, "clearPropertyFlags", _n_clearPropertyFlags0, None, Compiled, qt_QListView_clearPropertyFlags_void_QListView,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QListView"), End),
             // PROP: flow (flags QListView::Flow; QListView this)
             // PROP: gridSize (QSize; QListView this)
-            new Function(c, "isRowHidden", _n_isRowHidden0, None, Compiled,
-                         qt_QListView_isRowHidden_bool_QListView_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QListView"),
-                         new Param(c, "row", "int"), End),
+            new Function(c, "isRowHidden", _n_isRowHidden0, None, Compiled, qt_QListView_isRowHidden_bool_QListView_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "row", "int"), End),
             // PROP: isSelectionRectVisible (bool; QListView this)
             // PROP: isWrapping (bool; QListView this)
             // PROP: layoutMode (flags QListView::LayoutMode; QListView this)
@@ -2080,11 +1858,9 @@ namespace Mu
             // this, int column) PROP: setMovement (void; QListView this, flags
             // QListView::Movement movement) PROP: setResizeMode (void;
             // QListView this, flags QListView::ResizeMode mode)
-            new Function(
-                c, "setRowHidden", _n_setRowHidden0, None, Compiled,
-                qt_QListView_setRowHidden_void_QListView_int_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "row", "int"), new Param(c, "hide", "bool"), End),
+            new Function(c, "setRowHidden", _n_setRowHidden0, None, Compiled, qt_QListView_setRowHidden_void_QListView_int_bool, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "row", "int"), new Param(c, "hide", "bool"),
+                         End),
             // PROP: setSelectionRectVisible (void; QListView this, bool show)
             // PROP: setSpacing (void; QListView this, int space)
             // PROP: setUniformItemSizes (void; QListView this, bool enable)
@@ -2095,259 +1871,153 @@ namespace Mu
             // uniformItemSizes (bool; QListView this) PROP: viewMode (flags
             // QListView::ViewMode; QListView this) PROP: wordWrap (bool;
             // QListView this)
-            _func[0] = new MemberFunction(
-                c, "indexAt", _n_indexAt0, None, Compiled,
-                qt_QListView_indexAt_QModelIndex_QListView_QPoint, Return,
-                "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "p", "qt.QPoint"), End),
-            _func[1] = new MemberFunction(
-                c, "scrollTo", _n_scrollTo0, None, Compiled,
-                qt_QListView_scrollTo_void_QListView_QModelIndex_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "hint", "int",
-                          Value((int)QAbstractItemView::EnsureVisible)),
-                End),
-            _func[2] = new MemberFunction(
-                c, "visualRect", _n_visualRect0, None, Compiled,
-                qt_QListView_visualRect_QRect_QListView_QModelIndex, Return,
-                "qt.QRect", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(c, "rectForIndex", _n_rectForIndex0, None, Compiled,
-                         qt_QListView_rectForIndex_QRect_QListView_QModelIndex,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QListView"),
+            _func[0] =
+                new MemberFunction(c, "indexAt", _n_indexAt0, None, Compiled, qt_QListView_indexAt_QModelIndex_QListView_QPoint, Return,
+                                   "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "p", "qt.QPoint"), End),
+            _func[1] = new MemberFunction(c, "scrollTo", _n_scrollTo0, None, Compiled, qt_QListView_scrollTo_void_QListView_QModelIndex_int,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QListView"),
+                                          new Param(c, "index", "qt.QModelIndex"),
+                                          new Param(c, "hint", "int", Value((int)QAbstractItemView::EnsureVisible)), End),
+            _func[2] = new MemberFunction(c, "visualRect", _n_visualRect0, None, Compiled,
+                                          qt_QListView_visualRect_QRect_QListView_QModelIndex, Return, "qt.QRect", Parameters,
+                                          new Param(c, "this", "qt.QListView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "rectForIndex", _n_rectForIndex0, None, Compiled, qt_QListView_rectForIndex_QRect_QListView_QModelIndex, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "setPositionForIndex", _n_setPositionForIndex0, None, Compiled,
+                         qt_QListView_setPositionForIndex_void_QListView_QPoint_QModelIndex, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListView"), new Param(c, "position", "qt.QPoint"),
                          new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "setPositionForIndex", _n_setPositionForIndex0, None,
-                Compiled,
-                qt_QListView_setPositionForIndex_void_QListView_QPoint_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "position", "qt.QPoint"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[3] = new MemberFunction(
-                c, "currentChanged", _n_currentChanged0, None, Compiled,
-                qt_QListView_currentChanged_void_QListView_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "current", "qt.QModelIndex"),
-                new Param(c, "previous", "qt.QModelIndex"), End),
+            _func[3] = new MemberFunction(c, "currentChanged", _n_currentChanged0, None, Compiled,
+                                          qt_QListView_currentChanged_void_QListView_QModelIndex_QModelIndex, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QListView"), new Param(c, "current", "qt.QModelIndex"),
+                                          new Param(c, "previous", "qt.QModelIndex"), End),
             // MISSING: dataChanged (void; QListView this, QModelIndex topLeft,
             // QModelIndex bottomRight, "const QVector<int> &" roles) //
             // protected
-            _func[4] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QListView_dragLeaveEvent_void_QListView_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QDragLeaveEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QListView_dragMoveEvent_void_QListView_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QDragMoveEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QListView_dropEvent_void_QListView_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QDropEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QListView_event_bool_QListView_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QListView_horizontalOffset_int_QListView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QListView"), End),
-            _func[9] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QListView_isIndexHidden_bool_QListView_QModelIndex, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[10] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QListView_mouseMoveEvent_void_QListView_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QListView_mouseReleaseEvent_void_QListView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QListView_paintEvent_void_QListView_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QPaintEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QListView_resizeEvent_void_QListView_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "rowsAboutToBeRemoved", _n_rowsAboutToBeRemoved0, None,
-                Compiled,
-                qt_QListView_rowsAboutToBeRemoved_void_QListView_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[15] = new MemberFunction(
-                c, "rowsInserted", _n_rowsInserted0, None, Compiled,
-                qt_QListView_rowsInserted_void_QListView_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[16] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QListView_selectedIndexes_qt__QModelIndexBSB_ESB__QListView,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QListView"), End),
-            _func[17] = new MemberFunction(
-                c, "selectionChanged", _n_selectionChanged0, None, Compiled,
-                qt_QListView_selectionChanged_void_QListView_QItemSelection_QItemSelection,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "selected", "qt.QItemSelection"),
-                new Param(c, "deselected", "qt.QItemSelection"), End),
+            _func[4] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                          qt_QListView_dragLeaveEvent_void_QListView_QDragLeaveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QDragLeaveEvent"), End),
+            _func[5] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                          qt_QListView_dragMoveEvent_void_QListView_QDragMoveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QDragMoveEvent"), End),
+            _func[6] =
+                new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled, qt_QListView_dropEvent_void_QListView_QDropEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QDropEvent"), End),
+            _func[7] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QListView_event_bool_QListView_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QEvent"), End),
+            _func[8] =
+                new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled, qt_QListView_horizontalOffset_int_QListView,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QListView"), End),
+            _func[9] = new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                          qt_QListView_isIndexHidden_bool_QListView_QModelIndex, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QListView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[10] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QListView_mouseMoveEvent_void_QListView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[11] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QListView_mouseReleaseEvent_void_QListView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[12] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QListView_paintEvent_void_QListView_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QPaintEvent"), End),
+            _func[13] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QListView_resizeEvent_void_QListView_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[14] = new MemberFunction(c, "rowsAboutToBeRemoved", _n_rowsAboutToBeRemoved0, None, Compiled,
+                                           qt_QListView_rowsAboutToBeRemoved_void_QListView_QModelIndex_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[15] = new MemberFunction(c, "rowsInserted", _n_rowsInserted0, None, Compiled,
+                                           qt_QListView_rowsInserted_void_QListView_QModelIndex_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[16] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QListView_selectedIndexes_qt__QModelIndexBSB_ESB__QListView, Return, "qt.QModelIndex[]",
+                                           Parameters, new Param(c, "this", "qt.QListView"), End),
+            _func[17] = new MemberFunction(c, "selectionChanged", _n_selectionChanged0, None, Compiled,
+                                           qt_QListView_selectionChanged_void_QListView_QItemSelection_QItemSelection, Return, "void",
+                                           Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "selected", "qt.QItemSelection"),
+                                           new Param(c, "deselected", "qt.QItemSelection"), End),
             _func[18] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QListView_setSelection_void_QListView_QRect_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "rect", "qt.QRect"),
-                new Param(c, "command", "int"), End),
-            _func[19] = new MemberFunction(
-                c, "startDrag", _n_startDrag0, None, Compiled,
-                qt_QListView_startDrag_void_QListView_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "supportedActions", "int"), End),
-            _func[20] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QListView_timerEvent_void_QListView_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "updateGeometries", _n_updateGeometries0, None, Compiled,
-                qt_QListView_updateGeometries_void_QListView, Return, "void",
-                Parameters, new Param(c, "this", "qt.QListView"), End),
-            _func[22] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QListView_verticalOffset_int_QListView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QListView"), End),
+                c, "setSelection", _n_setSelection0, None, Compiled, qt_QListView_setSelection_void_QListView_QRect_int, Return, "void",
+                Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "rect", "qt.QRect"), new Param(c, "command", "int"), End),
+            _func[19] =
+                new MemberFunction(c, "startDrag", _n_startDrag0, None, Compiled, qt_QListView_startDrag_void_QListView_int, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "supportedActions", "int"), End),
+            _func[20] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QListView_timerEvent_void_QListView_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[21] = new MemberFunction(c, "updateGeometries", _n_updateGeometries0, None, Compiled,
+                                           qt_QListView_updateGeometries_void_QListView, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), End),
+            _func[22] =
+                new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled, qt_QListView_verticalOffset_int_QListView,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QListView"), End),
             // MISSING: viewOptions ("QStyleOptionViewItem"; QListView this) //
             // protected
-            _func[23] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QListView_viewportSizeHint_QSize_QListView, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QListView"),
-                End),
-            _func[24] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QListView_visualRegionForSelection_QRegion_QListView_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
-            _func[25] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QListView_wheelEvent_void_QListView_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
-                qt_QListView_keyboardSearch_void_QListView_string, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "search", "string"), End),
-            _func[27] = new MemberFunction(
-                c, "setModel", _n_setModel0, None, Compiled,
-                qt_QListView_setModel_void_QListView_QAbstractItemModel, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "model", "qt.QAbstractItemModel"), End),
-            _func[28] = new MemberFunction(
-                c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
-                qt_QListView_setSelectionModel_void_QListView_QItemSelectionModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
-            _func[29] = new MemberFunction(
-                c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
-                qt_QListView_sizeHintForColumn_int_QListView_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "column", "int"), End),
-            _func[30] = new MemberFunction(
-                c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
-                qt_QListView_sizeHintForRow_int_QListView_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "row", "int"), End),
-            _func[31] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QListView_inputMethodQuery_QVariant_QListView_int, Return,
-                "qt.QVariant", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "query", "int"), End),
-            _func[32] = new MemberFunction(
-                c, "edit", _n_edit0, None, Compiled,
-                qt_QListView_edit_bool_QListView_QModelIndex_int_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "trigger", "int"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[33] = new MemberFunction(
-                c, "selectionCommand", _n_selectionCommand0, None, Compiled,
-                qt_QListView_selectionCommand_int_QListView_QModelIndex_QEvent,
-                Return, "int", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[34] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QListView_dragEnterEvent_void_QListView_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[35] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QListView_focusInEvent_void_QListView_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[36] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QListView_focusNextPrevChild_bool_QListView_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "next", "bool"), End),
-            _func[37] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QListView_focusOutEvent_void_QListView_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[23] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QListView_viewportSizeHint_QSize_QListView, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QListView"), End),
+            _func[24] =
+                new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                   qt_QListView_visualRegionForSelection_QRegion_QListView_QItemSelection, Return, "qt.QRegion", Parameters,
+                                   new Param(c, "this", "qt.QListView"), new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[25] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QListView_wheelEvent_void_QListView_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[26] = new MemberFunction(c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
+                                           qt_QListView_keyboardSearch_void_QListView_string, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "search", "string"), End),
+            _func[27] = new MemberFunction(c, "setModel", _n_setModel0, None, Compiled,
+                                           qt_QListView_setModel_void_QListView_QAbstractItemModel, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "model", "qt.QAbstractItemModel"), End),
+            _func[28] =
+                new MemberFunction(c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
+                                   qt_QListView_setSelectionModel_void_QListView_QItemSelectionModel, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QListView"), new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
+            _func[29] = new MemberFunction(c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
+                                           qt_QListView_sizeHintForColumn_int_QListView_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "column", "int"), End),
+            _func[30] =
+                new MemberFunction(c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled, qt_QListView_sizeHintForRow_int_QListView_int,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "row", "int"), End),
+            _func[31] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QListView_inputMethodQuery_QVariant_QListView_int, Return, "qt.QVariant", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "query", "int"), End),
+            _func[32] =
+                new MemberFunction(c, "edit", _n_edit0, None, Compiled, qt_QListView_edit_bool_QListView_QModelIndex_int_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QListView"), new Param(c, "index", "qt.QModelIndex"),
+                                   new Param(c, "trigger", "int"), new Param(c, "event", "qt.QEvent"), End),
+            _func[33] = new MemberFunction(c, "selectionCommand", _n_selectionCommand0, None, Compiled,
+                                           qt_QListView_selectionCommand_int_QListView_QModelIndex_QEvent, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "index", "qt.QModelIndex"),
+                                           new Param(c, "event", "qt.QEvent"), End),
+            _func[34] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QListView_dragEnterEvent_void_QListView_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[35] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QListView_focusInEvent_void_QListView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[36] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QListView_focusNextPrevChild_bool_QListView_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "next", "bool"), End),
+            _func[37] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QListView_focusOutEvent_void_QListView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QListView this,
             // "QInputMethodEvent *" event) // protected
-            _func[38] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QListView_keyPressEvent_void_QListView_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[39] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QListView_mouseDoubleClickEvent_void_QListView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[40] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QListView_mousePressEvent_void_QListView_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[41] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QListView_viewportEvent_bool_QListView_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QListView"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[38] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QListView_keyPressEvent_void_QListView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[39] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QListView_mouseDoubleClickEvent_void_QListView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[40] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QListView_mousePressEvent_void_QListView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[41] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                           qt_QListView_viewportEvent_bool_QListView_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QListView"), new Param(c, "event", "qt.QEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

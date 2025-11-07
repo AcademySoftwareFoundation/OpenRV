@@ -33,10 +33,7 @@ namespace Mu
 
     const char* Exception::what() const throw() { return _message.c_str(); }
 
-    String Exception::backtraceAsString() const
-    {
-        return backtraceAsString(_backtrace);
-    }
+    String Exception::backtraceAsString() const { return backtraceAsString(_backtrace); }
 
     String Exception::backtraceAsString(const BackTrace& bt)
     {
@@ -57,8 +54,7 @@ namespace Mu
 
             if (bt[i].filename && *bt[i].filename && bt[i].linenum)
             {
-                cstr << bt[i].filename << ", line " << bt[i].linenum
-                     << ", char " << bt[i].charnum << ":" << endl;
+                cstr << bt[i].filename << ", line " << bt[i].linenum << ", char " << bt[i].charnum << ":" << endl;
             }
 
             if (i < 100)
@@ -77,8 +73,7 @@ namespace Mu
 
             if (f && f->returnType()->isTypePattern())
             {
-                cstr << "    returns: " << n->type()->fullyQualifiedName()
-                     << endl;
+                cstr << "    returns: " << n->type()->fullyQualifiedName() << endl;
             }
 
             for (int q = 0, s = n->numArgs(); q < s; q++)

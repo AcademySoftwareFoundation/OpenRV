@@ -43,10 +43,7 @@ void gltFace(const std::string& fontName, size_t fontSize)
     state.back() = GLTState(d, face);
 }
 
-void gltFace(const std::string& fontName)
-{
-    gltFace(fontName, state.back().first.second);
-}
+void gltFace(const std::string& fontName) { gltFace(fontName, state.back().first.second); }
 
 void gltSize(size_t fontSize) { gltFace(state.back().first.first, fontSize); }
 
@@ -54,15 +51,13 @@ float gltAscenderHeight() { return CURRENT_FACE->Ascender(); }
 
 float gltDescenderHeight() { return CURRENT_FACE->Descender(); }
 
-void gltBounds(const std::string& text, float& xmin, float& xmax, float& ymin,
-               float& ymax)
+void gltBounds(const std::string& text, float& xmin, float& xmax, float& ymin, float& ymax)
 {
     float zmin, zmax;
     CURRENT_FACE->BBox(text.c_str(), xmin, ymin, zmin, xmax, ymax, zmax);
 }
 
-void gltMultipleLineBounds(const std::string& text, float& xmin, float& xmax,
-                           float& ymin, float& ymax)
+void gltMultipleLineBounds(const std::string& text, float& xmin, float& xmax, float& ymin, float& ymax)
 {
     vector<string> lines;
     stl_ext::tokenize(lines, text, "\n");
@@ -106,8 +101,7 @@ void gltRender(float x, float y, const std::string& text)
     glPopAttrib();
 }
 
-void gltMultipleLineRender(float x, float y, const std::string& text,
-                           float mult)
+void gltMultipleLineRender(float x, float y, const std::string& text, float mult)
 {
     vector<string> lines;
     stl_ext::tokenize(lines, text, "\n");

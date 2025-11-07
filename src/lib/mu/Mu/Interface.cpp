@@ -22,8 +22,7 @@ namespace Mu
     {
     }
 
-    Interface::Interface(Context* context, const char* name,
-                         const Interfaces& interfaces)
+    Interface::Interface(Context* context, const char* name, const Interfaces& interfaces)
         : Type(context, name, Mu::PointerRep::rep())
         , _numFunctions(0)
     {
@@ -42,10 +41,7 @@ namespace Mu
 
     void Interface::deleteObject(Object*) const {}
 
-    void Interface::output(std::ostream& o) const
-    {
-        o << "interface " << fullyQualifiedName();
-    }
+    void Interface::output(std::ostream& o) const { o << "interface " << fullyQualifiedName(); }
 
     void Interface::outputNode(std::ostream& o, const Node* n) const
     {
@@ -55,15 +51,13 @@ namespace Mu
         outputValue(o, dn->_data);
     }
 
-    void Interface::outputValue(std::ostream& o, const Value& value,
-                                bool full) const
+    void Interface::outputValue(std::ostream& o, const Value& value, bool full) const
     {
         ValueOutputState state(o, full);
         outputValueRecursive(o, ValuePointer(&value._Pointer), state);
     }
 
-    void Interface::outputValueRecursive(std::ostream& o, const ValuePointer p,
-                                         ValueOutputState& state) const
+    void Interface::outputValueRecursive(std::ostream& o, const ValuePointer p, ValueOutputState& state) const
     {
         ClassInstance* i = *reinterpret_cast<ClassInstance**>(p);
 
@@ -77,10 +71,7 @@ namespace Mu
         }
     }
 
-    Value Interface::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value Interface::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void Interface::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -99,10 +90,7 @@ namespace Mu
         }
     }
 
-    const Symbol* Interface::findSymbol(Name n) const
-    {
-        return Type::findSymbol(n);
-    }
+    const Symbol* Interface::findSymbol(Name n) const { return Type::findSymbol(n); }
 
     void Interface::freeze() {}
 

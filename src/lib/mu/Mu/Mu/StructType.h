@@ -29,8 +29,7 @@ namespace Mu
         typedef std::pair<std::string, const Type*> NameValuePair;
         typedef STLVector<NameValuePair>::Type NameValuePairs;
 
-        StructType(Context* context, const char* name,
-                   const NameValuePairs& fields);
+        StructType(Context* context, const char* name, const NameValuePairs& fields);
         ~StructType();
 
         virtual void load();

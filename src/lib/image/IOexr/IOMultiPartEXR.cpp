@@ -59,9 +59,8 @@ namespace TwkFB
     //  Gets the bigger of the types specified by fbDataType/exrPixelTypes and
     //  channel.
     //
-    void IOexr::getBiggerFrameBufferAndEXRPixelType(
-        const Imf::Channel& channel, FrameBuffer::DataType& fbDataType,
-        Imf::PixelType& exrPixelType)
+    void IOexr::getBiggerFrameBufferAndEXRPixelType(const Imf::Channel& channel, FrameBuffer::DataType& fbDataType,
+                                                    Imf::PixelType& exrPixelType)
     {
         switch (channel.type)
         {
@@ -85,12 +84,10 @@ namespace TwkFB
         }
     }
 
-    void IOexr::readMultiPartChannelList(
-        const std::string& filename, const std::string& view, FrameBuffer& fb,
-        Imf::MultiPartInputFile& file, vector<MultiPartChannel>& channelsRead,
-        bool convertYRYBY, bool planar3channel, bool allChannels,
-        bool inheritChannels, bool noOneChannelPlanes, bool stripAlpha,
-        bool readWindowIsDisplayWindow, IOexr::ReadWindow window)
+    void IOexr::readMultiPartChannelList(const std::string& filename, const std::string& view, FrameBuffer& fb,
+                                         Imf::MultiPartInputFile& file, vector<MultiPartChannel>& channelsRead, bool convertYRYBY,
+                                         bool planar3channel, bool allChannels, bool inheritChannels, bool noOneChannelPlanes,
+                                         bool stripAlpha, bool readWindowIsDisplayWindow, IOexr::ReadWindow window)
     {
         // Move the outfb setup and attributes to
         // a new function.
@@ -122,16 +119,14 @@ namespace TwkFB
             clipped.min = Imath::clip(dspWin.min, datWin);
             clipped.max = Imath::clip(dspWin.max, datWin);
 
-            if (!dspWin.intersects(clipped.min)
-                && !dspWin.intersects(clipped.max))
+            if (!dspWin.intersects(clipped.min) && !dspWin.intersects(clipped.max))
             {
                 // datwin outside dspWin
                 dataWinOutsideDspWin = true;
             }
             else
             {
-                if (!dspWin.intersects(datWin.min)
-                    || !dspWin.intersects(datWin.max))
+                if (!dspWin.intersects(datWin.min) || !dspWin.intersects(datWin.max))
                 {
                     outfb = new FrameBuffer();
                 }
@@ -208,12 +203,10 @@ namespace TwkFB
             }
             else
             {
-                originalSampling << mpChannel.channel.xSampling << "x"
-                                 << mpChannel.channel.ySampling;
+                originalSampling << mpChannel.channel.xSampling << "x" << mpChannel.channel.ySampling;
             }
 
-            if ((!strcmp(mpChannel.name.c_str(), "RY")
-                 || !strcmp(mpChannel.name.c_str(), "BY")))
+            if ((!strcmp(mpChannel.name.c_str(), "RY") || !strcmp(mpChannel.name.c_str(), "BY")))
             {
                 if (!convertYRYBY)
                 {
@@ -225,8 +218,7 @@ namespace TwkFB
 #ifdef DEBUG_IOEXR
         for (int i = 0; i < channelsRead.size(); ++i)
         {
-            LOG.log("Before sort: Reading full channel name: %s",
-                    channelsRead[i].fullname.c_str());
+            LOG.log("Before sort: Reading full channel name: %s", channelsRead[i].fullname.c_str());
         }
 #endif
 
@@ -260,8 +252,7 @@ namespace TwkFB
             //  the list and the rest of the channels appear in their natural
             //  order
             //
-            stable_sort(channelsRead.begin(), channelsRead.end(),
-                        ChannelCompMP);
+            stable_sort(channelsRead.begin(), channelsRead.end(), ChannelCompMP);
 
             if (inheritChannels && !reduced)
             {
@@ -312,8 +303,7 @@ namespace TwkFB
         }
         else
         {
-            stable_sort(channelsRead.begin(), channelsRead.end(),
-                        ChannelCompMP);
+            stable_sort(channelsRead.begin(), channelsRead.end(), ChannelCompMP);
 
             int r = redIndex(channelsReadPartZero);
             int g = greenIndex(channelsReadPartZero);
@@ -343,8 +333,7 @@ namespace TwkFB
 #ifdef DEBUG_IOEXR
         for (int i = 0; i < channelsRead.size(); ++i)
         {
-            LOG.log("After sort: Reading updated full channel name: %s",
-                    channelsRead[i].fullname.c_str());
+            LOG.log("After sort: Reading updated full channel name: %s", channelsRead[i].fullname.c_str());
         }
 #endif
 
@@ -361,15 +350,13 @@ namespace TwkFB
         //
         if (inheritChannels && channelsRead.size() == 3 && !stripAlpha)
         {
-            if (redIndex(channelsRead) != -1 && greenIndex(channelsRead) != -1
-                && blueIndex(channelsRead) != -1)
+            if (redIndex(channelsRead) != -1 && greenIndex(channelsRead) != -1 && blueIndex(channelsRead) != -1)
             {
                 //
                 //  See if there's a default alpha channel
                 //
                 MultiPartChannel alpha;
-                findAnAlphaInView(file, view, channelsRead.front().partName,
-                                  alpha);
+                findAnAlphaInView(file, view, channelsRead.front().partName, alpha);
                 if (alpha.name != "")
                 {
                     channelsRead.push_back(alpha);
@@ -390,10 +377,7 @@ namespace TwkFB
             {
                 // Alpha channel need to come from the same part unless we are
                 // guessing/inheriting
-                if ((a == 3) && !stripAlpha
-                    && (inheritChannels
-                        || channelsRead[a].partNumber
-                               == channelsRead[r].partNumber))
+                if ((a == 3) && !stripAlpha && (inheritChannels || channelsRead[a].partNumber == channelsRead[r].partNumber))
                 {
                     numChannels = 4;
                 }
@@ -420,14 +404,10 @@ namespace TwkFB
         vector<vector<MultiPartChannel>::const_iterator> planeChannels;
         if (planarYRYBY || planar3)
         {
-            vector<MultiPartChannel>::const_iterator ci0 =
-                findChannelWithBasenameMP(planarYRYBY ? "Y" : "R", planarRead);
-            vector<MultiPartChannel>::const_iterator ci1 =
-                findChannelWithBasenameMP(planarYRYBY ? "RY" : "G", planarRead);
-            vector<MultiPartChannel>::const_iterator ci2 =
-                findChannelWithBasenameMP(planarYRYBY ? "BY" : "B", planarRead);
-            vector<MultiPartChannel>::const_iterator ci3 =
-                findChannelWithBasenameMP("A", planarRead);
+            vector<MultiPartChannel>::const_iterator ci0 = findChannelWithBasenameMP(planarYRYBY ? "Y" : "R", planarRead);
+            vector<MultiPartChannel>::const_iterator ci1 = findChannelWithBasenameMP(planarYRYBY ? "RY" : "G", planarRead);
+            vector<MultiPartChannel>::const_iterator ci2 = findChannelWithBasenameMP(planarYRYBY ? "BY" : "B", planarRead);
+            vector<MultiPartChannel>::const_iterator ci3 = findChannelWithBasenameMP("A", planarRead);
 
             bool checkForDuplicates = false;
 
@@ -470,8 +450,7 @@ namespace TwkFB
                 }
             }
 
-            bool has4 =
-                (!stripAlpha && ci3 != planarRead.end() && numChannels > 3);
+            bool has4 = (!stripAlpha && ci3 != planarRead.end() && numChannels > 3);
 
             planeChannels.resize((has4 || noOneChannelPlanes) ? 4 : 3);
             FrameBuffer::StringVector planeNames(has4 ? 4 : 3);
@@ -518,11 +497,9 @@ namespace TwkFB
             // the biggest of all the channel types i.e. float.
             //
             FrameBuffer::DataType dataType = FrameBuffer::HALF;
-            for (int i = 0; i < nchannels && dataType != FrameBuffer::FLOAT;
-                 ++i)
+            for (int i = 0; i < nchannels && dataType != FrameBuffer::FLOAT; ++i)
             {
-                getBiggerFrameBufferAndEXRPixelType(
-                    planeChannels[i]->channel.type, dataType, exrPixelType);
+                getBiggerFrameBufferAndEXRPixelType(planeChannels[i]->channel.type, dataType, exrPixelType);
             }
 
             if (checkForDuplicates)
@@ -547,14 +524,10 @@ namespace TwkFB
                 }
             }
 #ifdef DEBUG_IOEXR
-            LOG.log("outfb channel type is %d %d", (int)dataType,
-                    (int)exrPixelType);
-            LOG.log("planeNamesSize=%d has4=%d noOneChannelPlanes=%d",
-                    (int)planeNames.size(), (int)has4, (int)noOneChannelPlanes);
+            LOG.log("outfb channel type is %d %d", (int)dataType, (int)exrPixelType);
+            LOG.log("planeNamesSize=%d has4=%d noOneChannelPlanes=%d", (int)planeNames.size(), (int)has4, (int)noOneChannelPlanes);
 #endif
-            outfb->restructurePlanar(width, height, xsamps, ysamps, planeNames,
-                                     dataType, FrameBuffer::BOTTOMLEFT,
-                                     nchannels);
+            outfb->restructurePlanar(width, height, xsamps, ysamps, planeNames, dataType, FrameBuffer::BOTTOMLEFT, nchannels);
         }
         else
         {
@@ -563,16 +536,13 @@ namespace TwkFB
             // the biggest of all the channel types i.e. float.
             //
             FrameBuffer::DataType dataType = FrameBuffer::HALF;
-            for (int c = 0; c < numChannels && dataType != FrameBuffer::FLOAT;
-                 ++c)
+            for (int c = 0; c < numChannels && dataType != FrameBuffer::FLOAT; ++c)
             {
-                getBiggerFrameBufferAndEXRPixelType(
-                    channelsRead[c].channel.type, dataType, exrPixelType);
+                getBiggerFrameBufferAndEXRPixelType(channelsRead[c].channel.type, dataType, exrPixelType);
             }
 
 #ifdef DEBUG_IOEXR
-            LOG.log("outfb channel type is %d %d", (int)dataType,
-                    (int)exrPixelType);
+            LOG.log("outfb channel type is %d %d", (int)dataType, (int)exrPixelType);
 #endif
             outfb->restructure(width, height, 0, numChannels, dataType);
         }
@@ -633,10 +603,8 @@ namespace TwkFB
             }
 
             outfb->newAttribute("ChannelsInFile", totalChannels);
-            outfb->newAttribute("ChannelNamesInFile",
-                                stl_ext::wrap(originalChannels));
-            outfb->newAttribute("ChannelSamplingInFile",
-                                stl_ext::wrap(originalSampling.str()));
+            outfb->newAttribute("ChannelNamesInFile", stl_ext::wrap(originalChannels));
+            outfb->newAttribute("ChannelSamplingInFile", stl_ext::wrap(originalSampling.str()));
             outfb->newAttribute("ChannelsRead", stl_ext::wrap(cch));
         }
 
@@ -646,8 +614,7 @@ namespace TwkFB
             ostringstream nameStr;
             ostringstream numStr;
 
-            for (set<int>::const_iterator it = partNumbersInFile.begin();
-                 it != partNumbersInFile.end(); ++it)
+            for (set<int>::const_iterator it = partNumbersInFile.begin(); it != partNumbersInFile.end(); ++it)
             {
                 if (it != partNumbersInFile.begin())
                 {
@@ -655,13 +622,10 @@ namespace TwkFB
                     numStr << ", ";
                 }
                 numStr << *it;
-                nameStr << (file.header(*it).hasName() ? file.header(*it).name()
-                                                       : "");
+                nameStr << (file.header(*it).hasName() ? file.header(*it).name() : "");
             }
-            outfb->newAttribute("PartNumbersInFile",
-                                stl_ext::wrap(numStr.str()));
-            outfb->newAttribute("PartNamesInFile",
-                                stl_ext::wrap(nameStr.str()));
+            outfb->newAttribute("PartNumbersInFile", stl_ext::wrap(numStr.str()));
+            outfb->newAttribute("PartNamesInFile", stl_ext::wrap(nameStr.str()));
 
             nameStr.clear();
             nameStr.str("");
@@ -669,8 +633,7 @@ namespace TwkFB
             numStr.str("");
 
             // For numbers and names of parts that are read for display
-            for (set<int>::const_iterator it = partNumbersRead.begin();
-                 it != partNumbersRead.end(); ++it)
+            for (set<int>::const_iterator it = partNumbersRead.begin(); it != partNumbersRead.end(); ++it)
             {
                 if (it != partNumbersRead.begin())
                 {
@@ -678,8 +641,7 @@ namespace TwkFB
                     numStr << ", ";
                 }
                 numStr << *it;
-                nameStr << (file.header(*it).hasName() ? file.header(*it).name()
-                                                       : "");
+                nameStr << (file.header(*it).hasName() ? file.header(*it).name() : "");
             }
             outfb->newAttribute("PartNumbersRead", stl_ext::wrap(numStr.str()));
             outfb->newAttribute("PartNamesRead", stl_ext::wrap(nameStr.str()));
@@ -778,22 +740,17 @@ namespace TwkFB
 
                 for (FrameBuffer* p = outfb; p; p = p->nextPlane())
                 {
-                    vector<MultiPartChannel>::const_iterator ci =
-                        planeChannels[chindex++];
+                    vector<MultiPartChannel>::const_iterator ci = planeChannels[chindex++];
 
                     int xs = ci->channel.xSampling;
                     int ys = ci->channel.ySampling;
 #ifdef DEBUG_IOEXR
-                    LOG.log("X Reading part channel number: %d name: %s",
-                            ci->partNumber, ci->name.c_str());
+                    LOG.log("X Reading part channel number: %d name: %s", ci->partNumber, ci->name.c_str());
 #endif
                     partsRead.insert(ci->partNumber);
                     exrFrameBuffer[ci->partNumber].insert(
                         ci->name,
-                        Imf::Slice(exrPixelType,
-                                   p->pixels<char>()
-                                       - p->scanlineSize() * bufWin.min.y
-                                       - p->pixelSize() * bufWin.min.x,
+                        Imf::Slice(exrPixelType, p->pixels<char>() - p->scanlineSize() * bufWin.min.y - p->pixelSize() * bufWin.min.x,
                                    p->pixelSize(), p->scanlineSize(), xs, ys));
 
                     ci = planeChannels[chindex++];
@@ -803,19 +760,14 @@ namespace TwkFB
                         xs = ci->channel.xSampling;
                         ys = ci->channel.ySampling;
 #ifdef DEBUG_IOEXR
-                        LOG.log("XX Reading part channel number: %d name: %s",
-                                ci->partNumber, ci->name.c_str());
+                        LOG.log("XX Reading part channel number: %d name: %s", ci->partNumber, ci->name.c_str());
 #endif
                         partsRead.insert(ci->partNumber);
-                        exrFrameBuffer[ci->partNumber].insert(
-                            ci->name,
-                            Imf::Slice(exrPixelType,
-                                       p->pixels<char>()
-                                           - p->scanlineSize() * bufWin.min.y
-                                           - p->pixelSize() * bufWin.min.x
-                                           + p->bytesPerChannel(),
-                                       p->pixelSize(), p->scanlineSize(), xs,
-                                       ys));
+                        exrFrameBuffer[ci->partNumber].insert(ci->name,
+                                                              Imf::Slice(exrPixelType,
+                                                                         p->pixels<char>() - p->scanlineSize() * bufWin.min.y
+                                                                             - p->pixelSize() * bufWin.min.x + p->bytesPerChannel(),
+                                                                         p->pixelSize(), p->scanlineSize(), xs, ys));
                     }
                     else
                     {
@@ -829,8 +781,7 @@ namespace TwkFB
 
                 for (FrameBuffer* p = outfb; p; p = p->nextPlane())
                 {
-                    vector<MultiPartChannel>::const_iterator ci =
-                        planeChannels[chindex++];
+                    vector<MultiPartChannel>::const_iterator ci = planeChannels[chindex++];
 
                     const int xs = ci->channel.xSampling;
                     const int ys = ci->channel.ySampling;
@@ -843,10 +794,7 @@ namespace TwkFB
                     partsRead.insert(ci->partNumber);
                     exrFrameBuffer[ci->partNumber].insert(
                         ci->name,
-                        Imf::Slice(exrPixelType,
-                                   p->pixels<char>()
-                                       - p->scanlineSize() * bufWin.min.y
-                                       - p->pixelSize() * bufWin.min.x,
+                        Imf::Slice(exrPixelType, p->pixels<char>() - p->scanlineSize() * bufWin.min.y - p->pixelSize() * bufWin.min.x,
                                    p->pixelSize(), p->scanlineSize(), xs, ys));
                 }
             }
@@ -858,18 +806,15 @@ namespace TwkFB
                 const MultiPartChannel& mpChannel = channelsRead[c];
                 partsRead.insert(mpChannel.partNumber);
 #ifdef DEBUG_IOEXR
-                LOG.log("XXXX Reading part channel number: %d name: %s",
-                        mpChannel.partNumber, mpChannel.name.c_str());
+                LOG.log("XXXX Reading part channel number: %d name: %s", mpChannel.partNumber, mpChannel.name.c_str());
 #endif
-                exrFrameBuffer[mpChannel.partNumber].insert(
-                    mpChannel.name.c_str(),  // name
-                    Imf::Slice(exrPixelType, // type
-                               outfb->pixels<char>()
-                                   - outfb->scanlineSize() * bufWin.min.y
-                                   - outfb->pixelSize() * bufWin.min.x
-                                   + outfb->bytesPerChannel() * c,
-                               outfb->pixelSize(),      // xStride
-                               outfb->scanlineSize())); // yStride
+                exrFrameBuffer[mpChannel.partNumber].insert(mpChannel.name.c_str(),  // name
+                                                            Imf::Slice(exrPixelType, // type
+                                                                       outfb->pixels<char>() - outfb->scanlineSize() * bufWin.min.y
+                                                                           - outfb->pixelSize() * bufWin.min.x
+                                                                           + outfb->bytesPerChannel() * c,
+                                                                       outfb->pixelSize(),      // xStride
+                                                                       outfb->scanlineSize())); // yStride
             }
         }
 
@@ -879,8 +824,7 @@ namespace TwkFB
         //
         bool isPartialImage = false;
         int i = 0;
-        for (set<int>::const_iterator it = partsRead.begin();
-             it != partsRead.end(); ++it, ++i)
+        for (set<int>::const_iterator it = partsRead.begin(); it != partsRead.end(); ++it, ++i)
         {
 #ifdef DEBUG_IOEXR
             LOG.log("Reading part %d into framebuffer %d... ", (*it), i);
@@ -901,8 +845,7 @@ namespace TwkFB
 
         if (isPartialImage)
         {
-            cerr << "WARNING: EXR: incomplete image \"" << filename << "\""
-                 << endl;
+            cerr << "WARNING: EXR: incomplete image \"" << filename << "\"" << endl;
             if (!outfb->hasAttribute("PartialImage"))
             {
                 outfb->newAttribute("PartialImage", 1.0f);
@@ -938,9 +881,7 @@ namespace TwkFB
 
                 cropInto(outfb, &fb, x0, y0, x1, y1);
                 outfb->copyAttributesTo(&fb);
-                fb.setUncrop(dspWin.size().x + 1, dspWin.size().y + 1,
-                             clipped.min.x - dspWin.min.x,
-                             clipped.min.y - dspWin.min.y);
+                fb.setUncrop(dspWin.size().x + 1, dspWin.size().y + 1, clipped.min.x - dspWin.min.x, clipped.min.y - dspWin.min.y);
             }
             else
             {
@@ -962,17 +903,13 @@ namespace TwkFB
     //  matches the layer of the channelNameInFile in the
     //  partNameInFile when viewHasChannelConflict is either true or false.
     //
-    bool IOexr::doesRequestedLayerExists(bool viewHasChannelConflict,
-                                         const string& requestedView,
-                                         const string& requestedLayer,
-                                         const string& partNameInFile,
-                                         const string& channelNameInFile)
+    bool IOexr::doesRequestedLayerExists(bool viewHasChannelConflict, const string& requestedView, const string& requestedLayer,
+                                         const string& partNameInFile, const string& channelNameInFile)
     {
 
         if (viewHasChannelConflict)
         {
-            string fullChannelNameInFile =
-                partNameInFile + "." + channelNameInFile;
+            string fullChannelNameInFile = partNameInFile + "." + channelNameInFile;
             string baseName, layerNameInFile;
             channelSplit(fullChannelNameInFile, baseName, layerNameInFile);
             // Lets check if part names contain no occurrences of .<view> in
@@ -984,8 +921,7 @@ namespace TwkFB
             {
                 // Lets check if view was stripped at the end of orig part name
                 // =  <rvlayer>.<view>
-                string requestedLayerInFile =
-                    requestedLayer + "." + requestedView;
+                string requestedLayerInFile = requestedLayer + "." + requestedView;
                 if (layerNameInFile == requestedLayerInFile)
                     return true;
 
@@ -1000,8 +936,7 @@ namespace TwkFB
                 size_t pos = 0;
                 string viewStr = "." + requestedView + ".";
                 requestedLayerInFile = requestedLayer;
-                while ((pos = requestedLayerInFile.find(".", pos))
-                       != std::string::npos)
+                while ((pos = requestedLayerInFile.find(".", pos)) != std::string::npos)
                 {
                     requestedLayerInFile.replace(pos, 1, viewStr);
                     pos += viewStr.length();
@@ -1026,21 +961,15 @@ namespace TwkFB
     //  matches the channel of the channelNameInFile in the
     //  partNameInFile when viewHasChannelConflict is either true or false.
     //
-    bool IOexr::doesRequestedChannelExists(bool viewHasChannelConflict,
-                                           const string& requestedView,
-                                           const string& requestedLayer,
-                                           const string& requestedChannel,
-                                           const string& partNameInFile,
-                                           const string& channelNameInFile)
+    bool IOexr::doesRequestedChannelExists(bool viewHasChannelConflict, const string& requestedView, const string& requestedLayer,
+                                           const string& requestedChannel, const string& partNameInFile, const string& channelNameInFile)
     {
         string requestLayerDot = requestedLayer + ".";
-        string requestedFullChannelNameInFile =
-            requestLayerDot + requestedChannel;
+        string requestedFullChannelNameInFile = requestLayerDot + requestedChannel;
 
         if (viewHasChannelConflict)
         {
-            string fullChannelNameInFile =
-                partNameInFile + "." + channelNameInFile;
+            string fullChannelNameInFile = partNameInFile + "." + channelNameInFile;
             // Lets check if part names contain no occurrences of .<view> in
             // their names. i.e. orig part name = <rv layer>
             if (fullChannelNameInFile == requestedFullChannelNameInFile)
@@ -1050,15 +979,13 @@ namespace TwkFB
             {
                 // Lets check if view was stripped at the end of orig part name
                 // =  <rvlayer>.<view>
-                requestedFullChannelNameInFile =
-                    requestLayerDot + requestedView + "." + requestedChannel;
+                requestedFullChannelNameInFile = requestLayerDot + requestedView + "." + requestedChannel;
                 if (fullChannelNameInFile == requestedFullChannelNameInFile)
                     return true;
 
                 // Lets check if view was stripped at the beginning of orig part
                 // name =  <view>.<rvlayer>
-                requestedFullChannelNameInFile =
-                    requestedView + "." + requestLayerDot + requestedChannel;
+                requestedFullChannelNameInFile = requestedView + "." + requestLayerDot + requestedChannel;
                 if (fullChannelNameInFile == requestedFullChannelNameInFile)
                     return true;
 
@@ -1067,14 +994,12 @@ namespace TwkFB
                 size_t pos = 0;
                 string viewStr = "." + requestedView + ".";
                 requestedFullChannelNameInFile = requestedLayer;
-                while ((pos = requestedFullChannelNameInFile.find(".", pos))
-                       != std::string::npos)
+                while ((pos = requestedFullChannelNameInFile.find(".", pos)) != std::string::npos)
                 {
                     requestedFullChannelNameInFile.replace(pos, 1, viewStr);
                     pos += viewStr.length();
                 }
-                requestedFullChannelNameInFile =
-                    requestedFullChannelNameInFile + "." + requestedChannel;
+                requestedFullChannelNameInFile = requestedFullChannelNameInFile + "." + requestedChannel;
                 if (fullChannelNameInFile == requestedFullChannelNameInFile)
                     return true;
             }
@@ -1087,11 +1012,8 @@ namespace TwkFB
         return false;
     }
 
-    void IOexr::addToMultiPartChannelList(vector<MultiPartChannel>& rcl,
-                                          const int partNumber,
-                                          const string& partName,
-                                          const string& channelName,
-                                          const Imf::Channel& channel)
+    void IOexr::addToMultiPartChannelList(vector<MultiPartChannel>& rcl, const int partNumber, const string& partName,
+                                          const string& channelName, const Imf::Channel& channel)
     {
         MultiPartChannel mpChannel;
         mpChannel.partNumber = partNumber;
@@ -1102,11 +1024,9 @@ namespace TwkFB
         rcl.push_back(mpChannel);
     }
 
-    void IOexr::readImagesFromMultiPartFile(
-        Imf::MultiPartInputFile& file, FrameBufferVector& fbs,
-        const std::string& filename, const string& requestedView,
-        const string& requestedLayer, const string& requestedChannel,
-        const bool requestedAllChannels) const
+    void IOexr::readImagesFromMultiPartFile(Imf::MultiPartInputFile& file, FrameBufferVector& fbs, const std::string& filename,
+                                            const string& requestedView, const string& requestedLayer, const string& requestedChannel,
+                                            const bool requestedAllChannels) const
     {
 #ifdef DEBUG_IOEXR
         LOG.log("Reading multipart exr with %d parts.", file.parts());
@@ -1126,17 +1046,14 @@ namespace TwkFB
 
                 // Check for conflict in part p's channel list.
                 const Imf::ChannelList& cl = header.channels();
-                for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                     ci != cl.end(); ++ci)
+                for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
                 {
-                    if (channelNamesInView.find(ci.name())
-                        != channelNamesInView.end())
+                    if (channelNamesInView.find(ci.name()) != channelNamesInView.end())
                     {
                         // Found a channel conflict in 'view'.
                         viewHasChannelConflict = true;
 #ifdef DEBUG_IOEXR
-                        LOG.log("***View %s has conflicting channels",
-                                view.c_str());
+                        LOG.log("***View %s has conflicting channels", view.c_str());
 #endif
                         p = numOfParts;
                         break;
@@ -1172,18 +1089,14 @@ namespace TwkFB
                 if (!requestedChannel.empty())
                 {
                     // Layer and Channel specified
-                    for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                         ci != cl.end(); ++ci)
+                    for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
                     {
                         string ch = ci.name();
 
-                        if (doesRequestedChannelExists(
-                                viewHasChannelConflict, requestedView,
-                                requestedLayer, requestedChannel, partName, ch))
+                        if (doesRequestedChannelExists(viewHasChannelConflict, requestedView, requestedLayer, requestedChannel, partName,
+                                                       ch))
                         {
-                            addToMultiPartChannelList(requestedMPChannelList, p,
-                                                      partName, ch,
-                                                      ci.channel());
+                            addToMultiPartChannelList(requestedMPChannelList, p, partName, ch, ci.channel());
 
                             //
                             //  Don't strip alpha if specifically requested
@@ -1200,17 +1113,12 @@ namespace TwkFB
                 else
                 {
                     // Layer only specified
-                    for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                         ci != cl.end(); ++ci)
+                    for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
                     {
                         string ch = ci.name();
-                        if (doesRequestedLayerExists(
-                                viewHasChannelConflict, requestedView,
-                                requestedLayer, partName, ch))
+                        if (doesRequestedLayerExists(viewHasChannelConflict, requestedView, requestedLayer, partName, ch))
                         {
-                            addToMultiPartChannelList(requestedMPChannelList, p,
-                                                      partName, ch,
-                                                      ci.channel());
+                            addToMultiPartChannelList(requestedMPChannelList, p, partName, ch, ci.channel());
                         }
                     }
                 }
@@ -1221,12 +1129,9 @@ namespace TwkFB
                 if (requestedChannel.empty())
                 {
                     // No channel specified
-                    for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                         ci != cl.end(); ++ci)
+                    for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
                     {
-                        addToMultiPartChannelList(requestedMPChannelList, p,
-                                                  partName, ci.name(),
-                                                  ci.channel());
+                        addToMultiPartChannelList(requestedMPChannelList, p, partName, ci.name(), ci.channel());
                     }
                 }
                 else
@@ -1234,15 +1139,12 @@ namespace TwkFB
                     // Channel specified in view without layers
                     // Also implies viewHasChannelConflict=false; since
                     // if viewHasChannelConflict=true there must be layers.
-                    for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                         ci != cl.end(); ++ci)
+                    for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
                     {
                         string ch = ci.name();
                         if (requestedChannel == ch)
                         {
-                            addToMultiPartChannelList(requestedMPChannelList, p,
-                                                      partName, ch,
-                                                      ci.channel());
+                            addToMultiPartChannelList(requestedMPChannelList, p, partName, ch, ci.channel());
 
                             //
                             //  Don't strip alpha if specifically requested
@@ -1277,11 +1179,9 @@ namespace TwkFB
         //
         fbs.push_back(new FrameBuffer());
 
-        readMultiPartChannelList(
-            filename, requestedView, *fbs.back(), file, requestedMPChannelList,
-            m_convertYRYBY, m_planar3channel, requestedAllChannels,
-            m_inheritChannels, m_noOneChannelPlanes, stripAlpha,
-            m_readWindowIsDisplayWindow, m_readWindow);
+        readMultiPartChannelList(filename, requestedView, *fbs.back(), file, requestedMPChannelList, m_convertYRYBY, m_planar3channel,
+                                 requestedAllChannels, m_inheritChannels, m_noOneChannelPlanes, stripAlpha, m_readWindowIsDisplayWindow,
+                                 m_readWindow);
 
         if (!requestedChannel.empty())
         {
@@ -1322,13 +1222,10 @@ namespace TwkFB
         return didStrip;
     }
 
-    string IOexr::viewStrippedPartQualifiedName(
-        bool doStrip, const Imf::MultiPartInputFile& file, int partnum,
-        const string& view, const string& name)
+    string IOexr::viewStrippedPartQualifiedName(bool doStrip, const Imf::MultiPartInputFile& file, int partnum, const string& view,
+                                                const string& name)
     {
-        string result = (file.header(partnum).hasName()
-                             ? file.header(partnum).name() + "." + name
-                             : name);
+        string result = (file.header(partnum).hasName() ? file.header(partnum).name() + "." + name : name);
 
         if (doStrip)
             stripViewFromName(result, view);
@@ -1336,8 +1233,7 @@ namespace TwkFB
         return result;
     }
 
-    void IOexr::getMultiPartImageInfo(const Imf::MultiPartInputFile& file,
-                                      FBInfo& fbi) const
+    void IOexr::getMultiPartImageInfo(const Imf::MultiPartInputFile& file, FBInfo& fbi) const
     {
 #ifdef DEBUG_IOEXR
         LOG.log("***Entering: getMultiPartImageInfo");
@@ -1384,34 +1280,27 @@ namespace TwkFB
             const Imf::ChannelList& cl = header.channels();
             fbi.numChannels += channelListSize(cl);
 #ifdef DEBUG_IOEXR
-            LOG.log("***fbi.numChannels for part %d = %d", p,
-                    channelListSize(cl));
+            LOG.log("***fbi.numChannels for part %d = %d", p, channelListSize(cl));
 #endif
 
             // Determine the view of that part.
-            const string& view =
-                (header.hasView() ? header.view() : viewLessPartName);
+            const string& view = (header.hasView() ? header.view() : viewLessPartName);
             views.insert(view);
             if (viewChannelConflictTable.count(view) == 0)
             {
                 viewChannelConflictTable[view] = false;
             }
 
-            for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                 ci != cl.end(); ++ci)
+            for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
             {
                 exrPixelType.insert(ci.channel().type);
                 FBInfo::ChannelInfo cinfo;
-                setChannelInfo(baseChannelName(ci.name()), ci.channel().type,
-                               cinfo);
-                fbi.channelInfos.push_back(
-                    cinfo); // ***CBB: This should really be a set.
+                setChannelInfo(baseChannelName(ci.name()), ci.channel().type, cinfo);
+                fbi.channelInfos.push_back(cinfo); // ***CBB: This should really be a set.
 #ifdef DEBUG_IOEXR
-                LOG.log("***fbi.ChannelInfo.name = %s",
-                        fbi.channelInfos.back().name.c_str());
+                LOG.log("***fbi.ChannelInfo.name = %s", fbi.channelInfos.back().name.c_str());
 #endif
-                if (!viewChannelConflictTable[view]
-                    && viewChannelListTable[view].findChannel(ci.name()) != 0)
+                if (!viewChannelConflictTable[view] && viewChannelListTable[view].findChannel(ci.name()) != 0)
                 {
                     // Found a channel conflict in 'view'.
                     viewChannelConflictTable[view] = true;
@@ -1424,8 +1313,7 @@ namespace TwkFB
         // Initialize view's part named channel table if view has a conflict
         //
         map<string, Imf::ChannelList> viewPartNamedChannelListTable;
-        for (set<string>::const_iterator v = views.begin(); v != views.end();
-             ++v)
+        for (set<string>::const_iterator v = views.begin(); v != views.end(); ++v)
         {
             const string& view = *v;
             if (!viewChannelConflictTable[view])
@@ -1444,22 +1332,18 @@ namespace TwkFB
                 for (int p = 0; p < numOfParts; ++p)
                 {
                     const Imf::Header& header = file.header(p);
-                    const string& partView =
-                        (header.hasView() ? header.view() : viewLessPartName);
+                    const string& partView = (header.hasView() ? header.view() : viewLessPartName);
                     if (partView != view)
                         continue;
 
                     // Determine if there is a part name conflict if we do view
                     // stripping of part names.
-                    string partName =
-                        (file.header(p).hasName() ? file.header(p).name() : "");
+                    string partName = (file.header(p).hasName() ? file.header(p).name() : "");
                     if (!stripViewFromName(partName, view))
                     {
                         doViewStrip = false;
 #ifdef DEBUG_IOEXR
-                        LOG.log(
-                            "***View %s has conflicting view stripped parts",
-                            view.c_str());
+                        LOG.log("***View %s has conflicting view stripped parts", view.c_str());
 #endif
                         break;
                     }
@@ -1469,21 +1353,17 @@ namespace TwkFB
             for (int p = 0; p < numOfParts; ++p)
             {
                 const Imf::Header& header = file.header(p);
-                const string& partView =
-                    (header.hasView() ? header.view() : viewLessPartName);
+                const string& partView = (header.hasView() ? header.view() : viewLessPartName);
                 if (partView != view)
                     continue;
 
                 // Get part channelList.
                 const Imf::ChannelList& cl = header.channels();
-                for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                     ci != cl.end(); ++ci)
+                for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci)
                 {
-                    string partNamedChannel = viewStrippedPartQualifiedName(
-                        doViewStrip, file, p, view, ci.name());
+                    string partNamedChannel = viewStrippedPartQualifiedName(doViewStrip, file, p, view, ci.name());
 
-                    viewPartNamedChannelListTable[view].insert(partNamedChannel,
-                                                               ci.channel());
+                    viewPartNamedChannelListTable[view].insert(partNamedChannel, ci.channel());
                 }
             }
         }
@@ -1494,8 +1374,7 @@ namespace TwkFB
         //
         fbi.viewInfos.resize(views.size());
         int vindex = 0;
-        for (set<string>::const_iterator v = views.begin(); v != views.end();
-             ++v, ++vindex)
+        for (set<string>::const_iterator v = views.begin(); v != views.end(); ++v, ++vindex)
         {
             const string& view = *v;
             if (!view.empty())
@@ -1512,18 +1391,14 @@ namespace TwkFB
 #endif
 
             const Imf::ChannelList& vcl =
-                (viewChannelConflictTable[view]
-                     ? viewPartNamedChannelListTable[view]
-                     : viewChannelListTable[view]);
+                (viewChannelConflictTable[view] ? viewPartNamedChannelListTable[view] : viewChannelListTable[view]);
 
 #ifdef DEBUG_IOEXR
-            for (Imf::ChannelList::ConstIterator ci = vcl.begin();
-                 ci != vcl.end(); ++ci)
+            for (Imf::ChannelList::ConstIterator ci = vcl.begin(); ci != vcl.end(); ++ci)
             {
                 if (viewChannelConflictTable[view])
                 {
-                    LOG.log("***view=%s  partnamedchannel=%s", view.c_str(),
-                            ci.name());
+                    LOG.log("***view=%s  partnamedchannel=%s", view.c_str(), ci.name());
                 }
                 else
                 {
@@ -1535,8 +1410,7 @@ namespace TwkFB
             set<string> exrLayers;
             vcl.layers(exrLayers);
             exrLayers.insert(""); // Add a default layer
-            for (set<string>::const_iterator li = exrLayers.begin();
-                 li != exrLayers.end(); ++li)
+            for (set<string>::const_iterator li = exrLayers.begin(); li != exrLayers.end(); ++li)
             {
                 fbi.layers.push_back(*li);
 #ifdef DEBUG_IOEXR
@@ -1565,8 +1439,7 @@ namespace TwkFB
                         string baseName = baseChannelName(ci.name());
                         cl.insert(baseName.c_str(), ci.channel());
 #ifdef DEBUG_IOEXR
-                        LOG.log("***view=%s  layer=%s  channel=%s",
-                                view.c_str(), li->c_str(), baseName.c_str());
+                        LOG.log("***view=%s  layer=%s  channel=%s", view.c_str(), li->c_str(), baseName.c_str());
 #endif
                     }
                 }
@@ -1578,21 +1451,16 @@ namespace TwkFB
                     linfo.name = (*li);
                     vinfo.layers.push_back(linfo);
 #ifdef DEBUG_IOEXR
-                    LOG.log("***fbi.ViewInfo.LayerInfo.name = %s",
-                            vinfo.layers.back().name.c_str());
+                    LOG.log("***fbi.ViewInfo.LayerInfo.name = %s", vinfo.layers.back().name.c_str());
 #endif
                     vinfo.layers.back().channels.resize(channelListSize(cl));
                     int cindex = 0;
-                    for (Imf::ChannelList::ConstIterator ci = cl.begin();
-                         ci != cl.end(); ++ci, ++cindex)
+                    for (Imf::ChannelList::ConstIterator ci = cl.begin(); ci != cl.end(); ++ci, ++cindex)
                     {
-                        FBInfo::ChannelInfo& cinfo =
-                            vinfo.layers.back().channels[cindex];
+                        FBInfo::ChannelInfo& cinfo = vinfo.layers.back().channels[cindex];
                         setChannelInfo(ci, cinfo);
 #ifdef DEBUG_IOEXR
-                        LOG.log(
-                            "***fbi.ViewInfo.LayerInfo.ChannelInfo.name = %s",
-                            cinfo.name.c_str());
+                        LOG.log("***fbi.ViewInfo.LayerInfo.ChannelInfo.name = %s", cinfo.name.c_str());
 #endif
                     }
                 }
@@ -1606,16 +1474,13 @@ namespace TwkFB
         //
         {
             const Imf::Header& header = file.header(0);
-            if (const Imf::StringAttribute* sAttr =
-                    header.findTypedAttribute<Imf::StringAttribute>(
-                        "defaultView"))
+            if (const Imf::StringAttribute* sAttr = header.findTypedAttribute<Imf::StringAttribute>("defaultView"))
             {
                 fbi.defaultView = sAttr->value();
             }
             else
             {
-                fbi.defaultView =
-                    (header.hasView() ? header.view() : viewLessPartName);
+                fbi.defaultView = (header.hasView() ? header.view() : viewLessPartName);
             }
 #ifdef DEBUG_IOEXR
             LOG.log("***fbi.defaultView = %s", fbi.defaultView.c_str());
@@ -1625,8 +1490,7 @@ namespace TwkFB
         //
         //  Just float and half for EXR
         //
-        for (set<Imf::PixelType>::const_iterator it = exrPixelType.begin();
-             it != exrPixelType.end(); ++it)
+        for (set<Imf::PixelType>::const_iterator it = exrPixelType.begin(); it != exrPixelType.end(); ++it)
         {
             switch (*it)
             {
@@ -1661,8 +1525,7 @@ namespace TwkFB
 #endif
     }
 
-    void IOexr::writeImagesToMultiPartFile(const ConstFrameBufferVector& fbs,
-                                           const std::string& filename,
+    void IOexr::writeImagesToMultiPartFile(const ConstFrameBufferVector& fbs, const std::string& filename,
                                            const WriteRequest& request) const
     {
         const int numOfParts = fbs.size();
@@ -1676,8 +1539,7 @@ namespace TwkFB
         vector<string> userNames;
         vector<Imf::Attribute*> userAttrs;
 
-        bool acesFile = filename.size() > 5
-                        && filename.find(".aces") == filename.size() - 5;
+        bool acesFile = filename.size() > 5 && filename.find(".aces") == filename.size() - 5;
 
         bool usePrimaries = false;
         Imf::Chromaticities ch;
@@ -1706,8 +1568,7 @@ namespace TwkFB
             {
                 double pa = atof(value.c_str());
                 userNames.push_back("pixelAspectRatio");
-                userAttrs.push_back(
-                    new Imf::FloatAttribute(atof(value.c_str())));
+                userAttrs.push_back(new Imf::FloatAttribute(atof(value.c_str())));
             }
             else if (name == "output/ACES")
             {
@@ -1730,11 +1591,9 @@ namespace TwkFB
             else if (name == "output/gamma")
             {
                 userNames.push_back("transferFunction");
-                userAttrs.push_back(
-                    new Imf::StringAttribute(ColorSpace::Gamma()));
+                userAttrs.push_back(new Imf::StringAttribute(ColorSpace::Gamma()));
                 userNames.push_back("gamma");
-                userAttrs.push_back(
-                    new Imf::FloatAttribute(atof(value.c_str())));
+                userAttrs.push_back(new Imf::FloatAttribute(atof(value.c_str())));
             }
             else if (name == "output/chromaticities")
             {
@@ -1788,14 +1647,12 @@ namespace TwkFB
                 else if (t == "f")
                 {
                     userNames.push_back(m.subStr(0));
-                    userAttrs.push_back(
-                        new Imf::FloatAttribute(atof(value.c_str())));
+                    userAttrs.push_back(new Imf::FloatAttribute(atof(value.c_str())));
                 }
                 else if (t == "i")
                 {
                     userNames.push_back(m.subStr(0));
-                    userAttrs.push_back(
-                        new Imf::IntAttribute(atoi(value.c_str())));
+                    userAttrs.push_back(new Imf::IntAttribute(atoi(value.c_str())));
                 }
                 else if (t == "v2i")
                 {
@@ -2057,8 +1914,7 @@ namespace TwkFB
             //  the "common" format, then make the image packed.
             //
 
-            if (outfb->isPlanar()
-                && (!request.keepPlanar || request.preferCommonFormat))
+            if (outfb->isPlanar() && (!request.keepPlanar || request.preferCommonFormat))
             {
                 const FrameBuffer* fb = outfb;
                 outfb = mergePlanes(outfb);
@@ -2071,15 +1927,11 @@ namespace TwkFB
             //  "common" format is requested.
             //
 
-            if (request.preferCommonFormat && !acesFile
-                && (outfb->hasPrimaries() || outfb->isYUV()
-                    || outfb->isYRYBY()))
+            if (request.preferCommonFormat && !acesFile && (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY()))
             {
                 const FrameBuffer* fb = outfb;
 
-                cout << "INFO: IOexr: converting to REC 709 RGB because "
-                     << (outfb->hasPrimaries() ? " image has chromaticities "
-                                               : "")
+                cout << "INFO: IOexr: converting to REC 709 RGB because " << (outfb->hasPrimaries() ? " image has chromaticities " : "")
                      << (outfb->isYRYBY() ? " image is Y RY BY" : "") << endl;
 
                 outfb = convertToLinearRGB709(outfb);
@@ -2155,15 +2007,12 @@ namespace TwkFB
             compression = Imf::PIZ_COMPRESSION;
         else if (request.compression != "")
         {
-            cerr << "WARNING: IOexr: unknown compression type "
-                 << request.compression << ", using PIZ instead" << endl;
+            cerr << "WARNING: IOexr: unknown compression type " << request.compression << ", using PIZ instead" << endl;
         }
 
         if (acesFile)
         {
-            if (compression != Imf::PIZ_COMPRESSION
-                && compression != Imf::B44A_COMPRESSION
-                && compression != Imf::NO_COMPRESSION)
+            if (compression != Imf::PIZ_COMPRESSION && compression != Imf::B44A_COMPRESSION && compression != Imf::NO_COMPRESSION)
             {
                 if (compression == Imf::B44_COMPRESSION)
                 {
@@ -2174,8 +2023,7 @@ namespace TwkFB
                 }
                 else
                 {
-                    cerr << "WARNING: IOexr: using PIZ compression instead of "
-                         << request.compression << " for ACES output" << endl;
+                    cerr << "WARNING: IOexr: using PIZ compression instead of " << request.compression << " for ACES output" << endl;
                     compression = Imf::PIZ_COMPRESSION;
                 }
             }
@@ -2184,15 +2032,11 @@ namespace TwkFB
             {
                 Imf::ChromaticitiesAttribute* a = 0;
 
-                if (userNames[i] == "chromaticities"
-                    && (a = dynamic_cast<Imf::ChromaticitiesAttribute*>(
-                            userAttrs[i])))
+                if (userNames[i] == "chromaticities" && (a = dynamic_cast<Imf::ChromaticitiesAttribute*>(userAttrs[i])))
                 {
                     if (!isAces(a->value()))
                     {
-                        TWK_THROW_STREAM(
-                            Exception,
-                            "ERROR: EXR: chromaticities are not ACES");
+                        TWK_THROW_STREAM(Exception, "ERROR: EXR: chromaticities are not ACES");
                     }
                 }
             }
@@ -2285,9 +2129,7 @@ namespace TwkFB
         for (int p = 0; p < numOfParts; ++p)
         {
             const FrameBuffer* outfb = outfbs[p];
-            Imath::Box2i window(
-                Imath::V2i(0, 0),
-                Imath::V2i(outfb->width() - 1, outfb->height() - 1));
+            Imath::Box2i window(Imath::V2i(0, 0), Imath::V2i(outfb->width() - 1, outfb->height() - 1));
 
             Imath::Box2i displayWindow, dataWindow;
             displayWindow = window;
@@ -2357,16 +2199,14 @@ namespace TwkFB
 
                 string name = a->name().substr(cp + 3, string::npos);
 
-                if (name.find("IOexr/") == 0 || name.find("ColorSpace/") == 0
-                    || name == "")
+                if (name.find("IOexr/") == 0 || name.find("ColorSpace/") == 0 || name == "")
                 {
                     continue;
                 }
 
                 if (attrRE.matches(name))
                 {
-                    if (name == "View" || name == "Sequence" || name == "Eye"
-                        || name == "File" || name == "SourceFrame"
+                    if (name == "View" || name == "Sequence" || name == "Eye" || name == "File" || name == "SourceFrame"
                         || name == "AlphaType" || name == "RVSource")
                     {
                         continue;
@@ -2390,18 +2230,11 @@ namespace TwkFB
                     {
                         name = name.substr(partStr.str().size(), string::npos);
 
-                        if (name == "compression" || name == "dataWindow"
-                            || name == "displayWindow" || name == "lineOrder"
-                            || name == "name" || name == "view"
-                            || name == "type" || name == "screenWindowCenter"
-                            || name == "screenWindowWidth"
-                            || name == "pixelAspectRatio"
-                            || name == "ChannelsRead"
-                            || name == "ChannelNamesInFile"
-                            || name == "ChannelsInFile"
-                            || name == "ChannelSamplingInFile"
-                            || name == "PartNumbersInFile"
-                            || name == "PartNamesInFile" || name == "AlphaType")
+                        if (name == "compression" || name == "dataWindow" || name == "displayWindow" || name == "lineOrder"
+                            || name == "name" || name == "view" || name == "type" || name == "screenWindowCenter"
+                            || name == "screenWindowWidth" || name == "pixelAspectRatio" || name == "ChannelsRead"
+                            || name == "ChannelNamesInFile" || name == "ChannelsInFile" || name == "ChannelSamplingInFile"
+                            || name == "PartNumbersInFile" || name == "PartNamesInFile" || name == "AlphaType")
                         {
                             continue;
                         }
@@ -2425,12 +2258,10 @@ namespace TwkFB
                 }
             }
 
-            if ((compression == Imf::DWAA_COMPRESSION)
-                || (compression == Imf::DWAB_COMPRESSION))
+            if ((compression == Imf::DWAA_COMPRESSION) || (compression == Imf::DWAB_COMPRESSION))
             {
-                float dwaCompressionLevel =
-                    45.0f; // Default value in ImfDwaCompressor().
-                if (request.quality != 0.9f) // the rvio default
+                float dwaCompressionLevel = 45.0f; // Default value in ImfDwaCompressor().
+                if (request.quality != 0.9f)       // the rvio default
                 {
                     dwaCompressionLevel = request.quality;
                 }
@@ -2447,20 +2278,15 @@ namespace TwkFB
                     int ysamp = outfb->height() / fb->height();
                     string chname = prefix + fb->channelName(0);
 
-                    header.channels().insert(
-                        chname.c_str(),
-                        Imf::Channel(pixelTypes[p], xsamp, ysamp,
-                                     chname == "RY" || chname == "BY"));
+                    header.channels().insert(chname.c_str(), Imf::Channel(pixelTypes[p], xsamp, ysamp, chname == "RY" || chname == "BY"));
 
-                    output_frameBuffers[p].insert(
-                        chname.c_str(), // name
-                        Imf::Slice(
-                            pixelTypes[p],                            // type
-                            &fb->pixel<char>(0, fb->height() - 1, 0), // base
-                            fb->pixelSize(),                          // xStride
-                            -fb->scanlineSize(),                      // yStride
-                            xsamp,   // xSamples
-                            ysamp)); // ySamples
+                    output_frameBuffers[p].insert(chname.c_str(),                                      // name
+                                                  Imf::Slice(pixelTypes[p],                            // type
+                                                             &fb->pixel<char>(0, fb->height() - 1, 0), // base
+                                                             fb->pixelSize(),                          // xStride
+                                                             -fb->scanlineSize(),                      // yStride
+                                                             xsamp,                                    // xSamples
+                                                             ysamp));                                  // ySamples
                 }
             }
             else
@@ -2471,13 +2297,12 @@ namespace TwkFB
 
                     header.channels().insert(chname.c_str(), pixelTypes[p]);
 
-                    output_frameBuffers[p].insert(
-                        chname.c_str(),           // name
-                        Imf::Slice(pixelTypes[p], // type
-                                   &outfb->pixel<char>(0, outfb->height() - 1,
-                                                       c),   // base
-                                   outfb->pixelSize(),       // xStride
-                                   -outfb->scanlineSize())); // yStride
+                    output_frameBuffers[p].insert(chname.c_str(),           // name
+                                                  Imf::Slice(pixelTypes[p], // type
+                                                             &outfb->pixel<char>(0, outfb->height() - 1,
+                                                                                 c),   // base
+                                                             outfb->pixelSize(),       // xStride
+                                                             -outfb->scanlineSize())); // yStride
                 }
             }
 
@@ -2485,8 +2310,7 @@ namespace TwkFB
         }
 
         // Write the parts
-        Imf::MultiPartOutputFile outfile(filename.c_str(), &headers[0],
-                                         headers.size());
+        Imf::MultiPartOutputFile outfile(filename.c_str(), &headers[0], headers.size());
 
         for (int p = 0; p < numOfParts; ++p)
         {

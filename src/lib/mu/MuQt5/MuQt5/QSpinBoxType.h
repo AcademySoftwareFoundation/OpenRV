@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QSpinBoxType(Context* context, const char* name, Class* superClass = 0,
-                     Class* superClass2 = 0);
+        QSpinBoxType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QSpinBoxType();
 
@@ -95,150 +94,81 @@ namespace Mu
         virtual void wheelEvent(QWheelEvent* event);
 
     public:
-        QString textFromValue_pub(int value) const
-        {
-            return textFromValue(value);
-        }
+        QString textFromValue_pub(int value) const { return textFromValue(value); }
 
-        QString textFromValue_pub_parent(int value) const
-        {
-            return QSpinBox::textFromValue(value);
-        }
+        QString textFromValue_pub_parent(int value) const { return QSpinBox::textFromValue(value); }
 
-        int valueFromText_pub(const QString& text) const
-        {
-            return valueFromText(text);
-        }
+        int valueFromText_pub(const QString& text) const { return valueFromText(text); }
 
-        int valueFromText_pub_parent(const QString& text) const
-        {
-            return QSpinBox::valueFromText(text);
-        }
+        int valueFromText_pub_parent(const QString& text) const { return QSpinBox::valueFromText(text); }
 
         bool event_pub(QEvent* event_) { return event(event_); }
 
-        bool event_pub_parent(QEvent* event_)
-        {
-            return QSpinBox::event(event_);
-        }
+        bool event_pub_parent(QEvent* event_) { return QSpinBox::event(event_); }
 
         void changeEvent_pub(QEvent* event) { changeEvent(event); }
 
-        void changeEvent_pub_parent(QEvent* event)
-        {
-            QSpinBox::changeEvent(event);
-        }
+        void changeEvent_pub_parent(QEvent* event) { QSpinBox::changeEvent(event); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QSpinBox::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QSpinBox::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QSpinBox::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QSpinBox::contextMenuEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QSpinBox::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QSpinBox::focusInEvent(event); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QSpinBox::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QSpinBox::focusOutEvent(event); }
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QSpinBox::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QSpinBox::hideEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QSpinBox::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QSpinBox::keyPressEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QSpinBox::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QSpinBox::keyReleaseEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QSpinBox::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QSpinBox::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QSpinBox::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QSpinBox::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QSpinBox::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QSpinBox::mouseReleaseEvent(event); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QSpinBox::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QSpinBox::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* event) { resizeEvent(event); }
 
-        void resizeEvent_pub_parent(QResizeEvent* event)
-        {
-            QSpinBox::resizeEvent(event);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* event) { QSpinBox::resizeEvent(event); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QSpinBox::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QSpinBox::showEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QSpinBox::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QSpinBox::timerEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QSpinBox::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QSpinBox::wheelEvent(event); }
 
     public:
         const QSpinBoxType* _baseType;
@@ -246,11 +176,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QSpinBoxType::cachedInstance(const QSpinBoxType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QSpinBoxType::cachedInstance(const QSpinBoxType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

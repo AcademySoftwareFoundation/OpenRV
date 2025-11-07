@@ -23,10 +23,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorGrayScaleIPNode::ColorGrayScaleIPNode(const std::string& name,
-                                               const NodeDefinition* def,
-                                               IPGraph* graph,
-                                               GroupIPNode* group)
+    ColorGrayScaleIPNode::ColorGrayScaleIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);

@@ -29,9 +29,7 @@ namespace IPCore
     using namespace TwkAudio;
     using namespace std;
 
-    StackIPInstanceNode::StackIPInstanceNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* g, GroupIPNode* group)
+    StackIPInstanceNode::StackIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPInstanceNode(name, def, g, group)
         , m_offset(0)
         , m_fit(false)
@@ -41,13 +39,10 @@ namespace IPCore
         pthread_mutex_init(&m_lock, 0);
 
         m_useCutInfo = declareProperty<IntProperty>("timing.useCutInfo", 1);
-        m_alignStartFrames =
-            declareProperty<IntProperty>("timing.alignStartFrames", 0);
-        m_outOfRangePolicyProp =
-            declareProperty<StringProperty>("output.outOfRangePolicy", "hold");
+        m_alignStartFrames = declareProperty<IntProperty>("timing.alignStartFrames", 0);
+        m_outOfRangePolicyProp = declareProperty<StringProperty>("output.outOfRangePolicy", "hold");
         m_autoSize = declareProperty<IntProperty>("output.autoSize", 1);
-        m_activeAudioInput =
-            declareProperty<StringProperty>("output.activeAudioInput", ".all.");
+        m_activeAudioInput = declareProperty<StringProperty>("output.activeAudioInput", ".all.");
         m_outputFPS = declareProperty<FloatProperty>("output.fps", 0.0f);
 
         m_outputSize = createProperty<IntProperty>("output", "size");
@@ -60,10 +55,7 @@ namespace IPCore
         updateOutOfRangePolicy();
     }
 
-    StackIPInstanceNode::~StackIPInstanceNode()
-    {
-        pthread_mutex_destroy(&m_lock);
-    }
+    StackIPInstanceNode::~StackIPInstanceNode() { pthread_mutex_destroy(&m_lock); }
 
     void StackIPInstanceNode::updateOutOfRangePolicy()
     {
@@ -99,8 +91,7 @@ namespace IPCore
                 while (node->inputs().size())
                     node = node->inputs()[0];
 
-                if (const AdaptorIPNode* n =
-                        dynamic_cast<const AdaptorIPNode*>(node))
+                if (const AdaptorIPNode* n = dynamic_cast<const AdaptorIPNode*>(node))
                 {
                     node = n->groupInputNode();
                     if (node->name() == m_activeAudioInput->front())
@@ -130,8 +121,7 @@ namespace IPCore
     {
         if (!isDeleting())
         {
-            if (p == m_useCutInfo || p == m_alignStartFrames
-                || p == m_outOfRangePolicyProp || p == m_outputFPS)
+            if (p == m_useCutInfo || p == m_alignStartFrames || p == m_outOfRangePolicyProp || p == m_outputFPS)
             {
                 lock();
                 m_rangeInfoDirty = true;
@@ -180,24 +170,21 @@ namespace IPCore
         unlock();
     }
 
-    void StackIPInstanceNode::inputRangeChanged(int inputIndex,
-                                                PropagateTarget target)
+    void StackIPInstanceNode::inputRangeChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_rangeInfoDirty = true;
         unlock();
     }
 
-    void StackIPInstanceNode::inputImageStructureChanged(int inputIndex,
-                                                         PropagateTarget target)
+    void StackIPInstanceNode::inputImageStructureChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_structureInfoDirty = true;
         unlock();
     }
 
-    IPNode::ImageStructureInfo
-    StackIPInstanceNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo StackIPInstanceNode::imageStructureInfo(const Context& context) const
     {
         lazyUpdateRanges();
         return m_structureInfo;
@@ -224,8 +211,7 @@ namespace IPCore
         for (int i = 0; i < inputs().size(); i++)
         {
             m_rangeInfos[i] = inputs()[i]->imageRangeInfo();
-            m_structInfos[i] = inputs()[i]->imageStructureInfo(
-                graph()->contextForFrame(m_rangeInfos[i].start));
+            m_structInfos[i] = inputs()[i]->imageStructureInfo(graph()->contextForFrame(m_rangeInfos[i].start));
             const ImageStructureInfo& sinfo = m_structInfos[i];
 
             if (!i)
@@ -244,10 +230,8 @@ namespace IPCore
             }
             else
             {
-                m_structureInfo.width =
-                    max(m_structureInfo.width, int(sinfo.width));
-                m_structureInfo.height =
-                    max(m_structureInfo.height, int(sinfo.height));
+                m_structureInfo.width = max(m_structureInfo.width, int(sinfo.width));
+                m_structureInfo.height = max(m_structureInfo.height, int(sinfo.height));
 
                 int duration = 0;
 
@@ -255,8 +239,7 @@ namespace IPCore
                 {
                     m_info.start = min(m_info.start, m_rangeInfos[i].cutIn);
                     m_info.end = max(m_info.end, m_rangeInfos[i].cutOut);
-                    duration =
-                        m_rangeInfos[i].cutOut - m_rangeInfos[i].cutIn + 1;
+                    duration = m_rangeInfos[i].cutOut - m_rangeInfos[i].cutIn + 1;
                 }
                 else
                 {
@@ -319,8 +302,7 @@ namespace IPCore
         m_structureInfoDirty = false;
     }
 
-    int StackIPInstanceNode::inputFrame(size_t index, int frame,
-                                        bool unconstrained)
+    int StackIPInstanceNode::inputFrame(size_t index, int frame, bool unconstrained)
     {
         const ImageRangeInfo& info = m_rangeInfos[index];
         const bool useCutInfo = m_useCutInfo->front();
@@ -398,8 +380,7 @@ namespace IPCore
         bool useCutInfo = m_useCutInfo->front();
 
         IPImage* root =
-            new IPImage(this, IPImage::MergeRenderType, width, height, 1.0,
-                        IPImage::IntermediateBuffer, IPImage::FloatDataType);
+            new IPImage(this, IPImage::MergeRenderType, width, height, 1.0, IPImage::IntermediateBuffer, IPImage::FloatDataType);
 
         if (ninputs == 0)
             return root;
@@ -423,12 +404,9 @@ namespace IPCore
                 const ImageRangeInfo& info = m_rangeInfos[i];
 
                 const bool outOfRange =
-                    useCutInfo ? (inFrame < info.cutIn || inFrame > info.cutOut)
-                               : (inFrame < info.start || inFrame > info.end);
+                    useCutInfo ? (inFrame < info.cutIn || inFrame > info.cutOut) : (inFrame < info.start || inFrame > info.end);
 
-                if (outOfRange
-                    && (m_outOfRangePolicy == NoImageOutOfRange
-                        || m_outOfRangePolicy == BlackOutOfRange))
+                if (outOfRange && (m_outOfRangePolicy == NoImageOutOfRange || m_outOfRangePolicy == BlackOutOfRange))
                 {
                     const ImageStructureInfo& sinfo = m_structInfos[i];
 
@@ -445,13 +423,11 @@ namespace IPCore
 
                     if (m_outOfRangePolicy == NoImageOutOfRange)
                     {
-                        current = IPImage::newBlankImage(this, sinfo.width,
-                                                         sinfo.height);
+                        current = IPImage::newBlankImage(this, sinfo.width, sinfo.height);
                     }
                     else
                     {
-                        current = IPImage::newBlackImage(this, sinfo.width,
-                                                         sinfo.height);
+                        current = IPImage::newBlackImage(this, sinfo.width, sinfo.height);
                     }
                 }
                 else
@@ -467,10 +443,7 @@ namespace IPCore
                 {
                     // continue;
                     IPNode* node = nodes[i];
-                    TWK_THROW_STREAM(
-                        EvaluationFailedExc,
-                        "MergeIPInstanceNode evaluation failed on node "
-                            << node->name());
+                    TWK_THROW_STREAM(EvaluationFailedExc, "MergeIPInstanceNode evaluation failed on node " << node->name());
                 }
 
                 if (m_fit)
@@ -506,9 +479,7 @@ namespace IPCore
         //  necessary.
         //
 
-        balanceResourceUsage(F->isFilter() ? IPNode::filterAccumulate
-                                           : IPNode::accumulate,
-                             images, modifiedImages, 8, 8, 81);
+        balanceResourceUsage(F->isFilter() ? IPNode::filterAccumulate : IPNode::accumulate, images, modifiedImages, 8, 8, 81);
 
         //
         //  This function will prepare the root IPImage node and images
@@ -517,16 +488,14 @@ namespace IPCore
         //  touched.
         //
 
-        assembleMergeExpressions(root, images, modifiedImages, F->isFilter(),
-                                 inExpressions);
+        assembleMergeExpressions(root, images, modifiedImages, F->isFilter(), inExpressions);
 
         //
         //  Bind final merge expression and add children
         //
 
         root->appendChildren(images);
-        root->mergeExpr =
-            bind(root, inExpressions, context); // IPInstanceNode::bind
+        root->mergeExpr = bind(root, inExpressions, context); // IPInstanceNode::bind
         root->shaderExpr = Shader::newSourceRGBA(root);
 
         //
@@ -594,9 +563,7 @@ namespace IPCore
                     // continue;
                     IPNode* node = nodes[i];
                     TWK_THROW_STREAM(EvaluationFailedExc,
-                                     "NULL imgid in StackIPInstanceNode "
-                                         << name() << " failed on input "
-                                         << node->name());
+                                     "NULL imgid in StackIPInstanceNode " << name() << " failed on input " << node->name());
                 }
 
                 if (i)
@@ -622,8 +589,7 @@ namespace IPCore
         return root;
     }
 
-    void StackIPInstanceNode::testEvaluate(const Context& context,
-                                           TestEvaluationResult& result)
+    void StackIPInstanceNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         lazyUpdateRanges();
         IPNodes ins = inputs();
@@ -642,8 +608,7 @@ namespace IPCore
         }
     }
 
-    void StackIPInstanceNode::metaEvaluate(const Context& context,
-                                           MetaEvalVisitor& visitor)
+    void StackIPInstanceNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         lazyUpdateRanges();
         visitor.enter(context, this);
@@ -693,9 +658,7 @@ namespace IPCore
 
         size_t rval = 0;
 
-        AudioBuffer audioBuffer(
-            context.buffer.size(), context.buffer.channels(),
-            context.buffer.rate(), context.buffer.startTime());
+        AudioBuffer audioBuffer(context.buffer.size(), context.buffer.channels(), context.buffer.rate(), context.buffer.startTime());
 
         for (size_t i = 0; i < inputs().size(); i++)
         {
@@ -707,11 +670,9 @@ namespace IPCore
             if (m_activeAudioInputIndex >= 0 && m_activeAudioInputIndex != i)
                 continue;
 
-            const long foffset = inputFrame(i, m_info.start - m_offset, true)
-                                 - m_rangeInfos[i].start;
+            const long foffset = inputFrame(i, m_info.start - m_offset, true) - m_rangeInfos[i].start;
             const Time soffset = double(foffset) / context.fps;
-            Time contextStart = samplesToTime(context.buffer.startSample(),
-                                              context.buffer.rate());
+            Time contextStart = samplesToTime(context.buffer.startSample(), context.buffer.rate());
 
             AudioContext subContext(audioBuffer, context.fps);
             subContext.buffer.setStartTime(soffset + contextStart);
@@ -719,10 +680,8 @@ namespace IPCore
 
             rval = max(inputs()[i]->audioFillBuffer(subContext), rval);
 
-            transform(context.buffer.pointer(),
-                      context.buffer.pointer() + context.buffer.sizeInFloats(),
-                      subContext.buffer.pointer(), context.buffer.pointer(),
-                      plus<float>());
+            transform(context.buffer.pointer(), context.buffer.pointer() + context.buffer.sizeInFloats(), subContext.buffer.pointer(),
+                      context.buffer.pointer(), plus<float>());
 
             //
             //  If this was the .first. input to have audio then we are done.
@@ -743,17 +702,13 @@ namespace IPCore
         return rval;
     }
 
-    void StackIPInstanceNode::mapInputToEvalFrames(size_t inputIndex,
-                                                   const FrameVector& inframes,
-                                                   FrameVector& outframes) const
+    void StackIPInstanceNode::mapInputToEvalFrames(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         lazyUpdateRanges();
         mapInputToEvalFramesInternal(inputIndex, inframes, outframes);
     }
 
-    void StackIPInstanceNode::mapInputToEvalFramesInternal(
-        size_t inputIndex, const FrameVector& inframes,
-        FrameVector& outframes) const
+    void StackIPInstanceNode::mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         const ImageRangeInfo& info = m_rangeInfos[inputIndex];
         const bool useCutInfo = m_useCutInfo->front();
@@ -764,8 +719,7 @@ namespace IPCore
             for (size_t i = 0; i < inframes.size(); i++)
             {
                 int start = (useCutInfo) ? info.cutIn : info.start;
-                outframes.push_back((inframes[i] - start + m_info.start)
-                                    - m_offset);
+                outframes.push_back((inframes[i] - start + m_info.start) - m_offset);
             }
         }
         else
@@ -790,8 +744,7 @@ namespace IPCore
         IPInstanceNode::readCompleted(t, v);
     }
 
-    void
-    StackIPInstanceNode::propagateFlushToInputs(const FlushContext& context)
+    void StackIPInstanceNode::propagateFlushToInputs(const FlushContext& context)
     {
         Context c = context;
 

@@ -11,9 +11,7 @@
 
 // RV third party optional customization
 #if defined(RV_VIEW_GROUP_THIRD_PARTY_CUSTOMIZATION)
-extern IPCore::IPImage*
-rvViewGroupThirdPartyCustomization(IPCore::IPNode* node,
-                                   const IPCore::IPNode::Context& context);
+extern IPCore::IPImage* rvViewGroupThirdPartyCustomization(IPCore::IPNode* node, const IPCore::IPNode::Context& context);
 #endif
 
 namespace Rv

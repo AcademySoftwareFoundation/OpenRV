@@ -114,8 +114,7 @@ namespace LUT
         }
     }
 
-    static Pixel3f AccessLUTitem(vector<float>& data, vector<int>& sizes, int x,
-                                 int y, int z)
+    static Pixel3f AccessLUTitem(vector<float>& data, vector<int>& sizes, int x, int y, int z)
     {
         size_t place = 0;
 
@@ -134,8 +133,7 @@ namespace LUT
         return rgb;
     }
 
-    void ApplyLUTtoPixel(vector<float>& data, vector<int>& sizes, float& r,
-                         float& g, float& b)
+    void ApplyLUTtoPixel(vector<float>& data, vector<int>& sizes, float& r, float& g, float& b)
     {
         if (sizes.size() == 3)
         {
@@ -149,8 +147,7 @@ namespace LUT
             const size_t yl = ys - 1;
             const size_t zl = zs - 1;
 
-            Vec3f ip = Vec3f(clamp(p[0], 0.0f, 1.0f), clamp(p[1], 0.0f, 1.0f),
-                             clamp(p[2], 0.0f, 1.0f));
+            Vec3f ip = Vec3f(clamp(p[0], 0.0f, 1.0f), clamp(p[1], 0.0f, 1.0f), clamp(p[2], 0.0f, 1.0f));
 
             Vec3f vn = ip * Vec3f(xl, yl, zl);
 

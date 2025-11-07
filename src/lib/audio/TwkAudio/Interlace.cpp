@@ -15,8 +15,7 @@ namespace TwkAudio
 {
     using namespace std;
 
-    void deinterlace(const float* inbuffer, size_t inSamples, int nchannels,
-                     vector<SampleVector>& outbuffers)
+    void deinterlace(const float* inbuffer, size_t inSamples, int nchannels, vector<SampleVector>& outbuffers)
     {
         outbuffers.resize(nchannels);
 
@@ -43,8 +42,7 @@ namespace TwkAudio
         }
     }
 
-    void deinterlace(const SampleVector& inbuffer, int nchannels,
-                     vector<SampleVector>& outbuffers)
+    void deinterlace(const SampleVector& inbuffer, int nchannels, vector<SampleVector>& outbuffers)
     {
         outbuffers.resize(nchannels);
 
@@ -71,8 +69,7 @@ namespace TwkAudio
         }
     }
 
-    void interlace(const vector<SampleVector>& inbuffers,
-                   SampleVector& outbuffer)
+    void interlace(const vector<SampleVector>& inbuffers, SampleVector& outbuffer)
     {
         const unsigned int nc = inbuffers.size();
         outbuffer.resize(inbuffers.front().size() * inbuffers.size());
@@ -83,8 +80,7 @@ namespace TwkAudio
 
         if (inbuffers.size() == 1)
         {
-            memcpy(&outbuffer.front(), &inbuffers[0].front(),
-                   inbuffers[0].size() * sizeof(float));
+            memcpy(&outbuffer.front(), &inbuffers[0].front(), inbuffers[0].size() * sizeof(float));
         }
         else if (inbuffers.size() == 2)
         {
@@ -111,8 +107,7 @@ namespace TwkAudio
         }
     }
 
-    void interlace(const vector<SampleVector>& inbuffers, float* outbuffer,
-                   size_t start, size_t num)
+    void interlace(const vector<SampleVector>& inbuffers, float* outbuffer, size_t start, size_t num)
     {
         const unsigned int nc = inbuffers.size();
         const size_t n = num > 0 ? num : inbuffers.front().size();

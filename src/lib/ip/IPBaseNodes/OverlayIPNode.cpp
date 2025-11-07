@@ -11,8 +11,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    OverlayIPNode::OverlayIPNode(const string& name, const NodeDefinition* def,
-                                 IPGraph* g, GroupIPNode* group)
+    OverlayIPNode::OverlayIPNode(const string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_hasSideMattes(false)
         , m_matteRatio(0)
@@ -39,14 +38,10 @@ namespace IPCore
         const IntProperty* eyeP = c->property<IntProperty>("eye");
         const IntProperty* actP = c->property<IntProperty>("active");
 
-        const float height =
-            heightP && heightP->size() ? heightP->front() : 1.0f;
+        const float height = heightP && heightP->size() ? heightP->front() : 1.0f;
         const float width = widthP && widthP->size() ? widthP->front() : 1.0f;
-        const Vec4f color = colorP && colorP->size()
-                                ? colorP->front()
-                                : Vec4f(0.0, 0.0, 0.0, 1.0);
-        const Vec2f pos =
-            posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
+        const Vec4f color = colorP && colorP->size() ? colorP->front() : Vec4f(0.0, 0.0, 0.0, 1.0);
+        const Vec2f pos = posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
         const int eye = eyeP && eyeP->size() ? eyeP->front() : 2;
         const bool active = actP && actP->size() ? (actP->front() != 0) : true;
 
@@ -80,15 +75,10 @@ namespace IPCore
         const float scale = scaleP && scaleP->size() ? scaleP->front() : 1.0f;
         const float rot = rotP && rotP->size() ? rotP->front() : 0.0f;
         const float space = spaceP && spaceP->size() ? spaceP->front() : 1.0f;
-        const Vec4f color = colorP && colorP->size()
-                                ? colorP->front()
-                                : Vec4f(1.0, 1.0, 1.0, 1.0);
-        const Vec2f pos =
-            posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
-        const string font =
-            fontP && fontP->size() ? fontP->front() : string("");
-        const string origin =
-            originP && originP->size() ? originP->front() : string("");
+        const Vec4f color = colorP && colorP->size() ? colorP->front() : Vec4f(1.0, 1.0, 1.0, 1.0);
+        const Vec2f pos = posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
+        const string font = fontP && fontP->size() ? fontP->front() : string("");
+        const string origin = originP && originP->size() ? originP->front() : string("");
         const int debug = debugP && debugP->size() ? debugP->front() : 0;
         const int eye = eyeP && eyeP->size() ? eyeP->front() : 2;
         const int ff = ffP && ffP->size() ? ffP->front() : 1;
@@ -144,9 +134,8 @@ namespace IPCore
     namespace
     {
 
-        void initializeOutline(Paint::PolyLine& outline, const Vec2f* points,
-                               size_t npoints, TwkPaint::Color oc,
-                               float outlineWidth, const string& brush)
+        void initializeOutline(Paint::PolyLine& outline, const Vec2f* points, size_t npoints, TwkPaint::Color oc, float outlineWidth,
+                               const string& brush)
         {
             // these polyline owns the memory of their own points
             outline.points.assign(points->begin(), points->end());
@@ -158,14 +147,10 @@ namespace IPCore
             outline.brush = brush;
         }
 
-        void assembleFrameCommands(
-            OverlayIPNode::LocalWindow::FrameCommands& fc, int index, float ia,
-            const Vec2f& ps, const Vec4f& oc, const Vec4f& wc,
-            const FloatProperty* ULxP, const FloatProperty* ULyP,
-            const FloatProperty* URxP, const FloatProperty* URyP,
-            const FloatProperty* LLxP, const FloatProperty* LLyP,
-            const FloatProperty* LRxP, const FloatProperty* LRyP,
-            bool antialias, const string& brush)
+        void assembleFrameCommands(OverlayIPNode::LocalWindow::FrameCommands& fc, int index, float ia, const Vec2f& ps, const Vec4f& oc,
+                                   const Vec4f& wc, const FloatProperty* ULxP, const FloatProperty* ULyP, const FloatProperty* URxP,
+                                   const FloatProperty* URyP, const FloatProperty* LLxP, const FloatProperty* LLyP,
+                                   const FloatProperty* LRxP, const FloatProperty* LRyP, bool antialias, const string& brush)
         {
 
             fc.antialiased = antialias;
@@ -174,21 +159,13 @@ namespace IPCore
             //  Outline paint command.
             //
 
-            Vec2f UL =
-                Vec2f(index < ULxP->size() ? (*ULxP)[index] : ULxP->front(),
-                      index < ULyP->size() ? (*ULyP)[index] : ULyP->front());
+            Vec2f UL = Vec2f(index < ULxP->size() ? (*ULxP)[index] : ULxP->front(), index < ULyP->size() ? (*ULyP)[index] : ULyP->front());
 
-            Vec2f UR =
-                Vec2f(index < URxP->size() ? (*URxP)[index] : URxP->front(),
-                      index < URyP->size() ? (*URyP)[index] : URyP->front());
+            Vec2f UR = Vec2f(index < URxP->size() ? (*URxP)[index] : URxP->front(), index < URyP->size() ? (*URyP)[index] : URyP->front());
 
-            Vec2f LL =
-                Vec2f(index < LLxP->size() ? (*LLxP)[index] : LLxP->front(),
-                      index < LLyP->size() ? (*LLyP)[index] : LLyP->front());
+            Vec2f LL = Vec2f(index < LLxP->size() ? (*LLxP)[index] : LLxP->front(), index < LLyP->size() ? (*LLyP)[index] : LLyP->front());
 
-            Vec2f LR =
-                Vec2f(index < LRxP->size() ? (*LRxP)[index] : LRxP->front(),
-                      index < LRyP->size() ? (*LRyP)[index] : LRyP->front());
+            Vec2f LR = Vec2f(index < LRxP->size() ? (*LRxP)[index] : LRxP->front(), index < LRyP->size() ? (*LRyP)[index] : LRyP->front());
 
             Vec2f ULorig = UL;
             Vec2f URorig = UR;
@@ -236,32 +213,24 @@ namespace IPCore
                 Vec2f right[2] = {UR, LR};
                 Vec2f bottom[2] = {LL, LR};
 
-                initializeOutline(fc.outline[0], top, 2, oc, outlineWidth,
-                                  brush);
+                initializeOutline(fc.outline[0], top, 2, oc, outlineWidth, brush);
 
-                initializeOutline(fc.outline[1], left, 2, oc, outlineWidth,
-                                  brush);
+                initializeOutline(fc.outline[1], left, 2, oc, outlineWidth, brush);
 
-                initializeOutline(fc.outline[2], right, 2, oc, outlineWidth,
-                                  brush);
+                initializeOutline(fc.outline[2], right, 2, oc, outlineWidth, brush);
 
-                initializeOutline(fc.outline[3], bottom, 2, oc, outlineWidth,
-                                  brush);
+                initializeOutline(fc.outline[3], bottom, 2, oc, outlineWidth, brush);
 
                 // this is the solid matt outline
                 fc.quadsOutline.resize(4);
 
-                initializeOutline(fc.quadsOutline[0], top, 2, wc, outlineWidth,
-                                  brush);
+                initializeOutline(fc.quadsOutline[0], top, 2, wc, outlineWidth, brush);
 
-                initializeOutline(fc.quadsOutline[1], left, 2, wc, outlineWidth,
-                                  brush);
+                initializeOutline(fc.quadsOutline[1], left, 2, wc, outlineWidth, brush);
 
-                initializeOutline(fc.quadsOutline[2], right, 2, wc,
-                                  outlineWidth, brush);
+                initializeOutline(fc.quadsOutline[2], right, 2, wc, outlineWidth, brush);
 
-                initializeOutline(fc.quadsOutline[3], bottom, 2, wc,
-                                  outlineWidth, brush);
+                initializeOutline(fc.quadsOutline[3], bottom, 2, wc, outlineWidth, brush);
             }
 
             //
@@ -343,44 +312,28 @@ namespace IPCore
         LocalWindow& w = m_windows[c];
 
         const IntProperty* eyeP = c->property<IntProperty>("eye");
-        const IntProperty* windowActiveP =
-            c->property<IntProperty>("windowActive");
-        const IntProperty* outlineActiveP =
-            c->property<IntProperty>("outlineActive");
-        const FloatProperty* outlineWidthP =
-            c->property<FloatProperty>("outlineWidth");
-        const Vec4fProperty* outlineColorP =
-            c->property<Vec4fProperty>("outlineColor");
-        const StringProperty* outlineBrushP =
-            c->property<StringProperty>("outlineBrush");
-        const Vec4fProperty* windowColorP =
-            c->property<Vec4fProperty>("windowColor");
-        const FloatProperty* imageAspectP =
-            c->property<FloatProperty>("imageAspect");
-        const Vec2fProperty* pixelScaleP =
-            c->property<Vec2fProperty>("pixelScale");
+        const IntProperty* windowActiveP = c->property<IntProperty>("windowActive");
+        const IntProperty* outlineActiveP = c->property<IntProperty>("outlineActive");
+        const FloatProperty* outlineWidthP = c->property<FloatProperty>("outlineWidth");
+        const Vec4fProperty* outlineColorP = c->property<Vec4fProperty>("outlineColor");
+        const StringProperty* outlineBrushP = c->property<StringProperty>("outlineBrush");
+        const Vec4fProperty* windowColorP = c->property<Vec4fProperty>("windowColor");
+        const FloatProperty* imageAspectP = c->property<FloatProperty>("imageAspect");
+        const Vec2fProperty* pixelScaleP = c->property<Vec2fProperty>("pixelScale");
 
         const IntProperty* firstFrameP = c->property<IntProperty>("firstFrame");
 
-        const FloatProperty* windowULxP =
-            c->property<FloatProperty>("windowULx");
-        const FloatProperty* windowULyP =
-            c->property<FloatProperty>("windowULy");
+        const FloatProperty* windowULxP = c->property<FloatProperty>("windowULx");
+        const FloatProperty* windowULyP = c->property<FloatProperty>("windowULy");
 
-        const FloatProperty* windowURxP =
-            c->property<FloatProperty>("windowURx");
-        const FloatProperty* windowURyP =
-            c->property<FloatProperty>("windowURy");
+        const FloatProperty* windowURxP = c->property<FloatProperty>("windowURx");
+        const FloatProperty* windowURyP = c->property<FloatProperty>("windowURy");
 
-        const FloatProperty* windowLLxP =
-            c->property<FloatProperty>("windowLLx");
-        const FloatProperty* windowLLyP =
-            c->property<FloatProperty>("windowLLy");
+        const FloatProperty* windowLLxP = c->property<FloatProperty>("windowLLx");
+        const FloatProperty* windowLLyP = c->property<FloatProperty>("windowLLy");
 
-        const FloatProperty* windowLRxP =
-            c->property<FloatProperty>("windowLRx");
-        const FloatProperty* windowLRyP =
-            c->property<FloatProperty>("windowLRy");
+        const FloatProperty* windowLRxP = c->property<FloatProperty>("windowLRx");
+        const FloatProperty* windowLRyP = c->property<FloatProperty>("windowLRy");
 
         const IntProperty* antialias = c->property<IntProperty>("antialias");
 
@@ -391,8 +344,7 @@ namespace IPCore
 
         w.windowActive = w.outlineActive = false;
 
-        if (!windowULxP || !windowULyP || !windowURxP || !windowURyP
-            || !windowLLxP || !windowLLyP || !windowLRxP || !windowLRyP)
+        if (!windowULxP || !windowULyP || !windowURxP || !windowURyP || !windowLLxP || !windowLLyP || !windowLRxP || !windowLRyP)
         {
             return;
         }
@@ -401,19 +353,13 @@ namespace IPCore
                           min(windowULyP->size(),
                               min(windowURxP->size(),
                                   min(windowURyP->size(),
-                                      min(windowLLxP->size(),
-                                          min(windowLLyP->size(),
-                                              min(windowLRxP->size(),
-                                                  windowLRyP->size())))))));
+                                      min(windowLLxP->size(), min(windowLLyP->size(), min(windowLRxP->size(), windowLRyP->size())))))));
 
         int maxSize = max(windowULxP->size(),
                           max(windowULyP->size(),
                               max(windowURxP->size(),
                                   max(windowURyP->size(),
-                                      max(windowLLxP->size(),
-                                          max(windowLLyP->size(),
-                                              max(windowLRxP->size(),
-                                                  windowLRyP->size())))))));
+                                      max(windowLLxP->size(), max(windowLLyP->size(), max(windowLRxP->size(), windowLRyP->size())))))));
 
         if (minSize < 1)
             return;
@@ -421,11 +367,8 @@ namespace IPCore
         if (maxSize > 1 && (!firstFrameP || firstFrameP->size() < 1))
             return;
 
-        float ia = (imageAspectP && imageAspectP->size())
-                       ? imageAspectP->front()
-                       : 0.0;
-        Vec2f ps = (pixelScaleP && pixelScaleP->size()) ? pixelScaleP->front()
-                                                        : Vec2f(0.0, 0.0);
+        float ia = (imageAspectP && imageAspectP->size()) ? imageAspectP->front() : 0.0;
+        Vec2f ps = (pixelScaleP && pixelScaleP->size()) ? pixelScaleP->front() : Vec2f(0.0, 0.0);
 
         if (ia == 0.0 && ps == Vec2f(0.0, 0.0))
             return;
@@ -434,28 +377,15 @@ namespace IPCore
         //  These have sensible defaults
         //
 
-        w.windowActive = (windowActiveP && windowActiveP->size())
-                             ? (windowActiveP->front() != 0)
-                             : false;
-        w.outlineActive = (outlineActiveP && outlineActiveP->size())
-                              ? (outlineActiveP->front() != 0)
-                              : false;
-        w.outlineWidth = (outlineWidthP && outlineWidthP->size())
-                             ? outlineWidthP->front()
-                             : 3.0;
-        w.outlineBrush = (outlineBrushP && outlineBrushP->size())
-                             ? outlineBrushP->front()
-                             : "gauss";
-        w.firstFrame =
-            (firstFrameP && firstFrameP->size()) ? firstFrameP->front() : 1;
+        w.windowActive = (windowActiveP && windowActiveP->size()) ? (windowActiveP->front() != 0) : false;
+        w.outlineActive = (outlineActiveP && outlineActiveP->size()) ? (outlineActiveP->front() != 0) : false;
+        w.outlineWidth = (outlineWidthP && outlineWidthP->size()) ? outlineWidthP->front() : 3.0;
+        w.outlineBrush = (outlineBrushP && outlineBrushP->size()) ? outlineBrushP->front() : "gauss";
+        w.firstFrame = (firstFrameP && firstFrameP->size()) ? firstFrameP->front() : 1;
         w.eye = (eyeP && eyeP->size()) ? eyeP->front() : 2;
 
-        const Vec4f wc = (windowColorP && windowColorP->size())
-                             ? windowColorP->front()
-                             : Vec4f(0.0, 0.0, 0.0, 1.0);
-        const Vec4f oc = (outlineColorP && outlineColorP->size())
-                             ? outlineColorP->front()
-                             : Vec4f(0.4, 0.4, 1.0, 1.0);
+        const Vec4f wc = (windowColorP && windowColorP->size()) ? windowColorP->front() : Vec4f(0.0, 0.0, 0.0, 1.0);
+        const Vec4f oc = (outlineColorP && outlineColorP->size()) ? outlineColorP->front() : Vec4f(0.4, 0.4, 1.0, 1.0);
 
         w.scalingWidth = (ia == 0.0) ? ps.x : 0.0;
 
@@ -474,21 +404,17 @@ namespace IPCore
 
         w.frameCommands.resize(maxSize);
 
-        bool doAntialias =
-            (antialias && antialias->size()) ? antialias->front() : false;
+        bool doAntialias = (antialias && antialias->size()) ? antialias->front() : false;
         for (int i = 0; i < w.frameCommands.size(); ++i)
         {
             LocalWindow::FrameCommands& fc = w.frameCommands[i];
 
-            assembleFrameCommands(fc, i, ia, ps, oc, wc, windowULxP, windowULyP,
-                                  windowURxP, windowURyP, windowLLxP,
-                                  windowLLyP, windowLRxP, windowLRyP,
-                                  doAntialias, w.outlineBrush);
+            assembleFrameCommands(fc, i, ia, ps, oc, wc, windowULxP, windowULyP, windowURxP, windowURyP, windowLLxP, windowLLyP, windowLRxP,
+                                  windowLRyP, doAntialias, w.outlineBrush);
         }
     }
 
-    OverlayIPNode::LocalWindow::FrameCommands&
-    OverlayIPNode::LocalWindow::commandsForFrame(int frame)
+    OverlayIPNode::LocalWindow::FrameCommands& OverlayIPNode::LocalWindow::commandsForFrame(int frame)
     {
         int index = frame - firstFrame;
         index = min(max(0, index), int(frameCommands.size() - 1));
@@ -518,8 +444,7 @@ namespace IPCore
         IPNode::propertyChanged(p);
     }
 
-    void OverlayIPNode::readCompleted(const string& typeName,
-                                      unsigned int version)
+    void OverlayIPNode::readCompleted(const string& typeName, unsigned int version)
     {
         Components& comps = components();
 
@@ -607,8 +532,7 @@ namespace IPCore
 
                         if (t.active && (t.eye == 2 || (t.eye == context.eye)))
                         {
-                            head->commands.push_back(
-                                &t.commandForFrame(context.frame));
+                            head->commands.push_back(&t.commandForFrame(context.frame));
                         }
                     }
                 }
@@ -624,8 +548,7 @@ namespace IPCore
 
                         if (w.eye == 2 || (w.eye == context.eye))
                         {
-                            LocalWindow::FrameCommands& fc =
-                                w.commandsForFrame(context.frame);
+                            LocalWindow::FrameCommands& fc = w.commandsForFrame(context.frame);
 
                             if (w.windowActive)
                             {
@@ -635,24 +558,17 @@ namespace IPCore
                                 }
                                 if (fc.antialiased)
                                 {
-                                    float s = (w.scalingWidth != 0.0)
-                                                  ? 1.0 / w.scalingWidth
-                                                  : 1.0 / head->width;
+                                    float s = (w.scalingWidth != 0.0) ? 1.0 / w.scalingWidth : 1.0 / head->width;
 
-                                    for (int i = 0; i < fc.quadsOutline.size();
-                                         ++i)
+                                    for (int i = 0; i < fc.quadsOutline.size(); ++i)
                                     {
-                                        float oldWidth =
-                                            fc.quadsOutline[i].width;
-                                        fc.quadsOutline[i].width =
-                                            s * w.outlineWidth;
+                                        float oldWidth = fc.quadsOutline[i].width;
+                                        fc.quadsOutline[i].width = s * w.outlineWidth;
 
-                                        if (fc.quadsOutline[i].width
-                                            != oldWidth)
+                                        if (fc.quadsOutline[i].width != oldWidth)
                                             fc.quadsOutline[i].built = false;
 
-                                        head->commands.push_back(
-                                            &fc.quadsOutline[i]);
+                                        head->commands.push_back(&fc.quadsOutline[i]);
                                     }
                                 }
                             }
@@ -661,21 +577,17 @@ namespace IPCore
                             {
                                 if (fc.antialiased)
                                 {
-                                    float s = (w.scalingWidth != 0.0)
-                                                  ? 1.0 / w.scalingWidth
-                                                  : 1.0 / head->width;
+                                    float s = (w.scalingWidth != 0.0) ? 1.0 / w.scalingWidth : 1.0 / head->width;
 
                                     for (int i = 0; i < fc.outline.size(); ++i)
                                     {
                                         float oldWidth = fc.outline[i].width;
-                                        fc.outline[i].width =
-                                            s * w.outlineWidth;
+                                        fc.outline[i].width = s * w.outlineWidth;
 
                                         if (fc.outline[i].width != oldWidth)
                                             fc.outline[i].built = false;
 
-                                        head->commands.push_back(
-                                            &fc.outline[i]);
+                                        head->commands.push_back(&fc.outline[i]);
                                     }
                                 }
                                 else
@@ -706,8 +618,7 @@ namespace IPCore
         //
 
         IPNode* sessionNode = graph()->sessionNode();
-        bool drawMatte =
-            sessionNode->property<IntProperty>("matte", "show")->front();
+        bool drawMatte = sessionNode->property<IntProperty>("matte", "show")->front();
         IntProperty* showMatte = property<IntProperty>("matte", "show");
         if (showMatte && showMatte->size())
             drawMatte = showMatte->front();
@@ -723,22 +634,17 @@ namespace IPCore
             //     of the unmatted image.
             //
 
-            float matteOpacity =
-                sessionNode->property<FloatProperty>("matte", "opacity")
-                    ->front();
+            float matteOpacity = sessionNode->property<FloatProperty>("matte", "opacity")->front();
             FloatProperty* fp = property<FloatProperty>("matte", "opacity");
             if (fp && fp->size())
                 matteOpacity = fp->front();
             if (matteOpacity <= 0)
                 matteOpacity = 0.66;
-            m_top.color = m_bottom.color = m_left.color = m_right.color =
-                Vec4f(0.0, 0.0, 0.0, matteOpacity);
+            m_top.color = m_bottom.color = m_left.color = m_right.color = Vec4f(0.0, 0.0, 0.0, matteOpacity);
 
             bool refresh = false;
 
-            float matteRatio =
-                sessionNode->property<FloatProperty>("matte", "aspect")
-                    ->front();
+            float matteRatio = sessionNode->property<FloatProperty>("matte", "aspect")->front();
             fp = property<FloatProperty>("matte", "aspect");
             if (fp && fp->size())
                 matteRatio = fp->front();
@@ -746,17 +652,13 @@ namespace IPCore
                 matteRatio = 1.33;
             refresh |= (m_matteRatio != matteRatio);
 
-            float heightVisible =
-                sessionNode->property<FloatProperty>("matte", "heightVisible")
-                    ->front();
+            float heightVisible = sessionNode->property<FloatProperty>("matte", "heightVisible")->front();
             fp = property<FloatProperty>("matte", "heightVisible");
             if (fp && fp->size())
                 heightVisible = fp->front();
             refresh |= (m_heightVisible != heightVisible);
 
-            Vec2f centerPoint =
-                sessionNode->property<Vec2fProperty>("matte", "centerPoint")
-                    ->front();
+            Vec2f centerPoint = sessionNode->property<Vec2fProperty>("matte", "centerPoint")->front();
             Vec2fProperty* vp = property<Vec2fProperty>("matte", "centerPoint");
             if (vp && vp->size())
                 centerPoint = vp->front();
@@ -851,12 +753,9 @@ namespace IPCore
             if (m_hasSideMattes)
             {
                 float sideMattesVPosition = -0.5 + bottomMatteHeight;
-                float leftMatteWidth = max(
-                    (((imageWidth - widthVisible) / 2.0) + centerPoint.x), 0.0);
-                float rightMatteWidth = max(
-                    (((imageWidth - widthVisible) / 2.0) - centerPoint.x), 0.0);
-                float rightMatteHPosition =
-                    (imageWidth / 2.0) - rightMatteWidth;
+                float leftMatteWidth = max((((imageWidth - widthVisible) / 2.0) + centerPoint.x), 0.0);
+                float rightMatteWidth = max((((imageWidth - widthVisible) / 2.0) - centerPoint.x), 0.0);
+                float rightMatteHPosition = (imageWidth / 2.0) - rightMatteWidth;
 
                 m_left.height = heightVisible;
                 m_left.width = leftMatteWidth;

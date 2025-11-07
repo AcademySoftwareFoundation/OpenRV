@@ -58,39 +58,27 @@ namespace TwkFB
         //  Constructors
         //
 
-        IOgto(IOType ioMethod = StandardIO, size_t chunkSize = 61440,
-              int maxAsync = 16);
+        IOgto(IOType ioMethod = StandardIO, size_t chunkSize = 61440, int maxAsync = 16);
 
         virtual ~IOgto();
 
-        virtual void readImages(FrameBufferVector& fbs,
-                                const std::string& filename,
-                                const ReadRequest& request) const;
+        virtual void readImages(FrameBufferVector& fbs, const std::string& filename, const ReadRequest& request) const;
 
-        virtual void writeImages(const ConstFrameBufferVector& img,
-                                 const std::string& filename,
-                                 const WriteRequest& request) const;
+        virtual void writeImages(const ConstFrameBufferVector& img, const std::string& filename, const WriteRequest& request) const;
 
-        virtual void writeImageStream(const ConstFrameBufferVector&,
-                                      std::ostream&, const WriteRequest&) const;
+        virtual void writeImageStream(const ConstFrameBufferVector&, std::ostream&, const WriteRequest&) const;
 
-        virtual void readImageStream(FrameBufferVector&, std::istream&,
-                                     const std::string& filename,
-                                     const ReadRequest&) const;
+        virtual void readImageStream(FrameBufferVector&, std::istream&, const std::string& filename, const ReadRequest&) const;
 
-        virtual void readImageInMemory(FrameBufferVector&, void* data,
-                                       size_t size, const std::string& filename,
-                                       const ReadRequest&) const;
+        virtual void readImageInMemory(FrameBufferVector&, void* data, size_t size, const std::string& filename, const ReadRequest&) const;
 
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 
     private:
-        void writeOneImageStream(Gto::Writer&, WriteState&, std::ostream&,
-                                 const WriteRequest&) const;
+        void writeOneImageStream(Gto::Writer&, WriteState&, std::ostream&, const WriteRequest&) const;
 
-        void declareOneImageStream(Gto::Writer&, WriteState&,
-                                   const WriteRequest&) const;
+        void declareOneImageStream(Gto::Writer&, WriteState&, const WriteRequest&) const;
     };
 
 } // namespace TwkFB

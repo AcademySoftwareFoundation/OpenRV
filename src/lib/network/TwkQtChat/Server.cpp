@@ -46,14 +46,12 @@ namespace TwkQtChat
 
             if (!listen(QHostAddress::Any, myPort))
             {
-                cerr << "ERROR: RvNetwork could not listen to the network port "
-                     << port << " - " << errorString().toStdString() << endl;
+                cerr << "ERROR: RvNetwork could not listen to the network port " << port << " - " << errorString().toStdString() << endl;
             }
         }
         else
         {
-            cerr << "ERROR: RvNetwork: cannot find a free network port, tried "
-                 << port << "-" << port + fallbackCount << endl;
+            cerr << "ERROR: RvNetwork: cannot find a free network port, tried " << port << "-" << port + fallbackCount << endl;
         }
     }
 

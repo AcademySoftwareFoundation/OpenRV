@@ -19,8 +19,7 @@ namespace Mu
 {
     using namespace std;
 
-    StructType::StructType(Context* context, const char* name,
-                           const NameValuePairs& fields)
+    StructType::StructType(Context* context, const char* name, const NameValuePairs& fields)
         : Class(context, name)
         , _fields(fields)
     {
@@ -59,19 +58,15 @@ namespace Mu
 
         g->addSymbol(new ReferenceType(c, rn, this));
 
-        g->addSymbols(new Function(c, n, BaseFunctions::dereference, Cast,
-                                   Return, fn, Args, frn, End),
+        g->addSymbols(new Function(c, n, BaseFunctions::dereference, Cast, Return, fn, Args, frn, End),
 
-                      new Function(c, "=", BaseFunctions::assign, AsOp, Return,
-                                   frn, Args, frn, fn, End),
+                      new Function(c, "=", BaseFunctions::assign, AsOp, Return, frn, Args, frn, fn, End),
 
                       EndArguments);
 
-        addSymbols(new Function(c, "__allocate", defaultConstructor, None,
-                                Return, fn, End),
+        addSymbols(new Function(c, "__allocate", defaultConstructor, None, Return, fn, End),
 
-                   new Function(c, n, this, params.size(), &params.front(),
-                                aggregateConstructor, Mapped),
+                   new Function(c, n, this, params.size(), &params.front(), aggregateConstructor, Mapped),
 
                    EndArguments);
     }

@@ -50,15 +50,13 @@ namespace Rv
         if (!PyArg_ParseTuple(args, "O!", TwkApp::pyEventType(), &event))
             return NULL;
 
-        if (const PixelBlockTransferEvent* pe =
-                dynamic_cast<const PixelBlockTransferEvent*>(event->event))
+        if (const PixelBlockTransferEvent* pe = dynamic_cast<const PixelBlockTransferEvent*>(event->event))
         {
             const RvGraph::Sources& sources = s->rvgraph().imageSources();
 
             for (size_t i = 0; i < sources.size(); i++)
             {
-                if (ImageSourceIPNode* node =
-                        dynamic_cast<ImageSourceIPNode*>(sources[i]))
+                if (ImageSourceIPNode* node = dynamic_cast<ImageSourceIPNode*>(sources[i]))
                 {
                     size_t index = node->mediaIndex(pe->media());
 
@@ -66,9 +64,7 @@ namespace Rv
                     {
                         try
                         {
-                            node->insertPixels(pe->view(), pe->layer(),
-                                               pe->frame(), pe->x(), pe->y(),
-                                               pe->width(), pe->height(),
+                            node->insertPixels(pe->view(), pe->layer(), pe->frame(), pe->x(), pe->y(), pe->width(), pe->height(),
                                                pe->pixels(), pe->size());
                         }
                         catch (PixelBlockSizeMismatchExc& exc)
@@ -98,8 +94,7 @@ namespace Rv
 
         {"data", data, METH_NOARGS, "return session data object."},
 
-        {"insertCreatePixelBlock", insertCreatePixelBlock, METH_VARARGS,
-         "insert block of pixels into image source."},
+        {"insertCreatePixelBlock", insertCreatePixelBlock, METH_VARARGS, "insert block of pixels into image source."},
 
         {NULL}};
 

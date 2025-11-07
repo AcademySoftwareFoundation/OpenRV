@@ -28,9 +28,7 @@ namespace TwkFB
 
     // *****************************************************************************
     // Decodes one run-encoded channel from input buffer.
-    unsigned char* rlaDecodeScanline(unsigned char* input,
-                                     unsigned char* output, int xFile,
-                                     int xImage, int stride)
+    unsigned char* rlaDecodeScanline(unsigned char* input, unsigned char* output, int xFile, int xImage, int stride)
     {
         int x = xFile;
         int useX = 0;

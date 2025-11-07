@@ -22,8 +22,7 @@ namespace IPCore
     public:
         typedef std::vector<FrameBuffer*> FrameBufferVector;
 
-        NoiseReductionIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group = 0);
+        NoiseReductionIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~NoiseReductionIPNode();
 

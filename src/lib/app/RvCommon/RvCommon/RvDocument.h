@@ -77,10 +77,7 @@ namespace Rv
 
         RvTopViewToolBar* topViewToolBar() const { return m_topViewToolBar; };
 
-        RvBottomViewToolBar* bottomViewToolBar() const
-        {
-            return m_bottomViewToolBar;
-        }
+        RvBottomViewToolBar* bottomViewToolBar() const { return m_bottomViewToolBar; }
 
         void setDocumentDisabled(bool window, bool menuBarOnly = false);
 
@@ -159,8 +156,7 @@ namespace Rv
 
         void setBuildMenu();
 
-        void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int,
-                           int);
+        void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
     private:
         RvSession* m_session;

@@ -57,39 +57,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QBitmapType::Instance* i =
-            new QBitmapType::Instance((Class*)NODE_THIS.type());
+        QBitmapType::Instance* i = new QBitmapType::Instance((Class*)NODE_THIS.type());
         QBitmapType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QBitmapType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QBitmapType::finalizer, 0, 0, 0);
-    }
+    void QBitmapType::registerFinalizer(void* o) { GC_register_finalizer(o, QBitmapType::finalizer, 0, 0, 0); }
 
     void QBitmapType::finalizer(void* obj, void* data)
     {
-        QBitmapType::Instance* i =
-            reinterpret_cast<QBitmapType::Instance*>(obj);
+        QBitmapType::Instance* i = reinterpret_cast<QBitmapType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QBitmap_QBitmap_QBitmap_QBitmap(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QBitmap_QBitmap_QBitmap_QBitmap(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setpaintdevice(param_this, QBitmap());
         return param_this;
     }
 
-    Pointer qt_QBitmap_QBitmap_QBitmap_QBitmap_int_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_width,
-                                                       int param_height)
+    Pointer qt_QBitmap_QBitmap_QBitmap_QBitmap_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width, int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_width);
@@ -98,17 +89,14 @@ namespace Mu
         return param_this;
     }
 
-    void qt_QBitmap_clear_void_QBitmap(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    void qt_QBitmap_clear_void_QBitmap(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBitmap& arg0 = getqtype<QBitmapType>(param_this);
         arg0.clear();
     }
 
-    void qt_QBitmap_swap_void_QBitmap_QBitmap(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_other)
+    void qt_QBitmap_swap_void_QBitmap_QBitmap(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBitmap& arg0 = getqtype<QBitmapType>(param_this);
@@ -116,8 +104,7 @@ namespace Mu
         arg0.swap(arg1);
     }
 
-    Pointer qt_QBitmap_transformed_QBitmap_QBitmap_QTransform(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix)
+    Pointer qt_QBitmap_transformed_QBitmap_QBitmap_QTransform(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBitmap& arg0 = getqtype<QBitmapType>(param_this);
@@ -125,66 +112,52 @@ namespace Mu
         return makeqtype<QBitmapType>(c, arg0.transformed(arg1), "qt.QBitmap");
     }
 
-    Pointer qt_QBitmap_fromImage_QBitmap_QImage_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_image,
-                                                    int param_flags)
+    Pointer qt_QBitmap_fromImage_QBitmap_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_image, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage arg0 = getqtype<QImageType>(param_image);
         Qt::ImageConversionFlags arg1 = (Qt::ImageConversionFlags)(param_flags);
-        return makeqtype<QBitmapType>(c, QBitmap::fromImage(arg0, arg1),
-                                      "qt.QBitmap");
+        return makeqtype<QBitmapType>(c, QBitmap::fromImage(arg0, arg1), "qt.QBitmap");
     }
 
-    Pointer qt_QBitmap_fromPixmap_QBitmap_QPixmap(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_pixmap)
+    Pointer qt_QBitmap_fromPixmap_QBitmap_QPixmap(Mu::Thread& NODE_THREAD, Pointer param_pixmap)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPixmap arg0 = getqtype<QPixmapType>(param_pixmap);
-        return makeqtype<QBitmapType>(c, QBitmap::fromPixmap(arg0),
-                                      "qt.QBitmap");
+        return makeqtype<QBitmapType>(c, QBitmap::fromPixmap(arg0), "qt.QBitmap");
     }
 
     static NODE_IMPLEMENTATION(_n_QBitmap0, Pointer)
     {
-        NODE_RETURN(qt_QBitmap_QBitmap_QBitmap_QBitmap(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBitmap_QBitmap_QBitmap_QBitmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBitmap1, Pointer)
     {
-        NODE_RETURN(qt_QBitmap_QBitmap_QBitmap_QBitmap_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QBitmap_QBitmap_QBitmap_QBitmap_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QBitmap_clear_void_QBitmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QBitmap_clear_void_QBitmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QBitmap_swap_void_QBitmap_QBitmap(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QBitmap_swap_void_QBitmap_QBitmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_transformed0, Pointer)
     {
-        NODE_RETURN(qt_QBitmap_transformed_QBitmap_QBitmap_QTransform(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QBitmap_transformed_QBitmap_QBitmap_QTransform(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromImage0, Pointer)
     {
-        NODE_RETURN(qt_QBitmap_fromImage_QBitmap_QImage_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QBitmap_fromImage_QBitmap_QImage_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromPixmap0, Pointer)
     {
-        NODE_RETURN(qt_QBitmap_fromPixmap_QBitmap_QPixmap(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBitmap_fromPixmap_QBitmap_QPixmap(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     void QBitmapType::load()
@@ -204,60 +177,41 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QBitmap", _n_QBitmap0, None, Compiled,
-                         qt_QBitmap_QBitmap_QBitmap_QBitmap, Return,
-                         "qt.QBitmap", Parameters,
+            new Function(c, "QBitmap", _n_QBitmap0, None, Compiled, qt_QBitmap_QBitmap_QBitmap_QBitmap, Return, "qt.QBitmap", Parameters,
                          new Param(c, "this", "qt.QBitmap"), End),
-            new Function(c, "QBitmap", _n_QBitmap1, None, Compiled,
-                         qt_QBitmap_QBitmap_QBitmap_QBitmap_int_int, Return,
-                         "qt.QBitmap", Parameters,
-                         new Param(c, "this", "qt.QBitmap"),
-                         new Param(c, "width", "int"),
-                         new Param(c, "height", "int"), End),
+            new Function(c, "QBitmap", _n_QBitmap1, None, Compiled, qt_QBitmap_QBitmap_QBitmap_QBitmap_int_int, Return, "qt.QBitmap",
+                         Parameters, new Param(c, "this", "qt.QBitmap"), new Param(c, "width", "int"), new Param(c, "height", "int"), End),
             // MISSING: QBitmap (QBitmap; QBitmap this, string fileName, "const
             // char *" format)
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QBitmap_clear_void_QBitmap, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QBitmap"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QBitmap_swap_void_QBitmap_QBitmap, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QBitmap"),
-                         new Param(c, "other", "qt.QBitmap"), End),
-            new Function(c, "transformed", _n_transformed0, None, Compiled,
-                         qt_QBitmap_transformed_QBitmap_QBitmap_QTransform,
-                         Return, "qt.QBitmap", Parameters,
-                         new Param(c, "this", "qt.QBitmap"),
-                         new Param(c, "matrix", "qt.QTransform"), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QBitmap_clear_void_QBitmap, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QBitmap"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QBitmap_swap_void_QBitmap_QBitmap, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QBitmap"), new Param(c, "other", "qt.QBitmap"), End),
+            new Function(c, "transformed", _n_transformed0, None, Compiled, qt_QBitmap_transformed_QBitmap_QBitmap_QTransform, Return,
+                         "qt.QBitmap", Parameters, new Param(c, "this", "qt.QBitmap"), new Param(c, "matrix", "qt.QTransform"), End),
             // MISSING: QVariant ("QVariant operator"; QBitmap this)
             // static functions
             // MISSING: fromData (QBitmap; QSize size, "const uchar *" bits,
             // flags QImage::Format monoFormat)
-            new Function(
-                c, "fromImage", _n_fromImage0, None, Compiled,
-                qt_QBitmap_fromImage_QBitmap_QImage_int, Return, "qt.QBitmap",
-                Parameters, new Param(c, "image", "qt.QImage"),
-                new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
+            new Function(c, "fromImage", _n_fromImage0, None, Compiled, qt_QBitmap_fromImage_QBitmap_QImage_int, Return, "qt.QBitmap",
+                         Parameters, new Param(c, "image", "qt.QImage"), new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
             // MISSING: fromImage (QBitmap; "QImage & &" image, flags
             // Qt::ImageConversionFlags flags)
-            new Function(c, "fromPixmap", _n_fromPixmap0, None, Compiled,
-                         qt_QBitmap_fromPixmap_QBitmap_QPixmap, Return,
-                         "qt.QBitmap", Parameters,
-                         new Param(c, "pixmap", "qt.QPixmap"), End),
+            new Function(c, "fromPixmap", _n_fromPixmap0, None, Compiled, qt_QBitmap_fromPixmap_QBitmap_QPixmap, Return, "qt.QBitmap",
+                         Parameters, new Param(c, "pixmap", "qt.QPixmap"), End),
             EndArguments);
         globalScope()->addSymbols(EndArguments);
         scope()->addSymbols(EndArguments);

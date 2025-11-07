@@ -84,31 +84,23 @@ namespace TwkQtChat
             }
 
             if (print)
-                cerr << "INFO: Connection timing: pingpong " << m_pingpong
-                     << " pongtimeout " << PongTimeout << " pinginterval "
-                     << PingInterval << " transtimeout " << TransferTimeout
-                     << endl;
+                cerr << "INFO: Connection timing: pingpong " << m_pingpong << " pongtimeout " << PongTimeout << " pinginterval "
+                     << PingInterval << " transtimeout " << TransferTimeout << endl;
 
             first = false;
         }
 
         m_pingTimer.setInterval(PingInterval);
 
-        QObject::connect(this, SIGNAL(readyRead()), this,
-                         SLOT(processReadyRead()));
-        QObject::connect(this, SIGNAL(disconnected()), &m_pingTimer,
-                         SLOT(stop()));
-        QObject::connect(&m_pingTimer, SIGNAL(timeout()), this,
-                         SLOT(sendPing()));
-        QObject::connect(this, SIGNAL(connected()), this,
-                         SLOT(sendGreetingMessage()));
+        QObject::connect(this, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
+        QObject::connect(this, SIGNAL(disconnected()), &m_pingTimer, SLOT(stop()));
+        QObject::connect(&m_pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
+        QObject::connect(this, SIGNAL(connected()), this, SLOT(sendGreetingMessage()));
     }
 
     Connection::~Connection() {}
 
-    void Connection::connectToContact(const QString& name,
-                                      const QHostAddress& ip, quint16 port,
-                                      OpenMode openMode)
+    void Connection::connectToContact(const QString& name, const QHostAddress& ip, quint16 port, OpenMode openMode)
     {
         m_expectedContactName = name;
         m_expectedAddress = ip;
@@ -116,27 +108,17 @@ namespace TwkQtChat
         connectToHost(ip, port, openMode);
     }
 
-    const QHostAddress& Connection::expectedAddress() const
-    {
-        return m_expectedAddress;
-    }
+    const QHostAddress& Connection::expectedAddress() const { return m_expectedAddress; }
 
-    const QString& Connection::expectedContactName() const
-    {
-        return m_expectedContactName;
-    }
+    const QString& Connection::expectedContactName() const { return m_expectedContactName; }
 
     const QString& Connection::remoteName() const { return m_remoteName; }
 
     const QString& Connection::remoteApp() const { return m_remoteApp; }
 
-    const QString& Connection::remoteContactName() const
-    {
-        return m_remoteContactName;
-    }
+    const QString& Connection::remoteContactName() const { return m_remoteContactName; }
 
-    void Connection::setGreetingMessage(const QString& message,
-                                        const QString& app)
+    void Connection::setGreetingMessage(const QString& message, const QString& app)
     {
         m_greetingName = message;
         m_greetingApp = app;
@@ -149,8 +131,7 @@ namespace TwkQtChat
             return false;
 
         QByteArray msg = message.toUtf8();
-        QByteArray data =
-            "MESSAGE " + QByteArray::number(msg.size()) + " " + msg;
+        QByteArray data = "MESSAGE " + QByteArray::number(msg.size()) + " " + msg;
         DB("send: '" << data.data() << "'");
         const bool success = write(data) == data.size();
 
@@ -178,8 +159,7 @@ namespace TwkQtChat
     {
         if (timerEvent->timerId() == m_transferTimerId)
         {
-            cerr << "ERROR: connection timed out waiting for data transfer"
-                 << endl;
+            cerr << "ERROR: connection timed out waiting for data transfer" << endl;
             abort();
             killTimer(m_transferTimerId);
             m_transferTimerId = 0;
@@ -203,11 +183,9 @@ namespace TwkQtChat
             if (!readProtocolHeader())
                 return;
 
-            if (m_currentDataType != Greeting
-                && m_currentDataType != NewGreeting)
+            if (m_currentDataType != Greeting && m_currentDataType != NewGreeting)
             {
-                cerr << "ERROR: connection aborted because of bad greeting"
-                     << endl;
+                cerr << "ERROR: connection aborted because of bad greeting" << endl;
                 abort();
                 return;
             }
@@ -259,19 +237,16 @@ namespace TwkQtChat
             {
                 QHostAddress addr(peerAddress().toString());
 
-                if (addr.protocol()
-                    != QAbstractSocket::UnknownNetworkLayerProtocol)
+                if (addr.protocol() != QAbstractSocket::UnknownNetworkLayerProtocol)
                 {
-                    m_remoteContactName =
-                        m_remoteName + "@" + peerAddress().toString();
+                    m_remoteContactName = m_remoteName + "@" + peerAddress().toString();
                 }
                 else
                 {
                     m_remoteContactName = m_remoteName + "@unknown.host";
                 }
             }
-            m_local =
-                QHostAddress(QHostAddress::LocalHost).isEqual(peerAddress());
+            m_local = QHostAddress(QHostAddress::LocalHost).isEqual(peerAddress());
             m_currentDataType = Undefined;
             m_numBytesForCurrentDataType = 0;
             emit requestGreeting();
@@ -346,8 +321,7 @@ namespace TwkQtChat
 
         if (m_pongTime.elapsed() > PongTimeout)
         {
-            cerr << "ERROR: connection aborted because response was too slow"
-                 << endl;
+            cerr << "ERROR: connection aborted because response was too slow" << endl;
             abort();
             return;
         }
@@ -367,9 +341,7 @@ namespace TwkQtChat
             greetingString += " " + m_greetingApp;
         QByteArray greeting = greetingString.toUtf8();
 
-        QByteArray data =
-            ((m_greetingApp != "rv") ? "NEWGREETING " : "GREETING ")
-            + QByteArray::number(greeting.size()) + " " + greeting;
+        QByteArray data = ((m_greetingApp != "rv") ? "NEWGREETING " : "GREETING ") + QByteArray::number(greeting.size()) + " " + greeting;
 
         DB("send: '" << data.data() << "'");
         if (write(data) == data.size())
@@ -385,8 +357,7 @@ namespace TwkQtChat
 
         if (numBytesBeforeRead == MaxBufferSize)
         {
-            cerr << "ERROR: connection aborted because data load too big"
-                 << endl;
+            cerr << "ERROR: connection aborted because data load too big" << endl;
             abort();
             return 0;
         }
@@ -412,8 +383,7 @@ namespace TwkQtChat
 
     int Connection::dataLengthForCurrentDataType()
     {
-        if (bytesAvailable() <= 0 || readDataIntoBuffer() <= 0
-            || !m_buffer.endsWith(SeparatorToken))
+        if (bytesAvailable() <= 0 || readDataIntoBuffer() <= 0 || !m_buffer.endsWith(SeparatorToken))
         {
             return 0;
         }
@@ -485,8 +455,7 @@ namespace TwkQtChat
         if (m_numBytesForCurrentDataType <= 0)
             m_numBytesForCurrentDataType = dataLengthForCurrentDataType();
 
-        if (bytesAvailable() < m_numBytesForCurrentDataType
-            || m_numBytesForCurrentDataType <= 0)
+        if (bytesAvailable() < m_numBytesForCurrentDataType || m_numBytesForCurrentDataType <= 0)
         {
             m_transferTimerId = startTimer(TransferTimeout);
             return false;
@@ -505,8 +474,7 @@ namespace TwkQtChat
 
         if (m_buffer.size() != m_numBytesForCurrentDataType)
         {
-            cerr << "ERROR: connection aborted because data size mismatch"
-                 << endl;
+            cerr << "ERROR: connection aborted because data size mismatch" << endl;
             abort();
             return;
         }

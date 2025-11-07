@@ -49,11 +49,8 @@ namespace IPCore
 
         typedef unsigned int Flags;
 
-        PropertyInfo(Flags flags, size_t initialRefCount = 0,
-                     const std::string& interp = "")
-            : TwkContainer::Property::Info((flags & Persistent) != 0,
-                                           (flags & NotCopyable) == 0,
-                                           initialRefCount, interp)
+        PropertyInfo(Flags flags, size_t initialRefCount = 0, const std::string& interp = "")
+            : TwkContainer::Property::Info((flags & Persistent) != 0, (flags & NotCopyable) == 0, initialRefCount, interp)
             , m_flags(flags)
         {
         }
@@ -64,17 +61,11 @@ namespace IPCore
 
         bool outputOnly() const { return m_flags & OutputOnly; }
 
-        bool requiresProgramFlush() const
-        {
-            return m_flags & RequiresProgramFlush;
-        }
+        bool requiresProgramFlush() const { return m_flags & RequiresProgramFlush; }
 
         bool requiresAudioFlush() const { return m_flags & RequiresAudioFlush; }
 
-        bool excludedFromProfile() const
-        {
-            return m_flags & ExcludeFromProfile;
-        }
+        bool excludedFromProfile() const { return m_flags & ExcludeFromProfile; }
 
     protected:
         ~PropertyInfo() {}

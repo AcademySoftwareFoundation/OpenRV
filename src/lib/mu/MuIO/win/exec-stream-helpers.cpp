@@ -29,20 +29,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // os_error_t
 os_error_t::os_error_t(std::string const& msg) { compose(msg, GetLastError()); }
 
-os_error_t::os_error_t(std::string const& msg, exec_stream_t::error_code_t code)
-{
-    compose(msg, code);
-}
+os_error_t::os_error_t(std::string const& msg, exec_stream_t::error_code_t code) { compose(msg, code); }
 
-void os_error_t::compose(std::string const& msg,
-                         exec_stream_t::error_code_t code)
+void os_error_t::compose(std::string const& msg, exec_stream_t::error_code_t code)
 {
     std::string s(msg);
     s += '\n';
     LPVOID buf;
-    if (FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 0,
-            code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&buf, 0, 0)
+    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, 0, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPTSTR)&buf, 0, 0)
         == 0)
     {
         s += "[unable to retrieve error description]";
@@ -127,11 +122,9 @@ set_stdhandle_t::set_stdhandle_t(DWORD kind, HANDLE handle)
     , m_save_handle(GetStdHandle(kind))
 {
     if (m_save_handle == INVALID_HANDLE_VALUE)
-        throw os_error_t(
-            "set_stdhandle_t::set_stdhandle_t: GetStdHandle() failed");
+        throw os_error_t("set_stdhandle_t::set_stdhandle_t: GetStdHandle() failed");
     if (!SetStdHandle(kind, handle))
-        throw os_error_t(
-            "set_stdhandle_t::set_stdhandle_t: SetStdHandle() failed");
+        throw os_error_t("set_stdhandle_t::set_stdhandle_t: SetStdHandle() failed");
 }
 
 set_stdhandle_t::~set_stdhandle_t() { SetStdHandle(m_kind, m_save_handle); }
@@ -145,23 +138,19 @@ wait_result_t::wait_result_t()
     m_error_message = "";
 }
 
-wait_result_t::wait_result_t(DWORD wait_result, int objects_count,
-                             HANDLE const* objects)
+wait_result_t::wait_result_t(DWORD wait_result, int objects_count, HANDLE const* objects)
 {
     m_signaled_object = INVALID_HANDLE_VALUE;
     m_timed_out = false;
     m_error_code = ERROR_SUCCESS;
     m_error_message = "";
-    if (wait_result >= WAIT_OBJECT_0
-        && wait_result < WAIT_OBJECT_0 + objects_count)
+    if (wait_result >= WAIT_OBJECT_0 && wait_result < WAIT_OBJECT_0 + objects_count)
     {
         m_signaled_object = objects[wait_result - WAIT_OBJECT_0];
     }
-    else if (wait_result >= WAIT_ABANDONED_0
-             && wait_result < WAIT_ABANDONED_0 + objects_count)
+    else if (wait_result >= WAIT_ABANDONED_0 && wait_result < WAIT_ABANDONED_0 + objects_count)
     {
-        m_error_message =
-            "wait_result_t: one of the wait objects was abandoned";
+        m_error_message = "wait_result_t: one of the wait objects was abandoned";
     }
     else if (wait_result == WAIT_TIMEOUT)
     {
@@ -180,15 +169,9 @@ wait_result_t::wait_result_t(DWORD wait_result, int objects_count,
     }
 }
 
-bool wait_result_t::ok()
-{
-    return m_error_code == ERROR_SUCCESS && m_error_message[0] == 0;
-}
+bool wait_result_t::ok() { return m_error_code == ERROR_SUCCESS && m_error_message[0] == 0; }
 
-bool wait_result_t::is_signaled(event_t& event)
-{
-    return m_signaled_object == event.m_handle;
-}
+bool wait_result_t::is_signaled(event_t& event) { return m_signaled_object == event.m_handle; }
 
 bool wait_result_t::timed_out() { return m_timed_out; }
 
@@ -213,16 +196,9 @@ bool event_t::set() { return SetEvent(m_handle) != 0; }
 bool event_t::reset() { return ResetEvent(m_handle) != 0; }
 
 // wait functions
-wait_result_t wait(HANDLE h, DWORD timeout)
-{
-    return wait_result_t(WaitForSingleObject(h, timeout), 1, &h);
-}
+wait_result_t wait(HANDLE h, DWORD timeout) { return wait_result_t(WaitForSingleObject(h, timeout), 1, &h); }
 
-wait_result_t wait(event_t& e, DWORD timeout)
-{
-    return wait_result_t(WaitForSingleObject(e.m_handle, timeout), 1,
-                         &e.m_handle);
-}
+wait_result_t wait(event_t& e, DWORD timeout) { return wait_result_t(WaitForSingleObject(e.m_handle, timeout), 1, &e.m_handle); }
 
 wait_result_t wait(event_t& e1, event_t& e2, DWORD timeout)
 {
@@ -263,10 +239,7 @@ bool grab_mutex_t::ok() { return m_wait_result.ok(); }
 
 DWORD grab_mutex_t::error_code() { return m_wait_result.error_code(); }
 
-char const* grab_mutex_t::error_message()
-{
-    return m_wait_result.error_message();
-}
+char const* grab_mutex_t::error_message() { return m_wait_result.error_message(); }
 
 // thread_buffer_t
 thread_buffer_t::thread_buffer_t()
@@ -321,18 +294,14 @@ void thread_buffer_t::set_wait_timeout(DWORD milliseconds)
 {
     if (m_direction != dir_none)
     {
-        throw exec_stream_t::error_t(
-            "thread_buffer_t::set_wait_timeout: thread already started");
+        throw exec_stream_t::error_t("thread_buffer_t::set_wait_timeout: thread already started");
     }
     m_wait_timeout = milliseconds;
 }
 
 // next three set values that are accessed in the same thread only, so they may
 // be called anytime
-void thread_buffer_t::set_thread_termination_timeout(DWORD milliseconds)
-{
-    m_thread_termination_timeout = milliseconds;
-}
+void thread_buffer_t::set_thread_termination_timeout(DWORD milliseconds) { m_thread_termination_timeout = milliseconds; }
 
 void thread_buffer_t::set_binary_mode() { m_translate_crlf = false; }
 
@@ -342,8 +311,7 @@ void thread_buffer_t::set_buffer_limit(std::size_t limit)
 {
     if (m_direction != dir_none)
     {
-        throw exec_stream_t::error_t(
-            "thread_buffer_t::set_buffer_limit: thread already started");
+        throw exec_stream_t::error_t("thread_buffer_t::set_buffer_limit: thread already started");
     }
     m_buffer_limit = limit;
 }
@@ -352,28 +320,20 @@ void thread_buffer_t::set_read_buffer_size(std::size_t size)
 {
     if (m_direction != dir_none)
     {
-        throw exec_stream_t::error_t(
-            "thread_buffer_t::set_read_buffer_size: thread already started");
+        throw exec_stream_t::error_t("thread_buffer_t::set_read_buffer_size: thread already started");
     }
     m_read_buffer_size = size;
 }
 
-void thread_buffer_t::start_reader_thread(HANDLE pipe)
-{
-    start_thread(pipe, dir_read);
-}
+void thread_buffer_t::start_reader_thread(HANDLE pipe) { start_thread(pipe, dir_read); }
 
-void thread_buffer_t::start_writer_thread(HANDLE pipe)
-{
-    start_thread(pipe, dir_write);
-}
+void thread_buffer_t::start_writer_thread(HANDLE pipe) { start_thread(pipe, dir_write); }
 
 void thread_buffer_t::start_thread(HANDLE pipe, direction_t direction)
 {
     if (m_direction != dir_none)
     {
-        throw exec_stream_t::error_t(
-            "thread_buffer_t::start_thread: thread already started");
+        throw exec_stream_t::error_t("thread_buffer_t::start_thread: thread already started");
     }
     m_buffer_list.clear();
     m_pipe = pipe;
@@ -393,13 +353,10 @@ void thread_buffer_t::start_thread(HANDLE pipe, direction_t direction)
                          "m_want_data event");
     }
     DWORD thread_id;
-    m_thread = CreateThread(
-        0, 0, direction == dir_read ? reader_thread : writer_thread, this, 0,
-        &thread_id);
+    m_thread = CreateThread(0, 0, direction == dir_read ? reader_thread : writer_thread, this, 0, &thread_id);
     if (m_thread == 0)
     {
-        throw os_error_t(
-            "thread_buffer_t::start_thread: unable to start thread");
+        throw os_error_t("thread_buffer_t::start_thread: unable to start thread");
     }
     m_direction = direction == dir_read ? dir_read : dir_write;
 }
@@ -431,8 +388,7 @@ bool thread_buffer_t::stop_thread()
     {
         if (!m_stop_thread.set())
         {
-            throw os_error_t(
-                "thread_buffer_t::stop_thread: m_stop_thread.set() failed");
+            throw os_error_t("thread_buffer_t::stop_thread: m_stop_thread.set() failed");
         }
         bool res = check_thread_stopped();
         if (res)
@@ -450,16 +406,14 @@ bool thread_buffer_t::abort_thread()
     {
         if (!TerminateThread(m_thread, 0))
         {
-            throw os_error_t(
-                "exec_steam_t::abort_thread: TerminateThread failed");
+            throw os_error_t("exec_steam_t::abort_thread: TerminateThread failed");
         }
         return check_thread_stopped();
     }
     return true;
 }
 
-void thread_buffer_t::get(exec_stream_t::stream_kind_t, char* dst,
-                          std::size_t& size, bool& no_more)
+void thread_buffer_t::get(exec_stream_t::stream_kind_t, char* dst, std::size_t& size, bool& no_more)
 {
     if (m_direction != dir_read)
     {
@@ -507,14 +461,12 @@ void thread_buffer_t::get(exec_stream_t::stream_kind_t, char* dst,
         wait_result_t wait_result = wait(m_got_data, m_wait_timeout);
         if (!wait_result.ok())
         {
-            check_error("thread_buffer_t::get: wait for got_data failed",
-                        wait_result.error_code(), wait_result.error_message());
+            check_error("thread_buffer_t::get: wait for got_data failed", wait_result.error_code(), wait_result.error_message());
         }
         grab_mutex_t grab_mutex(m_mutex, m_wait_timeout);
         if (!grab_mutex.ok())
         {
-            check_error("thread_buffer_t::get: wait for mutex failed",
-                        grab_mutex.error_code(), grab_mutex.error_message());
+            check_error("thread_buffer_t::get: wait for mutex failed", grab_mutex.error_code(), grab_mutex.error_message());
         }
 
         if (m_translate_crlf)
@@ -531,8 +483,7 @@ void thread_buffer_t::get(exec_stream_t::stream_kind_t, char* dst,
         {
             if (!m_want_data.set())
             {
-                throw os_error_t(
-                    "thread_buffer_t::get: unable to set m_want_data event");
+                throw os_error_t("thread_buffer_t::get: unable to set m_want_data event");
             }
         }
         // if no data left - make the next get() wait until it arrives
@@ -540,8 +491,7 @@ void thread_buffer_t::get(exec_stream_t::stream_kind_t, char* dst,
         {
             if (!m_got_data.reset())
             {
-                throw os_error_t(
-                    "thread_buffer_t::get: unable to reset m_got_data event");
+                throw os_error_t("thread_buffer_t::get: unable to reset m_got_data event");
             }
         }
     }
@@ -561,14 +511,12 @@ DWORD WINAPI thread_buffer_t::reader_thread(LPVOID param)
         {
             // see if get() wants more data, or if someone wants to stop the
             // thread
-            wait_result_t wait_result =
-                wait(p->m_stop_thread, p->m_want_data, p->m_wait_timeout);
+            wait_result_t wait_result = wait(p->m_stop_thread, p->m_want_data, p->m_wait_timeout);
             if (!wait_result.ok() && !wait_result.timed_out())
             {
                 p->note_thread_error("thread_buffer_t::reader_thread: wait for "
                                      "want_data, destruction failed",
-                                     wait_result.error_code(),
-                                     wait_result.error_message());
+                                     wait_result.error_code(), wait_result.error_message());
                 break;
             }
 
@@ -583,15 +531,12 @@ DWORD WINAPI thread_buffer_t::reader_thread(LPVOID param)
                 // they want more data - read the file
                 DWORD read_size = 0;
                 DWORD read_status = ERROR_SUCCESS;
-                if (!ReadFile(p->m_pipe, read_buffer, p->m_read_buffer_size,
-                              &read_size, 0))
+                if (!ReadFile(p->m_pipe, read_buffer, p->m_read_buffer_size, &read_size, 0))
                 {
                     read_status = GetLastError();
                     if (read_status != ERROR_BROKEN_PIPE)
                     {
-                        p->note_thread_error(
-                            "thread_buffer_t::reader_thread: ReadFile failed",
-                            read_status, "");
+                        p->note_thread_error("thread_buffer_t::reader_thread: ReadFile failed", read_status, "");
                         break;
                     }
                 }
@@ -604,8 +549,7 @@ DWORD WINAPI thread_buffer_t::reader_thread(LPVOID param)
                     {
                         p->note_thread_error("thread_buffer_t::reader_thread: "
                                              "wait for mutex failed",
-                                             grab_mutex.error_code(),
-                                             grab_mutex.error_message());
+                                             grab_mutex.error_code(), grab_mutex.error_message());
                         break;
                     }
 
@@ -617,10 +561,9 @@ DWORD WINAPI thread_buffer_t::reader_thread(LPVOID param)
                     {
                         if (!p->m_want_data.reset())
                         {
-                            p->note_thread_error(
-                                "thread_buffer_t::reader_thread: unable to "
-                                "reset m_want_data event",
-                                GetLastError(), "");
+                            p->note_thread_error("thread_buffer_t::reader_thread: unable to "
+                                                 "reset m_want_data event",
+                                                 GetLastError(), "");
                             break;
                         }
                     }
@@ -645,9 +588,7 @@ DWORD WINAPI thread_buffer_t::reader_thread(LPVOID param)
     catch (...)
     {
         // might only be std::bad_alloc
-        p->note_thread_error(
-            "", ERROR_SUCCESS,
-            "thread_buffer_t::reader_thread: unknown exception caught");
+        p->note_thread_error("", ERROR_SUCCESS, "thread_buffer_t::reader_thread: unknown exception caught");
     }
 
     delete[] read_buffer;
@@ -661,8 +602,7 @@ void thread_buffer_t::put(char* const src, std::size_t& size, bool& no_more)
 {
     if (m_direction != dir_write)
     {
-        throw exec_stream_t::error_t(
-            "thread_buffer_t::put: thread not started or started for reading");
+        throw exec_stream_t::error_t("thread_buffer_t::put: thread not started or started for reading");
     }
     // check thread status
     DWORD thread_exit_code;
@@ -686,14 +626,12 @@ void thread_buffer_t::put(char* const src, std::size_t& size, bool& no_more)
         wait_result_t wait_result = wait(m_want_data, m_wait_timeout);
         if (!wait_result.ok())
         {
-            check_error("thread_buffer_t::put: wait for want_data failed",
-                        wait_result.error_code(), wait_result.error_message());
+            check_error("thread_buffer_t::put: wait for want_data failed", wait_result.error_code(), wait_result.error_message());
         }
         grab_mutex_t grab_mutex(m_mutex, m_wait_timeout);
         if (!grab_mutex.ok())
         {
-            check_error("thread_buffer_t::put: wait for mutex failed",
-                        grab_mutex.error_code(), grab_mutex.error_message());
+            check_error("thread_buffer_t::put: wait for mutex failed", grab_mutex.error_code(), grab_mutex.error_message());
         }
 
         // got them - put data
@@ -712,8 +650,7 @@ void thread_buffer_t::put(char* const src, std::size_t& size, bool& no_more)
         {
             if (!m_want_data.reset())
             {
-                throw os_error_t(
-                    "thread_buffer_t::put: unable to reset m_want_data event");
+                throw os_error_t("thread_buffer_t::put: unable to reset m_want_data event");
             }
         }
         // tell the thread we got data
@@ -721,8 +658,7 @@ void thread_buffer_t::put(char* const src, std::size_t& size, bool& no_more)
         {
             if (!m_got_data.set())
             {
-                throw os_error_t(
-                    "thread_buffer_t::put: unable to set m_got_data event");
+                throw os_error_t("thread_buffer_t::put: unable to set m_got_data event");
             }
         }
     }
@@ -746,15 +682,13 @@ DWORD WINAPI thread_buffer_t::writer_thread(LPVOID param)
             // for destruction the timeout is normally expected,
             // for got data the timeout is not normally expected but tolerable
             // (no one wants to write)
-            wait_result_t wait_result =
-                wait(p->m_got_data, p->m_stop_thread, p->m_wait_timeout);
+            wait_result_t wait_result = wait(p->m_got_data, p->m_stop_thread, p->m_wait_timeout);
 
             if (!wait_result.ok() && !wait_result.timed_out())
             {
                 p->note_thread_error("thread_buffer_t::writer_thread: wait for "
                                      "got_data, destruction failed",
-                                     wait_result.error_code(),
-                                     wait_result.error_message());
+                                     wait_result.error_code(), wait_result.error_message());
                 break;
             }
 
@@ -764,9 +698,8 @@ DWORD WINAPI thread_buffer_t::writer_thread(LPVOID param)
                 grab_mutex_t grab_mutex(p->m_mutex, p->m_wait_timeout);
                 if (!grab_mutex.ok())
                 {
-                    p->note_thread_error(
-                        "thread_buffer_t::writer_thread: wait for mutex failed",
-                        grab_mutex.error_code(), grab_mutex.error_message());
+                    p->note_thread_error("thread_buffer_t::writer_thread: wait for mutex failed", grab_mutex.error_code(),
+                                         grab_mutex.error_message());
                     break;
                 }
                 if (!p->m_buffer_list.empty())
@@ -809,12 +742,9 @@ DWORD WINAPI thread_buffer_t::writer_thread(LPVOID param)
             {
                 // we have buffer - write it
                 DWORD written_size;
-                if (!WriteFile(p->m_pipe, buffer.data + buffer_offset,
-                               buffer.size - buffer_offset, &written_size, 0))
+                if (!WriteFile(p->m_pipe, buffer.data + buffer_offset, buffer.size - buffer_offset, &written_size, 0))
                 {
-                    p->note_thread_error(
-                        "thread_buffer_t::writer_thread: WriteFile failed",
-                        GetLastError(), "");
+                    p->note_thread_error("thread_buffer_t::writer_thread: WriteFile failed", GetLastError(), "");
                     break;
                 }
                 buffer_offset += written_size;
@@ -835,23 +765,18 @@ DWORD WINAPI thread_buffer_t::writer_thread(LPVOID param)
     catch (...)
     {
         // unreachable code. really.
-        p->note_thread_error(
-            "", ERROR_SUCCESS,
-            "thread_buffer_t::writer_thread: unknown exception caught");
+        p->note_thread_error("", ERROR_SUCCESS, "thread_buffer_t::writer_thread: unknown exception caught");
     }
     // ensure that put() is not left waiting on m_want_data
     p->m_want_data.set();
     return 0;
 }
 
-void thread_buffer_t::check_error(std::string const& message_prefix,
-                                  DWORD error_code,
-                                  std::string const& error_message)
+void thread_buffer_t::check_error(std::string const& message_prefix, DWORD error_code, std::string const& error_message)
 {
     if (!error_message.empty())
     {
-        throw exec_stream_t::error_t(message_prefix + "\n" + error_message,
-                                     error_code);
+        throw exec_stream_t::error_t(message_prefix + "\n" + error_message, error_code);
     }
     else if (error_code != ERROR_SUCCESS)
     {
@@ -859,9 +784,7 @@ void thread_buffer_t::check_error(std::string const& message_prefix,
     }
 }
 
-void thread_buffer_t::note_thread_error(char const* message_prefix,
-                                        DWORD error_code,
-                                        char const* error_message)
+void thread_buffer_t::note_thread_error(char const* message_prefix, DWORD error_code, char const* error_message)
 {
     m_message_prefix = message_prefix;
     m_error_code = error_code;

@@ -85,13 +85,11 @@ namespace TwkFB
         //  Note that these are tags on the FB there is no transform applied to
         //  the pixels when a tag is set on the FB.
         //
-        TWKFB_EXPORT std::string Primaries(); // ColorSpace/Primaries
-        TWKFB_EXPORT std::string
-        TransferFunction();                    // ColorSpace/TransferFunction
-        TWKFB_EXPORT std::string Conversion(); // ColorSpace/Conversion
-        TWKFB_EXPORT std::string
-        ChromaPlacement();                // ColorSpace/ChromaPlacement
-        TWKFB_EXPORT std::string Range(); // ColorSpace/Range
+        TWKFB_EXPORT std::string Primaries();        // ColorSpace/Primaries
+        TWKFB_EXPORT std::string TransferFunction(); // ColorSpace/TransferFunction
+        TWKFB_EXPORT std::string Conversion();       // ColorSpace/Conversion
+        TWKFB_EXPORT std::string ChromaPlacement();  // ColorSpace/ChromaPlacement
+        TWKFB_EXPORT std::string Range();            // ColorSpace/Range
 
         TWKFB_EXPORT std::string RedPrimary();     // ColorSpace/RedPrimary
         TWKFB_EXPORT std::string GreenPrimary();   // ColorSpace/GreenPrimary
@@ -99,14 +97,12 @@ namespace TwkFB
         TWKFB_EXPORT std::string WhitePrimary();   // ColorSpace/WhitePrimary
         TWKFB_EXPORT std::string AdoptedNeutral(); // ColorSpace/AdoptedNeutral
 
-        TWKFB_EXPORT std::string
-        ConversionMatrix(); // ColorSpace/ConversionMatrix
+        TWKFB_EXPORT std::string ConversionMatrix(); // ColorSpace/ConversionMatrix
 
-        TWKFB_EXPORT std::string RGBtoXYZMatrix();  // ColorSpace/RGBtoXYZMatrix
-        TWKFB_EXPORT std::string LinearScale();     // Simple scale
-        TWKFB_EXPORT std::string FilmStyleMatrix(); // FilmStyle Matrix.
-        TWKFB_EXPORT std::string
-        FilmStyleInverseMatrix(); // Inverse of FilmStyle Matrix.
+        TWKFB_EXPORT std::string RGBtoXYZMatrix();         // ColorSpace/RGBtoXYZMatrix
+        TWKFB_EXPORT std::string LinearScale();            // Simple scale
+        TWKFB_EXPORT std::string FilmStyleMatrix();        // FilmStyle Matrix.
+        TWKFB_EXPORT std::string FilmStyleInverseMatrix(); // Inverse of FilmStyle Matrix.
 
         //
         //  Color Space Values
@@ -114,80 +110,68 @@ namespace TwkFB
         //  The base colorspace as well as the transfer function could be one of
         //  these.
         //
-        TWKFB_EXPORT std::string
-        sRGB(); // IEC 61966-2-1 (for primaries same as Rec709)
-        TWKFB_EXPORT std::string Rec709();  // ITU.BT-709 Y'CbCr
-        TWKFB_EXPORT std::string Rec601();  // ITU.BT-601 Y'CbCr
-        TWKFB_EXPORT std::string Rec2020(); // ITU.BT-2020 Y'CbCr
-        TWKFB_EXPORT std::string
-        AdobeRGB();                     // Adobe RGB space (for monitors mostly)
-        TWKFB_EXPORT std::string P3();  // DCI P3
-        TWKFB_EXPORT std::string XYZ(); // XYZ primaries
-        TWKFB_EXPORT std::string ArriWideGamut(); // ARRI ALEXA Wide Gamut
-        TWKFB_EXPORT std::string
-        ArriSceneReferred(); // ARRI ALEXA Wide Gamut (scene referred)
-        TWKFB_EXPORT std::string SonySGamut();   // SONY S-Gamut
-        TWKFB_EXPORT std::string SMPTE_C();      // SMPTE-C
-        TWKFB_EXPORT std::string SMPTE240M();    // SMPTE-240M
-        TWKFB_EXPORT std::string SMPTE2084();    // SMPTE-2084
-        TWKFB_EXPORT std::string HybridLogGamma(); // ARIB STD-B67
-        TWKFB_EXPORT std::string CineonLog();    // Cineon/DPX Log
-        TWKFB_EXPORT std::string ArriLogC();     // ARRI LogC
-        TWKFB_EXPORT std::string ArriLogCFilm(); // ARRI LogC Film
-        TWKFB_EXPORT std::string SonySLog();     // SONY S-Log
-        TWKFB_EXPORT std::string ViperLog();     // Viper Camera
-        TWKFB_EXPORT std::string RedSpace();  // Red Camera RedSpace primaries
-        TWKFB_EXPORT std::string RedColor();  // Red Camera RedColor primaries
-        TWKFB_EXPORT std::string RedColor2(); // Red Camera RedColor2 primaries
-        TWKFB_EXPORT std::string RedColor3(); // Red Camera RedColor3 primaries
-        TWKFB_EXPORT std::string RedColor4(); // Red Camera RedColor4 primaries
-        TWKFB_EXPORT std::string
-        DragonColor(); // Red Camera DragonColor primaries
-        TWKFB_EXPORT std::string
-        DragonColor2(); // Red Camera DragonColor2 primaries
-        TWKFB_EXPORT std::string
-        RedWideGamut();                    // Red Camera Wide Gamut primaries
-        TWKFB_EXPORT std::string RedLog(); // Red Camera Log
-        TWKFB_EXPORT std::string
-        RedLogFilm(); // Red Camera Log Film (CineonLog version)
-        TWKFB_EXPORT std::string Panalog(); // Panavision Camera
-        TWKFB_EXPORT std::string Linear();  // Linear Light
-        TWKFB_EXPORT std::string Gamma18(); // Gamma with exponent 1.8
-        TWKFB_EXPORT std::string Gamma22(); // Gamma with exponent 2.2
-        TWKFB_EXPORT std::string Gamma24(); // Gamma with exponent 2.4
-        TWKFB_EXPORT std::string Gamma26(); // Gamma with exponent 2.6
-        TWKFB_EXPORT std::string Gamma28(); // Gamma with exponent 2.8
-        TWKFB_EXPORT std::string
-        GammaExponent(); // Gamma with exponent ColorSpace/Gamma
-        TWKFB_EXPORT std::string
-        ACES(); // ACES (Academy Color Encoding Sepcification)
-        TWKFB_EXPORT std::string CIEXYZ();     // CIE XYZ
-        TWKFB_EXPORT std::string ICCProfile(); // Provided ICC Profile
-        TWKFB_EXPORT std::string CTL();        // Color Transform Language
-        TWKFB_EXPORT std::string Generic();  // Use available color space params
-        TWKFB_EXPORT std::string None();     // Unknown
-        TWKFB_EXPORT std::string Identity(); // Transfer function only
-        TWKFB_EXPORT std::string NonColorData(); // FB is not really color data
-        TWKFB_EXPORT std::string
-        VideoRange(); // Video Range Video (16-235/240) in 8 bit
-        TWKFB_EXPORT std::string
-        FilmRange(); // Film Range Video (4-1019) in 10 bit
-        TWKFB_EXPORT std::string FullRange();  // Full Range Video
-        TWKFB_EXPORT std::string Left();       // ChromaPlacement
-        TWKFB_EXPORT std::string Center();     // ChromaPlacement
-        TWKFB_EXPORT std::string TopLeft();    // ChromaPlacement
-        TWKFB_EXPORT std::string Top();        // ChromaPlacement
-        TWKFB_EXPORT std::string BottomLeft(); // ChromaPlacement
-        TWKFB_EXPORT std::string Bottom();     // ChromaPlacement
+        TWKFB_EXPORT std::string sRGB();              // IEC 61966-2-1 (for primaries same as Rec709)
+        TWKFB_EXPORT std::string Rec709();            // ITU.BT-709 Y'CbCr
+        TWKFB_EXPORT std::string Rec601();            // ITU.BT-601 Y'CbCr
+        TWKFB_EXPORT std::string Rec2020();           // ITU.BT-2020 Y'CbCr
+        TWKFB_EXPORT std::string AdobeRGB();          // Adobe RGB space (for monitors mostly)
+        TWKFB_EXPORT std::string P3();                // DCI P3
+        TWKFB_EXPORT std::string XYZ();               // XYZ primaries
+        TWKFB_EXPORT std::string ArriWideGamut();     // ARRI ALEXA Wide Gamut
+        TWKFB_EXPORT std::string ArriSceneReferred(); // ARRI ALEXA Wide Gamut (scene referred)
+        TWKFB_EXPORT std::string SonySGamut();        // SONY S-Gamut
+        TWKFB_EXPORT std::string SMPTE_C();           // SMPTE-C
+        TWKFB_EXPORT std::string SMPTE240M();         // SMPTE-240M
+        TWKFB_EXPORT std::string SMPTE2084();         // SMPTE-2084
+        TWKFB_EXPORT std::string HybridLogGamma();    // ARIB STD-B67
+        TWKFB_EXPORT std::string CineonLog();         // Cineon/DPX Log
+        TWKFB_EXPORT std::string ArriLogC();          // ARRI LogC
+        TWKFB_EXPORT std::string ArriLogCFilm();      // ARRI LogC Film
+        TWKFB_EXPORT std::string SonySLog();          // SONY S-Log
+        TWKFB_EXPORT std::string ViperLog();          // Viper Camera
+        TWKFB_EXPORT std::string RedSpace();          // Red Camera RedSpace primaries
+        TWKFB_EXPORT std::string RedColor();          // Red Camera RedColor primaries
+        TWKFB_EXPORT std::string RedColor2();         // Red Camera RedColor2 primaries
+        TWKFB_EXPORT std::string RedColor3();         // Red Camera RedColor3 primaries
+        TWKFB_EXPORT std::string RedColor4();         // Red Camera RedColor4 primaries
+        TWKFB_EXPORT std::string DragonColor();       // Red Camera DragonColor primaries
+        TWKFB_EXPORT std::string DragonColor2();      // Red Camera DragonColor2 primaries
+        TWKFB_EXPORT std::string RedWideGamut();      // Red Camera Wide Gamut primaries
+        TWKFB_EXPORT std::string RedLog();            // Red Camera Log
+        TWKFB_EXPORT std::string RedLogFilm();        // Red Camera Log Film (CineonLog version)
+        TWKFB_EXPORT std::string Panalog();           // Panavision Camera
+        TWKFB_EXPORT std::string Linear();            // Linear Light
+        TWKFB_EXPORT std::string Gamma18();           // Gamma with exponent 1.8
+        TWKFB_EXPORT std::string Gamma22();           // Gamma with exponent 2.2
+        TWKFB_EXPORT std::string Gamma24();           // Gamma with exponent 2.4
+        TWKFB_EXPORT std::string Gamma26();           // Gamma with exponent 2.6
+        TWKFB_EXPORT std::string Gamma28();           // Gamma with exponent 2.8
+        TWKFB_EXPORT std::string GammaExponent();     // Gamma with exponent ColorSpace/Gamma
+        TWKFB_EXPORT std::string ACES();              // ACES (Academy Color Encoding Sepcification)
+        TWKFB_EXPORT std::string CIEXYZ();            // CIE XYZ
+        TWKFB_EXPORT std::string ICCProfile();        // Provided ICC Profile
+        TWKFB_EXPORT std::string CTL();               // Color Transform Language
+        TWKFB_EXPORT std::string Generic();           // Use available color space params
+        TWKFB_EXPORT std::string None();              // Unknown
+        TWKFB_EXPORT std::string Identity();          // Transfer function only
+        TWKFB_EXPORT std::string NonColorData();      // FB is not really color data
+        TWKFB_EXPORT std::string VideoRange();        // Video Range Video (16-235/240) in 8 bit
+        TWKFB_EXPORT std::string FilmRange();         // Film Range Video (4-1019) in 10 bit
+        TWKFB_EXPORT std::string FullRange();         // Full Range Video
+        TWKFB_EXPORT std::string Left();              // ChromaPlacement
+        TWKFB_EXPORT std::string Center();            // ChromaPlacement
+        TWKFB_EXPORT std::string TopLeft();           // ChromaPlacement
+        TWKFB_EXPORT std::string Top();               // ChromaPlacement
+        TWKFB_EXPORT std::string BottomLeft();        // ChromaPlacement
+        TWKFB_EXPORT std::string Bottom();            // ChromaPlacement
 
         //
         //  Log Params
         //
         TWKFB_EXPORT std::string BlackPoint(); // CineonLog Parameter
         TWKFB_EXPORT std::string WhitePoint(); // CineonLog Parameter
-        TWKFB_EXPORT std::string
-        BreakPoint(); // CineonLog Parameter (defines SoftClip)
-        TWKFB_EXPORT std::string Rolloff(); //
+        TWKFB_EXPORT std::string BreakPoint(); // CineonLog Parameter (defines SoftClip)
+        TWKFB_EXPORT std::string Rolloff();    //
 
         TWKFB_EXPORT std::string LogCBlackSignal();
         TWKFB_EXPORT std::string LogCEncodingOffset();
@@ -196,27 +180,21 @@ namespace TwkFB
         TWKFB_EXPORT std::string LogCBlackOffset();
         TWKFB_EXPORT std::string LogCLinearSlope();
         TWKFB_EXPORT std::string LogCLinearOffset();
-        TWKFB_EXPORT std::string
-        LogCLinearCutPoint(); // Cutoff used for LogC to Linear
-        TWKFB_EXPORT std::string
-        LogCCutPoint(); // Cutoff used for Linear to LogC
+        TWKFB_EXPORT std::string LogCLinearCutPoint(); // Cutoff used for LogC to Linear
+        TWKFB_EXPORT std::string LogCCutPoint();       // Cutoff used for Linear to LogC
 
         //
         //  ICC data
         //
-        TWKFB_EXPORT std::string
-        ICCProfileDescription(); // ColorSpace/ICC Profile Description
-        TWKFB_EXPORT std::string
-        ICCProfileData(); // ColorSpace/ICC Profile Data
-        TWKFB_EXPORT std::string
-        ICCProfileVersion(); // ColorSpace/ICC Profile Version
+        TWKFB_EXPORT std::string ICCProfileDescription(); // ColorSpace/ICC Profile Description
+        TWKFB_EXPORT std::string ICCProfileData();        // ColorSpace/ICC Profile Data
+        TWKFB_EXPORT std::string ICCProfileVersion();     // ColorSpace/ICC Profile Version
 
         //
         //  CTL
         //
-        TWKFB_EXPORT std::string
-        CTLProgramName();                      // ColorSpace/CTL Program Name
-        TWKFB_EXPORT std::string CTLProgram(); // ColorSpace/CTL Program
+        TWKFB_EXPORT std::string CTLProgramName(); // ColorSpace/CTL Program Name
+        TWKFB_EXPORT std::string CTLProgram();     // ColorSpace/CTL Program
 
         //
         //  Gamma. This really should not be used. Quicktime/JPEG needs it.
@@ -433,8 +411,7 @@ namespace TwkFB
         //  the data buffer.
         //
 
-        FrameBuffer(CoordinateTypes coordinateType, int width, int height,
-                    int depth, DataType dataType, unsigned char* data,
+        FrameBuffer(CoordinateTypes coordinateType, int width, int height, int depth, DataType dataType, unsigned char* data,
                     const StringVector* channelNames);
 
         //
@@ -443,10 +420,8 @@ namespace TwkFB
         //  FrameBuffer::allocateLargeBlock().
         //
 
-        FrameBuffer(int width, int height, int numChannels, DataType dataType,
-                    unsigned char* data = NULL,
-                    const StringVector* channelNames = NULL,
-                    Orientation orient = BOTTOMLEFT, int extraScanlines = 0,
+        FrameBuffer(int width, int height, int numChannels, DataType dataType, unsigned char* data = NULL,
+                    const StringVector* channelNames = NULL, Orientation orient = BOTTOMLEFT, int extraScanlines = 0,
                     int extraScanlinePixels = 0);
 
         //
@@ -460,20 +435,16 @@ namespace TwkFB
         //
         //
 
-        FrameBuffer(int width, int height, int numChannels, DataType dataType,
-                    unsigned char* data, const StringVector* channelNames,
-                    Orientation orient, bool deleteOnDestruction,
-                    int extraScanlines = 0, int extraScanlinePixels = 0);
+        FrameBuffer(int width, int height, int numChannels, DataType dataType, unsigned char* data, const StringVector* channelNames,
+                    Orientation orient, bool deleteOnDestruction, int extraScanlines = 0, int extraScanlinePixels = 0);
 
         //
         //  Most general constructor (Allows 3D "image"). NOTE: to set
         //  uncrop you have to call uncrop() after you create the FB
         //
 
-        FrameBuffer(CoordinateTypes coordinateType, int width, int height,
-                    int depth, int numChannels, DataType dataType,
-                    unsigned char* data, const StringVector* channelNames,
-                    Orientation orient, bool deleteOnDestruction,
+        FrameBuffer(CoordinateTypes coordinateType, int width, int height, int depth, int numChannels, DataType dataType,
+                    unsigned char* data, const StringVector* channelNames, Orientation orient, bool deleteOnDestruction,
                     int extraScanlines = 0, int extraScanlinePixels = 0);
 
         //
@@ -502,15 +473,10 @@ namespace TwkFB
         //  deletePointer is that its equivalent to "pre-padding".
         //
 
-        void restructure(int width = 640, int height = 480, int depth = 0,
-                         int numChannels = 3, DataType dataType = UCHAR,
-                         unsigned char* data = NULL,
-                         const StringVector* channelNames = NULL,
-                         Orientation orient = BOTTOMLEFT,
-                         bool deleteOnDestruction = true,
-                         int extraScanlines = 0, int extraScanlinePixels = 0,
-                         unsigned char* deletePointer = NULL,
-                         bool clearAttributes = true);
+        void restructure(int width = 640, int height = 480, int depth = 0, int numChannels = 3, DataType dataType = UCHAR,
+                         unsigned char* data = NULL, const StringVector* channelNames = NULL, Orientation orient = BOTTOMLEFT,
+                         bool deleteOnDestruction = true, int extraScanlines = 0, int extraScanlinePixels = 0,
+                         unsigned char* deletePointer = NULL, bool clearAttributes = true);
 
         //
         //  Restructure Planar.
@@ -527,20 +493,14 @@ namespace TwkFB
         //  or height. A value of 1 means the same as the width or height.
         //
 
-        void restructurePlanar(int width, int height,
-                               const Samplings& xSamplings,
-                               const Samplings& ySamplings,
-                               const StringVector& planeNames,
-                               DataType dataType, Orientation orient,
-                               size_t numChannels = 1);
+        void restructurePlanar(int width, int height, const Samplings& xSamplings, const Samplings& ySamplings,
+                               const StringVector& planeNames, DataType dataType, Orientation orient, size_t numChannels = 1);
 
         //
         //  Same as above, except samplings are all 1
         //
 
-        void restructurePlanar(int width, int height,
-                               const StringVector& planeNames,
-                               DataType dataType, Orientation orient);
+        void restructurePlanar(int width, int height, const StringVector& planeNames, DataType dataType, Orientation orient);
 
         //
         //  Alternate Pixel Memory Management
@@ -607,10 +567,7 @@ namespace TwkFB
 
         const FrameBuffer* nextPlane() const { return m_nextPlane; }
 
-        const FrameBuffer* firstPlane() const
-        {
-            return m_firstPlane ? m_firstPlane : this;
-        }
+        const FrameBuffer* firstPlane() const { return m_firstPlane ? m_firstPlane : this; }
 
         const FrameBuffer* previousPlane() const { return m_previousPlane; }
 
@@ -658,9 +615,7 @@ namespace TwkFB
 
         bool needsUncrop() const
         {
-            return m_uncrop
-                   && (m_uncropWidth != m_width || m_uncropHeight != m_height
-                       || m_uncropX != 0 || m_uncropY != 0);
+            return m_uncrop && (m_uncropWidth != m_width || m_uncropHeight != m_height || m_uncropX != 0 || m_uncropY != 0);
         }
 
         int uncropWidth() const { return m_uncropWidth; }
@@ -676,15 +631,9 @@ namespace TwkFB
         void setUncropActive(bool);
         float uncroppedAspect() const;
 
-        void setScanlineSize(size_t scanlineSize)
-        {
-            m_scanlineSize = scanlineSize;
-        }
+        void setScanlineSize(size_t scanlineSize) { m_scanlineSize = scanlineSize; }
 
-        void setScanlinePaddedSize(size_t scanlinePaddedSize)
-        {
-            m_scanlinePaddedSize = scanlinePaddedSize;
-        }
+        void setScanlinePaddedSize(size_t scanlinePaddedSize) { m_scanlinePaddedSize = scanlinePaddedSize; }
 
         //
         //  Display dimensions incorporate the uncropped dimensions and
@@ -824,8 +773,7 @@ namespace TwkFB
 
         void insertChannel(const std::string& name, int channel = -1);
 
-        template <typename T>
-        void insertChannelByType(const std::string& name, int channel = -1);
+        template <typename T> void insertChannelByType(const std::string& name, int channel = -1);
 
         void removeChannel(int channel);
         void removeChannel(const std::string& name);
@@ -835,10 +783,7 @@ namespace TwkFB
         int channel(const std::string& name) const;
         bool hasChannel(const std::string& name) const;
 
-        const std::string& channelName(int c) const
-        {
-            return m_channelNames[c];
-        }
+        const std::string& channelName(int c) const { return m_channelNames[c]; }
 
         void setChannelName(int channel, const std::string& name);
 
@@ -869,11 +814,9 @@ namespace TwkFB
 
         template <typename T> T& attribute(const std::string& name);
 
-        template <typename T>
-        const std::vector<T>& vectorAttribute(const std::string& name) const;
+        template <typename T> const std::vector<T>& vectorAttribute(const std::string& name) const;
 
-        template <typename T>
-        std::vector<T>& vectorAttribute(const std::string& name);
+        template <typename T> std::vector<T>& vectorAttribute(const std::string& name);
 
         //
         //  Create and add a new attribute to the FB.
@@ -886,12 +829,9 @@ namespace TwkFB
         //      fb.newAttribute("simple_int", int(1));
         //
 
-        template <typename T>
-        TypedFBAttribute<T>* newAttribute(const std::string& name, T value);
+        template <typename T> TypedFBAttribute<T>* newAttribute(const std::string& name, T value);
 
-        template <typename T>
-        TypedFBVectorAttribute<T>* newAttribute(const std::string& name,
-                                                const std::vector<T>& value);
+        template <typename T> TypedFBVectorAttribute<T>* newAttribute(const std::string& name, const std::vector<T>& value);
 
         //
         //  Find an attribute by name
@@ -921,8 +861,7 @@ namespace TwkFB
 
         void copyAttributesTo(FrameBuffer*) const;
 
-        void appendAttributesAndPrefixTo(FrameBuffer*,
-                                         const std::string& prefix) const;
+        void appendAttributesAndPrefixTo(FrameBuffer*, const std::string& prefix) const;
 
         //
         //  Add an attribute to the FB.
@@ -949,19 +888,13 @@ namespace TwkFB
 
         void setPrimaryColorSpace(const std::string& name);
         void setTransferFunction(const std::string& tfun);
-        void setPrimaries(float xWhite, float yWhite, float xRed, float yRed,
-                          float xGreen, float yGreen, float xBlue, float yBlue);
+        void setPrimaries(float xWhite, float yWhite, float xRed, float yRed, float xGreen, float yGreen, float xBlue, float yBlue);
         void setPrimaries(const Chromaticities&);
         void setAdoptedNeutral(float x, float y);
-        void setMatrixAttribute(std::string name, float r0c0, float r0c1,
-                                float r0c2, float r0c3, float r1c0, float r1c1,
-                                float r1c2, float r1c3, float r2c0, float r2c1,
-                                float r2c2, float r2c3, float r3c0, float r3c1,
-                                float r3c2, float r3c3);
-        void setRGBToXYZMatrix(float r0c0, float r0c1, float r0c2, float r0c3,
-                               float r1c0, float r1c1, float r1c2, float r1c3,
-                               float r2c0, float r2c1, float r2c2, float r2c3,
-                               float r3c0, float r3c1, float r3c2, float r3c3);
+        void setMatrixAttribute(std::string name, float r0c0, float r0c1, float r0c2, float r0c3, float r1c0, float r1c1, float r1c2,
+                                float r1c3, float r2c0, float r2c1, float r2c2, float r2c3, float r3c0, float r3c1, float r3c2, float r3c3);
+        void setRGBToXYZMatrix(float r0c0, float r0c1, float r0c2, float r0c3, float r1c0, float r1c1, float r1c2, float r1c3, float r2c0,
+                               float r2c1, float r2c2, float r2c3, float r3c0, float r3c1, float r3c2, float r3c3);
         void setConversion(const std::string& c);
         void setRange(const std::string& c);
         void setChromaPlacement(const std::string& c);
@@ -980,8 +913,7 @@ namespace TwkFB
 
         const std::string& primaryColorSpace() const;
         const std::string& transferFunction() const;
-        void primaries(const std::string& primaryName, float& x,
-                       float& y) const;
+        void primaries(const std::string& primaryName, float& x, float& y) const;
         Chromaticities chromaticities() const;
         const std::string& conversion() const;
         const std::string& range() const;
@@ -1033,10 +965,7 @@ namespace TwkFB
     private:
         void lockCache() { m_cacheLock++; }
 
-        void unlockCache()
-        {
-            m_cacheLock = m_cacheLock > 0 ? m_cacheLock - 1 : 0;
-        }
+        void unlockCache() { m_cacheLock = m_cacheLock > 0 ? m_cacheLock - 1 : 0; }
 
     protected:
         void recalcStrides();
@@ -1121,20 +1050,17 @@ namespace TwkFB
         assert(x >= 0 && x < m_width);
         assert(y >= 0 && y < m_height);
 
-        size_t offset = (y * m_scanlinePaddedSize) + (x * m_pixelSize)
-                        + (c * m_bytesPerChannel);
+        size_t offset = (y * m_scanlinePaddedSize) + (x * m_pixelSize) + (c * m_bytesPerChannel);
 
         return (T&)(m_data[offset]);
     }
 
-    template <typename T>
-    inline T& FrameBuffer::pixel(int x, int y, int c) const
+    template <typename T> inline T& FrameBuffer::pixel(int x, int y, int c) const
     {
         assert(x >= 0 && x < m_width);
         assert(y >= 0 && y < m_height);
 
-        size_t offset = (y * m_scanlinePaddedSize) + (x * m_pixelSize)
-                        + (c * m_bytesPerChannel);
+        size_t offset = (y * m_scanlinePaddedSize) + (x * m_pixelSize) + (c * m_bytesPerChannel);
 
         return (T&)(m_data[offset]);
     }
@@ -1159,10 +1085,7 @@ namespace TwkFB
 
     template <typename T> inline T* FrameBuffer::pixels() { return (T*)m_data; }
 
-    template <typename T> inline const T* FrameBuffer::pixels() const
-    {
-        return (const T*)m_data;
-    }
+    template <typename T> inline const T* FrameBuffer::pixels() const { return (const T*)m_data; }
 
     template <typename T> inline T* FrameBuffer::end()
     {
@@ -1178,8 +1101,7 @@ namespace TwkFB
 
 #ifndef TWK_PUBLIC
 
-    template <typename T>
-    void FrameBuffer::insertChannelByType(const std::string& name, int channel)
+    template <typename T> void FrameBuffer::insertChannelByType(const std::string& name, int channel)
     {
         if (channel < 0 || channel > m_numChannels)
         {
@@ -1195,8 +1117,7 @@ namespace TwkFB
             for (int x = 0; x < m_width; ++x)
             {
                 int newOffset = (y * m_width * numChannels) + (x * numChannels);
-                int oldOffset =
-                    (y * m_width * m_numChannels) + (x * m_numChannels);
+                int oldOffset = (y * m_width * m_numChannels) + (x * m_numChannels);
 
                 for (int destC = 0, srcC = 0; destC < numChannels; ++destC)
                 {
@@ -1228,8 +1149,7 @@ namespace TwkFB
             for (int x = 0; x < m_width; ++x)
             {
                 int newOffset = (y * m_width * numChannels) + (x * numChannels);
-                int oldOffset =
-                    (y * m_width * m_numChannels) + (x * m_numChannels);
+                int oldOffset = (y * m_width * m_numChannels) + (x * m_numChannels);
 
                 for (int srcC = 0, destC = 0; srcC < numChannels; ++srcC)
                 {
@@ -1262,13 +1182,11 @@ namespace TwkFB
 
 #endif
 
-    template <typename T>
-    const T& FrameBuffer::attribute(const std::string& name) const
+    template <typename T> const T& FrameBuffer::attribute(const std::string& name) const
     {
         if (const FBAttribute* a = findAttribute(name))
         {
-            if (const TypedFBAttribute<T>* ta =
-                    dynamic_cast<const TypedFBAttribute<T>*>(a))
+            if (const TypedFBAttribute<T>* ta = dynamic_cast<const TypedFBAttribute<T>*>(a))
             {
                 return ta->value();
             }
@@ -1290,14 +1208,11 @@ namespace TwkFB
         return newAttribute<T>(name, T())->value();
     }
 
-    template <typename T>
-    const std::vector<T>&
-    FrameBuffer::vectorAttribute(const std::string& name) const
+    template <typename T> const std::vector<T>& FrameBuffer::vectorAttribute(const std::string& name) const
     {
         if (const FBAttribute* a = findAttribute(name))
         {
-            if (const TypedFBVectorAttribute<T>* ta =
-                    dynamic_cast<const TypedFBVectorAttribute<T>*>(a))
+            if (const TypedFBVectorAttribute<T>* ta = dynamic_cast<const TypedFBVectorAttribute<T>*>(a))
             {
                 return ta->value();
             }
@@ -1306,13 +1221,11 @@ namespace TwkFB
         throw name;
     }
 
-    template <typename T>
-    std::vector<T>& FrameBuffer::vectorAttribute(const std::string& name)
+    template <typename T> std::vector<T>& FrameBuffer::vectorAttribute(const std::string& name)
     {
         if (FBAttribute* a = findAttribute(name))
         {
-            if (TypedFBVectorAttribute<T>* ta =
-                    dynamic_cast<TypedFBVectorAttribute<T>*>(a))
+            if (TypedFBVectorAttribute<T>* ta = dynamic_cast<TypedFBVectorAttribute<T>*>(a))
             {
                 return ta->value();
             }
@@ -1321,9 +1234,7 @@ namespace TwkFB
         return newAttribute<T>(name, std::vector<T>())->value();
     }
 
-    template <typename T>
-    TypedFBAttribute<T>* FrameBuffer::newAttribute(const std::string& name,
-                                                   T value)
+    template <typename T> TypedFBAttribute<T>* FrameBuffer::newAttribute(const std::string& name, T value)
     {
         if (FBAttribute* old = findAttribute(name))
             deleteAttribute(old);
@@ -1332,15 +1243,11 @@ namespace TwkFB
         return a;
     }
 
-    template <typename T>
-    TypedFBVectorAttribute<T>*
-    FrameBuffer::newAttribute(const std::string& name,
-                              const std::vector<T>& value)
+    template <typename T> TypedFBVectorAttribute<T>* FrameBuffer::newAttribute(const std::string& name, const std::vector<T>& value)
     {
         if (FBAttribute* old = findAttribute(name))
             deleteAttribute(old);
-        TypedFBVectorAttribute<T>* a =
-            new TypedFBVectorAttribute<T>(name, value);
+        TypedFBVectorAttribute<T>* a = new TypedFBVectorAttribute<T>(name, value);
         m_attributes.push_back(a);
         return a;
     }

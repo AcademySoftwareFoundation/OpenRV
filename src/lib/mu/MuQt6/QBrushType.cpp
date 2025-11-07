@@ -59,16 +59,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QBrushType::Instance* i =
-            new QBrushType::Instance((Class*)NODE_THIS.type());
+        QBrushType::Instance* i = new QBrushType::Instance((Class*)NODE_THIS.type());
         QBrushType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QBrushType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QBrushType::finalizer, 0, 0, 0);
-    }
+    void QBrushType::registerFinalizer(void* o) { GC_register_finalizer(o, QBrushType::finalizer, 0, 0, 0); }
 
     void QBrushType::finalizer(void* obj, void* data)
     {
@@ -79,17 +75,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QBrushType>(param_this, QBrush());
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               int param_style)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_style)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::BrushStyle arg1 = (Qt::BrushStyle)(param_style);
@@ -97,10 +90,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_QColor_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_color,
-                                                      int param_style)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color, int param_style)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QColor arg1 = getqtype<QColorType>(param_color);
@@ -109,10 +99,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_int_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_color,
-                                                   int param_style)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_color, int param_style)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::GlobalColor arg1 = (Qt::GlobalColor)(param_color);
@@ -121,9 +108,8 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_QColor_QPixmap(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color,
-        Pointer param_pixmap)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_QColor_QPixmap(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color,
+                                                          Pointer param_pixmap)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QColor arg1 = getqtype<QColorType>(param_color);
@@ -132,10 +118,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_int_QPixmap(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_color,
-                                                       Pointer param_pixmap)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_int_QPixmap(Mu::Thread& NODE_THREAD, Pointer param_this, int param_color, Pointer param_pixmap)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::GlobalColor arg1 = (Qt::GlobalColor)(param_color);
@@ -144,9 +127,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_QPixmap(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_pixmap)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_QPixmap(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pixmap)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPixmap arg1 = getqtype<QPixmapType>(param_pixmap);
@@ -154,9 +135,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_QImage(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_image)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage arg1 = getqtype<QImageType>(param_image);
@@ -164,9 +143,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_QBrush_QBrush_QBrush_QGradient(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_gradient)
+    Pointer qt_QBrush_QBrush_QBrush_QBrush_QGradient(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_gradient)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QGradient arg1 = getqtype<QGradientType>(param_gradient);
@@ -174,25 +151,21 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QBrush_color_QColor_QBrush(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QBrush_color_QColor_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         return makeqtype<QColorType>(c, arg0.color(), "qt.QColor");
     }
 
-    bool qt_QBrush_isOpaque_bool_QBrush(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    bool qt_QBrush_isOpaque_bool_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         return arg0.isOpaque();
     }
 
-    void qt_QBrush_setColor_void_QBrush_QColor(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_color)
+    void qt_QBrush_setColor_void_QBrush_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -201,8 +174,7 @@ namespace Mu
         setqtype<QBrushType>(param_this, arg0);
     }
 
-    void qt_QBrush_setColor_void_QBrush_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_color)
+    void qt_QBrush_setColor_void_QBrush_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -211,8 +183,7 @@ namespace Mu
         setqtype<QBrushType>(param_this, arg0);
     }
 
-    void qt_QBrush_setStyle_void_QBrush_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_style)
+    void qt_QBrush_setStyle_void_QBrush_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_style)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -221,9 +192,7 @@ namespace Mu
         setqtype<QBrushType>(param_this, arg0);
     }
 
-    void qt_QBrush_setTexture_void_QBrush_QPixmap(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_pixmap)
+    void qt_QBrush_setTexture_void_QBrush_QPixmap(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pixmap)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -232,9 +201,7 @@ namespace Mu
         setqtype<QBrushType>(param_this, arg0);
     }
 
-    void qt_QBrush_setTextureImage_void_QBrush_QImage(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_image)
+    void qt_QBrush_setTextureImage_void_QBrush_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -243,9 +210,7 @@ namespace Mu
         setqtype<QBrushType>(param_this, arg0);
     }
 
-    void qt_QBrush_setTransform_void_QBrush_QTransform(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_matrix)
+    void qt_QBrush_setTransform_void_QBrush_QTransform(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -261,9 +226,7 @@ namespace Mu
         return int(arg0.style());
     }
 
-    void qt_QBrush_swap_void_QBrush_QBrush(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           Pointer param_other)
+    void qt_QBrush_swap_void_QBrush_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -272,33 +235,28 @@ namespace Mu
         setqtype<QBrushType>(param_this, arg0);
     }
 
-    Pointer qt_QBrush_texture_QPixmap_QBrush(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    Pointer qt_QBrush_texture_QPixmap_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         return makeqtype<QPixmapType>(c, arg0.texture(), "qt.QPixmap");
     }
 
-    Pointer qt_QBrush_textureImage_QImage_QBrush(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QBrush_textureImage_QImage_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         return makeqtype<QImageType>(c, arg0.textureImage(), "qt.QImage");
     }
 
-    Pointer qt_QBrush_transform_QTransform_QBrush(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QBrush_transform_QTransform_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         return makeqtype<QTransformType>(c, arg0.transform(), "qt.QTransform");
     }
 
-    bool qt_QBrush_operatorBang_EQ__bool_QBrush_QBrush(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_brush)
+    bool qt_QBrush_operatorBang_EQ__bool_QBrush_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_brush)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -306,9 +264,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_brush)
+    bool qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_brush)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
@@ -318,150 +274,119 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QBrush0, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush1, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush2, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QBrush_QBrush_QBrush_QBrush_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush3, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush4, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QColor_QPixmap(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QColor_QPixmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                  NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush5, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_int_QPixmap(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(
+            qt_QBrush_QBrush_QBrush_QBrush_int_QPixmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush6, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QPixmap(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QPixmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush7, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush8, Pointer)
     {
-        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QBrush_QBrush_QBrush_QBrush_QGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_color0, Pointer)
-    {
-        NODE_RETURN(qt_QBrush_color_QColor_QBrush(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_color0, Pointer) { NODE_RETURN(qt_QBrush_color_QColor_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_isOpaque0, bool)
     {
-        NODE_RETURN(qt_QBrush_isOpaque_bool_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBrush_isOpaque_bool_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setColor0, void)
     {
-        qt_QBrush_setColor_void_QBrush_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QBrush_setColor_void_QBrush_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setColor1, void)
     {
-        qt_QBrush_setColor_void_QBrush_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QBrush_setColor_void_QBrush_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setStyle0, void)
     {
-        qt_QBrush_setStyle_void_QBrush_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QBrush_setStyle_void_QBrush_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTexture0, void)
     {
-        qt_QBrush_setTexture_void_QBrush_QPixmap(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QBrush_setTexture_void_QBrush_QPixmap(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTextureImage0, void)
     {
-        qt_QBrush_setTextureImage_void_QBrush_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QBrush_setTextureImage_void_QBrush_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTransform0, void)
     {
-        qt_QBrush_setTransform_void_QBrush_QTransform(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QBrush_setTransform_void_QBrush_QTransform(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_style0, int)
-    {
-        NODE_RETURN(qt_QBrush_style_int_QBrush(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_style0, int) { NODE_RETURN(qt_QBrush_style_int_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QBrush_swap_void_QBrush_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QBrush_swap_void_QBrush_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_texture0, Pointer)
     {
-        NODE_RETURN(qt_QBrush_texture_QPixmap_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBrush_texture_QPixmap_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_textureImage0, Pointer)
     {
-        NODE_RETURN(qt_QBrush_textureImage_QImage_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBrush_textureImage_QImage_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_transform0, Pointer)
     {
-        NODE_RETURN(qt_QBrush_transform_QTransform_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QBrush_transform_QTransform_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QBrush_operatorBang_EQ__bool_QBrush_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QBrush_operatorBang_EQ__bool_QBrush_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QBrushType::load()
@@ -481,134 +406,78 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QBrush", _n_QBrush0, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush, Return, "qt.QBrush",
-                         Parameters, new Param(c, "this", "qt.QBrush"), End),
-            new Function(c, "QBrush", _n_QBrush1, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush_int, Return,
-                         "qt.QBrush", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "style", "int"), End),
-            new Function(
-                c, "QBrush", _n_QBrush2, None, Compiled,
-                qt_QBrush_QBrush_QBrush_QBrush_QColor_int, Return, "qt.QBrush",
-                Parameters, new Param(c, "this", "qt.QBrush"),
-                new Param(c, "color", "qt.QColor"),
-                new Param(c, "style", "int", Value((int)Qt::SolidPattern)),
-                End),
-            new Function(
-                c, "QBrush", _n_QBrush3, None, Compiled,
-                qt_QBrush_QBrush_QBrush_QBrush_int_int, Return, "qt.QBrush",
-                Parameters, new Param(c, "this", "qt.QBrush"),
-                new Param(c, "color", "int"),
-                new Param(c, "style", "int", Value((int)Qt::SolidPattern)),
-                End),
-            new Function(c, "QBrush", _n_QBrush4, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush_QColor_QPixmap, Return,
-                         "qt.QBrush", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "color", "qt.QColor"),
+            new Function(c, "QBrush", _n_QBrush0, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush, Return, "qt.QBrush", Parameters,
+                         new Param(c, "this", "qt.QBrush"), End),
+            new Function(c, "QBrush", _n_QBrush1, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_int, Return, "qt.QBrush", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "style", "int"), End),
+            new Function(c, "QBrush", _n_QBrush2, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_QColor_int, Return, "qt.QBrush",
+                         Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "color", "qt.QColor"),
+                         new Param(c, "style", "int", Value((int)Qt::SolidPattern)), End),
+            new Function(c, "QBrush", _n_QBrush3, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_int_int, Return, "qt.QBrush", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "color", "int"),
+                         new Param(c, "style", "int", Value((int)Qt::SolidPattern)), End),
+            new Function(c, "QBrush", _n_QBrush4, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_QColor_QPixmap, Return, "qt.QBrush",
+                         Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "color", "qt.QColor"),
                          new Param(c, "pixmap", "qt.QPixmap"), End),
-            new Function(c, "QBrush", _n_QBrush5, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush_int_QPixmap, Return,
-                         "qt.QBrush", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "color", "int"),
-                         new Param(c, "pixmap", "qt.QPixmap"), End),
-            new Function(c, "QBrush", _n_QBrush6, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush_QPixmap, Return,
-                         "qt.QBrush", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "pixmap", "qt.QPixmap"), End),
-            new Function(c, "QBrush", _n_QBrush7, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush_QImage, Return,
-                         "qt.QBrush", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "image", "qt.QImage"), End),
-            new Function(c, "QBrush", _n_QBrush8, None, Compiled,
-                         qt_QBrush_QBrush_QBrush_QBrush_QGradient, Return,
-                         "qt.QBrush", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "gradient", "qt.QGradient"), End),
+            new Function(c, "QBrush", _n_QBrush5, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_int_QPixmap, Return, "qt.QBrush",
+                         Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "color", "int"), new Param(c, "pixmap", "qt.QPixmap"),
+                         End),
+            new Function(c, "QBrush", _n_QBrush6, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_QPixmap, Return, "qt.QBrush", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "pixmap", "qt.QPixmap"), End),
+            new Function(c, "QBrush", _n_QBrush7, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_QImage, Return, "qt.QBrush", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "image", "qt.QImage"), End),
+            new Function(c, "QBrush", _n_QBrush8, None, Compiled, qt_QBrush_QBrush_QBrush_QBrush_QGradient, Return, "qt.QBrush", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "gradient", "qt.QGradient"), End),
             // MISSING: QBrush (QBrush; QBrush this, QBrush other)
-            new Function(c, "color", _n_color0, None, Compiled,
-                         qt_QBrush_color_QColor_QBrush, Return, "qt.QColor",
-                         Parameters, new Param(c, "this", "qt.QBrush"), End),
-            new Function(c, "isOpaque", _n_isOpaque0, None, Compiled,
-                         qt_QBrush_isOpaque_bool_QBrush, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QBrush"), End),
-            new Function(c, "setColor", _n_setColor0, None, Compiled,
-                         qt_QBrush_setColor_void_QBrush_QColor, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "color", "qt.QColor"), End),
-            new Function(c, "setColor", _n_setColor1, None, Compiled,
-                         qt_QBrush_setColor_void_QBrush_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "color", "int"), End),
-            new Function(c, "setStyle", _n_setStyle0, None, Compiled,
-                         qt_QBrush_setStyle_void_QBrush_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "style", "int"), End),
-            new Function(c, "setTexture", _n_setTexture0, None, Compiled,
-                         qt_QBrush_setTexture_void_QBrush_QPixmap, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "pixmap", "qt.QPixmap"), End),
-            new Function(c, "setTextureImage", _n_setTextureImage0, None,
-                         Compiled, qt_QBrush_setTextureImage_void_QBrush_QImage,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "image", "qt.QImage"), End),
-            new Function(c, "setTransform", _n_setTransform0, None, Compiled,
-                         qt_QBrush_setTransform_void_QBrush_QTransform, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "matrix", "qt.QTransform"), End),
-            new Function(c, "style", _n_style0, None, Compiled,
-                         qt_QBrush_style_int_QBrush, Return, "int", Parameters,
+            new Function(c, "color", _n_color0, None, Compiled, qt_QBrush_color_QColor_QBrush, Return, "qt.QColor", Parameters,
                          new Param(c, "this", "qt.QBrush"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QBrush_swap_void_QBrush_QBrush, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "other", "qt.QBrush"), End),
-            new Function(c, "texture", _n_texture0, None, Compiled,
-                         qt_QBrush_texture_QPixmap_QBrush, Return, "qt.QPixmap",
+            new Function(c, "isOpaque", _n_isOpaque0, None, Compiled, qt_QBrush_isOpaque_bool_QBrush, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QBrush"), End),
+            new Function(c, "setColor", _n_setColor0, None, Compiled, qt_QBrush_setColor_void_QBrush_QColor, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "color", "qt.QColor"), End),
+            new Function(c, "setColor", _n_setColor1, None, Compiled, qt_QBrush_setColor_void_QBrush_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "color", "int"), End),
+            new Function(c, "setStyle", _n_setStyle0, None, Compiled, qt_QBrush_setStyle_void_QBrush_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "style", "int"), End),
+            new Function(c, "setTexture", _n_setTexture0, None, Compiled, qt_QBrush_setTexture_void_QBrush_QPixmap, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "pixmap", "qt.QPixmap"), End),
+            new Function(c, "setTextureImage", _n_setTextureImage0, None, Compiled, qt_QBrush_setTextureImage_void_QBrush_QImage, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "image", "qt.QImage"), End),
+            new Function(c, "setTransform", _n_setTransform0, None, Compiled, qt_QBrush_setTransform_void_QBrush_QTransform, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "matrix", "qt.QTransform"), End),
+            new Function(c, "style", _n_style0, None, Compiled, qt_QBrush_style_int_QBrush, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QBrush"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QBrush_swap_void_QBrush_QBrush, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "other", "qt.QBrush"), End),
+            new Function(c, "texture", _n_texture0, None, Compiled, qt_QBrush_texture_QPixmap_QBrush, Return, "qt.QPixmap", Parameters,
+                         new Param(c, "this", "qt.QBrush"), End),
+            new Function(c, "textureImage", _n_textureImage0, None, Compiled, qt_QBrush_textureImage_QImage_QBrush, Return, "qt.QImage",
                          Parameters, new Param(c, "this", "qt.QBrush"), End),
-            new Function(c, "textureImage", _n_textureImage0, None, Compiled,
-                         qt_QBrush_textureImage_QImage_QBrush, Return,
-                         "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QBrush"), End),
-            new Function(c, "transform", _n_transform0, None, Compiled,
-                         qt_QBrush_transform_QTransform_QBrush, Return,
-                         "qt.QTransform", Parameters,
-                         new Param(c, "this", "qt.QBrush"), End),
+            new Function(c, "transform", _n_transform0, None, Compiled, qt_QBrush_transform_QTransform_QBrush, Return, "qt.QTransform",
+                         Parameters, new Param(c, "this", "qt.QBrush"), End),
             // MISSING: QVariant ("QVariant operator"; QBrush this)
             // static functions
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QBrush_operatorBang_EQ__bool_QBrush_QBrush, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "brush", "qt.QBrush"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QBrush_operatorBang_EQ__bool_QBrush_QBrush, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QBrush"), new Param(c, "brush", "qt.QBrush"), End),
             // MISSING: = (QBrush; QBrush this, QBrush brush)
             // MISSING: = (QBrush; QBrush this, "QBrush & &" other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QBrush"),
-                         new Param(c, "brush", "qt.QBrush"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QBrush"), new Param(c, "brush", "qt.QBrush"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

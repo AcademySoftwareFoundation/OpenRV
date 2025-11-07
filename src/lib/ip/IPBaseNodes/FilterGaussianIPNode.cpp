@@ -25,10 +25,7 @@ namespace IPCore
     using namespace TwkMath;
     using namespace TwkFB;
 
-    FilterGaussianIPNode::FilterGaussianIPNode(const std::string& name,
-                                               const NodeDefinition* def,
-                                               IPGraph* graph,
-                                               GroupIPNode* group)
+    FilterGaussianIPNode::FilterGaussianIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         m_sigma = declareProperty<FloatProperty>("node.sigma",
@@ -53,11 +50,9 @@ namespace IPCore
 
         IPImage* gaussHorizontal = NULL;
         if (radius <= 10)
-            gaussHorizontal =
-                Shader::applyGaussianFilter(this, image, (size_t)radius, sigma);
+            gaussHorizontal = Shader::applyGaussianFilter(this, image, (size_t)radius, sigma);
         else
-            gaussHorizontal =
-                Shader::applyFastGaussianFilter(this, image, (size_t)radius);
+            gaussHorizontal = Shader::applyFastGaussianFilter(this, image, (size_t)radius);
 
         return gaussHorizontal;
     }

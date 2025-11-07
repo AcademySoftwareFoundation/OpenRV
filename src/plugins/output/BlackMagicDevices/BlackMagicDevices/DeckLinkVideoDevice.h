@@ -46,8 +46,7 @@ namespace BlackMagicDevices
     {
         const char* desc{nullptr};
         BMDPixelFormat value{bmdFormatUnspecified};
-        TwkApp::VideoDevice::InternalDataFormat iformat{
-            TwkApp::VideoDevice::InternalDataFormat::RGB8};
+        TwkApp::VideoDevice::InternalDataFormat iformat{TwkApp::VideoDevice::InternalDataFormat::RGB8};
         bool rgb{false};
     };
 
@@ -99,9 +98,7 @@ namespace BlackMagicDevices
         using BufferVector = std::vector<unsigned char*>;
         using ThreadGroup = stl_ext::thread_group;
         using AudioBuffer = std::vector<int>;
-        using StereoFrameMap =
-            std::map<IDeckLinkMutableVideoFrame*,
-                     std::unique_ptr<StereoVideoFrame::Provider>>;
+        using StereoFrameMap = std::map<IDeckLinkMutableVideoFrame*, std::unique_ptr<StereoVideoFrame::Provider>>;
         using DLVideoFrameDeque = std::deque<IDeckLinkMutableVideoFrame*>;
 
         struct PBOData
@@ -175,8 +172,7 @@ namespace BlackMagicDevices
         //  Constructors
         //
 
-        DeckLinkVideoDevice(BlackMagicModule*, const std::string&, IDeckLink*,
-                            IDeckLinkOutput*);
+        DeckLinkVideoDevice(BlackMagicModule*, const std::string&, IDeckLink*, IDeckLinkOutput*);
         virtual ~DeckLinkVideoDevice();
 
         virtual size_t asyncMaxMappedBuffers() const;
@@ -220,8 +216,7 @@ namespace BlackMagicDevices
 
         virtual bool readyForTransfer() const;
         virtual void transfer(const TwkGLF::GLFBO*) const;
-        virtual void transfer2(const TwkGLF::GLFBO*,
-                               const TwkGLF::GLFBO*) const;
+        virtual void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const;
         virtual void transferAudio(void* interleavedData, size_t n) const;
         virtual bool willBlockOnTransfer() const;
 
@@ -242,23 +237,17 @@ namespace BlackMagicDevices
 
         virtual void unbind() const;
         virtual void bind(const TwkGLF::GLVideoDevice*) const;
-        virtual void bind2(const TwkGLF::GLVideoDevice*,
-                           const TwkGLF::GLVideoDevice*) const;
+        virtual void bind2(const TwkGLF::GLVideoDevice*, const TwkGLF::GLVideoDevice*) const;
         virtual void audioFrameSizeSequence(AudioFrameSizeVector&) const;
 
-        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid,
-                                                         LPVOID* ppv)
-        {
-            return E_NOINTERFACE;
-        }
+        virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv) { return E_NOINTERFACE; }
 
         virtual ULONG STDMETHODCALLTYPE AddRef() { return 1; }
 
         virtual ULONG STDMETHODCALLTYPE Release() { return 1; }
 
-        virtual HRESULT STDMETHODCALLTYPE
-        ScheduledFrameCompleted(IDeckLinkVideoFrame* completedFrame,
-                                BMDOutputFrameCompletionResult result);
+        virtual HRESULT STDMETHODCALLTYPE ScheduledFrameCompleted(IDeckLinkVideoFrame* completedFrame,
+                                                                  BMDOutputFrameCompletionResult result);
         virtual HRESULT STDMETHODCALLTYPE ScheduledPlaybackHasStopped();
 #ifdef PLATFORM_WINDOWS
         virtual HRESULT STDMETHODCALLTYPE RenderAudioSamples(BOOL preroll);
@@ -269,12 +258,8 @@ namespace BlackMagicDevices
     private:
         void initialize();
         bool transferChannel(size_t i, const TwkGLF::GLFBO*) const;
-        void transferChannelPBO(size_t i, const TwkGLF::GLFBO*,
-                                IDeckLinkMutableVideoFrame*,
-                                IDeckLinkMutableVideoFrame*) const;
-        void transferChannelReadPixels(size_t i, const TwkGLF::GLFBO*,
-                                       IDeckLinkMutableVideoFrame*,
-                                       IDeckLinkMutableVideoFrame*) const;
+        void transferChannelPBO(size_t i, const TwkGLF::GLFBO*, IDeckLinkMutableVideoFrame*, IDeckLinkMutableVideoFrame*) const;
+        void transferChannelReadPixels(size_t i, const TwkGLF::GLFBO*, IDeckLinkMutableVideoFrame*, IDeckLinkMutableVideoFrame*) const;
         void ScheduleFrame() const;
 
         std::string dumpHDRMetadata() const;
@@ -289,12 +274,10 @@ namespace BlackMagicDevices
         mutable IDeckLinkMutableVideoFrame* m_readyFrame;
         mutable StereoVideoFrame::Provider* m_readyStereoFrame;
         mutable DLVideoFrameDeque m_DLOutputVideoFrameQueue;
-        mutable DLVideoFrameDeque
-            m_DLReadbackVideoFrameQueue; // only rgb formats
+        mutable DLVideoFrameDeque m_DLReadbackVideoFrameQueue; // only rgb formats
         mutable bool m_needsFrameConverter;
         mutable bool m_hasAudio;
-        mutable StereoFrameMap
-            m_rightEyeToStereoFrameMap; // indexed by the left eye
+        mutable StereoFrameMap m_rightEyeToStereoFrameMap; // indexed by the left eye
         mutable PBOQueue m_pboQueue;
         HDRMetadata s_hdrMetadata;
         IDeckLinkOutput* m_outputAPI;
@@ -302,8 +285,7 @@ namespace BlackMagicDevices
         IDeckLinkConfiguration* m_configuration;
         bool m_useHDRMetadata{false};
         mutable PBOData* m_lastPboData;
-        mutable PBOData*
-            m_secondLastPboData; // use of stereo formats; stores left eye.
+        mutable PBOData* m_secondLastPboData; // use of stereo formats; stores left eye.
         BMDPixelFormat m_readPixelFormat;
         BMDPixelFormat m_outputPixelFormat;
         static const int NB_AUDIO_BUFFERS = 2;

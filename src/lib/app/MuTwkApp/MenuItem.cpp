@@ -59,15 +59,13 @@ namespace TwkApp
 
         s->addSymbols(new ReferenceType(c, refName, this),
 
-                      new Function(c, className, BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, className, BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
@@ -79,32 +77,21 @@ namespace TwkApp
         context->functionType(bft);
         context->arrayType(this, 1, 0);
 
-        addSymbols(
-            new MemberVariable(c, "label", "string"),
-            new MemberVariable(c, "actionHook", ft),
-            new MemberVariable(c, "key", "string"),
-            new MemberVariable(c, "stateHook", bft),
-            new MemberVariable(c, "subMenu", mi),
+        addSymbols(new MemberVariable(c, "label", "string"), new MemberVariable(c, "actionHook", ft),
+                   new MemberVariable(c, "key", "string"), new MemberVariable(c, "stateHook", bft), new MemberVariable(c, "subMenu", mi),
 
-            new Function(c, "__allocate", BaseFunctions::classAllocate,
-                         Function::None, Function::Return, tn, Function::End),
+                   new Function(c, "__allocate", BaseFunctions::classAllocate, Function::None, Function::Return, tn, Function::End),
 
-            new Function(
-                c, className, MenuItem::construct, None, Return, tn, Parameters,
-                new ParameterVariable(c, "this", tn),
-                new ParameterVariable(c, "label", "string"),
-                new ParameterVariable(c, "actionHook", ft),
-                new ParameterVariable(c, "key", "string", Value(Pointer(0))),
-                new ParameterVariable(c, "stateHook", bft, Value(Pointer(0))),
-                new ParameterVariable(c, "subMenu", mi, Value(Pointer(0))),
-                End),
+                   new Function(c, className, MenuItem::construct, None, Return, tn, Parameters, new ParameterVariable(c, "this", tn),
+                                new ParameterVariable(c, "label", "string"), new ParameterVariable(c, "actionHook", ft),
+                                new ParameterVariable(c, "key", "string", Value(Pointer(0))),
+                                new ParameterVariable(c, "stateHook", bft, Value(Pointer(0))),
+                                new ParameterVariable(c, "subMenu", mi, Value(Pointer(0))), End),
 
-            new Function(c, className, MenuItem::construct2, None, Return, tn,
-                         Parameters, new ParameterVariable(c, "this", tn),
-                         new ParameterVariable(c, "label", "string"),
-                         new ParameterVariable(c, "subMenu", mi), End),
+                   new Function(c, className, MenuItem::construct2, None, Return, tn, Parameters, new ParameterVariable(c, "this", tn),
+                                new ParameterVariable(c, "label", "string"), new ParameterVariable(c, "subMenu", mi), End),
 
-            EndArguments);
+                   EndArguments);
     }
 
     NODE_IMPLEMENTATION(MenuItem::construct, Pointer)

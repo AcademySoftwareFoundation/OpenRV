@@ -36,37 +36,27 @@ namespace IPCore
 
     static inline Imath::V2f convert(Vec2f v) { return Imath::V2f(v.x, v.y); }
 
-    static inline Imath::V3f convert(Vec3f v)
-    {
-        return Imath::V3f(v.x, v.y, v.z);
-    }
+    static inline Imath::V3f convert(Vec3f v) { return Imath::V3f(v.x, v.y, v.z); }
 
     static inline Vec2f convert(Imath::V2f v) { return Vec2f(v.x, v.y); }
 
     static inline Vec3f convert(Imath::V3f v) { return Vec3f(v.x, v.y, v.z); }
 
-    static inline Mat44f convert(const Imath::M44f& m)
-    {
-        return reinterpret_cast<const Mat44f*>(&m)->transposed();
-    }
+    static inline Mat44f convert(const Imath::M44f& m) { return reinterpret_cast<const Mat44f*>(&m)->transposed(); }
 
 #define NO_FLOAT_3D_TEXTURES
 
-    FileSpaceLinearizeIPNode::FileSpaceLinearizeIPNode(
-        const std::string& name, const NodeDefinition* def, IPGraph* graph,
-        GroupIPNode* group)
+    FileSpaceLinearizeIPNode::FileSpaceLinearizeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph,
+                                                       GroupIPNode* group)
         : LUTIPNode(name, def, graph, group)
     {
         setMaxInputs(1);
 
         m_colorAlphaType = declareProperty<IntProperty>("color.alphaType", 0);
         m_colorLogType = declareProperty<IntProperty>("color.logtype", 0);
-        m_cineonWhite =
-            declareProperty<IntProperty>("cineon.whiteCodeValue", 0);
-        m_cineonBlack =
-            declareProperty<IntProperty>("cineon.blackCodeValue", 0);
-        m_cineonBreakPoint =
-            declareProperty<IntProperty>("cineon.breakPointValue", 0);
+        m_cineonWhite = declareProperty<IntProperty>("cineon.whiteCodeValue", 0);
+        m_cineonBlack = declareProperty<IntProperty>("cineon.blackCodeValue", 0);
+        m_cineonBreakPoint = declareProperty<IntProperty>("cineon.breakPointValue", 0);
         m_colorYUV = declareProperty<IntProperty>("color.YUV", 0);
 
         // XXX we may have to always write these to file, since if they have
@@ -74,45 +64,28 @@ namespace IPCore
         // somethign), then when we load that session file, source_setup will
         // think they need to be configured (since they were not set in file).
 
-        m_colorsRGB2Linear =
-            declareProperty<IntProperty>("color.sRGB2linear", 0);
-        m_colorRec7092Linear =
-            declareProperty<IntProperty>("color.Rec709ToLinear", 0);
-        m_colorFileGamma =
-            declareProperty<FloatProperty>("color.fileGamma", 1.0f);
+        m_colorsRGB2Linear = declareProperty<IntProperty>("color.sRGB2linear", 0);
+        m_colorRec7092Linear = declareProperty<IntProperty>("color.Rec709ToLinear", 0);
+        m_colorFileGamma = declareProperty<FloatProperty>("color.fileGamma", 1.0f);
         m_colorActive = declareProperty<IntProperty>("color.active", 1);
-        m_colorIgnoreChromaticities =
-            declareProperty<IntProperty>("color.ignoreChromaticities", 0);
+        m_colorIgnoreChromaticities = declareProperty<IntProperty>("color.ignoreChromaticities", 0);
         m_CDLactive = declareProperty<IntProperty>("CDL.active", 0);
         m_CDLslope = declareProperty<Vec3fProperty>("CDL.slope", Vec3f(1.0f));
         m_CDLoffset = declareProperty<Vec3fProperty>("CDL.offset", Vec3f(0.0f));
         m_CDLpower = declareProperty<Vec3fProperty>("CDL.power", Vec3f(1.0f));
-        m_CDLsaturation =
-            declareProperty<FloatProperty>("CDL.saturation", 1.0f);
+        m_CDLsaturation = declareProperty<FloatProperty>("CDL.saturation", 1.0f);
         m_CDLnoclamp = declareProperty<IntProperty>("CDL.noClamp", 0);
     }
 
     FileSpaceLinearizeIPNode::~FileSpaceLinearizeIPNode() {}
 
-    void FileSpaceLinearizeIPNode::setLogLin(int t)
-    {
-        setProperty(m_colorLogType, t);
-    }
+    void FileSpaceLinearizeIPNode::setLogLin(int t) { setProperty(m_colorLogType, t); }
 
-    void FileSpaceLinearizeIPNode::setSRGB(int t)
-    {
-        setProperty(m_colorsRGB2Linear, t);
-    }
+    void FileSpaceLinearizeIPNode::setSRGB(int t) { setProperty(m_colorsRGB2Linear, t); }
 
-    void FileSpaceLinearizeIPNode::setRec709(int t)
-    {
-        setProperty(m_colorRec7092Linear, t);
-    }
+    void FileSpaceLinearizeIPNode::setRec709(int t) { setProperty(m_colorRec7092Linear, t); }
 
-    void FileSpaceLinearizeIPNode::setFileGamma(float y)
-    {
-        setProperty(m_colorFileGamma, y);
-    }
+    void FileSpaceLinearizeIPNode::setFileGamma(float y) { setProperty(m_colorFileGamma, y); }
 
     IPImage* FileSpaceLinearizeIPNode::evaluate(const Context& context)
     {
@@ -128,8 +101,7 @@ namespace IPCore
             // children and apply the linearization logic to each of them. This
             // usually happens in the context of a tiled-source.
             size_t i = 0;
-            for (IPImage* child = head->children; child;
-                 child = child->next, i++)
+            for (IPImage* child = head->children; child; child = child->next, i++)
             {
                 evaluateOne(child, context);
             }
@@ -147,8 +119,7 @@ namespace IPCore
         return head;
     }
 
-    void FileSpaceLinearizeIPNode::evaluateOne(IPImage* img,
-                                               const Context& context)
+    void FileSpaceLinearizeIPNode::evaluateOne(IPImage* img, const Context& context)
     {
         Vec2f cred;
         Vec2f cgreen;
@@ -167,29 +138,21 @@ namespace IPCore
         const bool active = propertyValue<IntProperty>(m_colorActive, 1) != 0;
         const bool CDLactive = propertyValue<IntProperty>(m_CDLactive, 1) != 0;
 
-        Vec3f CDL_offset =
-            propertyValue<Vec3fProperty>(m_CDLoffset, Vec3f(0.0f));
+        Vec3f CDL_offset = propertyValue<Vec3fProperty>(m_CDLoffset, Vec3f(0.0f));
         Vec3f CDL_slope = propertyValue<Vec3fProperty>(m_CDLslope, Vec3f(1.0f));
         Vec3f CDL_power = propertyValue<Vec3fProperty>(m_CDLpower, Vec3f(1.0f));
-        float CDL_saturation =
-            propertyValue<FloatProperty>(m_CDLsaturation, 1.0f);
+        float CDL_saturation = propertyValue<FloatProperty>(m_CDLsaturation, 1.0f);
 
-        if (CDLactive
-            && (CDL_offset != Vec3f(0.0f) || CDL_slope != Vec3f(1.0f)
-                || CDL_power != Vec3f(1.0f) || CDL_saturation != 1.0f))
+        if (CDLactive && (CDL_offset != Vec3f(0.0f) || CDL_slope != Vec3f(1.0f) || CDL_power != Vec3f(1.0f) || CDL_saturation != 1.0f))
         {
-            const bool noClamp =
-                (propertyValue<IntProperty>(m_CDLnoclamp, 0) != 0);
+            const bool noClamp = (propertyValue<IntProperty>(m_CDLnoclamp, 0) != 0);
 
-            img->shaderExpr =
-                Shader::newColorCDL(img->shaderExpr, CDL_slope, CDL_offset,
-                                    CDL_power, CDL_saturation, noClamp);
+            img->shaderExpr = Shader::newColorCDL(img->shaderExpr, CDL_slope, CDL_offset, CDL_power, CDL_saturation, noClamp);
         }
 
         if (img->fb && img->fb->hasRGBtoXYZMatrix())
         {
-            RGBXYZ =
-                img->fb->attribute<Mat44f>(TwkFB::ColorSpace::RGBtoXYZMatrix());
+            RGBXYZ = img->fb->attribute<Mat44f>(TwkFB::ColorSpace::RGBtoXYZMatrix());
             xyzMatrix = true;
             rec709 = false;
 
@@ -200,11 +163,9 @@ namespace IPCore
         }
         else if (img->fb && img->fb->hasPrimaries())
         {
-            cwhite =
-                img->fb->attribute<Vec2f>(TwkFB::ColorSpace::WhitePrimary());
+            cwhite = img->fb->attribute<Vec2f>(TwkFB::ColorSpace::WhitePrimary());
             cred = img->fb->attribute<Vec2f>(TwkFB::ColorSpace::RedPrimary());
-            cgreen =
-                img->fb->attribute<Vec2f>(TwkFB::ColorSpace::GreenPrimary());
+            cgreen = img->fb->attribute<Vec2f>(TwkFB::ColorSpace::GreenPrimary());
             cblue = img->fb->attribute<Vec2f>(TwkFB::ColorSpace::BluePrimary());
             rec709 = false;
         }
@@ -218,8 +179,7 @@ namespace IPCore
 
         if (img->fb && img->fb->hasAdoptedNeutral())
         {
-            cneutral =
-                img->fb->attribute<Vec2f>(TwkFB::ColorSpace::AdoptedNeutral());
+            cneutral = img->fb->attribute<Vec2f>(TwkFB::ColorSpace::AdoptedNeutral());
             rec709 = false;
         }
         else
@@ -244,14 +204,11 @@ namespace IPCore
             {
                 if (img->fb)
                 {
-                    if (const TwkFB::FBAttribute* a =
-                            img->fb->findAttribute("AlphaType"))
+                    if (const TwkFB::FBAttribute* a = img->fb->findAttribute("AlphaType"))
                     {
-                        if (const TwkFB::StringAttribute* sa =
-                                dynamic_cast<const TwkFB::StringAttribute*>(a))
+                        if (const TwkFB::StringAttribute* sa = dynamic_cast<const TwkFB::StringAttribute*>(a))
                         {
-                            alreadyUnpremulted =
-                                sa->value() == "Unpremultiplied";
+                            alreadyUnpremulted = sa->value() == "Unpremultiplied";
                         }
                     }
                 }
@@ -285,11 +242,7 @@ namespace IPCore
                             if (img->fb)
                             {
                                 if (const TwkFB::FloatAttribute* fattr =
-                                        dynamic_cast<
-                                            const TwkFB::FloatAttribute*>(
-                                            img->fb->findAttribute(
-                                                TwkFB::ColorSpace::
-                                                    BlackPoint())))
+                                        dynamic_cast<const TwkFB::FloatAttribute*>(img->fb->findAttribute(TwkFB::ColorSpace::BlackPoint())))
                                 {
                                     float ftmp = fattr->value();
                                     if (ftmp >= 1.0f)
@@ -313,11 +266,7 @@ namespace IPCore
                             if (img->fb)
                             {
                                 if (const TwkFB::FloatAttribute* fattr =
-                                        dynamic_cast<
-                                            const TwkFB::FloatAttribute*>(
-                                            img->fb->findAttribute(
-                                                TwkFB::ColorSpace::
-                                                    WhitePoint())))
+                                        dynamic_cast<const TwkFB::FloatAttribute*>(img->fb->findAttribute(TwkFB::ColorSpace::WhitePoint())))
                                 {
                                     float ftmp = fattr->value();
                                     if (ftmp >= 1.0f)
@@ -341,11 +290,7 @@ namespace IPCore
                             if (img->fb)
                             {
                                 if (const TwkFB::FloatAttribute* fattr =
-                                        dynamic_cast<
-                                            const TwkFB::FloatAttribute*>(
-                                            img->fb->findAttribute(
-                                                TwkFB::ColorSpace::
-                                                    BreakPoint())))
+                                        dynamic_cast<const TwkFB::FloatAttribute*>(img->fb->findAttribute(TwkFB::ColorSpace::BreakPoint())))
                                 {
                                     float ftmp = fattr->value();
                                     if (ftmp >= 1.0f)
@@ -357,14 +302,11 @@ namespace IPCore
                         }
                     }
 
-                    img->shaderExpr = Shader::newColorCineonLogToLinear(
-                        img->shaderExpr, cinblack, cinwhite,
-                        (cinwhite - cinbreakpoint));
+                    img->shaderExpr = Shader::newColorCineonLogToLinear(img->shaderExpr, cinblack, cinwhite, (cinwhite - cinbreakpoint));
                 }
                 else if (logtype == 2)
                 {
-                    img->shaderExpr =
-                        Shader::newColorViperLogToLinear(img->shaderExpr);
+                    img->shaderExpr = Shader::newColorViperLogToLinear(img->shaderExpr);
                 }
                 else if ((logtype == 3) || (logtype == 4)) // logC or logC_Film
                 {
@@ -374,30 +316,26 @@ namespace IPCore
                         // Undo the Film Style Matrix; this is done prior to
                         // linearizing the logC.
                         //
-                        img->shaderExpr = Shader::newColorMatrix(
-                            img->shaderExpr,
-                            ArriFilmStyleInverseMatrix<float>());
+                        img->shaderExpr = Shader::newColorMatrix(img->shaderExpr, ArriFilmStyleInverseMatrix<float>());
                     }
 
                     TwkFB::LogCTransformParams params;
 
                     TwkFB::getLogCCurveParams(params, img->fb);
 
-                    img->shaderExpr = Shader::newColorLogCLinear(
-                        img->shaderExpr,
-                        params.LogCBlackSignal,     // pbs
-                        params.LogCEncodingOffset,  // eo
-                        params.LogCEncodingGain,    // eg
-                        params.LogCGraySignal,      // gs
-                        params.LogCBlackOffset,     // bo
-                        params.LogCLinearSlope,     // ls
-                        params.LogCLinearOffset,    // lo
-                        params.LogCLinearCutPoint); // logc to linear cutoff
+                    img->shaderExpr = Shader::newColorLogCLinear(img->shaderExpr,
+                                                                 params.LogCBlackSignal,     // pbs
+                                                                 params.LogCEncodingOffset,  // eo
+                                                                 params.LogCEncodingGain,    // eg
+                                                                 params.LogCGraySignal,      // gs
+                                                                 params.LogCBlackOffset,     // bo
+                                                                 params.LogCLinearSlope,     // ls
+                                                                 params.LogCLinearOffset,    // lo
+                                                                 params.LogCLinearCutPoint); // logc to linear cutoff
                 }
                 else if (logtype == 6)
                 {
-                    img->shaderExpr =
-                        Shader::newColorRedLogToLinear(img->shaderExpr);
+                    img->shaderExpr = Shader::newColorRedLogToLinear(img->shaderExpr);
                 }
                 else if (logtype == 7) // RedLogFilm
                 {
@@ -406,17 +344,15 @@ namespace IPCore
                     double cinwhite = 685;
                     double cinbreakpoint = cinwhite;
 
-                    img->shaderExpr = Shader::newColorCineonLogToLinear(
-                        img->shaderExpr, cinblack, cinwhite,
-                        (cinwhite - cinbreakpoint));
+                    img->shaderExpr = Shader::newColorCineonLogToLinear(img->shaderExpr, cinblack, cinwhite, (cinwhite - cinbreakpoint));
                 }
-                else if (logtype == 8) {
-                    img->shaderExpr =
-                        Shader::newColorSMPTE2084ToLinear(img->shaderExpr);
+                else if (logtype == 8)
+                {
+                    img->shaderExpr = Shader::newColorSMPTE2084ToLinear(img->shaderExpr);
                 }
-                else if (logtype == 9) {
-                    img->shaderExpr =
-                        Shader::newColorHLGToLinear(img->shaderExpr);
+                else if (logtype == 9)
+                {
+                    img->shaderExpr = Shader::newColorHLGToLinear(img->shaderExpr);
                 }
             }
         }
@@ -433,8 +369,7 @@ namespace IPCore
             {
                 if (srgb->size() && srgb->front())
                 {
-                    img->shaderExpr =
-                        Shader::newColorSRGBToLinear(img->shaderExpr);
+                    img->shaderExpr = Shader::newColorSRGBToLinear(img->shaderExpr);
                 }
             }
 
@@ -442,8 +377,7 @@ namespace IPCore
             {
                 if (rec7092L->size() && rec7092L->front())
                 {
-                    img->shaderExpr =
-                        Shader::newColorRec709ToLinear(img->shaderExpr);
+                    img->shaderExpr = Shader::newColorRec709ToLinear(img->shaderExpr);
                 }
             }
 
@@ -480,24 +414,17 @@ namespace IPCore
                     if (xyzMatrix)
                     {
                         Mat44f A;
-                        TwkFB::colorSpaceConversionMatrix(
-                            (const float*)&chr709, (const float*)&chr709,
-                            (const float*)&cneutral,
-                            (const float*)&chr709.white, true, (float*)&A);
+                        TwkFB::colorSpaceConversionMatrix((const float*)&chr709, (const float*)&chr709, (const float*)&cneutral,
+                                                          (const float*)&chr709.white, true, (float*)&A);
 
-                        Mat44f m1 =
-                            convert(XYZtoRGB(Imf::Chromaticities(), 1.0));
+                        Mat44f m1 = convert(XYZtoRGB(Imf::Chromaticities(), 1.0));
                         C = m1 * A * RGBXYZ * C;
                     }
                     else
                     {
-                        Imf::Chromaticities chr(convert(cred), convert(cgreen),
-                                                convert(cblue),
-                                                convert(cwhite));
-                        TwkFB::colorSpaceConversionMatrix(
-                            (const float*)&chr, (const float*)&chr709,
-                            (const float*)&cneutral,
-                            (const float*)&chr709.white, true, (float*)&C);
+                        Imf::Chromaticities chr(convert(cred), convert(cgreen), convert(cblue), convert(cwhite));
+                        TwkFB::colorSpaceConversionMatrix((const float*)&chr, (const float*)&chr709, (const float*)&cneutral,
+                                                          (const float*)&chr709.white, true, (float*)&C);
                     }
                 }
             }
@@ -507,9 +434,7 @@ namespace IPCore
         if (img->fb)
         {
             if (const TwkFB::FloatAttribute* lsa =
-                    dynamic_cast<const TwkFB::FloatAttribute*>(
-                        img->fb->findAttribute(
-                            TwkFB::ColorSpace::LinearScale())))
+                    dynamic_cast<const TwkFB::FloatAttribute*>(img->fb->findAttribute(TwkFB::ColorSpace::LinearScale())))
             {
                 Mat44f S;
                 Vec3f scl(lsa->value());
@@ -543,8 +468,7 @@ namespace IPCore
                 //   [ 0, 0, 0,  1   ] ]
                 //
 
-                Mat44f T(1., 0, 1.402, 0., 1., -0.344136286201, -0.714136286201,
-                         0., 1., 1.772, 0, 0., 0., 0., 0., 1.);
+                Mat44f T(1., 0, 1.402, 0., 1., -0.344136286201, -0.714136286201, 0., 1., 1.772, 0, 0., 0., 0., 0., 1.);
 
                 C = T * C;
             }
@@ -558,8 +482,7 @@ namespace IPCore
         //  Yes, wrong - removing this for now.
         //
 
-        bool unpremult =
-            false; // (C != Mat44f() && active) && !alreadyUnpremulted;
+        bool unpremult = false; // (C != Mat44f() && active) && !alreadyUnpremulted;
         bool willPremult = unpremult || alreadyUnpremulted;
 
         if (unpremult)

@@ -35,16 +35,12 @@ namespace BlackMagicDevices
 #define dlbool_t bool
 #endif
 
-        HRESULT STDMETHODCALLTYPE
-        ProfileChanging(IDeckLinkProfile* profileToBeActivated,
-                        dlbool_t streamsWillBeForcedToStop) override;
-        HRESULT STDMETHODCALLTYPE
-        ProfileActivated(IDeckLinkProfile* activatedProfile) override;
+        HRESULT STDMETHODCALLTYPE ProfileChanging(IDeckLinkProfile* profileToBeActivated, dlbool_t streamsWillBeForcedToStop) override;
+        HRESULT STDMETHODCALLTYPE ProfileActivated(IDeckLinkProfile* activatedProfile) override;
 
         // IUnknown interface
 
-        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid,
-                                                 LPVOID* ppv) override;
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv) override;
         ULONG STDMETHODCALLTYPE AddRef() override;
         ULONG STDMETHODCALLTYPE Release() override;
 

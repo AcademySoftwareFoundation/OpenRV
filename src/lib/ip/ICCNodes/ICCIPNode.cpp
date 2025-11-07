@@ -76,8 +76,7 @@ namespace IPCore
         {
             int sizeOverflow = size % sizeof(size_t); // in bytes
             const size_t* p = reinterpret_cast<const size_t*>(data);
-            const size_t* e = reinterpret_cast<const size_t*>(
-                reinterpret_cast<const char*>(data) + size - sizeOverflow);
+            const size_t* e = reinterpret_cast<const size_t*>(reinterpret_cast<const char*>(data) + size - sizeOverflow);
             boost::hash<size_t> h;
             size_t v = 0;
             for (; p < e; p++)
@@ -86,16 +85,14 @@ namespace IPCore
             {
                 size_t lastOne = 0;
                 ;
-                memcpy(reinterpret_cast<char*>(&lastOne),
-                       reinterpret_cast<const char*>(e), sizeOverflow);
+                memcpy(reinterpret_cast<char*>(&lastOne), reinterpret_cast<const char*>(e), sizeOverflow);
                 v ^= h(lastOne);
             }
 
             return v;
         }
 
-        void parseParametricCurve(char* rawTagData, size_t rawDataSize,
-                                  ParaTag& para)
+        void parseParametricCurve(char* rawTagData, size_t rawDataSize, ParaTag& para)
         {
 #ifdef TWK_LITTLE_ENDIAN
             swapWords(rawTagData, 2);
@@ -136,9 +133,7 @@ namespace IPCore
             return IPNode::Vec3(x, y, z);
         }
 
-        void logErrorHandlerFunction(cmsContext ContextID,
-                                     cmsUInt32Number ErrorCode,
-                                     const char* Text)
+        void logErrorHandlerFunction(cmsContext ContextID, cmsUInt32Number ErrorCode, const char* Text)
         {
             cout << "ERROR: LCMS: " << Text << " (" << ErrorCode << ")" << endl;
         }
@@ -163,12 +158,10 @@ namespace IPCore
             cmsCIExyY white; // = {0.3127, 0.3290, 1.0}; // Rec709
             cmsWhitePointFromTemp(&white, 6504);
 
-            cmsCIExyYTRIPLE chromaticities = {{0.639998686, 0.330010138, 1.0},
-                                              {0.300003784, 0.600003357, 1.0},
-                                              {0.150002046, 0.059997204, 1.0}};
+            cmsCIExyYTRIPLE chromaticities = {
+                {0.639998686, 0.330010138, 1.0}, {0.300003784, 0.600003357, 1.0}, {0.150002046, 0.059997204, 1.0}};
 
-            cmsHPROFILE p =
-                cmsCreateRGBProfile(&white, &chromaticities, curve3);
+            cmsHPROFILE p = cmsCreateRGBProfile(&white, &chromaticities, curve3);
             cmsFreeToneCurve(gamma1);
             return p;
         }
@@ -270,8 +263,7 @@ namespace IPCore
 
             const _cmsICCPROFILE* iccProfile = (_cmsICCPROFILE*)state.profile;
 
-            for (cmsInt32Number i = 0, s = cmsGetTagCount(state.profile); i < s;
-                 i++)
+            for (cmsInt32Number i = 0, s = cmsGetTagCount(state.profile); i < s; i++)
             {
                 cmsTagSignature sig = cmsGetTagSignature(state.profile, i);
                 string sigName = packedFourCCAsString(sig);
@@ -279,8 +271,7 @@ namespace IPCore
                 const size_t tagSize = iccProfile->TagSizes[i];
                 vector<char> buffer(tagSize);
                 char* rawTagData = &buffer.front();
-                const size_t nread =
-                    cmsReadRawTag(state.profile, sig, rawTagData, tagSize);
+                const size_t nread = cmsReadRawTag(state.profile, sig, rawTagData, tagSize);
 
                 if (sigName == "aarg" || sigName == "aabg" || sigName == "aagg")
                 {
@@ -306,8 +297,7 @@ namespace IPCore
             }
         }
 
-        void createProfileStateFromMemory(ICCIPNode::ProfileState& state,
-                                          void* data, size_t size)
+        void createProfileStateFromMemory(ICCIPNode::ProfileState& state, void* data, size_t size)
         {
             clearProfileState(state);
 
@@ -321,8 +311,7 @@ namespace IPCore
             parseTags(state);
         }
 
-        void createProfileStateFromFile(ICCIPNode::ProfileState& state,
-                                        const string& filename)
+        void createProfileStateFromFile(ICCIPNode::ProfileState& state, const string& filename)
         {
             //
             //  Load the file using FileStream and stash the data. This
@@ -368,8 +357,7 @@ namespace IPCore
             state.dataHash = 2;
         }
 
-        void createSRGBProfileStateInOtherProfileSpace(
-            ICCIPNode::ProfileState& state, ICCIPNode::ProfileState& other)
+        void createSRGBProfileStateInOtherProfileSpace(ICCIPNode::ProfileState& state, ICCIPNode::ProfileState& other)
         {
             clearProfileState(state);
 
@@ -381,9 +369,7 @@ namespace IPCore
             state.dataHash = other.dataHash ^ (size_t(-1));
         }
 
-        void copyProfileToDataProperty(
-            ICCIPNode::ProfileState& state,
-            IPNode::ByteProperty::container_type& dataVector)
+        void copyProfileToDataProperty(ICCIPNode::ProfileState& state, IPNode::ByteProperty::container_type& dataVector)
         {
             size_t s = state.dataSize;
             const char* data = reinterpret_cast<const char*>(state.data);
@@ -395,8 +381,7 @@ namespace IPCore
 
     //----------------------------------------------------------------------
 
-    ICCIPNode::ICCIPNode(const string& name, const NodeDefinition* def,
-                         IPGraph* graph, GroupIPNode* group)
+    ICCIPNode::ICCIPNode(const string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_active(0)
         , m_inProfile(0)
@@ -433,8 +418,7 @@ namespace IPCore
         else
             abort();
 
-        PropertyInfo* info = new PropertyInfo(
-            PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit);
+        PropertyInfo* info = new PropertyInfo(PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit);
 
         m_active = declareProperty<IntProperty>("node.active", 1);
         m_samples2D = declareProperty<IntProperty>("samples.2d", 256);
@@ -442,26 +426,18 @@ namespace IPCore
 
         if (m_mode == DisplayMode || m_mode == TransformMode)
         {
-            m_outProfile =
-                declareProperty<StringProperty>("outProfile.url", "", info);
-            m_outProfileDesc =
-                declareProperty<StringProperty>("outProfile.description", "");
-            m_outProfileVersion =
-                declareProperty<FloatProperty>("outProfile.version", 0.0);
-            m_outProfileData =
-                declareProperty<ByteProperty>("outProfile.data", info);
+            m_outProfile = declareProperty<StringProperty>("outProfile.url", "", info);
+            m_outProfileDesc = declareProperty<StringProperty>("outProfile.description", "");
+            m_outProfileVersion = declareProperty<FloatProperty>("outProfile.version", 0.0);
+            m_outProfileData = declareProperty<ByteProperty>("outProfile.data", info);
         }
 
         if (m_mode == LinearizeMode || m_mode == TransformMode)
         {
-            m_inProfile =
-                declareProperty<StringProperty>("inProfile.url", "", info);
-            m_inProfileDesc =
-                declareProperty<StringProperty>("inProfile.description", "");
-            m_inProfileVersion =
-                declareProperty<FloatProperty>("inProfile.version", 0.0);
-            m_inProfileData =
-                declareProperty<ByteProperty>("inProfile.data", info);
+            m_inProfile = declareProperty<StringProperty>("inProfile.url", "", info);
+            m_inProfileDesc = declareProperty<StringProperty>("inProfile.description", "");
+            m_inProfileVersion = declareProperty<FloatProperty>("inProfile.version", 0.0);
+            m_inProfileData = declareProperty<ByteProperty>("inProfile.data", info);
         }
     }
 
@@ -519,15 +495,9 @@ namespace IPCore
         }
     }
 
-    string ICCIPNode::inProfile() const
-    {
-        return propertyValue(m_inProfile, "");
-    }
+    string ICCIPNode::inProfile() const { return propertyValue(m_inProfile, ""); }
 
-    string ICCIPNode::outProfile() const
-    {
-        return propertyValue(m_outProfile, "");
-    }
+    string ICCIPNode::outProfile() const { return propertyValue(m_outProfile, ""); }
 
     void ICCIPNode::clearState()
     {
@@ -539,16 +509,13 @@ namespace IPCore
         m_transform = 0;
     }
 
-    void ICCIPNode::updateProfileMetaData(const ProfileState& state,
-                                          StringProperty* desc,
-                                          FloatProperty* ver)
+    void ICCIPNode::updateProfileMetaData(const ProfileState& state, StringProperty* desc, FloatProperty* ver)
     {
         char temp[256];
 
         if (state.profile)
         {
-            cmsGetProfileInfoASCII(state.profile, cmsInfoDescription, "en",
-                                   "US", temp, 256);
+            cmsGetProfileInfoASCII(state.profile, cmsInfoDescription, "en", "US", temp, 256);
             setProperty(desc, temp);
 
             float f = float(cmsGetProfileVersion(state.profile));
@@ -581,15 +548,12 @@ namespace IPCore
         {
             if (m_inProfileData && !m_inProfileData->empty())
             {
-                createProfileStateFromMemory(m_inState,
-                                             m_inProfileData->rawData(),
-                                             m_inProfileData->size());
+                createProfileStateFromMemory(m_inState, m_inProfileData->rawData(), m_inProfileData->size());
             }
             else if (inProfile() != "")
             {
                 createProfileStateFromFile(m_inState, inProfile());
-                copyProfileToDataProperty(m_inState,
-                                          m_inProfileData->valueContainer());
+                copyProfileToDataProperty(m_inState, m_inProfileData->valueContainer());
             }
             else
             {
@@ -602,8 +566,7 @@ namespace IPCore
                 }
             }
 
-            updateProfileMetaData(m_inState, m_inProfileDesc,
-                                  m_inProfileVersion);
+            updateProfileMetaData(m_inState, m_inProfileDesc, m_inProfileVersion);
 
             if (!m_outProfile)
                 createSRGBProfileState(m_outState);
@@ -613,15 +576,12 @@ namespace IPCore
         {
             if (m_outProfileData && !m_outProfileData->empty())
             {
-                createProfileStateFromMemory(m_outState,
-                                             m_outProfileData->rawData(),
-                                             m_outProfileData->size());
+                createProfileStateFromMemory(m_outState, m_outProfileData->rawData(), m_outProfileData->size());
             }
             else if (outProfile() != "")
             {
                 createProfileStateFromFile(m_outState, outProfile());
-                copyProfileToDataProperty(m_outState,
-                                          m_outProfileData->valueContainer());
+                copyProfileToDataProperty(m_outState, m_outProfileData->valueContainer());
             }
             else
             {
@@ -634,8 +594,7 @@ namespace IPCore
                 }
             }
 
-            updateProfileMetaData(m_outState, m_outProfileDesc,
-                                  m_outProfileVersion);
+            updateProfileMetaData(m_outState, m_outProfileDesc, m_outProfileVersion);
 
             if (!m_inProfile)
                 createSRGBProfileState(m_inState);
@@ -685,9 +644,7 @@ namespace IPCore
 
         if (m_inState.profile)
         {
-            m_transform = cmsCreateTransform(m_inState.profile, TYPE_RGB_FLT,
-                                             m_outState.profile, TYPE_RGB_FLT,
-                                             INTENT_PERCEPTUAL, 0);
+            m_transform = cmsCreateTransform(m_inState.profile, TYPE_RGB_FLT, m_outState.profile, TYPE_RGB_FLT, INTENT_PERCEPTUAL, 0);
         }
         else
         {
@@ -699,8 +656,7 @@ namespace IPCore
 
         if (m_inState.csProfile)
         {
-            m_cstransform = newColorSyncTransformFromProfiles(
-                m_inState.csProfile, m_outState.csProfile);
+            m_cstransform = newColorSyncTransformFromProfiles(m_inState.csProfile, m_outState.csProfile);
         }
         else
         {
@@ -724,8 +680,7 @@ namespace IPCore
 
         if (m_method == LUT3DMethod)
         {
-            m_fb->restructure(samples3D, samples3D, samples3D, 3,
-                              FrameBuffer::FLOAT);
+            m_fb->restructure(samples3D, samples3D, samples3D, 3, FrameBuffer::FLOAT);
         }
         else
         {
@@ -734,17 +689,14 @@ namespace IPCore
 
         ostringstream str;
 
-        str << "ICC:fb:lut:" << m_method << ":"
-            << (m_method == LUT3DMethod ? samples3D : samples2D) << ":" << hex
-            << m_inState.dataHash << "|" << inProfile() << "+"
-            << m_outState.dataHash << "|" << outProfile();
+        str << "ICC:fb:lut:" << m_method << ":" << (m_method == LUT3DMethod ? samples3D : samples2D) << ":" << hex << m_inState.dataHash
+            << "|" << inProfile() << "+" << m_outState.dataHash << "|" << outProfile();
 
         const size_t s = m_fb->width();
         const float smax = float(s) - 1;
         m_fb->setIdentifier(str.str());
 
-        vector<float> buffer(m_method == LUT3DMethod ? (s * s * s * 3)
-                                                     : (s * 3));
+        vector<float> buffer(m_method == LUT3DMethod ? (s * s * s * 3) : (s * 3));
 
         if (m_method == LUT3DMethod)
         {
@@ -785,15 +737,13 @@ namespace IPCore
 #if USE_COLORSYNC
         if (m_cstransform)
         {
-            convert(m_cstransform, m_method == LUT3DMethod ? s * s : s,
-                    m_method == LUT3DMethod ? s : 1, &buffer.front(),
+            convert(m_cstransform, m_method == LUT3DMethod ? s * s : s, m_method == LUT3DMethod ? s : 1, &buffer.front(),
                     m_fb->pixels<float>());
         }
 #else
         if (m_transform)
         {
-            cmsDoTransform(m_transform, &buffer.front(), m_fb->pixels<void>(),
-                           m_method == LUT3DMethod ? s * s * s : s);
+            cmsDoTransform(m_transform, &buffer.front(), m_fb->pixels<void>(), m_method == LUT3DMethod ? s * s * s : s);
         }
 #endif
 
@@ -807,8 +757,7 @@ namespace IPCore
         m_updating = false;
     }
 
-    void ICCIPNode::applyTransform(IPImage* root, bool sRGBIn,
-                                   bool sRGBOut) const
+    void ICCIPNode::applyTransform(IPImage* root, bool sRGBIn, bool sRGBOut) const
     {
         if (m_transform)
         {
@@ -821,44 +770,36 @@ namespace IPCore
             // root->shaderExpr = Shader::newColorMatrix(root->shaderExpr,
             // m_conversionMatrix);
             if (sRGBIn)
-                root->shaderExpr =
-                    Shader::newColorLinearToSRGB(root->shaderExpr);
+                root->shaderExpr = Shader::newColorLinearToSRGB(root->shaderExpr);
 
             if (m_method == LUT3DMethod)
             {
                 // XXX temp backdoor in case users have to revert
                 if (useOldGLLUTInterp == -1)
                 {
-                    useOldGLLUTInterp =
-                        (getenv("TWK_USE_OLD_GL_LUT_INTERP") == 0) ? 0 : 1;
+                    useOldGLLUTInterp = (getenv("TWK_USE_OLD_GL_LUT_INTERP") == 0) ? 0 : 1;
                 }
 
                 if (useOldGLLUTInterp)
                 {
-                    Vec3 grid = Vec3(1.0 / fb->width(), 1.0 / fb->height(),
-                                     1.0 / fb->depth());
+                    Vec3 grid = Vec3(1.0 / fb->width(), 1.0 / fb->height(), 1.0 / fb->depth());
 
                     Vec3 scale = Vec3(Vec3(1.0, 1.0, 1.0) - grid);
 
-                    root->shaderExpr = Shader::newColor3DLUTGLSampling(
-                        root->shaderExpr, fb, scale, grid / 2.0f, outScale,
-                        outOffset);
+                    root->shaderExpr = Shader::newColor3DLUTGLSampling(root->shaderExpr, fb, scale, grid / 2.0f, outScale, outOffset);
                 }
                 else
                 {
-                    root->shaderExpr = Shader::newColor3DLUT(
-                        root->shaderExpr, fb, outScale, outOffset);
+                    root->shaderExpr = Shader::newColor3DLUT(root->shaderExpr, fb, outScale, outOffset);
                 }
             }
             else
             {
-                root->shaderExpr = Shader::newColorChannelLUT(
-                    root->shaderExpr, fb, outScale, outOffset);
+                root->shaderExpr = Shader::newColorChannelLUT(root->shaderExpr, fb, outScale, outOffset);
             }
 
             if (sRGBOut)
-                root->shaderExpr =
-                    Shader::newColorSRGBToLinear(root->shaderExpr);
+                root->shaderExpr = Shader::newColorSRGBToLinear(root->shaderExpr);
         }
 
         root->resourceUsage = root->shaderExpr->computeResourceUsageRecursive();
@@ -883,8 +824,7 @@ namespace IPCore
     {
         if (IPImage* root = IPNode::evaluate(context))
         {
-            if (!root->isBlank() && !root->isNoImage()
-                && propertyValue(m_active, 1) != 0 && m_transform)
+            if (!root->isBlank() && !root->isNoImage() && propertyValue(m_active, 1) != 0 && m_transform)
             {
                 applyTransform(root, false, true);
             }
@@ -925,10 +865,8 @@ namespace IPCore
         if (propertyValue(m_active, 1) == 0 || !m_transform)
             return root;
 
-        IPImage* nroot =
-            new IPImage(this, IPImage::BlendRenderType, context.viewWidth,
-                        context.viewHeight, 1.0, IPImage::IntermediateBuffer,
-                        IPImage::FloatDataType);
+        IPImage* nroot = new IPImage(this, IPImage::BlendRenderType, context.viewWidth, context.viewHeight, 1.0,
+                                     IPImage::IntermediateBuffer, IPImage::FloatDataType);
 
         root->fitToAspect(nroot->displayAspect());
         nroot->appendChild(root);
@@ -941,28 +879,18 @@ namespace IPCore
 
     void ICCIPNode::propertyChanged(const Property* p)
     {
-        if (p == m_inProfile || p == m_outProfile || p == m_inProfileData
-            || p == m_outProfileDesc)
+        if (p == m_inProfile || p == m_outProfile || p == m_inProfileData || p == m_outProfileDesc)
         {
             if (!m_updating)
                 updateState();
         }
     }
 
-    void ICCIPNode::readCompleted(const std::string&, unsigned int)
-    {
-        updateState();
-    }
+    void ICCIPNode::readCompleted(const std::string&, unsigned int) { updateState(); }
 
-    string ICCIPNode::inProfileDescription() const
-    {
-        return propertyValue(m_inProfileDesc, "");
-    }
+    string ICCIPNode::inProfileDescription() const { return propertyValue(m_inProfileDesc, ""); }
 
-    string ICCIPNode::outProfileDescription() const
-    {
-        return propertyValue(m_outProfileDesc, "");
-    }
+    string ICCIPNode::outProfileDescription() const { return propertyValue(m_outProfileDesc, ""); }
 
     void ICCIPNode::copyNode(const IPNode* node)
     {

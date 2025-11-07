@@ -26,15 +26,12 @@ namespace Mu
 {
     using namespace std;
 
-    PartialApplicator::PartialApplicator(const Function* f, Process* p,
-                                         Thread* t, const ArgumentVector& args,
-                                         const ArgumentMask& mask,
+    PartialApplicator::PartialApplicator(const Function* f, Process* p, Thread* t, const ArgumentVector& args, const ArgumentMask& mask,
                                          bool dynamicDispatch)
         : _as(p->context(), p, t)
         , _root(0)
         , _f(f)
-        , _method(dynamic_cast<const MemberFunction*>(f) != 0
-                  && dynamicDispatch)
+        , _method(dynamic_cast<const MemberFunction*>(f) != 0 && dynamicDispatch)
     {
         _as.allowUnresolvedCalls(false);
         SymbolList newParams = _as.emptySymbolList();
@@ -54,15 +51,13 @@ namespace Mu
 
                 if (p)
                 {
-                    nv = new ParameterVariable(_as.context(), p->name().c_str(),
-                                               p->storageClass());
+                    nv = new ParameterVariable(_as.context(), p->name().c_str(), p->storageClass());
                 }
                 else
                 {
                     char tname[20];
                     sprintf(tname, "p%d", i);
-                    nv = new ParameterVariable(_as.context(), tname,
-                                               f->argType(i));
+                    nv = new ParameterVariable(_as.context(), tname, f->argType(i));
                 }
 
                 if (!dynamic_cast<FreeVariable*>(p))
@@ -82,20 +77,14 @@ namespace Mu
 
         if (newParams.empty())
         {
-            _closure = new Function(
-                _as.context(),
-                _as.context()->uniqueName(_as.scope(), "__lambda").c_str(),
-                _f->returnType(), 0, 0, 0,
-                Function::ContextDependent | Function::LambdaExpression);
+            _closure = new Function(_as.context(), _as.context()->uniqueName(_as.scope(), "__lambda").c_str(), _f->returnType(), 0, 0, 0,
+                                    Function::ContextDependent | Function::LambdaExpression);
         }
         else
         {
-            _closure = new Function(
-                _as.context(),
-                _as.context()->uniqueName(_as.scope(), "__lambda").c_str(),
-                _f->returnType(), newParams.size(),
-                (ParameterVariable**)&(newParams.front()), 0,
-                Function::ContextDependent | Function::LambdaExpression);
+            _closure =
+                new Function(_as.context(), _as.context()->uniqueName(_as.scope(), "__lambda").c_str(), _f->returnType(), newParams.size(),
+                             (ParameterVariable**)&(newParams.front()), 0, Function::ContextDependent | Function::LambdaExpression);
         }
 
         _as.scope()->addAnonymousSymbol(_closure);
@@ -129,8 +118,7 @@ namespace Mu
 
     PartialApplicator::~PartialApplicator() {}
 
-    Node* PartialApplicator::generate(const ArgumentVector& args,
-                                      ParameterVector& closureParams)
+    Node* PartialApplicator::generate(const ArgumentVector& args, ParameterVector& closureParams)
     {
         NodeList nl = _as.emptyNodeList();
         Node* thisArg = 0;

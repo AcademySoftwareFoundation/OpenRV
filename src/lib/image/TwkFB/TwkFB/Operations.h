@@ -25,9 +25,7 @@ namespace TwkFB
     //  The final argument is blind data passed to the function
     //
 
-    typedef void (*ColorTransformFunc)(const float* input, float* output,
-                                       int nchannels, int nelements,
-                                       void* data);
+    typedef void (*ColorTransformFunc)(const float* input, float* output, int nchannels, int nelements, void* data);
 
     struct TWKFB_EXPORT LogCTransformParams
     {
@@ -40,7 +38,7 @@ namespace TwkFB
         float LogCLinearOffset;   // ColorSpace::LogCLinearOffset()
         float LogCLinearCutPoint; // ColorSpace::LogCLinearCutPoint();  Logc to
                                   // Linear cutoff
-        float LogCCutPoint; // ColorSpace::LogCCutPoint(); Linear to LogC cutoff
+        float LogCCutPoint;       // ColorSpace::LogCCutPoint(); Linear to LogC cutoff
         bool* chmap;
     };
 
@@ -52,9 +50,7 @@ namespace TwkFB
     //  Also if ei=0.0 and there are no framebuffer LogC attrs, then
     //  the LogC curve parameter values for ei=800 are returned.
     //
-    TWKFB_EXPORT void getLogCCurveParams(LogCTransformParams& params,
-                                         const FrameBuffer* fb,
-                                         float ei = 0.0f);
+    TWKFB_EXPORT void getLogCCurveParams(LogCTransformParams& params, const FrameBuffer* fb, float ei = 0.0f);
 
     //
     //  Some ColorTransformFuncs
@@ -64,12 +60,10 @@ namespace TwkFB
                                          void*); // void* => bool[nchannels]
     TWKFB_EXPORT void linearLogTransform(const float*, float*, int, int,
                                          void*); // void* => bool[nchannels]
-    TWKFB_EXPORT void
-    logCLinearTransform(const float*, float*, int, int,
-                        void*); // void* => LogCTransformParams
-    TWKFB_EXPORT void
-    linearLogCTransform(const float*, float*, int, int,
-                        void*); // void* => LogCTransformParams
+    TWKFB_EXPORT void logCLinearTransform(const float*, float*, int, int,
+                                          void*); // void* => LogCTransformParams
+    TWKFB_EXPORT void linearLogCTransform(const float*, float*, int, int,
+                                          void*); // void* => LogCTransformParams
     TWKFB_EXPORT void redLogLinearTransform(const float*, float*, int, int,
                                             void*); // void* => bool[nchannels]
     TWKFB_EXPORT void linearRedLogTransform(const float*, float*, int, int,
@@ -78,20 +72,14 @@ namespace TwkFB
                                            void*); // void* => Mat44f*
     TWKFB_EXPORT void yryby2rgbColorTransform(const float*, float*, int, int,
                                               void*); // void* => Vec3f* (Yw)
-    TWKFB_EXPORT void rgb2yrybyColorTransform(const float*, float*, int, int,
-                                              void*);
+    TWKFB_EXPORT void rgb2yrybyColorTransform(const float*, float*, int, int, void*);
     TWKFB_EXPORT void premultTransform(const float*, float*, int, int, void*);
     TWKFB_EXPORT void unpremultTransform(const float*, float*, int, int, void*);
-    TWKFB_EXPORT void floatChromaToIntegralTransform(const float*, float*, int,
-                                                     int, void*);
-    TWKFB_EXPORT void sRGBtoLinearTransform(const float*, float*, int, int,
-                                            void*);
-    TWKFB_EXPORT void linearToSRGBTransform(const float*, float*, int, int,
-                                            void*);
-    TWKFB_EXPORT void Rec709toLinearTransform(const float*, float*, int, int,
-                                              void*);
-    TWKFB_EXPORT void linearToRec709Transform(const float*, float*, int, int,
-                                              void*);
+    TWKFB_EXPORT void floatChromaToIntegralTransform(const float*, float*, int, int, void*);
+    TWKFB_EXPORT void sRGBtoLinearTransform(const float*, float*, int, int, void*);
+    TWKFB_EXPORT void linearToSRGBTransform(const float*, float*, int, int, void*);
+    TWKFB_EXPORT void Rec709toLinearTransform(const float*, float*, int, int, void*);
+    TWKFB_EXPORT void linearToRec709Transform(const float*, float*, int, int, void*);
     TWKFB_EXPORT void channelLUTTransform(const float*, float*, int, int,
                                           void*); // void* => LUT FB*
     TWKFB_EXPORT void pixel3DLUTTransform(const float*, float*, int, int,
@@ -118,7 +106,7 @@ namespace TwkFB
     //
 
     TWKFB_EXPORT void scaledTransfer(const float*, float*,
-                                     void*); // void* => float
+                                     void*);                    // void* => float
     TWKFB_EXPORT void minTransfer(const float*, float*, void*); // void* => NULL
     TWKFB_EXPORT void maxTransfer(const float*, float*, void*); // void* => NULL
 
@@ -152,19 +140,16 @@ namespace TwkFB
     //  here). See their docs for a rationalization.
     //
 
-    TWKFB_EXPORT FrameBuffer* copyConvertPlane(const FrameBuffer* from,
-                                               FrameBuffer::DataType);
+    TWKFB_EXPORT FrameBuffer* copyConvertPlane(const FrameBuffer* from, FrameBuffer::DataType);
 
-    TWKFB_EXPORT FrameBuffer* copyConvert(const FrameBuffer* from,
-                                          FrameBuffer::DataType);
+    TWKFB_EXPORT FrameBuffer* copyConvert(const FrameBuffer* from, FrameBuffer::DataType);
 
     //
     //  Copy convert Y-RY-BY (float) to Y-U-V (integral) The DataType
     //  argument should be one of the integral types.
     //
 
-    TWKFB_EXPORT FrameBuffer* copyConvertYRYBYtoYUV(const FrameBuffer* from,
-                                                    FrameBuffer::DataType);
+    TWKFB_EXPORT FrameBuffer* copyConvertYRYBYtoYUV(const FrameBuffer* from, FrameBuffer::DataType);
 
     //
     //  Apply the function func to the pixels in from buffer and deposit
@@ -172,42 +157,28 @@ namespace TwkFB
     //  in-place operation.
     //
 
-    TWKFB_EXPORT void applyTransform(const FrameBuffer* from, FrameBuffer* to,
-                                     ColorTransformFunc func, void* data);
+    TWKFB_EXPORT void applyTransform(const FrameBuffer* from, FrameBuffer* to, ColorTransformFunc func, void* data);
 
     //
     //  Color space adjustments
     //
 
-    TWKFB_EXPORT void convertLogToLinear(const FrameBuffer* from,
-                                         FrameBuffer* to);
-    TWKFB_EXPORT void convertLinearToLog(const FrameBuffer* from,
-                                         FrameBuffer* to);
-    TWKFB_EXPORT void convertLogCToLinear(const FrameBuffer* from,
-                                          FrameBuffer* to, float ei);
-    TWKFB_EXPORT void convertLinearToLogC(const FrameBuffer* from,
-                                          FrameBuffer* to, float ei);
-    TWKFB_EXPORT void convertRedLogToLinear(const FrameBuffer* from,
-                                            FrameBuffer* to);
-    TWKFB_EXPORT void convertLinearToRedLog(const FrameBuffer* from,
-                                            FrameBuffer* to);
-    TWKFB_EXPORT void convertSRGBToLinear(const FrameBuffer* from,
-                                          FrameBuffer* to);
-    TWKFB_EXPORT void convertLinearToSRGB(const FrameBuffer* from,
-                                          FrameBuffer* to);
-    TWKFB_EXPORT void convertLinearToRec709(const FrameBuffer* from,
-                                            FrameBuffer* to);
-    TWKFB_EXPORT void convertRGBtoYRYBY(const FrameBuffer* from,
-                                        FrameBuffer* to);
+    TWKFB_EXPORT void convertLogToLinear(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertLinearToLog(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertLogCToLinear(const FrameBuffer* from, FrameBuffer* to, float ei);
+    TWKFB_EXPORT void convertLinearToLogC(const FrameBuffer* from, FrameBuffer* to, float ei);
+    TWKFB_EXPORT void convertRedLogToLinear(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertLinearToRedLog(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertSRGBToLinear(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertLinearToSRGB(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertLinearToRec709(const FrameBuffer* from, FrameBuffer* to);
+    TWKFB_EXPORT void convertRGBtoYRYBY(const FrameBuffer* from, FrameBuffer* to);
     TWKFB_EXPORT void premult(const FrameBuffer* from, FrameBuffer* to);
     TWKFB_EXPORT void unpremult(const FrameBuffer* from, FrameBuffer* to);
 
-    TWKFB_EXPORT void linearizeFromGamma(const FrameBuffer* from,
-                                         FrameBuffer* to, float fromGamma);
-    TWKFB_EXPORT void applyGamma(const FrameBuffer* from, FrameBuffer* to,
-                                 float gamma);
-    TWKFB_EXPORT void applyCurve(const FrameBuffer* from, FrameBuffer* to,
-                                 float r[256], float g[256], float b[256]);
+    TWKFB_EXPORT void linearizeFromGamma(const FrameBuffer* from, FrameBuffer* to, float fromGamma);
+    TWKFB_EXPORT void applyGamma(const FrameBuffer* from, FrameBuffer* to, float gamma);
+    TWKFB_EXPORT void applyCurve(const FrameBuffer* from, FrameBuffer* to, float r[256], float g[256], float b[256]);
 
     //
     //  There are better quality versions of the these functions in
@@ -219,25 +190,17 @@ namespace TwkFB
 
     TWKFB_EXPORT void normalize(FrameBuffer*, bool discardmax, bool invert);
 
-    TWKFB_EXPORT void nearestNeighborResize(const FrameBuffer* from,
-                                            FrameBuffer* to);
+    TWKFB_EXPORT void nearestNeighborResize(const FrameBuffer* from, FrameBuffer* to);
 
-    TWKFB_EXPORT FrameBuffer*
-    channelMap(const FrameBuffer* from,
-               const std::vector<std::string>& newMapping);
+    TWKFB_EXPORT FrameBuffer* channelMap(const FrameBuffer* from, const std::vector<std::string>& newMapping);
 
-    TWKFB_EXPORT FrameBuffer*
-    channelMapToPlanar(const FrameBuffer* from,
-                       std::vector<std::string> newMapping);
+    TWKFB_EXPORT FrameBuffer* channelMapToPlanar(const FrameBuffer* from, std::vector<std::string> newMapping);
 
-    TWKFB_EXPORT void minMax(const FrameBuffer* fb,
-                             std::vector<float>& minValues,
-                             std::vector<float>& maxValues);
+    TWKFB_EXPORT void minMax(const FrameBuffer* fb, std::vector<float>& minValues, std::vector<float>& maxValues);
 
     //
 
-    TWKFB_EXPORT void transfer(const FrameBuffer* from, FrameBuffer* to,
-                               TransferFunc, void*);
+    TWKFB_EXPORT void transfer(const FrameBuffer* from, FrameBuffer* to, TransferFunc, void*);
 
     //
     // These are in place.
@@ -251,10 +214,8 @@ namespace TwkFB
     //  images that have depth > 1.
     //
 
-    TWKFB_EXPORT FrameBuffer* cropPlane(const FrameBuffer* fb, int x0, int y0,
-                                        int x1, int y1);
-    TWKFB_EXPORT FrameBuffer* crop(const FrameBuffer* fb, int x0, int y0,
-                                   int x1, int y1);
+    TWKFB_EXPORT FrameBuffer* cropPlane(const FrameBuffer* fb, int x0, int y0, int x1, int y1);
+    TWKFB_EXPORT FrameBuffer* crop(const FrameBuffer* fb, int x0, int y0, int x1, int y1);
 
     //
     //  Crops in infb using a rectangle starting at x0, y0, with the width
@@ -262,14 +223,12 @@ namespace TwkFB
     //  each plane currently.
     //
 
-    TWKFB_EXPORT void cropInto(const FrameBuffer* infb, FrameBuffer* outfb,
-                               int x0, int y0, int x1, int y1);
+    TWKFB_EXPORT void cropInto(const FrameBuffer* infb, FrameBuffer* outfb, int x0, int y0, int x1, int y1);
     //
     //  like crop, but also sets uncrop region
     //
 
-    TWKFB_EXPORT FrameBuffer* cropWithUncrop(const FrameBuffer* fb, int x0,
-                                             int y0, int x1, int y1);
+    TWKFB_EXPORT FrameBuffer* cropWithUncrop(const FrameBuffer* fb, int x0, int y0, int x1, int y1);
 
     //
     //  Rip an fb into individual image planes (each a single
@@ -300,13 +259,10 @@ namespace TwkFB
     //  or return 709 version thereof
     //
 
-    TWKFB_EXPORT void yrybyYweights(const FrameBuffer* fb, float& rw, float& gw,
-                                    float& bw);
+    TWKFB_EXPORT void yrybyYweights(const FrameBuffer* fb, float& rw, float& gw, float& bw);
 
-    TWKFB_EXPORT void rec709Matrix(const FrameBuffer* fb, float M[16],
-                                   bool adapt = false);
-    TWKFB_EXPORT void acesMatrix(const FrameBuffer* fb, float M[16],
-                                 bool adapt = false);
+    TWKFB_EXPORT void rec709Matrix(const FrameBuffer* fb, float M[16], bool adapt = false);
+    TWKFB_EXPORT void acesMatrix(const FrameBuffer* fb, float M[16], bool adapt = false);
 
     //
     //  General conversion function. This takes an array of floats (the
@@ -316,13 +272,12 @@ namespace TwkFB
     //  should be applied.
     //
 
-    TWKFB_EXPORT void
-    colorSpaceConversionMatrix(const float*, // in chromaticies (8 floats)
-                               const float*, // out chromaticies
-                               const float*, // in neutal (2 floats)
-                               const float*, // out neutal
-                               bool,         // adapt
-                               float*);      // return 4x4 matrix
+    TWKFB_EXPORT void colorSpaceConversionMatrix(const float*, // in chromaticies (8 floats)
+                                                 const float*, // out chromaticies
+                                                 const float*, // in neutal (2 floats)
+                                                 const float*, // out neutal
+                                                 bool,         // adapt
+                                                 float*);      // return 4x4 matrix
 
     //
     //  Get the RGB<->YUV matrix for various conversion types.
@@ -331,14 +286,10 @@ namespace TwkFB
     TWKFB_EXPORT TwkMath::Mat44f RGBtoYUVMatrix(const FrameBuffer* fb);
     TWKFB_EXPORT TwkMath::Mat44f YUVtoRGBMatrix(const FrameBuffer* fb);
 
-    TWKFB_EXPORT void getRGBtoYUVMatrix(TwkMath::Mat44f& m,
-                                        const std::string& fb_conversion,
-                                        const std::string& fb_range,
+    TWKFB_EXPORT void getRGBtoYUVMatrix(TwkMath::Mat44f& m, const std::string& fb_conversion, const std::string& fb_range,
                                         unsigned int bits = 8);
 
-    TWKFB_EXPORT void getYUVtoRGBMatrix(TwkMath::Mat44f& m,
-                                        const std::string& rb_conversion,
-                                        const std::string& fb_range,
+    TWKFB_EXPORT void getYUVtoRGBMatrix(TwkMath::Mat44f& m, const std::string& rb_conversion, const std::string& fb_range,
                                         unsigned int bits = 8);
 
     //
@@ -362,8 +313,7 @@ namespace TwkFB
     //  orientation.
     //
 
-    TWKFB_EXPORT void orientationMatrix(const FrameBuffer* fb, bool normalized,
-                                        float* m);
+    TWKFB_EXPORT void orientationMatrix(const FrameBuffer* fb, bool normalized, float* m);
 
     //
     //  Get a single linear (REC709 primaries) RGBA value from the frame
@@ -375,8 +325,7 @@ namespace TwkFB
     //  corner of the image (when being viewed).
     //
 
-    TWKFB_EXPORT void linearRGBA709pixelValue(const FrameBuffer* fb, int x,
-                                              int y, float* result);
+    TWKFB_EXPORT void linearRGBA709pixelValue(const FrameBuffer* fb, int x, int y, float* result);
 
 } // namespace TwkFB
 

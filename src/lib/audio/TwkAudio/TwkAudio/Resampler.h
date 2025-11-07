@@ -40,10 +40,7 @@ namespace TwkAudio
 
         size_t filterWidth() const { return m_filterwidth; }
 
-        size_t outputSize(size_t inputSize) const
-        {
-            return size_t(m_factor * double(inputSize));
-        }
+        size_t outputSize(size_t inputSize) const { return size_t(m_factor * double(inputSize)); }
 
         ///
         /// This function is called repeatedly to resample the audio. The
@@ -51,16 +48,14 @@ namespace TwkAudio
         /// converted. It may not be equal to the outSize.
         ///
 
-        size_t process(const float* in, size_t inSize, float* out,
-                       size_t outSize, bool endFlag, bool enableClamp);
+        size_t process(const float* in, size_t inSize, float* out, size_t outSize, bool endFlag, bool enableClamp);
 
         ///
         /// This is a convenience function which calls the other process
         /// function.
         ///
 
-        void process(const SampleVector& in, SampleVector& out, bool endFlag,
-                     bool enableClamp);
+        void process(const SampleVector& in, SampleVector& out, bool endFlag, bool enableClamp);
 
         ///
         /// Resets the resampler to its initial state.
@@ -106,18 +101,11 @@ namespace TwkAudio
 
         size_t size() const { return m_resamplers.size(); }
 
-        size_t filterWidth() const
-        {
-            return m_resamplers.front()->filterWidth();
-        }
+        size_t filterWidth() const { return m_resamplers.front()->filterWidth(); }
 
-        size_t outputSize(size_t inputSize) const
-        {
-            return m_resamplers.front()->outputSize(inputSize);
-        }
+        size_t outputSize(size_t inputSize) const { return m_resamplers.front()->outputSize(inputSize); }
 
-        size_t process(const float* in, size_t inSize, float* out,
-                       size_t outSize, bool endFlag, bool enableClamp);
+        size_t process(const float* in, size_t inSize, float* out, size_t outSize, bool endFlag, bool enableClamp);
 
         void reset();
 

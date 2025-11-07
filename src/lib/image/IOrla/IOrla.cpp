@@ -74,8 +74,7 @@ namespace TwkFB
             m_error = false;
             if (file)
                 fclose(file);
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RLA: failed to open file \"" << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RLA: failed to open file \"" << filename);
         }
     }
 
@@ -91,8 +90,7 @@ namespace TwkFB
 
         if (fread(&header, sizeof(RLAHeader), 1, infile) != 1)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RLA: failed to read header of \"" << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RLA: failed to read header of \"" << filename);
         }
 
         fclose(infile);
@@ -101,9 +99,7 @@ namespace TwkFB
 
         if (header.revision != RLA_MAGIC && header.revision != RPF_MAGIC)
         {
-            TWK_THROW_STREAM(
-                IOException,
-                "RLA: not a supported format revision: " << filename);
+            TWK_THROW_STREAM(IOException, "RLA: not a supported format revision: " << filename);
         }
 
         if (header.chan_bits <= 8)
@@ -113,8 +109,7 @@ namespace TwkFB
         else if (header.chan_bits == 32)
             fbi.dataType = FrameBuffer::FLOAT;
         else
-            TWK_THROW_STREAM(IOException,
-                             "RLA: unsupported bit depth: " << filename)
+            TWK_THROW_STREAM(IOException, "RLA: unsupported bit depth: " << filename)
 
         fbi.width = header.window.right - header.window.left + 1;
         fbi.height = header.window.top - header.window.bottom + 1;
@@ -122,8 +117,7 @@ namespace TwkFB
         fbi.orientation = FrameBuffer::NATURAL;
     }
 
-    void IOrla::readImage(FrameBuffer& fb, const std::string& filename,
-                          const ReadRequest& request) const
+    void IOrla::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         RLAHeader header;
         FILE* infile = NULL;
@@ -138,15 +132,12 @@ namespace TwkFB
         }
         if (fread(&header, sizeof(RLAHeader), 1, infile) != 1)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RLA: failed to read header of " << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RLA: failed to read header of " << filename);
         }
         header.conformByteOrder();
 
-        const int dataWidth =
-            header.active_window.right - header.active_window.left + 1;
-        const int dataHeight =
-            header.active_window.top - header.active_window.bottom + 1;
+        const int dataWidth = header.active_window.right - header.active_window.left + 1;
+        const int dataHeight = header.active_window.top - header.active_window.bottom + 1;
 
         // TODO: Handle the case where different channels have different bit
         // depths!
@@ -217,12 +208,9 @@ namespace TwkFB
         // necessary
         //
         std::vector<int> offsets(dataHeight);
-        if (fread(&offsets.front(), sizeof(int), dataHeight, infile)
-            != dataHeight)
+        if (fread(&offsets.front(), sizeof(int), dataHeight, infile) != dataHeight)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RLA: failed to read offset table of "
-                                 << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RLA: failed to read offset table of " << filename);
         }
 #if defined(TWK_LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__)
         TwkUtil::swapWords(&offsets.front(), offsets.size());
@@ -250,8 +238,7 @@ namespace TwkFB
             int renderInfoSize = sizeof(MaxRenderInfo);
             if (renderInfoVersion != 1000)
             {
-                renderInfoSize -= sizeof(
-                    MaxRECT); // the old record didn't have the region Rect.
+                renderInfoSize -= sizeof(MaxRECT); // the old record didn't have the region Rect.
 
                 // The old version didn't start with a version word, but
                 // with the projType, so we need to move the file pointer
@@ -304,9 +291,7 @@ namespace TwkFB
         const int width = header.window.right - header.window.left + 1;
         const int height = header.window.top - header.window.bottom + 1;
         const int depth = 0;
-        const int numChannels =
-            request.allChannels ? allChannelNames.size()
-                                : std::min(allChannelNames.size(), (size_t)4);
+        const int numChannels = request.allChannels ? allChannelNames.size() : std::min(allChannelNames.size(), (size_t)4);
         FrameBuffer::DataType dataType;
         if (header.chan_bits <= 8)
             dataType = FrameBuffer::UCHAR;
@@ -315,8 +300,7 @@ namespace TwkFB
         else if (header.chan_bits == 32)
             dataType = FrameBuffer::FLOAT;
         else
-            TWK_THROW_STREAM(IOException,
-                             "RLA: unsupported bit depth: " << filename)
+            TWK_THROW_STREAM(IOException, "RLA: unsupported bit depth: " << filename)
 
         StringVector channelNames;
         for (int i = 0; i < numChannels; ++i)
@@ -324,35 +308,22 @@ namespace TwkFB
             channelNames.push_back(allChannelNames[i]);
         }
 
-        fb.restructure(width, height, depth, numChannels, dataType, NULL,
-                       &channelNames, FrameBuffer::NATURAL, true);
+        fb.restructure(width, height, depth, numChannels, dataType, NULL, &channelNames, FrameBuffer::NATURAL, true);
 
         if (maxExtras & MAX_RENDER_INFO)
         {
-            fb.newAttribute<string>("RLA/3DS/projectionType",
-                                    maxRenderInfo.projType == ProjPerspective
-                                        ? "Perspective"
-                                        : "Orthographic");
+            fb.newAttribute<string>("RLA/3DS/projectionType", maxRenderInfo.projType == ProjPerspective ? "Perspective" : "Orthographic");
             fb.newAttribute("RLA/3DS/projScale", maxRenderInfo.projScale);
             fb.newAttribute("RLA/3DS/origin", maxRenderInfo.origin);
-            fb.newAttribute<string>(
-                "RLA/3DS/fieldRender",
-                maxRenderInfo.fieldRender
-                    ? (maxRenderInfo.fieldOdd ? "Odd" : "Even")
-                    : "No");
+            fb.newAttribute<string>("RLA/3DS/fieldRender", maxRenderInfo.fieldRender ? (maxRenderInfo.fieldOdd ? "Odd" : "Even") : "No");
             char renderTimeStr[32];
-            snprintf(renderTimeStr, 32, "%d %d", maxRenderInfo.renderTime[0],
-                     maxRenderInfo.renderTime[1]);
-            fb.newAttribute<string>("RLA/3DS/renderTime",
-                                    std::string(renderTimeStr));
-            fb.newAttribute("RLA/3DS/worldToCam(t0)",
-                            maxRenderInfo.worldToCam[0].asMat44());
-            fb.newAttribute("RLA/3DS/camToWorld(t0)",
-                            maxRenderInfo.camToWorld[0].asMat44());
+            snprintf(renderTimeStr, 32, "%d %d", maxRenderInfo.renderTime[0], maxRenderInfo.renderTime[1]);
+            fb.newAttribute<string>("RLA/3DS/renderTime", std::string(renderTimeStr));
+            fb.newAttribute("RLA/3DS/worldToCam(t0)", maxRenderInfo.worldToCam[0].asMat44());
+            fb.newAttribute("RLA/3DS/camToWorld(t0)", maxRenderInfo.camToWorld[0].asMat44());
             char regionStr[64];
-            snprintf(renderTimeStr, 32, "%d, %d - %d, %d",
-                     maxRenderInfo.region.left, maxRenderInfo.region.top,
-                     maxRenderInfo.region.right, maxRenderInfo.region.bottom);
+            snprintf(renderTimeStr, 32, "%d, %d - %d, %d", maxRenderInfo.region.left, maxRenderInfo.region.top, maxRenderInfo.region.right,
+                     maxRenderInfo.region.bottom);
             fb.newAttribute("RLA/3DS/region", std::string(renderTimeStr));
         }
         if (maxExtras & MAX_NODE_TABLE)
@@ -375,12 +346,9 @@ namespace TwkFB
         fb.newAttribute("RLA/user", std::string(header.user));
         fb.newAttribute("RLA/date", std::string(header.date));
         fb.newAttribute("RLA/time", std::string(header.time));
-        fb.newAttribute("RLA/Chromaticities/white",
-                        std::string(header.white_pt));
-        fb.newAttribute("RLA/Chromaticities/blue",
-                        std::string(header.blue_pri));
-        fb.newAttribute("RLA/Chromaticities/green",
-                        std::string(header.green_pri));
+        fb.newAttribute("RLA/Chromaticities/white", std::string(header.white_pt));
+        fb.newAttribute("RLA/Chromaticities/blue", std::string(header.blue_pri));
+        fb.newAttribute("RLA/Chromaticities/green", std::string(header.green_pri));
         fb.newAttribute("RLA/Chromaticities/red", std::string(header.red_pri));
         fb.newAttribute("RLA/chan", std::string(header.chan));
         fb.newAttribute("RLA/gamma", std::string(header.gamma));
@@ -389,25 +357,16 @@ namespace TwkFB
         fb.newAttribute("RLA/num_chan", int(header.num_chan));
 
         char revisionStr[32];
-        snprintf(revisionStr, 32, "%s (0x%hX)",
-                 header.revision == RLA_MAGIC ? "Wavefront" : "3DS Max",
-                 header.revision);
+        snprintf(revisionStr, 32, "%s (0x%hX)", header.revision == RLA_MAGIC ? "Wavefront" : "3DS Max", header.revision);
         fb.newAttribute("RLA/revision", std::string(revisionStr));
 
-        if (header.window.left != header.active_window.left
-            || header.window.right != header.active_window.right
-            || header.window.bottom != header.active_window.bottom
-            || header.window.top != header.active_window.top)
+        if (header.window.left != header.active_window.left || header.window.right != header.active_window.right
+            || header.window.bottom != header.active_window.bottom || header.window.top != header.active_window.top)
         {
-            fb.newAttribute("DataWindowSize",
-                            TwkMath::Vec2i(dataWidth, dataHeight));
-            fb.newAttribute(
-                "DataWindowOrigin",
-                TwkMath::Vec2i(header.window.left, header.window.bottom));
+            fb.newAttribute("DataWindowSize", TwkMath::Vec2i(dataWidth, dataHeight));
+            fb.newAttribute("DataWindowOrigin", TwkMath::Vec2i(header.window.left, header.window.bottom));
             fb.newAttribute("DisplayWindowSize", TwkMath::Vec2i(width, height));
-            fb.newAttribute("DisplayWindowOrigin",
-                            TwkMath::Vec2i(header.active_window.left,
-                                           header.active_window.bottom));
+            fb.newAttribute("DisplayWindowOrigin", TwkMath::Vec2i(header.active_window.left, header.active_window.bottom));
         }
 
         std::string channelNamesStr;
@@ -434,15 +393,13 @@ namespace TwkFB
             {
                 if (!fb.hasAttribute("PartialImage"))
                 {
-                    std::cerr << "WARNING: RLA: incomplete image \"" << filename
-                              << "\"" << std::endl;
+                    std::cerr << "WARNING: RLA: incomplete image \"" << filename << "\"" << std::endl;
                     fb.newAttribute("PartialImage", 1.0);
                 }
                 break;
             }
 
-            unsigned char* scanline =
-                fb.scanline<unsigned char>(y + header.active_window.bottom);
+            unsigned char* scanline = fb.scanline<unsigned char>(y + header.active_window.bottom);
             scanline += header.active_window.left * fb.pixelSize();
             for (int c = 0; c < numChannels; ++c)
             {
@@ -453,8 +410,7 @@ namespace TwkFB
                 {
                     if (!fb.hasAttribute("PartialImage"))
                     {
-                        std::cerr << "WARNING: RLA: incomplete image \""
-                                  << filename << "\"" << std::endl;
+                        std::cerr << "WARNING: RLA: incomplete image \"" << filename << "\"" << std::endl;
                         fb.newAttribute("PartialImage", 1.0);
                     }
                     break;
@@ -467,8 +423,7 @@ namespace TwkFB
                 {
                     if (!fb.hasAttribute("PartialImage"))
                     {
-                        std::cerr << "WARNING: RLA: incomplete image \""
-                                  << filename << "\"" << std::endl;
+                        std::cerr << "WARNING: RLA: incomplete image \"" << filename << "\"" << std::endl;
                         fb.newAttribute("PartialImage", 1.0);
                     }
                     break;
@@ -476,8 +431,7 @@ namespace TwkFB
 
                 if (header.chan_bits <= 8)
                 {
-                    rlaDecodeScanline(&lineBuffer.front(), scanline + offset,
-                                      width, width, stride);
+                    rlaDecodeScanline(&lineBuffer.front(), scanline + offset, width, width, stride);
                 }
                 else if (header.chan_bits <= 16)
                 {
@@ -485,17 +439,11 @@ namespace TwkFB
                     // WHERE it gets decoded differs depending on the endianness
                     // of the machine:
 #if defined(TWK_LITTLE_ENDIAN) || defined(__LITTLE_ENDIAN__)
-                    unsigned char* linepos = rlaDecodeScanline(
-                        &lineBuffer.front(), scanline + offset + 1, width,
-                        width, stride);
-                    rlaDecodeScanline(linepos, scanline + offset, width, width,
-                                      stride);
+                    unsigned char* linepos = rlaDecodeScanline(&lineBuffer.front(), scanline + offset + 1, width, width, stride);
+                    rlaDecodeScanline(linepos, scanline + offset, width, width, stride);
 #else
-                    unsigned char* linepos = rlaDecodeScanline(
-                        &lineBuffer.front(), scanline + offset, width, width,
-                        stride);
-                    rlaDecodeScanline(linepos, scanline + offset + 1, width,
-                                      width, stride);
+                    unsigned char* linepos = rlaDecodeScanline(&lineBuffer.front(), scanline + offset, width, width, stride);
+                    rlaDecodeScanline(linepos, scanline + offset + 1, width, width, stride);
 #endif
                 }
                 else if (header.chan_bits == 32)
@@ -504,8 +452,7 @@ namespace TwkFB
                     TwkUtil::swapWords(&lineBuffer.front(), dataWidth);
 #endif
                     float* floatScanline = reinterpret_cast<float*>(scanline);
-                    float* floatBuffer =
-                        reinterpret_cast<float*>(&lineBuffer.front());
+                    float* floatBuffer = reinterpret_cast<float*>(&lineBuffer.front());
                     for (int x = 0; x < dataWidth; ++x)
                     {
                         floatScanline[x * numChannels + c] = floatBuffer[x];
@@ -526,8 +473,7 @@ namespace TwkFB
                 unsigned short* shortScanline = (unsigned short*)scanline;
                 for (size_t i = 0; i < dataWidth * numChannels; ++i)
                 {
-                    shortScanline[i] = shortScanline[i]
-                                       << (16 - header.chan_bits);
+                    shortScanline[i] = shortScanline[i] << (16 - header.chan_bits);
                 }
             }
         }

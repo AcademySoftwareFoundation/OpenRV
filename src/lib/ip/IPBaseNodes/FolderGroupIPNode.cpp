@@ -20,9 +20,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkContainer;
 
-    FolderGroupIPNode::FolderGroupIPNode(const std::string& name,
-                                         const NodeDefinition* def,
-                                         IPGraph* graph, GroupIPNode* group)
+    FolderGroupIPNode::FolderGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
         declareProperty<StringProperty>("ui.name", name);
@@ -42,13 +40,11 @@ namespace IPCore
 
         for (size_t i = 0; i < props.size(); i++)
         {
-            if (const StringProperty* sp =
-                    dynamic_cast<const StringProperty*>(props[i]))
+            if (const StringProperty* sp = dynamic_cast<const StringProperty*>(props[i]))
             {
                 if (sp->size() == 1)
                 {
-                    m_internalNodes.push_back(
-                        InternalNodeEntry(sp->front(), sp->name()));
+                    m_internalNodes.push_back(InternalNodeEntry(sp->front(), sp->name()));
                 }
             }
         }
@@ -63,8 +59,7 @@ namespace IPCore
         //
     }
 
-    IPNode* FolderGroupIPNode::newSubGraphForInput(size_t index,
-                                                   const IPNodes& newInputs)
+    IPNode* FolderGroupIPNode::newSubGraphForInput(size_t index, const IPNodes& newInputs)
     {
         IPNode* innode = newInputs[index];
         return newAdaptorForInput(innode);
@@ -104,8 +99,7 @@ namespace IPCore
         {
             InternalNodeEntry& entry = m_internalNodes[i];
 
-            if (view == entry.value
-                && (!rootNode() || rootNode() != entry.node))
+            if (view == entry.value && (!rootNode() || rootNode() != entry.node))
             {
                 if (!entry.node)
                     entry.node = newMemberNode(entry.type, entry.value);

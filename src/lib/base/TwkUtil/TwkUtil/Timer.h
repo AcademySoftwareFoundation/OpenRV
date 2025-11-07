@@ -41,8 +41,7 @@ namespace TwkUtil
         // first arg n second arg number of n's
         double estimate(int n, int ofN) const;
 
-        static void hms(double secondsTotal, int& hours, int& minutes,
-                        double& seconds);
+        static void hms(double secondsTotal, int& hours, int& minutes, double& seconds);
 
         std::string estimateReport(int n, int ofN, bool remaining = true) const;
 

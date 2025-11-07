@@ -225,13 +225,10 @@ namespace Mu
 
         virtual void output(std::ostream&) const;
         virtual void outputNode(std::ostream&, const Node*) const;
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        void outputValue(std::ostream&, const ValuePointer,
-                         bool full = false) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        void outputValue(std::ostream&, const ValuePointer, bool full = false) const;
 
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
 
         //
         //	Aggregate Type API, by default, these return 0.
@@ -261,11 +258,9 @@ namespace Mu
         //  functions yourself.
         //
 
-        virtual void serialize(std::ostream&, Archive::Writer&,
-                               const ValuePointer) const;
+        virtual void serialize(std::ostream&, Archive::Writer&, const ValuePointer) const;
 
-        virtual void deserialize(std::istream&, Archive::Reader&,
-                                 ValuePointer) const;
+        virtual void deserialize(std::istream&, Archive::Reader&, ValuePointer) const;
 
         virtual void reconstitute(Archive::Reader&, Object*) const;
 

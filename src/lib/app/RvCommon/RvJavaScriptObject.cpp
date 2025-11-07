@@ -20,8 +20,7 @@ namespace Rv
     using namespace TwkApp;
     using namespace TwkQtCoreUtil;
 
-    RvJavaScriptObject::RvJavaScriptObject(RvDocument* doc,
-                                           QWebEnginePage* page)
+    RvJavaScriptObject::RvJavaScriptObject(RvDocument* doc, QWebEnginePage* page)
         : QObject(doc)
         , EventNode("jsobject")
         , m_frame(page)
@@ -31,8 +30,7 @@ namespace Rv
 
         if (!webChannelJsFile.open(QIODevice::ReadOnly))
         {
-            QString msg = QString("Couldn't open qwebchannel.js file: %1")
-                              .arg(webChannelJsFile.errorString());
+            QString msg = QString("Couldn't open qwebchannel.js file: %1").arg(webChannelJsFile.errorString());
             string err = msg.toStdString();
             cout << "ERROR: " << err << endl;
             TWK_THROW_EXC_STREAM(err);
@@ -40,10 +38,9 @@ namespace Rv
         else
         {
             QByteArray webChannelJs = webChannelJsFile.readAll();
-            webChannelJs.append(
-                "\nnew QWebChannel(window.qt.webChannelTransport, "
-                "function(channel) {window.rvsession = "
-                "channel.objects.rvsession;});");
+            webChannelJs.append("\nnew QWebChannel(window.qt.webChannelTransport, "
+                                "function(channel) {window.rvsession = "
+                                "channel.objects.rvsession;});");
             QWebEngineScript script;
             script.setSourceCode(webChannelJs);
             script.setName("qwebchannel.js");
@@ -73,43 +70,32 @@ namespace Rv
 
     void RvJavaScriptObject::emitReady()
     {
-        m_frame->runJavaScript(
-            "var event = new CustomEvent(\"rvsession-ready\",{}); "
-            "document.dispatchEvent(event);");
+        m_frame->runJavaScript("var event = new CustomEvent(\"rvsession-ready\",{}); "
+                               "document.dispatchEvent(event);");
     }
 
     QString RvJavaScriptObject::evaluate(const QString& code)
     {
-        string rval = m_doc->session()->userGenericEvent(
-            "remote-eval", UTF8::qconvert(code),
-            UTF8::qconvert(m_frame->url().toString()));
+        string rval = m_doc->session()->userGenericEvent("remote-eval", UTF8::qconvert(code), UTF8::qconvert(m_frame->url().toString()));
         return UTF8::qconvert(rval.c_str());
     }
 
     QString RvJavaScriptObject::pyevaluate(const QString& code)
     {
-        string rval = m_doc->session()->userGenericEvent(
-            "remote-pyeval", UTF8::qconvert(code),
-            UTF8::qconvert(m_frame->url().toString()));
+        string rval = m_doc->session()->userGenericEvent("remote-pyeval", UTF8::qconvert(code), UTF8::qconvert(m_frame->url().toString()));
         return UTF8::qconvert(rval.c_str());
     }
 
     void RvJavaScriptObject::pyexec(const QString& code)
     {
-        (void)m_doc->session()->userGenericEvent(
-            "remote-pyexec", UTF8::qconvert(code),
-            UTF8::qconvert(m_frame->url().toString()));
+        (void)m_doc->session()->userGenericEvent("remote-pyexec", UTF8::qconvert(code), UTF8::qconvert(m_frame->url().toString()));
     }
 
-    QString RvJavaScriptObject::sendInternalEvent(const QString& eventName,
-                                                  const QString& contents,
-                                                  const QString& sender)
+    QString RvJavaScriptObject::sendInternalEvent(const QString& eventName, const QString& contents, const QString& sender)
     {
         QString s = (sender == "") ? m_frame->url().toString() : sender;
 
-        string rval = m_doc->session()->userGenericEvent(
-            UTF8::qconvert(eventName), UTF8::qconvert(contents),
-            UTF8::qconvert(s));
+        string rval = m_doc->session()->userGenericEvent(UTF8::qconvert(eventName), UTF8::qconvert(contents), UTF8::qconvert(s));
         return UTF8::qconvert(rval.c_str());
     }
 
@@ -120,18 +106,11 @@ namespace Rv
             m_eventNames.push_back(re);
     }
 
-    void RvJavaScriptObject::unbindRegex(const QString& name)
-    {
-        m_eventNames.removeOne(QRegularExpression(name));
-    }
+    void RvJavaScriptObject::unbindRegex(const QString& name) { m_eventNames.removeOne(QRegularExpression(name)); }
 
-    bool RvJavaScriptObject::hasBinding(const QString& name)
-    {
-        return m_eventNames.contains(QRegularExpression(name));
-    }
+    bool RvJavaScriptObject::hasBinding(const QString& name) { return m_eventNames.contains(QRegularExpression(name)); }
 
-    EventNode::Result
-    RvJavaScriptObject::receiveEvent(const TwkApp::Event& event)
+    EventNode::Result RvJavaScriptObject::receiveEvent(const TwkApp::Event& event)
     {
         QString name = event.name().c_str();
 
@@ -139,32 +118,24 @@ namespace Rv
         {
             if (m_eventNames[i].match(name).hasMatch())
             {
-                if (const GenericStringEvent* ge =
-                        dynamic_cast<const GenericStringEvent*>(&event))
+                if (const GenericStringEvent* ge = dynamic_cast<const GenericStringEvent*>(&event))
                 {
-                    emit eventString(ge->name().c_str(),
-                                     ge->stringContent().c_str(),
-                                     ge->senderName().c_str());
+                    emit eventString(ge->name().c_str(), ge->stringContent().c_str(), ge->senderName().c_str());
                 }
-                else if (const KeyEvent* ke =
-                             dynamic_cast<const KeyEvent*>(&event))
+                else if (const KeyEvent* ke = dynamic_cast<const KeyEvent*>(&event))
                 {
-                    emit eventKey(ke->name().c_str(), ke->key(),
-                                  ke->modifiers());
+                    emit eventKey(ke->name().c_str(), ke->key(), ke->modifiers());
                 }
-                else if (const PointerEvent* pe =
-                             dynamic_cast<const PointerEvent*>(&event))
+                else if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(&event))
                 {
                     float atime = 0.0;
 
-                    if (const PointerButtonPressEvent* bp =
-                            dynamic_cast<const PointerButtonPressEvent*>(pe))
+                    if (const PointerButtonPressEvent* bp = dynamic_cast<const PointerButtonPressEvent*>(pe))
                     {
                         atime = bp->activationTime();
                     }
 
-                    if (const DragDropEvent* dd =
-                            dynamic_cast<const DragDropEvent*>(pe))
+                    if (const DragDropEvent* dd = dynamic_cast<const DragDropEvent*>(pe))
                     {
                         QString t, ct;
 
@@ -197,18 +168,13 @@ namespace Rv
                             break;
                         }
 
-                        emit eventDragDrop(pe->name().c_str(), pe->x(), pe->y(),
-                                           pe->w(), pe->h(), pe->startX(),
-                                           pe->startY(),
-                                           (int)pe->buttonStates(), t, ct,
-                                           dd->stringContent().c_str());
+                        emit eventDragDrop(pe->name().c_str(), pe->x(), pe->y(), pe->w(), pe->h(), pe->startX(), pe->startY(),
+                                           (int)pe->buttonStates(), t, ct, dd->stringContent().c_str());
                     }
                     else
                     {
-                        emit eventPointer(pe->name().c_str(), pe->x(), pe->y(),
-                                          pe->w(), pe->h(), pe->startX(),
-                                          pe->startY(), pe->buttonStates(),
-                                          atime);
+                        emit eventPointer(pe->name().c_str(), pe->x(), pe->y(), pe->w(), pe->h(), pe->startX(), pe->startY(),
+                                          pe->buttonStates(), atime);
                     }
                 }
 

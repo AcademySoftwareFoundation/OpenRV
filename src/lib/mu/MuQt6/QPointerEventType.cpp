@@ -41,8 +41,7 @@ namespace Mu
 {
     using namespace std;
 
-    QPointerEventType::QPointerEventType(Context* c, const char* name,
-                                         Class* super)
+    QPointerEventType::QPointerEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -52,32 +51,28 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    bool qt_QPointerEvent_allPointsAccepted_bool_QPointerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QPointerEvent_allPointsAccepted_bool_QPointerEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPointerEvent* arg0 = getqpointer<QPointerEventType>(param_this);
         return arg0->allPointsAccepted();
     }
 
-    bool qt_QPointerEvent_allPointsGrabbed_bool_QPointerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QPointerEvent_allPointsGrabbed_bool_QPointerEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPointerEvent* arg0 = getqpointer<QPointerEventType>(param_this);
         return arg0->allPointsGrabbed();
     }
 
-    int qt_QPointerEvent_pointerType_int_QPointerEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QPointerEvent_pointerType_int_QPointerEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPointerEvent* arg0 = getqpointer<QPointerEventType>(param_this);
         return int(arg0->pointerType());
     }
 
-    void qt_QPointerEvent_setAccepted_void_QPointerEvent_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_accepted)
+    void qt_QPointerEvent_setAccepted_void_QPointerEvent_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_accepted)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPointerEvent* arg0 = getqpointer<QPointerEventType>(param_this);
@@ -88,26 +83,22 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_allPointsAccepted0, bool)
     {
-        NODE_RETURN(qt_QPointerEvent_allPointsAccepted_bool_QPointerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPointerEvent_allPointsAccepted_bool_QPointerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_allPointsGrabbed0, bool)
     {
-        NODE_RETURN(qt_QPointerEvent_allPointsGrabbed_bool_QPointerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPointerEvent_allPointsGrabbed_bool_QPointerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pointerType0, int)
     {
-        NODE_RETURN(qt_QPointerEvent_pointerType_int_QPointerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPointerEvent_pointerType_int_QPointerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAccepted0, void)
     {
-        qt_QPointerEvent_setAccepted_void_QPointerEvent_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QPointerEvent_setAccepted_void_QPointerEvent_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     void QPointerEventType::load()
@@ -127,13 +118,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -146,16 +135,11 @@ namespace Mu
             // member functions
             // MISSING: addPassiveGrabber (bool; QPointerEvent this, "const
             // QEventPoint &" point, QObject grabber)
-            new Function(c, "allPointsAccepted", _n_allPointsAccepted0, None,
-                         Compiled,
-                         qt_QPointerEvent_allPointsAccepted_bool_QPointerEvent,
-                         Return, "bool", Parameters,
+            new Function(c, "allPointsAccepted", _n_allPointsAccepted0, None, Compiled,
+                         qt_QPointerEvent_allPointsAccepted_bool_QPointerEvent, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QPointerEvent"), End),
-            new Function(c, "allPointsGrabbed", _n_allPointsGrabbed0, None,
-                         Compiled,
-                         qt_QPointerEvent_allPointsGrabbed_bool_QPointerEvent,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QPointerEvent"), End),
+            new Function(c, "allPointsGrabbed", _n_allPointsGrabbed0, None, Compiled, qt_QPointerEvent_allPointsGrabbed_bool_QPointerEvent,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QPointerEvent"), End),
             // MISSING: clearPassiveGrabbers (void; QPointerEvent this, "const
             // QEventPoint &" point) MISSING: exclusiveGrabber (QObject;
             // QPointerEvent this, "const QEventPoint &" point) MISSING:
@@ -164,21 +148,16 @@ namespace Mu
             // QPointerEvent this, "qsizetype" i) MISSING: pointById
             // ("QEventPoint *"; QPointerEvent this, int id) MISSING: pointCount
             // ("qsizetype"; QPointerEvent this)
-            new Function(c, "pointerType", _n_pointerType0, None, Compiled,
-                         qt_QPointerEvent_pointerType_int_QPointerEvent, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QPointerEvent"), End),
+            new Function(c, "pointerType", _n_pointerType0, None, Compiled, qt_QPointerEvent_pointerType_int_QPointerEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QPointerEvent"), End),
             // MISSING: pointingDevice ("const QPointingDevice *"; QPointerEvent
             // this) MISSING: points ("const QList<QEventPoint> &";
             // QPointerEvent this) MISSING: removePassiveGrabber (bool;
             // QPointerEvent this, "const QEventPoint &" point, QObject grabber)
             // MISSING: setExclusiveGrabber (void; QPointerEvent this, "const
             // QEventPoint &" point, QObject exclusiveGrabber)
-            new MemberFunction(
-                c, "setAccepted", _n_setAccepted0, None, Compiled,
-                qt_QPointerEvent_setAccepted_void_QPointerEvent_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QPointerEvent"),
-                new Param(c, "accepted", "bool"), End),
+            new MemberFunction(c, "setAccepted", _n_setAccepted0, None, Compiled, qt_QPointerEvent_setAccepted_void_QPointerEvent_bool,
+                               Return, "void", Parameters, new Param(c, "this", "qt.QPointerEvent"), new Param(c, "accepted", "bool"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

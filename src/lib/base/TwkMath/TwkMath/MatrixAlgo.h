@@ -30,8 +30,7 @@ namespace TwkMath
     };
 
     //******************************************************************************
-    template <typename T, class MAT, size_t N>
-    void gaussjInvert<T, MAT, N>::doit(MAT& mat)
+    template <typename T, class MAT, size_t N> void gaussjInvert<T, MAT, N>::doit(MAT& mat)
     {
         if (mat[0][0] != mat[0][0])
             throw SingularMatrixExc();

@@ -40,8 +40,7 @@ namespace TwkContainer
         //
 
         Containers read(const char* filename);
-        Containers read(std::istream& in, const char* name,
-                        unsigned int ormode = 0);
+        Containers read(std::istream& in, const char* name, unsigned int ormode = 0);
 
         //
         //  Override this function if you want to do non-default
@@ -59,22 +58,14 @@ namespace TwkContainer
         //  property type.
         //
 
-        virtual Property* newProperty(const std::string& name,
-                                      const std::string& interp,
-                                      const PropertyInfo&);
+        virtual Property* newProperty(const std::string& name, const std::string& interp, const PropertyInfo&);
 
-        virtual Request object(const std::string& name,
-                               const std::string& protocol,
-                               unsigned int protocolVersion,
+        virtual Request object(const std::string& name, const std::string& protocol, unsigned int protocolVersion,
                                const ObjectInfo& header);
 
-        virtual Request component(const std::string& name,
-                                  const std::string& interp,
-                                  const ComponentInfo& header);
+        virtual Request component(const std::string& name, const std::string& interp, const ComponentInfo& header);
 
-        virtual Request property(const std::string& name,
-                                 const std::string& interp,
-                                 const PropertyInfo& header);
+        virtual Request property(const std::string& name, const std::string& interp, const PropertyInfo& header);
 
         virtual void* data(const PropertyInfo&, size_t bytes);
         virtual void dataRead(const PropertyInfo&);

@@ -62,14 +62,12 @@ public:
 
     // IDeckLinkVideoFrame3DExtensions methods
     BMDVideo3DPackingFormat STDMETHODCALLTYPE Get3DPackingFormat() override;
-    HRESULT STDMETHODCALLTYPE
-    GetFrameForRightEye(/* out */ IDeckLinkVideoFrame** rightEyeFrame) override;
+    HRESULT STDMETHODCALLTYPE GetFrameForRightEye(/* out */ IDeckLinkVideoFrame** rightEyeFrame) override;
 
     class Provider : public IUnknown
     {
     public:
-        Provider(IDeckLinkMutableVideoFrame* parent,
-                 IDeckLinkMutableVideoFrame* right);
+        Provider(IDeckLinkMutableVideoFrame* parent, IDeckLinkMutableVideoFrame* right);
         virtual ~Provider();
 
         Provider(const Provider&) = delete;
@@ -78,8 +76,7 @@ public:
         Provider& operator=(Provider&&) = delete;
 
         // IUnknown methods
-        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid,
-                                                 LPVOID* ppv) override;
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, LPVOID* ppv) override;
         ULONG STDMETHODCALLTYPE AddRef() override;
         ULONG STDMETHODCALLTYPE Release() override;
 
@@ -94,8 +91,7 @@ public:
 private:
     friend class Provider;
 
-    StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
-                     IDeckLinkMutableVideoFrame* right);
+    StereoVideoFrame(IDeckLinkMutableVideoFrame* owner, IDeckLinkMutableVideoFrame* right);
 
     IDeckLinkMutableVideoFrame* m_frameLeft;
     IDeckLinkMutableVideoFrame* m_frameRight;

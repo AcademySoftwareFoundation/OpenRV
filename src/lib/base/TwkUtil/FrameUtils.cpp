@@ -64,13 +64,11 @@ namespace TwkUtil
     static const string optionalFPS = "([0-9]+)?";
 
     static const string preCookie = notEscaped + "(";
-    static const string postCookie =
-        optionalOffset1 + optionalMult + optionalModulo + optionalOffset2 + ")";
+    static const string postCookie = optionalOffset1 + optionalMult + optionalModulo + optionalOffset2 + ")";
 
-    static const string timeRange =
-        "((([^0-9]-)?([0-9]+)?-?-?[0-9]+(x-?[0-9]+)?)(,(-?([0-9]+)?-?-?[0-9]+("
-        "x-?[0-9]+)?))*)?"
-        "([@#]+|%[-+ 0-9]*[di])";
+    static const string timeRange = "((([^0-9]-)?([0-9]+)?-?-?[0-9]+(x-?[0-9]+)?)(,(-?([0-9]+)?-?-?[0-9]+("
+                                    "x-?[0-9]+)?))*)?"
+                                    "([@#]+|%[-+ 0-9]*[di])";
 
     static const string timeRange2 = "(-?[0-9]+)-?(-*[0-9]+)?x?([0-9]+)?";
 
@@ -86,8 +84,7 @@ namespace TwkUtil
 
     static const RegEx unPaddedFrameSymRE(preCookie + "(@+)" + postCookie);
     static const RegEx paddedFrameSymRE(preCookie + "(#+)" + postCookie);
-    static const RegEx unPaddedTickSymRE(preCookie + "`" + optionalFPS
-                                         + postCookie);
+    static const RegEx unPaddedTickSymRE(preCookie + "`" + optionalFPS + postCookie);
     static const RegEx pctSyntaxRE(preCookie + "(%[0-9+]*[di])" + postCookie);
 
     static const RegEx unPaddedFrameSymRENoEsc("^((@+)" + postCookie);
@@ -99,10 +96,7 @@ namespace TwkUtil
 
     static SequencePredicateExtensionSet sequenceExtenions;
 
-    SequencePredicateExtensionSet& predicateFileExtensions()
-    {
-        return sequenceExtenions;
-    }
+    SequencePredicateExtensionSet& predicateFileExtensions() { return sequenceExtenions; }
 
     static bool isNumeric(string& s)
     {
@@ -144,8 +138,7 @@ struct LexinumericCompare
 };
 #endif
 
-    static string replaceAll(string retStr, const RegEx& regex,
-                             const string& replacement, int maxLen, int& count)
+    static string replaceAll(string retStr, const RegEx& regex, const string& replacement, int maxLen, int& count)
     {
         std::string result;
         bool endsWithReplacement = false;
@@ -220,27 +213,21 @@ struct LexinumericCompare
         static const RegEx phre("(PLACE\\|HOLDER)");
         count = 0;
 
-        retStr = replaceAll(retStr, dotre, "PLACE|HOLDER", MAX_SEQUENCE_LEN + 2,
-                            count);
-        retStr =
-            replaceAll(retStr, re, "PLACE|HOLDER", MAX_SEQUENCE_LEN, count);
+        retStr = replaceAll(retStr, dotre, "PLACE|HOLDER", MAX_SEQUENCE_LEN + 2, count);
+        retStr = replaceAll(retStr, re, "PLACE|HOLDER", MAX_SEQUENCE_LEN, count);
         return replaceAll(retStr, phre, DIGIT_REGEX, INT_MAX, count);
     }
 
     //
     //  Returns all the SequenceNames in a directory.
     //
-    SequenceNameList sequencesInDirectory(const string& path,
-                                          SequencePredicate P,
-                                          bool includeNonMatching,
-                                          bool frameRanges, bool showDirs)
+    SequenceNameList sequencesInDirectory(const string& path, SequencePredicate P, bool includeNonMatching, bool frameRanges, bool showDirs)
     {
         FileNameList allFiles;
 
         if (filesInDirectory(path.c_str(), allFiles, showDirs))
         {
-            return sequencesInFileList(allFiles, P, includeNonMatching,
-                                       frameRanges);
+            return sequencesInFileList(allFiles, P, includeNonMatching, frameRanges);
         }
 
         return SequenceNameList();
@@ -275,10 +262,8 @@ struct LexinumericCompare
 
     static int defaultMinSequenceSize = -2;
 
-    SequenceNameList sequencesInFileList(const FileNameList& infiles,
-                                         SequencePredicate P,
-                                         bool includeNonMatching,
-                                         bool frameRanges, int minSequenceSize)
+    SequenceNameList sequencesInFileList(const FileNameList& infiles, SequencePredicate P, bool includeNonMatching, bool frameRanges,
+                                         int minSequenceSize)
     {
         if (defaultMinSequenceSize == -2)
         {
@@ -311,13 +296,11 @@ struct LexinumericCompare
         typedef list<string> TempFileList;
         TempFileList allfiles;
         copy(infiles.begin(), infiles.end(), back_inserter(allfiles));
-        transform(allfiles.begin(), allfiles.end(), allfiles.begin(),
-                  pathConform);
+        transform(allfiles.begin(), allfiles.end(), allfiles.begin(), pathConform);
 
         SequenceNameList frameSequences;
 
-        DB("sequencesInFileList " << infiles.size() << " files, min size "
-                                  << minSequenceSize);
+        DB("sequencesInFileList " << infiles.size() << " files, min size " << minSequenceSize);
 
         while (allfiles.size() > 0)
         {
@@ -378,8 +361,7 @@ struct LexinumericCompare
                 Match m(regEx, f);
                 if (!m.foundMatch())
                 {
-                    DB("        pattern '" << pattern << "' not found in file '"
-                                           << f << "'");
+                    DB("        pattern '" << pattern << "' not found in file '" << f << "'");
                     // Name is probably garbled.  Give up trying to find the
                     // sequence.
                     if (includeNonMatching)
@@ -391,21 +373,17 @@ struct LexinumericCompare
                 for (int i = m.subCount() - 2; i >= 0; i--)
                 {
                     int subStartPos = m.subStartPos(i);
-                    bool hasDot =
-                        (subStartPos > 0 && f[subStartPos - 1] == '.');
+                    bool hasDot = (subStartPos > 0 && f[subStartPos - 1] == '.');
                     string subprefix = f.substr(0, subStartPos);
                     subprefix = escapeRegexConflicts(subprefix);
-                    string subsuffix =
-                        f.substr(m.subEndPos(i), f.size() - m.subEndPos(i));
+                    string subsuffix = f.substr(m.subEndPos(i), f.size() - m.subEndPos(i));
                     subsuffix = escapeRegexConflicts(subsuffix);
-                    string subpattern =
-                        subprefix + string(DIGIT_REGEX) + subsuffix;
+                    string subpattern = subprefix + string(DIGIT_REGEX) + subsuffix;
                     RegEx subpatternRe("^" + subpattern + "$");
                     size_t matchCount = 0;
 
                     matchFrames.clear();
-                    for (TempFileList::iterator iter = allfiles.begin();
-                         iter != allfiles.end(); ++iter)
+                    for (TempFileList::iterator iter = allfiles.begin(); iter != allfiles.end(); ++iter)
                     {
                         if (subpatternRe.matches(iter->c_str()))
                         {
@@ -419,8 +397,7 @@ struct LexinumericCompare
                     int longestRun = 0;
                     int lastFrame = matchFrames.front();
                     matchFrames.pop_front();
-                    for (list<int>::iterator iter = matchFrames.begin();
-                         iter != matchFrames.end(); ++iter)
+                    for (list<int>::iterator iter = matchFrames.begin(); iter != matchFrames.end(); ++iter)
                     {
                         if (*iter == (lastFrame + 1))
                             contiguous++;
@@ -431,19 +408,14 @@ struct LexinumericCompare
                             longestRun = contiguous;
                         lastFrame = *iter;
                     }
-                    DB("        subpattern '" << subpattern << "' hasDot "
-                                              << hasDot << ", matches "
-                                              << matchCount << " files");
+                    DB("        subpattern '" << subpattern << "' hasDot " << hasDot << ", matches " << matchCount << " files");
                     //
                     //  Prefer pattern with the most contiguous frames or
                     //  preceded by dot.
                     //
-                    if ((matchCount > bestPatternCount
-                         && longestRun >= bestPatternLongestRun)
-                        || (bestPatternLongestRun == 0
-                            && longestRun >= minSequenceSize)
-                        || (matchCount == bestPatternCount && hasDot
-                            && !bestPatternHasDot))
+                    if ((matchCount > bestPatternCount && longestRun >= bestPatternLongestRun)
+                        || (bestPatternLongestRun == 0 && longestRun >= minSequenceSize)
+                        || (matchCount == bestPatternCount && hasDot && !bestPatternHasDot))
                     {
                         bestPatternHasDot = hasDot;
                         bestPatternCount = matchCount;
@@ -461,8 +433,7 @@ struct LexinumericCompare
                     RegEx bestPatternRe("^" + bestPattern + "$");
 
                     // mR - changed so it wouldn't crash in Windows
-                    for (TempFileList::iterator iter = allfiles.begin();
-                         iter != allfiles.end();
+                    for (TempFileList::iterator iter = allfiles.begin(); iter != allfiles.end();
                          /* ++iter */)
                     {
                         const string& s = *iter;
@@ -489,8 +460,7 @@ struct LexinumericCompare
                 int pad = 1000;
 
                 // mR - changed so it wouldn't crash in Windows
-                for (TempFileList::iterator iter = allfiles.begin();
-                     iter != allfiles.end();
+                for (TempFileList::iterator iter = allfiles.begin(); iter != allfiles.end();
                      /* ++iter */)
                 {
                     const string& s = *iter;
@@ -542,9 +512,7 @@ struct LexinumericCompare
                         timeStr += "@";
                 }
 
-                string frameSeq =
-                    bestPattern.replace(bestPattern.find(DIGIT_REGEX),
-                                        strlen(DIGIT_REGEX), timeStr);
+                string frameSeq = bestPattern.replace(bestPattern.find(DIGIT_REGEX), strlen(DIGIT_REGEX), timeStr);
                 frameSequences.push_back(frameSeq);
             }
             catch (...)
@@ -575,10 +543,7 @@ struct LexinumericCompare
         return frameSequences;
     }
 
-    bool isStereoSequence(SequenceName seqName)
-    {
-        return Match(stereoSeqRE, seqName);
-    }
+    bool isStereoSequence(SequenceName seqName) { return Match(stereoSeqRE, seqName); }
 
     //
     //  Returns an ExistingFile for each frame in a SequenceName in order.  Note
@@ -589,8 +554,7 @@ struct LexinumericCompare
     //  memeber of every existing file will hold the corresponding frame.
     //
 
-    ExistingFileList existingFilesInSequence(const SequenceName& inSeqName,
-                                             bool justOne)
+    ExistingFileList existingFilesInSequence(const SequenceName& inSeqName, bool justOne)
     {
         std::string seqName = pathConform(inSeqName);
 
@@ -604,8 +568,7 @@ struct LexinumericCompare
         {
             if (timeStr != "")
             {
-                DB("    split timeStr '" << timeStr << "' pattern '" << pattern
-                                         << "'");
+                DB("    split timeStr '" << timeStr << "' pattern '" << pattern << "'");
                 FrameList frms = frameRange(timeStr.c_str());
 
                 string seqDir = dirname(seqName.c_str());
@@ -623,8 +586,7 @@ struct LexinumericCompare
 
                 for (unsigned int i = 0; i < frms.size(); ++i)
                 {
-                    string filename =
-                        replaceFrameSymbols(pattern.c_str(), frms[i]);
+                    string filename = replaceFrameSymbols(pattern.c_str(), frms[i]);
                     ExistingFile ef;
                     ef.name = filename;
                     //
@@ -658,8 +620,7 @@ struct LexinumericCompare
                 string fmt = "";
                 string frameMatcher = ".*";
 
-                DB("    split failed, trying direct match on seq '" << seq
-                                                                    << "'");
+                DB("    split failed, trying direct match on seq '" << seq << "'");
 
                 //
                 //  Use NoEsc versions of regex first, since at this point there
@@ -669,22 +630,19 @@ struct LexinumericCompare
 
                 Match m;
                 bool doReplace = false;
-                if ((m = Match(paddedFrameSymRENoEsc, seq))
-                    || (m = Match(paddedFrameSymRE, seq)))
+                if ((m = Match(paddedFrameSymRENoEsc, seq)) || (m = Match(paddedFrameSymRE, seq)))
                 {
                     DB("    padded match");
                     fmt = m.subStr(1);
                     doReplace = true;
                 }
-                else if ((m = Match(unPaddedFrameSymRENoEsc, seq))
-                         || (m = Match(unPaddedFrameSymRE, seq)))
+                else if ((m = Match(unPaddedFrameSymRENoEsc, seq)) || (m = Match(unPaddedFrameSymRE, seq)))
                 {
                     DB("    unpadded match");
                     fmt = m.subStr(1);
                     doReplace = true;
                 }
-                else if ((m = Match(pctSyntaxRENoEsc, seq))
-                         || (m = Match(pctSyntaxRE, seq)))
+                else if ((m = Match(pctSyntaxRENoEsc, seq)) || (m = Match(pctSyntaxRE, seq)))
                 {
                     DB("    pct match");
                     fmt = m.subStr(1);
@@ -693,13 +651,10 @@ struct LexinumericCompare
                 if (doReplace)
                 {
                     frameMatcher = "^" + seq + "$";
-                    frameMatcher = frameMatcher.replace(
-                        frameMatcher.find(fmt), fmt.size(), "([-0-9]+)");
+                    frameMatcher = frameMatcher.replace(frameMatcher.find(fmt), fmt.size(), "([-0-9]+)");
                     seq = seq.replace(seq.find(fmt), fmt.size(), "*");
                 }
-                DB("    after matching seq '" << seq << "' fmt '" << fmt
-                                              << "' frameMatcher '"
-                                              << frameMatcher << "'");
+                DB("    after matching seq '" << seq << "' fmt '" << fmt << "' frameMatcher '" << frameMatcher << "'");
 
                 // Get all the files matching the sequenceName
 
@@ -740,8 +695,7 @@ struct LexinumericCompare
                         ostringstream timeStrStr;
                         timeStrStr << minFrame << "-" << maxFrame << fmt;
 
-                        newSeqName = newSeqName.replace(
-                            newSeqName.find(fmt), fmt.size(), timeStrStr.str());
+                        newSeqName = newSeqName.replace(newSeqName.find(fmt), fmt.size(), timeStrStr.str());
 
                         return existingFilesInSequence(newSeqName, justOne);
                     }
@@ -753,8 +707,7 @@ struct LexinumericCompare
                 {
                     if (m = Match(frameMatcher, allFiles[i]))
                     {
-                        DB("        file matches: " << allFiles[i] << " frame "
-                                                    << m.subStr(0));
+                        DB("        file matches: " << allFiles[i] << " frame " << m.subStr(0));
                         ExistingFile ef;
                         ef.name = dir + "/" + allFiles[i];
                         ef.exists = true;
@@ -766,9 +719,7 @@ struct LexinumericCompare
                 }
             }
 
-            if (existingFiles.empty()
-                && (seqName.find_first_of("#@") != std::string::npos)
-                && fileExists(seqName.c_str()))
+            if (existingFiles.empty() && (seqName.find_first_of("#@") != std::string::npos) && fileExists(seqName.c_str()))
             {
                 // In this case the file path contains really # and @ characters
                 ExistingFile ef;
@@ -791,8 +742,7 @@ struct LexinumericCompare
         return existingFiles;
     }
 
-    bool splitSequenceName(const SequenceName& sequenceName, string& timeStr,
-                           string& sequencePattern)
+    bool splitSequenceName(const SequenceName& sequenceName, string& timeStr, string& sequencePattern)
     {
         if (Match m = Match(timeRE, sequenceName))
         {
@@ -813,8 +763,7 @@ struct LexinumericCompare
 
             if (timeStr != "")
             {
-                sequencePattern = sequencePattern.replace(
-                    sequencePattern.find(timeStr), timeStr.size(), "");
+                sequencePattern = sequencePattern.replace(sequencePattern.find(timeStr), timeStr.size(), "");
             }
 
             return true;
@@ -825,8 +774,7 @@ struct LexinumericCompare
         }
     }
 
-    SequencePattern sequencePattern(const ExistingFileList& efl,
-                                    bool onlyExisting, int minSequenceSize)
+    SequencePattern sequencePattern(const ExistingFileList& efl, bool onlyExisting, int minSequenceSize)
     {
         FileNameList files;
 
@@ -837,8 +785,7 @@ struct LexinumericCompare
             files.push_back(efl[i].name);
         }
 
-        SequenceNameList patterns =
-            sequencesInFileList(files, NULL, true, true, minSequenceSize);
+        SequenceNameList patterns = sequencesInFileList(files, NULL, true, true, minSequenceSize);
         return patterns.front();
     }
 
@@ -1104,8 +1051,7 @@ struct LexinumericCompare
                 }
                 else
                 {
-                    timeStr << frmRange[0] << "-" << frame << "x" << incr
-                            << ",";
+                    timeStr << frmRange[0] << "-" << frame << "x" << incr << ",";
                 }
             }
 
@@ -1144,15 +1090,13 @@ struct LexinumericCompare
         }
         else
         {
-            cout << "WARNING: ignoring sequence \"" << inpattern << " "
-                 << inrange << "\" : not convertable" << endl;
+            cout << "WARNING: ignoring sequence \"" << inpattern << " " << inrange << "\" : not convertable" << endl;
 
             return inpattern;
         }
     }
 
-    void convertNukeToShakeForm(const SequenceNameList& inlist,
-                                SequenceNameList& outlist)
+    void convertNukeToShakeForm(const SequenceNameList& inlist, SequenceNameList& outlist)
     {
         assert(inlist.size() % 2 == 0);
 
@@ -1165,8 +1109,7 @@ struct LexinumericCompare
         }
     }
 
-    PatternFramePair sequenceOfFile(const std::string& infilename,
-                                    SequencePredicate P, bool frameRanges)
+    PatternFramePair sequenceOfFile(const std::string& infilename, SequencePredicate P, bool frameRanges)
     {
         string filename = pathConform(infilename);
 

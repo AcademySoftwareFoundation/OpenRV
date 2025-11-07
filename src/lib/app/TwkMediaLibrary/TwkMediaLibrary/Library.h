@@ -32,8 +32,7 @@ namespace TwkMediaLibrary
 
     struct HTTPCookie
     {
-        HTTPCookie(const std::string& d, const std::string& p,
-                   const std::string& n, const std::string& v)
+        HTTPCookie(const std::string& d, const std::string& p, const std::string& n, const std::string& v)
             : domain(d)
             , path(p)
             , name(n)
@@ -145,10 +144,8 @@ namespace TwkMediaLibrary
         RawExportCapabilityFlag = 1 << 3,   // can export raw media files
         EditCapabilityFlag = 1 << 4,        // can edit library
 
-        DefaultCapabiliesFlag = AdministratorCapabilityFlag
-                                | NoWatermarkCapabilityFlag
-                                | ExportCapabilityFlag | RawExportCapabilityFlag
-                                | EditCapabilityFlag
+        DefaultCapabiliesFlag =
+            AdministratorCapabilityFlag | NoWatermarkCapabilityFlag | ExportCapabilityFlag | RawExportCapabilityFlag | EditCapabilityFlag
     };
 
     enum TaskType
@@ -277,12 +274,9 @@ namespace TwkMediaLibrary
         virtual PropertyKey metaKey(const PropertyKey&, size_t index) const;
         virtual PropertyKeyVector metaKeys(const PropertyKey&) const;
         virtual bool hasMeta(const PropertyKey&, const PropertyKey&) const;
-        virtual PropertyValue metaValue(const PropertyKey&,
-                                        const PropertyKey& metaKey) const;
-        virtual PropertyType metaType(const PropertyKey&,
-                                      const PropertyKey& metaKey) const;
-        std::string metaValueAsString(const PropertyKey&,
-                                      const PropertyKey&) const;
+        virtual PropertyValue metaValue(const PropertyKey&, const PropertyKey& metaKey) const;
+        virtual PropertyType metaType(const PropertyKey&, const PropertyKey& metaKey) const;
+        std::string metaValueAsString(const PropertyKey&, const PropertyKey&) const;
 
         //
         //  Utilities
@@ -300,11 +294,8 @@ namespace TwkMediaLibrary
         //
 
         virtual bool deleteProperty(const PropertyKey&);
-        virtual void setProperty(const PropertyKey&, PropertyType type,
-                                 const PropertyValue& value);
-        virtual void setPropertyFromString(const PropertyKey&,
-                                           PropertyType type,
-                                           const std::string& value);
+        virtual void setProperty(const PropertyKey&, PropertyType type, const PropertyValue& value);
+        virtual void setPropertyFromString(const PropertyKey&, PropertyType type, const std::string& value);
         virtual void setName(const std::string&);
         virtual void setParent(const Node*);
 
@@ -352,8 +343,7 @@ namespace TwkMediaLibrary
     {
     public:
         virtual std::string loginName() const = 0;
-        virtual bool
-        passwordMatches(const std::string& plainTextUTF8) const = 0;
+        virtual bool passwordMatches(const std::string& plainTextUTF8) const = 0;
         virtual UserCapabilityFlags capabilities() const = 0;
 
     protected:
@@ -499,17 +489,9 @@ namespace TwkMediaLibrary
             return b;
         }
 
-        void setProperty(const PropertyKey& k, PropertyType t,
-                         const PropertyValue& v)
-        {
-            n()->setProperty(k, t, v);
-        }
+        void setProperty(const PropertyKey& k, PropertyType t, const PropertyValue& v) { n()->setProperty(k, t, v); }
 
-        void setPropertyFromString(const PropertyKey& k, PropertyType t,
-                                   const std::string& v)
-        {
-            n()->setPropertyFromString(k, t, v);
-        }
+        void setPropertyFromString(const PropertyKey& k, PropertyType t, const std::string& v) { n()->setPropertyFromString(k, t, v); }
 
         void setName(const std::string& name) { n()->setName(name); }
 
@@ -577,8 +559,7 @@ namespace TwkMediaLibrary
         typedef void(NodeStringFunc)(const Node*, const std::string&);
         typedef void(NodeSizetFunc)(const Node*, size_t);
         typedef void(StringFunc)(const std::string&);
-        typedef void(NodeMoveFunc)(const Node*, const Node*, size_t,
-                                   const Node*, size_t);
+        typedef void(NodeMoveFunc)(const Node*, const Node*, size_t, const Node*, size_t);
 
         typedef boost::signals2::signal<VoidFunc> VoidSignal;
         typedef boost::signals2::signal<NodeFunc> NodeSignal;
@@ -587,8 +568,7 @@ namespace TwkMediaLibrary
         typedef boost::signals2::signal<NodeSizetFunc> NodeIndexSignal;
         typedef boost::signals2::signal<NodeMoveFunc> NodeMoveSignal;
         typedef boost::signals2::signal<StringFunc> StringSignal;
-        typedef std::pair<const Node*, PropertyKeyVector>
-            NodePropertyKeyVectorPair;
+        typedef std::pair<const Node*, PropertyKeyVector> NodePropertyKeyVectorPair;
         typedef std::vector<NodePropertyKeyVectorPair> NodePropertyResult;
         typedef boost::mutex Mutex;
         typedef boost::mutex::scoped_lock ScopedLock;
@@ -596,20 +576,17 @@ namespace TwkMediaLibrary
         typedef boost::condition_variable Condition;
         typedef std::deque<Task*> TaskDeque;
 
-        typedef void(NodePropertyResultFunc)(const Task*,
-                                             const NodePropertyResult&);
+        typedef void(NodePropertyResultFunc)(const Task*, const NodePropertyResult&);
         typedef void(NodeTaskFunc)(const Task*, const Node*);
 
-        typedef boost::function<NodePropertyResultFunc>
-            PropertyQueryResultFunction;
+        typedef boost::function<NodePropertyResultFunc> PropertyQueryResultFunction;
         typedef boost::function<NodeTaskFunc> NodeQueryResultFunction;
 
         //
         //  Constructors
         //
 
-        explicit Library(const std::string& typeName,
-                         const std::string& appName);
+        explicit Library(const std::string& typeName, const std::string& appName);
         virtual ~Library();
 
         //
@@ -640,72 +617,39 @@ namespace TwkMediaLibrary
 
         VoidSignal& willDeleteSignal() { return m_willDeleteSignal; }
 
-        NodeSignal& nodeTreeWillDeleteSignal()
-        {
-            return m_nodeTreeWillDeleteSignal;
-        }
+        NodeSignal& nodeTreeWillDeleteSignal() { return m_nodeTreeWillDeleteSignal; }
 
-        NodeSignal& nodeTreeDidDeleteSignal()
-        {
-            return m_nodeTreeDidDeleteSignal;
-        }
+        NodeSignal& nodeTreeDidDeleteSignal() { return m_nodeTreeDidDeleteSignal; }
 
         NodeSignal& nodeWillDeleteSignal() { return m_nodeWillDeleteSignal; }
 
         NodeSignal& nodeDidDeleteSignal() { return m_nodeDidDeleteSignal; }
 
-        NodeIndexSignal& willCreateNodeSignal()
-        {
-            return m_willCreateNodeSignal;
-        }
+        NodeIndexSignal& willCreateNodeSignal() { return m_willCreateNodeSignal; }
 
         NodeSignal& newNodeSignal() { return m_newNodeSignal; }
 
-        NodePropertySignal& nodePropertyChangedSignal()
-        {
-            return m_nodePropertyChangedSignal;
-        }
+        NodePropertySignal& nodePropertyChangedSignal() { return m_nodePropertyChangedSignal; }
 
-        NodeSignal& nodePropertiesWillBeAddedSignal()
-        {
-            return m_nodePropertiesWillBeAddedSignal;
-        }
+        NodeSignal& nodePropertiesWillBeAddedSignal() { return m_nodePropertiesWillBeAddedSignal; }
 
-        NodeSignal& nodePropertiesAddedSignal()
-        {
-            return m_nodePropertiesAddedSignal;
-        }
+        NodeSignal& nodePropertiesAddedSignal() { return m_nodePropertiesAddedSignal; }
 
         StringSignal& nameChangedSignal() { return m_nameChangedSignal; }
 
         NodeSignal& nodeNameChangedSignal() { return m_nodeNameChangedSignal; }
 
-        NodePairSignal& willChangeNodeParentSignal()
-        {
-            return m_willChangeNodeParentSignal;
-        }
+        NodePairSignal& willChangeNodeParentSignal() { return m_willChangeNodeParentSignal; }
 
-        NodePairSignal& nodeParentChangedSignal()
-        {
-            return m_nodeParentChangedSignal;
-        }
+        NodePairSignal& nodeParentChangedSignal() { return m_nodeParentChangedSignal; }
 
-        NodeIndexSignal& willReorderNodeSignal()
-        {
-            return m_willReorderNodeSignal;
-        }
+        NodeIndexSignal& willReorderNodeSignal() { return m_willReorderNodeSignal; }
 
         NodeSignal& nodeReorderedSignal() { return m_nodeReorderedSignal; }
 
-        NodeSignal& nodeSchemeWillChangeSignal()
-        {
-            return m_nodeShemeWillChangeSignal;
-        }
+        NodeSignal& nodeSchemeWillChangeSignal() { return m_nodeShemeWillChangeSignal; }
 
-        NodeSignal& nodeSchemeChangedSignal()
-        {
-            return m_nodeShemeChangedSignal;
-        }
+        NodeSignal& nodeSchemeChangedSignal() { return m_nodeShemeChangedSignal; }
 
         NodeMoveSignal& willMoveNodeSignal() { return m_willMoveSignal; }
 
@@ -741,8 +685,7 @@ namespace TwkMediaLibrary
         //
 
         virtual bool isAuthenticated() const;
-        virtual bool authenticate(const std::string& authenticationName,
-                                  const std::string& password) const;
+        virtual bool authenticate(const std::string& authenticationName, const std::string& password) const;
         virtual const CapabilityAPI* authenticatedCapabilityAPI() const;
         virtual const CapabilityAPI* owner() const;
 
@@ -761,8 +704,7 @@ namespace TwkMediaLibrary
         virtual void setNodeParent(const Node*, const Node*);
         virtual void reorderNode(const Node*, size_t newIndex);
 
-        virtual void moveNode(const Node* node, const Node* newParent,
-                              size_t newIndex);
+        virtual void moveNode(const Node* node, const Node* newParent, size_t newIndex);
 
         //
         //  Isolating a node does not delete the node but it does make it
@@ -807,10 +749,8 @@ namespace TwkMediaLibrary
         virtual const Node* nodeOfMedia(const URL& url) const;
         virtual NodeVector associatedNodes(const URL& url) const;
 
-        virtual const Task*
-        referencesToNodeASync(const Node*, PropertyQueryResultFunction) const;
-        virtual const Task* nodeOfMediaASync(const URL&,
-                                             NodeQueryResultFunction) const;
+        virtual const Task* referencesToNodeASync(const Node*, PropertyQueryResultFunction) const;
+        virtual const Task* nodeOfMediaASync(const URL&, NodeQueryResultFunction) const;
 
         virtual bool isLibraryMediaURL(const URL&) const;
 
@@ -940,14 +880,9 @@ namespace TwkMediaLibrary
     URLVector libraryURLsOfMedia(const URL&);
     NodeVector libraryNodesAssociatedWithURL(const URL&);
     URLVector libraryURLsAssociatedWithURL(const URL&);
-    std::string lookupFilenameInMediaLibrary(
-        const std::string& filename,
-        std::deque<std::pair<std::string, std::string>>& params);
+    std::string lookupFilenameInMediaLibrary(const std::string& filename, std::deque<std::pair<std::string, std::string>>& params);
 
-    inline bool isPropertyListType(PropertyType t)
-    {
-        return t >= FirstListType;
-    }
+    inline bool isPropertyListType(PropertyType t) { return t >= FirstListType; }
 
     template <class T> inline const T* api_cast(const Node* node)
     {

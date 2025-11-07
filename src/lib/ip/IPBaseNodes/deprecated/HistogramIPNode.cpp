@@ -22,8 +22,7 @@ namespace IPCore
     using namespace TwkMath;
     using namespace std;
 
-    HistogramIPNode::HistogramIPNode(const std::string& name, IPGraph* g,
-                                     GroupIPNode* group)
+    HistogramIPNode::HistogramIPNode(const std::string& name, IPGraph* g, GroupIPNode* group)
         : IPNode(name, g, group)
     {
         init();
@@ -63,11 +62,9 @@ namespace IPCore
 
             FBHistorgram histogram(n);
 
-            MinMaxPair rmm = computeChannelHistogram(image->fb, histogram,
-                                                     size->front(), false);
+            MinMaxPair rmm = computeChannelHistogram(image->fb, histogram, size->front(), false);
 
-            fb->attribute<Vec2f>("Histogram/Bounds") =
-                Vec2f(rmm.first, rmm.second);
+            fb->attribute<Vec2f>("Histogram/Bounds") = Vec2f(rmm.first, rmm.second);
 
             float min = numeric_limits<float>::max();
             float max = numeric_limits<float>::min();
@@ -88,13 +85,11 @@ namespace IPCore
                 ostringstream str;
                 str << "Histogram/" << ch.channelName;
 
-                TypedFBVectorAttribute<float>* attr =
-                    new TypedFBVectorAttribute<float>(str.str(), ch.histogram);
+                TypedFBVectorAttribute<float>* attr = new TypedFBVectorAttribute<float>(str.str(), ch.histogram);
 
                 fb->addAttribute(attr);
 
-                if (ch.channelName == "R" || ch.channelName == "G"
-                    || ch.channelName == "B")
+                if (ch.channelName == "R" || ch.channelName == "G" || ch.channelName == "B")
                 {
                     if (ch.min > numeric_limits<float>::min())
                         min = std::min(min, ch.min);
@@ -127,8 +122,7 @@ namespace IPCore
                 if (std::fabs(maxAlt) < numeric_limits<float>::epsilon())
                     maxAlt = 0;
 
-                image->fb->attribute<Vec2f>("ColorBounds") =
-                    Vec2f(minAlt, maxAlt);
+                image->fb->attribute<Vec2f>("ColorBounds") = Vec2f(minAlt, maxAlt);
             }
         }
     }
@@ -139,14 +133,12 @@ namespace IPCore
         {
             if (image->fb && image->fb->identifier() != m_currentID)
             {
-                if (IntProperty* ip =
-                        createProperty<IntProperty>("node", "active"))
+                if (IntProperty* ip = createProperty<IntProperty>("node", "active"))
                 {
                     if (ip->front() == 1)
                     {
                         computeHistorgram(image);
-                        IntProperty* size =
-                            property<IntProperty>("histogram", "size");
+                        IntProperty* size = property<IntProperty>("histogram", "size");
                         image->fb->idstream() << ":h_" << size->front();
                     }
                 }

@@ -18,10 +18,8 @@ namespace TwkFB
     using namespace TwkFB;
 
     template <typename T>
-    void floatScanlineHistogram(const T* scanline, size_t len, size_t nchannels,
-                                FBHistorgram::iterator hbegin,
-                                FBHistorgram::iterator hend, float minRange,
-                                float maxRange)
+    void floatScanlineHistogram(const T* scanline, size_t len, size_t nchannels, FBHistorgram::iterator hbegin, FBHistorgram::iterator hend,
+                                float minRange, float maxRange)
     {
         size_t hsize = hend - hbegin;
         const T* e = scanline + (len * hsize);
@@ -52,9 +50,7 @@ namespace TwkFB
     }
 
     template <typename T>
-    void integralScanlineHistogram(const T* scanline, size_t len,
-                                   size_t nchannels,
-                                   FBHistorgram::iterator hbegin,
+    void integralScanlineHistogram(const T* scanline, size_t len, size_t nchannels, FBHistorgram::iterator hbegin,
                                    FBHistorgram::iterator hend)
     {
         size_t hsize = hend - hbegin;
@@ -67,8 +63,7 @@ namespace TwkFB
             ChannelHistogram& h = *i;
 
             const size_t bins = h.accum.size();
-            const double divisor =
-                double(numeric_limits<T>::max()) / double(bins - 1);
+            const double divisor = double(numeric_limits<T>::max()) / double(bins - 1);
             size_t* a = &h.accum.front();
 
             for (const T* p = scanline + index; p < e; p += nchannels)
@@ -88,8 +83,7 @@ namespace TwkFB
     }
 
     template <typename T>
-    MinMaxPair histogram(const FrameBuffer* fb, FBHistorgram::iterator& hbegin,
-                         FBHistorgram::iterator& hend, float minRange = 0.0,
+    MinMaxPair histogram(const FrameBuffer* fb, FBHistorgram::iterator& hbegin, FBHistorgram::iterator& hend, float minRange = 0.0,
                          float maxRange = 1.0)
     {
         for (size_t i = 0; i < fb->height(); i++)
@@ -98,13 +92,11 @@ namespace TwkFB
 
             if (numeric_limits<T>::is_integer)
             {
-                integralScanlineHistogram(scanline, fb->width(),
-                                          fb->numChannels(), hbegin, hend);
+                integralScanlineHistogram(scanline, fb->width(), fb->numChannels(), hbegin, hend);
             }
             else
             {
-                floatScanlineHistogram(scanline, fb->width(), fb->numChannels(),
-                                       hbegin, hend, minRange, maxRange);
+                floatScanlineHistogram(scanline, fb->width(), fb->numChannels(), hbegin, hend, minRange, maxRange);
             }
         }
 
@@ -140,8 +132,7 @@ namespace TwkFB
         return minmax;
     }
 
-    MinMaxPair computeChannelHistogram(const FrameBuffer* fb, FBHistorgram& h,
-                                       size_t bins, bool fullRangeOverOne)
+    MinMaxPair computeChannelHistogram(const FrameBuffer* fb, FBHistorgram& h, size_t bins, bool fullRangeOverOne)
     {
         if (fb->isPlanar())
         {
@@ -163,13 +154,11 @@ namespace TwkFB
         }
 
         FBHistorgram::iterator hi = h.begin();
-        MinMaxPair minmax = make_pair(numeric_limits<float>::max(),
-                                      numeric_limits<float>::min());
+        MinMaxPair minmax = make_pair(numeric_limits<float>::max(), numeric_limits<float>::min());
 
         size_t index = 0;
 
-        for (const FrameBuffer* f = fb; f;
-             hi += f->numChannels(), f = f->nextPlane())
+        for (const FrameBuffer* f = fb; f; hi += f->numChannels(), f = f->nextPlane())
         {
             FBHistorgram::iterator he = hi + f->numChannels();
             MinMaxPair p;
@@ -211,21 +200,18 @@ namespace TwkFB
             FBHistorgram::iterator hi = h.begin();
             MinMaxPair p;
 
-            for (const FrameBuffer* f = fb; f;
-                 hi += f->numChannels(), f = f->nextPlane())
+            for (const FrameBuffer* f = fb; f; hi += f->numChannels(), f = f->nextPlane())
             {
                 FBHistorgram::iterator he = hi + f->numChannels();
 
                 switch (fb->dataType())
                 {
                 case FrameBuffer::HALF:
-                    p = histogram<half>(f, hi, he, min(minmax.first, 0.f),
-                                        minmax.second);
+                    p = histogram<half>(f, hi, he, min(minmax.first, 0.f), minmax.second);
                     break;
 
                 case FrameBuffer::FLOAT:
-                    p = histogram<float>(f, hi, he, min(minmax.first, 0.f),
-                                         minmax.second);
+                    p = histogram<float>(f, hi, he, min(minmax.first, 0.f), minmax.second);
                     break;
 
                 default:

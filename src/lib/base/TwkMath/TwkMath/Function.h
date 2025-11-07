@@ -22,23 +22,13 @@ namespace TwkMath
         return rem < ((T)0) ? rem + by : rem;
     }
 
-    template <typename T> inline T betterMod(const T& a, const T& by)
-    {
-        return wrap(a, by);
-    }
+    template <typename T> inline T betterMod(const T& a, const T& by) { return wrap(a, by); }
 
-    template <typename T> inline T degToRad(const T& deg)
-    {
-        return Math<T>::degToRad(deg);
-    }
+    template <typename T> inline T degToRad(const T& deg) { return Math<T>::degToRad(deg); }
 
-    template <typename T> inline T radToDeg(const T& rad)
-    {
-        return Math<T>::radToDeg(rad);
-    }
+    template <typename T> inline T radToDeg(const T& rad) { return Math<T>::radToDeg(rad); }
 
-    template <typename T, typename INTERP>
-    inline T lerp(const T& lo, const T& hi, const INTERP& interp)
+    template <typename T, typename INTERP> inline T lerp(const T& lo, const T& hi, const INTERP& interp)
     {
         // CJH:
         // After having lunch with Larry Gritz, he explained
@@ -86,30 +76,24 @@ namespace TwkMath
         }
     }
 
-    template <typename T>
-    inline T smoothstep(const T& edge0, const T& edge1, const T& t)
+    template <typename T> inline T smoothstep(const T& edge0, const T& edge1, const T& t)
     {
         if (edge0 == edge1)
             return t < edge0 ? T(0) : T(1); // step function
         return smoothstep((t - edge0) / (edge1 - edge0));
     }
 
-    template <typename T>
-    inline T gradSmoothstep(const T& edge0, const T& edge1, const T& t)
+    template <typename T> inline T gradSmoothstep(const T& edge0, const T& edge1, const T& t)
     {
         if (edge0 == edge1)
             return T(0);
         return gradSmoothstep((t - edge0) / (edge1 - edge0));
     }
 
-    template <typename T> inline T gauss(const T& x)
-    {
-        return Math<T>::expf(-(x * x));
-    }
+    template <typename T> inline T gauss(const T& x) { return Math<T>::expf(-(x * x)); }
 
     // RGB to unit hsv
-    template <typename T>
-    void rgbToHsv(const T& r, const T& g, const T& b, T& h, T& s, T& v)
+    template <typename T> void rgbToHsv(const T& r, const T& g, const T& b, T& h, T& s, T& v)
     {
         // Find the minimum and maximum values.
         T minVal = Math<T>::max();
@@ -179,8 +163,7 @@ namespace TwkMath
     }
 
     // unit HSV to RGB
-    template <typename T>
-    void hsvToRgb(const T& h, const T& s, const T& v, T& r, T& g, T& b)
+    template <typename T> void hsvToRgb(const T& h, const T& s, const T& v, T& r, T& g, T& b)
     {
         if (s <= (T)0)
         {
@@ -240,20 +223,11 @@ namespace TwkMath
         }
     }
 
-    template <typename T> inline bool zeroTol(const T& v, const T& tol)
-    {
-        return (Math<T>::abs(v) < tol);
-    }
+    template <typename T> inline bool zeroTol(const T& v, const T& tol) { return (Math<T>::abs(v) < tol); }
 
-    template <typename T>
-    inline bool equalTol(const T& a, const T& b, const T& tol)
-    {
-        return (Math<T>::abs(a - b) < tol);
-    }
+    template <typename T> inline bool equalTol(const T& a, const T& b, const T& tol) { return (Math<T>::abs(a - b) < tol); }
 
-    template <typename T>
-    inline T areaOfTriangle(const Vec3<T>& va, const Vec3<T>& vb,
-                            const Vec3<T>& vc)
+    template <typename T> inline T areaOfTriangle(const Vec3<T>& va, const Vec3<T>& vb, const Vec3<T>& vc)
     {
         Vec3<T> v0 = vb - va;
         Vec3<T> v1 = vc - va;
@@ -261,14 +235,12 @@ namespace TwkMath
         return c.magnitude() / T(2);
     }
 
-    template <typename T>
-    inline T min4(const T& a1, const T& a2, const T& a3, const T& a4)
+    template <typename T> inline T min4(const T& a1, const T& a2, const T& a3, const T& a4)
     {
         return std::min(std::min(std::min(a1, a2), a3), a4);
     }
 
-    template <typename T>
-    inline T max4(const T& a1, const T& a2, const T& a3, const T& a4)
+    template <typename T> inline T max4(const T& a1, const T& a2, const T& a3, const T& a4)
     {
         return std::max(std::max(std::max(a1, a2), a3), a4);
     }
@@ -290,9 +262,7 @@ namespace TwkMath
         if (val < T(0))
             val = lo;
         const T u = (val - lo) / (hi - lo);
-        return lerp(lo, hi,
-                    (Math<T>::exp(T(0)) - Math<T>::exp(-u))
-                        / (Math<T>::exp(T(0)) - Math<T>::exp(T(-1))));
+        return lerp(lo, hi, (Math<T>::exp(T(0)) - Math<T>::exp(-u)) / (Math<T>::exp(T(0)) - Math<T>::exp(T(-1))));
     }
 
     template <typename T> static const T trilinear(T v[2][2][2], float t[3])
@@ -329,9 +299,7 @@ namespace TwkMath
     //  c and d
     //
 
-    template <typename T>
-    Vec2<T> intersectionOfLines(const Vec2<T>& a, const Vec2<T>& b,
-                                const Vec2<T>& c, const Vec2<T>& d)
+    template <typename T> Vec2<T> intersectionOfLines(const Vec2<T>& a, const Vec2<T>& b, const Vec2<T>& c, const Vec2<T>& d)
     {
         const T x1 = a.x;
         const T x2 = b.x;

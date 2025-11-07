@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebChannelType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QWebChannelType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWebChannelType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QWebChannel();
-        MuQt_QWebChannel(Pointer muobj, const CallEnvironment*,
-                         QObject* parent);
+        MuQt_QWebChannel(Pointer muobj, const CallEnvironment*, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -75,17 +73,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QWebChannel::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QWebChannel::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QWebChannel::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QWebChannel::timerEvent(event); }
 
     public:
         const QWebChannelType* _baseType;
@@ -93,11 +85,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QWebChannelType::cachedInstance(const QWebChannelType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWebChannelType::cachedInstance(const QWebChannelType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

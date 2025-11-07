@@ -55,8 +55,7 @@ namespace TwkApp
         PyObject* callable = 0;
         const char* docString = 0;
 
-        if (!PyArg_ParseTuple(args, "sssOs", &modeName, &tableName, &eventName,
-                              &callable, &docString))
+        if (!PyArg_ParseTuple(args, "sssOs", &modeName, &tableName, &eventName, &callable, &docString))
             return NULL;
 
         if (!docString)
@@ -79,8 +78,7 @@ namespace TwkApp
                 mode->addEventTable(table);
             }
 
-            PyFunctionAction* action =
-                new PyFunctionAction(callable, docString);
+            PyFunctionAction* action = new PyFunctionAction(callable, docString);
             table->bind(eventName, action);
             //
             //  currentDocument has a copy of this table, so invalidate
@@ -110,8 +108,7 @@ namespace TwkApp
         PyObject* callable = 0;
         const char* docString = 0;
 
-        if (!PyArg_ParseTuple(args, "sssOs", &modeName, &tableName, &eventName,
-                              &callable, &docString))
+        if (!PyArg_ParseTuple(args, "sssOs", &modeName, &tableName, &eventName, &callable, &docString))
             return NULL;
 
         if (!docString)
@@ -128,8 +125,7 @@ namespace TwkApp
                 mode->addEventTable(table);
             }
 
-            PyFunctionAction* action =
-                new PyFunctionAction(callable, docString);
+            PyFunctionAction* action = new PyFunctionAction(callable, docString);
             table->bindRegex(eventName, action);
             //
             //  currentDocument has a copy of this table, so invalidate
@@ -157,8 +153,7 @@ namespace TwkApp
         const char* modeName;
         int strict = 0;
 
-        int ok = PyArg_ParseTuple(args, "sO!|i", &modeName, &PyList_Type,
-                                  &listobj, &strict);
+        int ok = PyArg_ParseTuple(args, "sO!|i", &modeName, &PyList_Type, &listobj, &strict);
         if (!ok)
             return NULL;
 
@@ -186,8 +181,7 @@ namespace TwkApp
         return PyLong_FromLong(1);
     }
 
-    static PyObject* py_imgui_register_diagnostics_callback(PyObject*,
-                                                            PyObject* args)
+    static PyObject* py_imgui_register_diagnostics_callback(PyObject*, PyObject* args)
     {
         PyObject* callable;
         if (!PyArg_ParseTuple(args, "O", &callable))
@@ -201,8 +195,7 @@ namespace TwkApp
         Py_RETURN_NONE;
     }
 
-    static PyObject* py_imgui_unregister_diagnostics_callback(PyObject*,
-                                                            PyObject* args)
+    static PyObject* py_imgui_unregister_diagnostics_callback(PyObject*, PyObject* args)
     {
         PyObject* callable;
         if (!PyArg_ParseTuple(args, "O", &callable))
@@ -221,13 +214,9 @@ namespace TwkApp
     static PyMethodDef localmethods[] = {
         {"bind", bind, METH_VARARGS, "bind event to action."},
         {"bindRegex", bindRegex, METH_VARARGS, "bind regex event to action."},
-        {"defineModeMenu", defineModeMenu, METH_VARARGS,
-         "define the menu for a mode."},
-        {"register_diagnostics_callback",
-         py_imgui_register_diagnostics_callback, METH_VARARGS,
-         "Register a Python ImGui draw callback"},
-        {"unregister_diagnostics_callback",
-         py_imgui_unregister_diagnostics_callback, METH_VARARGS,
+        {"defineModeMenu", defineModeMenu, METH_VARARGS, "define the menu for a mode."},
+        {"register_diagnostics_callback", py_imgui_register_diagnostics_callback, METH_VARARGS, "Register a Python ImGui draw callback"},
+        {"unregister_diagnostics_callback", py_imgui_unregister_diagnostics_callback, METH_VARARGS,
          "Unregister a Python ImGui draw callback"},
         {NULL}};
 

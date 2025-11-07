@@ -102,13 +102,10 @@ extern "C++"
 
         int YYLeng() const { return yyleng; }
 
-        virtual void
-        yy_switch_to_buffer(struct yy_buffer_state* new_buffer) = 0;
-        virtual struct yy_buffer_state* yy_create_buffer(std::istream* s,
-                                                         int size) = 0;
+        virtual void yy_switch_to_buffer(struct yy_buffer_state* new_buffer) = 0;
+        virtual struct yy_buffer_state* yy_create_buffer(std::istream* s, int size) = 0;
 #if MU_FLEX_MINOR_VERSION >= 6
-        virtual struct yy_buffer_state* yy_create_buffer(std::istream& s,
-                                                         int size) = 0;
+        virtual struct yy_buffer_state* yy_create_buffer(std::istream& s, int size) = 0;
 #endif
         virtual void yy_delete_buffer(struct yy_buffer_state* b) = 0;
         virtual void yyrestart(std::istream* s) = 0;
@@ -128,11 +125,9 @@ extern "C++"
         // Switch to new input/output streams.  A nil stream pointer
         // indicates "keep the current one".
 #if MU_FLEX_MINOR_VERSION >= 6
-        virtual void switch_streams(std::istream& new_in,
-                                    std::ostream& new_out) = 0;
+        virtual void switch_streams(std::istream& new_in, std::ostream& new_out) = 0;
 #endif
-        virtual void switch_streams(std::istream* new_in = 0,
-                                    std::ostream* new_out = 0) = 0;
+        virtual void switch_streams(std::istream* new_in = 0, std::ostream* new_out = 0) = 0;
 
         int lineno() const { return yylineno; }
 
@@ -196,11 +191,9 @@ extern "C++"
 
         virtual int yylex();
 #if MU_FLEX_MINOR_VERSION >= 6
-        virtual void switch_streams(std::istream& new_in,
-                                    std::ostream& new_out);
+        virtual void switch_streams(std::istream& new_in, std::ostream& new_out);
 #endif
-        virtual void switch_streams(std::istream* new_in,
-                                    std::ostream* new_out);
+        virtual void switch_streams(std::istream* new_in, std::ostream* new_out);
         virtual int yywrap();
 
         const char* sourceName() const { return as->sourceName().c_str(); }

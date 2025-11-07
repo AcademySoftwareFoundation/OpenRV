@@ -12,9 +12,7 @@ namespace IPCore
 {
     using namespace std;
 
-    AudioTextureIPNode::AudioTextureIPNode(const string& name,
-                                           const NodeDefinition* def,
-                                           IPGraph* graph, GroupIPNode* group)
+    AudioTextureIPNode::AudioTextureIPNode(const string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setWritable(false);
@@ -31,8 +29,7 @@ namespace IPCore
         }
         else
         {
-            SoundTrackIPNode* snode =
-                static_cast<SoundTrackIPNode*>(inputs().front());
+            SoundTrackIPNode* snode = static_cast<SoundTrackIPNode*>(inputs().front());
             return snode->evaluateAudioTexture(context);
         }
     }

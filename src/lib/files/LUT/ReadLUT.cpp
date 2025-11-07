@@ -39,9 +39,7 @@ namespace LUT
         //  Add the extensions that we support.
         //
 
-        static const char* exts[] = {"rvchlut", "rv3dlut", "lt", "3dl", "cube",
-                                     "shakelt", "mga",     "vf", "3dl", "csp",
-                                     "a3d",     "txt",     0};
+        static const char* exts[] = {"rvchlut", "rv3dlut", "lt", "3dl", "cube", "shakelt", "mga", "vf", "3dl", "csp", "a3d", "txt", 0};
 
         for (const char** p = exts; *p; p++)
         {
@@ -52,11 +50,7 @@ namespace LUT
         return false;
     }
 
-    static int comp(const LUTData::MappingPair& a,
-                    const LUTData::MappingPair& b)
-    {
-        return a.first < b.first;
-    }
+    static int comp(const LUTData::MappingPair& a, const LUTData::MappingPair& b) { return a.first < b.first; }
 
     void readFile(const string& filename, LUTData& data)
     {
@@ -71,8 +65,7 @@ namespace LUT
         {
             readRV3DLUT(filename, ext, data);
         }
-        else if (ext == "rvchlut" || ext == "lt" || ext == "shakelt"
-                 || ext == "txt")
+        else if (ext == "rvchlut" || ext == "lt" || ext == "shakelt" || ext == "txt")
         {
             readShakeLUT(filename, ext, data);
         }
@@ -157,8 +150,7 @@ namespace LUT
 
         for (int i = 0; i < data.size(); i += 3)
         {
-            ApplyLUTtoPixel(original_data, original_sizes, data[i], data[i + 1],
-                            data[i + 2]);
+            ApplyLUTtoPixel(original_data, original_sizes, data[i], data[i + 1], data[i + 2]);
         }
     }
 
@@ -170,8 +162,7 @@ namespace LUT
             // resizing 3D LUTs that aren't a power of 2 on each side
             //
 
-            if (!Log2strict(lut.dimensions[0]) || !Log2strict(lut.dimensions[1])
-                || !Log2strict(lut.dimensions[2]))
+            if (!Log2strict(lut.dimensions[0]) || !Log2strict(lut.dimensions[1]) || !Log2strict(lut.dimensions[2]))
             {
                 //
                 // Set new_sizes to a power of 2.
@@ -201,11 +192,7 @@ namespace LUT
         }
     }
 
-    static bool mappingPair2Comp(const LUTData::MappingPair& a,
-                                 const LUTData::MappingPair& b)
-    {
-        return a.first < b.first;
-    }
+    static bool mappingPair2Comp(const LUTData::MappingPair& a, const LUTData::MappingPair& b) { return a.first < b.first; }
 
     void compilePreLUT(LUTData& inlut, size_t nsamples)
     {
@@ -259,9 +246,8 @@ namespace LUT
                 {
                     const LUTData::ChannelMap& plut = inlut.prelut[q];
 
-                    LUTData::ChannelMap::const_iterator p = lower_bound(
-                        plut.begin(), plut.end(), LUTData::MappingPair(t, 0),
-                        mappingPair2Comp);
+                    LUTData::ChannelMap::const_iterator p =
+                        lower_bound(plut.begin(), plut.end(), LUTData::MappingPair(t, 0), mappingPair2Comp);
 
                     size_t ns = plut.size();
                     size_t i1;
@@ -299,8 +285,7 @@ namespace LUT
                 }
             }
 
-            Mat44f M(scales[0], 0, 0, offsets[0], 0, scales[1], 0, offsets[1],
-                     0, 0, scales[2], offsets[2], 0, 0, 0, 1);
+            Mat44f M(scales[0], 0, 0, offsets[0], 0, scales[1], 0, offsets[1], 0, 0, scales[2], offsets[2], 0, 0, 0, 1);
 
             inlut.inMatrix = M.inverted();
         }
@@ -313,8 +298,7 @@ namespace LUT
         const size_t size2 = lut.prelut[2].size();
         bool linear = true;
 
-        if (lut.prelut[0].size() < 2 && lut.prelut[1].size() < 2
-            && lut.prelut[2].size() < 2)
+        if (lut.prelut[0].size() < 2 && lut.prelut[1].size() < 2 && lut.prelut[2].size() < 2)
         {
             lut.prelut[0].resize(0);
             lut.prelut[1].resize(0);
@@ -404,8 +388,7 @@ namespace LUT
 
     float normalize(LUTData& lut, bool powerOfTwo)
     {
-        LUTData::Data::iterator i =
-            max_element(lut.data.begin(), lut.data.end());
+        LUTData::Data::iterator i = max_element(lut.data.begin(), lut.data.end());
         float m = *i;
 
         if (powerOfTwo)

@@ -21,9 +21,8 @@ namespace IPCore
     using namespace TwkMath;
     using namespace TwkAudio;
 
-    TransitionIPInstanceNode::TransitionIPInstanceNode(
-        const std::string& name, const NodeDefinition* def, IPGraph* graph,
-        GroupIPNode* group)
+    TransitionIPInstanceNode::TransitionIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* graph,
+                                                       GroupIPNode* group)
         : IPInstanceNode(name, def, graph, group)
         , m_fit(true)
         , m_rangeInfoDirty(true)
@@ -39,10 +38,8 @@ namespace IPCore
         m_outputSize = declareProperty<IntProperty>("output.size");
         m_autoSize = declareProperty<IntProperty>("output.autoSize", 1);
         m_useCutInfo = declareProperty<IntProperty>("mode.useCutInfo", 1);
-        m_startFrame = declareProperty<FloatProperty>("parameters.startFrame",
-                                                      1, 0, false);
-        m_duration = declareProperty<FloatProperty>("parameters.numFrames", 10,
-                                                    0, false);
+        m_startFrame = declareProperty<FloatProperty>("parameters.startFrame", 1, 0, false);
+        m_duration = declareProperty<FloatProperty>("parameters.numFrames", 10, 0, false);
 
         m_outputSize->resize(2);
         m_outputSize->front() = 720;
@@ -109,25 +106,21 @@ namespace IPCore
         unlock();
     }
 
-    void TransitionIPInstanceNode::inputRangeChanged(int inputIndex,
-                                                     PropagateTarget target)
+    void TransitionIPInstanceNode::inputRangeChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_rangeInfoDirty = true;
         unlock();
     }
 
-    void
-    TransitionIPInstanceNode::inputImageStructureChanged(int inputIndex,
-                                                         PropagateTarget target)
+    void TransitionIPInstanceNode::inputImageStructureChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_structureInfoDirty = true;
         unlock();
     }
 
-    IPNode::ImageStructureInfo
-    TransitionIPInstanceNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo TransitionIPInstanceNode::imageStructureInfo(const Context& context) const
     {
         lazyUpdateRanges();
         return m_structureInfo;
@@ -160,10 +153,8 @@ namespace IPCore
         m_rangeInfos[0] = in0->imageRangeInfo();
         m_rangeInfos[1] = in1->imageRangeInfo();
 
-        ImageStructureInfo sinfo0 = in0->imageStructureInfo(
-            graph()->contextForFrame(m_rangeInfos[0].start));
-        ImageStructureInfo sinfo1 = in1->imageStructureInfo(
-            graph()->contextForFrame(m_rangeInfos[1].start));
+        ImageStructureInfo sinfo0 = in0->imageStructureInfo(graph()->contextForFrame(m_rangeInfos[0].start));
+        ImageStructureInfo sinfo1 = in1->imageStructureInfo(graph()->contextForFrame(m_rangeInfos[1].start));
 
         if (useCutInfo)
         {
@@ -176,9 +167,7 @@ namespace IPCore
         const size_t len0 = m_rangeInfos[0].end - m_rangeInfos[0].start + 1;
         const size_t len1 = m_rangeInfos[1].end - m_rangeInfos[1].start + 1;
 
-        size_t overlap = (m_startFrame->front() <= m_rangeInfos[0].end)
-                             ? (1 + len0 - m_startFrame->front())
-                             : 0;
+        size_t overlap = (m_startFrame->front() <= m_rangeInfos[0].end) ? (1 + len0 - m_startFrame->front()) : 0;
         m_info.start = 1;
         m_info.end = len0 + len1 - overlap;
 
@@ -223,16 +212,14 @@ namespace IPCore
         //
         //  Range ends are _inclusive_
         //
-        m_globalRanges[0] =
-            FrameRange(1, m_startFrame->front() + m_duration->front() - 1);
+        m_globalRanges[0] = FrameRange(1, m_startFrame->front() + m_duration->front() - 1);
         m_globalRanges[1] = FrameRange(m_startFrame->front(), m_info.end);
 
         m_rangeInfoDirty = false;
         m_structureInfoDirty = false;
     }
 
-    int TransitionIPInstanceNode::inputFrame(size_t index, int frame,
-                                             bool unconstrained)
+    int TransitionIPInstanceNode::inputFrame(size_t index, int frame, bool unconstrained)
     {
         const ImageRangeInfo& info = m_rangeInfos[index];
         const int tstart = m_startFrame->front();
@@ -296,8 +283,7 @@ namespace IPCore
         }
 
         IPImage* root =
-            new IPImage(this, IPImage::MergeRenderType, width, height, 1.0,
-                        IPImage::IntermediateBuffer, IPImage::FloatDataType);
+            new IPImage(this, IPImage::MergeRenderType, width, height, 1.0, IPImage::IntermediateBuffer, IPImage::FloatDataType);
 
         if (ninputs == 0)
             return root;
@@ -324,10 +310,7 @@ namespace IPCore
 
                 if (!current)
                 {
-                    TWK_THROW_STREAM(
-                        EvaluationFailedExc,
-                        "TransitionIPInstanceNode evaluation failed on node "
-                            << nodes[i]->name());
+                    TWK_THROW_STREAM(EvaluationFailedExc, "TransitionIPInstanceNode evaluation failed on node " << nodes[i]->name());
                 }
 
                 //
@@ -367,9 +350,7 @@ namespace IPCore
 
         const Shader::Function* F = definition()->function();
 
-        balanceResourceUsage(F->isFilter() ? IPNode::filterAccumulate
-                                           : IPNode::accumulate,
-                             images, modifiedImages, 8, 8, 81);
+        balanceResourceUsage(F->isFilter() ? IPNode::filterAccumulate : IPNode::accumulate, images, modifiedImages, 8, 8, 81);
 
         //
         //  This function will prepare the root IPImage node and images
@@ -378,8 +359,7 @@ namespace IPCore
         //  touched.
         //
 
-        assembleMergeExpressions(root, images, modifiedImages, F->isFilter(),
-                                 inExpressions);
+        assembleMergeExpressions(root, images, modifiedImages, F->isFilter(), inExpressions);
 
         //
         //  Assemble shaders
@@ -393,8 +373,7 @@ namespace IPCore
         return root;
     }
 
-    IPImageID*
-    TransitionIPInstanceNode::evaluateIdentifier(const Context& context)
+    IPImageID* TransitionIPInstanceNode::evaluateIdentifier(const Context& context)
     {
         lazyUpdateRanges();
         const IPNodes nodes = inputs();
@@ -431,9 +410,7 @@ namespace IPCore
                     // continue;
                     IPNode* node = nodes[i];
                     TWK_THROW_STREAM(EvaluationFailedExc,
-                                     "NULL imgid in TransitionIPInstanceNode "
-                                         << name() << " failed on input "
-                                         << node->name());
+                                     "NULL imgid in TransitionIPInstanceNode " << name() << " failed on input " << node->name());
                 }
 
                 if (i)
@@ -459,8 +436,7 @@ namespace IPCore
         return root;
     }
 
-    void TransitionIPInstanceNode::testEvaluate(const Context& context,
-                                                TestEvaluationResult& result)
+    void TransitionIPInstanceNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         lazyUpdateRanges();
         IPNodes ins = inputs();
@@ -479,8 +455,7 @@ namespace IPCore
         }
     }
 
-    void TransitionIPInstanceNode::metaEvaluate(const Context& context,
-                                                MetaEvalVisitor& visitor)
+    void TransitionIPInstanceNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         lazyUpdateRanges();
         visitor.enter(context, this);
@@ -512,8 +487,7 @@ namespace IPCore
         return m_info;
     }
 
-    size_t
-    TransitionIPInstanceNode::audioFillBuffer(const AudioContext& context)
+    size_t TransitionIPInstanceNode::audioFillBuffer(const AudioContext& context)
     {
         lazyUpdateRanges();
 
@@ -534,9 +508,7 @@ namespace IPCore
 
         size_t rval = 0;
 
-        AudioBuffer tempbuffer(context.buffer.size(), context.buffer.channels(),
-                               context.buffer.rate(),
-                               context.buffer.startTime());
+        AudioBuffer tempbuffer(context.buffer.size(), context.buffer.channels(), context.buffer.rate(), context.buffer.startTime());
 
         size_t gss = startSample;
         size_t gse = startSample + nsamples;
@@ -550,24 +522,17 @@ namespace IPCore
             //
 
             const long foffset =
-                inputFrame(i, m_info.start, true) - m_rangeInfos[i].start
-                - ((i == 1) ? m_startFrame->front() - m_info.start : 0);
+                inputFrame(i, m_info.start, true) - m_rangeInfos[i].start - ((i == 1) ? m_startFrame->front() - m_info.start : 0);
 
-            size_t transitionStartSample = timeToSamples(
-                ((i == 1) ? 0 : (m_startFrame->front() - 1)) / fps, rate);
-            size_t transitionEndSample = timeToSamples(
-                ((i == 1) ? m_duration->front()
-                          : m_startFrame->front() - 1 + m_duration->front() + 1)
-                    / fps,
-                rate);
+            size_t transitionStartSample = timeToSamples(((i == 1) ? 0 : (m_startFrame->front() - 1)) / fps, rate);
+            size_t transitionEndSample =
+                timeToSamples(((i == 1) ? m_duration->front() : m_startFrame->front() - 1 + m_duration->front() + 1) / fps, rate);
 
             const long soffset = foffset * sampsPerFrame;
             const long eoffset = soffset + nsamples;
 
-            const size_t gstart =
-                timeToSamples((m_globalRanges[i].first - 1) / fps, rate);
-            const size_t gend = timeToSamples(
-                (m_globalRanges[i].second - 1) / fps + 1.0 / fps, rate);
+            const size_t gstart = timeToSamples((m_globalRanges[i].first - 1) / fps, rate);
+            const size_t gend = timeToSamples((m_globalRanges[i].second - 1) / fps + 1.0 / fps, rate);
 
             //
             //  soffset may be negative, so don't let sample index explode.
@@ -606,8 +571,7 @@ namespace IPCore
                 //
 
                 if (!(temp.buffer.startSample() > transitionEndSample
-                      || temp.buffer.startSample() + temp.buffer.size()
-                             < transitionStartSample))
+                      || temp.buffer.startSample() + temp.buffer.size() < transitionStartSample))
 
                 {
                     size_t sample = temp.buffer.startSample();
@@ -617,32 +581,23 @@ namespace IPCore
 
                     if (temp.buffer.startSample() < transitionStartSample)
                     {
-                        startSampleOffset =
-                            transitionStartSample - temp.buffer.startSample();
+                        startSampleOffset = transitionStartSample - temp.buffer.startSample();
                     }
-                    if (temp.buffer.startSample() + temp.buffer.size()
-                        > transitionEndSample)
+                    if (temp.buffer.startSample() + temp.buffer.size() > transitionEndSample)
                     {
-                        endSampleOffset = temp.buffer.startSample()
-                                          + temp.buffer.size()
-                                          - transitionEndSample;
+                        endSampleOffset = temp.buffer.startSample() + temp.buffer.size() - transitionEndSample;
                     }
 
-                    float* f = temp.buffer.pointer()
-                               + temp.buffer.numChannels() * startSampleOffset;
-                    float* lim = temp.buffer.pointer()
-                                 + temp.buffer.numChannels()
-                                       * (temp.buffer.size() - endSampleOffset);
-                    float denom =
-                        float(transitionEndSample - transitionStartSample);
+                    float* f = temp.buffer.pointer() + temp.buffer.numChannels() * startSampleOffset;
+                    float* lim = temp.buffer.pointer() + temp.buffer.numChannels() * (temp.buffer.size() - endSampleOffset);
+                    float denom = float(transitionEndSample - transitionStartSample);
                     float factor = 1.0;
 
                     if (i == 0)
                     {
                         while (f < lim)
                         {
-                            factor =
-                                float(transitionEndSample - sample) / denom;
+                            factor = float(transitionEndSample - sample) / denom;
 
                             *f = factor * *f;
                             ++f;
@@ -656,9 +611,7 @@ namespace IPCore
                     {
                         while (f < lim)
                         {
-                            factor =
-                                1.0
-                                - float(transitionEndSample - sample) / denom;
+                            factor = 1.0 - float(transitionEndSample - sample) / denom;
 
                             *f = factor * *f;
                             ++f;
@@ -670,29 +623,22 @@ namespace IPCore
                     }
                 }
 
-                transform(context.buffer.pointer(),
-                          context.buffer.pointer()
-                              + context.buffer.sizeInFloats(),
-                          temp.buffer.pointer(), context.buffer.pointer(),
-                          plus<float>());
+                transform(context.buffer.pointer(), context.buffer.pointer() + context.buffer.sizeInFloats(), temp.buffer.pointer(),
+                          context.buffer.pointer(), plus<float>());
             }
         }
 
         return rval;
     }
 
-    void
-    TransitionIPInstanceNode::mapInputToEvalFrames(size_t inputIndex,
-                                                   const FrameVector& inframes,
-                                                   FrameVector& outframes) const
+    void TransitionIPInstanceNode::mapInputToEvalFrames(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         lazyUpdateRanges();
         mapInputToEvalFramesInternal(inputIndex, inframes, outframes);
     }
 
-    void TransitionIPInstanceNode::mapInputToEvalFramesInternal(
-        size_t inputIndex, const FrameVector& inframes,
-        FrameVector& outframes) const
+    void TransitionIPInstanceNode::mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector& inframes,
+                                                                FrameVector& outframes) const
     {
         const ImageRangeInfo& info = m_rangeInfos[inputIndex];
         const bool useCutInfo = m_useCutInfo->front();
@@ -714,8 +660,7 @@ namespace IPCore
         }
     }
 
-    void TransitionIPInstanceNode::propagateFlushToInputs(
-        const FlushContext& context)
+    void TransitionIPInstanceNode::propagateFlushToInputs(const FlushContext& context)
     {
         Context c = context;
 
@@ -726,8 +671,7 @@ namespace IPCore
         }
     }
 
-    void TransitionIPInstanceNode::readCompleted(const string& t,
-                                                 unsigned int v)
+    void TransitionIPInstanceNode::readCompleted(const string& t, unsigned int v)
     {
         lock();
         m_rangeInfoDirty = true;

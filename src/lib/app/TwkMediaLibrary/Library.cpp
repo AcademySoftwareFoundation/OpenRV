@@ -81,46 +81,23 @@ namespace TwkMediaLibrary
 
     bool Node::hasProperty(const PropertyKey&) const { return false; }
 
-    PropertyValue Node::propertyValue(const PropertyKey&) const
-    {
-        return PropertyValue();
-    }
+    PropertyValue Node::propertyValue(const PropertyKey&) const { return PropertyValue(); }
 
     bool Node::deleteProperty(const PropertyKey&) { return true; }
 
-    void Node::setProperty(const PropertyKey&, PropertyType type,
-                           const PropertyValue& value)
-    {
-    }
+    void Node::setProperty(const PropertyKey&, PropertyType type, const PropertyValue& value) {}
 
-    void Node::setPropertyFromString(const PropertyKey&, PropertyType type,
-                                     const string& value)
-    {
-    }
+    void Node::setPropertyFromString(const PropertyKey&, PropertyType type, const string& value) {}
 
-    PropertyType Node::propertyType(const PropertyKey&) const
-    {
-        return StringType;
-    }
+    PropertyType Node::propertyType(const PropertyKey&) const { return StringType; }
 
     size_t Node::numMetaKeys(const PropertyKey&) const { return 0; }
 
-    PropertyKey Node::metaKey(const PropertyKey&, size_t index) const
-    {
-        return 0;
-    }
+    PropertyKey Node::metaKey(const PropertyKey&, size_t index) const { return 0; }
 
-    PropertyValue Node::metaValue(const PropertyKey&,
-                                  const PropertyKey& metaKey) const
-    {
-        return PropertyValue();
-    }
+    PropertyValue Node::metaValue(const PropertyKey&, const PropertyKey& metaKey) const { return PropertyValue(); }
 
-    PropertyType Node::metaType(const PropertyKey&,
-                                const PropertyKey& metaKey) const
-    {
-        return StringType;
-    }
+    PropertyType Node::metaType(const PropertyKey&, const PropertyKey& metaKey) const { return StringType; }
 
     size_t Node::index() const
     {
@@ -223,8 +200,7 @@ namespace TwkMediaLibrary
         return str.str();
     }
 
-    string Node::metaValueAsString(const PropertyKey& key,
-                                   const PropertyKey& metaKey) const
+    string Node::metaValueAsString(const PropertyKey& key, const PropertyKey& metaKey) const
     {
         ostringstream str;
         PropertyValue value = metaValue(key, metaKey);
@@ -357,15 +333,9 @@ namespace TwkMediaLibrary
 
     MediaAPI::~MediaAPI() {}
 
-    HTTPCookieVector MediaAPI::httpCookies() const
-    {
-        return HTTPCookieVector();
-    }
+    HTTPCookieVector MediaAPI::httpCookies() const { return HTTPCookieVector(); }
 
-    HTTPHeaderVector MediaAPI::httpHeaders() const
-    {
-        return HTTPHeaderVector();
-    }
+    HTTPHeaderVector MediaAPI::httpHeaders() const { return HTTPHeaderVector(); }
 
     URL MediaAPI::httpRedirection() const { return URL(); }
 
@@ -452,10 +422,7 @@ namespace TwkMediaLibrary
 
     const Node* Library::nodeFromLibraryURL(const URL&) const { return 0; }
 
-    const Node* Library::nodeFromInternalPath(const InternalPath&) const
-    {
-        return 0;
-    }
+    const Node* Library::nodeFromInternalPath(const InternalPath&) const { return 0; }
 
     void Library::deleteNode(const Node*) {}
 
@@ -483,37 +450,21 @@ namespace TwkMediaLibrary
 
     string Library::nodeTypeForMedia(const URL& url) const { return ""; }
 
-    bool Library::copyToLibrary(const Node*, const PropertyKey&)
-    {
-        return false;
-    }
+    bool Library::copyToLibrary(const Node*, const PropertyKey&) { return false; }
 
     bool Library::isAuthenticated() const { return false; }
 
-    bool Library::authenticate(const std::string& userName,
-                               const std::string& password) const
-    {
-        return false;
-    }
+    bool Library::authenticate(const std::string& userName, const std::string& password) const { return false; }
 
-    const CapabilityAPI* Library::authenticatedCapabilityAPI() const
-    {
-        return NULL;
-    }
+    const CapabilityAPI* Library::authenticatedCapabilityAPI() const { return NULL; }
 
     const CapabilityAPI* Library::owner() const { return NULL; }
 
     UserAPIVector Library::userNodeAPIs() const { return UserAPIVector(); }
 
-    OrganizationAPIVector Library::organizationNodeAPIs() const
-    {
-        return OrganizationAPIVector();
-    }
+    OrganizationAPIVector Library::organizationNodeAPIs() const { return OrganizationAPIVector(); }
 
-    WatermarkAPIVector Library::watermarkNodeAPIs() const
-    {
-        return WatermarkAPIVector();
-    }
+    WatermarkAPIVector Library::watermarkNodeAPIs() const { return WatermarkAPIVector(); }
 
     const NodeAPI* Library::nodeAPI(const Node*) const { return NULL; }
 
@@ -571,8 +522,7 @@ namespace TwkMediaLibrary
 
         TwkUtil::Timer timer;
         timer.start();
-        TwkUtil::FileStream fileStream(mediaFile,
-                                       TwkUtil::FileStream::MemoryMap);
+        TwkUtil::FileStream fileStream(mediaFile, TwkUtil::FileStream::MemoryMap);
         size_t hashid = TwkUtil::FNV1a64(fileStream.data(), fileStream.size());
         timer.stop();
 
@@ -590,8 +540,7 @@ namespace TwkMediaLibrary
     namespace
     {
 
-        void recursiveFindReferences(const string& refNodeURL, const Node* node,
-                                     Library::NodePropertyResult& result)
+        void recursiveFindReferences(const string& refNodeURL, const Node* node, Library::NodePropertyResult& result)
         {
             Library::NodePropertyKeyVectorPair propPair;
             PropertyKeyVector keys = node->keys();
@@ -613,8 +562,7 @@ namespace TwkMediaLibrary
                 }
                 else if (t == ReferenceListType)
                 {
-                    vector<string> v =
-                        any_cast<vector<string>>(node->propertyValue(key));
+                    vector<string> v = any_cast<vector<string>>(node->propertyValue(key));
 
                     for (size_t q = 0; q < v.size(); q++)
                     {
@@ -654,8 +602,7 @@ namespace TwkMediaLibrary
     NodeVector Library::associatedNodes(const URL& inURL) const
     {
         QUrl url(inURL.c_str());
-        const Node* node =
-            url.scheme() == "file" ? nodeOfMedia(inURL) : nodeOfURL(inURL);
+        const Node* node = url.scheme() == "file" ? nodeOfMedia(inURL) : nodeOfURL(inURL);
         NodeVector nodes;
 
         if (node)
@@ -671,14 +618,9 @@ namespace TwkMediaLibrary
         return nodes;
     }
 
-    const Task* Library::nodeOfMediaASync(const URL&,
-                                          NodeQueryResultFunction) const
-    {
-        return 0;
-    }
+    const Task* Library::nodeOfMediaASync(const URL&, NodeQueryResultFunction) const { return 0; }
 
-    Library::NodePropertyResult
-    Library::referencesToNode(const Node* node) const
+    Library::NodePropertyResult Library::referencesToNode(const Node* node) const
     {
         //
         //  NOTE: this is a *terrible* way to do this. Each library
@@ -692,12 +634,7 @@ namespace TwkMediaLibrary
         return result;
     }
 
-    const Task*
-    Library::referencesToNodeASync(const Node*,
-                                   PropertyQueryResultFunction) const
-    {
-        return 0;
-    }
+    const Task* Library::referencesToNodeASync(const Node*, PropertyQueryResultFunction) const { return 0; }
 
     void Library::threadTrampoline(Library* library) { library->threadMain(); }
 
@@ -714,8 +651,7 @@ namespace TwkMediaLibrary
         {
             ScopedLock lock(m_taskMutex);
 
-            TaskDeque::iterator i =
-                find(m_taskQueue.begin(), m_taskQueue.end(), item);
+            TaskDeque::iterator i = find(m_taskQueue.begin(), m_taskQueue.end(), item);
 
             if (i != m_taskQueue.end())
             {
@@ -743,8 +679,7 @@ namespace TwkMediaLibrary
 
                 if (item && item->library() == this)
                 {
-                    TaskDeque::iterator i =
-                        find(m_taskQueue.begin(), m_taskQueue.end(), item);
+                    TaskDeque::iterator i = find(m_taskQueue.begin(), m_taskQueue.end(), item);
 
                     if (i != m_taskQueue.end())
                     {
@@ -786,13 +721,11 @@ namespace TwkMediaLibrary
                 }
                 catch (const std::exception& exc)
                 {
-                    cout << "ERROR: Library worker thread caught: "
-                         << exc.what() << endl;
+                    cout << "ERROR: Library worker thread caught: " << exc.what() << endl;
                 }
                 catch (...)
                 {
-                    cout << "ERROR: Library worker thread uncaught exception"
-                         << endl;
+                    cout << "ERROR: Library worker thread uncaught exception" << endl;
                 }
 
                 delete item;
@@ -839,8 +772,7 @@ namespace TwkMediaLibrary
     {
         NodeVector nodes;
 
-        for (LibraryMap::const_iterator i = globalLibraryMap.begin();
-             i != globalLibraryMap.end(); ++i)
+        for (LibraryMap::const_iterator i = globalLibraryMap.begin(); i != globalLibraryMap.end(); ++i)
         {
             NodeVector n = i->second->associatedNodes(inURL);
             std::copy(n.begin(), n.end(), back_inserter(nodes));
@@ -853,8 +785,7 @@ namespace TwkMediaLibrary
     {
         URLVector urls;
 
-        for (LibraryMap::const_iterator i = globalLibraryMap.begin();
-             i != globalLibraryMap.end(); ++i)
+        for (LibraryMap::const_iterator i = globalLibraryMap.begin(); i != globalLibraryMap.end(); ++i)
         {
             NodeVector n = i->second->associatedNodes(inURL);
 
@@ -869,8 +800,7 @@ namespace TwkMediaLibrary
     {
         URLVector urls;
 
-        for (LibraryMap::const_iterator i = globalLibraryMap.begin();
-             i != globalLibraryMap.end(); ++i)
+        for (LibraryMap::const_iterator i = globalLibraryMap.begin(); i != globalLibraryMap.end(); ++i)
         {
             if (const Node* node = i->second->nodeOfMedia(mediaURL))
             {
@@ -883,8 +813,7 @@ namespace TwkMediaLibrary
 
     bool isLibraryMediaURL(const URL& mediaURL)
     {
-        for (LibraryMap::const_iterator i = globalLibraryMap.begin();
-             i != globalLibraryMap.end(); ++i)
+        for (LibraryMap::const_iterator i = globalLibraryMap.begin(); i != globalLibraryMap.end(); ++i)
         {
             if (i->second->isLibraryMediaURL(mediaURL))
                 return true;
@@ -893,9 +822,7 @@ namespace TwkMediaLibrary
         return false;
     }
 
-    std::string lookupFilenameInMediaLibrary(
-        const std::string& filename,
-        std::deque<std::pair<std::string, std::string>>& params)
+    std::string lookupFilenameInMediaLibrary(const std::string& filename, std::deque<std::pair<std::string, std::string>>& params)
     {
         std::string file(filename);
 
@@ -937,14 +864,12 @@ namespace TwkMediaLibrary
                             {
                                 if (c > 0)
                                     cookieStm << "\n";
-                                cookieStm << cookies[c].name << "="
-                                          << cookies[c].value;
+                                cookieStm << cookies[c].name << "=" << cookies[c].value;
 
                                 if (!cookies[c].path.empty())
                                     cookieStm << "; path=" << cookies[c].path;
                                 if (!cookies[c].domain.empty())
-                                    cookieStm << "; domain="
-                                              << cookies[c].domain;
+                                    cookieStm << "; domain=" << cookies[c].domain;
                             }
 
                             /*
@@ -954,8 +879,7 @@ namespace TwkMediaLibrary
                                                                       <<
                                cookieStm.str() << std::endl;
                             */
-                            params.push_back(
-                                StringPair("cookies", cookieStm.str()));
+                            params.push_back(StringPair("cookies", cookieStm.str()));
                         }
 
                         HTTPHeaderVector headers = api->httpHeaders();
@@ -963,13 +887,11 @@ namespace TwkMediaLibrary
                         {
                             ostringstream headersStm;
 
-                            for (size_t h = 0, size = headers.size(); h < size;
-                                 ++h)
+                            for (size_t h = 0, size = headers.size(); h < size; ++h)
                             {
                                 if (h > 0)
                                     headersStm << "\r\n";
-                                headersStm << headers[h].name << ": "
-                                           << headers[h].value;
+                                headersStm << headers[h].name << ": " << headers[h].value;
                             }
                             /*
                                                         if
@@ -978,16 +900,14 @@ namespace TwkMediaLibrary
                                                                       <<
                                headersStm.str() << std::endl;
                             */
-                            params.push_back(
-                                StringPair("headers", headersStm.str()));
+                            params.push_back(StringPair("headers", headersStm.str()));
                         }
                     }
 
                     if (api->isRedirecting())
                     {
                         std::string redirection = api->httpRedirection();
-                        std::cout << "INFO: " << nodeName << " is redirecting "
-                                  << file << " to " << redirection << std::endl;
+                        std::cout << "INFO: " << nodeName << " is redirecting " << file << " to " << redirection << std::endl;
                         file = redirection;
                     }
                 }

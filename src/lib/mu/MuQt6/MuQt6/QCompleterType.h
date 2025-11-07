@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QCompleterType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QCompleterType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QCompleterType();
 
@@ -67,10 +66,8 @@ namespace Mu
     public:
         virtual ~MuQt_QCompleter();
         MuQt_QCompleter(Pointer muobj, const CallEnvironment*, QObject* parent);
-        MuQt_QCompleter(Pointer muobj, const CallEnvironment*,
-                        QAbstractItemModel* model, QObject* parent);
-        MuQt_QCompleter(Pointer muobj, const CallEnvironment*,
-                        const QStringList& list, QObject* parent);
+        MuQt_QCompleter(Pointer muobj, const CallEnvironment*, QAbstractItemModel* model, QObject* parent);
+        MuQt_QCompleter(Pointer muobj, const CallEnvironment*, const QStringList& list, QObject* parent);
         virtual QString pathFromIndex(const QModelIndex& index) const;
         virtual QStringList splitPath(const QString& path) const;
 
@@ -85,29 +82,17 @@ namespace Mu
 
         bool event_pub_parent(QEvent* ev) { return QCompleter::event(ev); }
 
-        bool eventFilter_pub(QObject* o, QEvent* e)
-        {
-            return eventFilter(o, e);
-        }
+        bool eventFilter_pub(QObject* o, QEvent* e) { return eventFilter(o, e); }
 
-        bool eventFilter_pub_parent(QObject* o, QEvent* e)
-        {
-            return QCompleter::eventFilter(o, e);
-        }
+        bool eventFilter_pub_parent(QObject* o, QEvent* e) { return QCompleter::eventFilter(o, e); }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QCompleter::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QCompleter::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QCompleter::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QCompleter::timerEvent(event); }
 
     public:
         const QCompleterType* _baseType;
@@ -115,11 +100,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QCompleterType::cachedInstance(const QCompleterType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QCompleterType::cachedInstance(const QCompleterType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

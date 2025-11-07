@@ -139,9 +139,7 @@ namespace Rv
             QString defaultTooltip;
         };
 
-        void updateActionToolButton(QAction* action, const std::string& text,
-                                    const std::string& icon,
-                                    bool forceRepaint = false);
+        void updateActionToolButton(QAction* action, const std::string& text, const std::string& icon, bool forceRepaint = false);
 
         void updateActionAvailability();
 

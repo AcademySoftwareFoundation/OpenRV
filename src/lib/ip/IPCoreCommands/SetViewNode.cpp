@@ -21,10 +21,7 @@ namespace IPCore
 
         SetViewNodeInfo::~SetViewNodeInfo() {}
 
-        TwkApp::Command* SetViewNodeInfo::newCommand() const
-        {
-            return new SetViewNode(this);
-        }
+        TwkApp::Command* SetViewNodeInfo::newCommand() const { return new SetViewNode(this); }
 
         //----------------------------------------------------------------------
 

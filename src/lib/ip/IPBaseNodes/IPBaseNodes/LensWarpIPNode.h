@@ -23,8 +23,7 @@ namespace IPCore
     class LensWarpIPNode : public IPNode
     {
     public:
-        LensWarpIPNode(const std::string& name, const NodeDefinition* def,
-                       IPGraph* graph, GroupIPNode* group = 0);
+        LensWarpIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~LensWarpIPNode();
         virtual IPImage* evaluate(const Context&);

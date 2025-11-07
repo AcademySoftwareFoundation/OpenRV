@@ -32,8 +32,7 @@ namespace stl_ext
         typedef std::vector<thread_function> func_vector;
         typedef std::vector<void*> data_vector;
         typedef void* (*pthread_main_function)(void*);
-        typedef int (*thread_create)(pthread_t*, const pthread_attr_t*,
-                                     pthread_main_function, void*);
+        typedef int (*thread_create)(pthread_t*, const pthread_attr_t*, pthread_main_function, void*);
         typedef int (*thread_join)(pthread_t, void**);
         typedef int (*thread_detach)(pthread_t);
 
@@ -76,9 +75,7 @@ namespace stl_ext
         //  sized vectors here, then send 0/0 in later dispatch calls.
         //
 
-        thread_group(int num_initial_threads = 0, int stack_size_mult = 1,
-                     thread_api* = 0, const func_vector* = 0,
-                     const data_vector* = 0);
+        thread_group(int num_initial_threads = 0, int stack_size_mult = 1, thread_api* = 0, const func_vector* = 0, const data_vector* = 0);
         ~thread_group();
 
         //----------------------------------------------------------------------
@@ -116,8 +113,7 @@ namespace stl_ext
         //  sized vectors here, then send 0/0 in later dispatch calls.
         //
 
-        void add_thread(int num_threads = 1, size_t stack_mult = 1,
-                        const func_vector* = 0, const data_vector* = 0);
+        void add_thread(int num_threads = 1, size_t stack_mult = 1, const func_vector* = 0, const data_vector* = 0);
 
         //
         //  Number of worker threads in the thread group.
@@ -146,8 +142,7 @@ namespace stl_ext
         static void lock(pthread_mutex_t&);
         static void unlock(pthread_mutex_t&);
         static void wait_cond(pthread_cond_t&, pthread_mutex_t&);
-        static bool wait_cond_time(pthread_cond_t&, pthread_mutex_t&,
-                                   size_t usec);
+        static bool wait_cond_time(pthread_cond_t&, pthread_mutex_t&, size_t usec);
         static void signal(pthread_cond_t&);
         static void broadcast(pthread_cond_t&);
 

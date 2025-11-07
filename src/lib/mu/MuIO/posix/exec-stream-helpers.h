@@ -173,8 +173,7 @@ public:
     int set(unsigned bits, mutex_registrator_t* mutex_registrator);
     int reset(unsigned bits, mutex_registrator_t* mutex_registrator);
 
-    wait_result_t wait(unsigned any_bits, unsigned long timeout,
-                       mutex_registrator_t* mutex_registrator);
+    wait_result_t wait(unsigned any_bits, unsigned long timeout, mutex_registrator_t* mutex_registrator);
 
 private:
     mutex_t m_mutex;
@@ -185,8 +184,7 @@ private:
 class thread_buffer_t
 {
 public:
-    thread_buffer_t(pipe_t& in_pipe, pipe_t& out_pipe, pipe_t& err_pipe,
-                    std::ostream& in);
+    thread_buffer_t(pipe_t& in_pipe, pipe_t& out_pipe, pipe_t& err_pipe, std::ostream& in);
     ~thread_buffer_t();
 
     void set_wait_timeout(int stream_kind, unsigned long milliseconds);
@@ -195,8 +193,7 @@ public:
 
     void start();
 
-    void get(exec_stream_t::stream_kind_t kind, char* dst, std::size_t& size,
-             bool& no_more);
+    void get(exec_stream_t::stream_kind_t kind, char* dst, std::size_t& size, bool& no_more);
     void put(char* src, std::size_t& size, bool& no_more);
 
     void close_in();

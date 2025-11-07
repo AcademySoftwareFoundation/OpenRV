@@ -61,8 +61,7 @@ namespace IPCore
         Q_OBJECT
 
     public:
-        QTAudioOutput(QAudioDevice& audioDevice, QAudioFormat& audioFormat,
-                      QTAudioIODevice& ioDevice, QTAudioThread& audioThread);
+        QTAudioOutput(QAudioDevice& audioDevice, QAudioFormat& audioFormat, QTAudioIODevice& ioDevice, QTAudioThread& audioThread);
         ~QTAudioOutput();
 
     public slots:
@@ -75,9 +74,7 @@ namespace IPCore
         void play(IPCore::Session* s);
 
     private:
-        int calcAudioBufferSize(const int channels, const int sampleRate,
-                                const int sampleSizeInBytes,
-                                const int defaultBufferSize) const;
+        int calcAudioBufferSize(const int channels, const int sampleRate, const int sampleSizeInBytes, const int defaultBufferSize) const;
         std::string toString(QAudio::State state);
 
     private:
@@ -141,10 +138,7 @@ namespace IPCore
         TwkUtil::SystemClock::Time endOfInitialization();
         bool isInInitialization() const;
 
-        TwkUtil::SystemClock::Time getLastDeviceLatency() const
-        {
-            return m_lastDeviceLatency;
-        }
+        TwkUtil::SystemClock::Time getLastDeviceLatency() const { return m_lastDeviceLatency; }
 
         QTAudioOutput* audioOutput() const { return m_audioOutput; }
 
@@ -221,17 +215,14 @@ namespace IPCore
         // T is the Application type that is adding this
         // renderer as an audio module e.g. 'RvApplication'
         // or 'NoodleApplication'.
-        template <class T>
-        static IPCore::AudioRenderer::Module addQTAudioModule();
+        template <class T> static IPCore::AudioRenderer::Module addQTAudioModule();
 
         TwkAudio::Format getTwkAudioFormat() const;
         TwkAudio::Format convertToTwkAudioFormat(SampleFormat fmtType) const;
 
-        QAudioFormat::SampleFormat
-        convertToQtAudioFormat(TwkAudio::Format fmtType) const;
+        QAudioFormat::SampleFormat convertToQtAudioFormat(TwkAudio::Format fmtType) const;
 
-        void setSampleSizeAndType(Layout twkLayout, Format twkFormat,
-                                  QAudioFormat& qformat) const;
+        void setSampleSizeAndType(Layout twkLayout, Format twkFormat, QAudioFormat& qformat) const;
 
         friend class QTAudioThread;
 
@@ -251,18 +242,14 @@ namespace IPCore
         std::string m_codec;
     };
 
-    template <class T>
-    static IPCore::AudioRenderer*
-    createQTAudio(const IPCore::AudioRenderer::RendererParameters& p)
+    template <class T> static IPCore::AudioRenderer* createQTAudio(const IPCore::AudioRenderer::RendererParameters& p)
     {
         return (new QTAudioRenderer(p, static_cast<T*>(IPCore::App())));
     }
 
-    template <class T>
-    IPCore::AudioRenderer::Module QTAudioRenderer::addQTAudioModule()
+    template <class T> IPCore::AudioRenderer::Module QTAudioRenderer::addQTAudioModule()
     {
-        return IPCore::AudioRenderer::Module("Platform Audio", "",
-                                             createQTAudio<T>);
+        return IPCore::AudioRenderer::Module("Platform Audio", "", createQTAudio<T>);
     }
 
 } // namespace IPCore

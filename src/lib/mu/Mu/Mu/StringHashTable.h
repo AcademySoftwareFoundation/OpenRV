@@ -20,10 +20,7 @@ namespace Mu
 
     struct StringTraits
     {
-        static int compare(const String& a, const String& b)
-        {
-            return a.compare(b);
-        }
+        static int compare(const String& a, const String& b) { return a.compare(b); }
 
         static bool equals(const String& a, const String& b) { return a == b; }
 

@@ -47,24 +47,19 @@ namespace Mu
 
         Context* c = context();
 
-        addSymbols(
-            new Function(c, "document_symbol", AutoDocModule::document_symbol,
-                         None, Return, "string", Parameters,
-                         new Param(c, "symbol", "string"),
-                         new Param(c, "format", "int", Value(0)),
-                         new Param(c, "indent_level", "int", Value(0)), End),
+        addSymbols(new Function(c, "document_symbol", AutoDocModule::document_symbol, None, Return, "string", Parameters,
+                                new Param(c, "symbol", "string"), new Param(c, "format", "int", Value(0)),
+                                new Param(c, "indent_level", "int", Value(0)), End),
 
-            //
-            // NOTE: document_modules probably belongs in 'runtime'.
-            //
-            new Function(c, "document_modules", AutoDocModule::document_modules,
-                         None, Return, "string[]", End),
+                   //
+                   // NOTE: document_modules probably belongs in 'runtime'.
+                   //
+                   new Function(c, "document_modules", AutoDocModule::document_modules, None, Return, "string[]", End),
 
-            new SymbolicConstant(c, "Text", "int", Value(0)),
-            new SymbolicConstant(c, "HTML", "int", Value(1)),
-            new SymbolicConstant(c, "Texinfo", "int", Value(2)),
+                   new SymbolicConstant(c, "Text", "int", Value(0)), new SymbolicConstant(c, "HTML", "int", Value(1)),
+                   new SymbolicConstant(c, "Texinfo", "int", Value(2)),
 
-            EndArguments);
+                   EndArguments);
     }
 
     static void outputIndent(ostream& o, int n)
@@ -75,14 +70,10 @@ namespace Mu
 
     struct Comp
     {
-        int operator()(Symbol* a, Symbol* b)
-        {
-            return strcmp(a->name().c_str(), b->name().c_str()) < 0;
-        }
+        int operator()(Symbol* a, Symbol* b) { return strcmp(a->name().c_str(), b->name().c_str()) < 0; }
     };
 
-    static String textDocSymbol(Process* p, Symbol* s, int indent,
-                                bool overloaded = true)
+    static String textDocSymbol(Process* p, Symbol* s, int indent, bool overloaded = true)
     {
         ostringstream str;
 
@@ -225,8 +216,7 @@ namespace Mu
 
             if (t == context->stringType())
             {
-                const StringType::String* sobj =
-                    static_cast<StringType::String*>(o);
+                const StringType::String* sobj = static_cast<StringType::String*>(o);
                 str << endl << sobj->c_str() << endl;
             }
         }
@@ -360,8 +350,7 @@ namespace Mu
 
     static void texiDoc(ostream& o, Function* f)
     {
-        o << "@deftypefn {Function} {} " << f->name() << " ("
-          << f->returnType()->fullyQualifiedName() << "; ";
+        o << "@deftypefn {Function} {} " << f->name() << " (" << f->returnType()->fullyQualifiedName() << "; ";
 
         for (int i = 0; i < f->numArgs(); i++)
         {
@@ -373,8 +362,7 @@ namespace Mu
             if (f->hasParameters())
             {
                 const ParameterVariable* p = f->parameter(i);
-                o << p->storageClass()->fullyQualifiedName() << " @var{"
-                  << p->name() << "}";
+                o << p->storageClass()->fullyQualifiedName() << " @var{" << p->name() << "}";
 
                 if (p->hasDefaultValue())
                 {
@@ -393,8 +381,7 @@ namespace Mu
 
     static void texiDoc(ostream& o, Alias* a)
     {
-        o << "@deftp {Alias} " << a->name() << " -> "
-          << a->alias()->fullyQualifiedName() << "\n@end deftp\n";
+        o << "@deftp {Alias} " << a->name() << " -> " << a->alias()->fullyQualifiedName() << "\n@end deftp\n";
     }
 
     static String texiDocSymbol(Symbol* s, bool overloaded = true)
@@ -468,13 +455,11 @@ namespace Mu
 
             if (m)
             {
-                str << "@deftp {Module} " << m->fullyQualifiedName()
-                    << "\n@end deftp";
+                str << "@deftp {Module} " << m->fullyQualifiedName() << "\n@end deftp";
             }
             else if (t)
             {
-                str << "@deftp {Type} " << t->fullyQualifiedName()
-                    << "\n@end deftp";
+                str << "@deftp {Type} " << t->fullyQualifiedName() << "\n@end deftp";
             }
 
             if (s->symbolTable())
@@ -546,8 +531,7 @@ namespace Mu
         }
         else
         {
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(c->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(c->exceptionType());
             e->string() += "no symbol with qualified name ";
             e->string() += n->c_str();
             e->string() += " exists";
@@ -580,8 +564,7 @@ namespace Mu
         array->resize(moduleNames.size());
         for (int i = 0; i < moduleNames.size(); i++)
         {
-            array->element<StringType::String*>(i) =
-                c->stringType()->allocate(moduleNames[i]);
+            array->element<StringType::String*>(i) = c->stringType()->allocate(moduleNames[i]);
         }
 
         NODE_RETURN(array);

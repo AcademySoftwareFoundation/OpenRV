@@ -58,22 +58,17 @@ namespace TwkMovie
             }
 
             std::string fileName; //  File corresponding to frame
-            int generation; //  Increases when the frame pixels are out-of-date
+            int generation;       //  Increases when the frame pixels are out-of-date
             std::time_t readTime; //  Time at which this file was last read
         };
 
-        typedef std::map<int, FrameFile>
-            FrameMap; // Map of frame number -> filename
+        typedef std::map<int, FrameFile> FrameMap; // Map of frame number -> filename
 
         struct CompareFrameFilePair
         {
             CompareFrameFilePair() {}
 
-            bool operator()(const FrameMap::value_type& a,
-                            const FrameMap::value_type& b)
-            {
-                return a.first < b.first;
-            }
+            bool operator()(const FrameMap::value_type& a, const FrameMap::value_type& b) { return a.first < b.first; }
         };
 
         //
@@ -92,11 +87,9 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         //
         //  Movie API
@@ -145,8 +138,7 @@ namespace TwkMovie
         virtual std::string about() const;
         virtual MovieReader* movieReader() const;
         virtual MovieWriter* movieWriter() const;
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
 
         static int readerCount() { return m_readerCount; }
 

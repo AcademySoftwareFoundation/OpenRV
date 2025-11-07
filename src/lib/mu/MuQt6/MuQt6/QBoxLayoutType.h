@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QBoxLayoutType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QBoxLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QBoxLayoutType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QBoxLayout();
-        MuQt_QBoxLayout(Pointer muobj, const CallEnvironment*,
-                        QBoxLayout::Direction dir, QWidget* parent);
+        MuQt_QBoxLayout(Pointer muobj, const CallEnvironment*, QBoxLayout::Direction dir, QWidget* parent);
         virtual void addItem(QLayoutItem* item);
         virtual int count() const;
         virtual Qt::Orientations expandingDirections() const;
@@ -84,8 +82,7 @@ namespace Mu
         virtual int spacing() const;
         virtual QLayoutItem* takeAt(int index);
         virtual int indexOf(const QWidget* widget) const;
-        virtual QLayoutItem* replaceWidget(QWidget* from, QWidget* to,
-                                           Qt::FindChildOptions options);
+        virtual QLayoutItem* replaceWidget(QWidget* from, QWidget* to, Qt::FindChildOptions options);
         virtual QSizePolicy::ControlTypes controlTypes() const;
         virtual QRect geometry() const;
         virtual bool isEmpty() const;
@@ -97,11 +94,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QBoxLayoutType::cachedInstance(const QBoxLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QBoxLayoutType::cachedInstance(const QBoxLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

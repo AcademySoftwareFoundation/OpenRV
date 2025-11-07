@@ -33,8 +33,7 @@ namespace IPCore
         //  Constructors
         //
 
-        DisplayIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph*, GroupIPNode* group = 0);
+        DisplayIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group = 0);
         virtual ~DisplayIPNode();
 
         virtual IPImage* evaluate(const Context&);

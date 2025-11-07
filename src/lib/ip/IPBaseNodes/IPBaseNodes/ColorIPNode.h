@@ -28,8 +28,7 @@ namespace IPCore
     class ColorIPNode : public LUTIPNode
     {
     public:
-        ColorIPNode(const std::string& name, const NodeDefinition* def,
-                    IPGraph* graph, GroupIPNode* group = 0);
+        ColorIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorIPNode();
 

@@ -27,8 +27,7 @@ namespace IPCore
         public:
             typedef TwkApp::Command Command;
 
-            SetFrameInfo(const std::string& name,
-                         TwkApp::CommandInfo::UndoType type);
+            SetFrameInfo(const std::string& name, TwkApp::CommandInfo::UndoType type);
             virtual ~SetFrameInfo();
             virtual Command* newCommand() const;
         };

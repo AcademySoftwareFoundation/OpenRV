@@ -83,12 +83,9 @@ namespace TwkFB
 
         bool operator==(const TwkFB::FBInfo& i)
         {
-            return width == i.width && height == i.height
-                   && uncropWidth == i.uncropWidth
-                   && uncropHeight == i.uncropHeight && uncropX == i.uncropX
-                   && uncropY == i.uncropY && numChannels == i.numChannels
-                   && !i.viewInfos.empty() && !this->viewInfos.empty()
-                   && i.viewInfos.front().name == this->viewInfos.front().name;
+            return width == i.width && height == i.height && uncropWidth == i.uncropWidth && uncropHeight == i.uncropHeight
+                   && uncropX == i.uncropX && uncropY == i.uncropY && numChannels == i.numChannels && !i.viewInfos.empty()
+                   && !this->viewInfos.empty() && i.viewInfos.front().name == this->viewInfos.front().name;
         }
 
         bool operator!=(const TwkFB::FBInfo& i) { return !operator==(i); }
@@ -107,8 +104,7 @@ namespace TwkFB
         {
         }
 
-        FBInfo(int w, int h, int n, FrameBuffer::DataType d,
-               FrameBuffer::Orientation o)
+        FBInfo(int w, int h, int n, FrameBuffer::DataType d, FrameBuffer::Orientation o)
             : width(w)
             , height(h)
             , uncropWidth(w)
@@ -122,8 +118,7 @@ namespace TwkFB
         {
         }
 
-        FBInfo(int w, int h, int uw, int uh, int ux, int uy, int n,
-               FrameBuffer::DataType d, FrameBuffer::Orientation o)
+        FBInfo(int w, int h, int uw, int uh, int ux, int uy, int n, FrameBuffer::DataType d, FrameBuffer::Orientation o)
             : width(w)
             , height(h)
             , uncropWidth(uw)
@@ -137,8 +132,7 @@ namespace TwkFB
         {
         }
 
-        FBInfo(int w, int h, float pA, int n, FrameBuffer::DataType d,
-               FrameBuffer::Orientation o)
+        FBInfo(int w, int h, float pA, int n, FrameBuffer::DataType d, FrameBuffer::Orientation o)
             : width(w)
             , height(h)
             , uncropWidth(w)
@@ -152,8 +146,7 @@ namespace TwkFB
         {
         }
 
-        FBInfo(int w, int h, int uw, int uh, int ux, int uy, float pA, int n,
-               FrameBuffer::DataType d, FrameBuffer::Orientation o)
+        FBInfo(int w, int h, int uw, int uh, int ux, int uy, float pA, int n, FrameBuffer::DataType d, FrameBuffer::Orientation o)
             : width(w)
             , height(h)
             , uncropWidth(uw)
@@ -266,26 +259,19 @@ namespace TwkFB
 
         struct ImageTypeInfo
         {
-            ImageTypeInfo(const std::string& ext, const std::string& desc,
-                          unsigned int c)
+            ImageTypeInfo(const std::string& ext, const std::string& desc, unsigned int c)
                 : extension(ext)
                 , description(desc)
                 , capabilities(c)
             {
             }
 
-            ImageTypeInfo(const std::string& ext, const std::string& desc,
-                          unsigned int c, const StringPairVector& compressors);
+            ImageTypeInfo(const std::string& ext, const std::string& desc, unsigned int c, const StringPairVector& compressors);
 
-            ImageTypeInfo(const std::string& ext, const std::string& desc,
-                          unsigned int c, const StringPairVector& compressors,
-                          const StringPairVector& decodeParams,
-                          const StringPairVector& encodeParams);
+            ImageTypeInfo(const std::string& ext, const std::string& desc, unsigned int c, const StringPairVector& compressors,
+                          const StringPairVector& decodeParams, const StringPairVector& encodeParams);
 
-            bool operator==(const std::string& e)
-            {
-                return !strcasecmp(e.c_str(), extension.c_str());
-            }
+            bool operator==(const std::string& e) { return !strcasecmp(e.c_str(), extension.c_str()); }
 
             std::string extension;
             std::string description;
@@ -388,9 +374,9 @@ namespace TwkFB
                                      // possible
             std::string compression; // compression scheme
             float quality;           // 0 -> 1 for lossy quality
-            float pixelAspect; // if not 1.0, add to file metadata if format
-                               // permits
-            StringVector args; // writer extra args
+            float pixelAspect;       // if not 1.0, add to file metadata if format
+                                     // permits
+            StringVector args;       // writer extra args
             StringPairVector parameters;
         };
 
@@ -398,8 +384,7 @@ namespace TwkFB
         //  Constructor
         //
 
-        FrameBufferIO(const std::string& identifier = "",
-                      const std::string& key = "mz");
+        FrameBufferIO(const std::string& identifier = "", const std::string& key = "mz");
         virtual ~FrameBufferIO();
 
         //
@@ -442,12 +427,9 @@ namespace TwkFB
         //  classes for time based images!
         //
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
 
-        virtual void readImages(FrameBufferVector& fbs,
-                                const std::string& filename,
-                                const ReadRequest& request) const;
+        virtual void readImages(FrameBufferVector& fbs, const std::string& filename, const ReadRequest& request) const;
 
         //
         //  ImageWrite capabaility says you can call these.  May throw
@@ -464,13 +446,9 @@ namespace TwkFB
         //  image per-file.
         //
 
-        virtual void writeImage(const FrameBuffer& img,
-                                const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const;
 
-        virtual void writeImages(const ConstFrameBufferVector& fbs,
-                                 const std::string& filename,
-                                 const WriteRequest& request) const;
+        virtual void writeImages(const ConstFrameBufferVector& fbs, const std::string& filename, const WriteRequest& request) const;
 
         //
         //  This is a convenience function which will make a
@@ -478,18 +456,14 @@ namespace TwkFB
         //  and call the above.
         //
 
-        void writeImages(const FrameBufferVector& fbs,
-                         const std::string& filename,
-                         const WriteRequest& request) const;
+        void writeImages(const FrameBufferVector& fbs, const std::string& filename, const WriteRequest& request) const;
 
         //
         //  Returns a list of lower-case extensions the plugin can support
         //
 
         const ImageTypeInfos& extensionsSupported() const;
-        bool
-        supportsExtension(std::string extension,
-                          unsigned int capabilities = AnyCapabilities) const;
+        bool supportsExtension(std::string extension, unsigned int capabilities = AnyCapabilities) const;
 
         //
         //  Do any of this plugins accepted formats allow for attempting
@@ -531,22 +505,17 @@ namespace TwkFB
         virtual int getIntAttribute(const std::string& name) const;
         virtual void setIntAttribute(const std::string& name, int value);
         virtual std::string getStringAttribute(const std::string& name) const;
-        virtual void setStringAttribute(const std::string& name,
-                                        const std::string& value);
+        virtual void setStringAttribute(const std::string& name, const std::string& value);
         virtual double getDoubleAttribute(const std::string& name) const;
-        virtual void setDoubleAttribute(const std::string& name,
-                                        double value) const;
+        virtual void setDoubleAttribute(const std::string& name, double value) const;
 
     protected:
         void addType(const std::string&, const std::string&, unsigned int);
 
-        void addType(const std::string&, const std::string&, unsigned int,
-                     const StringPairVector& compressors);
+        void addType(const std::string&, const std::string&, unsigned int, const StringPairVector& compressors);
 
-        void addType(const std::string&, const std::string&, unsigned int,
-                     const StringPairVector& compressors,
-                     const StringPairVector& dparams,
-                     const StringPairVector& eparams);
+        void addType(const std::string&, const std::string&, unsigned int, const StringPairVector& compressors,
+                     const StringPairVector& dparams, const StringPairVector& eparams);
 
         void addType(const std::string&, unsigned int);
 
@@ -563,8 +532,7 @@ namespace TwkFB
     class TWKFB_EXPORT ProxyFBIO : public FrameBufferIO
     {
     public:
-        ProxyFBIO(const std::string& identifier, const std::string& sortKey,
-                  const std::string& realPlugin)
+        ProxyFBIO(const std::string& identifier, const std::string& sortKey, const std::string& realPlugin)
             : FrameBufferIO(identifier, sortKey)
             , m_file(realPlugin)
         {
@@ -574,10 +542,8 @@ namespace TwkFB
 
         virtual std::string about() const;
 
-        void add(const std::string& ext, const std::string& desc,
-                 unsigned int capabilities, const StringPairVector& codecs,
-                 const StringPairVector& dparams,
-                 const StringPairVector& eparams)
+        void add(const std::string& ext, const std::string& desc, unsigned int capabilities, const StringPairVector& codecs,
+                 const StringPairVector& dparams, const StringPairVector& eparams)
         {
             addType(ext, desc, capabilities, codecs, dparams, eparams);
         }
@@ -604,11 +570,7 @@ namespace TwkFB
 
         struct IOComp
         {
-            bool operator()(const FrameBufferIO* a,
-                            const FrameBufferIO* b) const
-            {
-                return a->sortKey().compare(b->sortKey()) < 0;
-            }
+            bool operator()(const FrameBufferIO* a, const FrameBufferIO* b) const { return a->sortKey().compare(b->sortKey()) < 0; }
         };
 
         typedef TwkFB::FrameBuffer FrameBuffer;
@@ -643,9 +605,7 @@ namespace TwkFB
         //  on error
         //
 
-        static void readImages(FrameBufferVector& fbs,
-                               const std::string& filename,
-                               const FrameBufferIO::ReadRequest& request,
+        static void readImages(FrameBufferVector& fbs, const std::string& filename, const FrameBufferIO::ReadRequest& request,
                                const char* ext = 0);
 
         //
@@ -654,14 +614,10 @@ namespace TwkFB
         //  extension. Throws exception on error
         //
 
-        static void writeImages(const ConstFrameBufferVector& fbs,
-                                const std::string& filename,
-                                const FrameBufferIO::WriteRequest& request,
+        static void writeImages(const ConstFrameBufferVector& fbs, const std::string& filename, const FrameBufferIO::WriteRequest& request,
                                 const char* fmt = 0);
 
-        static void writeImages(const FrameBufferVector& fbs,
-                                const std::string& filename,
-                                const FrameBufferIO::WriteRequest& request,
+        static void writeImages(const FrameBufferVector& fbs, const std::string& filename, const FrameBufferIO::WriteRequest& request,
                                 const char* fmt = 0);
 
         //
@@ -675,9 +631,8 @@ namespace TwkFB
         //  Find a specific IO object
         //
 
-        static const FrameBufferIO* findByExtension(
-            const std::string& extension,
-            unsigned int capabilities = FrameBufferIO::AnyCapabilities);
+        static const FrameBufferIO* findByExtension(const std::string& extension,
+                                                    unsigned int capabilities = FrameBufferIO::AnyCapabilities);
 
         //
         //  Find a specific IO object by brute force: call getImageInfo()
@@ -685,9 +640,8 @@ namespace TwkFB
         //  that one.
         //
 
-        static const FrameBufferIO* findByBruteForce(
-            const std::string& filename,
-            unsigned int capabilities = FrameBufferIO::AnyCapabilities);
+        static const FrameBufferIO* findByBruteForce(const std::string& filename,
+                                                     unsigned int capabilities = FrameBufferIO::AnyCapabilities);
 
         //
         //  Load a specific plugin file

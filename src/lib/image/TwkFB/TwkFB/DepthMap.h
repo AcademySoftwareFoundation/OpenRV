@@ -47,8 +47,7 @@ namespace TwkFB
         typedef TwkMath::Vec2f Vec2f;
 
         DepthMap(const FrameBuffer*);
-        DepthMap(const FrameBuffer*, int depthChannel = 0,
-                 DepthSpace space = CameraSpace);
+        DepthMap(const FrameBuffer*, int depthChannel = 0, DepthSpace space = CameraSpace);
         ~DepthMap();
 
         float depthAtNDC(float x, float y) const;

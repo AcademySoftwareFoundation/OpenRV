@@ -19,15 +19,11 @@ c->tupleType(ttypes);
 
 addSymbols(
 
-    new Function(c, "windowFlags", _n_QWidget_windowFlags_int, None, Return,
-                 "int", Parameters, new Param(c, "this", "qt.QWidget"), End),
+    new Function(c, "windowFlags", _n_QWidget_windowFlags_int, None, Return, "int", Parameters, new Param(c, "this", "qt.QWidget"), End),
 
-    new Function(c, "setWindowFlags", _n_QWidget_setWindowFlags_void_int, None,
-                 Return, "void", Parameters, new Param(c, "this", "qt.QWidget"),
-                 new Param(c, "windowFlags", "int"), End),
+    new Function(c, "setWindowFlags", _n_QWidget_setWindowFlags_void_int, None, Return, "void", Parameters,
+                 new Param(c, "this", "qt.QWidget"), new Param(c, "windowFlags", "int"), End),
 
-    new Function(c, "action", _n_action0, None, Compiled,
-                 qt_QWidget_action_QAction_QWidget_int, Return, "qt.QAction",
-                 Parameters, new Param(c, "this", "qt.QWidget"),
-                 new Param(c, "index", "int"), End),
+    new Function(c, "action", _n_action0, None, Compiled, qt_QWidget_action_QAction_QWidget_int, Return, "qt.QAction", Parameters,
+                 new Param(c, "this", "qt.QWidget"), new Param(c, "index", "int"), End),
     EndArguments);

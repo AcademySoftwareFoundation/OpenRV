@@ -17,9 +17,7 @@ namespace IPCore
     class FileOutputGroupIPNode : public OutputGroupIPNode
     {
     public:
-        FileOutputGroupIPNode(const std::string& name,
-                              const NodeDefinition* def, IPGraph* graph,
-                              GroupIPNode* group = 0);
+        FileOutputGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~FileOutputGroupIPNode();
 

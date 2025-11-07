@@ -23,15 +23,12 @@ namespace IPCore
 
     bool StackGroupIPNode::m_defaultAutoRetime = true;
 
-    StackGroupIPNode::StackGroupIPNode(const std::string& name,
-                                       const NodeDefinition* def,
-                                       IPGraph* graph, GroupIPNode* group)
+    StackGroupIPNode::StackGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
         declareProperty<StringProperty>("ui.name", name);
 
-        m_retimeToOutput = declareProperty<IntProperty>(
-            "timing.retimeInputs", m_defaultAutoRetime ? 1 : 0);
+        m_retimeToOutput = declareProperty<IntProperty>("timing.retimeInputs", m_defaultAutoRetime ? 1 : 0);
 
         m_stackNode = newMemberNodeOfType<StackIPNode>(stackType(), "stack");
         m_paintNode = newMemberNodeOfType<PaintIPNode>(paintType(), "paint");
@@ -53,29 +50,15 @@ namespace IPCore
         //
     }
 
-    string StackGroupIPNode::retimeType()
-    {
-        return definition()->stringValue("defaults.retimeType", "Retime");
-    }
+    string StackGroupIPNode::retimeType() { return definition()->stringValue("defaults.retimeType", "Retime"); }
 
-    string StackGroupIPNode::transformType()
-    {
-        return definition()->stringValue("defaults.transformType",
-                                         "Transform2D");
-    }
+    string StackGroupIPNode::transformType() { return definition()->stringValue("defaults.transformType", "Transform2D"); }
 
-    string StackGroupIPNode::stackType()
-    {
-        return definition()->stringValue("defaults.stackType", "Stack");
-    }
+    string StackGroupIPNode::stackType() { return definition()->stringValue("defaults.stackType", "Stack"); }
 
-    string StackGroupIPNode::paintType()
-    {
-        return definition()->stringValue("defaults.paintType", "Paint");
-    }
+    string StackGroupIPNode::paintType() { return definition()->stringValue("defaults.paintType", "Paint"); }
 
-    IPNode* StackGroupIPNode::newSubGraphForInput(size_t index,
-                                                  const IPNodes& newInputs)
+    IPNode* StackGroupIPNode::newSubGraphForInput(size_t index, const IPNodes& newInputs)
     {
         float fps = m_stackNode->imageRangeInfo().fps;
         if (fps == 0.0 && !newInputs.empty())
@@ -88,9 +71,7 @@ namespace IPCore
         bool retimeInputs = m_retimeToOutput->front() ? true : false;
         IPNode* innode = newInputs[index];
         AdaptorIPNode* anode = newAdaptorForInput(innode);
-        Transform2DIPNode* tnode =
-            newMemberNodeOfTypeForInput<Transform2DIPNode>(transformType(),
-                                                           innode, "t");
+        Transform2DIPNode* tnode = newMemberNodeOfTypeForInput<Transform2DIPNode>(transformType(), innode, "t");
 
         tnode->setAdaptiveResampling(true);
         tnode->setInputs1(anode);
@@ -107,9 +88,7 @@ namespace IPCore
         return node;
     }
 
-    IPNode* StackGroupIPNode::modifySubGraphForInput(size_t index,
-                                                     const IPNodes& newInputs,
-                                                     IPNode* subgraph)
+    IPNode* StackGroupIPNode::modifySubGraphForInput(size_t index, const IPNodes& newInputs, IPNode* subgraph)
     {
         bool retimeInputs = m_retimeToOutput->front() ? true : false;
 
@@ -119,11 +98,9 @@ namespace IPCore
             if (!inputRangeInfo.isUndiscovered)
             {
                 IPNode* innode = newInputs[index];
-                IPNode* retimer =
-                    newMemberNodeForInput(retimeType(), innode, "rt");
+                IPNode* retimer = newMemberNodeForInput(retimeType(), innode, "rt");
                 retimer->setInputs1(subgraph);
-                retimer->setProperty<FloatProperty>("output.fps",
-                                                    inputRangeInfo.fps);
+                retimer->setProperty<FloatProperty>("output.fps", inputRangeInfo.fps);
                 subgraph = retimer;
             }
         }
@@ -187,8 +164,7 @@ namespace IPCore
         GroupIPNode::propertyChanged(p);
     }
 
-    void StackGroupIPNode::inputMediaChanged(IPNode* srcNode, int srcOutIndex,
-                                             PropagateTarget target)
+    void StackGroupIPNode::inputMediaChanged(IPNode* srcNode, int srcOutIndex, PropagateTarget target)
     {
         IPNode::inputMediaChanged(srcNode, srcOutIndex, target);
 

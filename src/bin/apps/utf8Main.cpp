@@ -19,13 +19,11 @@ int wmain(int argc, wchar_t* wargv[])
     char** argv = new char*[argc];
     for (int argn = 0; argn < argc; argn++)
     {
-        int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, wargv[argn], -1, NULL,
-                                             0, NULL, NULL);
+        int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, wargv[argn], -1, NULL, 0, NULL, NULL);
         if (sizeNeeded > 0)
         {
             char* strTo = new char[sizeNeeded];
-            WideCharToMultiByte(CP_UTF8, 0, wargv[argn], -1, strTo, sizeNeeded,
-                                NULL, NULL);
+            WideCharToMultiByte(CP_UTF8, 0, wargv[argn], -1, strTo, sizeNeeded, NULL, NULL);
             argv[argn] = strTo;
         }
         else

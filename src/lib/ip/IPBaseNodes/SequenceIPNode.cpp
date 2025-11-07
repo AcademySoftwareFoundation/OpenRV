@@ -35,8 +35,7 @@
 namespace
 {
 
-    TwkAudio::SampleTime frameToSample(int frame, double fps,
-                                       double audioSamplingRate)
+    TwkAudio::SampleTime frameToSample(int frame, double fps, double audioSamplingRate)
     {
         return TwkAudio::timeToSamples(double(frame) / fps, audioSamplingRate);
     }
@@ -51,9 +50,7 @@ namespace IPCore
     using namespace TwkAudio;
     using namespace TwkMath;
 
-    SequenceIPNode::SequenceIPNode(const std::string& name,
-                                   const NodeDefinition* def, IPGraph* g,
-                                   GroupIPNode* group)
+    SequenceIPNode::SequenceIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_updateHiddenData(false)
         , m_updateEDL(false)
@@ -76,8 +73,7 @@ namespace IPCore
         m_outputSize->back() = 480;
 
         m_outputFPS = declareProperty<FloatProperty>("output.fps", 0.0f);
-        m_interactiveSize =
-            declareProperty<IntProperty>("output.interactiveSize", 1);
+        m_interactiveSize = declareProperty<IntProperty>("output.interactiveSize", 1);
         m_autoEDL = declareProperty<IntProperty>("mode.autoEDL", 1);
         m_useCutInfo = declareProperty<IntProperty>("mode.useCutInfo", 1);
         m_autoSize = declareProperty<IntProperty>("output.autoSize", 1);
@@ -85,22 +81,16 @@ namespace IPCore
         // SequenceIPNode can optionally provide per-input blend modes. Those
         // are stored in a container that is indexed with the source indices,
         // just like any other per-input EDL information.
-        m_inputsBlendingModes = declareProperty<StringProperty>(
-            "composite.inputBlendModes", "", 0, false);
+        m_inputsBlendingModes = declareProperty<StringProperty>("composite.inputBlendModes", "", 0, false);
 
-        m_inputsOpacities = declareProperty<FloatProperty>(
-            "composite.inputOpacities", 1.0f, nullptr, false);
+        m_inputsOpacities = declareProperty<FloatProperty>("composite.inputOpacities", 1.0f, nullptr, false);
 
-        m_inputsAngularMaskPivotX = declareProperty<FloatProperty>(
-            "composite.inputAngularMaskPivotX", 0.0f, nullptr, false);
-        m_inputsAngularMaskPivotY = declareProperty<FloatProperty>(
-            "composite.inputAngularMaskPivotY", 0.0f, nullptr, false);
-        m_inputsAngularMaskAngleInRadians = declareProperty<FloatProperty>(
-            "composite.inputAngularMaskAngleInRadians", 0.0f, nullptr, false);
-        m_inputsAngularMaskActive =
-            declareProperty<IntProperty>("composite.inputAngularMaskActive", 1);
-        m_inputsReverseAngularMask =
-            declareProperty<IntProperty>("composite.swapAngularMaskInput", 1);
+        m_inputsAngularMaskPivotX = declareProperty<FloatProperty>("composite.inputAngularMaskPivotX", 0.0f, nullptr, false);
+        m_inputsAngularMaskPivotY = declareProperty<FloatProperty>("composite.inputAngularMaskPivotY", 0.0f, nullptr, false);
+        m_inputsAngularMaskAngleInRadians =
+            declareProperty<FloatProperty>("composite.inputAngularMaskAngleInRadians", 0.0f, nullptr, false);
+        m_inputsAngularMaskActive = declareProperty<IntProperty>("composite.inputAngularMaskActive", 1);
+        m_inputsReverseAngularMask = declareProperty<IntProperty>("composite.swapAngularMaskInput", 1);
 
         // since they are per input, make sure the property containers are
         // emptied at creation time
@@ -115,8 +105,7 @@ namespace IPCore
         // By default, the output of this node support reverse-order blending.
         // this is mainly kept for backward compatibility reason.
         // See ImageRenderer::renderAllChildren for more details on this mode.
-        m_supportReversedOrderBlending = declareProperty<IntProperty>(
-            "mode.supportReversedOrderBlending", 1);
+        m_supportReversedOrderBlending = declareProperty<IntProperty>("mode.supportReversedOrderBlending", 1);
 
         setHasLinearTransform(true); // fits to aspect
     }
@@ -125,8 +114,7 @@ namespace IPCore
 
     bool SequenceIPNode::interactiveSize(const Context& c) const
     {
-        return m_interactiveSize->front() != 0 && graph()->viewNode() == group()
-               && c.allowInteractiveResize && c.viewWidth != 0
+        return m_interactiveSize->front() != 0 && graph()->viewNode() == group() && c.allowInteractiveResize && c.viewWidth != 0
                && c.viewHeight != 0;
     }
 
@@ -171,8 +159,7 @@ namespace IPCore
         //  greater than) m_edlGlobalIn "global" frame number
         //
 
-        IntProperty::const_iterator globalFrameItr =
-            lower_bound(m_edlGlobalIn->begin(), m_edlGlobalIn->end(), frame);
+        IntProperty::const_iterator globalFrameItr = lower_bound(m_edlGlobalIn->begin(), m_edlGlobalIn->end(), frame);
 
         //
         //  Since lower_bound returns an iterator pointing at the "global" frame
@@ -188,8 +175,7 @@ namespace IPCore
         //  range.
         //
 
-        if (globalFrameItr >= m_edlGlobalIn->end()
-            || frame == m_edlGlobalIn->back())
+        if (globalFrameItr >= m_edlGlobalIn->end() || frame == m_edlGlobalIn->back())
         {
             //
             // Minus 2 because the last valid index in all other lists/vectors
@@ -226,21 +212,17 @@ namespace IPCore
 
         if (inputs().size())
         {
-            if (index >= m_edlSource->size() - 1
-                || index >= m_edlSourceIn->size() - 1
-                || index >= m_edlSourceOut->size() - 1
+            if (index >= m_edlSource->size() - 1 || index >= m_edlSourceIn->size() - 1 || index >= m_edlSourceOut->size() - 1
                 || index >= m_edlGlobalIn->size() - 1 || index < 0)
             {
-                TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                                 "Out-of-bounds EDL data");
+                TWK_THROW_STREAM(SequenceOutOfBoundsExc, "Out-of-bounds EDL data");
             }
         }
 
         return index;
     }
 
-    int SequenceIPNode::indexAtSample(SampleTime seekSample, double sampleRate,
-                                      double fps)
+    int SequenceIPNode::indexAtSample(SampleTime seekSample, double sampleRate, double fps)
     {
         lazyBuildState();
         if (!m_edlGlobalIn)
@@ -261,8 +243,7 @@ namespace IPCore
         int index = indexAtFrame(seekFrame + globalOffset);
 
         int inputFrame = (*m_edlGlobalIn)[index];
-        SampleTime inputStart =
-            frameToSample(inputFrame - globalOffset, fps, sampleRate);
+        SampleTime inputStart = frameToSample(inputFrame - globalOffset, fps, sampleRate);
 
         //
         //  Since audio samples and video frames don't line up precisely we
@@ -276,22 +257,19 @@ namespace IPCore
         {
             index = indexAtFrame(--seekFrame + globalOffset);
             inputFrame = (*m_edlGlobalIn)[index];
-            inputStart =
-                frameToSample(inputFrame - globalOffset, fps, sampleRate);
+            inputStart = frameToSample(inputFrame - globalOffset, fps, sampleRate);
         }
 
         return index;
     }
 
-    SequenceIPNode::EvalPoint
-    SequenceIPNode::evaluationPoint(int frame, int forceIndex) const
+    SequenceIPNode::EvalPoint SequenceIPNode::evaluationPoint(int frame, int forceIndex) const
     {
         const IPNodes& ins = inputs();
 
         if (ins.size() > 0)
         {
-            const int index =
-                (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
+            const int index = (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
 
             const int source = (*m_edlSource)[index];
             const int in = (*m_edlSourceIn)[index];
@@ -342,26 +320,21 @@ namespace IPCore
         if (source < 0 || source >= ins.size())
         {
             TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                             "Bad Sequence EDL source number "
-                                 << source << " is not in range [0,"
-                                 << ins.size() - 1 << "]");
+                             "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
         }
 
-        IPImage* root =
-            new IPImage(this, IPImage::BlendRenderType, vw, vh, 1.0);
+        IPImage* root = new IPImage(this, IPImage::BlendRenderType, vw, vh, 1.0);
 
         // if we have per-input blending modes, now is the time to use them
         if (source >= 0 && source < m_inputsBlendingModes->size())
         {
             string blendModeString = (*m_inputsBlendingModes)[source];
-            root->blendMode =
-                IPImage::getBlendModeFromString(blendModeString.c_str());
+            root->blendMode = IPImage::getBlendModeFromString(blendModeString.c_str());
         }
 
         // Make sure to disable reverse-order blending if required.
         // See ImageRenderer::renderAllChildren for more details on this mode.
-        root->supportReversedOrderBlending =
-            m_supportReversedOrderBlending->front() != 0;
+        root->supportReversedOrderBlending = m_supportReversedOrderBlending->front() != 0;
 
         //
         //  If we pull multiple inputs simultaneously we'll need to
@@ -384,8 +357,7 @@ namespace IPCore
 
         convertBlendRenderTypeToIntermediate(images, modifiedImages);
 
-        balanceResourceUsage(IPNode::filterAccumulate, images, modifiedImages,
-                             8, 8, 81);
+        balanceResourceUsage(IPNode::filterAccumulate, images, modifiedImages, 8, 8, 81);
 
         //
         //  Put adaptive resize on child
@@ -394,37 +366,29 @@ namespace IPCore
         // Shader::installAdaptiveBoxResizeRecursive(root);
 
         // If we have per-input opacities, now is the time to use them
-        if (source >= 0 && source < m_inputsOpacities->size()
-            && child->shaderExpr != nullptr)
+        if (source >= 0 && source < m_inputsOpacities->size() && child->shaderExpr != nullptr)
         {
-            child->shaderExpr = Shader::newOpacity(
-                child, child->shaderExpr, (*m_inputsOpacities)[source]);
+            child->shaderExpr = Shader::newOpacity(child, child->shaderExpr, (*m_inputsOpacities)[source]);
         }
 
-        const bool isSourceValid =
-            source >= 0 && source < m_inputsAngularMaskPivotX->size()
-            && source < m_inputsAngularMaskPivotY->size()
-            && source < m_inputsAngularMaskAngleInRadians->size()
-            && source < m_inputsAngularMaskActive->size()
-            && source < m_inputsReverseAngularMask->size();
+        const bool isSourceValid = source >= 0 && source < m_inputsAngularMaskPivotX->size() && source < m_inputsAngularMaskPivotY->size()
+                                   && source < m_inputsAngularMaskAngleInRadians->size() && source < m_inputsAngularMaskActive->size()
+                                   && source < m_inputsReverseAngularMask->size();
 
         if (isSourceValid && ((*m_inputsAngularMaskActive)[source] != 0))
         {
 
             const float pivotX = (*m_inputsAngularMaskPivotX)[source];
             const float pivotY = (*m_inputsAngularMaskPivotY)[source];
-            const float angleInRadians =
-                (*m_inputsAngularMaskAngleInRadians)[source];
+            const float angleInRadians = (*m_inputsAngularMaskAngleInRadians)[source];
 
-            child->shaderExpr = Shader::newAngularMask(
-                child, child->shaderExpr, Vec2f(pivotX, pivotY), angleInRadians,
-                (*m_inputsReverseAngularMask)[source] != 0);
+            child->shaderExpr = Shader::newAngularMask(child, child->shaderExpr, Vec2f(pivotX, pivotY), angleInRadians,
+                                                       (*m_inputsReverseAngularMask)[source] != 0);
         }
 
         root->appendChild(child);
 
-        if (m_clipCaching && context.thread == CacheEvalThread
-            && context.frame == context.baseFrame && !context.cacheNode)
+        if (m_clipCaching && context.thread == CacheEvalThread && context.frame == context.baseFrame && !context.cacheNode)
         {
             //
             //  Force eval point for "clip of display frame", only if frame is
@@ -439,16 +403,14 @@ namespace IPCore
             {
                 EvalPoint clipP = evaluationPoint(frame, dispP.inputIndex);
 
-                if (clipP.sourceFrame >= m_rangeInfos[dispP.inputIndex].start
-                    && clipP.sourceFrame <= m_rangeInfos[dispP.inputIndex].end)
+                if (clipP.sourceFrame >= m_rangeInfos[dispP.inputIndex].start && clipP.sourceFrame <= m_rangeInfos[dispP.inputIndex].end)
                 {
                     Context clipContext = context;
                     clipContext.frame = clipP.sourceFrame;
 
                     //  cerr << "clipCaching: evaluating source frame " <<
                     //  clipP.sourceFrame << endl;
-                    root->appendChild(
-                        ins[clipP.sourceIndex]->evaluate(clipContext));
+                    root->appendChild(ins[clipP.sourceIndex]->evaluate(clipContext));
                 }
             }
         }
@@ -483,16 +445,13 @@ namespace IPCore
 
         if (source < 0 || source >= ins.size())
         {
-            TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                             "Bad Sequence EDL source number "
-                                 << source << " is not in range [0,"
-                                 << ins.size() - 1 << "] from frame " << frame);
+            TWK_THROW_STREAM(SequenceOutOfBoundsExc, "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1
+                                                                                       << "] from frame " << frame);
         }
 
         IPImageID* root = ins[ep.sourceIndex]->evaluateIdentifier(newContext);
 
-        if (m_clipCaching && context.thread == CacheEvalThread
-            && context.frame == context.baseFrame && !context.cacheNode)
+        if (m_clipCaching && context.thread == CacheEvalThread && context.frame == context.baseFrame && !context.cacheNode)
         {
             //
             //  Force eval point for "clip of display frame", only if frame is
@@ -507,15 +466,12 @@ namespace IPCore
             {
                 EvalPoint clipP = evaluationPoint(frame, dispP.inputIndex);
 
-                if (clipP.sourceFrame >= m_rangeInfos[dispP.inputIndex].start
-                    && clipP.sourceFrame <= m_rangeInfos[dispP.inputIndex].end)
+                if (clipP.sourceFrame >= m_rangeInfos[dispP.inputIndex].start && clipP.sourceFrame <= m_rangeInfos[dispP.inputIndex].end)
                 {
                     Context clipContext = context;
                     clipContext.frame = clipP.sourceFrame;
 
-                    root->appendChild(
-                        ins[clipP.sourceIndex]->evaluateIdentifier(
-                            clipContext));
+                    root->appendChild(ins[clipP.sourceIndex]->evaluateIdentifier(clipContext));
                 }
             }
         }
@@ -537,8 +493,7 @@ namespace IPCore
         //  equality is not a good enough test for append-only
         //
 
-        if (nodes.size() > inputs().size() && !inputs().empty()
-            && !m_volatileInputs)
+        if (nodes.size() > inputs().size() && !inputs().empty() && !m_volatileInputs)
         {
             for (size_t i = 0; i < inputs().size(); i++)
             {
@@ -564,8 +519,7 @@ namespace IPCore
 
         updateInputDataInternal(nodes);
         if (m_autoEDL->front())
-            createDefaultEDLInternal(
-                (differs || m_volatileInputs) ? 0 : sizeDiff, nodes);
+            createDefaultEDLInternal((differs || m_volatileInputs) ? 0 : sizeDiff, nodes);
         graph()->flushAudioCache();
         IPNode::setInputs(nodes);
         propagateRangeChange();
@@ -584,8 +538,7 @@ namespace IPCore
         inputRangeChanged(inputIndex);
     }
 
-    void SequenceIPNode::inputRangeChanged(int inputIndex,
-                                           PropagateTarget target)
+    void SequenceIPNode::inputRangeChanged(int inputIndex, PropagateTarget target)
     {
         //
         //  This function should *only* set dirty flags, etc, but should never
@@ -608,8 +561,7 @@ namespace IPCore
         }
     }
 
-    void SequenceIPNode::inputImageStructureChanged(int inputIndex,
-                                                    PropagateTarget target)
+    void SequenceIPNode::inputImageStructureChanged(int inputIndex, PropagateTarget target)
     {
         //
         //  This function should *only* set dirty flags, etc, but should never
@@ -656,24 +608,18 @@ namespace IPCore
             }
             else
             {
-                DB("Discoverd Source #" << i
-                                        << " start: " << m_rangeInfos[i].start
-                                        << ", end: " << m_rangeInfos[i].end);
-                totalStartEndRange +=
-                    (m_rangeInfos[i].end - m_rangeInfos[i].start);
-                totalCutInCutOutRange +=
-                    (m_rangeInfos[i].cutOut - m_rangeInfos[i].cutIn);
+                DB("Discoverd Source #" << i << " start: " << m_rangeInfos[i].start << ", end: " << m_rangeInfos[i].end);
+                totalStartEndRange += (m_rangeInfos[i].end - m_rangeInfos[i].start);
+                totalCutInCutOutRange += (m_rangeInfos[i].cutOut - m_rangeInfos[i].cutIn);
             }
 
-            if (!i && m_outputFPS->front() == 0.0f
-                && !m_rangeInfos[i].isUndiscovered)
+            if (!i && m_outputFPS->front() == 0.0f && !m_rangeInfos[i].isUndiscovered)
             {
                 m_outputFPS->front() = m_rangeInfos[i].fps;
                 assert(m_outputFPS->front() != 1.0f);
             }
 
-            ImageStructureInfo sinfo = ins[i]->imageStructureInfo(
-                graph()->contextForFrame(m_rangeInfos[i].start));
+            ImageStructureInfo sinfo = ins[i]->imageStructureInfo(graph()->contextForFrame(m_rangeInfos[i].start));
 
             if (!i)
             {
@@ -683,33 +629,25 @@ namespace IPCore
             }
             else
             {
-                m_structInfo.width =
-                    std::max(int(sinfo.width), m_structInfo.width);
-                m_structInfo.height =
-                    std::max(int(sinfo.height), m_structInfo.height);
+                m_structInfo.width = std::max(int(sinfo.width), m_structInfo.width);
+                m_structInfo.height = std::max(int(sinfo.height), m_structInfo.height);
                 m_structInfo.pixelAspect = 1.0;
             }
         }
 
-        const auto nbDiscoveredSources =
-            ins.size() - undiscoveredRangeInfosIdx.size();
+        const auto nbDiscoveredSources = ins.size() - undiscoveredRangeInfosIdx.size();
         DB("Discovered sources: " << nbDiscoveredSources);
-        if ((nbDiscoveredSources >= kMinSourceDiscovered)
-            && !undiscoveredRangeInfosIdx.empty())
+        if ((nbDiscoveredSources >= kMinSourceDiscovered) && !undiscoveredRangeInfosIdx.empty())
         {
-            const int averageStartEndRange =
-                totalStartEndRange / nbDiscoveredSources;
-            const int averageCutInCutOutRange =
-                totalCutInCutOutRange / nbDiscoveredSources;
+            const int averageStartEndRange = totalStartEndRange / nbDiscoveredSources;
+            const int averageCutInCutOutRange = totalCutInCutOutRange / nbDiscoveredSources;
             DB("Average start-end range: " << averageStartEndRange);
             DB("Average cutIn-cutOut range: " << averageCutInCutOutRange);
             while (!undiscoveredRangeInfosIdx.empty())
             {
                 const auto idx = undiscoveredRangeInfosIdx.front();
-                m_rangeInfos[idx].end =
-                    m_rangeInfos[idx].start + averageStartEndRange;
-                m_rangeInfos[idx].cutOut =
-                    m_rangeInfos[idx].cutIn + averageCutInCutOutRange;
+                m_rangeInfos[idx].end = m_rangeInfos[idx].start + averageStartEndRange;
+                m_rangeInfos[idx].cutOut = m_rangeInfos[idx].cutIn + averageCutInCutOutRange;
                 undiscoveredRangeInfosIdx.pop_front();
             }
         }
@@ -728,13 +666,9 @@ namespace IPCore
         m_updateHiddenData = false;
     }
 
-    void SequenceIPNode::createDefaultEDL(int append) const
-    {
-        createDefaultEDLInternal(append, inputs());
-    }
+    void SequenceIPNode::createDefaultEDL(int append) const { createDefaultEDLInternal(append, inputs()); }
 
-    void SequenceIPNode::createDefaultEDLInternal(int append,
-                                                  const IPNodes& ins) const
+    void SequenceIPNode::createDefaultEDLInternal(int append, const IPNodes& ins) const
     {
 
         m_updateEDL = false;
@@ -757,8 +691,7 @@ namespace IPCore
             int accum = (*m_edlGlobalIn)[startIndex];
             int inindex = ins.size() - append;
 
-            for (int i = startIndex; i < m_edlGlobalIn->size() - 1;
-                 i++, inindex++)
+            for (int i = startIndex; i < m_edlGlobalIn->size() - 1; i++, inindex++)
             {
                 const ImageRangeInfo& info = m_rangeInfos[inindex];
 
@@ -806,8 +739,7 @@ namespace IPCore
         }
     }
 
-    void SequenceIPNode::mediaInfo(const Context& context,
-                                   MediaInfoVector& infos) const
+    void SequenceIPNode::mediaInfo(const Context& context, MediaInfoVector& infos) const
     {
         const IPNodes& ins = inputs();
         if (ins.empty())
@@ -818,9 +750,7 @@ namespace IPCore
         if (source < 0 || source >= ins.size())
         {
             TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                             "Bad Sequence EDL source number "
-                                 << source << " is not in range [0,"
-                                 << ins.size() - 1 << "]");
+                             "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
         }
 
         Context newContext = context;
@@ -847,16 +777,13 @@ namespace IPCore
         }
     }
 
-    IPNode::ImageStructureInfo
-    SequenceIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo SequenceIPNode::imageStructureInfo(const Context& context) const
     {
         lazyBuildState();
 
         const bool interactive = interactiveSize(context);
-        const float vw =
-            interactive ? context.viewWidth : float(m_structInfo.width);
-        const float vh =
-            interactive ? context.viewHeight : float(m_structInfo.height);
+        const float vw = interactive ? context.viewWidth : float(m_structInfo.width);
+        const float vh = interactive ? context.viewHeight : float(m_structInfo.height);
 
         if (inputs().empty() || interactive)
         {
@@ -867,8 +794,7 @@ namespace IPCore
             const float aspect = vw / vh;
             EvalPoint ep = evaluationPoint(context.frame);
             Context context = graph()->contextForFrame(ep.sourceFrame);
-            ImageStructureInfo ininfo =
-                inputs()[ep.sourceIndex]->imageStructureInfo(context);
+            ImageStructureInfo ininfo = inputs()[ep.sourceIndex]->imageStructureInfo(context);
 
             //
             //  We may have an input that has no media "behind it" (IE a
@@ -910,8 +836,7 @@ namespace IPCore
                     m_updateHiddenData = true;
                 }
 
-                const_cast<SequenceIPNode*>(this)
-                    ->propagateImageStructureChange();
+                const_cast<SequenceIPNode*>(this)->propagateImageStructureChange();
                 if (group())
                     group()->propertyChanged(p);
             }
@@ -951,8 +876,7 @@ namespace IPCore
         //
 
         const int globalOffset = m_edlGlobalIn->front();
-        SampleTime startSample =
-            timeToSamples(context.buffer.startTime(), rate);
+        SampleTime startSample = timeToSamples(context.buffer.startTime(), rate);
         SampleTime readSample = startSample;
 
         //
@@ -983,8 +907,7 @@ namespace IPCore
             //
 
             int inputFrame = (*m_edlGlobalIn)[index] - globalOffset;
-            SampleTime inputStart =
-                frameToSample(inputFrame, context.fps, rate);
+            SampleTime inputStart = frameToSample(inputFrame, context.fps, rate);
 
             //
             //  Normalized sample delta (scopeless);
@@ -1015,17 +938,12 @@ namespace IPCore
             //
 
             int firstFrame = (*m_edlSourceIn)[index];
-            SampleTime sourceStartSample =
-                frameToSample(firstFrame, context.fps, rate);
-            SampleTime sourceCutInSample = frameToSample(
-                m_rangeInfos[sourceIndex].start, context.fps, rate);
+            SampleTime sourceStartSample = frameToSample(firstFrame, context.fps, rate);
+            SampleTime sourceCutInSample = frameToSample(m_rangeInfos[sourceIndex].start, context.fps, rate);
             int lastFrame = (*m_edlSourceOut)[index];
-            int sourceDuration = m_rangeInfos[sourceIndex].end
-                                 - m_rangeInfos[sourceIndex].start + 1;
-            SampleTime samplesInSource =
-                frameToSample(sourceDuration, context.fps, rate);
-            SampleTime samplesIntoSource =
-                sourceStartSample - sourceCutInSample;
+            int sourceDuration = m_rangeInfos[sourceIndex].end - m_rangeInfos[sourceIndex].start + 1;
+            SampleTime samplesInSource = frameToSample(sourceDuration, context.fps, rate);
+            SampleTime samplesIntoSource = sourceStartSample - sourceCutInSample;
             SampleTime sourceReadStart = samplesIntoInput + samplesIntoSource;
 
             //
@@ -1035,22 +953,16 @@ namespace IPCore
             //  numSamples will be the remainder of what we want.
             //
 
-            SampleTime samplesStillWanted =
-                SampleTime(requestedSamples) - (readSample - startSample);
-            SampleTime samplesToNextInput =
-                (index < m_edlGlobalIn->size() - 2)
-                    ? samplesInSource - sourceReadStart + 1
-                    : requestedSamples;
+            SampleTime samplesStillWanted = SampleTime(requestedSamples) - (readSample - startSample);
+            SampleTime samplesToNextInput = (index < m_edlGlobalIn->size() - 2) ? samplesInSource - sourceReadStart + 1 : requestedSamples;
             SampleTime numSamples = min(samplesStillWanted, samplesToNextInput);
 
             if (numSamples > 0)
             {
-                AudioBuffer audioBuffer(numSamples, channels, rate,
-                                        samplesToTime(sourceReadStart, rate));
+                AudioBuffer audioBuffer(numSamples, channels, rate, samplesToTime(sourceReadStart, rate));
 
                 AudioContext subContext(audioBuffer, context.fps);
-                const size_t numRead =
-                    inputs()[sourceIndex]->audioFillBuffer(subContext);
+                const size_t numRead = inputs()[sourceIndex]->audioFillBuffer(subContext);
 
                 //
                 // If we got something back then copy it into the context buffer
@@ -1070,8 +982,7 @@ namespace IPCore
                     //
 
                     size_t advance = min(SampleTime(numRead), numSamples);
-                    memcpy(outBuffer, subContext.buffer.pointer(),
-                           advance * numChannels * sizeof(float));
+                    memcpy(outBuffer, subContext.buffer.pointer(), advance * numChannels * sizeof(float));
                     outBuffer += (advance * numChannels);
                     readSample += advance;
                 }
@@ -1085,9 +996,7 @@ namespace IPCore
             {
                 if (IPCore::AudioRenderer::debug)
                 {
-                    cerr
-                        << "AUDIO: invalid request for sequence audio samples: "
-                        << numSamples << endl;
+                    cerr << "AUDIO: invalid request for sequence audio samples: " << numSamples << endl;
                 }
                 break;
             }
@@ -1113,8 +1022,7 @@ namespace IPCore
 
     } // namespace
 
-    void SequenceIPNode::testEvaluate(const Context& context,
-                                      TestEvaluationResult& result)
+    void SequenceIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         lazyBuildState();
 
@@ -1134,9 +1042,7 @@ namespace IPCore
                 outputProp(m_edlSourceOut);
 
                 TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                                 "Bad Sequence EDL source number "
-                                     << source << " is not in range [0,"
-                                     << ins.size() - 1 << "]");
+                                 "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
             }
 
             Context newContext = context;
@@ -1149,8 +1055,7 @@ namespace IPCore
         }
     }
 
-    void SequenceIPNode::metaEvaluate(const Context& context,
-                                      MetaEvalVisitor& visitor)
+    void SequenceIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         lazyBuildState();
 
@@ -1165,9 +1070,7 @@ namespace IPCore
             if (source < 0 || source >= ins.size())
             {
                 TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                                 "Bad Sequence EDL source number "
-                                     << source << " is not in range [0,"
-                                     << ins.size() - 1 << "]");
+                                 "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
             }
 
             Context c = context;
@@ -1189,18 +1092,14 @@ namespace IPCore
         visitor.leave(context, this);
     }
 
-    void SequenceIPNode::mapInputToEvalFrames(size_t inputIndex,
-                                              const FrameVector& inframes,
-                                              FrameVector& outframes) const
+    void SequenceIPNode::mapInputToEvalFrames(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         lazyBuildState();
 
         const IntProperty::container_type& src = m_edlSource->valueContainer();
         const IntProperty::container_type& in = m_edlSourceIn->valueContainer();
-        const IntProperty::container_type& out =
-            m_edlSourceOut->valueContainer();
-        const IntProperty::container_type& global =
-            m_edlGlobalIn->valueContainer();
+        const IntProperty::container_type& out = m_edlSourceOut->valueContainer();
+        const IntProperty::container_type& global = m_edlGlobalIn->valueContainer();
 
         if (m_autoEDL)
         {
@@ -1273,8 +1172,7 @@ namespace IPCore
             // we dont to do a build state in an event
             return;
 
-        bool needBuildState =
-            m_updateHiddenData || (m_updateEDL && m_autoEDL->front());
+        bool needBuildState = m_updateHiddenData || (m_updateEDL && m_autoEDL->front());
         if (!needBuildState)
             return;
 
@@ -1307,12 +1205,9 @@ namespace IPCore
         }
     }
 
-    bool SequenceIPNode::getSourceRange(int sourceIndex,
-                                        ImageRangeInfo& rangeInfo,
-                                        int& sourceOffset)
+    bool SequenceIPNode::getSourceRange(int sourceIndex, ImageRangeInfo& rangeInfo, int& sourceOffset)
     {
-        if (sourceIndex < 0 || sourceIndex >= m_rangeInfos.size()
-            || sourceIndex >= m_edlGlobalIn->size())
+        if (sourceIndex < 0 || sourceIndex >= m_rangeInfos.size() || sourceIndex >= m_edlGlobalIn->size())
             return false;
 
         rangeInfo = m_rangeInfos[sourceIndex];

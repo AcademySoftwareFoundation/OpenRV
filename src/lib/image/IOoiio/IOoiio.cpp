@@ -64,7 +64,7 @@ namespace TwkFB
         //
         // addType("tif", "TIFF Image", rw, codecs);
         // addType("tiff", "TIFF Image", rw, codecs);
-        //addType("j2c", "JPEG-2000 Codestream", r, codecs);
+        // addType("j2c", "JPEG-2000 Codestream", r, codecs);
         addType("j2k", "JPEG-2000 Codestream", r, codecs);
         addType("jpt", "JPT-stream (JPEG 2000, JPIP)", r, codecs);
         addType("jp2", "JPEG-2000 Image", r, codecs);
@@ -77,8 +77,7 @@ namespace TwkFB
     string IOoiio::about() const
     {
         ostringstream str;
-        str << "OpenImageIO: " << OIIO_VERSION_MAJOR << "."
-            << OIIO_VERSION_MINOR << "." << OIIO_VERSION_PATCH;
+        str << "OpenImageIO: " << OIIO_VERSION_MAJOR << "." << OIIO_VERSION_MINOR << "." << OIIO_VERSION_PATCH;
 
         return str.str();
     }
@@ -159,8 +158,7 @@ namespace TwkFB
             {
                 if (n == 1)
                 {
-                    fb.newAttribute<string>(
-                        name, spec.get_string_attribute(name, "?"));
+                    fb.newAttribute<string>(name, spec.get_string_attribute(name, "?"));
                 }
                 break;
             }
@@ -170,10 +168,7 @@ namespace TwkFB
         fb.newAttribute<string>("Reader", "OpenImageIO");
     }
 
-    static bool subimagesAsLayers(const string& fname)
-    {
-        return fname == "psd";
-    }
+    static bool subimagesAsLayers(const string& fname) { return fname == "psd"; }
 
     static bool premultedAlpha(const string& fname) { return fname != "psd"; }
 
@@ -264,9 +259,7 @@ namespace TwkFB
 
             fbi.orientation = orientation;
 
-            fbi.proxy.attribute<string>("AlphaType") =
-                premultedAlpha(in->format_name()) ? "Premultiplied"
-                                                  : "Unpremultiplied";
+            fbi.proxy.attribute<string>("AlphaType") = premultedAlpha(in->format_name()) ? "Premultiplied" : "Unpremultiplied";
 
             readAttrs(fbi.proxy, spec);
 
@@ -303,8 +296,7 @@ namespace TwkFB
                         FBInfo::ChannelInfo cinfo;
                         cinfo.name = subspec.channelnames[q];
 
-                        if (subspec.channelformats.size()
-                            == subspec.channelnames.size())
+                        if (subspec.channelformats.size() == subspec.channelnames.size())
                         {
                             switch (subspec.channelformats[q].basetype)
                             {
@@ -356,14 +348,11 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \""
-                                              << filename << "\" for reading. "
-                                              << OpenImageIO_v2_4::geterror());
+            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" << filename << "\" for reading. " << OpenImageIO_v2_4::geterror());
         }
     }
 
-    void IOoiio::readImage(FrameBuffer& fb, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOoiio::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         if (std::unique_ptr<ImageInput> in = ImageInput::create(filename))
         {
@@ -380,9 +369,7 @@ namespace TwkFB
                     sscanf(request.layers[0].c_str(), "Layer %d", &subimage);
                     if (!in->seek_subimage(subimage, 0, spec))
                     {
-                        TWK_THROW_STREAM(IOException,
-                                         "OIIO: failed to find subimage "
-                                             << subimage);
+                        TWK_THROW_STREAM(IOException, "OIIO: failed to find subimage " << subimage);
                     }
                 }
             }
@@ -391,15 +378,12 @@ namespace TwkFB
                 sscanf(request.views[0].c_str(), "View %d", &subimage);
                 if (!in->seek_subimage(subimage, 0, spec))
                 {
-                    TWK_THROW_STREAM(IOException,
-                                     "OIIO: failed to find subimage "
-                                         << subimage);
+                    TWK_THROW_STREAM(IOException, "OIIO: failed to find subimage " << subimage);
                 }
             }
 
             FrameBuffer::DataType dtype;
-            TypeDesc::BASETYPE informat =
-                (TypeDesc::BASETYPE)spec.format.basetype;
+            TypeDesc::BASETYPE informat = (TypeDesc::BASETYPE)spec.format.basetype;
 
             switch (spec.format.basetype)
             {
@@ -453,16 +437,13 @@ namespace TwkFB
                 break;
             }
 
-            fb.restructure(spec.width, spec.height, spec.depth, spec.nchannels,
-                           dtype, NULL, &spec.channelnames, orientation, true);
+            fb.restructure(spec.width, spec.height, spec.depth, spec.nchannels, dtype, NULL, &spec.channelnames, orientation, true);
 
             in->read_image(informat, fb.pixels<void>());
 
             readAttrs(fb, spec);
 
-            fb.attribute<string>("AlphaType") =
-                premultedAlpha(in->format_name()) ? "Premultiplied"
-                                                  : "Unpremultiplied";
+            fb.attribute<string>("AlphaType") = premultedAlpha(in->format_name()) ? "Premultiplied" : "Unpremultiplied";
 
             if (useLayers)
             {
@@ -483,14 +464,11 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \""
-                                              << filename << "\" for reading. "
-                                              << OpenImageIO_v2_4::geterror());
+            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" << filename << "\" for reading. " << OpenImageIO_v2_4::geterror());
         }
     }
 
-    void IOoiio::writeImage(const FrameBuffer& img, const std::string& filename,
-                            const WriteRequest& request) const
+    void IOoiio::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         FrameBufferIO::writeImage(img, filename, request);
     }

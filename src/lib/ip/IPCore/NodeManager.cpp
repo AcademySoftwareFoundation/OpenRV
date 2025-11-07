@@ -43,8 +43,7 @@ namespace IPCore
     void NodeManager::loadDefinitionsAlongPathVar(const string& paths)
     {
         vector<string> parts;
-        algorithm::split(parts, paths, is_any_of(string(SEP)),
-                         token_compress_on);
+        algorithm::split(parts, paths, is_any_of(string(SEP)), token_compress_on);
 
         for (size_t i = 0; i < parts.size(); i++)
         {
@@ -56,8 +55,7 @@ namespace IPCore
             {
                 if (exists(nodedir) && is_directory(nodedir))
                 {
-                    for (directory_iterator di(nodedir);
-                         di != directory_iterator(); ++di)
+                    for (directory_iterator di(nodedir); di != directory_iterator(); ++di)
                     {
                         path p = di->path();
 
@@ -73,9 +71,7 @@ namespace IPCore
                                 }
                                 catch (std::exception& e)
                                 {
-                                    cout << "WARNING: caught exception reading "
-                                         << p.string() << ": " << e.what()
-                                         << endl;
+                                    cout << "WARNING: caught exception reading " << p.string() << ": " << e.what() << endl;
                                 }
                             }
                         }
@@ -84,8 +80,7 @@ namespace IPCore
             }
             catch (filesystem_error& ex)
             {
-                cerr << "ERROR: Cannot read from \"" << nodedir.string() << "\""
-                     << endl;
+                cerr << "ERROR: Cannot read from \"" << nodedir.string() << "\"" << endl;
                 continue;
             }
         }
@@ -107,8 +102,7 @@ namespace IPCore
             for (size_t i = 0; i < containers.size(); i++)
             {
                 PropertyContainer* pc = containers[i];
-                pc->declareProperty<StringProperty>("node.origin", infile,
-                                                    notPersistent);
+                pc->declareProperty<StringProperty>("node.origin", infile, notPersistent);
                 addDefinition(new NodeDefinition(pc));
             }
         }
@@ -131,8 +125,7 @@ namespace IPCore
                     //  delete these because some node might be using it.
                     //
 
-                    m_retiredDefinitions.push_back(
-                        m_definitionMap[def->name()]);
+                    m_retiredDefinitions.push_back(m_definitionMap[def->name()]);
                 }
 
                 m_definitionMap[def->name()] = def;
@@ -143,13 +136,11 @@ namespace IPCore
         catch (ShaderSignatureExc& e)
         {
             if (m_debug)
-                cout << "WARNING: skipping unsigned shader: " << def->name()
-                     << ": " << e.what() << endl;
+                cout << "WARNING: skipping unsigned shader: " << def->name() << ": " << e.what() << endl;
         }
         catch (std::exception& e)
         {
-            cerr << "ERROR: failed to add node definition: " << e.what()
-                 << endl;
+            cerr << "ERROR: failed to add node definition: " << e.what() << endl;
             delete def;
             def = NULL;
             throw;
@@ -162,8 +153,7 @@ namespace IPCore
         return i == m_definitionMap.end() ? 0 : (*i).second;
     }
 
-    IPNode* NodeManager::newNode(const string& typeName, const string& nodeName,
-                                 IPGraph* graph, GroupIPNode* group) const
+    IPNode* NodeManager::newNode(const string& typeName, const string& nodeName, IPGraph* graph, GroupIPNode* group) const
     {
         if (const NodeDefinition* def = definition(typeName))
         {
@@ -187,19 +177,16 @@ namespace IPCore
         return false;
     }
 
-    void NodeManager::writeAllDefinitions(const string& filename,
-                                          bool inlineSourceCode) const
+    void NodeManager::writeAllDefinitions(const string& filename, bool inlineSourceCode) const
     {
         NodeDefinitionVector defs;
         const NodeManager::NodeDefinitionMap& map = m_definitionMap;
 
-        for (NodeManager::NodeDefinitionMap::const_iterator i = map.begin();
-             i != map.end(); ++i)
+        for (NodeManager::NodeDefinitionMap::const_iterator i = map.begin(); i != map.end(); ++i)
         {
             const NodeDefinition* definition = (*i).second;
 
-            if (definition->function()
-                && definition->function()->originalSource() != "")
+            if (definition->function() && definition->function()->originalSource() != "")
             {
                 defs.push_back(definition);
             }
@@ -208,9 +195,7 @@ namespace IPCore
         writeDefinitions(filename, defs, inlineSourceCode);
     }
 
-    void NodeManager::writeDefinitions(const string& infilename,
-                                       const NodeDefinitionVector& defs,
-                                       bool inlineSourceCode) const
+    void NodeManager::writeDefinitions(const string& infilename, const NodeDefinitionVector& defs, bool inlineSourceCode) const
     {
         vector<PropertyContainer*> tempContainers;
         GTOWriter::ObjectVector objects;
@@ -220,8 +205,7 @@ namespace IPCore
         {
             const NodeDefinition* definition = defs[i];
 
-            if (!definition->function()
-                || definition->function()->originalSource() == "")
+            if (!definition->function() || definition->function()->originalSource() == "")
             {
                 continue;
             }
@@ -230,8 +214,7 @@ namespace IPCore
 
             if (inlineSourceCode)
             {
-                tempPC->setProperty<StringProperty>(
-                    "function.glsl", definition->function()->originalSource());
+                tempPC->setProperty<StringProperty>("function.glsl", definition->function()->originalSource());
             }
 
             tempContainers.push_back(tempPC);

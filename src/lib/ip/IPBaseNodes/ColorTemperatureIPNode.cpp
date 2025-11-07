@@ -27,10 +27,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorTemperatureIPNode::ColorTemperatureIPNode(const std::string& name,
-                                                   const NodeDefinition* def,
-                                                   IPGraph* graph,
-                                                   GroupIPNode* group)
+    ColorTemperatureIPNode::ColorTemperatureIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -38,12 +35,9 @@ namespace IPCore
         Property::Info* info = new Property::Info();
         info->setPersistent(false);
 
-        m_inWhitePrimary = declareProperty<Vec2fProperty>(
-            "color.inWhitePrimary", Vec2f(0.3457, 0.3585));
-        m_inTemperature =
-            declareProperty<FloatProperty>("color.inTemperature", 6500.0f);
-        m_outTemperature =
-            declareProperty<FloatProperty>("color.outTemperature", 6500.0f);
+        m_inWhitePrimary = declareProperty<Vec2fProperty>("color.inWhitePrimary", Vec2f(0.3457, 0.3585));
+        m_inTemperature = declareProperty<FloatProperty>("color.inTemperature", 6500.0f);
+        m_outTemperature = declareProperty<FloatProperty>("color.outTemperature", 6500.0f);
         m_active = declareProperty<IntProperty>("color.active", 1);
         m_method = declareProperty<IntProperty>("color.method", 2);
     }
@@ -125,13 +119,11 @@ namespace IPCore
         kelvin /= 1000;
         if (kelvin > 7) // 7k - 25k
         {
-            xy.x = -4.607 / (kelvin * kelvin * kelvin)
-                   + 2.9678 / (kelvin * kelvin) + 0.09911 / kelvin + 0.244063;
+            xy.x = -4.607 / (kelvin * kelvin * kelvin) + 2.9678 / (kelvin * kelvin) + 0.09911 / kelvin + 0.244063;
         }
         else // 4k - 7k
         {
-            xy.x = -2.0064 / (kelvin * kelvin * kelvin)
-                   + 1.9018 / (kelvin * kelvin) + 0.24748 / kelvin + 0.23704;
+            xy.x = -2.0064 / (kelvin * kelvin * kelvin) + 1.9018 / (kelvin * kelvin) + 0.24748 / kelvin + 0.23704;
         }
 
         xy.y = -3 * xy.x * xy.x + 2.87 * xy.x - 0.275;
@@ -168,8 +160,7 @@ static void XYToKelvin(const Vec2f& xy, float& kelvin)
                 if (inTemperature == outTemperature)
                     return img;
                 Vec3f c = temperatureToRGB(outTemperature);
-                img->shaderExpr = Shader::newColorBlendWithConstant(
-                    img->shaderExpr, Vec4f(c.x, c.y, c.z, blend));
+                img->shaderExpr = Shader::newColorBlendWithConstant(img->shaderExpr, Vec4f(c.x, c.y, c.z, blend));
             }
             else if (method == DANIELLE)
             {
@@ -177,8 +168,7 @@ static void XYToKelvin(const Vec2f& xy, float& kelvin)
                 if (inTemperature == outTemperature)
                     return img;
                 Vec3f c = computeOffset(inTemperature, outTemperature);
-                img->shaderExpr = Shader::newColorTemperatureOffset(
-                    img->shaderExpr, Vec4f(c.x, c.y, c.z, blend));
+                img->shaderExpr = Shader::newColorTemperatureOffset(img->shaderExpr, Vec4f(c.x, c.y, c.z, blend));
             }
             else
             {
@@ -208,15 +198,11 @@ static void XYToKelvin(const Vec2f& xy, float& kelvin)
                 // Bradford Transform
                 Imf::Chromaticities c0;
                 Imath::M44f A;
-                static const Imath::M44f B(
-                    0.895100, -0.750200, 0.038900, 0.000000, 0.266400, 1.713500,
-                    -0.068500, 0.000000, -0.161400, 0.036700, 1.029600,
-                    0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
+                static const Imath::M44f B(0.895100, -0.750200, 0.038900, 0.000000, 0.266400, 1.713500, -0.068500, 0.000000, -0.161400,
+                                           0.036700, 1.029600, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
 
-                static const Imath::M44f BI(
-                    0.986993, 0.432305, -0.008529, 0.000000, -0.147054,
-                    0.518360, 0.040043, 0.000000, 0.159963, 0.049291, 0.968487,
-                    0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
+                static const Imath::M44f BI(0.986993, 0.432305, -0.008529, 0.000000, -0.147054, 0.518360, 0.040043, 0.000000, 0.159963,
+                                            0.049291, 0.968487, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
 
                 float ix = inIlluminant.x;
                 float iy = inIlluminant.y;
@@ -228,8 +214,7 @@ static void XYToKelvin(const Vec2f& xy, float& kelvin)
 
                 Imath::V3f ratio((outN * B) / (inN * B));
 
-                Imath::M44f R(ratio[0], 0, 0, 0, 0, ratio[1], 0, 0, 0, 0,
-                              ratio[2], 0, 0, 0, 0, 1);
+                Imath::M44f R(ratio[0], 0, 0, 0, 0, ratio[1], 0, 0, 0, 0, ratio[2], 0, 0, 0, 0, 1);
 
                 A = B * R * BI;
 
@@ -238,8 +223,7 @@ static void XYToKelvin(const Vec2f& xy, float& kelvin)
                 TwkMath::Mat44f conversionMatrix;
                 memcpy(&conversionMatrix, &A, sizeof(float) * 16);
 
-                img->shaderExpr =
-                    Shader::newColorMatrix(img->shaderExpr, conversionMatrix);
+                img->shaderExpr = Shader::newColorMatrix(img->shaderExpr, conversionMatrix);
             }
         }
 

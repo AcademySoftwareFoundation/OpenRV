@@ -73,8 +73,7 @@ namespace TwkUtil
         if (m_allPrefix)
         {
             // TODO: make this POSIX-compliant
-            asprintf(&buffer, "%s: %s: %s", m_allPrefix, m_tagStr[tag],
-                     ubuffer);
+            asprintf(&buffer, "%s: %s: %s", m_allPrefix, m_tagStr[tag], ubuffer);
         }
         else
         {

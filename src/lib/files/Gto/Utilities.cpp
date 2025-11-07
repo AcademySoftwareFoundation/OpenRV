@@ -31,23 +31,17 @@ namespace Gto
 {
     using namespace std;
 
-    static unsigned int Csizes[] = {
-        Int,    sizeof(int32),   Float,   sizeof(float32),
-        Double, sizeof(float64),
+    static unsigned int Csizes[] = {Int,    sizeof(int32),  Float,   sizeof(float32), Double, sizeof(float64),
 #ifdef GTO_SUPPORT_HALF
-        Half,   sizeof(half),
+                                    Half,   sizeof(half),
 #else
-        Half,   sizeof(float32) / 2,
+                                    Half,   sizeof(float32) / 2,
 #endif
-        String, sizeof(uint32),  Boolean, sizeof(uint8),
-        Short,  sizeof(uint16),  Byte,    sizeof(uint8)};
+                                    String, sizeof(uint32), Boolean, sizeof(uint8),   Short,  sizeof(uint16),  Byte, sizeof(uint8)};
 
     size_t dataSizeInBytes(Gto::uint32 type) { return Csizes[type * 2 + 1]; }
 
-    size_t bufferSizeInBytes(Gto::uint32 type, const Dimensions& dims)
-    {
-        return dataSizeInBytes(type) * elementSize(dims);
-    }
+    size_t bufferSizeInBytes(Gto::uint32 type, const Dimensions& dims) { return dataSizeInBytes(type) * elementSize(dims); }
 
     size_t elementSize(const Dimensions& dims)
     {
@@ -59,11 +53,7 @@ namespace Gto
         return xs * ys * zs * ws;
     }
 
-    size_t elementSize(const TypeSpec& spec)
-    {
-        return elementSize(
-            Dimensions(spec.dims.x, spec.dims.y, spec.dims.z, spec.dims.w));
-    }
+    size_t elementSize(const TypeSpec& spec) { return elementSize(Dimensions(spec.dims.x, spec.dims.y, spec.dims.z, spec.dims.w)); }
 
     const char* typeName(Gto::DataType t)
     {
@@ -171,9 +161,7 @@ namespace Gto
             return false;
 #endif
 
-        return header.magic == GTO_MAGIC || header.magic == GTO_MAGICl
-               || header.magic == GTO_MAGIC_TEXT
-               || header.magic == GTO_MAGIC_TEXTl;
+        return header.magic == GTO_MAGIC || header.magic == GTO_MAGICl || header.magic == GTO_MAGIC_TEXT || header.magic == GTO_MAGIC_TEXTl;
     }
 
     void splitComponentName(const char* name, vector<string>& buffer) {}

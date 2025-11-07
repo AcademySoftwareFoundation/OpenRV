@@ -41,11 +41,9 @@ namespace Mu
 
     ImageModule::~ImageModule() {}
 
-    static ClassInstance* makeImage(MuLangContext* c, const Class* imageType,
-                                    int w, int h)
+    static ClassInstance* makeImage(MuLangContext* c, const Class* imageType, int w, int h)
     {
-        DynamicArrayType* dataType =
-            static_cast<DynamicArrayType*>(c->arrayType(c->vec4fType(), 1, 0));
+        DynamicArrayType* dataType = static_cast<DynamicArrayType*>(c->arrayType(c->vec4fType(), 1, 0));
         ClassInstance* o = ClassInstance::allocate(imageType);
         ImageStruct* im = o->data<ImageStruct>();
 
@@ -60,8 +58,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(resize, Pointer)
     {
-        MuLangContext* context =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
+        MuLangContext* context = static_cast<MuLangContext*>(NODE_THREAD.context());
         const Class* c = static_cast<const ImageType*>(NODE_THIS.type());
         ClassInstance* inObj = NODE_ARG_OBJECT(0, ClassInstance);
         int width = NODE_ARG(1, int);
@@ -73,11 +70,9 @@ namespace Mu
         CvMat inMat;
         CvMat outMat;
 
-        cvInitMatHeader(&inMat, inIm->height, inIm->width, CV_32FC(4),
-                        inIm->data->data<float>(), 0);
+        cvInitMatHeader(&inMat, inIm->height, inIm->width, CV_32FC(4), inIm->data->data<float>(), 0);
 
-        cvInitMatHeader(&outMat, outIm->height, outIm->width, CV_32FC(4),
-                        outIm->data->data<float>(), 0);
+        cvInitMatHeader(&outMat, outIm->height, outIm->width, CV_32FC(4), outIm->data->data<float>(), 0);
 
         cvResize(&inMat, &outMat, CV_INTER_AREA);
 
@@ -92,11 +87,8 @@ namespace Mu
 
         addSymbols(new ImageType(c), new PixelsType(c),
 
-                   new Function(c, "resize", resize, None, Return,
-                                "image.image", Parameters,
-                                new Param(c, "img", "image.image"),
-                                new Param(c, "newWidth", "int"),
-                                new Param(c, "newHeight", "int"), End),
+                   new Function(c, "resize", resize, None, Return, "image.image", Parameters, new Param(c, "img", "image.image"),
+                                new Param(c, "newWidth", "int"), new Param(c, "newHeight", "int"), End),
 
                    EndArguments);
     }

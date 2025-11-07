@@ -146,8 +146,7 @@ namespace Gto
 
         virtual bool open(void const* pData, size_t dataSize, const char* name);
         virtual bool open(const char* filename);
-        virtual bool open(std::istream&, const char* name,
-                          unsigned int ormode = 0);
+        virtual bool open(std::istream&, const char* name, unsigned int ormode = 0);
         void close();
 
         //
@@ -251,29 +250,21 @@ namespace Gto
         //  Version 3 API
         //
 
-        virtual Request object(const std::string& name,
-                               const std::string& protocol,
-                               unsigned int protocolVersion,
+        virtual Request object(const std::string& name, const std::string& protocol, unsigned int protocolVersion,
                                const ObjectInfo& header);
 
-        virtual Request component(const std::string& name,
-                                  const std::string& interp,
-                                  const ComponentInfo& header);
+        virtual Request component(const std::string& name, const std::string& interp, const ComponentInfo& header);
 
-        virtual Request property(const std::string& name,
-                                 const std::string& interp,
-                                 const PropertyInfo& header);
+        virtual Request property(const std::string& name, const std::string& interp, const PropertyInfo& header);
 
         //
         //  Version 2 API still works, if the version 3 API (above) is not
         //  overriden. New applications should not use these functions.
         //
 
-        virtual Request component(const std::string& name,
-                                  const ComponentInfo& header);
+        virtual Request component(const std::string& name, const ComponentInfo& header);
 
-        virtual Request property(const std::string& name,
-                                 const PropertyInfo& header);
+        virtual Request property(const std::string& name, const PropertyInfo& header);
 
         //
         //  Data should return a pointer to a region of memory large
@@ -309,14 +300,11 @@ namespace Gto
         //
 
         void beginHeader(uint32 version);
-        void beginObject(unsigned int name, unsigned int protocol,
-                         unsigned int pversion = 1);
+        void beginObject(unsigned int name, unsigned int protocol, unsigned int pversion = 1);
 
         void beginComponent(unsigned int name, unsigned int interp);
 
-        void beginProperty(unsigned int name, unsigned int interp,
-                           unsigned int size, DataType type,
-                           const Dimensions& dims);
+        void beginProperty(unsigned int name, unsigned int interp, unsigned int size, DataType type, const Dimensions& dims);
 
         void endComponent();
         void endProperty();

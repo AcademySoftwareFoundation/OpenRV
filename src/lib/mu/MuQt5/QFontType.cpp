@@ -51,16 +51,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QFontType::Instance* i =
-            new QFontType::Instance((Class*)NODE_THIS.type());
+        QFontType::Instance* i = new QFontType::Instance((Class*)NODE_THIS.type());
         QFontType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QFontType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QFontType::finalizer, 0, 0, 0);
-    }
+    void QFontType::registerFinalizer(void* o) { GC_register_finalizer(o, QFontType::finalizer, 0, 0, 0); }
 
     void QFontType::finalizer(void* obj, void* data)
     {
@@ -71,17 +67,15 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QFont_QFont_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    Pointer qt_QFont_QFont_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QFontType>(param_this, QFont());
         return param_this;
     }
 
-    Pointer qt_QFont_QFont_QFont_QFont_string_int_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_family,
-        int param_pointSize, int param_weight, bool param_italic)
+    Pointer qt_QFont_QFont_QFont_QFont_string_int_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_family,
+                                                           int param_pointSize, int param_weight, bool param_italic)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_family);
@@ -99,49 +93,42 @@ namespace Mu
         return arg0.bold();
     }
 
-    int qt_QFont_capitalization_int_QFont(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    int qt_QFont_capitalization_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return int(arg0.capitalization());
     }
 
-    Pointer qt_QFont_defaultFamily_string_QFont(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    Pointer qt_QFont_defaultFamily_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.defaultFamily());
     }
 
-    bool qt_QFont_exactMatch_bool_QFont(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    bool qt_QFont_exactMatch_bool_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.exactMatch();
     }
 
-    Pointer qt_QFont_family_string_QFont(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    Pointer qt_QFont_family_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.family());
     }
 
-    bool qt_QFont_fixedPitch_bool_QFont(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    bool qt_QFont_fixedPitch_bool_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.fixedPitch();
     }
 
-    bool qt_QFont_fromString_bool_QFont_string(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_descrip)
+    bool qt_QFont_fromString_bool_QFont_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_descrip)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -149,16 +136,14 @@ namespace Mu
         return arg0.fromString(arg1);
     }
 
-    int qt_QFont_hintingPreference_int_QFont(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QFont_hintingPreference_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return int(arg0.hintingPreference());
     }
 
-    bool qt_QFont_isCopyOf_bool_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, Pointer param_f)
+    bool qt_QFont_isCopyOf_bool_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_f)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -173,89 +158,77 @@ namespace Mu
         return arg0.italic();
     }
 
-    bool qt_QFont_kerning_bool_QFont(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    bool qt_QFont_kerning_bool_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.kerning();
     }
 
-    Pointer qt_QFont_key_string_QFont(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    Pointer qt_QFont_key_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.key());
     }
 
-    Pointer qt_QFont_lastResortFamily_string_QFont(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QFont_lastResortFamily_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.lastResortFamily());
     }
 
-    Pointer qt_QFont_lastResortFont_string_QFont(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QFont_lastResortFont_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.lastResortFont());
     }
 
-    double qt_QFont_letterSpacing_double_QFont(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    double qt_QFont_letterSpacing_double_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.letterSpacing();
     }
 
-    int qt_QFont_letterSpacingType_int_QFont(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QFont_letterSpacingType_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return int(arg0.letterSpacingType());
     }
 
-    bool qt_QFont_overline_bool_QFont(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    bool qt_QFont_overline_bool_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.overline();
     }
 
-    int qt_QFont_pixelSize_int_QFont(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QFont_pixelSize_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.pixelSize();
     }
 
-    int qt_QFont_pointSize_int_QFont(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QFont_pointSize_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.pointSize();
     }
 
-    double qt_QFont_pointSizeF_double_QFont(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    double qt_QFont_pointSizeF_double_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.pointSizeF();
     }
 
-    Pointer qt_QFont_resolve_QFont_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_other)
+    Pointer qt_QFont_resolve_QFont_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -263,8 +236,7 @@ namespace Mu
         return makeqtype<QFontType>(c, arg0.resolve(arg1), "qt.QFont");
     }
 
-    void qt_QFont_setBold_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, bool param_enable)
+    void qt_QFont_setBold_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -273,9 +245,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setCapitalization_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_caps)
+    void qt_QFont_setCapitalization_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_caps)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -284,9 +254,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setFamily_void_QFont_string(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_family)
+    void qt_QFont_setFamily_void_QFont_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_family)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -295,9 +263,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setFixedPitch_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                bool param_enable)
+    void qt_QFont_setFixedPitch_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -306,22 +272,16 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void
-    qt_QFont_setHintingPreference_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_hintingPreference)
+    void qt_QFont_setHintingPreference_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_hintingPreference)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
-        QFont::HintingPreference arg1 =
-            (QFont::HintingPreference)(param_hintingPreference);
+        QFont::HintingPreference arg1 = (QFont::HintingPreference)(param_hintingPreference);
         arg0.setHintingPreference(arg1);
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setItalic_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this,
-                                            bool param_enable)
+    void qt_QFont_setItalic_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -330,9 +290,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setKerning_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             bool param_enable)
+    void qt_QFont_setKerning_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -341,9 +299,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setLetterSpacing_void_QFont_int_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
-        double param_spacing)
+    void qt_QFont_setLetterSpacing_void_QFont_int_double(Mu::Thread& NODE_THREAD, Pointer param_this, int param_type, double param_spacing)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -353,9 +309,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setOverline_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              bool param_enable)
+    void qt_QFont_setOverline_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -364,9 +318,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setPixelSize_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_pixelSize)
+    void qt_QFont_setPixelSize_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pixelSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -375,9 +327,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setPointSize_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_pointSize)
+    void qt_QFont_setPointSize_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pointSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -386,9 +336,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setPointSizeF_void_QFont_double(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  double param_pointSize)
+    void qt_QFont_setPointSizeF_void_QFont_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_pointSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -397,9 +345,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setStretch_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this,
-                                            int param_factor)
+    void qt_QFont_setStretch_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_factor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -408,9 +354,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setStrikeOut_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               bool param_enable)
+    void qt_QFont_setStrikeOut_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -419,8 +363,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setStyle_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_style)
+    void qt_QFont_setStyle_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_style)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -429,10 +372,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setStyleHint_void_QFont_int_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_hint,
-                                                  int param_strategy)
+    void qt_QFont_setStyleHint_void_QFont_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_hint, int param_strategy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -442,9 +382,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setStyleName_void_QFont_string(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 Pointer param_styleName)
+    void qt_QFont_setStyleName_void_QFont_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_styleName)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -453,9 +391,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setStyleStrategy_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_s)
+    void qt_QFont_setStyleStrategy_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_s)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -464,9 +400,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setUnderline_void_QFont_bool(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               bool param_enable)
+    void qt_QFont_setUnderline_void_QFont_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -475,8 +409,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setWeight_void_QFont_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_weight)
+    void qt_QFont_setWeight_void_QFont_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_weight)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -485,9 +418,7 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    void qt_QFont_setWordSpacing_void_QFont_double(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   double param_spacing)
+    void qt_QFont_setWordSpacing_void_QFont_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_spacing)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -503,8 +434,7 @@ namespace Mu
         return arg0.stretch();
     }
 
-    bool qt_QFont_strikeOut_bool_QFont(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    bool qt_QFont_strikeOut_bool_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -518,32 +448,28 @@ namespace Mu
         return int(arg0.style());
     }
 
-    int qt_QFont_styleHint_int_QFont(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QFont_styleHint_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return int(arg0.styleHint());
     }
 
-    Pointer qt_QFont_styleName_string_QFont(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    Pointer qt_QFont_styleName_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.styleName());
     }
 
-    int qt_QFont_styleStrategy_int_QFont(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    int qt_QFont_styleStrategy_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return int(arg0.styleStrategy());
     }
 
-    void qt_QFont_swap_void_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this, Pointer param_other)
+    void qt_QFont_swap_void_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont& arg0 = getqtype<QFontType>(param_this);
@@ -552,16 +478,14 @@ namespace Mu
         setqtype<QFontType>(param_this, arg0);
     }
 
-    Pointer qt_QFont_toString_string_QFont(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QFont_toString_string_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return makestring(c, arg0.toString());
     }
 
-    bool qt_QFont_underline_bool_QFont(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    bool qt_QFont_underline_bool_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -575,17 +499,14 @@ namespace Mu
         return arg0.weight();
     }
 
-    double qt_QFont_wordSpacing_double_QFont(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    double qt_QFont_wordSpacing_double_QFont(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         return arg0.wordSpacing();
     }
 
-    bool qt_QFont_operatorBang_EQ__bool_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_f)
+    bool qt_QFont_operatorBang_EQ__bool_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_f)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -593,9 +514,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QFont_operatorLT__bool_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_f)
+    bool qt_QFont_operatorLT__bool_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_f)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -603,9 +522,7 @@ namespace Mu
         return arg0.operator<(arg1);
     }
 
-    bool qt_QFont_operatorEQ_EQ__bool_QFont_QFont(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_f)
+    bool qt_QFont_operatorEQ_EQ__bool_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_f)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
@@ -613,10 +530,7 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    void
-    qt_QFont_insertSubstitution_void_string_string(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_familyName,
-                                                   Pointer param_substituteName)
+    void qt_QFont_insertSubstitution_void_string_string(Mu::Thread& NODE_THREAD, Pointer param_familyName, Pointer param_substituteName)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_familyName);
@@ -624,9 +538,8 @@ namespace Mu
         QFont::insertSubstitution(arg0, arg1);
     }
 
-    void qt_QFont_insertSubstitutions_void_string_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_familyName,
-        Pointer param_substituteNames)
+    void qt_QFont_insertSubstitutions_void_string_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_familyName,
+                                                                 Pointer param_substituteNames)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_familyName);
@@ -634,24 +547,21 @@ namespace Mu
         QFont::insertSubstitutions(arg0, arg1);
     }
 
-    void qt_QFont_removeSubstitutions_void_string(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_familyName)
+    void qt_QFont_removeSubstitutions_void_string(Mu::Thread& NODE_THREAD, Pointer param_familyName)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_familyName);
         QFont::removeSubstitutions(arg0);
     }
 
-    Pointer qt_QFont_substitute_string_string(Mu::Thread& NODE_THREAD,
-                                              Pointer param_familyName)
+    Pointer qt_QFont_substitute_string_string(Mu::Thread& NODE_THREAD, Pointer param_familyName)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_familyName);
         return makestring(c, QFont::substitute(arg0));
     }
 
-    Pointer qt_QFont_substitutes_stringBSB_ESB__string(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_familyName)
+    Pointer qt_QFont_substitutes_stringBSB_ESB__string(Mu::Thread& NODE_THREAD, Pointer param_familyName)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_familyName);
@@ -664,9 +574,7 @@ namespace Mu
         return makestringlist(c, QFont::substitutions());
     }
 
-    Pointer qt_QFont_QVariant_QVariant_QVariant_QFont(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_from)
+    Pointer qt_QFont_QVariant_QVariant_QVariant_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFont arg1 = getqtype<QFontType>(param_from);
@@ -674,396 +582,288 @@ namespace Mu
         return param_this;
     }
 
-    static NODE_IMPLEMENTATION(_n_QFont0, Pointer)
-    {
-        NODE_RETURN(qt_QFont_QFont_QFont_QFont(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_QFont0, Pointer) { NODE_RETURN(qt_QFont_QFont_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_QFont1, Pointer)
     {
-        NODE_RETURN(qt_QFont_QFont_QFont_QFont_string_int_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, bool)));
+        NODE_RETURN(qt_QFont_QFont_QFont_QFont_string_int_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, bool)));
     }
 
-    static NODE_IMPLEMENTATION(_n_bold0, bool)
-    {
-        NODE_RETURN(
-            qt_QFont_bold_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_bold0, bool) { NODE_RETURN(qt_QFont_bold_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_capitalization0, int)
     {
-        NODE_RETURN(qt_QFont_capitalization_int_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_capitalization_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_defaultFamily0, Pointer)
     {
-        NODE_RETURN(qt_QFont_defaultFamily_string_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_defaultFamily_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_exactMatch0, bool)
     {
-        NODE_RETURN(qt_QFont_exactMatch_bool_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_exactMatch_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_family0, Pointer)
-    {
-        NODE_RETURN(qt_QFont_family_string_QFont(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_family0, Pointer) { NODE_RETURN(qt_QFont_family_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_fixedPitch0, bool)
     {
-        NODE_RETURN(qt_QFont_fixedPitch_bool_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_fixedPitch_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromString0, bool)
     {
-        NODE_RETURN(qt_QFont_fromString_bool_QFont_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_fromString_bool_QFont_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hintingPreference0, int)
     {
-        NODE_RETURN(qt_QFont_hintingPreference_int_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_hintingPreference_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isCopyOf0, bool)
     {
-        NODE_RETURN(qt_QFont_isCopyOf_bool_QFont_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_isCopyOf_bool_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_italic0, bool)
-    {
-        NODE_RETURN(qt_QFont_italic_bool_QFont(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_italic0, bool) { NODE_RETURN(qt_QFont_italic_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_kerning0, bool)
-    {
-        NODE_RETURN(qt_QFont_kerning_bool_QFont(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_kerning0, bool) { NODE_RETURN(qt_QFont_kerning_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_key0, Pointer)
-    {
-        NODE_RETURN(qt_QFont_key_string_QFont(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_key0, Pointer) { NODE_RETURN(qt_QFont_key_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_lastResortFamily0, Pointer)
     {
-        NODE_RETURN(qt_QFont_lastResortFamily_string_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_lastResortFamily_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_lastResortFont0, Pointer)
     {
-        NODE_RETURN(qt_QFont_lastResortFont_string_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_lastResortFont_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_letterSpacing0, double)
     {
-        NODE_RETURN(qt_QFont_letterSpacing_double_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_letterSpacing_double_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_letterSpacingType0, int)
     {
-        NODE_RETURN(qt_QFont_letterSpacingType_int_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_letterSpacingType_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_overline0, bool)
-    {
-        NODE_RETURN(qt_QFont_overline_bool_QFont(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_overline0, bool) { NODE_RETURN(qt_QFont_overline_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_pixelSize0, int)
-    {
-        NODE_RETURN(qt_QFont_pixelSize_int_QFont(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_pixelSize0, int) { NODE_RETURN(qt_QFont_pixelSize_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_pointSize0, int)
-    {
-        NODE_RETURN(qt_QFont_pointSize_int_QFont(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_pointSize0, int) { NODE_RETURN(qt_QFont_pointSize_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_pointSizeF0, double)
     {
-        NODE_RETURN(qt_QFont_pointSizeF_double_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_pointSizeF_double_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resolve0, Pointer)
     {
-        NODE_RETURN(qt_QFont_resolve_QFont_QFont_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_resolve_QFont_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setBold0, void)
     {
-        qt_QFont_setBold_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setBold_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setCapitalization0, void)
     {
-        qt_QFont_setCapitalization_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setCapitalization_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setFamily0, void)
     {
-        qt_QFont_setFamily_void_QFont_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFont_setFamily_void_QFont_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setFixedPitch0, void)
     {
-        qt_QFont_setFixedPitch_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setFixedPitch_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setHintingPreference0, void)
     {
-        qt_QFont_setHintingPreference_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setHintingPreference_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setItalic0, void)
     {
-        qt_QFont_setItalic_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setItalic_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setKerning0, void)
     {
-        qt_QFont_setKerning_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setKerning_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setLetterSpacing0, void)
     {
-        qt_QFont_setLetterSpacing_void_QFont_int_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, double));
+        qt_QFont_setLetterSpacing_void_QFont_int_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setOverline0, void)
     {
-        qt_QFont_setOverline_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setOverline_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setPixelSize0, void)
     {
-        qt_QFont_setPixelSize_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setPixelSize_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPointSize0, void)
     {
-        qt_QFont_setPointSize_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setPointSize_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPointSizeF0, void)
     {
-        qt_QFont_setPointSizeF_void_QFont_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QFont_setPointSizeF_void_QFont_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setStretch0, void)
     {
-        qt_QFont_setStretch_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setStretch_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setStrikeOut0, void)
     {
-        qt_QFont_setStrikeOut_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setStrikeOut_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setStyle0, void)
     {
-        qt_QFont_setStyle_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setStyle_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setStyleHint0, void)
     {
-        qt_QFont_setStyleHint_void_QFont_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QFont_setStyleHint_void_QFont_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setStyleName0, void)
     {
-        qt_QFont_setStyleName_void_QFont_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFont_setStyleName_void_QFont_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setStyleStrategy0, void)
     {
-        qt_QFont_setStyleStrategy_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setStyleStrategy_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setUnderline0, void)
     {
-        qt_QFont_setUnderline_void_QFont_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QFont_setUnderline_void_QFont_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setWeight0, void)
     {
-        qt_QFont_setWeight_void_QFont_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFont_setWeight_void_QFont_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setWordSpacing0, void)
     {
-        qt_QFont_setWordSpacing_void_QFont_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QFont_setWordSpacing_void_QFont_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
-    static NODE_IMPLEMENTATION(_n_stretch0, int)
-    {
-        NODE_RETURN(qt_QFont_stretch_int_QFont(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_stretch0, int) { NODE_RETURN(qt_QFont_stretch_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_strikeOut0, bool)
     {
-        NODE_RETURN(qt_QFont_strikeOut_bool_QFont(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_strikeOut_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_style0, int)
-    {
-        NODE_RETURN(
-            qt_QFont_style_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_style0, int) { NODE_RETURN(qt_QFont_style_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_styleHint0, int)
-    {
-        NODE_RETURN(qt_QFont_styleHint_int_QFont(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_styleHint0, int) { NODE_RETURN(qt_QFont_styleHint_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_styleName0, Pointer)
     {
-        NODE_RETURN(qt_QFont_styleName_string_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_styleName_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_styleStrategy0, int)
     {
-        NODE_RETURN(qt_QFont_styleStrategy_int_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_styleStrategy_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QFont_swap_void_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                       NODE_ARG(1, Pointer));
+        qt_QFont_swap_void_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_toString0, Pointer)
     {
-        NODE_RETURN(qt_QFont_toString_string_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_toString_string_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_underline0, bool)
     {
-        NODE_RETURN(qt_QFont_underline_bool_QFont(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_underline_bool_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_weight0, int)
-    {
-        NODE_RETURN(qt_QFont_weight_int_QFont(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_weight0, int) { NODE_RETURN(qt_QFont_weight_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_wordSpacing0, double)
     {
-        NODE_RETURN(qt_QFont_wordSpacing_double_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_wordSpacing_double_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QFont_operatorBang_EQ__bool_QFont_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_operatorBang_EQ__bool_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorLT_0, bool)
     {
-        NODE_RETURN(qt_QFont_operatorLT__bool_QFont_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_operatorLT__bool_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QFont_operatorEQ_EQ__bool_QFont_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_operatorEQ_EQ__bool_QFont_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertSubstitution0, void)
     {
-        qt_QFont_insertSubstitution_void_string_string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFont_insertSubstitution_void_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertSubstitutions0, void)
     {
-        qt_QFont_insertSubstitutions_void_string_stringBSB_ESB_(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFont_insertSubstitutions_void_string_stringBSB_ESB_(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeSubstitutions0, void)
     {
-        qt_QFont_removeSubstitutions_void_string(NODE_THREAD,
-                                                 NODE_ARG(0, Pointer));
+        qt_QFont_removeSubstitutions_void_string(NODE_THREAD, NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_substitute0, Pointer)
     {
-        NODE_RETURN(qt_QFont_substitute_string_string(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_substitute_string_string(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_substitutes0, Pointer)
     {
-        NODE_RETURN(qt_QFont_substitutes_stringBSB_ESB__string(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFont_substitutes_stringBSB_ESB__string(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_substitutions0, Pointer)
-    {
-        NODE_RETURN(qt_QFont_substitutions_stringBSB_ESB_(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_substitutions0, Pointer) { NODE_RETURN(qt_QFont_substitutions_stringBSB_ESB_(NODE_THREAD)); }
 
     static NODE_IMPLEMENTATION(_co_n_QVariant0, Pointer)
     {
-        NODE_RETURN(qt_QFont_QVariant_QVariant_QVariant_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFont_QVariant_QVariant_QVariant_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QFontType::load()
@@ -1083,391 +883,218 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "Capitalization", "int"),
-            new SymbolicConstant(c, "MixedCase", "int",
-                                 Value(int(QFont::MixedCase))),
-            new SymbolicConstant(c, "AllUppercase", "int",
-                                 Value(int(QFont::AllUppercase))),
-            new SymbolicConstant(c, "AllLowercase", "int",
-                                 Value(int(QFont::AllLowercase))),
-            new SymbolicConstant(c, "SmallCaps", "int",
-                                 Value(int(QFont::SmallCaps))),
-            new SymbolicConstant(c, "Capitalize", "int",
-                                 Value(int(QFont::Capitalize))),
-            new Alias(c, "HintingPreference", "int"),
-            new SymbolicConstant(c, "PreferDefaultHinting", "int",
-                                 Value(int(QFont::PreferDefaultHinting))),
-            new SymbolicConstant(c, "PreferNoHinting", "int",
-                                 Value(int(QFont::PreferNoHinting))),
-            new SymbolicConstant(c, "PreferVerticalHinting", "int",
-                                 Value(int(QFont::PreferVerticalHinting))),
-            new SymbolicConstant(c, "PreferFullHinting", "int",
-                                 Value(int(QFont::PreferFullHinting))),
-            new Alias(c, "SpacingType", "int"),
-            new SymbolicConstant(c, "PercentageSpacing", "int",
-                                 Value(int(QFont::PercentageSpacing))),
-            new SymbolicConstant(c, "AbsoluteSpacing", "int",
-                                 Value(int(QFont::AbsoluteSpacing))),
-            new Alias(c, "Stretch", "int"),
-            new SymbolicConstant(c, "UltraCondensed", "int",
-                                 Value(int(QFont::UltraCondensed))),
-            new SymbolicConstant(c, "ExtraCondensed", "int",
-                                 Value(int(QFont::ExtraCondensed))),
-            new SymbolicConstant(c, "Condensed", "int",
-                                 Value(int(QFont::Condensed))),
-            new SymbolicConstant(c, "SemiCondensed", "int",
-                                 Value(int(QFont::SemiCondensed))),
-            new SymbolicConstant(c, "Unstretched", "int",
-                                 Value(int(QFont::Unstretched))),
-            new SymbolicConstant(c, "SemiExpanded", "int",
-                                 Value(int(QFont::SemiExpanded))),
-            new SymbolicConstant(c, "Expanded", "int",
-                                 Value(int(QFont::Expanded))),
-            new SymbolicConstant(c, "ExtraExpanded", "int",
-                                 Value(int(QFont::ExtraExpanded))),
-            new SymbolicConstant(c, "UltraExpanded", "int",
-                                 Value(int(QFont::UltraExpanded))),
-            new Alias(c, "Style", "int"),
-            new SymbolicConstant(c, "StyleNormal", "int",
-                                 Value(int(QFont::StyleNormal))),
-            new SymbolicConstant(c, "StyleItalic", "int",
-                                 Value(int(QFont::StyleItalic))),
-            new SymbolicConstant(c, "StyleOblique", "int",
-                                 Value(int(QFont::StyleOblique))),
-            new Alias(c, "StyleHint", "int"),
-            new SymbolicConstant(c, "AnyStyle", "int",
-                                 Value(int(QFont::AnyStyle))),
-            new SymbolicConstant(c, "SansSerif", "int",
-                                 Value(int(QFont::SansSerif))),
-            new SymbolicConstant(c, "Helvetica", "int",
-                                 Value(int(QFont::Helvetica))),
-            new SymbolicConstant(c, "Serif", "int", Value(int(QFont::Serif))),
-            new SymbolicConstant(c, "Times", "int", Value(int(QFont::Times))),
-            new SymbolicConstant(c, "TypeWriter", "int",
-                                 Value(int(QFont::TypeWriter))),
-            new SymbolicConstant(c, "Courier", "int",
-                                 Value(int(QFont::Courier))),
-            new SymbolicConstant(c, "OldEnglish", "int",
-                                 Value(int(QFont::OldEnglish))),
-            new SymbolicConstant(c, "Decorative", "int",
-                                 Value(int(QFont::Decorative))),
-            new SymbolicConstant(c, "Monospace", "int",
-                                 Value(int(QFont::Monospace))),
-            new SymbolicConstant(c, "Fantasy", "int",
-                                 Value(int(QFont::Fantasy))),
-            new SymbolicConstant(c, "Cursive", "int",
-                                 Value(int(QFont::Cursive))),
-            new SymbolicConstant(c, "System", "int", Value(int(QFont::System))),
-            new Alias(c, "StyleStrategy", "int"),
-            new SymbolicConstant(c, "PreferDefault", "int",
-                                 Value(int(QFont::PreferDefault))),
-            new SymbolicConstant(c, "PreferBitmap", "int",
-                                 Value(int(QFont::PreferBitmap))),
-            new SymbolicConstant(c, "PreferDevice", "int",
-                                 Value(int(QFont::PreferDevice))),
-            new SymbolicConstant(c, "PreferOutline", "int",
-                                 Value(int(QFont::PreferOutline))),
-            new SymbolicConstant(c, "ForceOutline", "int",
-                                 Value(int(QFont::ForceOutline))),
-            new SymbolicConstant(c, "NoAntialias", "int",
-                                 Value(int(QFont::NoAntialias))),
-            new SymbolicConstant(c, "NoSubpixelAntialias", "int",
-                                 Value(int(QFont::NoSubpixelAntialias))),
-            new SymbolicConstant(c, "PreferAntialias", "int",
-                                 Value(int(QFont::PreferAntialias))),
-            new SymbolicConstant(c, "OpenGLCompatible", "int",
-                                 Value(int(QFont::OpenGLCompatible))),
-            new SymbolicConstant(c, "NoFontMerging", "int",
-                                 Value(int(QFont::NoFontMerging))),
-            new Alias(c, "Weight", "int"),
-            new SymbolicConstant(c, "Thin", "int", Value(int(QFont::Thin))),
-            new SymbolicConstant(c, "ExtraLight", "int",
-                                 Value(int(QFont::ExtraLight))),
-            new SymbolicConstant(c, "Light", "int", Value(int(QFont::Light))),
-            new SymbolicConstant(c, "Normal", "int", Value(int(QFont::Normal))),
-            new SymbolicConstant(c, "Medium", "int", Value(int(QFont::Medium))),
-            new SymbolicConstant(c, "DemiBold", "int",
-                                 Value(int(QFont::DemiBold))),
-            new SymbolicConstant(c, "Bold", "int", Value(int(QFont::Bold))),
-            new SymbolicConstant(c, "ExtraBold", "int",
-                                 Value(int(QFont::ExtraBold))),
-            new SymbolicConstant(c, "Black", "int", Value(int(QFont::Black))),
-            EndArguments);
+        addSymbols(new Alias(c, "Capitalization", "int"), new SymbolicConstant(c, "MixedCase", "int", Value(int(QFont::MixedCase))),
+                   new SymbolicConstant(c, "AllUppercase", "int", Value(int(QFont::AllUppercase))),
+                   new SymbolicConstant(c, "AllLowercase", "int", Value(int(QFont::AllLowercase))),
+                   new SymbolicConstant(c, "SmallCaps", "int", Value(int(QFont::SmallCaps))),
+                   new SymbolicConstant(c, "Capitalize", "int", Value(int(QFont::Capitalize))), new Alias(c, "HintingPreference", "int"),
+                   new SymbolicConstant(c, "PreferDefaultHinting", "int", Value(int(QFont::PreferDefaultHinting))),
+                   new SymbolicConstant(c, "PreferNoHinting", "int", Value(int(QFont::PreferNoHinting))),
+                   new SymbolicConstant(c, "PreferVerticalHinting", "int", Value(int(QFont::PreferVerticalHinting))),
+                   new SymbolicConstant(c, "PreferFullHinting", "int", Value(int(QFont::PreferFullHinting))),
+                   new Alias(c, "SpacingType", "int"),
+                   new SymbolicConstant(c, "PercentageSpacing", "int", Value(int(QFont::PercentageSpacing))),
+                   new SymbolicConstant(c, "AbsoluteSpacing", "int", Value(int(QFont::AbsoluteSpacing))), new Alias(c, "Stretch", "int"),
+                   new SymbolicConstant(c, "UltraCondensed", "int", Value(int(QFont::UltraCondensed))),
+                   new SymbolicConstant(c, "ExtraCondensed", "int", Value(int(QFont::ExtraCondensed))),
+                   new SymbolicConstant(c, "Condensed", "int", Value(int(QFont::Condensed))),
+                   new SymbolicConstant(c, "SemiCondensed", "int", Value(int(QFont::SemiCondensed))),
+                   new SymbolicConstant(c, "Unstretched", "int", Value(int(QFont::Unstretched))),
+                   new SymbolicConstant(c, "SemiExpanded", "int", Value(int(QFont::SemiExpanded))),
+                   new SymbolicConstant(c, "Expanded", "int", Value(int(QFont::Expanded))),
+                   new SymbolicConstant(c, "ExtraExpanded", "int", Value(int(QFont::ExtraExpanded))),
+                   new SymbolicConstant(c, "UltraExpanded", "int", Value(int(QFont::UltraExpanded))), new Alias(c, "Style", "int"),
+                   new SymbolicConstant(c, "StyleNormal", "int", Value(int(QFont::StyleNormal))),
+                   new SymbolicConstant(c, "StyleItalic", "int", Value(int(QFont::StyleItalic))),
+                   new SymbolicConstant(c, "StyleOblique", "int", Value(int(QFont::StyleOblique))), new Alias(c, "StyleHint", "int"),
+                   new SymbolicConstant(c, "AnyStyle", "int", Value(int(QFont::AnyStyle))),
+                   new SymbolicConstant(c, "SansSerif", "int", Value(int(QFont::SansSerif))),
+                   new SymbolicConstant(c, "Helvetica", "int", Value(int(QFont::Helvetica))),
+                   new SymbolicConstant(c, "Serif", "int", Value(int(QFont::Serif))),
+                   new SymbolicConstant(c, "Times", "int", Value(int(QFont::Times))),
+                   new SymbolicConstant(c, "TypeWriter", "int", Value(int(QFont::TypeWriter))),
+                   new SymbolicConstant(c, "Courier", "int", Value(int(QFont::Courier))),
+                   new SymbolicConstant(c, "OldEnglish", "int", Value(int(QFont::OldEnglish))),
+                   new SymbolicConstant(c, "Decorative", "int", Value(int(QFont::Decorative))),
+                   new SymbolicConstant(c, "Monospace", "int", Value(int(QFont::Monospace))),
+                   new SymbolicConstant(c, "Fantasy", "int", Value(int(QFont::Fantasy))),
+                   new SymbolicConstant(c, "Cursive", "int", Value(int(QFont::Cursive))),
+                   new SymbolicConstant(c, "System", "int", Value(int(QFont::System))), new Alias(c, "StyleStrategy", "int"),
+                   new SymbolicConstant(c, "PreferDefault", "int", Value(int(QFont::PreferDefault))),
+                   new SymbolicConstant(c, "PreferBitmap", "int", Value(int(QFont::PreferBitmap))),
+                   new SymbolicConstant(c, "PreferDevice", "int", Value(int(QFont::PreferDevice))),
+                   new SymbolicConstant(c, "PreferOutline", "int", Value(int(QFont::PreferOutline))),
+                   new SymbolicConstant(c, "ForceOutline", "int", Value(int(QFont::ForceOutline))),
+                   new SymbolicConstant(c, "NoAntialias", "int", Value(int(QFont::NoAntialias))),
+                   new SymbolicConstant(c, "NoSubpixelAntialias", "int", Value(int(QFont::NoSubpixelAntialias))),
+                   new SymbolicConstant(c, "PreferAntialias", "int", Value(int(QFont::PreferAntialias))),
+                   new SymbolicConstant(c, "OpenGLCompatible", "int", Value(int(QFont::OpenGLCompatible))),
+                   new SymbolicConstant(c, "NoFontMerging", "int", Value(int(QFont::NoFontMerging))), new Alias(c, "Weight", "int"),
+                   new SymbolicConstant(c, "Thin", "int", Value(int(QFont::Thin))),
+                   new SymbolicConstant(c, "ExtraLight", "int", Value(int(QFont::ExtraLight))),
+                   new SymbolicConstant(c, "Light", "int", Value(int(QFont::Light))),
+                   new SymbolicConstant(c, "Normal", "int", Value(int(QFont::Normal))),
+                   new SymbolicConstant(c, "Medium", "int", Value(int(QFont::Medium))),
+                   new SymbolicConstant(c, "DemiBold", "int", Value(int(QFont::DemiBold))),
+                   new SymbolicConstant(c, "Bold", "int", Value(int(QFont::Bold))),
+                   new SymbolicConstant(c, "ExtraBold", "int", Value(int(QFont::ExtraBold))),
+                   new SymbolicConstant(c, "Black", "int", Value(int(QFont::Black))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QFont", _n_QFont0, None, Compiled,
-                         qt_QFont_QFont_QFont_QFont, Return, "qt.QFont",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "QFont", _n_QFont1, None, Compiled,
-                         qt_QFont_QFont_QFont_QFont_string_int_int_bool, Return,
-                         "qt.QFont", Parameters,
-                         new Param(c, "this", "qt.QFont"),
-                         new Param(c, "family", "string"),
-                         new Param(c, "pointSize", "int", Value((int)-1)),
-                         new Param(c, "weight", "int", Value((int)-1)),
+            new Function(c, "QFont", _n_QFont0, None, Compiled, qt_QFont_QFont_QFont_QFont, Return, "qt.QFont", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "QFont", _n_QFont1, None, Compiled, qt_QFont_QFont_QFont_QFont_string_int_int_bool, Return, "qt.QFont",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "family", "string"),
+                         new Param(c, "pointSize", "int", Value((int)-1)), new Param(c, "weight", "int", Value((int)-1)),
                          new Param(c, "italic", "bool"), End),
             // MISSING: QFont (QFont; QFont this, QFont font)
-            new Function(c, "bold", _n_bold0, None, Compiled,
-                         qt_QFont_bold_bool_QFont, Return, "bool", Parameters,
+            new Function(c, "bold", _n_bold0, None, Compiled, qt_QFont_bold_bool_QFont, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "capitalization", _n_capitalization0, None,
-                         Compiled, qt_QFont_capitalization_int_QFont, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QFont"),
-                         End),
-            new Function(c, "defaultFamily", _n_defaultFamily0, None, Compiled,
-                         qt_QFont_defaultFamily_string_QFont, Return, "string",
+            new Function(c, "capitalization", _n_capitalization0, None, Compiled, qt_QFont_capitalization_int_QFont, Return, "int",
                          Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "exactMatch", _n_exactMatch0, None, Compiled,
-                         qt_QFont_exactMatch_bool_QFont, Return, "bool",
+            new Function(c, "defaultFamily", _n_defaultFamily0, None, Compiled, qt_QFont_defaultFamily_string_QFont, Return, "string",
                          Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "family", _n_family0, None, Compiled,
-                         qt_QFont_family_string_QFont, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "fixedPitch", _n_fixedPitch0, None, Compiled,
-                         qt_QFont_fixedPitch_bool_QFont, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "fromString", _n_fromString0, None, Compiled,
-                         qt_QFont_fromString_bool_QFont_string, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "descrip", "string"), End),
-            new Function(c, "hintingPreference", _n_hintingPreference0, None,
-                         Compiled, qt_QFont_hintingPreference_int_QFont, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QFont"),
-                         End),
-            new Function(c, "isCopyOf", _n_isCopyOf0, None, Compiled,
-                         qt_QFont_isCopyOf_bool_QFont_QFont, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "f", "qt.QFont"), End),
-            new Function(c, "italic", _n_italic0, None, Compiled,
-                         qt_QFont_italic_bool_QFont, Return, "bool", Parameters,
+            new Function(c, "exactMatch", _n_exactMatch0, None, Compiled, qt_QFont_exactMatch_bool_QFont, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "kerning", _n_kerning0, None, Compiled,
-                         qt_QFont_kerning_bool_QFont, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "key", _n_key0, None, Compiled,
-                         qt_QFont_key_string_QFont, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "lastResortFamily", _n_lastResortFamily0, None,
-                         Compiled, qt_QFont_lastResortFamily_string_QFont,
-                         Return, "string", Parameters,
+            new Function(c, "family", _n_family0, None, Compiled, qt_QFont_family_string_QFont, Return, "string", Parameters,
                          new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "lastResortFont", _n_lastResortFont0, None,
-                         Compiled, qt_QFont_lastResortFont_string_QFont, Return,
-                         "string", Parameters, new Param(c, "this", "qt.QFont"),
-                         End),
-            new Function(c, "letterSpacing", _n_letterSpacing0, None, Compiled,
-                         qt_QFont_letterSpacing_double_QFont, Return, "double",
+            new Function(c, "fixedPitch", _n_fixedPitch0, None, Compiled, qt_QFont_fixedPitch_bool_QFont, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "fromString", _n_fromString0, None, Compiled, qt_QFont_fromString_bool_QFont_string, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "descrip", "string"), End),
+            new Function(c, "hintingPreference", _n_hintingPreference0, None, Compiled, qt_QFont_hintingPreference_int_QFont, Return, "int",
                          Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "letterSpacingType", _n_letterSpacingType0, None,
-                         Compiled, qt_QFont_letterSpacingType_int_QFont, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QFont"),
-                         End),
-            new Function(c, "overline", _n_overline0, None, Compiled,
-                         qt_QFont_overline_bool_QFont, Return, "bool",
+            new Function(c, "isCopyOf", _n_isCopyOf0, None, Compiled, qt_QFont_isCopyOf_bool_QFont_QFont, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "f", "qt.QFont"), End),
+            new Function(c, "italic", _n_italic0, None, Compiled, qt_QFont_italic_bool_QFont, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "kerning", _n_kerning0, None, Compiled, qt_QFont_kerning_bool_QFont, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "key", _n_key0, None, Compiled, qt_QFont_key_string_QFont, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "lastResortFamily", _n_lastResortFamily0, None, Compiled, qt_QFont_lastResortFamily_string_QFont, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "lastResortFont", _n_lastResortFont0, None, Compiled, qt_QFont_lastResortFont_string_QFont, Return, "string",
                          Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "pixelSize", _n_pixelSize0, None, Compiled,
-                         qt_QFont_pixelSize_int_QFont, Return, "int",
+            new Function(c, "letterSpacing", _n_letterSpacing0, None, Compiled, qt_QFont_letterSpacing_double_QFont, Return, "double",
                          Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "pointSize", _n_pointSize0, None, Compiled,
-                         qt_QFont_pointSize_int_QFont, Return, "int",
+            new Function(c, "letterSpacingType", _n_letterSpacingType0, None, Compiled, qt_QFont_letterSpacingType_int_QFont, Return, "int",
                          Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "pointSizeF", _n_pointSizeF0, None, Compiled,
-                         qt_QFont_pointSizeF_double_QFont, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "resolve", _n_resolve0, None, Compiled,
-                         qt_QFont_resolve_QFont_QFont_QFont, Return, "qt.QFont",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "other", "qt.QFont"), End),
-            new Function(c, "setBold", _n_setBold0, None, Compiled,
-                         qt_QFont_setBold_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(c, "setCapitalization", _n_setCapitalization0, None,
-                         Compiled, qt_QFont_setCapitalization_void_QFont_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFont"),
-                         new Param(c, "caps", "int"), End),
-            new Function(c, "setFamily", _n_setFamily0, None, Compiled,
-                         qt_QFont_setFamily_void_QFont_string, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "family", "string"), End),
-            new Function(c, "setFixedPitch", _n_setFixedPitch0, None, Compiled,
-                         qt_QFont_setFixedPitch_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(c, "setHintingPreference", _n_setHintingPreference0,
-                         None, Compiled,
-                         qt_QFont_setHintingPreference_void_QFont_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "hintingPreference", "int"), End),
-            new Function(c, "setItalic", _n_setItalic0, None, Compiled,
-                         qt_QFont_setItalic_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(c, "setKerning", _n_setKerning0, None, Compiled,
-                         qt_QFont_setKerning_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(
-                c, "setLetterSpacing", _n_setLetterSpacing0, None, Compiled,
-                qt_QFont_setLetterSpacing_void_QFont_int_double, Return, "void",
-                Parameters, new Param(c, "this", "qt.QFont"),
-                new Param(c, "type", "int"), new Param(c, "spacing", "double"),
-                End),
-            new Function(c, "setOverline", _n_setOverline0, None, Compiled,
-                         qt_QFont_setOverline_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(c, "setPixelSize", _n_setPixelSize0, None, Compiled,
-                         qt_QFont_setPixelSize_void_QFont_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "pixelSize", "int"), End),
-            new Function(c, "setPointSize", _n_setPointSize0, None, Compiled,
-                         qt_QFont_setPointSize_void_QFont_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "pointSize", "int"), End),
-            new Function(c, "setPointSizeF", _n_setPointSizeF0, None, Compiled,
-                         qt_QFont_setPointSizeF_void_QFont_double, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "pointSize", "double"), End),
-            new Function(c, "setStretch", _n_setStretch0, None, Compiled,
-                         qt_QFont_setStretch_void_QFont_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "factor", "int"), End),
-            new Function(c, "setStrikeOut", _n_setStrikeOut0, None, Compiled,
-                         qt_QFont_setStrikeOut_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(c, "setStyle", _n_setStyle0, None, Compiled,
-                         qt_QFont_setStyle_void_QFont_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "style", "int"), End),
-            new Function(c, "setStyleHint", _n_setStyleHint0, None, Compiled,
-                         qt_QFont_setStyleHint_void_QFont_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "hint", "int"),
-                         new Param(c, "strategy", "int",
-                                   Value((int)QFont::PreferDefault)),
-                         End),
-            new Function(c, "setStyleName", _n_setStyleName0, None, Compiled,
-                         qt_QFont_setStyleName_void_QFont_string, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "styleName", "string"), End),
-            new Function(c, "setStyleStrategy", _n_setStyleStrategy0, None,
-                         Compiled, qt_QFont_setStyleStrategy_void_QFont_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFont"),
-                         new Param(c, "s", "int"), End),
-            new Function(c, "setUnderline", _n_setUnderline0, None, Compiled,
-                         qt_QFont_setUnderline_void_QFont_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "enable", "bool"), End),
-            new Function(c, "setWeight", _n_setWeight0, None, Compiled,
-                         qt_QFont_setWeight_void_QFont_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "weight", "int"), End),
-            new Function(c, "setWordSpacing", _n_setWordSpacing0, None,
-                         Compiled, qt_QFont_setWordSpacing_void_QFont_double,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFont"),
+            new Function(c, "overline", _n_overline0, None, Compiled, qt_QFont_overline_bool_QFont, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "pixelSize", _n_pixelSize0, None, Compiled, qt_QFont_pixelSize_int_QFont, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "pointSize", _n_pointSize0, None, Compiled, qt_QFont_pointSize_int_QFont, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "pointSizeF", _n_pointSizeF0, None, Compiled, qt_QFont_pointSizeF_double_QFont, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "resolve", _n_resolve0, None, Compiled, qt_QFont_resolve_QFont_QFont_QFont, Return, "qt.QFont", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "other", "qt.QFont"), End),
+            new Function(c, "setBold", _n_setBold0, None, Compiled, qt_QFont_setBold_void_QFont_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setCapitalization", _n_setCapitalization0, None, Compiled, qt_QFont_setCapitalization_void_QFont_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "caps", "int"), End),
+            new Function(c, "setFamily", _n_setFamily0, None, Compiled, qt_QFont_setFamily_void_QFont_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "family", "string"), End),
+            new Function(c, "setFixedPitch", _n_setFixedPitch0, None, Compiled, qt_QFont_setFixedPitch_void_QFont_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setHintingPreference", _n_setHintingPreference0, None, Compiled, qt_QFont_setHintingPreference_void_QFont_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "hintingPreference", "int"), End),
+            new Function(c, "setItalic", _n_setItalic0, None, Compiled, qt_QFont_setItalic_void_QFont_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setKerning", _n_setKerning0, None, Compiled, qt_QFont_setKerning_void_QFont_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setLetterSpacing", _n_setLetterSpacing0, None, Compiled, qt_QFont_setLetterSpacing_void_QFont_int_double,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "type", "int"),
                          new Param(c, "spacing", "double"), End),
-            new Function(c, "stretch", _n_stretch0, None, Compiled,
-                         qt_QFont_stretch_int_QFont, Return, "int", Parameters,
+            new Function(c, "setOverline", _n_setOverline0, None, Compiled, qt_QFont_setOverline_void_QFont_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setPixelSize", _n_setPixelSize0, None, Compiled, qt_QFont_setPixelSize_void_QFont_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "pixelSize", "int"), End),
+            new Function(c, "setPointSize", _n_setPointSize0, None, Compiled, qt_QFont_setPointSize_void_QFont_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "pointSize", "int"), End),
+            new Function(c, "setPointSizeF", _n_setPointSizeF0, None, Compiled, qt_QFont_setPointSizeF_void_QFont_double, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "pointSize", "double"), End),
+            new Function(c, "setStretch", _n_setStretch0, None, Compiled, qt_QFont_setStretch_void_QFont_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "factor", "int"), End),
+            new Function(c, "setStrikeOut", _n_setStrikeOut0, None, Compiled, qt_QFont_setStrikeOut_void_QFont_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setStyle", _n_setStyle0, None, Compiled, qt_QFont_setStyle_void_QFont_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "style", "int"), End),
+            new Function(c, "setStyleHint", _n_setStyleHint0, None, Compiled, qt_QFont_setStyleHint_void_QFont_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "hint", "int"),
+                         new Param(c, "strategy", "int", Value((int)QFont::PreferDefault)), End),
+            new Function(c, "setStyleName", _n_setStyleName0, None, Compiled, qt_QFont_setStyleName_void_QFont_string, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "styleName", "string"), End),
+            new Function(c, "setStyleStrategy", _n_setStyleStrategy0, None, Compiled, qt_QFont_setStyleStrategy_void_QFont_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "s", "int"), End),
+            new Function(c, "setUnderline", _n_setUnderline0, None, Compiled, qt_QFont_setUnderline_void_QFont_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setWeight", _n_setWeight0, None, Compiled, qt_QFont_setWeight_void_QFont_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "weight", "int"), End),
+            new Function(c, "setWordSpacing", _n_setWordSpacing0, None, Compiled, qt_QFont_setWordSpacing_void_QFont_double, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "spacing", "double"), End),
+            new Function(c, "stretch", _n_stretch0, None, Compiled, qt_QFont_stretch_int_QFont, Return, "int", Parameters,
                          new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "strikeOut", _n_strikeOut0, None, Compiled,
-                         qt_QFont_strikeOut_bool_QFont, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "style", _n_style0, None, Compiled,
-                         qt_QFont_style_int_QFont, Return, "int", Parameters,
+            new Function(c, "strikeOut", _n_strikeOut0, None, Compiled, qt_QFont_strikeOut_bool_QFont, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "styleHint", _n_styleHint0, None, Compiled,
-                         qt_QFont_styleHint_int_QFont, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "styleName", _n_styleName0, None, Compiled,
-                         qt_QFont_styleName_string_QFont, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "styleStrategy", _n_styleStrategy0, None, Compiled,
-                         qt_QFont_styleStrategy_int_QFont, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QFont_swap_void_QFont_QFont, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "other", "qt.QFont"), End),
-            new Function(c, "toString", _n_toString0, None, Compiled,
-                         qt_QFont_toString_string_QFont, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "underline", _n_underline0, None, Compiled,
-                         qt_QFont_underline_bool_QFont, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "weight", _n_weight0, None, Compiled,
-                         qt_QFont_weight_int_QFont, Return, "int", Parameters,
+            new Function(c, "style", _n_style0, None, Compiled, qt_QFont_style_int_QFont, Return, "int", Parameters,
                          new Param(c, "this", "qt.QFont"), End),
-            new Function(c, "wordSpacing", _n_wordSpacing0, None, Compiled,
-                         qt_QFont_wordSpacing_double_QFont, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "styleHint", _n_styleHint0, None, Compiled, qt_QFont_styleHint_int_QFont, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "styleName", _n_styleName0, None, Compiled, qt_QFont_styleName_string_QFont, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "styleStrategy", _n_styleStrategy0, None, Compiled, qt_QFont_styleStrategy_int_QFont, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QFont_swap_void_QFont_QFont, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QFont"), new Param(c, "other", "qt.QFont"), End),
+            new Function(c, "toString", _n_toString0, None, Compiled, qt_QFont_toString_string_QFont, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "underline", _n_underline0, None, Compiled, qt_QFont_underline_bool_QFont, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "weight", _n_weight0, None, Compiled, qt_QFont_weight_int_QFont, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
+            new Function(c, "wordSpacing", _n_wordSpacing0, None, Compiled, qt_QFont_wordSpacing_double_QFont, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QFont"), End),
             // static functions
-            new Function(
-                c, "insertSubstitution", _n_insertSubstitution0, None, Compiled,
-                qt_QFont_insertSubstitution_void_string_string, Return, "void",
-                Parameters, new Param(c, "familyName", "string"),
-                new Param(c, "substituteName", "string"), End),
-            new Function(
-                c, "insertSubstitutions", _n_insertSubstitutions0, None,
-                Compiled,
-                qt_QFont_insertSubstitutions_void_string_stringBSB_ESB_, Return,
-                "void", Parameters, new Param(c, "familyName", "string"),
-                new Param(c, "substituteNames", "string[]"), End),
-            new Function(
-                c, "removeSubstitutions", _n_removeSubstitutions0, None,
-                Compiled, qt_QFont_removeSubstitutions_void_string, Return,
-                "void", Parameters, new Param(c, "familyName", "string"), End),
-            new Function(c, "substitute", _n_substitute0, None, Compiled,
-                         qt_QFont_substitute_string_string, Return, "string",
-                         Parameters, new Param(c, "familyName", "string"), End),
-            new Function(c, "substitutes", _n_substitutes0, None, Compiled,
-                         qt_QFont_substitutes_stringBSB_ESB__string, Return,
-                         "string[]", Parameters,
+            new Function(c, "insertSubstitution", _n_insertSubstitution0, None, Compiled, qt_QFont_insertSubstitution_void_string_string,
+                         Return, "void", Parameters, new Param(c, "familyName", "string"), new Param(c, "substituteName", "string"), End),
+            new Function(c, "insertSubstitutions", _n_insertSubstitutions0, None, Compiled,
+                         qt_QFont_insertSubstitutions_void_string_stringBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "familyName", "string"), new Param(c, "substituteNames", "string[]"), End),
+            new Function(c, "removeSubstitutions", _n_removeSubstitutions0, None, Compiled, qt_QFont_removeSubstitutions_void_string,
+                         Return, "void", Parameters, new Param(c, "familyName", "string"), End),
+            new Function(c, "substitute", _n_substitute0, None, Compiled, qt_QFont_substitute_string_string, Return, "string", Parameters,
                          new Param(c, "familyName", "string"), End),
-            new Function(c, "substitutions", _n_substitutions0, None, Compiled,
-                         qt_QFont_substitutions_stringBSB_ESB_, Return,
-                         "string[]", End),
+            new Function(c, "substitutes", _n_substitutes0, None, Compiled, qt_QFont_substitutes_stringBSB_ESB__string, Return, "string[]",
+                         Parameters, new Param(c, "familyName", "string"), End),
+            new Function(c, "substitutions", _n_substitutions0, None, Compiled, qt_QFont_substitutions_stringBSB_ESB_, Return, "string[]",
+                         End),
             EndArguments);
-        globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QFont_operatorBang_EQ__bool_QFont_QFont, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "f", "qt.QFont"), End),
-            new Function(c, "<", _n_operatorLT_0, Op, Compiled,
-                         qt_QFont_operatorLT__bool_QFont_QFont, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "f", "qt.QFont"), End),
-            // MISSING: = (QFont; QFont this, QFont font)
-            // MISSING: = (QFont; QFont this, QFont other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QFont_operatorEQ_EQ__bool_QFont_QFont, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QFont"),
-                         new Param(c, "f", "qt.QFont"), End),
-            EndArguments);
-        scope()->addSymbols(
-            new Function(c, "QVariant", _co_n_QVariant0, Cast, Compiled,
-                         qt_QFont_QVariant_QVariant_QVariant_QFont, Return,
-                         "qt.QVariant", Parameters,
-                         new Param(c, "this", "qt.QVariant"),
-                         new Param(c, "from", "qt.QFont"), End),
-            EndArguments);
+        globalScope()->addSymbols(new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QFont_operatorBang_EQ__bool_QFont_QFont,
+                                               Return, "bool", Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "f", "qt.QFont"),
+                                               End),
+                                  new Function(c, "<", _n_operatorLT_0, Op, Compiled, qt_QFont_operatorLT__bool_QFont_QFont, Return, "bool",
+                                               Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "f", "qt.QFont"), End),
+                                  // MISSING: = (QFont; QFont this, QFont font)
+                                  // MISSING: = (QFont; QFont this, QFont other)
+                                  new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QFont_operatorEQ_EQ__bool_QFont_QFont, Return,
+                                               "bool", Parameters, new Param(c, "this", "qt.QFont"), new Param(c, "f", "qt.QFont"), End),
+                                  EndArguments);
+        scope()->addSymbols(new Function(c, "QVariant", _co_n_QVariant0, Cast, Compiled, qt_QFont_QVariant_QVariant_QVariant_QFont, Return,
+                                         "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "from", "qt.QFont"),
+                                         End),
+                            EndArguments);
     }
 
 } // namespace Mu

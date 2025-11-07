@@ -34,8 +34,7 @@ namespace TwkFB
     using namespace TwkMath;
     using namespace std;
 
-    static void setFBOrientation(FrameBuffer& infb,
-                                 FrameBuffer::Orientation orientation)
+    static void setFBOrientation(FrameBuffer& infb, FrameBuffer::Orientation orientation)
     {
         for (FrameBuffer* fb = &infb; fb; fb = fb->nextPlane())
         {
@@ -49,24 +48,22 @@ namespace TwkFB
         unsigned int value;
     };
 
-    static NameValue orientationNames[] = {
-        {"Top Left", IOcin::CIN_TOP_LEFT},
-        {"Bottom Left", IOcin::CIN_BOTTOM_LEFT},
-        {"Top Right", IOcin::CIN_TOP_RIGHT},
-        {"Bottom Right", IOcin::CIN_BOTTOM_RIGHT},
-        {"Rotated Top Left", IOcin::CIN_ROTATED_TOP_LEFT},
-        {"Rotated Bottom Left", IOcin::CIN_ROTATED_BOTTOM_LEFT},
-        {"Rotated Top Right", IOcin::CIN_ROTATED_TOP_RIGHT},
-        {"Rotated Bottom Right", IOcin::CIN_ROTATED_BOTTOM_RIGHT},
-        {"", 0}};
+    static NameValue orientationNames[] = {{"Top Left", IOcin::CIN_TOP_LEFT},
+                                           {"Bottom Left", IOcin::CIN_BOTTOM_LEFT},
+                                           {"Top Right", IOcin::CIN_TOP_RIGHT},
+                                           {"Bottom Right", IOcin::CIN_BOTTOM_RIGHT},
+                                           {"Rotated Top Left", IOcin::CIN_ROTATED_TOP_LEFT},
+                                           {"Rotated Bottom Left", IOcin::CIN_ROTATED_BOTTOM_LEFT},
+                                           {"Rotated Top Right", IOcin::CIN_ROTATED_TOP_RIGHT},
+                                           {"Rotated Bottom Right", IOcin::CIN_ROTATED_BOTTOM_RIGHT},
+                                           {"", 0}};
 
     //----------------------------------------------------------------------
     //
     //  Cineon structs
     //
 
-    IOcin::IOcin(StorageFormat format, bool useChromaticies, IOType type,
-                 size_t iosize, int maxAsync)
+    IOcin::IOcin(StorageFormat format, bool useChromaticies, IOType type, size_t iosize, int maxAsync)
         : StreamingFrameBufferIO("IOcin", "m6", type, iosize, maxAsync)
         , m_format(format)
         , m_useChromaticities(useChromaticies)
@@ -74,8 +71,7 @@ namespace TwkFB
         init();
     }
 
-    IOcin::IOcin(const std::string& format, bool useChromaticies, IOType type,
-                 size_t iosize, int maxAsync)
+    IOcin::IOcin(const std::string& format, bool useChromaticies, IOType type, size_t iosize, int maxAsync)
         : StreamingFrameBufferIO("IOcin", "m6", type, iosize, maxAsync)
         , m_useChromaticities(useChromaticies)
     {
@@ -144,8 +140,7 @@ namespace TwkFB
         return StreamingFrameBufferIO::getStringAttribute(name);
     }
 
-    void IOcin::setStringAttribute(const std::string& name,
-                                   const std::string& value)
+    void IOcin::setStringAttribute(const std::string& name, const std::string& value)
     {
         if (name == "format")
         {
@@ -183,11 +178,8 @@ namespace TwkFB
 
     string IOcin::about() const { return "Cineon (Tweak)"; }
 
-    void IOcin::readAttrs(FrameBuffer& fb, FileInformation& genericHeader,
-                          ImageInformation& infoHeader,
-                          DataFormatInformation& dataFormatHeader,
-                          ImageOriginInformation& originHeader,
-                          FilmInformation& filmHeader) const
+    void IOcin::readAttrs(FrameBuffer& fb, FileInformation& genericHeader, ImageInformation& infoHeader,
+                          DataFormatInformation& dataFormatHeader, ImageOriginInformation& originHeader, FilmInformation& filmHeader) const
     {
         union InfStruct
         {
@@ -216,13 +208,11 @@ namespace TwkFB
         fb.setPrimaryColorSpace(ColorSpace::Rec709());
         fb.setTransferFunction(ColorSpace::CineonLog());
 
-        if (red != vundef && green != vundef && blue != vundef
-            && white != vundef)
+        if (red != vundef && green != vundef && blue != vundef && white != vundef)
         {
             if (m_useChromaticities)
             {
-                fb.setPrimaries(white.x, white.y, red.x, red.y, green.x,
-                                green.y, blue.x, blue.y);
+                fb.setPrimaries(white.x, white.y, red.x, red.y, green.x, green.y, blue.x, blue.y);
             }
             else
             {
@@ -240,14 +230,12 @@ namespace TwkFB
         inputDevice += " ";
         inputDevice += originHeader.input_device_serial;
 
-        Vec2f pitch(originHeader.input_device_X_pitch,
-                    originHeader.input_device_Y_pitch);
+        Vec2f pitch(originHeader.input_device_X_pitch, originHeader.input_device_Y_pitch);
 
         if (*filmHeader.unknown7 && strlen(filmHeader.unknown7) < 200)
         {
             {
-                fb.newAttribute("CIN-Film/Field11",
-                                string(filmHeader.unknown7));
+                fb.newAttribute("CIN-Film/Field11", string(filmHeader.unknown7));
             }
         }
 
@@ -268,36 +256,27 @@ namespace TwkFB
         if (filmHeader.film_type != bundef)
             fb.newAttribute("CIN-Film/Type", int(filmHeader.film_type));
         if (filmHeader.film_mfg_id != bundef)
-            fb.newAttribute("CIN-Film/ManufacturerID",
-                            int(filmHeader.film_mfg_id));
+            fb.newAttribute("CIN-Film/ManufacturerID", int(filmHeader.film_mfg_id));
 
         if (dataFormatHeader.data_sign != bundef)
-            fb.newAttribute("CIN-Format/DataSign",
-                            int(dataFormatHeader.data_sign));
+            fb.newAttribute("CIN-Format/DataSign", int(dataFormatHeader.data_sign));
         if (dataFormatHeader.image_sense != bundef)
-            fb.newAttribute("CIN-Format/Sense",
-                            int(dataFormatHeader.image_sense));
+            fb.newAttribute("CIN-Format/Sense", int(dataFormatHeader.image_sense));
 
         if (originHeader.input_gamma != fundef)
-            fb.newAttribute("CIN-Origin/Gamma",
-                            float(originHeader.input_gamma));
+            fb.newAttribute("CIN-Origin/Gamma", float(originHeader.input_gamma));
         if (pitch != vundef)
             fb.newAttribute("CIN-Origin/Pitch", pitch);
 
         if (inputDevice != "")
             fb.newAttribute("CIN-Origin/Device", inputDevice);
-        fb.newAttribute("CIN-Origin/CreationTime",
-                        string(originHeader.creation_time));
-        fb.newAttribute("CIN-Origin/CreationDate",
-                        string(originHeader.creation_date));
+        fb.newAttribute("CIN-Origin/CreationTime", string(originHeader.creation_time));
+        fb.newAttribute("CIN-Origin/CreationDate", string(originHeader.creation_date));
         fb.newAttribute("CIN-Origin/filename", string(originHeader.filename));
         if (*infoHeader.label)
             fb.newAttribute("CIN/Label", string(infoHeader.label));
 
-        const char* ostring =
-            infoHeader.orientation < 8
-                ? orientationNames[infoHeader.orientation].name
-                : (const char*)0;
+        const char* ostring = infoHeader.orientation < 8 ? orientationNames[infoHeader.orientation].name : (const char*)0;
 
         if (ostring == 0)
         {
@@ -333,16 +312,14 @@ namespace TwkFB
 
         try
         {
-            FileStream fmap(filename, FileStream::MemoryMap, m_iosize,
-                            m_iomaxAsync);
+            FileStream fmap(filename, FileStream::MemoryMap, m_iosize, m_iomaxAsync);
             data = (const unsigned char*)fmap.data();
 
             memcpy((char*)&genericHeader, data, sizeof(FileInformation));
             data += sizeof(FileInformation);
             memcpy((char*)&infoHeader, data, sizeof(ImageInformation));
             data += sizeof(ImageInformation);
-            memcpy((char*)&dataFormatHeader, data,
-                   sizeof(DataFormatInformation));
+            memcpy((char*)&dataFormatHeader, data, sizeof(DataFormatInformation));
             data += sizeof(DataFormatInformation);
             memcpy((char*)&originHeader, data, sizeof(ImageOriginInformation));
             data += sizeof(ImageOriginInformation);
@@ -351,16 +328,14 @@ namespace TwkFB
         }
         catch (...)
         {
-            FileStream fmap(filename, FileStream::Buffering, m_iosize,
-                            m_iomaxAsync);
+            FileStream fmap(filename, FileStream::Buffering, m_iosize, m_iomaxAsync);
             data = (const unsigned char*)fmap.data();
 
             memcpy((char*)&genericHeader, data, sizeof(FileInformation));
             data += sizeof(FileInformation);
             memcpy((char*)&infoHeader, data, sizeof(ImageInformation));
             data += sizeof(ImageInformation);
-            memcpy((char*)&dataFormatHeader, data,
-                   sizeof(DataFormatInformation));
+            memcpy((char*)&dataFormatHeader, data, sizeof(DataFormatInformation));
             data += sizeof(DataFormatInformation);
             memcpy((char*)&originHeader, data, sizeof(ImageOriginInformation));
             data += sizeof(ImageOriginInformation);
@@ -432,25 +407,19 @@ namespace TwkFB
             break;
         }
 
-        readAttrs(fbi.proxy, genericHeader, infoHeader, dataFormatHeader,
-                  originHeader, filmHeader);
+        readAttrs(fbi.proxy, genericHeader, infoHeader, dataFormatHeader, originHeader, filmHeader);
     }
 
-    void IOcin::readImage(FrameBuffer& fb, const std::string& filename,
-                          const ReadRequest& request) const
+    void IOcin::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
-        FileStream::Type ftype = m_iotype == StandardIO
-                                     ? FileStream::Buffering
-                                     : (FileStream::Type)(m_iotype - 1);
+        FileStream::Type ftype = m_iotype == StandardIO ? FileStream::Buffering : (FileStream::Type)(m_iotype - 1);
 
         FileStream fmap(filename, ftype, m_iosize, m_iomaxAsync);
 
         readImage(fmap, fb, filename, request);
     }
 
-    void IOcin::readImage(FileStream& fmap, FrameBuffer& fb,
-                          const std::string& filename,
-                          const ReadRequest& request) const
+    void IOcin::readImage(FileStream& fmap, FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         const unsigned char* data = (const unsigned char*)fmap.data();
 
@@ -511,12 +480,10 @@ namespace TwkFB
             Read10Bit::readRGB16(filename, data, fb, w, h, maxData, swap);
             break;
         case RGBA8:
-            Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, false,
-                                 swap);
+            Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, false, swap);
             break;
         case RGBA16:
-            Read10Bit::readRGBA16(filename, data, fb, w, h, maxData, false,
-                                  swap);
+            Read10Bit::readRGBA16(filename, data, fb, w, h, maxData, false, swap);
             break;
         case RGB10_A2:
             Read10Bit::readRGB10_A2(filename, data, fb, w, h, maxData, swap);
@@ -528,8 +495,7 @@ namespace TwkFB
             Read10Bit::readRGB8_PLANAR(filename, data, fb, w, h, maxData, swap);
             break;
         case RGB16_PLANAR:
-            Read10Bit::readRGB16_PLANAR(filename, data, fb, w, h, maxData,
-                                        swap);
+            Read10Bit::readRGB16_PLANAR(filename, data, fb, w, h, maxData, swap);
             break;
         }
 
@@ -558,12 +524,10 @@ namespace TwkFB
             break;
         }
 
-        readAttrs(fb, genericHeader, infoHeader, dataFormatHeader, originHeader,
-                  filmHeader);
+        readAttrs(fb, genericHeader, infoHeader, dataFormatHeader, originHeader, filmHeader);
     }
 
-    void IOcin::writeImage(const FrameBuffer& img, const std::string& filename,
-                           const WriteRequest& request) const
+    void IOcin::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         FrameBuffer* outfb = const_cast<FrameBuffer*>(&img);
 
@@ -583,8 +547,7 @@ namespace TwkFB
         //  Convert everything to REC709
         //
 
-        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY()
-            || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
+        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY() || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
         {
             const FrameBuffer* fb = outfb;
             outfb = convertToLinearRGB709(outfb);
@@ -652,8 +615,7 @@ namespace TwkFB
         //  Don't do the lin->log
         //
 
-        TwkImg::Img4f image(outfb->width(), outfb->height(),
-                            outfb->pixels<Col4f>());
+        TwkImg::Img4f image(outfb->width(), outfb->height(), outfb->pixels<Col4f>());
 
         TwkImg::CineonIff::write(&image, filename.c_str(), 0, 0, 0, false);
 
