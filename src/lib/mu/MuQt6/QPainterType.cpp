@@ -879,6 +879,43 @@ namespace Mu
         setqpointer<QPainterType>(param_this, arg0);
     }
 
+    void qt_QPainter_drawText_void_QPainter_QPointF_string(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position,
+        Pointer param_text)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QPainter* arg0 = getqpointer<QPainterType>(param_this);
+        const QPointF arg1 = getqtype<QPointFType>(param_position);
+        const QString arg2 = qstring(param_text);
+        arg0->drawText(arg1, arg2);
+        setqpointer<QPainterType>(param_this, arg0);
+    }
+
+    void qt_QPainter_drawText_void_QPainter_QPoint_string(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position,
+        Pointer param_text)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QPainter* arg0 = getqpointer<QPainterType>(param_this);
+        const QPoint arg1 = getqtype<QPointType>(param_position);
+        const QString arg2 = qstring(param_text);
+        arg0->drawText(arg1, arg2);
+        setqpointer<QPainterType>(param_this, arg0);
+    }
+
+    void qt_QPainter_drawText_void_QPainter_int_int_string(
+        Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
+        Pointer param_text)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QPainter* arg0 = getqpointer<QPainterType>(param_this);
+        int arg1 = (int)(param_x);
+        int arg2 = (int)(param_y);
+        const QString arg3 = qstring(param_text);
+        arg0->drawText(arg1, arg2, arg3);
+        setqpointer<QPainterType>(param_this, arg0);
+    }
+
     bool qt_QPainter_end_bool_QPainter(Mu::Thread& NODE_THREAD,
                                        Pointer param_this)
     {
@@ -2078,6 +2115,27 @@ namespace Mu
             NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, int));
     }
 
+    static NODE_IMPLEMENTATION(_n_drawText0, void)
+    {
+        qt_QPainter_drawText_void_QPainter_QPointF_string(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+            NODE_ARG(2, Pointer));
+    }
+
+    static NODE_IMPLEMENTATION(_n_drawText1, void)
+    {
+        qt_QPainter_drawText_void_QPainter_QPoint_string(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+            NODE_ARG(2, Pointer));
+    }
+
+    static NODE_IMPLEMENTATION(_n_drawText2, void)
+    {
+        qt_QPainter_drawText_void_QPainter_int_int_string(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+    }
+
     static NODE_IMPLEMENTATION(_n_end0, bool)
     {
         NODE_RETURN(qt_QPainter_end_bool_QPainter(NODE_THREAD,
@@ -3106,6 +3164,24 @@ namespace Mu
             // "const QStaticText &" staticText) MISSING: drawStaticText (void;
             // QPainter this, int left, int top, "const QStaticText &"
             // staticText)
+            new Function(c, "drawText", _n_drawText0, None, Compiled,
+                         qt_QPainter_drawText_void_QPainter_QPointF_string,
+                         Return, "void", Parameters,
+                         new Param(c, "this", "qt.QPainter"),
+                         new Param(c, "position", "qt.QPointF"),
+                         new Param(c, "text", "string"), End),
+            new Function(c, "drawText", _n_drawText1, None, Compiled,
+                         qt_QPainter_drawText_void_QPainter_QPoint_string,
+                         Return, "void", Parameters,
+                         new Param(c, "this", "qt.QPainter"),
+                         new Param(c, "position", "qt.QPoint"),
+                         new Param(c, "text", "string"), End),
+            new Function(c, "drawText", _n_drawText2, None, Compiled,
+                         qt_QPainter_drawText_void_QPainter_int_int_string,
+                         Return, "void", Parameters,
+                         new Param(c, "this", "qt.QPainter"),
+                         new Param(c, "x", "int"), new Param(c, "y", "int"),
+                         new Param(c, "text", "string"), End),
             new Function(c, "end", _n_end0, None, Compiled,
                          qt_QPainter_end_bool_QPainter, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QPainter"), End),
