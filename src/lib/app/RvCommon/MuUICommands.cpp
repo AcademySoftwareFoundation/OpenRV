@@ -89,6 +89,7 @@
 #include <MuQt5/QWidgetType.h>
 #include <MuQt5/QObjectType.h>
 #include <MuQt5/QMainWindowType.h>
+#include <MuQt5/QPainterType.h>
 #include <MuQt5/QWebEnginePageType.h>
 #else
 #include <MuQt6/qtModule.h>
@@ -96,6 +97,7 @@
 #include <MuQt6/QWidgetType.h>
 #include <MuQt6/QObjectType.h>
 #include <MuQt6/QMainWindowType.h>
+#include <MuQt6/QPainterType.h>
 #include <MuQt6/QWebEnginePageType.h>
 #endif
 
@@ -413,6 +415,9 @@ namespace Rv
 
             new Function(c, "mainViewWidget", mainViewWidget, None, Return,
                          "qt.QWidget", End),
+
+            new Function(c, "mainViewPainter", mainViewPainter, None, Return,
+                         "qt.QPainter", End),
 
             new Function(c, "prefTabWidget", prefTabWidget, None, Return,
                          "qt.QTabWidget", End),
@@ -1991,6 +1996,25 @@ namespace Rv
                 c->internName("qt.QWidget"), false);
 
         NODE_RETURN(makeinstance(type, static_cast<QWidget*>(w)));
+    }
+
+    NODE_IMPLEMENTATION(mainViewPainter, Pointer)
+    {
+        Process* p = NODE_THREAD.process();
+        MuLangContext* c = static_cast<MuLangContext*>(p->context());
+        Session* s = Session::currentSession();
+        QPainter* painter = static_cast<QPainter*>(s->currentPainter());
+
+        if (!painter)
+        {
+            NODE_RETURN(Pointer(0));
+        }
+
+        const QPainterType* type =
+            c->findSymbolOfTypeByQualifiedName<QPainterType>(
+                c->internName("qt.QPainter"), false);
+
+        NODE_RETURN(makeqpointer<QPainterType>(type, painter));
     }
 
     NODE_IMPLEMENTATION(prefTabWidget, Pointer)

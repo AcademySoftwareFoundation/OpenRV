@@ -484,6 +484,10 @@ namespace IPCore
 
         ImageRenderer* renderer() const { return m_renderer; }
 
+        void setCurrentPainter(void* painter) { m_currentPainter = painter; }
+
+        void* currentPainter() const { return m_currentPainter; }
+
         void setRendererBGType(unsigned int);
 
         void setMargins(float left, float right, float top, float bottom,
@@ -1214,6 +1218,7 @@ namespace IPCore
         IPGraph* m_graph;
         std::string m_name;
         ImageRenderer* m_renderer;
+        void* m_currentPainter; // QPainter* for overlay rendering
         Timer m_timer;
         Timer m_stopTimer;
         Timer m_userTimer;

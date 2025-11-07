@@ -71,6 +71,7 @@ namespace Rv
     NODE_DECLARATION(openUrlFromUrl, void);
     NODE_DECLARATION(mainWindowWidget, Mu::Pointer);
     NODE_DECLARATION(mainViewWidget, Mu::Pointer);
+    NODE_DECLARATION(mainViewPainter, Mu::Pointer);
     NODE_DECLARATION(prefTabWidget, Mu::Pointer);
     NODE_DECLARATION(sessionBottomToolBar, Mu::Pointer);
     NODE_DECLARATION(networkAccessManager, Mu::Pointer);

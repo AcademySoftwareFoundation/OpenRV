@@ -15,6 +15,7 @@ use math;
 use math_util;
 use commands;
 use extra_commands;
+use qt;
 use gl;
 use glu;
 require io;
@@ -275,6 +276,33 @@ class: ImageInfo : Widget
         }
 
         updateBounds(emin, emax);
+
+        let widget = mainViewWidget();
+        let cx = widget.width() / 2.0;
+        let cy = widget.height() / 2.0;
+
+        // Get the paint device and create QPainter
+        let painter = commands.mainViewPainter();
+        if (painter eq nil) return;
+
+        // Draw a crosshair in the center
+        let pen = qt.QPen(qt.QColor(255, 0, 0));  // Red, 3px wide
+        painter.setPen(pen);
+        
+        let crossSize = 50.0;
+        // Horizontal line
+        painter.drawLine(cx - crossSize, cy, cx + crossSize, cy);
+        // Vertical line
+        painter.drawLine(cx, cy - crossSize, cx, cy + crossSize);
+        
+        // Draw a circle in the center
+        painter.setBrush(qt.QBrush(qt.QColor(255, 0, 0, 128)));  // Semi-transparent red
+        painter.drawEllipse(qt.QPointF(cx, cy), 10.0, 10.0);
+        
+        // Draw text above the crosshair
+        painter.setPen(qt.QPen(qt.QColor(255, 255, 255)));  // White
+        painter.setFont(qt.QFont("Arial", 16, qt.QFont.Bold));
+        painter.drawText(cx - 60.0, cy - 60.0, "QPainter Test!");        
     }
 }
 
