@@ -28,6 +28,7 @@ class: PyMinorMode : MinorMode
     PyObject _activateFunc;
     PyObject _deactivateFunc;
     PyObject _renderFunc;
+    PyObject _renderOverlayFunc;
     PyObject _layoutFunc;
 
     method: PyMinorMode (PyMinorMode; PyObject obj)
@@ -58,6 +59,8 @@ class: PyMinorMode : MinorMode
 	//
 
         _renderFunc         = PyObject_GetAttr(_pymode, "render");
+	Py_INCREF(_pymode);
+        _renderOverlayFunc  = PyObject_GetAttr(_pymode, "renderOverlay");
 	Py_INCREF(_pymode);
         _layoutFunc         = PyObject_GetAttr(_pymode, "layout");
 	Py_INCREF(_pymode);
@@ -99,6 +102,13 @@ class: PyMinorMode : MinorMode
         // NOTE: _renderFunc is partially evalled by python so no need to
         // give it _pymode as the "self" argument. Just pass in the event.
         PyObject_CallObject(_renderFunc, event);
+    }
+
+    method: renderOverlay (void; Event event)
+    {
+        // NOTE: _renderOverlayFunc is partially evalled by python so no need to
+        // give it _pymode as the "self" argument. Just pass in the event.
+        PyObject_CallObject(_renderOverlayFunc, event);
     }
 }
 

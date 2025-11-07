@@ -1730,6 +1730,7 @@ httpPut(...)
 
 mainWindowWidget "Returns the main window Qt widget"
 mainViewWidget "Returns a qt.QWidget corresponding to the session's QGLWidget"
+mainViewPainter "Returns the current qt.QPainter for overlay rendering (only valid during renderOverlay events)"
 prefTabWidget "Returns the preferences tab Qt widget"
 sessionBottomToolBar "Returns the QToolBar for the current RV session bottom tool bar"
 networkAccessManager "Returns Qt network access manager object"

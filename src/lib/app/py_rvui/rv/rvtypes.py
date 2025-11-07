@@ -85,6 +85,10 @@ class Mode(object):
         "The render function is called on each active minor mode."
         pass
 
+    def renderOverlay(self, event):
+        "The renderOverlay function is called after paintGL completes, allowing QPainter-based drawing on top of the OpenGL content."
+        pass
+
     def supportPath(self, module, packageName=None):
         if packageName is None:
             packageName = module.__name__

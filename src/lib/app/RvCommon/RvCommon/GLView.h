@@ -75,6 +75,7 @@ namespace Rv
         void initializeGL();
         void resizeGL(int w, int h);
         void paintGL();
+        void paintEvent(QPaintEvent* event) override;
         bool validateReadPixels(int x, int y, int w, int h);
         void debugSaveFramebuffer();
 

@@ -412,6 +412,33 @@ class: PresentationControlMinorMode : MinorMode
 	*/
     }
 
+    method: renderOutputDeviceOverlay (void; Event event)
+    {
+        // TEST IMPLEMENTATION: renderOutputDevice does weird things
+        // with the gc and other things !?!?!?
+        event.reject();
+
+        // Don't draw on empty session
+        if (isCurrentFrameIncomplete()) return;
+
+        State state = data();
+
+        // Call renderOverlay() on all active modes that have implemented it
+        for_each (m; state.minorModes) if (m._active && m._drawOnPresentation) m.renderOverlay(event);
+        for_each (w; state.widgets) if (w._active && w._drawOnPresentation) w.renderOverlay(event);
+
+        // Call renderOverlay on specific widgets
+        if (_showTimelineMagnifier && state.motionScope neq nil && state.motionScope._active) state.motionScope.renderOverlay(event);
+        if (_showTimeline && state.timeline neq nil && state.timeline._active) state.timeline.renderOverlay(event);
+        // Use widget's _active flag instead of presentation mode's _showImageInfo flag
+        if (state.imageInfo neq nil && state.imageInfo._active) state.imageInfo.renderOverlay(event);
+        if (_showSourceDetails && state.sourceDetails neq nil && state.sourceDetails._active) state.sourceDetails.renderOverlay(event);
+        if (_showInfoStrip && state.infoStrip neq nil && state.infoStrip._active) state.infoStrip.renderOverlay(event);
+        if (_showInspector && state.inspector neq nil && state.inspector._active) state.inspector.renderOverlay(event);
+        if (_showSync && state.sync neq nil && state.sync._active) state.sync.renderOverlay(event);
+        if (_showWipes && state.wipe neq nil && state.wipe._active) state.wipe.renderOverlay(event);
+    }
+
     method: deviceChanged (void; Event event)
     {
         event.reject();
@@ -503,6 +530,7 @@ class: PresentationControlMinorMode : MinorMode
              [("pointer--move", move, "Track pointer"),
               ("stylus-pen--move", move, "Track stylus pointer"),
               ("render-output-device", renderOutputDevice, "Render"),
+              ("render-output-device-overlay", renderOutputDeviceOverlay, "Render Overlay with QPainter"),
               ("output-video-device-changed", deviceChanged, ""),
               ("pre-render", preRender, ""),
               ("key-down--!", scaleOneToOne, "Set image scale to 1:1 on presentation device"),

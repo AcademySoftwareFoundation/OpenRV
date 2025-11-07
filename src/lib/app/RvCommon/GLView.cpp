@@ -25,6 +25,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 #include <QtWidgets/QMenu>
+#include <QPainter>
 
 namespace Rv
 {
@@ -576,6 +577,25 @@ namespace Rv
         m_eventProcessingTimer.start();
 
         TWK_GLDEBUG;
+    }
+
+    void GLView::paintEvent(QPaintEvent* event)
+    {
+        // First, let QOpenGLWidget do its normal rendering (calls paintGL())
+        QOpenGLWidget::paintEvent(event);
+
+        // After OpenGL rendering is complete, create QPainter for overlay
+        // rendering
+        IPCore::Session* session = m_doc->session();
+        if (session)
+        {
+            QPainter painter(this);
+            session->setCurrentPainter(&painter);
+
+            session->userRenderEvent("render-output-device-overlay", "");
+
+            session->setCurrentPainter(nullptr);
+        }
     }
 
     void GLView::eventProcessingTimeout()

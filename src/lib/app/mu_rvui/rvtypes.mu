@@ -256,6 +256,9 @@ class: Mode
     documentation: "The render function is called on each active minor mode."
     method: render (void; Event event) { ; }
 
+    documentation: "The renderOverlay function is called after paintGL completes, allowing QPainter-based drawing on top of the OpenGL content."
+    method: renderOverlay (void; Event event) { ; }
+
     method: supportPath (string; string moduleName, string packageName)
     {
         use io;
