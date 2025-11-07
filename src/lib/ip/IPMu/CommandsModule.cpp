@@ -4143,12 +4143,29 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
+    // This is for backwards compatibility with the old live review plugin and latest OpenRV.
+    // TODO: Remove setFilterLiveReviewEvents command in the future.
     NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
     {
         Session* s = Session::currentSession();
         bool shouldFilterEvents = NODE_ARG(0, bool);
 
-        s->setFilterLiveReviewEvents(shouldFilterEvents);
+        if (s && shouldFilterEvents)
+        {
+            // Disable all event categories
+            for (const auto& category : EventCategories::all_categories())
+            {
+                s->disableEventCategory(category);
+            }
+        }
+        else if (s && !shouldFilterEvents)
+        {
+            // Re-enable all event categories
+            for (const auto& category : EventCategories::all_categories())
+            {
+                s->enableEventCategory(category);
+            }
+        }
     }
 
     NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)

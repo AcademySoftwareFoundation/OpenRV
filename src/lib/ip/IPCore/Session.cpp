@@ -720,18 +720,13 @@ namespace IPCore
         }
     }
 
-    void Session::setFilterLiveReviewEvents(bool shouldFilterEvents)
-    {
-        m_filterLiveReviewEvents = shouldFilterEvents;
-    }
-
     bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
 
     //----------------------------------------------------------------------
     // Event Category Blocking
     //----------------------------------------------------------------------
 
-    void Session::enableEventCategory(const std::string& category)
+    void Session::enableEventCategory(std::string_view category)
     {
         // Don't enable empty category (legacy commands)
         if (category.empty())
@@ -746,7 +741,7 @@ namespace IPCore
         }
     }
 
-    void Session::disableEventCategory(const std::string& category)
+    void Session::disableEventCategory(std::string_view category)
     {
         // Don't disable empty category (legacy commands)
         if (category.empty())
@@ -759,9 +754,10 @@ namespace IPCore
         {
             m_disabledEventCategories.push_back(category);
         }
+        std::cout << "Disabled event category: " << category << std::endl;
     }
 
-    bool Session::isEventCategoryDisabled(const std::string& category) const
+    bool Session::isEventCategoryDisabled(std::string_view category) const
     {
         // Empty category (legacy commands) is never disabled
         if (category.empty())
@@ -772,12 +768,12 @@ namespace IPCore
                != m_disabledEventCategories.end();
     }
 
-    bool Session::isEventCategoryEnabled(const std::string& category) const
+    bool Session::isEventCategoryEnabled(std::string_view category) const
     {
         return !isEventCategoryDisabled(category);
     }
 
-    const std::vector<std::string>& Session::disabledEventCategories() const
+    const std::vector<std::string_view>& Session::disabledEventCategories() const
     {
         return m_disabledEventCategories;
     }
@@ -4674,31 +4670,6 @@ namespace IPCore
     {
         if (m_beingDeleted)
             return "";
-
-        if (m_filterLiveReviewEvents
-            && (eventName == "mode-manager-toggle-mode"
-                || (eventName == "remote-eval"
-                    && (contents == "commands.stop()"
-                        || contents
-                               == "commands.scrubAudio(false); "
-                                  "commands.setInc(-1); commands.play();"
-                        || contents == "commands.setInc(-1); commands.play();"
-                        || contents
-                               == "commands.scrubAudio(false); "
-                                  "commands.setInc(1); commands.play();"
-                        || contents == "commands.setInc(1); commands.play();"
-                        || contents == "rvui.previousMarkedFrame()"
-                        || contents == "rvui.nextMarkedFrame()"
-                        || contents == "extra_commands.stepForward(1)"
-                        || contents == "extra_commands.stepBackward(1)"
-                        || contents == "commands.setPlayMode(PlayOnce)"
-                        || contents == "commands.setPlayMode(PlayPingPong)"
-                        || contents == "commands.setPlayMode(PlayLoop)"))))
-        {
-            GenericStringEvent event("live-review-blocked-event", this, "");
-            sendEvent(event);
-            return "";
-        }
 
         // cout << "userGenericEvent: " << eventName << " '" << contents << "'"
         // << endl;
