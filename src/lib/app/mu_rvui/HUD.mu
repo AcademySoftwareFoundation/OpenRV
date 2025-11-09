@@ -9,6 +9,7 @@
 module: HUD {
 use rvtypes;
 use glyph;
+use glyph2;
 use app_utils;
 use math_linear;
 use math;
@@ -256,53 +257,27 @@ class: ImageInfo : Widget
         }
 
         let devicePixelRatio = devicePixelRatio();
+        devicePixelRatio = 1.0;
         gltext.size(state.config.infoTextSize*devicePixelRatio);
-        setupProjection(domain.x, domain.y, event.domainVerticalFlip());
+        g2SetupProjection(domain.x, domain.y);
 
         let margin  = state.config.bevelMargin*devicePixelRatio,
             x       = _x*devicePixelRatio + margin,
             y       = _y*devicePixelRatio + margin,
             wrap    = if (_wrap) then 80*devicePixelRatio else 0,
-            tbox    = drawNameValuePairs(expandNameValuePairs(attrs, wrap),
+            tbox    = g2DrawNameValuePairs(expandNameValuePairs(attrs, wrap),
                                          fg, bg, x, y, margin)._0,
             emin    = vec2f(_x, _y),
             emax    = emin + (tbox + vec2f(margin*2.0, 0.0))/devicePixelRatio;
 
         if (_inCloseArea)
         {
-            drawCloseButton(x - margin/2,
+            g2DrawCloseButton(x - margin/2,
                             tbox.y + y - margin - margin/4,
                             margin/2, bg, fg);
         }
 
         updateBounds(emin, emax);
-
-        let widget = mainViewWidget();
-        let cx = widget.width() / 2.0;
-        let cy = widget.height() / 2.0;
-
-        // Get the paint device and create QPainter
-        let painter = commands.mainViewPainter();
-        if (painter eq nil) return;
-
-        // Draw a crosshair in the center
-        let pen = qt.QPen(qt.QColor(255, 0, 0));  // Red, 3px wide
-        painter.setPen(pen);
-        
-        let crossSize = 50.0;
-        // Horizontal line
-        painter.drawLine(cx - crossSize, cy, cx + crossSize, cy);
-        // Vertical line
-        painter.drawLine(cx, cy - crossSize, cx, cy + crossSize);
-        
-        // Draw a circle in the center
-        painter.setBrush(qt.QBrush(qt.QColor(255, 0, 0, 128)));  // Semi-transparent red
-        painter.drawEllipse(qt.QPointF(cx, cy), 10.0, 10.0);
-        
-        // Draw text above the crosshair
-        painter.setPen(qt.QPen(qt.QColor(255, 255, 255)));  // White
-        painter.setFont(qt.QFont("Arial", 16, qt.QFont.Bold));
-        painter.drawText(cx - 60.0, cy - 60.0, "QPainter Test!");        
     }
 }
 
