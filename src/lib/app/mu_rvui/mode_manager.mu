@@ -220,9 +220,9 @@ class: ModeManagerMode : MinorMode
                 return DisabledMenuState;
             }
     
-            if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+            if (!commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager")
             {
-                sendInternalEvent("category-event-blocked", "media_category");
+                sendInternalEvent("category-event-blocked", "sessionmanager_category");
                 return DisabledMenuState;
             }
     
@@ -444,9 +444,9 @@ class: ModeManagerMode : MinorMode
             return;
         }
 
-        if (!commands.isEventCategoryEnabled("media_category") && entry.name == "session_manager")
+        if (!commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager")
         {
-            sendInternalEvent("category-event-blocked", "media_category");
+            sendInternalEvent("category-event-blocked", "sessionmanager_category");
             return;
         }
             

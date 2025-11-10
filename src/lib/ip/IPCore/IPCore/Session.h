@@ -16,9 +16,11 @@
 #include <TwkContainer/PropertyContainer.h>
 #include <TwkMath/Time.h>
 #include <TwkUtil/Timer.h>
+#include <array>
 #include <map>
 #include <limits>
 #include <deque>
+#include <string_view>
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -29,6 +31,60 @@ namespace IPCore
     class IPNode;
     class ImageRenderer;
     class PropertyInfo;
+
+    //
+    //  Event Category Constants
+    //
+    //  Central definition of all event category names used throughout RV.
+    //  These categories are used by the event filtering system to control
+    //  which UI actions are enabled/disabled.
+    //
+    namespace EventCategories
+    {
+        inline constexpr std::string_view annotateCategory = "annotate_category";
+        inline constexpr std::string_view clearCategory = "clear_category";
+        inline constexpr std::string_view exportCategory = "export_category";
+        inline constexpr std::string_view flowptCategory = "flowpt_category";
+        inline constexpr std::string_view helpCategory = "help_category";
+        inline constexpr std::string_view infoCategory = "info_category";
+        inline constexpr std::string_view markCategory = "mark_category";
+        inline constexpr std::string_view mediaCategory = "media_category";
+        inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view presentationCategory = "presentation_category";
+        inline constexpr std::string_view sessionmanagerCategory = "sessionmanager_category";
+        inline constexpr std::string_view sourceCategory = "source_category";
+        inline constexpr std::string_view systemCategory = "system_category";
+        inline constexpr std::string_view screeningroomCategory = "screeningroom_category";
+        inline constexpr std::string_view unclassifiedCategory = "unclassified_category";
+        inline constexpr std::string_view viewmodeCategory = "viewmode_category";
+        inline constexpr std::string_view wipesCategory = "wipes_category";
+
+        constexpr auto all_categories()
+        {
+            // Explicitly specify template parameters for MSVC compatibility.
+            // CTAD (Class Template Argument Deduction) works on GCC/Clang but
+            // fails on Windows MSVC, so we specify <std::string_view, 17> explicitly.
+            return std::array<std::string_view, 17>{
+                annotateCategory,
+                clearCategory,
+                exportCategory,
+                flowptCategory,
+                helpCategory,
+                infoCategory,
+                markCategory,
+                mediaCategory,
+                playcontrolCategory,
+                presentationCategory,
+                sessionmanagerCategory,
+                sourceCategory,
+                systemCategory,
+                screeningroomCategory,
+                unclassifiedCategory,
+                viewmodeCategory,
+                wipesCategory
+            };
+        }
+    }
 
     //
     //  class Session
@@ -814,17 +870,16 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(bool shouldFilterEvents = false);
         bool filterLiveReviewEvents();
 
         //
         //  Event Category Blocking
         //
-        void enableEventCategory(const std::string& category);
-        void disableEventCategory(const std::string& category);
-        bool isEventCategoryDisabled(const std::string& category) const;
-        bool isEventCategoryEnabled(const std::string& category) const;
-        const std::vector<std::string>& disabledEventCategories() const;
+        void enableEventCategory(std::string_view category);
+        void disableEventCategory(std::string_view category);
+        bool isEventCategoryDisabled(std::string_view category) const;
+        bool isEventCategoryEnabled(std::string_view category) const;
+        const std::vector<std::string_view>& disabledEventCategories() const;
 
         //
         //  Marks
@@ -1304,7 +1359,7 @@ namespace IPCore
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
         bool m_filterLiveReviewEvents{false};
-        std::vector<std::string>
+        std::vector<std::string_view>
             m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;
