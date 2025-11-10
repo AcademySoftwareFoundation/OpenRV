@@ -57,8 +57,8 @@ void QAlertPanel::setupUI()
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     m_textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    m_textLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_textLabel->setMinimumSize(0, 0);        // Allow it to shrink
+    m_textLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    m_textLabel->setFixedSize(100, 50);       // by default, 2x large as high
     m_textLabel->setFocusPolicy(Qt::NoFocus); // Prevent text from taking focus
     m_contentLayout->addWidget(m_textLabel, 1);
 
@@ -217,17 +217,8 @@ void QAlertPanel::adjustBestFitDimensions()
             }
         }
 
-        // Calculate dialog size with reasonable padding
-        int dialogWidth =
-            bestWidth + 100; // Add padding for icon and margins (87 + buffer)
-        int dialogHeight =
-            bestHeight + 80; // Add padding for buttons and margins
-
-        // Set minimum size to calculated dimensions, but allow expansion
-        setMinimumSize(dialogWidth, dialogHeight);
-
-        // Set the calculated size as initial size
-        resize(dialogWidth, dialogHeight);
+        // set the size of the text label as per calculated dimensions.
+        m_textLabel->setFixedSize(bestWidth, bestHeight);
     }
     else
     {
