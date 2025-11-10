@@ -5230,9 +5230,30 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                 state.ddFileKind == MovieFileKind ||
                 state.ddFileKind == DirectoryFileKind)
             {
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Add as Layer", 
-                                                         "Add Source to Session"});
+                // Check if media operations are allowed
+                bool mediaAllowed = isEventCategoryEnabled("media_category");
+                
+                // Build list of available drop regions based on category state
+                string[] regions;
+                if (mediaAllowed)
+                {
+                    regions = string[] {"Add as Layer", "Add Source to Session"};
+                }
+                else
+                {
+                    // Show blocked regions when media category is disabled
+                    regions = string[] {"Add as Layer", "Add Source to Session"};
+                }
+                
+                if (mediaAllowed)
+                {
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20, regions);
+                }
+                else
+                {
+                    drawBlockedRegions(w, h, x, y, 20, regions);
+                    state.ddRegion = -1;  // No valid drop region
+                }
 
                 (void;string) F = if state.ddRegion == 0 
                                        then addToClosestSource(,"drop")
@@ -5271,80 +5292,116 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
             }
             else if (state.ddFileKind == CDLFileKind)
             {
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Set File CDL",
-                                                           "Set Look CDL"});
+                // Check if source modifications are allowed
+                bool sourceAllowed = isEventCategoryEnabled("source_category");
+                
+                if (sourceAllowed)
+                {
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20,
+                                                     string[] {"Set File CDL",
+                                                               "Set Look CDL"});
 
-                let N = if state.ddRegion == 0
-                             then "#RVLinearize"
-                             else if state.ddRegion == 1
-                                   then "#RVColor"
-                                   else "";
+                    let N = if state.ddRegion == 0
+                                 then "#RVLinearize"
+                                 else if state.ddRegion == 1
+                                       then "#RVColor"
+                                       else "";
 
-                state.ddDropFunc = \: (void; int a, string s) 
-                { 
-                    if (N == "")
-                    {
-                        ddCancelled(s);
-                    }
-                    else
-                    {
-                        try
+                    state.ddDropFunc = \: (void; int a, string s) 
+                    { 
+                        if (N == "")
                         {
-                            readCDL(s, N, true);
-                            displayFeedback("%s CDL" % path.basename(s));
+                            ddCancelled(s);
                         }
-                        catch (exception exc)
+                        else
                         {
-                            let sexc = string(exc);
-                            displayFeedback("Unable to read CDL %s: %s" % (path.basename(s), sexc));
+                            try
+                            {
+                                readCDL(s, N, true);
+                                displayFeedback("%s CDL" % path.basename(s));
+                            }
+                            catch (exception exc)
+                            {
+                                let sexc = string(exc);
+                                displayFeedback("Unable to read CDL %s: %s" % (path.basename(s), sexc));
+                            }
                         }
-                    }
-                };
+                    };
+                }
+                else
+                {
+                    // Show blocked regions when source category is disabled
+                    drawBlockedRegions(w, h, x, y, 20, string[] {"Set File CDL", "Set Look CDL"});
+                    state.ddRegion = -1;
+                }
             }
             else if (state.ddFileKind == LUTFileKind)
             {
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Set Display LUT", 
-                                                           "Set File LUT",
-                                                           "Set Look LUT"});
+                // Check if source modifications are allowed
+                bool sourceAllowed = isEventCategoryEnabled("source_category");
+                
+                if (sourceAllowed)
+                {
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20,
+                                                     string[] {"Set Display LUT", 
+                                                               "Set File LUT",
+                                                               "Set Look LUT"});
 
-                let N = if state.ddRegion == 0 
-                           then "@RVDisplayColor"
-                           else if state.ddRegion == 1
-                                 then "#RVLinearize"
-                                 else if state.ddRegion == 2
-                                       then "#RVLookLUT"
-                                       else "";
+                    let N = if state.ddRegion == 0 
+                               then "@RVDisplayColor"
+                               else if state.ddRegion == 1
+                                     then "#RVLinearize"
+                                     else if state.ddRegion == 2
+                                           then "#RVLookLUT"
+                                           else "";
 
-                state.ddDropFunc = \: (void; int a, string s) 
-                { 
-                    if (N == "")
-                    {
-                        ddCancelled(s);
-                    }
-                    else
-                    {
-                        try
+                    state.ddDropFunc = \: (void; int a, string s) 
+                    { 
+                        if (N == "")
                         {
-                            readLUT(s, N, true);
-                            displayFeedback("%s LUT" % path.basename(s));
+                            ddCancelled(s);
                         }
-                        catch (exception exc)
+                        else
                         {
-                            let sexc = string(exc);
-                            displayFeedback("Unable to read LUT %s: %s" % (path.basename(s), sexc));
+                            try
+                            {
+                                readLUT(s, N, true);
+                                displayFeedback("%s LUT" % path.basename(s));
+                            }
+                            catch (exception exc)
+                            {
+                                let sexc = string(exc);
+                                displayFeedback("Unable to read LUT %s: %s" % (path.basename(s), sexc));
+                            }
                         }
-                    }
-                };
+                    };
+                }
+                else
+                {
+                    // Show blocked regions when source category is disabled
+                    drawBlockedRegions(w, h, x, y, 20, string[] {"Set Display LUT", "Set File LUT", "Set Look LUT"});
+                    state.ddRegion = -1;
+                }
             }
             else if (state.ddFileKind == RVFileKind)
             {
-                state.ddProgressiveDrop = true;
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Replace Session"});
+                // Check if media operations are allowed
+                bool mediaAllowed = isEventCategoryEnabled("media_category");
+                
+                if (mediaAllowed)
+                {
+                    state.ddProgressiveDrop = true;
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20,
+                                                     string[] {"Replace Session"});
 
-                state.ddDropFunc = \: (void; int a, string s) { addSources(string[] {s}, "drop"); };
+                    state.ddDropFunc = \: (void; int a, string s) { addSources(string[] {s}, "drop"); };
+                }
+                else
+                {
+                    // Show blocked regions when media category is disabled
+                    drawBlockedRegions(w, h, x, y, 20, string[] {"Replace Session"});
+                    state.ddRegion = -1;
+                }
             }
             else
             {
@@ -5377,46 +5434,82 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                 state.ddFileKind == MovieFileKind ||
                 state.ddFileKind == DirectoryFileKind)
             {
-                state.ddProgressiveDrop = true;
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Add Source to Session"});
-                state.ddDropFunc = \: (void; int a, string s) 
-                { 
-                    let f     = frameEnd(),
-                    empty = sources().size() == 0;
+                // Check if media operations are allowed
+                bool mediaAllowed = isEventCategoryEnabled("media_category");
+                
+                if (mediaAllowed)
+                {
+                    state.ddProgressiveDrop = true;
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20,
+                                                     string[] {"Add Source to Session"});
+                    state.ddDropFunc = \: (void; int a, string s) 
+                    { 
+                        let f     = frameEnd(),
+                        empty = sources().size() == 0;
 
-                    addSources(string[] {s}, "drop"); 
+                        addSources(string[] {s}, "drop"); 
 
-                    if (empty)
-                    {
-                        setFrame(frameStart());
-                    }
-                    else
-                    {
-                        setFrame(f + 1);
-                        //markFrame(f + 1, true);
-                        //markFrame(frameStart(), true);
-                    }
-                    redraw();
-                };
+                        if (empty)
+                        {
+                            setFrame(frameStart());
+                        }
+                        else
+                        {
+                            setFrame(f + 1);
+                            //markFrame(f + 1, true);
+                            //markFrame(frameStart(), true);
+                        }
+                        redraw();
+                    };
+                }
+                else
+                {
+                    // Show blocked regions when media category is disabled
+                    drawBlockedRegions(w, h, x, y, 20, string[] {"Add Source to Session"});
+                    state.ddRegion = -1;
+                }
             }
             else if (state.ddFileKind == RVFileKind)
             {
-                state.ddProgressiveDrop = true;
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Load Session"});
+                // Check if media operations are allowed
+                bool mediaAllowed = isEventCategoryEnabled("media_category");
+                
+                if (mediaAllowed)
+                {
+                    state.ddProgressiveDrop = true;
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20,
+                                                     string[] {"Load Session"});
 
-                state.ddDropFunc = \: (void; int a, string s) { addSources(string[] {s}, "drop"); };
+                    state.ddDropFunc = \: (void; int a, string s) { addSources(string[] {s}, "drop"); };
+                }
+                else
+                {
+                    // Show blocked regions when media category is disabled
+                    drawBlockedRegions(w, h, x, y, 20, string[] {"Load Session"});
+                    state.ddRegion = -1;
+                }
             }
             else if (state.ddFileKind == LUTFileKind)
             {
-                state.ddRegion = drawDropRegions(w, h, x, y, 20,
-                                                 string[] {"Set Display LUT"});
+                // Check if source modifications are allowed
+                bool sourceAllowed = isEventCategoryEnabled("source_category");
+                
+                if (sourceAllowed)
+                {
+                    state.ddRegion = drawDropRegions(w, h, x, y, 20,
+                                                     string[] {"Set Display LUT"});
 
-                state.ddDropFunc = \: (void; int a, string s) 
-                { 
-                    readLUT(s, "@RVDisplayColor", true); 
-                };
+                    state.ddDropFunc = \: (void; int a, string s) 
+                    { 
+                        readLUT(s, "@RVDisplayColor", true); 
+                    };
+                }
+                else
+                {
+                    // Show blocked regions when source category is disabled
+                    drawBlockedRegions(w, h, x, y, 20, string[] {"Set Display LUT"});
+                    state.ddRegion = -1;
+                }
             }
             else
             {
