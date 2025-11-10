@@ -9,12 +9,14 @@
 module: HUD {
 use rvtypes;
 use glyph;
+use glyph2;
 use app_utils;
 use math_linear;
 use math;
 use math_util;
 use commands;
 use extra_commands;
+use qt;
 use gl;
 use glu;
 require io;
@@ -255,21 +257,22 @@ class: ImageInfo : Widget
         }
 
         let devicePixelRatio = devicePixelRatio();
+        devicePixelRatio = 1.0;
         gltext.size(state.config.infoTextSize*devicePixelRatio);
-        setupProjection(domain.x, domain.y, event.domainVerticalFlip());
+        g2SetupProjection(domain.x, domain.y);
 
         let margin  = state.config.bevelMargin*devicePixelRatio,
             x       = _x*devicePixelRatio + margin,
             y       = _y*devicePixelRatio + margin,
             wrap    = if (_wrap) then 80*devicePixelRatio else 0,
-            tbox    = drawNameValuePairs(expandNameValuePairs(attrs, wrap),
+            tbox    = g2DrawNameValuePairs(expandNameValuePairs(attrs, wrap),
                                          fg, bg, x, y, margin)._0,
             emin    = vec2f(_x, _y),
             emax    = emin + (tbox + vec2f(margin*2.0, 0.0))/devicePixelRatio;
 
         if (_inCloseArea)
         {
-            drawCloseButton(x - margin/2,
+            g2DrawCloseButton(x - margin/2,
                             tbox.y + y - margin - margin/4,
                             margin/2, bg, fg);
         }

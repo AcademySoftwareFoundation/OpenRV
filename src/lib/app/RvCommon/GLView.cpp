@@ -25,6 +25,7 @@
 #include <boost/thread/condition_variable.hpp>
 
 #include <QtWidgets/QMenu>
+#include <QPainter>
 
 namespace Rv
 {
@@ -369,9 +370,34 @@ namespace Rv
         // image.save("/home/<username>>/<orv_folder>/fbo.png");
     }
 
+    class QPainterScope
+    {
+    public:
+        QPainterScope(GLView* view, IPCore::Session* session)
+            : m_view(view)
+            , m_session(session)
+
+        {
+            m_painter = new QPainter(m_view);
+            m_session->setCurrentPainter(m_painter);
+        }
+
+        ~QPainterScope()
+        {
+            m_session->setCurrentPainter(nullptr);
+            delete m_painter;
+        }
+
+        GLView* m_view;
+        IPCore::Session* m_session;
+        QPainter* m_painter;
+    };
+
     void GLView::paintGL()
     {
         TWK_GLDEBUG;
+
+        QPainterScope painterScope(this, m_doc->session());
 
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;

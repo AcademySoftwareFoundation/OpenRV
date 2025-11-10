@@ -49,6 +49,9 @@ SET(_sources
 )
 
 SET(_autotypes
+    Painter
+    PainterPath
+    Pen
     Color
     Size
     Point

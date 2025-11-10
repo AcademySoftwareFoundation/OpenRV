@@ -389,6 +389,7 @@ namespace IPCore
         , m_wantsRedraw(false)
         , m_fullScreen(false)
         , m_renderer(0)
+        , m_currentPainter(0)
         , m_realfps(0)
         , m_lastCheckTime(0)
         , m_lastCheckFrame(0)

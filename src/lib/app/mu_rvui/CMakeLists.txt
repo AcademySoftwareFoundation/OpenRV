@@ -57,6 +57,7 @@ CONFIGURE_FILE(window_mode.mu.in ${CMAKE_CURRENT_SOURCE_DIR}/window_mode.mu @ONL
 SET(_mumodules
     rvui.mu
     glyph.mu
+    glyph2.mu
     app_utils.mu
     export_utils.mu
     rvtypes.mu

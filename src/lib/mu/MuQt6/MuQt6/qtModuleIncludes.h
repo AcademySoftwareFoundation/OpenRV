@@ -177,3 +177,6 @@
 #include <MuQt6/QListWidgetType.h>
 #include <MuQt6/QTreeWidgetType.h>
 #include <MuQt6/QTableWidgetType.h>
+#include <MuQt6/QPainterType.h>
+#include <MuQt6/QPainterPathType.h>
+#include <MuQt6/QPenType.h>
