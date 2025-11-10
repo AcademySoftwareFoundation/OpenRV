@@ -54,11 +54,9 @@ namespace TwkMovie
     GenericIO::Preloader::Reader::Reader(std::string_view filename,
                                          const Movie::ReadRequest& request)
     {
-        m_movieReader = nullptr;
+        // other members initialized to default in the class definition
         m_filename = filename;
-        m_status = Status::PENDING;
         m_request = request;
-        m_priority = false;
     }
 
     void GenericIO::Preloader::Reader::clearFilename()

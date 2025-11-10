@@ -357,11 +357,11 @@ namespace TwkMovie
 
             public:
                 std::string m_filename;
-                Status m_status;
-                bool m_priority;
+                Status m_status = Status::PENDING;
+                bool m_priority = false;
                 std::thread m_thread;
                 Movie::ReadRequest m_request;
-                MovieReader* m_movieReader;
+                MovieReader* m_movieReader = nullptr;
             };
 
         public:
