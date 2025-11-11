@@ -36,7 +36,7 @@ RV_VFX_SET_VARIABLE(
 )
 
 SET(_download_url
-    "https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v${_version}.tar.gz"
+    "https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v${_version}.zip"
 )
 
 # Another project that isn't adding a debug postfix

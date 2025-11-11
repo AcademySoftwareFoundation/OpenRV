@@ -24,7 +24,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2025")
     # https://github.com/AcademySoftwareFoundation/OpenColorIO
     SET(RV_DEPS_OCIO_VERSION "2.4.2")
     SET(RV_DEPS_OCIO_VERSION_SHORT "2_4")
-    SET(RV_DEPS_OCIO_DOWNLOAD_HASH "db64ac0b4a67fd8e6d6d8111dccade29")
+    SET(RV_DEPS_OCIO_DOWNLOAD_HASH "1bc8f31a1479ce6518644cdd7df26631")
 
     # OIIO
     # https://github.com/AcademySoftwareFoundation/OpenImageIO
