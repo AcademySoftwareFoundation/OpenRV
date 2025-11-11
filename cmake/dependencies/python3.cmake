@@ -33,8 +33,12 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
+# This version is used for:
+# 1. Building OpenTimelineIO from source for Windows debug builds
+# 2. Generating src/build/requirements.txt from requirements.txt.in template
+#    (used by all other platforms/builds to install from PyPI)
 SET(_opentimelineio_version
-    "0.16.0"
+    "0.18.1"
 )
 
 RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.10" CY2024 "6.5.3")
@@ -249,8 +253,15 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
+# Generate requirements.txt from template with the OpenTimelineIO version substituted
+CONFIGURE_FILE(
+    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
+    "${CMAKE_BINARY_DIR}/requirements.txt"
+    @ONLY
+)
+
 SET(_requirements_file
-    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt"
+    "${CMAKE_BINARY_DIR}/requirements.txt"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -363,7 +374,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${_requirements_file}
+  DEPENDS ${_python3_target} ${_requirements_file} "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
 )
 
 IF(RV_TARGET_WINDOWS
@@ -375,7 +386,7 @@ IF(RV_TARGET_WINDOWS
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file} "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
   )
 ENDIF()
 
