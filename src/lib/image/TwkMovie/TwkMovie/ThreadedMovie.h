@@ -76,25 +76,6 @@ namespace TwkMovie
 
         void dispatchAll();
 
-    protected:
-        void lock();
-        void unlock();
-
-        struct Lock
-        {
-            Lock(ThreadedMovie* m)
-                : movie(m)
-            {
-                movie->lock();
-            }
-
-            ~Lock() { movie->unlock(); }
-
-            ThreadedMovie* movie;
-        };
-
-        friend class ThreadedMovie::Lock;
-
     private:
         Movies m_movies;
         ThreadGroup m_threadGroup;
