@@ -61,28 +61,24 @@ ENDIF()
 #
 # VFX Platform option
 #
+INCLUDE(${RV_VFX_PLATFORM})
+# Add preprocessor variable for use in the code and cmake variable to 
+# decide the version of an external dependencies based on the VFX 
+# platform. 
+#
+# Note that the macro in rv_vfx.cmake are dependant on those
+# RV_VFX_CY20XX.
 
-# Add preprocessor variable for use in the code and cmake variable to decide the version of an external dependencies based on the VFX platform. Note that the
-# macro in rv_vfx.cmake are dependant on those RV_VFX_CY20XX.
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
-  SET(RV_VFX_CY2024
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_VFX_CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   SET(RV_QT_PACKAGE_NAME
       "Qt6"
   )
   SET(RV_QT_MU_TARGET
       "MuQt6"
   )
-ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
-  SET(RV_VFX_CY2023
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_VFX_CY2023)
+ELSEIF(RV_VFX_PLATFORM STREQUAL "CY2023")
   SET(RV_QT_PACKAGE_NAME
-      "Qt5"
-  )
+      "Qt5" )
   SET(RV_QT_MU_TARGET
       "MuQt5"
   )

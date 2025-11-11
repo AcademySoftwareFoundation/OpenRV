@@ -1,0 +1,76 @@
+# CY2026 VFX Reference Platform versions of dependencies
+# see https://vfxplatform.com/
+
+IF(RV_VFX_PLATFORM STREQUAL "CY2026")
+    # Year
+    SET(RV_VFX_CY_YEAR "2026")
+    SET(RV_VFX_CY2026 ON )
+    ADD_COMPILE_DEFINITIONS(RV_VFX_CY2026)
+
+    # Boost
+    SET(RV_DEPS_BOOST_VERSION "1.88.0")
+    SET(RV_DEPS_BOOST_MAJOR_MINOR_VERSION "1_88")
+    SET(RV_DEPS_BOOST_DOWNLOAD_HASH "6cd58b3cc890e4fbbc036c7629129e18")
+
+    # Imath
+    SET(RV_DEPS_IMATH_VERSION "3.2.2")
+    SET(RV_DEPS_IMATH_DOWNLOAD_HASH "d9c3aadc25a7d47a893b649787e59a44")
+
+    # NumPy
+    # https://numpy.org/doc/stable/release.html
+    SET(ENV{RV_DEPS_NUMPY_VERSION} "2.3.0")
+
+    # OCIO
+    # https://github.com/AcademySoftwareFoundation/OpenColorIO
+    SET(RV_DEPS_OCIO_VERSION "2.5.0")
+    SET(RV_DEPS_OCIO_VERSION_SHORT "2_5")
+    SET(RV_DEPS_OCIO_DOWNLOAD_HASH "41d6b62ac672ed333ebfdcc1108407e0")
+
+    # OIIO
+    # https://github.com/AcademySoftwareFoundation/OpenImageIO
+    SET(RV_DEPS_OIIO_VERSION "2.5.19.1")
+    SET(RV_DEPS_OIIO_DOWNLOAD_HASH "5af6de5a73c6d234eed8e2874a5aed62")
+
+    # OpenEXR
+    # https://github.com/AcademySoftwareFoundation/openexr/releases
+    SET(RV_DEPS_OPENEXR_VERSION "3.4.3")
+    SET(RV_DEPS_OPENEXR_DOWNLOAD_HASH "c11676598aa27a01a1cd21ad75b72e44")
+    SET(RV_DEPS_OPENEXR_LIBNAME_SUFFIX "3_4")
+    SET(RV_DEPS_OPENEXR_LIB_VERSION_SUFFIX "33.${RV_DEPS_OPENEXR_VERSION}")
+    SET(RV_DEPS_OPENEXR_PATCH_NAME "openexr_${RV_DEPS_OPENEXR_VERSION}_invalid_to_black")
+
+    # OpenSSL
+    # https://github.com/openssl/openssl
+    SET(RV_DEPS_OPENSSL_VERSION "3.6.0")
+    SET(RV_DEPS_OPENSSL_HASH "34733f7be2d60ecd8bd9ddb796e182af")
+    SET(RV_DEPS_OPENSSL_VERSION_DOT ".3")
+    SET(RV_DEPS_OPENSSL_VERSION_UNDERSCORE "3")
+
+    # OTIO
+    # https://github.com/AcademySoftwareFoundation/OpenTimelineIO
+    SET(RV_DEPS_OTIO_VERSION "0.18.1")
+
+    # PySide 
+    # Should be 6.8.3 for CY2026, but 
+    # using 6.5.3 for now pending updates to RV
+    #
+    # SET(RV_DEPS_PYSIDE_VERSION "6.8.3")
+    # SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "2a81028f5896edeb9c2a80adac3a8e68")
+    # SET(RV_DEPS_PYSIDE_TARGET "RV_DEPS_PYSIDE6")
+    # SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_QT_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_QT_VERSION}.zip")
+    SET(RV_DEPS_PYSIDE_VERSION "6.5.3")
+    SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "515d3249c6e743219ff0d7dd25b8c8d8")
+    SET(RV_DEPS_PYSIDE_TARGET "RV_DEPS_PYSIDE6")
+    SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_QT_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_QT_VERSION}.zip")
+
+    # Python
+    # https://www.python.org/downloads/source/
+    SET(RV_DEPS_PYTHON_VERSION "3.13.9")
+    SET(RV_DEPS_PYTHON_DOWNLOAD_HASH "922596355aaa82f1f431fd88e114310d")
+
+    # Qt
+    # Should be 6.8.3 for CY2026, but
+    # using 6.5.3 for now pending updates to RV
+    #SET(RV_DEPS_QT_VERSION "6.8.3")
+    SET(RV_DEPS_QT_VERSION "6.5.3")
+ENDIF()
