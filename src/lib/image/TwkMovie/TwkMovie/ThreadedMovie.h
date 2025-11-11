@@ -12,6 +12,7 @@
 #include <TwkMovie/dll_defs.h>
 #include <stl_ext/thread_group.h>
 #include <map>
+#include <mutex>
 
 namespace TwkMovie
 {
@@ -98,8 +99,8 @@ namespace TwkMovie
         Movies m_movies;
         ThreadGroup m_threadGroup;
         FBMap m_map;
-        pthread_mutex_t m_mapLock;
-        pthread_mutex_t m_runLock;
+        std::mutex m_mapLock;
+        std::mutex m_runLock;
         Frames m_frames;
         ThreadDataVector m_threadData;
         int m_currentIndex;

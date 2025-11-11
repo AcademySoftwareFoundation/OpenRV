@@ -33,8 +33,6 @@ namespace TwkMovie
         // if (!m_movie->isThreadSafe()) throw runtime_exception();
         m_info = movies.front()->info();
         m_threadSafe = false;
-        pthread_mutex_init(&m_mapLock, 0);
-        pthread_mutex_init(&m_runLock, 0);
         m_threadData.resize(movies.size());
 
         for (size_t i = 0; i < m_threadData.size(); i++)
@@ -60,13 +58,11 @@ namespace TwkMovie
             for (size_t q = 0; q < i->second.size(); q++)
                 delete i->second[q];
         }
-
-        pthread_mutex_destroy(&m_mapLock);
     }
 
-    void ThreadedMovie::lock() { m_threadGroup.lock(m_mapLock); }
+    void ThreadedMovie::lock() { m_mapLock.lock(); }
 
-    void ThreadedMovie::unlock() { m_threadGroup.unlock(m_mapLock); }
+    void ThreadedMovie::unlock() { m_mapLock.unlock(); }
 
     void ThreadedMovie::threadMain()
     {
@@ -83,45 +79,45 @@ namespace TwkMovie
         ThreadData* td = 0;
         pthread_t self = pthread_self();
 
-        m_threadGroup.lock(m_runLock);
-
-        //
-        //  If we already have a ThreadData for this thread use it
-        //
-
-        for (size_t i = 0; !td && i < m_threadData.size(); i++)
         {
-            ThreadData& d = m_threadData[i];
+            std::lock_guard<std::mutex> guard(m_runLock);
 
-            if (d.init && pthread_equal(d.thread, self))
+            //
+            //  If we already have a ThreadData for this thread use it
+            //
+
+            for (size_t i = 0; !td && i < m_threadData.size(); i++)
             {
-                d.running = true;
-                td = &d;
+                ThreadData& d = m_threadData[i];
+
+                if (d.init && pthread_equal(d.thread, self))
+                {
+                    d.running = true;
+                    td = &d;
+                }
+            }
+
+            //
+            //  If we don't have a ThreadData find an available one and use
+            //  that
+            //
+
+            bool first = false;
+
+            for (size_t i = 0; !td && i < m_threadData.size(); i++)
+            {
+                ThreadData& d = m_threadData[i];
+
+                if (!d.init)
+                {
+                    d.init = true;
+                    first = true;
+                    d.thread = self;
+                    d.running = true;
+                    td = &d;
+                }
             }
         }
-
-        //
-        //  If we don't have a ThreadData find an available one and use
-        //  that
-        //
-
-        bool first = false;
-
-        for (size_t i = 0; !td && i < m_threadData.size(); i++)
-        {
-            ThreadData& d = m_threadData[i];
-
-            if (!d.init)
-            {
-                d.init = true;
-                first = true;
-                d.thread = self;
-                d.running = true;
-                td = &d;
-            }
-        }
-
-        m_threadGroup.unlock(m_runLock);
 
         if (m_initialize)
             m_initialize();
@@ -188,12 +184,12 @@ namespace TwkMovie
             }
         } while (1);
 
-        m_threadGroup.lock(m_runLock);
-        td->running = false;
-
-        bool allFramesDone = (m_currentIndex >= m_frames.size());
-
-        m_threadGroup.unlock(m_runLock);
+        bool allFramesDone;
+        {
+            std::lock_guard<std::mutex> guard(m_runLock);
+            td->running = false;
+            allFramesDone = (m_currentIndex >= m_frames.size());
+        }
 
         if (allFramesDone && m_finalize != nullptr)
         {
