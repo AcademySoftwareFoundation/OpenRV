@@ -7,22 +7,15 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_VFX_SET_VARIABLE(
-  _ext_openexr_version
-  CY2023 "3.1.7"
-  CY2024 "3.2.4"
-)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${_ext_openexr_version}" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
 
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
 )
 
-RV_VFX_SET_VARIABLE(
-  _download_hash
-  CY2023 "a278571601083a74415d40d2497d205c"
-  CY2024 "11e713886a0e1c6a2c147e9704bbbe68"
+SET(_download_hash 
+  "${RV_DEPS_OPENEXR_DOWNLOAD_HASH}"
 )
 
 SET(_install_dir
@@ -60,10 +53,8 @@ IF(RV_TARGET_WINDOWS)
       ninja
   )
 ENDIF()
-RV_VFX_SET_VARIABLE(
-  _openexr_libname_suffix_
-  CY2023 "3_1"
-  CY2024 "3_2"
+SET(_openexr_libname_suffix_
+    "${RV_DEPS_OPENEXR_LIBNAME_SUFFIX}"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -79,10 +70,8 @@ SET(_openexr_lib
     ${_lib_dir}/${_openexr_name}
 )
 
-RV_VFX_SET_VARIABLE(
-  LIB_VERSION_SUFFIX
-  CY2023 "30.7.1"
-  CY2024 "31.3.2.4"
+SET(LIB_VERSION_SUFFIX
+  "${RV_DEPS_OPENEXR_LIB_VERSION_SUFFIX}"
 )
 
 IF(RV_TARGET_DARWIN)
@@ -155,15 +144,21 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _openexr_byproducts ${_openexr_implib} ${_ilmthread_implib} ${_iex_implib})
 ENDIF()
 
-RV_VFX_SET_VARIABLE(
-  _openexr_patch_name_
-  CY2023 "openexr_3.1.7_invalid_to_black"
-  CY2024 "openexr_3.2.4_invalid_to_black"
+SET(_openexr_patch_file_
+  "${CMAKE_CURRENT_SOURCE_DIR}"/patch/"${RV_DEPS_OPENEXR_PATCH_NAME}".patch
 )
 
-SET(_patch_command 
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/${_openexr_patch_name_}.patch
-)
+IF(EXISTS "${_openexr_patch_file_}")
+    SET(_patch_command 
+      "patch -p1 < \"${_openexr_patch_file_}\""
+    )
+    MESSAGE(STATUS "Patch command set for ${_target}: ${_patch_command}")
+ELSE()
+    # If it does not exist, set the command to an empty string.
+    # ExternalProject_Add will skip the patch step if the command is empty.
+    SET(_patch_command "")
+    MESSAGE(STATUS "ERROR Patch file not found, skipping patch for ${_target}: ${_patch_file}")
+ENDIF()
 
 LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
