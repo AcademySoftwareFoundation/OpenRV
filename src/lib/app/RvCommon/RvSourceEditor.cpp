@@ -57,8 +57,7 @@ namespace Rv
 
         m_ui.textEdit->setFont(font);
         m_ui.marginTextEdit->setFont(font);
-        m_ui.marginTextEdit->setHorizontalScrollBarPolicy(
-            Qt::ScrollBarAlwaysOff);
+        m_ui.marginTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         m_ui.marginTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
         m_highlighter = new GLSLSyntaxHighlighter(m_ui.textEdit->document());
@@ -73,70 +72,46 @@ namespace Rv
         connect(m_ui.actionCompile, SIGNAL(triggered()), this, SLOT(compile()));
         connect(m_ui.actionRevert, SIGNAL(triggered()), this, SLOT(revert()));
         connect(m_ui.actionPublish, SIGNAL(triggered()), this, SLOT(publish()));
-        connect(m_typeComboBox, SIGNAL(activated(int)), this,
-                SLOT(typeChanged(int)));
-        connect(m_ui.actionUndo, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(undo()));
-        connect(m_ui.actionRedo, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(redo()));
-        connect(m_ui.actionCut, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(cut()));
-        connect(m_ui.actionCopy, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(copy()));
-        connect(m_ui.actionPaste, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(paste()));
-        connect(m_ui.actionSelectAll, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(selectAll()));
-        connect(m_ui.actionDeselectAll, SIGNAL(triggered()), this,
-                SLOT(deselectAll()));
-        connect(m_ui.actionBigger_Text, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(zoomIn()));
-        connect(m_ui.actionSmaller_Text, SIGNAL(triggered()), m_ui.textEdit,
-                SLOT(zoomOut()));
-        connect(m_ui.actionBigger_Text, SIGNAL(triggered()),
-                m_ui.marginTextEdit, SLOT(zoomIn()));
-        connect(m_ui.actionSmaller_Text, SIGNAL(triggered()),
-                m_ui.marginTextEdit, SLOT(zoomOut()));
-        connect(m_ui.actionBigger_Text, SIGNAL(triggered()),
-                m_ui.outputTextEdit, SLOT(zoomIn()));
-        connect(m_ui.actionSmaller_Text, SIGNAL(triggered()),
-                m_ui.outputTextEdit, SLOT(zoomOut()));
-        connect(m_ui.actionNext_Line, SIGNAL(triggered()), this,
-                SLOT(downLine()));
-        connect(m_ui.actionPrevious_Line, SIGNAL(triggered()), this,
-                SLOT(upLine()));
-        connect(m_ui.actionNext_Word, SIGNAL(triggered()), this,
-                SLOT(forwardWord()));
-        connect(m_ui.actionPrevious_Word, SIGNAL(triggered()), this,
-                SLOT(backWord()));
+        connect(m_typeComboBox, SIGNAL(activated(int)), this, SLOT(typeChanged(int)));
+        connect(m_ui.actionUndo, SIGNAL(triggered()), m_ui.textEdit, SLOT(undo()));
+        connect(m_ui.actionRedo, SIGNAL(triggered()), m_ui.textEdit, SLOT(redo()));
+        connect(m_ui.actionCut, SIGNAL(triggered()), m_ui.textEdit, SLOT(cut()));
+        connect(m_ui.actionCopy, SIGNAL(triggered()), m_ui.textEdit, SLOT(copy()));
+        connect(m_ui.actionPaste, SIGNAL(triggered()), m_ui.textEdit, SLOT(paste()));
+        connect(m_ui.actionSelectAll, SIGNAL(triggered()), m_ui.textEdit, SLOT(selectAll()));
+        connect(m_ui.actionDeselectAll, SIGNAL(triggered()), this, SLOT(deselectAll()));
+        connect(m_ui.actionBigger_Text, SIGNAL(triggered()), m_ui.textEdit, SLOT(zoomIn()));
+        connect(m_ui.actionSmaller_Text, SIGNAL(triggered()), m_ui.textEdit, SLOT(zoomOut()));
+        connect(m_ui.actionBigger_Text, SIGNAL(triggered()), m_ui.marginTextEdit, SLOT(zoomIn()));
+        connect(m_ui.actionSmaller_Text, SIGNAL(triggered()), m_ui.marginTextEdit, SLOT(zoomOut()));
+        connect(m_ui.actionBigger_Text, SIGNAL(triggered()), m_ui.outputTextEdit, SLOT(zoomIn()));
+        connect(m_ui.actionSmaller_Text, SIGNAL(triggered()), m_ui.outputTextEdit, SLOT(zoomOut()));
+        connect(m_ui.actionNext_Line, SIGNAL(triggered()), this, SLOT(downLine()));
+        connect(m_ui.actionPrevious_Line, SIGNAL(triggered()), this, SLOT(upLine()));
+        connect(m_ui.actionNext_Word, SIGNAL(triggered()), this, SLOT(forwardWord()));
+        connect(m_ui.actionPrevious_Word, SIGNAL(triggered()), this, SLOT(backWord()));
 
-        connect(m_ui.textEdit->verticalScrollBar(), SIGNAL(valueChanged(int)),
-                m_ui.marginTextEdit->verticalScrollBar(), SLOT(setValue(int)));
+        connect(m_ui.textEdit->verticalScrollBar(), SIGNAL(valueChanged(int)), m_ui.marginTextEdit->verticalScrollBar(),
+                SLOT(setValue(int)));
 
-        connect(m_ui.textEdit, SIGNAL(textChanged()), this,
-                SLOT(sourceChanged()));
+        connect(m_ui.textEdit, SIGNAL(textChanged()), this, SLOT(sourceChanged()));
 
-        connect(m_ui.tabWidget, SIGNAL(currentChanged(int)), this,
-                SLOT(tabChanged(int)));
-        connect(m_ui.tabWidget, SIGNAL(tabCloseRequested(int)), this,
-                SLOT(tabClosed(int)));
+        connect(m_ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+        connect(m_ui.tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabClosed(int)));
 
-        connect(m_publishDialog, SIGNAL(accepted()), this,
-                SLOT(publishAccepted()));
+        connect(m_publishDialog, SIGNAL(accepted()), this, SLOT(publishAccepted()));
     }
 
     RvSourceEditor::~RvSourceEditor() {}
 
     EventNode::Result RvSourceEditor::receiveEvent(const Event& event)
     {
-        if (const GenericStringEvent* gevent =
-                dynamic_cast<const GenericStringEvent*>(&event))
+        if (const GenericStringEvent* gevent = dynamic_cast<const GenericStringEvent*>(&event))
         {
             if (event.name() == "graph-state-change")
             {
                 vector<string> parts;
-                algorithm::split(parts, gevent->stringContent(),
-                                 is_any_of(string(".")));
+                algorithm::split(parts, gevent->stringContent(), is_any_of(string(".")));
 
                 IPNode* node = m_session->graph().findNode(parts.front());
 
@@ -146,17 +121,14 @@ namespace Rv
                     {
                         if (parts[2] == "evaluationType")
                         {
-                            TwkContainer::StringProperty* sp =
-                                node->property<TwkContainer::StringProperty>(
-                                    "node.evaluationType");
+                            TwkContainer::StringProperty* sp = node->property<TwkContainer::StringProperty>("node.evaluationType");
                             QString etype = sp->front().c_str();
 
                             int n = m_typeComboBox->count();
 
                             for (size_t i = 0; i < n; i++)
                             {
-                                if (m_typeComboBox->itemData(i).toString()
-                                    == etype)
+                                if (m_typeComboBox->itemData(i).toString() == etype)
                                 {
                                     m_typeComboBox->setCurrentIndex(i);
                                     break;
@@ -173,8 +145,7 @@ namespace Rv
                     }
                 }
 
-                for (NodeEditStateMap::const_iterator i = m_stateMap.begin();
-                     i != m_stateMap.end(); ++i)
+                for (NodeEditStateMap::const_iterator i = m_stateMap.begin(); i != m_stateMap.end(); ++i)
                 {
                     if ((*i).second.node == node)
                     {
@@ -183,8 +154,7 @@ namespace Rv
                             if (parts[2] == "name")
                             {
                                 int index = m_ui.tabWidget->indexOf((*i).first);
-                                m_ui.tabWidget->setTabText(
-                                    index, node->uiName().c_str());
+                                m_ui.tabWidget->setTabText(index, node->uiName().c_str());
                             }
                         }
                     }
@@ -259,24 +229,20 @@ namespace Rv
             {
                 if (errorLines.count(i + 1))
                 {
-                    lineText +=
-                        QString("<font color=red>%1</font><br>").arg(i + 1);
+                    lineText += QString("<font color=red>%1</font><br>").arg(i + 1);
                 }
                 else if (warningLines.count(i + 1))
                 {
-                    lineText +=
-                        QString("<font color=orange>%1</font><br>").arg(i + 1);
+                    lineText += QString("<font color=orange>%1</font><br>").arg(i + 1);
                 }
                 else
                 {
-                    lineText +=
-                        QString("<font color=#505050>%1</font><br>").arg(i + 1);
+                    lineText += QString("<font color=#505050>%1</font><br>").arg(i + 1);
                 }
             }
 
             m_ui.marginTextEdit->setHtml(lineText);
-            m_ui.marginTextEdit->verticalScrollBar()->setValue(
-                m_ui.textEdit->verticalScrollBar()->value());
+            m_ui.marginTextEdit->verticalScrollBar()->setValue(m_ui.textEdit->verticalScrollBar()->value());
         }
     }
 
@@ -304,16 +270,14 @@ namespace Rv
         {
             if (m_stateMap.count(m_currentPage))
             {
-                m_stateMap[m_currentPage].source =
-                    m_ui.textEdit->toPlainText().toUtf8().constData();
+                m_stateMap[m_currentPage].source = m_ui.textEdit->toPlainText().toUtf8().constData();
                 m_stateMap[m_currentPage].node = m_node;
             }
         }
 
         m_currentPage = 0;
 
-        for (NodeEditStateMap::const_iterator i = m_stateMap.begin();
-             i != m_stateMap.end(); ++i)
+        for (NodeEditStateMap::const_iterator i = m_stateMap.begin(); i != m_stateMap.end(); ++i)
         {
             if ((*i).second.node == node)
             {
@@ -324,20 +288,15 @@ namespace Rv
         if (!m_currentPage)
         {
             m_currentPage = new QWidget(m_ui.tabWidget);
-            int index =
-                m_ui.tabWidget->addTab(m_currentPage, node->uiName().c_str());
+            int index = m_ui.tabWidget->addTab(m_currentPage, node->uiName().c_str());
             m_stateMap[m_currentPage] = NodeEditState(node, "");
         }
 
         m_ui.tabWidget->setCurrentWidget(m_currentPage);
 
         m_node = node;
-        m_ui.textEdit->setPlainText(
-            node->property<IPNode::StringProperty>("function.glsl")
-                ->front()
-                .c_str());
-        m_ui.tabWidget->setTabText(m_ui.tabWidget->indexOf(m_currentPage),
-                                   m_node->uiName().c_str());
+        m_ui.textEdit->setPlainText(node->property<IPNode::StringProperty>("function.glsl")->front().c_str());
+        m_ui.tabWidget->setTabText(m_ui.tabWidget->indexOf(m_currentPage), m_node->uiName().c_str());
         m_ui.outputTextEdit->clear();
         string etype = m_node->stringValue("node.evaluationType");
         QString es = etype.c_str();
@@ -386,9 +345,7 @@ namespace Rv
 
             for (size_t i = 0; i < n; i++)
             {
-                if (m_typeComboBox->itemData(i).toString()
-                        == etype.value().c_str()
-                    && m_typeComboBox->currentIndex() != i)
+                if (m_typeComboBox->itemData(i).toString() == etype.value().c_str() && m_typeComboBox->currentIndex() != i)
                 {
                     if (message.size() && message[message.size() - 1] != '\n')
                         message += "\n";
@@ -407,15 +364,13 @@ namespace Rv
             m_ui.outputTextEdit->clear();
 
             QDateTime dt = QDateTime::currentDateTime();
-            QString dtString = QString("<font color=grey>%1</font>")
-                                   .arg(dt.toString("ddd MMMM d h:mm:ss"));
+            QString dtString = QString("<font color=grey>%1</font>").arg(dt.toString("ddd MMMM d h:mm:ss"));
 
             if (message == "")
             {
-                m_ui.outputTextEdit->append(
-                    QString("<i><font color=grey>Compilation "
-                            "Succeeded</font></i> - %1")
-                        .arg(dtString));
+                m_ui.outputTextEdit->append(QString("<i><font color=grey>Compilation "
+                                                    "Succeeded</font></i> - %1")
+                                                .arg(dtString));
             }
             else
             {
@@ -442,8 +397,7 @@ namespace Rv
                 //
 
                 regex hashRE("\\b" + m_node->outputFunctionCallName() + "\\b");
-                message = regex_replace(message, hashRE,
-                                        m_node->outputFunctionName());
+                message = regex_replace(message, hashRE, m_node->outputFunctionName());
 
                 //
                 //  Mac/AMD style output
@@ -451,12 +405,8 @@ namespace Rv
 
                 regex berrorRE("\\bERROR:\\s+(\\D)");
                 regex bwarningRE("\\bWARNING:\\s+(\\D)");
-                message =
-                    regex_replace(message, berrorRE,
-                                  "<font color=red><b>ERROR:</b></font> \\1");
-                message = regex_replace(
-                    message, bwarningRE,
-                    "<font color=orange><b>WARNING:</b></font> \\1");
+                message = regex_replace(message, berrorRE, "<font color=red><b>ERROR:</b></font> \\1");
+                message = regex_replace(message, bwarningRE, "<font color=orange><b>WARNING:</b></font> \\1");
 
                 //
                 //  Mac/AMD style output
@@ -464,13 +414,10 @@ namespace Rv
 
                 regex errorRE("\\bERROR\\b:?\\s*([0-9]+):([0-9]+):");
                 regex warningRE("\\bWARNING\\b:?\\s*([0-9]+):([0-9]+):");
-                message = regex_replace(
-                    message, errorRE,
-                    "<font color=red><b>ERROR:</b></font> <b>line \\2: </b>");
-                message =
-                    regex_replace(message, warningRE,
-                                  "<font color=orange><b>WARNING:</b></font> "
-                                  "<b>line \\2: </b>");
+                message = regex_replace(message, errorRE, "<font color=red><b>ERROR:</b></font> <b>line \\2: </b>");
+                message = regex_replace(message, warningRE,
+                                        "<font color=orange><b>WARNING:</b></font> "
+                                        "<b>line \\2: </b>");
 
                 //
                 //  nvidia style output
@@ -478,21 +425,17 @@ namespace Rv
 
                 regex errorRE2("[0-9]+\\(([0-9]+)\\)\\s*:\\s*error\\s+");
                 regex warningRE2("[0-9]+\\(([0-9]+)\\)\\s*:\\s*warning\\s+");
-                message = regex_replace(
-                    message, errorRE2,
-                    "<font color=red><b>ERROR:</b></font> <b>line \\1: </b>");
-                message =
-                    regex_replace(message, warningRE2,
-                                  "<font color=orange><b>WARNING:</b></font> "
-                                  "<b>line \\1: </b>");
+                message = regex_replace(message, errorRE2, "<font color=red><b>ERROR:</b></font> <b>line \\1: </b>");
+                message = regex_replace(message, warningRE2,
+                                        "<font color=orange><b>WARNING:</b></font> "
+                                        "<b>line \\1: </b>");
 
                 //
                 //  Internal style info output
                 //
 
                 regex infoRE("\\bINFO\\b:?");
-                message = regex_replace(message, infoRE,
-                                        "<font color=cyan>INFO:</font>");
+                message = regex_replace(message, infoRE, "<font color=cyan>INFO:</font>");
 
                 vector<string> lines;
                 algorithm::split(lines, message, is_any_of(string("\n")));
@@ -524,21 +467,14 @@ namespace Rv
 
     void RvSourceEditor::publish()
     {
-        m_publishUI.typeNameEdit->setText(
-            m_node->stringValue("node.name").c_str());
-        m_publishUI.fileNameEdit->setText(
-            m_node->stringValue("node.export").c_str());
-        m_publishUI.authorEdit->setText(
-            m_node->stringValue("node.author").c_str());
-        m_publishUI.companyEdit->setText(
-            m_node->stringValue("node.company").c_str());
-        m_publishUI.commentEdit->setText(
-            m_node->stringValue("node.comment").c_str());
-        m_publishUI.fetchesSpinBox->setValue(
-            m_node->intValue("function.fetches"));
+        m_publishUI.typeNameEdit->setText(m_node->stringValue("node.name").c_str());
+        m_publishUI.fileNameEdit->setText(m_node->stringValue("node.export").c_str());
+        m_publishUI.authorEdit->setText(m_node->stringValue("node.author").c_str());
+        m_publishUI.companyEdit->setText(m_node->stringValue("node.company").c_str());
+        m_publishUI.commentEdit->setText(m_node->stringValue("node.comment").c_str());
+        m_publishUI.fetchesSpinBox->setValue(m_node->intValue("function.fetches"));
         m_publishUI.versionSpinBox->setValue(m_node->intValue("node.version"));
-        m_publishUI.userVisibleCheckBox->setChecked(
-            m_node->intValue("node.userVisible") == 0);
+        m_publishUI.userVisibleCheckBox->setChecked(m_node->intValue("node.userVisible") == 0);
         m_publishDialog->open();
 
         /*

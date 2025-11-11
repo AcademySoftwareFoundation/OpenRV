@@ -39,8 +39,7 @@ namespace Mu
 {
     using namespace std;
 
-    QGestureEventType::QGestureEventType(Context* c, const char* name,
-                                         Class* super)
+    QGestureEventType::QGestureEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -50,9 +49,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    void qt_QGestureEvent_accept_void_QGestureEvent_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_gestureType)
+    void qt_QGestureEvent_accept_void_QGestureEvent_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_gestureType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGestureEvent* arg0 = getqpointer<QGestureEventType>(param_this);
@@ -61,9 +58,7 @@ namespace Mu
         setqpointer<QGestureEventType>(param_this, arg0);
     }
 
-    void qt_QGestureEvent_ignore_void_QGestureEvent_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_gestureType)
+    void qt_QGestureEvent_ignore_void_QGestureEvent_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_gestureType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGestureEvent* arg0 = getqpointer<QGestureEventType>(param_this);
@@ -72,8 +67,7 @@ namespace Mu
         setqpointer<QGestureEventType>(param_this, arg0);
     }
 
-    bool qt_QGestureEvent_isAccepted_bool_QGestureEvent_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_gestureType)
+    bool qt_QGestureEvent_isAccepted_bool_QGestureEvent_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_gestureType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGestureEvent* arg0 = getqpointer<QGestureEventType>(param_this);
@@ -81,19 +75,17 @@ namespace Mu
         return arg0->isAccepted(arg1);
     }
 
-    Pointer qt_QGestureEvent_mapToGraphicsScene_QPointF_QGestureEvent_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_gesturePoint)
+    Pointer qt_QGestureEvent_mapToGraphicsScene_QPointF_QGestureEvent_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_gesturePoint)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGestureEvent* arg0 = getqpointer<QGestureEventType>(param_this);
         const QPointF arg1 = getqtype<QPointFType>(param_gesturePoint);
-        return makeqtype<QPointFType>(c, arg0->mapToGraphicsScene(arg1),
-                                      "qt.QPointF");
+        return makeqtype<QPointFType>(c, arg0->mapToGraphicsScene(arg1), "qt.QPointF");
     }
 
-    void qt_QGestureEvent_setAccepted_void_QGestureEvent_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_gestureType,
-        bool param_value)
+    void qt_QGestureEvent_setAccepted_void_QGestureEvent_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_gestureType,
+                                                                  bool param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGestureEvent* arg0 = getqpointer<QGestureEventType>(param_this);
@@ -103,9 +95,7 @@ namespace Mu
         setqpointer<QGestureEventType>(param_this, arg0);
     }
 
-    Pointer
-    qt_QGestureEvent_widget_QWidget_QGestureEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QGestureEvent_widget_QWidget_QGestureEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGestureEvent* arg0 = getqpointer<QGestureEventType>(param_this);
@@ -114,41 +104,34 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_accept1, void)
     {
-        qt_QGestureEvent_accept_void_QGestureEvent_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QGestureEvent_accept_void_QGestureEvent_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_ignore1, void)
     {
-        qt_QGestureEvent_ignore_void_QGestureEvent_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QGestureEvent_ignore_void_QGestureEvent_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_isAccepted1, bool)
     {
-        NODE_RETURN(qt_QGestureEvent_isAccepted_bool_QGestureEvent_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGestureEvent_isAccepted_bool_QGestureEvent_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapToGraphicsScene0, Pointer)
     {
-        NODE_RETURN(
-            qt_QGestureEvent_mapToGraphicsScene_QPointF_QGestureEvent_QPointF(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QGestureEvent_mapToGraphicsScene_QPointF_QGestureEvent_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAccepted1, void)
     {
-        qt_QGestureEvent_setAccepted_void_QGestureEvent_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QGestureEvent_setAccepted_void_QGestureEvent_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QGestureEvent_widget_QWidget_QGestureEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGestureEvent_widget_QWidget_QGestureEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QGestureEventType::load()
@@ -168,13 +151,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -188,48 +169,30 @@ namespace Mu
             // MISSING: QGestureEvent (QGestureEvent; QGestureEvent this, "const
             // QList<QGesture * > &" gestures) MISSING: accept (void;
             // QGestureEvent this, "QGesture *" gesture)
-            new Function(c, "accept", _n_accept1, None, Compiled,
-                         qt_QGestureEvent_accept_void_QGestureEvent_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QGestureEvent"),
-                         new Param(c, "gestureType", "int"), End),
+            new Function(c, "accept", _n_accept1, None, Compiled, qt_QGestureEvent_accept_void_QGestureEvent_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QGestureEvent"), new Param(c, "gestureType", "int"), End),
             // MISSING: activeGestures ("QList<QGesture * >"; QGestureEvent
             // this) MISSING: canceledGestures ("QList<QGesture * >";
             // QGestureEvent this) MISSING: gesture ("QGesture *"; QGestureEvent
             // this, flags Qt::GestureType type) MISSING: gestures
             // ("QList<QGesture * >"; QGestureEvent this) MISSING: ignore (void;
             // QGestureEvent this, "QGesture *" gesture)
-            new Function(c, "ignore", _n_ignore1, None, Compiled,
-                         qt_QGestureEvent_ignore_void_QGestureEvent_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QGestureEvent"),
-                         new Param(c, "gestureType", "int"), End),
+            new Function(c, "ignore", _n_ignore1, None, Compiled, qt_QGestureEvent_ignore_void_QGestureEvent_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QGestureEvent"), new Param(c, "gestureType", "int"), End),
             // MISSING: isAccepted (bool; QGestureEvent this, "QGesture *"
             // gesture)
-            new Function(c, "isAccepted", _n_isAccepted1, None, Compiled,
-                         qt_QGestureEvent_isAccepted_bool_QGestureEvent_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QGestureEvent"),
-                         new Param(c, "gestureType", "int"), End),
-            new Function(
-                c, "mapToGraphicsScene", _n_mapToGraphicsScene0, None, Compiled,
-                qt_QGestureEvent_mapToGraphicsScene_QPointF_QGestureEvent_QPointF,
-                Return, "qt.QPointF", Parameters,
-                new Param(c, "this", "qt.QGestureEvent"),
-                new Param(c, "gesturePoint", "qt.QPointF"), End),
+            new Function(c, "isAccepted", _n_isAccepted1, None, Compiled, qt_QGestureEvent_isAccepted_bool_QGestureEvent_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QGestureEvent"), new Param(c, "gestureType", "int"), End),
+            new Function(c, "mapToGraphicsScene", _n_mapToGraphicsScene0, None, Compiled,
+                         qt_QGestureEvent_mapToGraphicsScene_QPointF_QGestureEvent_QPointF, Return, "qt.QPointF", Parameters,
+                         new Param(c, "this", "qt.QGestureEvent"), new Param(c, "gesturePoint", "qt.QPointF"), End),
             // MISSING: setAccepted (void; QGestureEvent this, "QGesture *"
             // gesture, bool value)
-            new Function(
-                c, "setAccepted", _n_setAccepted1, None, Compiled,
-                qt_QGestureEvent_setAccepted_void_QGestureEvent_int_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGestureEvent"),
-                new Param(c, "gestureType", "int"),
-                new Param(c, "value", "bool"), End),
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QGestureEvent_widget_QWidget_QGestureEvent, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QGestureEvent"), End),
+            new Function(c, "setAccepted", _n_setAccepted1, None, Compiled, qt_QGestureEvent_setAccepted_void_QGestureEvent_int_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QGestureEvent"), new Param(c, "gestureType", "int"),
+                         new Param(c, "value", "bool"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QGestureEvent_widget_QWidget_QGestureEvent, Return, "qt.QWidget",
+                         Parameters, new Param(c, "this", "qt.QGestureEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

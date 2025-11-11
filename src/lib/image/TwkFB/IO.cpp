@@ -26,10 +26,7 @@ static std::mutex plugin_mutex;
 
 static bool TwkFB_GenericIO_debug = false;
 
-TWKFB_EXPORT void TwkFB_GenericIO_setDebug(bool b)
-{
-    TwkFB_GenericIO_debug = b;
-}
+TWKFB_EXPORT void TwkFB_GenericIO_setDebug(bool b) { TwkFB_GenericIO_debug = b; }
 
 namespace TwkFB
 {
@@ -39,28 +36,22 @@ namespace TwkFB
     typedef FrameBufferIO* create_t(float);
     typedef void destroy_t(FrameBufferIO*);
 
-    static const char* capabilityNames[] = {
-        "AttributeRead",  "AttributeWrite", "ImageRead",      "ImageWrite",
-        "ProxyRead",      "PlanarRead",     "PlanarWrite",    "TileRead",
-        "TileWrite",      "Int8Capable",    "Int16Capable",   "Float16Capable",
-        "Float32Capable", "Float64Capable", "AnyCapabilities"};
+    static const char* capabilityNames[] = {"AttributeRead", "AttributeWrite", "ImageRead",      "ImageWrite",     "ProxyRead",
+                                            "PlanarRead",    "PlanarWrite",    "TileRead",       "TileWrite",      "Int8Capable",
+                                            "Int16Capable",  "Float16Capable", "Float32Capable", "Float64Capable", "AnyCapabilities"};
 
-    FrameBufferIO::ImageTypeInfo::ImageTypeInfo(
-        const std::string& ext, const std::string& desc, unsigned int c,
-        const StringPairVector& compressors)
+    FrameBufferIO::ImageTypeInfo::ImageTypeInfo(const std::string& ext, const std::string& desc, unsigned int c,
+                                                const StringPairVector& compressors)
         : extension(ext)
         , description(desc)
         , capabilities(c)
     {
-        copy(compressors.begin(), compressors.end(),
-             back_inserter(compressionSchemes));
+        copy(compressors.begin(), compressors.end(), back_inserter(compressionSchemes));
     }
 
-    FrameBufferIO::ImageTypeInfo::ImageTypeInfo(
-        const std::string& ext, const std::string& desc, unsigned int c,
-        const StringPairVector& compressors,
-        const StringPairVector& encodeParams,
-        const StringPairVector& decodeParams)
+    FrameBufferIO::ImageTypeInfo::ImageTypeInfo(const std::string& ext, const std::string& desc, unsigned int c,
+                                                const StringPairVector& compressors, const StringPairVector& encodeParams,
+                                                const StringPairVector& decodeParams)
         : extension(ext)
         , description(desc)
         , capabilities(c)
@@ -113,56 +104,39 @@ namespace TwkFB
 
     FrameBufferIO::~FrameBufferIO() {}
 
-    void FrameBufferIO::addType(const std::string& e, const std::string& d,
-                                unsigned int c)
-    {
-        m_exts.push_back(ImageTypeInfo(e, d, c));
-    }
+    void FrameBufferIO::addType(const std::string& e, const std::string& d, unsigned int c) { m_exts.push_back(ImageTypeInfo(e, d, c)); }
 
-    void FrameBufferIO::addType(const std::string& e, const std::string& d,
-                                unsigned int c, const StringPairVector& comps)
+    void FrameBufferIO::addType(const std::string& e, const std::string& d, unsigned int c, const StringPairVector& comps)
     {
         m_exts.push_back(ImageTypeInfo(e, d, c, comps));
     }
 
-    void FrameBufferIO::addType(const std::string& e, const std::string& d,
-                                unsigned int c, const StringPairVector& comps,
-                                const StringPairVector& dparams,
-                                const StringPairVector& eparams)
+    void FrameBufferIO::addType(const std::string& e, const std::string& d, unsigned int c, const StringPairVector& comps,
+                                const StringPairVector& dparams, const StringPairVector& eparams)
     {
         m_exts.push_back(ImageTypeInfo(e, d, c, comps, dparams, eparams));
     }
 
-    void FrameBufferIO::addType(const std::string& e, unsigned int c)
-    {
-        m_exts.push_back(ImageTypeInfo(e, "", c));
-    }
+    void FrameBufferIO::addType(const std::string& e, unsigned int c) { m_exts.push_back(ImageTypeInfo(e, "", c)); }
 
-    void FrameBufferIO::readImage(FrameBuffer& fb, const string& filename,
-                                  const ReadRequest& request) const
+    void FrameBufferIO::readImage(FrameBuffer& fb, const string& filename, const ReadRequest& request) const
     {
         throw UnsupportedException();
     }
 
-    void FrameBufferIO::readImages(FrameBufferVector& fbs,
-                                   const string& filename,
-                                   const ReadRequest& request) const
+    void FrameBufferIO::readImages(FrameBufferVector& fbs, const string& filename, const ReadRequest& request) const
     {
         if (fbs.empty())
             fbs.push_back(new FrameBuffer());
         readImage(*fbs.front(), filename, request);
     }
 
-    void FrameBufferIO::writeImage(const FrameBuffer& img,
-                                   const string& filename,
-                                   const WriteRequest& request) const
+    void FrameBufferIO::writeImage(const FrameBuffer& img, const string& filename, const WriteRequest& request) const
     {
         throw UnsupportedException();
     }
 
-    void FrameBufferIO::writeImages(const ConstFrameBufferVector& fbs,
-                                    const string& filename,
-                                    const WriteRequest& request) const
+    void FrameBufferIO::writeImages(const ConstFrameBufferVector& fbs, const string& filename, const WriteRequest& request) const
     {
         if (fbs.size() == 1)
         {
@@ -174,9 +148,7 @@ namespace TwkFB
         }
     }
 
-    void FrameBufferIO::writeImages(const FrameBufferVector& fbs,
-                                    const std::string& filename,
-                                    const WriteRequest& request) const
+    void FrameBufferIO::writeImages(const FrameBufferVector& fbs, const std::string& filename, const WriteRequest& request) const
     {
         ConstFrameBufferVector outfbs(fbs.size());
         copy(fbs.begin(), fbs.end(), outfbs.begin());
@@ -185,14 +157,9 @@ namespace TwkFB
 
     string FrameBufferIO::about() const { return "(no info available)"; }
 
-    const FrameBufferIO::ImageTypeInfos&
-    FrameBufferIO::extensionsSupported() const
-    {
-        return m_exts;
-    }
+    const FrameBufferIO::ImageTypeInfos& FrameBufferIO::extensionsSupported() const { return m_exts; }
 
-    bool FrameBufferIO::supportsExtension(std::string extension,
-                                          unsigned int capabilities) const
+    bool FrameBufferIO::supportsExtension(std::string extension, unsigned int capabilities) const
     {
         for (int i = 0; i < m_exts.size(); i++)
         {
@@ -225,39 +192,21 @@ namespace TwkFB
         info.height = 0;
     }
 
-    bool FrameBufferIO::getBoolAttribute(const std::string& name) const
-    {
-        return false;
-    }
+    bool FrameBufferIO::getBoolAttribute(const std::string& name) const { return false; }
 
     void FrameBufferIO::setBoolAttribute(const std::string& name, bool value) {}
 
-    int FrameBufferIO::getIntAttribute(const std::string& name) const
-    {
-        return false;
-    }
+    int FrameBufferIO::getIntAttribute(const std::string& name) const { return false; }
 
     void FrameBufferIO::setIntAttribute(const std::string& name, int value) {}
 
-    string FrameBufferIO::getStringAttribute(const std::string& name) const
-    {
-        return "";
-    }
+    string FrameBufferIO::getStringAttribute(const std::string& name) const { return ""; }
 
-    void FrameBufferIO::setStringAttribute(const std::string& name,
-                                           const std::string& value)
-    {
-    }
+    void FrameBufferIO::setStringAttribute(const std::string& name, const std::string& value) {}
 
-    double FrameBufferIO::getDoubleAttribute(const std::string& name) const
-    {
-        return 0.0;
-    }
+    double FrameBufferIO::getDoubleAttribute(const std::string& name) const { return 0.0; }
 
-    void FrameBufferIO::setDoubleAttribute(const std::string& name,
-                                           double value) const
-    {
-    }
+    void FrameBufferIO::setDoubleAttribute(const std::string& name, double value) const {}
 
     GenericIO::Plugins* GenericIO::m_plugins = 0;
     bool GenericIO::m_loadedAll = false;
@@ -279,8 +228,7 @@ namespace TwkFB
     {
         if (m_plugins)
         {
-            for (Plugins::iterator i = plugins().begin(); i != plugins().end();
-                 ++i)
+            for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
             {
                 delete *i;
             }
@@ -342,9 +290,7 @@ namespace TwkFB
             {
                 dlclose(handle);
 
-                cerr << "ERROR: ignoring FB plugin " << file
-                     << ": missing create() or destroy(): " << dlerror()
-                     << endl;
+                cerr << "ERROR: ignoring FB plugin " << file << ": missing create() or destroy(): " << dlerror() << endl;
             }
             else
             {
@@ -356,20 +302,17 @@ namespace TwkFB
 
                         if (TwkFB_GenericIO_debug)
                         {
-                            cerr << "INFO: plugin loaded:  " << file << ", ID "
-                                 << plugin->identifier() << ", description '"
+                            cerr << "INFO: plugin loaded:  " << file << ", ID " << plugin->identifier() << ", description '"
                                  << plugin->about() << "'" << endl;
 
                             //
                             //  Check for _ARGS-style args env var
                             //
                             string var = plugin->identifier();
-                            transform(var.begin(), var.end(), var.begin(),
-                                      (int (*)(int))toupper);
+                            transform(var.begin(), var.end(), var.begin(), (int (*)(int))toupper);
                             var = var + "_ARGS";
                             if (getenv(var.c_str()))
-                                cerr << "INFO: " << var << ": "
-                                     << getenv(var.c_str()) << endl;
+                                cerr << "INFO: " << var << ": " << getenv(var.c_str()) << endl;
                         }
 
                         return plugin;
@@ -377,8 +320,7 @@ namespace TwkFB
                 }
                 catch (...)
                 {
-                    cerr << "WARNING: exception thrown while creating plugin "
-                         << file << ", ignoring" << endl;
+                    cerr << "WARNING: exception thrown while creating plugin " << file << ", ignoring" << endl;
 
                     dlclose(handle);
                 }
@@ -386,8 +328,7 @@ namespace TwkFB
         }
         else
         {
-            cerr << "ERROR: cannot open fb plugin " << file << ": " << dlerror()
-                 << endl;
+            cerr << "ERROR: cannot open fb plugin " << file << ": " << dlerror() << endl;
         }
 
         return 0;
@@ -457,8 +398,7 @@ namespace TwkFB
         }
         else
         {
-            cout << "WARNING: " << pio->pathToPlugin() << " failed to load"
-                 << endl;
+            cout << "WARNING: " << pio->pathToPlugin() << " failed to load" << endl;
 
             plugins().erase(i);
             delete pio;
@@ -466,8 +406,7 @@ namespace TwkFB
         }
     }
 
-    const FrameBufferIO* GenericIO::findByExtension(const string& extension,
-                                                    unsigned int capabilities)
+    const FrameBufferIO* GenericIO::findByExtension(const string& extension, unsigned int capabilities)
     {
         if (!plugins().empty())
         {
@@ -476,8 +415,7 @@ namespace TwkFB
             {
                 restart = false;
 
-                for (Plugins::iterator i = plugins().begin();
-                     i != plugins().end(); ++i)
+                for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
                 {
                     FrameBufferIO* io = *i;
 
@@ -487,9 +425,7 @@ namespace TwkFB
                         {
                             if (TwkFB_GenericIO_debug)
                             {
-                                cout << "INFO: " << extension
-                                     << " requires plugin "
-                                     << basename(pio->pathToPlugin()) << endl;
+                                cout << "INFO: " << extension << " requires plugin " << basename(pio->pathToPlugin()) << endl;
                             }
 
                             if (io = loadFromProxy(i))
@@ -514,24 +450,20 @@ namespace TwkFB
         return NULL;
     }
 
-    const FrameBufferIO*
-    GenericIO::findByBruteForce(const std::string& filename,
-                                unsigned int capabilities)
+    const FrameBufferIO* GenericIO::findByBruteForce(const std::string& filename, unsigned int capabilities)
     {
         // if (!m_loadedAll) loadPlugins("TWK_FB_PLUGIN_PATH");
 
         if (!plugins().empty())
         {
-            cerr << "INFO: trying brute force to find an image reader for "
-                 << basename(filename) << endl;
+            cerr << "INFO: trying brute force to find an image reader for " << basename(filename) << endl;
 
             std::lock_guard<std::mutex> guard(plugin_mutex);
             for (bool restart = true; restart;)
             {
                 restart = false;
 
-                for (Plugins::iterator i = plugins().begin();
-                     i != plugins().end(); ++i)
+                for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
                 {
                     if (*i && (*i)->canAttemptBruteForceRead())
                     {
@@ -548,9 +480,7 @@ namespace TwkFB
 
                             (*i)->getImageInfo(filename, info);
 
-                            cerr << "INFO: " << basename(filename)
-                                 << " is being read by: " << (*i)->about()
-                                 << endl;
+                            cerr << "INFO: " << basename(filename) << " is being read by: " << (*i)->about() << endl;
 
                             return (*i);
                         }
@@ -565,9 +495,7 @@ namespace TwkFB
         return NULL;
     }
 
-    void GenericIO::readImages(FrameBufferVector& fbs,
-                               const std::string& filename,
-                               const FrameBufferIO::ReadRequest& request,
+    void GenericIO::readImages(FrameBufferVector& fbs, const std::string& filename, const FrameBufferIO::ReadRequest& request,
                                const char* fmt)
     {
         string format;
@@ -576,8 +504,7 @@ namespace TwkFB
         else
             format = extension(filename);
 
-        if (const FrameBufferIO* io =
-                findByExtension(format, FrameBufferIO::ImageRead))
+        if (const FrameBufferIO* io = findByExtension(format, FrameBufferIO::ImageRead))
         {
             io->readImages(fbs, filename, request);
         }
@@ -587,15 +514,12 @@ namespace TwkFB
         }
     }
 
-    void GenericIO::writeImages(const ConstFrameBufferVector& fbs,
-                                const string& filename,
-                                const FrameBufferIO::WriteRequest& request,
+    void GenericIO::writeImages(const ConstFrameBufferVector& fbs, const string& filename, const FrameBufferIO::WriteRequest& request,
                                 const char* fmt)
     {
         string format = fmt ? fmt : extension(filename);
 
-        if (const FrameBufferIO* io =
-                findByExtension(format, FrameBufferIO::ImageWrite))
+        if (const FrameBufferIO* io = findByExtension(format, FrameBufferIO::ImageWrite))
         {
             io->writeImages(fbs, filename, request);
         }
@@ -605,15 +529,12 @@ namespace TwkFB
         }
     }
 
-    void GenericIO::writeImages(const FrameBufferVector& fbs,
-                                const string& filename,
-                                const FrameBufferIO::WriteRequest& request,
+    void GenericIO::writeImages(const FrameBufferVector& fbs, const string& filename, const FrameBufferIO::WriteRequest& request,
                                 const char* fmt)
     {
         string format = fmt ? fmt : extension(filename);
 
-        if (const FrameBufferIO* io =
-                findByExtension(format, FrameBufferIO::ImageWrite))
+        if (const FrameBufferIO* io = findByExtension(format, FrameBufferIO::ImageWrite))
         {
             io->writeImages(fbs, filename, request);
         }
@@ -627,11 +548,9 @@ namespace TwkFB
     {
         if (!plugins().empty())
         {
-            for (Plugins::iterator i = plugins().begin(); i != plugins().end();
-                 ++i)
+            for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
             {
-                const FrameBufferIO::ImageTypeInfos& ins =
-                    (*i)->extensionsSupported();
+                const FrameBufferIO::ImageTypeInfos& ins = (*i)->extensionsSupported();
 
                 for (int q = 0; q < ins.size(); q++)
                 {

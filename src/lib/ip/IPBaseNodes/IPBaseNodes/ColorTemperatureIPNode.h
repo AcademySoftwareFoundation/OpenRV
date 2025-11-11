@@ -19,9 +19,7 @@ namespace IPCore
     class ColorTemperatureIPNode : public IPNode
     {
     public:
-        ColorTemperatureIPNode(const std::string& name,
-                               const NodeDefinition* def, IPGraph* graph,
-                               GroupIPNode* group = 0);
+        ColorTemperatureIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorTemperatureIPNode();
 

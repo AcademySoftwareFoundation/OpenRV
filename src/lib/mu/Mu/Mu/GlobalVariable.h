@@ -22,9 +22,8 @@ namespace Mu
     class GlobalVariable : public Variable
     {
     public:
-        GlobalVariable(Context* context, const char* name,
-                       const Type* storageClass, int offset,
-                       Attributes a = Readable, Node* initializer = 0);
+        GlobalVariable(Context* context, const char* name, const Type* storageClass, int offset, Attributes a = Readable,
+                       Node* initializer = 0);
 
         virtual ~GlobalVariable();
 

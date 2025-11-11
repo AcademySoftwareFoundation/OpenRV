@@ -30,8 +30,7 @@ namespace IPCore
     public:
         struct InternalNodeEntry
         {
-            InternalNodeEntry(const std::string& t = "",
-                              const std::string& v = "")
+            InternalNodeEntry(const std::string& t = "", const std::string& v = "")
                 : value(v)
                 , type(t)
                 , node(0)
@@ -45,8 +44,7 @@ namespace IPCore
 
         typedef std::vector<InternalNodeEntry> InternalNodeEntryVector;
 
-        FolderGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        FolderGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~FolderGroupIPNode();
 

@@ -65,41 +65,34 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAction::MuQt_QAction(Pointer muobj, const CallEnvironment* ce,
-                               QObject* parent)
+    MuQt_QAction::MuQt_QAction(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QAction(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QActionType>(
-            c->internName("qt.QAction"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QActionType>(c->internName("qt.QAction"));
     }
 
-    MuQt_QAction::MuQt_QAction(Pointer muobj, const CallEnvironment* ce,
-                               const QString& text, QObject* parent)
+    MuQt_QAction::MuQt_QAction(Pointer muobj, const CallEnvironment* ce, const QString& text, QObject* parent)
         : QAction(text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QActionType>(
-            c->internName("qt.QAction"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QActionType>(c->internName("qt.QAction"));
     }
 
-    MuQt_QAction::MuQt_QAction(Pointer muobj, const CallEnvironment* ce,
-                               const QIcon& icon, const QString& text,
-                               QObject* parent)
+    MuQt_QAction::MuQt_QAction(Pointer muobj, const CallEnvironment* ce, const QIcon& icon, const QString& text, QObject* parent)
         : QAction(icon, text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QActionType>(
-            c->internName("qt.QAction"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QActionType>(c->internName("qt.QAction"));
     }
 
     bool MuQt_QAction::event(QEvent* e)
@@ -134,8 +127,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -183,8 +175,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -196,8 +187,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QActionType::QActionType(Context* c, const char* name, Class* super,
-                             Class* super2)
+    QActionType::QActionType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -218,8 +208,7 @@ namespace Mu
         }
         else if (QAction* w = object<QAction>(widget))
         {
-            QActionType* type = c->findSymbolOfTypeByQualifiedName<QActionType>(
-                c->internName("qt.QAction"), false);
+            QActionType* type = c->findSymbolOfTypeByQualifiedName<QActionType>(c->internName("qt.QAction"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -230,62 +219,45 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QAction_QAction_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QAction_QAction_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QAction_QAction_QAction_QAction_QObject(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_parent)
+    Pointer qt_QAction_QAction_QAction_QAction_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAction(param_this, NODE_THREAD.process()->callEnv(),
-                                   arg1));
+        setobject(param_this, new MuQt_QAction(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QAction_QAction_QAction_QAction_string_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        Pointer param_parent)
+    Pointer qt_QAction_QAction_QAction_QAction_string_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
+                                                              Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_text);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAction(param_this, NODE_THREAD.process()->callEnv(),
-                                   arg1, arg2));
+        setobject(param_this, new MuQt_QAction(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer qt_QAction_QAction_QAction_QAction_QIcon_string_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_icon,
-        Pointer param_text, Pointer param_parent)
+    Pointer qt_QAction_QAction_QAction_QAction_QIcon_string_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_icon,
+                                                                    Pointer param_text, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QIcon arg1 = getqtype<QIconType>(param_icon);
         const QString arg2 = qstring(param_text);
         QObject* arg3 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAction(param_this, NODE_THREAD.process()->callEnv(),
-                                   arg1, arg2, arg3));
+        setobject(param_this, new MuQt_QAction(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer qt_QAction_actionGroup_QActionGroup_QAction(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QAction_actionGroup_QActionGroup_QAction(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
-        return makeinstance<QActionGroupType>(c, arg0->actionGroup(),
-                                              "qt.QActionGroup");
+        return makeinstance<QActionGroupType>(c, arg0->actionGroup(), "qt.QActionGroup");
     }
 
-    void qt_QAction_activate_void_QAction_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_event)
+    void qt_QAction_activate_void_QAction_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -293,32 +265,28 @@ namespace Mu
         arg0->activate(arg1);
     }
 
-    Pointer qt_QAction_data_QVariant_QAction(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    Pointer qt_QAction_data_QVariant_QAction(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
         return makeqtype<QVariantType>(c, arg0->data(), "qt.QVariant");
     }
 
-    bool qt_QAction_isSeparator_bool_QAction(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QAction_isSeparator_bool_QAction(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
         return arg0->isSeparator();
     }
 
-    Pointer qt_QAction_menu_QMenu_QAction(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QAction_menu_QMenu_QAction(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
         return makeinstance<QMenuType>(c, arg0->menu(), "qt.QMenu");
     }
 
-    void qt_QAction_setActionGroup_void_QAction_QActionGroup(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_group)
+    void qt_QAction_setActionGroup_void_QAction_QActionGroup(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_group)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -326,9 +294,7 @@ namespace Mu
         arg0->setActionGroup(arg1);
     }
 
-    void qt_QAction_setData_void_QAction_QVariant(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_data)
+    void qt_QAction_setData_void_QAction_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -336,9 +302,7 @@ namespace Mu
         arg0->setData(arg1);
     }
 
-    void qt_QAction_setMenu_void_QAction_QMenu(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_menu)
+    void qt_QAction_setMenu_void_QAction_QMenu(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_menu)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -346,9 +310,7 @@ namespace Mu
         arg0->setMenu(arg1);
     }
 
-    void qt_QAction_setSeparator_void_QAction_bool(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   bool param_b)
+    void qt_QAction_setSeparator_void_QAction_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_b)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -356,8 +318,7 @@ namespace Mu
         arg0->setSeparator(arg1);
     }
 
-    void qt_QAction_setShortcut_void_QAction_QKeySequence(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_shortcut)
+    void qt_QAction_setShortcut_void_QAction_QKeySequence(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_shortcut)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -365,9 +326,7 @@ namespace Mu
         arg0->setShortcut(arg1);
     }
 
-    void qt_QAction_setShortcuts_void_QAction_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_key)
+    void qt_QAction_setShortcuts_void_QAction_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -375,18 +334,14 @@ namespace Mu
         arg0->setShortcuts(arg1);
     }
 
-    Pointer qt_QAction_shortcut_QKeySequence_QAction(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QAction_shortcut_QKeySequence_QAction(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
-        return makeqtype<QKeySequenceType>(c, arg0->shortcut(),
-                                           "qt.QKeySequence");
+        return makeqtype<QKeySequenceType>(c, arg0->shortcut(), "qt.QKeySequence");
     }
 
-    bool qt_QAction_showStatusText_bool_QAction_QObject(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_object)
+    bool qt_QAction_showStatusText_bool_QAction_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -394,33 +349,25 @@ namespace Mu
         return arg0->showStatusText(arg1);
     }
 
-    bool qt_QAction_event_bool_QAction_QEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_e)
+    bool qt_QAction_event_bool_QAction_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAction*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QAction*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAction*)arg0)->event_pub_parent(arg1) : ((MuQt_QAction*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QAction_eventFilter_bool_QAction_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QAction_eventFilter_bool_QAction_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QAction::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QAction::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QAction_customEvent_void_QAction_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_event)
+    void qt_QAction_customEvent_void_QAction_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -431,9 +378,7 @@ namespace Mu
             ((MuQt_QAction*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QAction_timerEvent_void_QAction_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QAction_timerEvent_void_QAction_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAction* arg0 = object<QAction>(param_this);
@@ -446,125 +391,102 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QAction0, Pointer)
     {
-        NODE_RETURN(qt_QAction_QAction_QAction_QAction_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAction_QAction_QAction_QAction_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QAction1, Pointer)
     {
-        NODE_RETURN(qt_QAction_QAction_QAction_QAction_string_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAction_QAction_QAction_QAction_string_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QAction2, Pointer)
     {
-        NODE_RETURN(qt_QAction_QAction_QAction_QAction_QIcon_string_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAction_QAction_QAction_QAction_QIcon_string_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_actionGroup0, Pointer)
     {
-        NODE_RETURN(qt_QAction_actionGroup_QActionGroup_QAction(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAction_actionGroup_QActionGroup_QAction(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_activate0, void)
     {
-        qt_QAction_activate_void_QAction_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAction_activate_void_QAction_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_data0, Pointer)
     {
-        NODE_RETURN(qt_QAction_data_QVariant_QAction(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAction_data_QVariant_QAction(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isSeparator0, bool)
     {
-        NODE_RETURN(qt_QAction_isSeparator_bool_QAction(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAction_isSeparator_bool_QAction(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_menu0, Pointer)
-    {
-        NODE_RETURN(qt_QAction_menu_QMenu_QAction(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_menu0, Pointer) { NODE_RETURN(qt_QAction_menu_QMenu_QAction(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_setActionGroup0, void)
     {
-        qt_QAction_setActionGroup_void_QAction_QActionGroup(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAction_setActionGroup_void_QAction_QActionGroup(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setData0, void)
     {
-        qt_QAction_setData_void_QAction_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAction_setData_void_QAction_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setMenu0, void)
     {
-        qt_QAction_setMenu_void_QAction_QMenu(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAction_setMenu_void_QAction_QMenu(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSeparator0, void)
     {
-        qt_QAction_setSeparator_void_QAction_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QAction_setSeparator_void_QAction_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setShortcut0, void)
     {
-        qt_QAction_setShortcut_void_QAction_QKeySequence(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAction_setShortcut_void_QAction_QKeySequence(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setShortcuts1, void)
     {
-        qt_QAction_setShortcuts_void_QAction_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAction_setShortcuts_void_QAction_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_shortcut0, Pointer)
     {
-        NODE_RETURN(qt_QAction_shortcut_QKeySequence_QAction(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAction_shortcut_QKeySequence_QAction(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_showStatusText0, bool)
     {
-        NODE_RETURN(qt_QAction_showStatusText_bool_QAction_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAction_showStatusText_bool_QAction_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QAction_event_bool_QAction_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAction_event_bool_QAction_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QAction_eventFilter_bool_QAction_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAction_eventFilter_bool_QAction_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QAction_customEvent_void_QAction_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAction_customEvent_void_QAction_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QAction_timerEvent_void_QAction_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAction_timerEvent_void_QAction_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QActionType::load()
@@ -584,17 +506,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAction_QAction_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAction_QAction_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -602,37 +520,21 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QAction", _n_QAction0, None, Compiled,
-                         qt_QAction_QAction_QAction_QAction_QObject, Return,
-                         "qt.QAction", Parameters,
-                         new Param(c, "this", "qt.QAction"),
+            new Function(c, "QAction", _n_QAction0, None, Compiled, qt_QAction_QAction_QAction_QAction_QObject, Return, "qt.QAction",
+                         Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QAction", _n_QAction1, None, Compiled, qt_QAction_QAction_QAction_QAction_string_QObject, Return, "qt.QAction",
+                         Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "text", "string"),
                          new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "QAction", _n_QAction1, None, Compiled,
-                         qt_QAction_QAction_QAction_QAction_string_QObject,
-                         Return, "qt.QAction", Parameters,
-                         new Param(c, "this", "qt.QAction"),
-                         new Param(c, "text", "string"),
-                         new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "QAction", _n_QAction2, None, Compiled,
-                qt_QAction_QAction_QAction_QAction_QIcon_string_QObject, Return,
-                "qt.QAction", Parameters, new Param(c, "this", "qt.QAction"),
-                new Param(c, "icon", "qt.QIcon"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "actionGroup", _n_actionGroup0, None, Compiled,
-                         qt_QAction_actionGroup_QActionGroup_QAction, Return,
-                         "qt.QActionGroup", Parameters,
-                         new Param(c, "this", "qt.QAction"), End),
-            new Function(c, "activate", _n_activate0, None, Compiled,
-                         qt_QAction_activate_void_QAction_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QAction"),
-                         new Param(c, "event", "int"), End),
+            new Function(c, "QAction", _n_QAction2, None, Compiled, qt_QAction_QAction_QAction_QAction_QIcon_string_QObject, Return,
+                         "qt.QAction", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "icon", "qt.QIcon"),
+                         new Param(c, "text", "string"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "actionGroup", _n_actionGroup0, None, Compiled, qt_QAction_actionGroup_QActionGroup_QAction, Return,
+                         "qt.QActionGroup", Parameters, new Param(c, "this", "qt.QAction"), End),
+            new Function(c, "activate", _n_activate0, None, Compiled, qt_QAction_activate_void_QAction_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAction"), new Param(c, "event", "int"), End),
             // MISSING: associatedObjects ("QList<QObject * >"; QAction this)
             // PROP: autoRepeat (bool; QAction this)
-            new Function(c, "data", _n_data0, None, Compiled,
-                         qt_QAction_data_QVariant_QAction, Return,
-                         "qt.QVariant", Parameters,
+            new Function(c, "data", _n_data0, None, Compiled, qt_QAction_data_QVariant_QAction, Return, "qt.QVariant", Parameters,
                          new Param(c, "this", "qt.QAction"), End),
             // PROP: font (QFont; QAction this)
             // PROP: icon (QIcon; QAction this)
@@ -641,102 +543,72 @@ namespace Mu
             // PROP: isChecked (bool; QAction this)
             // PROP: isEnabled (bool; QAction this)
             // PROP: isIconVisibleInMenu (bool; QAction this)
-            new Function(c, "isSeparator", _n_isSeparator0, None, Compiled,
-                         qt_QAction_isSeparator_bool_QAction, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QAction"), End),
+            new Function(c, "isSeparator", _n_isSeparator0, None, Compiled, qt_QAction_isSeparator_bool_QAction, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAction"), End),
             // PROP: isShortcutVisibleInContextMenu (bool; QAction this)
             // PROP: isVisible (bool; QAction this)
-            new Function(c, "menu", _n_menu0, None, Compiled,
-                         qt_QAction_menu_QMenu_QAction, Return, "qt.QMenu",
-                         Parameters, new Param(c, "this", "qt.QAction"), End),
+            new Function(c, "menu", _n_menu0, None, Compiled, qt_QAction_menu_QMenu_QAction, Return, "qt.QMenu", Parameters,
+                         new Param(c, "this", "qt.QAction"), End),
             // PROP: menuRole (flags QAction::MenuRole; QAction this)
             // PROP: priority (flags QAction::Priority; QAction this)
-            new Function(
-                c, "setActionGroup", _n_setActionGroup0, None, Compiled,
-                qt_QAction_setActionGroup_void_QAction_QActionGroup, Return,
-                "void", Parameters, new Param(c, "this", "qt.QAction"),
-                new Param(c, "group", "qt.QActionGroup"), End),
+            new Function(c, "setActionGroup", _n_setActionGroup0, None, Compiled, qt_QAction_setActionGroup_void_QAction_QActionGroup,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "group", "qt.QActionGroup"), End),
             // PROP: setAutoRepeat (void; QAction this, bool _p4)
             // PROP: setCheckable (void; QAction this, bool _p4)
-            new Function(c, "setData", _n_setData0, None, Compiled,
-                         qt_QAction_setData_void_QAction_QVariant, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QAction"),
-                         new Param(c, "data", "qt.QVariant"), End),
+            new Function(c, "setData", _n_setData0, None, Compiled, qt_QAction_setData_void_QAction_QVariant, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAction"), new Param(c, "data", "qt.QVariant"), End),
             // PROP: setFont (void; QAction this, QFont font)
             // PROP: setIcon (void; QAction this, QIcon icon)
             // PROP: setIconText (void; QAction this, string text)
             // PROP: setIconVisibleInMenu (void; QAction this, bool visible)
-            new Function(c, "setMenu", _n_setMenu0, None, Compiled,
-                         qt_QAction_setMenu_void_QAction_QMenu, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QAction"),
-                         new Param(c, "menu", "qt.QMenu"), End),
+            new Function(c, "setMenu", _n_setMenu0, None, Compiled, qt_QAction_setMenu_void_QAction_QMenu, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAction"), new Param(c, "menu", "qt.QMenu"), End),
             // PROP: setMenuRole (void; QAction this, flags QAction::MenuRole
             // menuRole) PROP: setPriority (void; QAction this, flags
             // QAction::Priority priority)
-            new Function(c, "setSeparator", _n_setSeparator0, None, Compiled,
-                         qt_QAction_setSeparator_void_QAction_bool, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QAction"),
-                         new Param(c, "b", "bool"), End),
-            new Function(c, "setShortcut", _n_setShortcut0, None, Compiled,
-                         qt_QAction_setShortcut_void_QAction_QKeySequence,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QAction"),
-                         new Param(c, "shortcut", "qt.QKeySequence"), End),
+            new Function(c, "setSeparator", _n_setSeparator0, None, Compiled, qt_QAction_setSeparator_void_QAction_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "b", "bool"), End),
+            new Function(c, "setShortcut", _n_setShortcut0, None, Compiled, qt_QAction_setShortcut_void_QAction_QKeySequence, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "shortcut", "qt.QKeySequence"), End),
             // PROP: setShortcutContext (void; QAction this, flags
             // Qt::ShortcutContext context) PROP:
             // setShortcutVisibleInContextMenu (void; QAction this, bool show)
             // MISSING: setShortcuts (void; QAction this, "const
             // QList<QKeySequence> &" shortcuts)
-            new Function(c, "setShortcuts", _n_setShortcuts1, None, Compiled,
-                         qt_QAction_setShortcuts_void_QAction_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QAction"),
-                         new Param(c, "key", "int"), End),
+            new Function(c, "setShortcuts", _n_setShortcuts1, None, Compiled, qt_QAction_setShortcuts_void_QAction_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "key", "int"), End),
             // PROP: setStatusTip (void; QAction this, string statusTip)
             // PROP: setText (void; QAction this, string text)
             // PROP: setToolTip (void; QAction this, string tip)
             // PROP: setWhatsThis (void; QAction this, string what)
-            new Function(c, "shortcut", _n_shortcut0, None, Compiled,
-                         qt_QAction_shortcut_QKeySequence_QAction, Return,
-                         "qt.QKeySequence", Parameters,
-                         new Param(c, "this", "qt.QAction"), End),
+            new Function(c, "shortcut", _n_shortcut0, None, Compiled, qt_QAction_shortcut_QKeySequence_QAction, Return, "qt.QKeySequence",
+                         Parameters, new Param(c, "this", "qt.QAction"), End),
             // PROP: shortcutContext (flags Qt::ShortcutContext; QAction this)
             // MISSING: shortcuts ("QList<QKeySequence>"; QAction this)
-            new Function(c, "showStatusText", _n_showStatusText0, None,
-                         Compiled,
-                         qt_QAction_showStatusText_bool_QAction_QObject, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QAction"),
-                         new Param(c, "object", "qt.QObject"), End),
+            new Function(c, "showStatusText", _n_showStatusText0, None, Compiled, qt_QAction_showStatusText_bool_QAction_QObject, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "object", "qt.QObject"), End),
             // PROP: statusTip (string; QAction this)
             // PROP: text (string; QAction this)
             // PROP: toolTip (string; QAction this)
             // PROP: whatsThis (string; QAction this)
-            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled,
-                                          qt_QAction_event_bool_QAction_QEvent,
-                                          Return, "bool", Parameters,
-                                          new Param(c, "this", "qt.QAction"),
-                                          new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QAction_eventFilter_bool_QAction_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAction"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QAction_event_bool_QAction_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] =
+                new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QAction_eventFilter_bool_QAction_QObject_QEvent,
+                                   Return, "bool", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "watched", "qt.QObject"),
+                                   new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QAction this)
             // MISSING: childEvent (void; QAction this, "QChildEvent *" event)
             // // protected MISSING: connectNotify (void; QAction this, "const
             // QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QAction_customEvent_void_QAction_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QAction"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] =
+                new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled, qt_QAction_customEvent_void_QAction_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QAction this, "const QMetaMethod
             // &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QAction_timerEvent_void_QAction_QTimerEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QAction"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] =
+                new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QAction_timerEvent_void_QAction_QTimerEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QAction"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

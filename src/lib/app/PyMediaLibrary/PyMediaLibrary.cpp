@@ -21,10 +21,7 @@ namespace TwkMediaLibrary
 
     size_t PyMediaLibrary::numNodeTypeNames() const { return 2; }
 
-    std::string PyMediaLibrary::nodeTypeName(size_t i) const
-    {
-        return nameFromPyNodeType(PyNodeType(PyNoType + i + 1));
-    }
+    std::string PyMediaLibrary::nodeTypeName(size_t i) const { return nameFromPyNodeType(PyNodeType(PyNoType + i + 1)); }
 
     const NodeAPI* PyMediaLibrary::nodeAPI(const Node* innode) const
     {

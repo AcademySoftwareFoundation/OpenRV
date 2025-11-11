@@ -14,11 +14,8 @@ namespace TwkMovie
 {
 
     TWK_DERIVED_EXCEPTION_WITH_EXPORT(Exception, TWKMOVIE_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception,
-                                           UnsupportedMovieTypeException,
-                                           TWKMOVIE_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, IOException,
-                                           TWKMOVIE_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, UnsupportedMovieTypeException, TWKMOVIE_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, IOException, TWKMOVIE_EXPORT)
 
 } // namespace TwkMovie
 

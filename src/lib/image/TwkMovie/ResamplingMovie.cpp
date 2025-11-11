@@ -19,8 +19,7 @@ namespace TwkMovie
     ofstream* sourceAudioDump = 0;
     ofstream* resampledAudioDump = 0;
 
-    void dumpAudio(AudioBuffer* buffer, string filename, bool isBackwards,
-                   ofstream** dumpfile)
+    void dumpAudio(AudioBuffer* buffer, string filename, bool isBackwards, ofstream** dumpfile)
     {
         if (isBackwards)
             buffer->reverse();
@@ -28,8 +27,7 @@ namespace TwkMovie
         if (!*dumpfile)
             *dumpfile = new ofstream(filename.c_str(), ios::binary | ios::out);
 
-        (*dumpfile)->write(reinterpret_cast<const char*>(buffer->pointer()),
-                           buffer->sizeInBytes());
+        (*dumpfile)->write(reinterpret_cast<const char*>(buffer->pointer()), buffer->sizeInBytes());
 
         if (isBackwards)
             buffer->reverse();
@@ -64,10 +62,8 @@ namespace TwkMovie
     {
         double sourceRate = audioMovie()->info().audioSampleRate;
         bool doOffset =
-            (!audioMovie()->canConvertAudioRate() && sourceRate < rate
-             && m_readPositionOffset > AUDIO_READPOSITIONOFFSET_THRESHOLD);
-        Time startTime =
-            doOffset ? m_readStart - m_readPositionOffset : m_readStart;
+            (!audioMovie()->canConvertAudioRate() && sourceRate < rate && m_readPositionOffset > AUDIO_READPOSITIONOFFSET_THRESHOLD);
+        Time startTime = doOffset ? m_readStart - m_readPositionOffset : m_readStart;
         return TwkAudio::timeToSamples(startTime, rate);
     }
 
@@ -75,24 +71,19 @@ namespace TwkMovie
     {
         if (samples != m_accumSamples && samples != 0)
         {
-            memmove(m_accumBuffer, m_accumBuffer + samples * channels,
-                    (m_accumSamples - samples) * channels * sizeof(float));
+            memmove(m_accumBuffer, m_accumBuffer + samples * channels, (m_accumSamples - samples) * channels * sizeof(float));
         }
     }
 
-    void ResamplingMovie::reset(int channels, float factor, size_t samples,
-                                int blocksize)
+    void ResamplingMovie::reset(int channels, float factor, size_t samples, int blocksize)
     {
         if (ResamplingMovie::debug)
         {
-            cerr << "AUDIO: ResamplingMovie::reset channels=" << channels
-                 << " factor=" << factor << " samples=" << samples
+            cerr << "AUDIO: ResamplingMovie::reset channels=" << channels << " factor=" << factor << " samples=" << samples
                  << " blocksize=" << blocksize << endl;
         }
 
-        channels = (!audioMovie()->canConvertAudioChannels())
-                       ? audioMovie()->info().audioChannels.size()
-                       : channels;
+        channels = (!audioMovie()->canConvertAudioChannels()) ? audioMovie()->info().audioChannels.size() : channels;
 
         if (factor == 1.0)
         {
@@ -105,8 +96,7 @@ namespace TwkMovie
             m_readPosition = 0;
             m_accumAllocated = 0;
         }
-        else if (!m_resampler || factor != m_resampler->factor()
-                 || channels != m_resampler->size())
+        else if (!m_resampler || factor != m_resampler->factor() || channels != m_resampler->size())
         {
             if (m_resampler)
                 delete m_resampler;
@@ -128,19 +118,15 @@ namespace TwkMovie
     {
         Movie* mov = audioMovie();
 
-        const bool needsChannelMix =
-            !(mov->canConvertAudioChannels()
-              || buffer.channels() == mov->info().audioChannels);
-        const ChannelsVector audioChannels =
-            (needsChannelMix) ? mov->info().audioChannels : buffer.channels();
+        const bool needsChannelMix = !(mov->canConvertAudioChannels() || buffer.channels() == mov->info().audioChannels);
+        const ChannelsVector audioChannels = (needsChannelMix) ? mov->info().audioChannels : buffer.channels();
 
         const double rate = buffer.rate();
         const unsigned int numChannels = audioChannels.size();
         const size_t numSamples = buffer.size();
 
         const size_t margin = 0;
-        const bool needsResample = !(mov->canConvertAudioRate()
-                                     || rate == mov->info().audioSampleRate);
+        const bool needsResample = !(mov->canConvertAudioRate() || rate == mov->info().audioSampleRate);
         const SampleTime bufferStart = buffer.startSample();
         const Time startTime = samplesToTime(bufferStart, rate);
 
@@ -153,9 +139,7 @@ namespace TwkMovie
         //  audio sample target and prepare the resampler.
         //
 
-        Time length = needsResample ? retimeAudioSampleTarget(buffer, startTime,
-                                                              numChannels)
-                                    : samplesToTime(numSamples, rate);
+        Time length = needsResample ? retimeAudioSampleTarget(buffer, startTime, numChannels) : samplesToTime(numSamples, rate);
 
         //
         //  Don't bother asking for samples if we are out of the valid range
@@ -166,12 +150,10 @@ namespace TwkMovie
         //  skew into consideration.
         //
 
-        if (bufferStart > maxAvailableSample(rate)
-            || bufferStart + SampleTime(numSamples) < minAvailableSample(rate))
+        if (bufferStart > maxAvailableSample(rate) || bufferStart + SampleTime(numSamples) < minAvailableSample(rate))
         {
             if (ResamplingMovie::debug)
-                cerr << "ERROR: read " << offsetStart(rate)
-                     << " is out of range" << endl;
+                cerr << "ERROR: read " << offsetStart(rate) << " is out of range" << endl;
             return 0;
         }
 
@@ -180,14 +162,12 @@ namespace TwkMovie
         //  audio buffer.
         //
 
-        Movie::AudioReadRequest request(samplesToTime(offsetStart(rate), rate),
-                                        length, margin);
+        Movie::AudioReadRequest request(samplesToTime(offsetStart(rate), rate), length, margin);
 
         size_t nread = mov->audioFillBuffer(request, buffer);
 
         if (ResamplingMovie::dump)
-            dumpAudio(&buffer, "audio-source-dump", m_isBackwards,
-                      &sourceAudioDump);
+            dumpAudio(&buffer, "audio-source-dump", m_isBackwards, &sourceAudioDump);
 
         if (nread == 0)
         {
@@ -227,8 +207,7 @@ namespace TwkMovie
 
         if (ResamplingMovie::debug && (nanCount || outOfBounds))
         {
-            cerr << "ERROR: " << nanCount << " NANs in audio stream and "
-                 << outOfBounds << " floats out of bounds." << endl;
+            cerr << "ERROR: " << nanCount << " NANs in audio stream and " << outOfBounds << " floats out of bounds." << endl;
         }
 
         //
@@ -242,8 +221,7 @@ namespace TwkMovie
             buffer.resize(expectedSamples);
         if (nread < expectedSamples)
         {
-            memset(buffer.pointer() + nread * numChannels, 0,
-                   (expectedSamples - nread) * numChannels * sizeof(float));
+            memset(buffer.pointer() + nread * numChannels, 0, (expectedSamples - nread) * numChannels * sizeof(float));
         }
 
         if (needsResample && m_resampler)
@@ -251,22 +229,18 @@ namespace TwkMovie
             AUDIOBUFFER_CHECK(buffer, "FileSourceIPNode::audioFillFromMedia() "
                                       "from media (before resample)")
 
-            resampleAudio(buffer, nread, numSamples, startTime, audioChannels,
-                          rate);
+            resampleAudio(buffer, nread, numSamples, startTime, audioChannels, rate);
 
-            AUDIOBUFFER_CHECK(
-                buffer, "FileSourceIPNode::audioFillFromMedia() after resample")
+            AUDIOBUFFER_CHECK(buffer, "FileSourceIPNode::audioFillFromMedia() after resample")
         }
 
         if (ResamplingMovie::dump)
-            dumpAudio(&buffer, "audio-source-resampled-dump", m_isBackwards,
-                      &resampledAudioDump);
+            dumpAudio(&buffer, "audio-source-resampled-dump", m_isBackwards, &resampledAudioDump);
 
         return nread;
     }
 
-    TwkAudio::Time ResamplingMovie::retimeAudioSampleTarget(
-        AudioBuffer buffer, const Time startTime, const int numChannels)
+    TwkAudio::Time ResamplingMovie::retimeAudioSampleTarget(AudioBuffer buffer, const Time startTime, const int numChannels)
     {
         const double rate = buffer.rate();       // requested rate
         const size_t numSamples = buffer.size(); // requested samples
@@ -291,8 +265,7 @@ namespace TwkMovie
         //  where we left off.
         //
 
-        if (m_accumSamples && tdiff >= -aepsilon
-            && tdiff < samplesToTime(m_accumAllocated, rate))
+        if (m_accumSamples && tdiff >= -aepsilon && tdiff < samplesToTime(m_accumAllocated, rate))
         {
             //
             //  We're within range of our buffer. If readStart is past the first
@@ -381,9 +354,7 @@ namespace TwkMovie
 
             const SampleTime bufferStart = buffer.startSample();
             if (((!m_isBackwards && bufferStart <= minAvailableSample(rate))
-                 || (m_isBackwards
-                     && bufferStart + SampleTime(numSamples)
-                            >= maxAvailableSample(rate)))
+                 || (m_isBackwards && bufferStart + SampleTime(numSamples) >= maxAvailableSample(rate)))
                 && m_resampler)
             {
                 m_resampler->reset();
@@ -402,17 +373,13 @@ namespace TwkMovie
 
     SampleTime ResamplingMovie::maxAvailableSample(double audioSampleRate)
     {
-        int audioEndFrame =
-            audioMovie()->info().end - audioMovie()->info().start + 1;
+        int audioEndFrame = audioMovie()->info().end - audioMovie()->info().start + 1;
         Time endOffet = (double(audioEndFrame) / audioMovie()->info().fps);
         return timeToSamples(endOffet, audioSampleRate) - 1;
     }
 
-    void ResamplingMovie::resampleAudio(AudioBuffer& buffer, const size_t nread,
-                                        const size_t numSamples,
-                                        const Time startTime,
-                                        const ChannelsVector audioChannels,
-                                        const double rate)
+    void ResamplingMovie::resampleAudio(AudioBuffer& buffer, const size_t nread, const size_t numSamples, const Time startTime,
+                                        const ChannelsVector audioChannels, const double rate)
     {
         const int numChannels = audioChannels.size();
 
@@ -432,11 +399,9 @@ namespace TwkMovie
         //
 
         const double factor = m_resampler->factor();
-        size_t nresampled =
-            timeToSamples(samplesToTime(nread, ping->rate()), rate);
+        size_t nresampled = timeToSamples(samplesToTime(nread, ping->rate()), rate);
 
-        pong->reconfigure(nresampled, audioChannels, rate, m_readStart,
-                          size_t(factor * ping->margin()));
+        pong->reconfigure(nresampled, audioChannels, rate, m_readStart, size_t(factor * ping->margin()));
 
         //
         // NB: When upsampling i.e. factor > 1.0; we enable clamping
@@ -445,11 +410,10 @@ namespace TwkMovie
 
         if (m_isBackwards)
             ping->reverse();
-        nresampled = m_resampler->process(
-            ping->pointerIncludingMargin(), ping->sizeIncludingMargin(),
-            pong->pointerIncludingMargin(), pong->sizeIncludingMargin(),
-            false, // buffer already padded
-            (factor > 1.0));
+        nresampled = m_resampler->process(ping->pointerIncludingMargin(), ping->sizeIncludingMargin(), pong->pointerIncludingMargin(),
+                                          pong->sizeIncludingMargin(),
+                                          false, // buffer already padded
+                                          (factor > 1.0));
 
         pong->resize(nresampled);
 
@@ -482,8 +446,7 @@ namespace TwkMovie
 
         if (srate < rate)
         {
-            m_readPositionOffset +=
-                samplesToTime(nread, srate) - samplesToTime(nresampled, rate);
+            m_readPositionOffset += samplesToTime(nread, srate) - samplesToTime(nresampled, rate);
         }
 
         //
@@ -504,8 +467,7 @@ namespace TwkMovie
 
             if (asamps)
             {
-                memcpy(pong->pointer(), m_accumBuffer,
-                       asamps * numChannels * sizeof(float));
+                memcpy(pong->pointer(), m_accumBuffer, asamps * numChannels * sizeof(float));
 
                 shiftBuffer(asamps, numChannels);
                 m_accumSamples -= asamps;
@@ -516,13 +478,11 @@ namespace TwkMovie
 
             if (rsamps)
             {
-                memcpy(pong->pointer() + numChannels * asamps, ping->pointer(),
-                       rsamps * numChannels * sizeof(float));
+                memcpy(pong->pointer() + numChannels * asamps, ping->pointer(), rsamps * numChannels * sizeof(float));
             }
 
             size_t resampledSamplesToAccumulate = ping->size() - rsamps;
-            if (m_accumSamples + resampledSamplesToAccumulate
-                > m_accumAllocated)
+            if (m_accumSamples + resampledSamplesToAccumulate > m_accumAllocated)
             {
                 //
                 // We should really never get this condition.
@@ -531,12 +491,10 @@ namespace TwkMovie
                 //
 
                 cerr << "*****ERROR: accumBuffer copy exceeded! - 1" << endl;
-                resampledSamplesToAccumulate =
-                    m_accumAllocated - m_accumSamples;
+                resampledSamplesToAccumulate = m_accumAllocated - m_accumSamples;
             }
 
-            memcpy(m_accumBuffer + m_accumSamples * numChannels,
-                   ping->pointer() + rsamps * numChannels,
+            memcpy(m_accumBuffer + m_accumSamples * numChannels, ping->pointer() + rsamps * numChannels,
                    resampledSamplesToAccumulate * numChannels * sizeof(float));
 
             m_accumSamples += resampledSamplesToAccumulate;
@@ -560,9 +518,7 @@ namespace TwkMovie
 
             if (ping->size())
             {
-                size_t resampledSamplesToAccumulate =
-                    (ping->size() >= numSamples) ? ping->size() - numSamples
-                                                 : ping->size();
+                size_t resampledSamplesToAccumulate = (ping->size() >= numSamples) ? ping->size() - numSamples : ping->size();
 
                 if (resampledSamplesToAccumulate > m_accumAllocated)
                 {
@@ -572,8 +528,7 @@ namespace TwkMovie
                     // write.
                     //
 
-                    cerr << "*****ERROR: accumBuffer copy exceeded! - 2"
-                         << endl;
+                    cerr << "*****ERROR: accumBuffer copy exceeded! - 2" << endl;
                     resampledSamplesToAccumulate = m_accumAllocated;
                 }
 
@@ -581,10 +536,8 @@ namespace TwkMovie
                 m_accumStart = startTime + samplesToTime(copied, rate);
                 if (resampledSamplesToAccumulate)
                 {
-                    memcpy(m_accumBuffer,
-                           ping->pointer() + copied * numChannels,
-                           resampledSamplesToAccumulate * numChannels
-                               * sizeof(float));
+                    memcpy(m_accumBuffer, ping->pointer() + copied * numChannels,
+                           resampledSamplesToAccumulate * numChannels * sizeof(float));
                 }
             }
         }

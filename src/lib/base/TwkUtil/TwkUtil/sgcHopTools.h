@@ -23,9 +23,7 @@ extern "C"
 
     // Function to enable HOP before calling the function pointer.
     // This can be useful to add some HOP traces in C code.
-    void HOP_PROF_FUNCTION_PTR(const char* functionName,
-                               void (*functionPtr)(void**, void*),
-                               void** params, void* ret);
+    void HOP_PROF_FUNCTION_PTR(const char* functionName, void (*functionPtr)(void**, void*), void** params, void* ret);
 
 #ifdef __cplusplus
 }

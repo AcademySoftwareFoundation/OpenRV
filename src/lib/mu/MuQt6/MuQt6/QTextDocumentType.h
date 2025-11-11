@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextDocumentType(Context* context, const char* name,
-                          Class* superClass = 0, Class* superClass2 = 0);
+        QTextDocumentType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTextDocumentType();
 
@@ -66,10 +65,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QTextDocument();
-        MuQt_QTextDocument(Pointer muobj, const CallEnvironment*,
-                           QObject* parent);
-        MuQt_QTextDocument(Pointer muobj, const CallEnvironment*,
-                           const QString& text, QObject* parent);
+        MuQt_QTextDocument(Pointer muobj, const CallEnvironment*, QObject* parent);
+        MuQt_QTextDocument(Pointer muobj, const CallEnvironment*, const QString& text, QObject* parent);
         virtual void clear();
 
     protected:
@@ -84,29 +81,17 @@ namespace Mu
         virtual void timerEvent(QTimerEvent* event);
 
     public:
-        QVariant loadResource_pub(int type, const QUrl& name)
-        {
-            return loadResource(type, name);
-        }
+        QVariant loadResource_pub(int type, const QUrl& name) { return loadResource(type, name); }
 
-        QVariant loadResource_pub_parent(int type, const QUrl& name)
-        {
-            return QTextDocument::loadResource(type, name);
-        }
+        QVariant loadResource_pub_parent(int type, const QUrl& name) { return QTextDocument::loadResource(type, name); }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QTextDocument::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QTextDocument::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QTextDocument::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QTextDocument::timerEvent(event); }
 
     public:
         const QTextDocumentType* _baseType;
@@ -114,11 +99,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTextDocumentType::cachedInstance(const QTextDocumentType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTextDocumentType::cachedInstance(const QTextDocumentType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

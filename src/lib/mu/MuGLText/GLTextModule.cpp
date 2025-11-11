@@ -95,62 +95,43 @@ namespace Mu
 
         addSymbols(
 
-            new Function(c, "init", GLTextModule::TwkGLText_init, None, Return,
-                         "void", Args, Optional, "string", End),
+            new Function(c, "init", GLTextModule::TwkGLText_init, None, Return, "void", Args, Optional, "string", End),
 
-            new Function(c, "writeAt", GLTextModule::writeAt, None, Return,
-                         "void", Args, "float", "float", "string", End),
+            new Function(c, "writeAt", GLTextModule::writeAt, None, Return, "void", Args, "float", "float", "string", End),
 
-            new Function(c, "writeAt", GLTextModule::writeAt, None, Return,
-                         "void", Args, "vector float[2]", "string", End),
+            new Function(c, "writeAt", GLTextModule::writeAt, None, Return, "void", Args, "vector float[2]", "string", End),
 
-            new Function(c, "writeAtNL", GLTextModule::writeAtNLf, None, Return,
-                         "void", Args, "float", "float", "string", Optional,
+            new Function(c, "writeAtNL", GLTextModule::writeAtNLf, None, Return, "void", Args, "float", "float", "string", Optional,
                          "float", End),
 
-            new Function(c, "writeAtNL", GLTextModule::writeAtNLfv, None,
-                         Return, "int", Args, "vector float[2]", "string",
-                         Optional, "float", End),
-
-            new Function(c, "size", GLTextModule::setSize, None, Return, "void",
-                         Args, "int", End),
-
-            new Function(c, "size", GLTextModule::getSize, None, Return, "int",
-                         End),
-
-            new Function(c, "bounds", GLTextModule::bounds, None, Return,
-                         "float[4]", Args, "string", End),
-
-            new Function(c, "boundsNL", GLTextModule::boundsNL, None, Return,
-                         "float[4]", Args, "string", Optional, "float", End),
-
-            new Function(c, "color", GLTextModule::color4f, None, Return,
-                         "void", Args, "float", "float", "float", Optional,
+            new Function(c, "writeAtNL", GLTextModule::writeAtNLfv, None, Return, "int", Args, "vector float[2]", "string", Optional,
                          "float", End),
 
-            new Function(c, "color", GLTextModule::color3fv, None, Return,
-                         "void", Args, "vector float[3]", End),
+            new Function(c, "size", GLTextModule::setSize, None, Return, "void", Args, "int", End),
 
-            new Function(c, "color", GLTextModule::color4fv, None, Return,
-                         "void", Args, "vector float[4]", End),
+            new Function(c, "size", GLTextModule::getSize, None, Return, "int", End),
 
-            new Function(c, "width", GLTextModule::width, None, Return, "float",
-                         Args, "string", End),
+            new Function(c, "bounds", GLTextModule::bounds, None, Return, "float[4]", Args, "string", End),
 
-            new Function(c, "height", GLTextModule::height, None, Return,
-                         "float", Args, "string", End),
+            new Function(c, "boundsNL", GLTextModule::boundsNL, None, Return, "float[4]", Args, "string", Optional, "float", End),
 
-            new Function(c, "widthNL", GLTextModule::widthNL, None, Return,
-                         "float", Args, "string", End),
+            new Function(c, "color", GLTextModule::color4f, None, Return, "void", Args, "float", "float", "float", Optional, "float", End),
 
-            new Function(c, "heightNL", GLTextModule::heightNL, None, Return,
-                         "float", Args, "string", End),
+            new Function(c, "color", GLTextModule::color3fv, None, Return, "void", Args, "vector float[3]", End),
 
-            new Function(c, "ascenderHeight", GLTextModule::ascenderHeight,
-                         None, Return, "float", End),
+            new Function(c, "color", GLTextModule::color4fv, None, Return, "void", Args, "vector float[4]", End),
 
-            new Function(c, "descenderDepth", GLTextModule::descenderDepth,
-                         None, Return, "float", End),
+            new Function(c, "width", GLTextModule::width, None, Return, "float", Args, "string", End),
+
+            new Function(c, "height", GLTextModule::height, None, Return, "float", Args, "string", End),
+
+            new Function(c, "widthNL", GLTextModule::widthNL, None, Return, "float", Args, "string", End),
+
+            new Function(c, "heightNL", GLTextModule::heightNL, None, Return, "float", Args, "string", End),
+
+            new Function(c, "ascenderHeight", GLTextModule::ascenderHeight, None, Return, "float", End),
+
+            new Function(c, "descenderDepth", GLTextModule::descenderDepth, None, Return, "float", End),
 
             EndArguments);
     }
@@ -165,8 +146,7 @@ namespace Mu
         }
         else if (NODE_NUM_ARGS() == 1)
         {
-            const StringType::String* stext =
-                NODE_ARG_OBJECT(0, const StringType::String);
+            const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
             const char* fontName = stext->c_str();
             GLtext::init(fontName);
         }
@@ -209,8 +189,7 @@ namespace Mu
             x = NODE_ARG(0, float);
             y = NODE_ARG(1, float);
         }
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(2, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(2, const StringType::String);
         string s = removeReturns(stext->c_str());
 
         GLtext::writeAt(x, y, s.c_str());
@@ -220,8 +199,7 @@ namespace Mu
     {
         float x = NODE_ARG(0, float);
         float y = NODE_ARG(1, float);
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(2, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(2, const StringType::String);
         string s = removeReturns(stext->c_str());
         float mult = 1.0f;
         if (NODE_NUM_ARGS() == 4)
@@ -237,8 +215,7 @@ namespace Mu
         const Vector2f& p = NODE_ARG(0, Vector2f);
         float x = p[0];
         float y = p[1];
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(2, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(2, const StringType::String);
         string s = removeReturns(stext->c_str());
         float mult = 1.0f;
         if (NODE_NUM_ARGS() == 4)
@@ -249,27 +226,19 @@ namespace Mu
         NODE_RETURN(GLtext::writeAtNL(x, y, s.c_str(), mult));
     }
 
-    NODE_IMPLEMENTATION(GLTextModule::setSize, void)
-    {
-        GLtext::size(NODE_ARG(0, int));
-    }
+    NODE_IMPLEMENTATION(GLTextModule::setSize, void) { GLtext::size(NODE_ARG(0, int)); }
 
-    NODE_IMPLEMENTATION(GLTextModule::getSize, int)
-    {
-        NODE_RETURN(GLtext::size());
-    }
+    NODE_IMPLEMENTATION(GLTextModule::getSize, int) { NODE_RETURN(GLtext::size()); }
 
     NODE_IMPLEMENTATION(GLTextModule::bounds, Pointer)
     {
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
         string s = removeReturns(stext->c_str());
 
-        const FixedArrayType* atype =
-            (FixedArrayType*)c->arrayType(c->floatType(), 1, 4);
+        const FixedArrayType* atype = (FixedArrayType*)c->arrayType(c->floatType(), 1, 4);
         FixedArray* bounds = (FixedArray*)ClassInstance::allocate(atype);
 
         TwkMath::Box2f b = GLtext::bounds(s.c_str());
@@ -287,8 +256,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
         string s = removeReturns(stext->c_str());
 
         float mult = 1.0f;
@@ -297,8 +265,7 @@ namespace Mu
             mult = NODE_ARG(1, float);
         }
 
-        const FixedArrayType* atype =
-            (FixedArrayType*)c->arrayType(c->floatType(), 1, 4);
+        const FixedArrayType* atype = (FixedArrayType*)c->arrayType(c->floatType(), 1, 4);
         FixedArray* bounds = (FixedArray*)ClassInstance::allocate(atype);
 
         TwkMath::Box2f b = GLtext::boundsNL(s.c_str(), mult);
@@ -341,8 +308,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
         const char* text = stext->c_str();
 
         TwkMath::Box2f b = GLtext::bounds(text);
@@ -354,8 +320,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
         const char* text = stext->c_str();
 
         TwkMath::Box2f b = GLtext::bounds(text);
@@ -367,8 +332,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
         const char* text = stext->c_str();
 
         TwkMath::Box2f b = GLtext::boundsNL(text);
@@ -380,8 +344,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
-        const StringType::String* stext =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* stext = NODE_ARG_OBJECT(0, const StringType::String);
         const char* text = stext->c_str();
 
         TwkMath::Box2f b = GLtext::boundsNL(text);

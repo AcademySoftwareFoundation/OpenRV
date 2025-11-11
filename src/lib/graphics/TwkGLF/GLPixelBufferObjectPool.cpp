@@ -23,10 +23,7 @@
 
 namespace
 {
-    void printVarType(const char* sVar, const char* sType)
-    {
-        printf("environment variable \"%s\" should be a %s\n", sVar, sType);
-    }
+    void printVarType(const char* sVar, const char* sType) { printf("environment variable \"%s\" should be a %s\n", sVar, sType); }
 
     template <class T, T Ini_> struct Initializer
     {
@@ -122,28 +119,19 @@ namespace TwkGLF
 
     RV_MAKE_STATIC(RV_PREFETCH_USE_PBOS, bool, true, prefetchUsePBOs);
     RV_MAKE_STATIC(s, size_t, 1024UL, prefetchPoolMB);
-    RV_MAKE_STATIC(RV_PREFETCH_POOL_MAX_NB_BUFFERS, unsigned, 7U,
-                   prefetchPoolMaxNbBuffers);
-    RV_MAKE_STATIC(RV_PREFETCH_USE_FIXED_SIZE_PBOS, bool, true,
-                   prefetchUseFixedSizePBOs);
-    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MAX_SIZE, size_t,
-                   4032 * 4536 * 6, prefetchFixedSizePBOsMaxSize);
-    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_SIZE, size_t,
-                   1920 * 1080 * 6, prefetchFixedSizePBOsMinSize);
-    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_NB_BUFFERS, unsigned, 3U,
-                   prefetchFixedSizePBOsMinNbBuffers);
+    RV_MAKE_STATIC(RV_PREFETCH_POOL_MAX_NB_BUFFERS, unsigned, 7U, prefetchPoolMaxNbBuffers);
+    RV_MAKE_STATIC(RV_PREFETCH_USE_FIXED_SIZE_PBOS, bool, true, prefetchUseFixedSizePBOs);
+    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MAX_SIZE, size_t, 4032 * 4536 * 6, prefetchFixedSizePBOsMaxSize);
+    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_SIZE, size_t, 1920 * 1080 * 6, prefetchFixedSizePBOsMinSize);
+    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_NB_BUFFERS, unsigned, 3U, prefetchFixedSizePBOsMinNbBuffers);
     RV_MAKE_STATIC(RV_WRITE_BEHIND_USE_PBOS, bool, false, writeBehindUsePBOs);
-    RV_MAKE_STATIC(RV_WRITE_BEHIND_QUEUE_LENGTH, unsigned, 3U,
-                   asyncOutputQueueLength);
+    RV_MAKE_STATIC(RV_WRITE_BEHIND_QUEUE_LENGTH, unsigned, 3U, asyncOutputQueueLength);
 
     static ENVVAR_INT(evDebug, "RV_PBO_POOL_DEBUG", 0);
 
     //------------------------------------------------------------------------------
     //
-    unsigned PipelinePrefetchPoolMaxNbBuffers()
-    {
-        return prefetchPoolMaxNbBuffers;
-    }
+    unsigned PipelinePrefetchPoolMaxNbBuffers() { return prefetchPoolMaxNbBuffers; }
 
     //------------------------------------------------------------------------------
     //
@@ -153,8 +141,7 @@ namespace TwkGLF
         {
             unsigned prev = prefetchPoolMaxNbBuffers;
             prefetchPoolMaxNbBuffers = maxNbBuffers;
-            RV_LOG("Pipeline : Frame prefetching pool max nb buffers = %u\n",
-                   maxNbBuffers);
+            RV_LOG("Pipeline : Frame prefetching pool max nb buffers = %u\n", maxNbBuffers);
             return prev;
         }
         return prefetchPoolMaxNbBuffers;
@@ -172,8 +159,7 @@ namespace TwkGLF
         {
             size_t prev = prefetchPoolMB;
             prefetchPoolMB = nbMegaBytes;
-            RV_LOG("Pipeline : Frame prefetching pool size = %zd (%zd MB)\n",
-                   PipelinePrefetchPoolBytes(), nbMegaBytes);
+            RV_LOG("Pipeline : Frame prefetching pool size = %zd (%zd MB)\n", PipelinePrefetchPoolBytes(), nbMegaBytes);
             return prev;
         }
         return prefetchPoolMB;
@@ -187,8 +173,7 @@ namespace TwkGLF
     //
     void printPrefetchUseFixedSizePBOs()
     {
-        RV_LOG("Pipeline : %s fixed size PBOs in frame prefetching\n",
-               PipelinePrefetchUseFixedSizePBOs() ? "enabled" : "disabled");
+        RV_LOG("Pipeline : %s fixed size PBOs in frame prefetching\n", PipelinePrefetchUseFixedSizePBOs() ? "enabled" : "disabled");
     }
 
     //------------------------------------------------------------------------------
@@ -203,10 +188,7 @@ namespace TwkGLF
 
     //------------------------------------------------------------------------------
     //
-    size_t PipelinePrefetchFixedSizePBOsMaxSize()
-    {
-        return prefetchFixedSizePBOsMaxSize;
-    }
+    size_t PipelinePrefetchFixedSizePBOsMaxSize() { return prefetchFixedSizePBOsMaxSize; }
 
     //------------------------------------------------------------------------------
     //
@@ -223,10 +205,7 @@ namespace TwkGLF
 
     //------------------------------------------------------------------------------
     //
-    size_t PipelinePrefetchFixedSizePBOsMinSize()
-    {
-        return prefetchFixedSizePBOsMinSize;
-    }
+    size_t PipelinePrefetchFixedSizePBOsMinSize() { return prefetchFixedSizePBOsMinSize; }
 
     //------------------------------------------------------------------------------
     //
@@ -243,10 +222,7 @@ namespace TwkGLF
 
     //------------------------------------------------------------------------------
     //
-    unsigned PipelinePrefetchFixedSizePBOsMinNbBuffers()
-    {
-        return prefetchFixedSizePBOsMinNbBuffers;
-    }
+    unsigned PipelinePrefetchFixedSizePBOsMinNbBuffers() { return prefetchFixedSizePBOsMinNbBuffers; }
 
     //------------------------------------------------------------------------------
     //
@@ -321,10 +297,7 @@ namespace TwkGLF
             {
             }
 
-            bool operator()(const PBOInfo& elem) const
-            {
-                return _pbo == elem.pbo;
-            }
+            bool operator()(const PBOInfo& elem) const { return _pbo == elem.pbo; }
 
         private:
             GLPixelBufferObject* _pbo{nullptr};
@@ -347,13 +320,9 @@ namespace TwkGLF
 
             GLPixelBufferObject* pbo = NULL;
 
-            const size_t maxSize =
-                _recycleExactSizeOnly
-                    ? size
-                    : static_cast<size_t>(size * _invRecycleMinPercentage);
+            const size_t maxSize = _recycleExactSizeOnly ? size : static_cast<size_t>(size * _invRecycleMinPercentage);
 
-            QueueMap::iterator p = _freePool.lower_bound(size),
-                               pEnd = _freePool.end();
+            QueueMap::iterator p = _freePool.lower_bound(size), pEnd = _freePool.end();
 
             if (p != pEnd && (maxSize == 0.0f || p->first <= maxSize))
             {
@@ -383,8 +352,7 @@ namespace TwkGLF
             size_t purgedSize = 0;
             size_t purgedNbBuffer = 0;
 
-            while (!_freePool.empty() && (!minSize || (purgedSize < minSize))
-                   && (!minNbBuffers || (purgedNbBuffer < minNbBuffers)))
+            while (!_freePool.empty() && (!minSize || (purgedSize < minSize)) && (!minNbBuffers || (purgedNbBuffer < minNbBuffers)))
             {
                 QueueMap::iterator p, pEnd = _freePool.end();
 
@@ -401,8 +369,7 @@ namespace TwkGLF
                     PBOQueue::iterator it, end = q.end();
                     for (it = q.begin(); it != end; ++it)
                     {
-                        if (it->purgeable
-                            && (minPool == pEnd || it->stamp < minStamp))
+                        if (it->purgeable && (minPool == pEnd || it->stamp < minStamp))
                         {
                             minPool = p;
                             minPBO = it;
@@ -440,9 +407,7 @@ namespace TwkGLF
 
         void _dumpNoLock(bool details)
         {
-            printf("%s pool state, size %zd:\n",
-                   _dir == GLPixelBufferObject::TO_GPU ? "To GPU" : "From GPU",
-                   _allocSize);
+            printf("%s pool state, size %zd:\n", _dir == GLPixelBufferObject::TO_GPU ? "To GPU" : "From GPU", _allocSize);
 
             printf("   %zd free queues\n", _freePool.size());
             QueueMap::const_iterator p, pEnd = _freePool.end();
@@ -456,8 +421,7 @@ namespace TwkGLF
                     {
                         printf("        free, size %u stamp %zd purgeable %d "
                                "(%p)\n",
-                               q->pbo->getSize(), q->stamp, q->purgeable,
-                               q->pbo);
+                               q->pbo->getSize(), q->stamp, q->purgeable, q->pbo);
                     }
                 }
             }
@@ -474,8 +438,7 @@ namespace TwkGLF
                     {
                         printf("        used, size %u stamp %zd purgeable %d "
                                "(%p)\n",
-                               q->pbo->getSize(), q->stamp, q->purgeable,
-                               q->pbo);
+                               q->pbo->getSize(), q->stamp, q->purgeable, q->pbo);
                     }
                 }
             }
@@ -571,9 +534,7 @@ namespace TwkGLF
             _maxPBOSize = maxPBOSize;
         }
 
-        GLPixelBufferObject*
-        pop(size_t size,
-            bool purgeable = true /* only used when first allocated */
+        GLPixelBufferObject* pop(size_t size, bool purgeable = true /* only used when first allocated */
         )
         {
             if (_maxPBOSize != 0 && size > _maxPBOSize)
@@ -595,16 +556,13 @@ namespace TwkGLF
                 bool overSoftMaxSize = false;
                 if (_softMaxSize > 0 && (_allocSize + size) > _softMaxSize)
                 {
-                    overSoftMaxSize =
-                        !_purgeNoLock((_allocSize + size) - _softMaxSize, 0);
+                    overSoftMaxSize = !_purgeNoLock((_allocSize + size) - _softMaxSize, 0);
                 }
 
                 bool overSoftMaxNbBuffer = false;
-                if (_softMaxNbBuffers > 0
-                    && (_allocNbBuffers + 1) > _softMaxNbBuffers)
+                if (_softMaxNbBuffers > 0 && (_allocNbBuffers + 1) > _softMaxNbBuffers)
                 {
-                    overSoftMaxNbBuffer = !_purgeNoLock(
-                        0, (_allocNbBuffers + 1) - _softMaxNbBuffers);
+                    overSoftMaxNbBuffer = !_purgeNoLock(0, (_allocNbBuffers + 1) - _softMaxNbBuffers);
                 }
 
                 if (overSoftMaxSize || overSoftMaxNbBuffer)
@@ -612,9 +570,7 @@ namespace TwkGLF
                     // Go over the soft limits as long as the hard limit is not
                     // reached.
                     size_t physTotal = 0, physFree = 0;
-                    TwkUtil::SystemInfo::getSystemMemoryInfo(
-                        &physTotal, &physFree, nullptr, nullptr, nullptr,
-                        nullptr, nullptr, nullptr);
+                    TwkUtil::SystemInfo::getSystemMemoryInfo(&physTotal, &physFree, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 
                     float freeMemory = static_cast<float>(physFree) / physTotal;
                     if (freeMemory < _hardMaxMinFreeMemory)
@@ -623,8 +579,7 @@ namespace TwkGLF
 
                 pbo = new GLPixelBufferObject(_dir, size);
 
-                _usedPool[size].push_back(
-                    PBOInfo(pbo, new GLSyncObject, ++_curStamp, purgeable));
+                _usedPool[size].push_back(PBOInfo(pbo, new GLSyncObject, ++_curStamp, purgeable));
                 _allocSize += size;
                 ++_allocNbBuffers;
             }
@@ -636,8 +591,7 @@ namespace TwkGLF
                 if (_softMaxSize > 0 && _allocSize > _softMaxSize)
                     _purgeNoLock(_allocSize - _softMaxSize, 0);
 
-                if (_softMaxNbBuffers > 0
-                    && _allocNbBuffers > _softMaxNbBuffers)
+                if (_softMaxNbBuffers > 0 && _allocNbBuffers > _softMaxNbBuffers)
                     _purgeNoLock(0, _allocNbBuffers - _softMaxNbBuffers);
             }
 
@@ -660,8 +614,7 @@ namespace TwkGLF
                 assert(p != _usedPool.end());
 
                 PBOQueue& q = p->second;
-                PBOQueue::iterator it =
-                    std::find_if(q.begin(), q.end(), PBOInfoCompare(pbo));
+                PBOQueue::iterator it = std::find_if(q.begin(), q.end(), PBOInfoCompare(pbo));
                 assert(it != q.end());
 
                 PBOInfo& pboInfo = *it;
@@ -758,19 +711,14 @@ namespace TwkGLF
                         // for processing.
                         const float extraNbBuffers = 1.05f;
 
-                        const size_t pboMinSize =
-                            PipelinePrefetchFixedSizePBOsMinSize();
-                        const unsigned poolMinNbBuffers = static_cast<unsigned>(
-                            ceilf(PipelinePrefetchFixedSizePBOsMinNbBuffers()
-                                  * extraNbBuffers));
-                        const size_t poolMinSize =
-                            pboMinSize * poolMinNbBuffers;
+                        const size_t pboMinSize = PipelinePrefetchFixedSizePBOsMinSize();
+                        const unsigned poolMinNbBuffers =
+                            static_cast<unsigned>(ceilf(PipelinePrefetchFixedSizePBOsMinNbBuffers() * extraNbBuffers));
+                        const size_t poolMinSize = pboMinSize * poolMinNbBuffers;
 
                         size_t pboSize = PipelinePrefetchFixedSizePBOsMaxSize();
 
-                        unsigned poolNbBuffers = static_cast<unsigned>(
-                            ceilf(PipelinePrefetchPoolMaxNbBuffers()
-                                  * extraNbBuffers));
+                        unsigned poolNbBuffers = static_cast<unsigned>(ceilf(PipelinePrefetchPoolMaxNbBuffers() * extraNbBuffers));
                         size_t poolSize = pboSize * poolNbBuffers;
 
                         size_t poolUpperLimit = 0;
@@ -785,8 +733,7 @@ namespace TwkGLF
                         if (poolMinSize > poolUpperLimit)
                         {
                             setPipelinePrefetchUseFixedSizePBOs(false);
-                            initPBOPool(
-                                dir); // Re-init without fixed size PBO pool.
+                            initPBOPool(dir); // Re-init without fixed size PBO pool.
 
                             return;
                         }
@@ -809,8 +756,7 @@ namespace TwkGLF
                                 // that (poolMinSize <= poolUpperLimit).
                                 poolNbBuffers = poolSize / pboMinSize;
                                 pboSize = poolSize / poolNbBuffers;
-                                setPipelinePrefetchPoolMaxNbBuffers(
-                                    poolNbBuffers);
+                                setPipelinePrefetchPoolMaxNbBuffers(poolNbBuffers);
                             }
                         }
 
@@ -822,8 +768,7 @@ namespace TwkGLF
                         std::vector<GLPixelBufferObject*> pbos;
                         for (int i = 0; i < poolNbBuffers; ++i)
                         {
-                            GLPixelBufferObject* pbo =
-                                gPoolToGPU.pop(pboSize, false);
+                            GLPixelBufferObject* pbo = gPoolToGPU.pop(pboSize, false);
                             pbo->map();
                             pbo->unmap();
                             pbos.push_back(pbo);
@@ -848,8 +793,7 @@ namespace TwkGLF
                         if (poolUpperLimit == 0)
                             poolUpperLimit = poolSize;
 
-                        gPoolToGPU.setSoftMaxSize(
-                            static_cast<size_t>(poolUpperLimit));
+                        gPoolToGPU.setSoftMaxSize(static_cast<size_t>(poolUpperLimit));
                         gPoolToGPU.setHardMaxMinFreeMemory(0.10f);
                         gPoolToGPU.setRecycleParams(false, 0.75f);
                     }
@@ -865,8 +809,7 @@ namespace TwkGLF
                 {
                     // The +2 is because two extra buffers can be allocated by
                     // the write-behind for requests waiting to be queued.
-                    gPoolFromGPU.setSoftMaxNbBuffers(
-                        PipelineWriteBehindQueueLength() + 2);
+                    gPoolFromGPU.setSoftMaxNbBuffers(PipelineWriteBehindQueueLength() + 2);
                     gPoolFromGPU.setHardMaxMinFreeMemory(0.10f);
                     gPoolFromGPU.setRecycleParams(true);
 
@@ -931,30 +874,22 @@ namespace TwkGLF
                 _pPBO->copyBufferData(data, size);
         }
 
-        GLPixelBufferObject::PackDir getPackDir() const
-        {
-            return _pPBO ? _pPBO->getPackDir() : GLPixelBufferObject::TO_GPU;
-        }
+        GLPixelBufferObject::PackDir getPackDir() const { return _pPBO ? _pPBO->getPackDir() : GLPixelBufferObject::TO_GPU; }
     };
 
     bool PBOWrap::gPoolToGPUInitialized = false;
     bool PBOWrap::gPoolFromGPUInitialized = false;
     GLPixelBufferObjectPool PBOWrap::gPoolToGPU(GLPixelBufferObject::TO_GPU);
-    GLPixelBufferObjectPool
-        PBOWrap::gPoolFromGPU(GLPixelBufferObject::FROM_GPU);
+    GLPixelBufferObjectPool PBOWrap::gPoolFromGPU(GLPixelBufferObject::FROM_GPU);
 
     //-----------------------------------------------------------------------------
     //
-    GLPixelBufferObjectFromPool::GLPixelBufferObjectFromPool(
-        GLPixelBufferObject::PackDir dir, unsigned int num_bytes)
+    GLPixelBufferObjectFromPool::GLPixelBufferObjectFromPool(GLPixelBufferObject::PackDir dir, unsigned int num_bytes)
     {
         _pPBOWrap = new PBOWrap(dir, num_bytes);
     }
 
-    GLPixelBufferObjectFromPool::~GLPixelBufferObjectFromPool()
-    {
-        delete _pPBOWrap;
-    }
+    GLPixelBufferObjectFromPool::~GLPixelBufferObjectFromPool() { delete _pPBOWrap; }
 
     void GLPixelBufferObjectFromPool::bind() { return _pPBOWrap->bind(); }
 
@@ -962,27 +897,15 @@ namespace TwkGLF
 
     void* GLPixelBufferObjectFromPool::map() { return _pPBOWrap->map(); }
 
-    void* GLPixelBufferObjectFromPool::getMappedPtr()
-    {
-        return _pPBOWrap->getMappedPtr();
-    }
+    void* GLPixelBufferObjectFromPool::getMappedPtr() { return _pPBOWrap->getMappedPtr(); }
 
     void GLPixelBufferObjectFromPool::unmap() { _pPBOWrap->unmap(); }
 
-    unsigned int GLPixelBufferObjectFromPool::getSize() const
-    {
-        return _pPBOWrap->getSize();
-    }
+    unsigned int GLPixelBufferObjectFromPool::getSize() const { return _pPBOWrap->getSize(); }
 
-    void GLPixelBufferObjectFromPool::copyBufferData(void* data, unsigned size)
-    {
-        _pPBOWrap->copyBufferData(data, size);
-    }
+    void GLPixelBufferObjectFromPool::copyBufferData(void* data, unsigned size) { _pPBOWrap->copyBufferData(data, size); }
 
-    GLPixelBufferObject::PackDir GLPixelBufferObjectFromPool::getPackDir() const
-    {
-        return _pPBOWrap->getPackDir();
-    }
+    GLPixelBufferObject::PackDir GLPixelBufferObjectFromPool::getPackDir() const { return _pPBOWrap->getPackDir(); }
 
     //-----------------------------------------------------------------------------
     //

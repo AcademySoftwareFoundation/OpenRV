@@ -38,18 +38,18 @@ namespace TwkApp
         enum Capabilities
         {
             NoCapabilities = 0,
-            ImageOutput = 1 << 0,     // can display images/video
-            ImageCapture = 1 << 1,    // can capture images/video
-            ProvidesSync = 1 << 2,    // provides a (wait on) sync call
-            FixedResolution = 1 << 3, // limited set of fixed resolutions
-            SubWindow = 1 << 4,    // device is a subwindow of something larger
-            Clock = 1 << 5,        // has its own clock to sync to
-            AudioOutput = 1 << 6,  // can output audio samples (with the video)
-            AudioCapture = 1 << 7, // can capture audio samples (with the video)
-            TimeCodeOutput = 1 << 8,   // can output VITC timecode
-            BlockingTransfer = 1 << 9, // transfer functions may block
-            ASyncReadBack = 1 << 10,   // will read frames back asynchronously
-            FlippedImage = 1 << 11,    // image should be rendered flipped
+            ImageOutput = 1 << 0,           // can display images/video
+            ImageCapture = 1 << 1,          // can capture images/video
+            ProvidesSync = 1 << 2,          // provides a (wait on) sync call
+            FixedResolution = 1 << 3,       // limited set of fixed resolutions
+            SubWindow = 1 << 4,             // device is a subwindow of something larger
+            Clock = 1 << 5,                 // has its own clock to sync to
+            AudioOutput = 1 << 6,           // can output audio samples (with the video)
+            AudioCapture = 1 << 7,          // can capture audio samples (with the video)
+            TimeCodeOutput = 1 << 8,        // can output VITC timecode
+            BlockingTransfer = 1 << 9,      // transfer functions may block
+            ASyncReadBack = 1 << 10,        // will read frames back asynchronously
+            FlippedImage = 1 << 11,         // image should be rendered flipped
             NormalizedCoordinates = 1 << 12 // passed in FBO attachements
                                             // are GL_TEXTURE_2D instead
                                             // of GL_TEXTURE_RECTANGLE
@@ -148,8 +148,7 @@ namespace TwkApp
             {
             }
 
-            VideoFormat(size_t w, size_t h, float pa, float ps, float hertz,
-                        const std::string& desc = "")
+            VideoFormat(size_t w, size_t h, float pa, float ps, float hertz, const std::string& desc = "")
                 : Resolution(w, h, pa, ps)
                 , Timing(hertz)
                 , description(desc)
@@ -241,8 +240,7 @@ namespace TwkApp
             {
             }
 
-            AudioFormat(Time rate, TwkAudio::Format t, size_t n,
-                        TwkAudio::Layout layout, const std::string& desc)
+            AudioFormat(Time rate, TwkAudio::Format t, size_t n, TwkAudio::Layout layout, const std::string& desc)
                 : hz(rate)
                 , format(t)
                 , description(desc)
@@ -266,9 +264,7 @@ namespace TwkApp
 
         struct ColorProfile
         {
-            ColorProfile(ColorProfileType t = NoColorProfile,
-                         const std::string& desc = "",
-                         const std::string& u = "")
+            ColorProfile(ColorProfileType t = NoColorProfile, const std::string& desc = "", const std::string& u = "")
                 : type(t)
                 , description(desc)
                 , url(u)
@@ -287,13 +283,10 @@ namespace TwkApp
             virtual ~AudioInterface();
 
             virtual size_t numChannels() const = 0;
-            virtual void audioFillChannel(size_t startSample, double rate,
-                                          size_t channel, float* buffer,
-                                          size_t numSamples);
+            virtual void audioFillChannel(size_t startSample, double rate, size_t channel, float* buffer, size_t numSamples);
         };
 
-        VideoDevice(VideoModule*, const std::string& name,
-                    unsigned int capabilities);
+        VideoDevice(VideoModule*, const std::string& name, unsigned int capabilities);
 
         virtual ~VideoDevice();
 
@@ -332,22 +325,15 @@ namespace TwkApp
         };
 
         size_t hashID(IDType t = HostnameVideoAndDataFormatID) const;
-        std::string
-        humanReadableID(IDType t = HostnameVideoAndDataFormatID) const;
+        std::string humanReadableID(IDType t = HostnameVideoAndDataFormatID) const;
 
         //
         //  Audio
         //
 
-        bool hasAudioOutput() const
-        {
-            return (m_capabilities & AudioOutput) != 0;
-        }
+        bool hasAudioOutput() const { return (m_capabilities & AudioOutput) != 0; }
 
-        bool audioOutputEnabled() const
-        {
-            return hasAudioOutput() && m_useAudioOutput;
-        }
+        bool audioOutputEnabled() const { return hasAudioOutput() && m_useAudioOutput; }
 
         void setAudioOutputEnabled(bool b) { m_useAudioOutput = b; }
 
@@ -415,15 +401,9 @@ namespace TwkApp
         //  Timecode
         //
 
-        bool hasTimecodeOutput() const
-        {
-            return (m_capabilities & TimeCodeOutput) != 0;
-        }
+        bool hasTimecodeOutput() const { return (m_capabilities & TimeCodeOutput) != 0; }
 
-        bool timecodeOutputEnabled() const
-        {
-            return hasTimecodeOutput() && m_useTimecodeOutput;
-        }
+        bool timecodeOutputEnabled() const { return hasTimecodeOutput() && m_useTimecodeOutput; }
 
         void setTimecodeOutputEnabled(bool b) { m_useTimecodeOutput = b; }
 
@@ -593,10 +573,7 @@ namespace TwkApp
         //  Margins
         //
 
-        void setMargins(float l, float r, float t, float b) const
-        {
-            m_margins = Margins(l, r, t, b);
-        }
+        void setMargins(float l, float r, float t, float b) const { m_margins = Margins(l, r, t, b); }
 
         void setMargins(const Margins& m) const { m_margins = m; }
 

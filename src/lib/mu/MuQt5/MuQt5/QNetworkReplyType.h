@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QNetworkReplyType(Context* context, const char* name,
-                          Class* superClass = 0, Class* superClass2 = 0);
+        QNetworkReplyType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QNetworkReplyType();
 
@@ -57,11 +56,7 @@ namespace Mu
         MemberFunction* _func[14];
     };
 
-    inline ClassInstance*
-    QNetworkReplyType::cachedInstance(const QNetworkReplyType::MuQtType* obj)
-    {
-        return 0;
-    }
+    inline ClassInstance* QNetworkReplyType::cachedInstance(const QNetworkReplyType::MuQtType* obj) { return 0; }
 
 } // namespace Mu
 

@@ -70,21 +70,17 @@ namespace Mu
                         //  that the types match and fix if not.
                         //
 
-                        if (Node* cn =
-                                _as->cast(newNode, _function->returnType()))
+                        if (Node* cn = _as->cast(newNode, _function->returnType()))
                         {
                             newNode = cn;
                         }
                         else
                         {
-                            _as->freportError(
-                                newNode,
-                                "Cannot cast from type \"%s\" to "
-                                "type \"%s\"",
-                                newNode->type()->fullyQualifiedName().c_str(),
-                                _function->returnType()
-                                    ->fullyQualifiedName()
-                                    .c_str());
+                            _as->freportError(newNode,
+                                              "Cannot cast from type \"%s\" to "
+                                              "type \"%s\"",
+                                              newNode->type()->fullyQualifiedName().c_str(),
+                                              _function->returnType()->fullyQualifiedName().c_str());
 
                             throw BadCastException();
                         }
@@ -101,9 +97,7 @@ namespace Mu
             }
             else
             {
-                _as->freportError(node,
-                                  "Unresolvable expression in function \"%s\"",
-                                  _function->fullyQualifiedName().c_str());
+                _as->freportError(node, "Unresolvable expression in function \"%s\"", _function->fullyQualifiedName().c_str());
 
                 throw UnresolvedFunctionException();
             }

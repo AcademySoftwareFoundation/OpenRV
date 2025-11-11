@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QSinglePointEventType(Context* context, const char* name,
-                              Class* superClass = 0);
+        QSinglePointEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QSinglePointEventType();
 
         //

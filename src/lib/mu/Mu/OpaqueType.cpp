@@ -26,15 +26,9 @@ namespace Mu
 
     OpaqueType::~OpaqueType() {}
 
-    PrimitiveObject* OpaqueType::newObject() const
-    {
-        return new PrimitiveObject(this);
-    }
+    PrimitiveObject* OpaqueType::newObject() const { return new PrimitiveObject(this); }
 
-    Value OpaqueType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value OpaqueType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void OpaqueType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -42,15 +36,12 @@ namespace Mu
         *ip = (*n->func()._PointerFunc)(*n, thread);
     }
 
-    void OpaqueType::outputValue(ostream& o, const Value& value,
-                                 bool full) const
+    void OpaqueType::outputValue(ostream& o, const Value& value, bool full) const
     {
-        o << "<#" << fullyQualifiedName() << " 0x" << hex << value._Pointer
-          << dec << ">";
+        o << "<#" << fullyQualifiedName() << " 0x" << hex << value._Pointer << dec << ">";
     }
 
-    void OpaqueType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                          ValueOutputState& state) const
+    void OpaqueType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         Pointer p = *reinterpret_cast<Pointer*>(vp);
 
@@ -68,16 +59,9 @@ namespace Mu
 
     Pointer __C_Pointer_Pointer_PointerAmp_(T, Pointer& a) { return a; }
 
-    Pointer& __C_EQ__PointerAmp__PointerAmp__Pointer(T, Pointer& a, Pointer b)
-    {
-        return a = b;
-    }
+    Pointer& __C_EQ__PointerAmp__PointerAmp__Pointer(T, Pointer& a, Pointer b) { return a = b; }
 
-    Pointer __C_QMark_Colon__bool_Pointer_Pointer(T, bool p, Pointer a,
-                                                  Pointer b)
-    {
-        return p ? a : b;
-    }
+    Pointer __C_QMark_Colon__bool_Pointer_Pointer(T, bool p, Pointer a, Pointer b) { return p ? a : b; }
 
 #undef T
 
@@ -104,22 +88,17 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, rname.c_str(), this),
 
-                      new Function(c, name().c_str(), OpaqueType::dereference,
-                                   Cast, Compiled,
-                                   __C_Pointer_Pointer_PointerAmp_, Return, n,
+                      new Function(c, name().c_str(), OpaqueType::dereference, Cast, Compiled, __C_Pointer_Pointer_PointerAmp_, Return, n,
                                    Args, nr, End),
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "=", OpaqueType::assign, AsOp, Compiled,
-                         __C_EQ__PointerAmp__PointerAmp__Pointer, Return, nr,
-                         Args, nr, n, End),
+            new Function(c, "=", OpaqueType::assign, AsOp, Compiled, __C_EQ__PointerAmp__PointerAmp__Pointer, Return, nr, Args, nr, n, End),
 
             new Function(c, "?:", OpaqueType::conditionalExpr,
                          Op ^ NativeInlined, // not inlined
-                         Compiled, __C_QMark_Colon__bool_Pointer_Pointer,
-                         Return, n, Args, "bool", n, n, End),
+                         Compiled, __C_QMark_Colon__bool_Pointer_Pointer, Return, n, Args, "bool", n, n, End),
 
             EndArguments);
     }
@@ -132,8 +111,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(OpaqueType::conditionalExpr, Pointer)
     {
-        NODE_RETURN(NODE_ARG(0, bool) ? NODE_ARG(1, Pointer)
-                                      : NODE_ARG(2, Pointer));
+        NODE_RETURN(NODE_ARG(0, bool) ? NODE_ARG(1, Pointer) : NODE_ARG(2, Pointer));
     }
 
     NODE_IMPLEMENTATION(OpaqueType::assign, Pointer)

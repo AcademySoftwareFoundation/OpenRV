@@ -38,15 +38,9 @@ namespace Mu
             int width;
             int height;
 
-            Vector4f* row(int y)
-            {
-                return data->data<Vector4f>() + (y * width);
-            }
+            Vector4f* row(int y) { return data->data<Vector4f>() + (y * width); }
 
-            Vector4f& pixel(int x, int y)
-            {
-                return data->data<Vector4f>()[x + y * width];
-            }
+            Vector4f& pixel(int x, int y) { return data->data<Vector4f>()[x + y * width]; }
 
             Vector4f sample(float x, float y);
         };

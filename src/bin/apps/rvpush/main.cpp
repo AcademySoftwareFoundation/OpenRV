@@ -95,10 +95,8 @@ int utf8Main(int argc, char* argv[])
     string command = argv[commandPos];
     DB("commandPos " << commandPos << " command " << command);
 
-    if (command != "set" && command != "merge" && command != "mu-eval"
-        && command != "mu-eval-return" && command != "py-eval"
-        && command != "py-eval-return" && command != "py-exec"
-        && command != "url")
+    if (command != "set" && command != "merge" && command != "mu-eval" && command != "mu-eval-return" && command != "py-eval"
+        && command != "py-eval-return" && command != "py-exec" && command != "url")
     {
         cerr << usage << endl;
         exit(3);

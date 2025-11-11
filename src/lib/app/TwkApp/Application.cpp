@@ -42,9 +42,7 @@ namespace TwkApp
 
     void Application::remove(Document* d) { stl_ext::remove(m_documents, d); }
 
-    bool Application::receive(Notifier* originator, Notifier* sender,
-                              Notifier::MessageId id,
-                              Notifier::MessageData* data)
+    bool Application::receive(Notifier* originator, Notifier* sender, Notifier::MessageId id, Notifier::MessageData* data)
     {
         if (id == Document::deleteMessage())
         {
@@ -54,10 +52,7 @@ namespace TwkApp
         return true;
     }
 
-    VideoModule* Application::primaryVideoModule() const
-    {
-        return m_videoModules.empty() ? 0 : m_videoModules.front().get();
-    }
+    VideoModule* Application::primaryVideoModule() const { return m_videoModules.empty() ? 0 : m_videoModules.front().get(); }
 
     void Application::loadOutputPlugins(const std::string& envvar)
     {
@@ -68,15 +63,13 @@ namespace TwkApp
             TwkApp::VideoModule* outputModule = nullptr;
             do
             {
-                outputModule = outputPlugin->output_module_create(
-                    OUTPUT_PLUGIN_VERSION, moduleIndex++);
+                outputModule = outputPlugin->output_module_create(OUTPUT_PLUGIN_VERSION, moduleIndex++);
                 if (outputModule)
                 {
                     addVideoModule(outputModule);
                     for (auto d : outputModule->devices())
                     {
-                        std::cout << "INFO: " << outputModule->name()
-                                  << " found " << d->name() << std::endl;
+                        std::cout << "INFO: " << outputModule->name() << " found " << d->name() << std::endl;
                     }
                 }
             } while (outputModule != nullptr);

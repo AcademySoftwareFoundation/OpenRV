@@ -69,9 +69,7 @@ namespace Mu
             _allocSize *= 2;
             byte* old = _data;
             bool atomic = elementType()->machineRep() != PointerRep::rep();
-            _data =
-                (byte*)(atomic ? MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(_allocSize)
-                               : MU_GC_ALLOC_IGNORE_OFF_PAGE(_allocSize));
+            _data = (byte*)(atomic ? MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(_allocSize) : MU_GC_ALLOC_IGNORE_OFF_PAGE(_allocSize));
             //_data = (byte*)MU_GC_MALLOC(_allocSize);
 
             if (old && _dataSize)
@@ -87,9 +85,7 @@ namespace Mu
             _allocSize = n;
             byte* old = _data;
             bool atomic = elementType()->machineRep() != PointerRep::rep();
-            _data =
-                (byte*)(atomic ? MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(_allocSize)
-                               : MU_GC_ALLOC_IGNORE_OFF_PAGE(_allocSize));
+            _data = (byte*)(atomic ? MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(_allocSize) : MU_GC_ALLOC_IGNORE_OFF_PAGE(_allocSize));
             //_data = (byte*)MU_GC_MALLOC(_allocSize);
 
             if (old && _dataSize)
@@ -171,8 +167,7 @@ namespace Mu
     void DynamicArray::erase(size_t start, size_t n)
     {
         size_t esize = elementType()->machineRep()->size();
-        memmove(_data + start * esize, _data + (start + n) * esize,
-                _dataSize - (start + n) * esize);
+        memmove(_data + start * esize, _data + (start + n) * esize, _dataSize - (start + n) * esize);
         _dataSize -= n * esize;
     }
 

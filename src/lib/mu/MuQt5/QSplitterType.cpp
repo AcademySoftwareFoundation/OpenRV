@@ -59,28 +59,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QSplitter::MuQt_QSplitter(Pointer muobj, const CallEnvironment* ce,
-                                   QWidget* parent)
+    MuQt_QSplitter::MuQt_QSplitter(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QSplitter(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSplitterType>(
-            c->internName("qt.QSplitter"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSplitterType>(c->internName("qt.QSplitter"));
     }
 
-    MuQt_QSplitter::MuQt_QSplitter(Pointer muobj, const CallEnvironment* ce,
-                                   Qt::Orientation orientation, QWidget* parent)
+    MuQt_QSplitter::MuQt_QSplitter(Pointer muobj, const CallEnvironment* ce, Qt::Orientation orientation, QWidget* parent)
         : QSplitter(orientation, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSplitterType>(
-            c->internName("qt.QSplitter"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSplitterType>(c->internName("qt.QSplitter"));
     }
 
     QSize MuQt_QSplitter::minimumSizeHint() const
@@ -181,8 +177,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, _p15, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, _p15, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -205,8 +200,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -218,8 +212,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QSplitterType::QSplitterType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QSplitterType::QSplitterType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -240,9 +233,7 @@ namespace Mu
         }
         else if (QSplitter* w = object<QSplitter>(widget))
         {
-            QSplitterType* type =
-                c->findSymbolOfTypeByQualifiedName<QSplitterType>(
-                    c->internName("qt.QSplitter"), false);
+            QSplitterType* type = c->findSymbolOfTypeByQualifiedName<QSplitterType>(c->internName("qt.QSplitter"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -253,39 +244,27 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QSplitter_QSplitter_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QSplitter_QSplitter_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QSplitter_QSplitter_QSplitter_QSplitter_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QSplitter_QSplitter_QSplitter_QSplitter_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QSplitter(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QSplitter(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QSplitter_QSplitter_QSplitter_QSplitter_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_orientation,
-        Pointer param_parent)
+    Pointer qt_QSplitter_QSplitter_QSplitter_QSplitter_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_orientation,
+                                                                   Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::Orientation arg1 = (Qt::Orientation)(param_orientation);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QSplitter(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QSplitter(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    void qt_QSplitter_addWidget_void_QSplitter_QWidget(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_widget)
+    void qt_QSplitter_addWidget_void_QSplitter_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -293,17 +272,14 @@ namespace Mu
         arg0->addWidget(arg1);
     }
 
-    int qt_QSplitter_count_int_QSplitter(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    int qt_QSplitter_count_int_QSplitter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
         return arg0->count();
     }
 
-    int qt_QSplitter_indexOf_int_QSplitter_QWidget(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_widget)
+    int qt_QSplitter_indexOf_int_QSplitter_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -311,9 +287,8 @@ namespace Mu
         return arg0->indexOf(arg1);
     }
 
-    void qt_QSplitter_insertWidget_void_QSplitter_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_widget)
+    void qt_QSplitter_insertWidget_void_QSplitter_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                              Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -322,9 +297,7 @@ namespace Mu
         arg0->insertWidget(arg1, arg2);
     }
 
-    bool qt_QSplitter_isCollapsible_bool_QSplitter_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_index)
+    bool qt_QSplitter_isCollapsible_bool_QSplitter_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -332,16 +305,14 @@ namespace Mu
         return arg0->isCollapsible(arg1);
     }
 
-    void qt_QSplitter_refresh_void_QSplitter(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    void qt_QSplitter_refresh_void_QSplitter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
         arg0->refresh();
     }
 
-    bool qt_QSplitter_restoreState_bool_QSplitter_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_state)
+    bool qt_QSplitter_restoreState_bool_QSplitter_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -349,17 +320,15 @@ namespace Mu
         return arg0->restoreState(arg1);
     }
 
-    Pointer qt_QSplitter_saveState_QByteArray_QSplitter(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QSplitter_saveState_QByteArray_QSplitter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
         return makeqtype<QByteArrayType>(c, arg0->saveState(), "qt.QByteArray");
     }
 
-    void qt_QSplitter_setCollapsible_void_QSplitter_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        bool param_collapse)
+    void qt_QSplitter_setCollapsible_void_QSplitter_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                             bool param_collapse)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -368,9 +337,8 @@ namespace Mu
         arg0->setCollapsible(arg1, arg2);
     }
 
-    void qt_QSplitter_setStretchFactor_void_QSplitter_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        int param_stretch)
+    void qt_QSplitter_setStretchFactor_void_QSplitter_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                              int param_stretch)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -379,9 +347,7 @@ namespace Mu
         arg0->setStretchFactor(arg1, arg2);
     }
 
-    Pointer qt_QSplitter_widget_QWidget_QSplitter_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_index)
+    Pointer qt_QSplitter_widget_QWidget_QSplitter_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -389,33 +355,23 @@ namespace Mu
         return makeinstance<QWidgetType>(c, arg0->widget(arg1), "qt.QWidget");
     }
 
-    Pointer
-    qt_QSplitter_minimumSizeHint_QSize_QSplitter(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QSplitter_minimumSizeHint_QSize_QSplitter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSplitter::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSplitter::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QSplitter_sizeHint_QSize_QSplitter(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QSplitter_sizeHint_QSize_QSplitter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSplitter::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSplitter::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    int qt_QSplitter_closestLegalPosition_int_QSplitter_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_pos,
-        int param_index)
+    int qt_QSplitter_closestLegalPosition_int_QSplitter_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pos, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -424,9 +380,7 @@ namespace Mu
         return ((MuQt_QSplitter*)arg0)->closestLegalPosition_pub(arg1, arg2);
     }
 
-    void qt_QSplitter_moveSplitter_void_QSplitter_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_pos,
-        int param_index)
+    void qt_QSplitter_moveSplitter_void_QSplitter_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pos, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -435,9 +389,7 @@ namespace Mu
         ((MuQt_QSplitter*)arg0)->moveSplitter_pub(arg1, arg2);
     }
 
-    void qt_QSplitter_setRubberBand_void_QSplitter_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_pos)
+    void qt_QSplitter_setRubberBand_void_QSplitter_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -445,9 +397,7 @@ namespace Mu
         ((MuQt_QSplitter*)arg0)->setRubberBand_pub(arg1);
     }
 
-    void qt_QSplitter_changeEvent_void_QSplitter_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_ev)
+    void qt_QSplitter_changeEvent_void_QSplitter_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -458,20 +408,15 @@ namespace Mu
             ((MuQt_QSplitter*)arg0)->changeEvent_pub(arg1);
     }
 
-    bool qt_QSplitter_event_bool_QSplitter_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QSplitter_event_bool_QSplitter_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QSplitter*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QSplitter*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QSplitter*)arg0)->event_pub_parent(arg1) : ((MuQt_QSplitter*)arg0)->event_pub(arg1);
     }
 
-    void qt_QSplitter_resizeEvent_void_QSplitter_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p15)
+    void qt_QSplitter_resizeEvent_void_QSplitter_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p15)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -482,8 +427,7 @@ namespace Mu
             ((MuQt_QSplitter*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QSplitter_paintEvent_void_QSplitter_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
+    void qt_QSplitter_paintEvent_void_QSplitter_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSplitter* arg0 = object<QSplitter>(param_this);
@@ -496,140 +440,109 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QSplitter0, Pointer)
     {
-        NODE_RETURN(qt_QSplitter_QSplitter_QSplitter_QSplitter_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSplitter_QSplitter_QSplitter_QSplitter_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QSplitter1, Pointer)
     {
-        NODE_RETURN(qt_QSplitter_QSplitter_QSplitter_QSplitter_int_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QSplitter_QSplitter_QSplitter_QSplitter_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                           NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addWidget0, void)
     {
-        qt_QSplitter_addWidget_void_QSplitter_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSplitter_addWidget_void_QSplitter_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_count0, int)
-    {
-        NODE_RETURN(qt_QSplitter_count_int_QSplitter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_count0, int) { NODE_RETURN(qt_QSplitter_count_int_QSplitter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QSplitter_indexOf_int_QSplitter_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSplitter_indexOf_int_QSplitter_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertWidget0, void)
     {
-        qt_QSplitter_insertWidget_void_QSplitter_int_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QSplitter_insertWidget_void_QSplitter_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                             NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isCollapsible0, bool)
     {
-        NODE_RETURN(qt_QSplitter_isCollapsible_bool_QSplitter_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSplitter_isCollapsible_bool_QSplitter_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_refresh0, void)
-    {
-        qt_QSplitter_refresh_void_QSplitter(NODE_THREAD,
-                                            NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_refresh0, void) { qt_QSplitter_refresh_void_QSplitter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_restoreState0, bool)
     {
-        NODE_RETURN(qt_QSplitter_restoreState_bool_QSplitter_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSplitter_restoreState_bool_QSplitter_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_saveState0, Pointer)
     {
-        NODE_RETURN(qt_QSplitter_saveState_QByteArray_QSplitter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSplitter_saveState_QByteArray_QSplitter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCollapsible0, void)
     {
-        qt_QSplitter_setCollapsible_void_QSplitter_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QSplitter_setCollapsible_void_QSplitter_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setStretchFactor0, void)
     {
-        qt_QSplitter_setStretchFactor_void_QSplitter_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QSplitter_setStretchFactor_void_QSplitter_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QSplitter_widget_QWidget_QSplitter_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSplitter_widget_QWidget_QSplitter_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSplitter_minimumSizeHint_QSize_QSplitter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSplitter_minimumSizeHint_QSize_QSplitter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSplitter_sizeHint_QSize_QSplitter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSplitter_sizeHint_QSize_QSplitter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_closestLegalPosition0, int)
     {
-        NODE_RETURN(qt_QSplitter_closestLegalPosition_int_QSplitter_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QSplitter_closestLegalPosition_int_QSplitter_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                            NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveSplitter0, void)
     {
-        qt_QSplitter_moveSplitter_void_QSplitter_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QSplitter_moveSplitter_void_QSplitter_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRubberBand0, void)
     {
-        qt_QSplitter_setRubberBand_void_QSplitter_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QSplitter_setRubberBand_void_QSplitter_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QSplitter_changeEvent_void_QSplitter_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSplitter_changeEvent_void_QSplitter_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QSplitter_event_bool_QSplitter_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSplitter_event_bool_QSplitter_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QSplitter_resizeEvent_void_QSplitter_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSplitter_resizeEvent_void_QSplitter_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QSplitter_paintEvent_void_QSplitter_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSplitter_paintEvent_void_QSplitter_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QSplitterType::load()
@@ -649,17 +562,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QSplitter_QSplitter_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QSplitter_QSplitter_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -667,132 +576,77 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QSplitter", _n_QSplitter0, None, Compiled,
-                         qt_QSplitter_QSplitter_QSplitter_QSplitter_QWidget,
-                         Return, "qt.QSplitter", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
+            new Function(c, "QSplitter", _n_QSplitter0, None, Compiled, qt_QSplitter_QSplitter_QSplitter_QSplitter_QWidget, Return,
+                         "qt.QSplitter", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QSplitter", _n_QSplitter1, None, Compiled, qt_QSplitter_QSplitter_QSplitter_QSplitter_int_QWidget, Return,
+                         "qt.QSplitter", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "orientation", "int"),
                          new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "QSplitter", _n_QSplitter1, None, Compiled,
-                         qt_QSplitter_QSplitter_QSplitter_QSplitter_int_QWidget,
-                         Return, "qt.QSplitter", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "orientation", "int"),
-                         new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "addWidget", _n_addWidget0, None, Compiled,
-                         qt_QSplitter_addWidget_void_QSplitter_QWidget, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "addWidget", _n_addWidget0, None, Compiled, qt_QSplitter_addWidget_void_QSplitter_QWidget, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "widget", "qt.QWidget"), End),
             // PROP: childrenCollapsible (bool; QSplitter this)
-            new Function(c, "count", _n_count0, None, Compiled,
-                         qt_QSplitter_count_int_QSplitter, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QSplitter"), End),
+            new Function(c, "count", _n_count0, None, Compiled, qt_QSplitter_count_int_QSplitter, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QSplitter"), End),
             // MISSING: getRange (void; QSplitter this, int index, "int *" min,
             // "int *" max) MISSING: handle ("QSplitterHandle *"; QSplitter
             // this, int index) PROP: handleWidth (int; QSplitter this)
-            new Function(c, "indexOf", _n_indexOf0, None, Compiled,
-                         qt_QSplitter_indexOf_int_QSplitter_QWidget, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
+            new Function(c, "indexOf", _n_indexOf0, None, Compiled, qt_QSplitter_indexOf_int_QSplitter_QWidget, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QSplitter"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "insertWidget", _n_insertWidget0, None, Compiled, qt_QSplitter_insertWidget_void_QSplitter_int_QWidget, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "index", "int"),
                          new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "insertWidget", _n_insertWidget0, None, Compiled,
-                         qt_QSplitter_insertWidget_void_QSplitter_int_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "index", "int"),
-                         new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "isCollapsible", _n_isCollapsible0, None, Compiled,
-                         qt_QSplitter_isCollapsible_bool_QSplitter_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "index", "int"), End),
+            new Function(c, "isCollapsible", _n_isCollapsible0, None, Compiled, qt_QSplitter_isCollapsible_bool_QSplitter_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "index", "int"), End),
             // PROP: opaqueResize (bool; QSplitter this)
             // PROP: orientation (flags Qt::Orientation; QSplitter this)
-            new Function(c, "refresh", _n_refresh0, None, Compiled,
-                         qt_QSplitter_refresh_void_QSplitter, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QSplitter"), End),
-            new Function(c, "restoreState", _n_restoreState0, None, Compiled,
-                         qt_QSplitter_restoreState_bool_QSplitter_QByteArray,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "state", "qt.QByteArray"), End),
-            new Function(c, "saveState", _n_saveState0, None, Compiled,
-                         qt_QSplitter_saveState_QByteArray_QSplitter, Return,
-                         "qt.QByteArray", Parameters,
+            new Function(c, "refresh", _n_refresh0, None, Compiled, qt_QSplitter_refresh_void_QSplitter, Return, "void", Parameters,
                          new Param(c, "this", "qt.QSplitter"), End),
+            new Function(c, "restoreState", _n_restoreState0, None, Compiled, qt_QSplitter_restoreState_bool_QSplitter_QByteArray, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "state", "qt.QByteArray"), End),
+            new Function(c, "saveState", _n_saveState0, None, Compiled, qt_QSplitter_saveState_QByteArray_QSplitter, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QSplitter"), End),
             // PROP: setChildrenCollapsible (void; QSplitter this, bool _p5)
-            new Function(
-                c, "setCollapsible", _n_setCollapsible0, None, Compiled,
-                qt_QSplitter_setCollapsible_void_QSplitter_int_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "index", "int"), new Param(c, "collapse", "bool"),
-                End),
+            new Function(c, "setCollapsible", _n_setCollapsible0, None, Compiled, qt_QSplitter_setCollapsible_void_QSplitter_int_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "index", "int"),
+                         new Param(c, "collapse", "bool"), End),
             // PROP: setHandleWidth (void; QSplitter this, int _p4)
             // PROP: setOpaqueResize (void; QSplitter this, bool opaque)
             // PROP: setOrientation (void; QSplitter this, flags Qt::Orientation
             // _p16) MISSING: setSizes (void; QSplitter this, "const QList<int>
             // &" list)
-            new Function(
-                c, "setStretchFactor", _n_setStretchFactor0, None, Compiled,
-                qt_QSplitter_setStretchFactor_void_QSplitter_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "index", "int"), new Param(c, "stretch", "int"),
-                End),
+            new Function(c, "setStretchFactor", _n_setStretchFactor0, None, Compiled, qt_QSplitter_setStretchFactor_void_QSplitter_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "index", "int"),
+                         new Param(c, "stretch", "int"), End),
             // MISSING: sizes ("QList<int>"; QSplitter this)
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QSplitter_widget_QWidget_QSplitter_int, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "index", "int"), End),
-            _func[0] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QSplitter_minimumSizeHint_QSize_QSplitter, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QSplitter"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QSplitter_sizeHint_QSize_QSplitter, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSplitter"), End),
-            new Function(
-                c, "closestLegalPosition", _n_closestLegalPosition0, None,
-                Compiled,
-                qt_QSplitter_closestLegalPosition_int_QSplitter_int_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "pos", "int"), new Param(c, "index", "int"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QSplitter_widget_QWidget_QSplitter_int, Return, "qt.QWidget",
+                         Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "index", "int"), End),
+            _func[0] =
+                new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QSplitter_minimumSizeHint_QSize_QSplitter,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QSplitter"), End),
+            _func[1] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QSplitter_sizeHint_QSize_QSplitter, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QSplitter"), End),
+            new Function(c, "closestLegalPosition", _n_closestLegalPosition0, None, Compiled,
+                         qt_QSplitter_closestLegalPosition_int_QSplitter_int_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QSplitter"), new Param(c, "pos", "int"), new Param(c, "index", "int"), End),
             // MISSING: createHandle ("QSplitterHandle *"; QSplitter this) //
             // protected
-            new Function(
-                c, "moveSplitter", _n_moveSplitter0, None, Compiled,
-                qt_QSplitter_moveSplitter_void_QSplitter_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "pos", "int"), new Param(c, "index", "int"), End),
-            new Function(c, "setRubberBand", _n_setRubberBand0, None, Compiled,
-                         qt_QSplitter_setRubberBand_void_QSplitter_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QSplitter"),
-                         new Param(c, "pos", "int"), End),
-            _func[2] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QSplitter_changeEvent_void_QSplitter_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "ev", "qt.QEvent"), End),
+            new Function(c, "moveSplitter", _n_moveSplitter0, None, Compiled, qt_QSplitter_moveSplitter_void_QSplitter_int_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "pos", "int"), new Param(c, "index", "int"),
+                         End),
+            new Function(c, "setRubberBand", _n_setRubberBand0, None, Compiled, qt_QSplitter_setRubberBand_void_QSplitter_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "pos", "int"), End),
+            _func[2] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QSplitter_changeEvent_void_QSplitter_QEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "ev", "qt.QEvent"), End),
             // MISSING: childEvent (void; QSplitter this, "QChildEvent *" c) //
             // protected
-            _func[3] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QSplitter_event_bool_QSplitter_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QSplitter_resizeEvent_void_QSplitter_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "_p15", "qt.QResizeEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QSplitter_paintEvent_void_QSplitter_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSplitter"),
-                new Param(c, "_p14", "qt.QPaintEvent"), End),
+            _func[3] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QSplitter_event_bool_QSplitter_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QSplitter"), new Param(c, "e", "qt.QEvent"), End),
+            _func[4] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                          qt_QSplitter_resizeEvent_void_QSplitter_QResizeEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSplitter"), new Param(c, "_p15", "qt.QResizeEvent"), End),
+            _func[5] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QSplitter_paintEvent_void_QSplitter_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSplitter"), new Param(c, "_p14", "qt.QPaintEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

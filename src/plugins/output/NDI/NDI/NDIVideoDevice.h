@@ -46,8 +46,7 @@ namespace NDI
 
     struct NDIDataFormat
     {
-        TwkApp::VideoDevice::InternalDataFormat iformat{
-            TwkApp::VideoDevice::RGBA8};
+        TwkApp::VideoDevice::InternalDataFormat iformat{TwkApp::VideoDevice::RGBA8};
         NDIlib_FourCC_video_type_e ndiFormat{NDIlib_FourCC_type_RGBA};
         bool isRGB{true};
         const char* description{nullptr};
@@ -145,8 +144,7 @@ namespace NDI
 
         bool readyForTransfer() const override;
         void transfer(const TwkGLF::GLFBO* glfbo) const override;
-        void transfer2(const TwkGLF::GLFBO* glfbo1,
-                       const TwkGLF::GLFBO* glfbo2) const override;
+        void transfer2(const TwkGLF::GLFBO* glfbo1, const TwkGLF::GLFBO* glfbo2) const override;
         void transferAudio(void* interleavedData, size_t n) const override;
         bool willBlockOnTransfer() const override;
 
@@ -163,33 +161,25 @@ namespace NDI
 
         void unbind() const override;
         void bind(const TwkGLF::GLVideoDevice* device) const override;
-        void bind2(const TwkGLF::GLVideoDevice* device1,
-                   const TwkGLF::GLVideoDevice* device2) const override;
-        void
-        audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const override;
+        void bind2(const TwkGLF::GLVideoDevice* device1, const TwkGLF::GLVideoDevice* device2) const override;
+        void audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const override;
 
     private:
         void initialize();
         bool transferChannel(size_t index, const TwkGLF::GLFBO*) const;
-        void transferChannelPBO(size_t index, const TwkGLF::GLFBO*,
-                                NDIVideoFrame*, NDIVideoFrame*) const;
-        void transferChannelReadPixels(size_t index, const TwkGLF::GLFBO*,
-                                       NDIVideoFrame*, NDIVideoFrame*) const;
+        void transferChannelPBO(size_t index, const TwkGLF::GLFBO*, NDIVideoFrame*, NDIVideoFrame*) const;
+        void transferChannelReadPixels(size_t index, const TwkGLF::GLFBO*, NDIVideoFrame*, NDIVideoFrame*) const;
 
         NDIVideoFormatVector m_ndiVideoFormats;
         NDIDataFormatVector m_ndiDataFormats;
         NDIlib_send_instance_t m_ndiSender{nullptr};
         mutable NDIlib_video_frame_v2_t m_ndiVideoFrame;
-        mutable NDIlib_audio_frame_interleaved_16s_t
-            m_ndiInterleaved16AudioFrame;
-        mutable NDIlib_audio_frame_interleaved_32s_t
-            m_ndiInterleaved32AudioFrame;
-        mutable NDIlib_audio_frame_interleaved_32f_t
-            m_ndiInterleaved32fAudioFrame;
+        mutable NDIlib_audio_frame_interleaved_16s_t m_ndiInterleaved16AudioFrame;
+        mutable NDIlib_audio_frame_interleaved_32s_t m_ndiInterleaved32AudioFrame;
+        mutable NDIlib_audio_frame_interleaved_32f_t m_ndiInterleaved32fAudioFrame;
         mutable NDIVideoFrame* m_readyFrame{nullptr};
         mutable DLVideoFrameDeque m_DLOutputVideoFrameQueue;
-        mutable DLVideoFrameDeque
-            m_DLReadbackVideoFrameQueue; // only rgb formats
+        mutable DLVideoFrameDeque m_DLReadbackVideoFrameQueue; // only rgb formats
         mutable bool m_needsFrameConverter{false};
         mutable bool m_hasAudio{false};
         mutable PBOQueue m_pboQueue;

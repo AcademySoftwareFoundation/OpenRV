@@ -30,8 +30,7 @@ namespace TwkApp
         if (!self->event)
             return badArgument();
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(self->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(self->event))
         {
             return PyLong_FromLong(pe->buttonStates());
         }
@@ -44,8 +43,7 @@ namespace TwkApp
         PyLockObject locker;
         if (!self->event)
             return badArgument();
-        if (const ModifierEvent* pe =
-                dynamic_cast<const ModifierEvent*>(self->event))
+        if (const ModifierEvent* pe = dynamic_cast<const ModifierEvent*>(self->event))
         {
             return PyLong_FromLong(pe->modifiers());
         }
@@ -58,13 +56,11 @@ namespace TwkApp
         PyLockObject locker;
         if (!self->event)
             return badArgument();
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             return Py_BuildValue("(f,f)", float(te->gx()), float(te->gy()));
         }
-        else if (const PointerEvent* pe =
-                     dynamic_cast<const PointerEvent*>(self->event))
+        else if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(self->event))
         {
             return Py_BuildValue("(f,f)", float(pe->x()), float(pe->y()));
         }
@@ -81,8 +77,7 @@ namespace TwkApp
         PyLockObject locker;
         if (!self->event)
             return badArgument();
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             float v0 = te->gx();
             float v1 = te->gy();
@@ -95,8 +90,7 @@ namespace TwkApp
 
             return Py_BuildValue("(f,f)", v0, v1);
         }
-        else if (const PointerEvent* pe =
-                     dynamic_cast<const PointerEvent*>(self->event))
+        else if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(self->event))
         {
             float v0 = pe->x();
             float v1 = pe->y();
@@ -124,14 +118,12 @@ namespace TwkApp
             return badArgument();
         float v[2];
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(self->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(self->event))
         {
             v[0] = pe->w();
             v[1] = pe->h();
         }
-        else if (const RenderEvent* re =
-                     dynamic_cast<const RenderEvent*>(self->event))
+        else if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(self->event))
         {
             v[0] = re->w();
             v[1] = re->h();
@@ -152,9 +144,7 @@ namespace TwkApp
         {
             if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(e))
             {
-                return re->device()->capabilities() & VideoDevice::FlippedImage
-                           ? Py_True
-                           : Py_False;
+                return re->device()->capabilities() & VideoDevice::FlippedImage ? Py_True : Py_False;
             }
             else
             {
@@ -172,14 +162,12 @@ namespace TwkApp
             return badArgument();
         float v[2];
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(self->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(self->event))
         {
             v[0] = pe->w();
             v[1] = pe->h();
         }
-        else if (const RenderEvent* re =
-                     dynamic_cast<const RenderEvent*>(self->event))
+        else if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(self->event))
         {
             v[0] = re->w();
             v[1] = re->h();
@@ -232,13 +220,11 @@ namespace TwkApp
             return badArgument();
         const char* s = 0;
 
-        if (const GenericStringEvent* e =
-                dynamic_cast<const GenericStringEvent*>(self->event))
+        if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(self->event))
         {
             s = e->senderName().c_str();
         }
-        else if (const RawDataEvent* e =
-                     dynamic_cast<const RawDataEvent*>(self->event))
+        else if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(self->event))
         {
             s = e->senderName().c_str();
         }
@@ -257,18 +243,15 @@ namespace TwkApp
             return badArgument();
         const char* s = "";
 
-        if (const DragDropEvent* de =
-                dynamic_cast<const DragDropEvent*>(self->event))
+        if (const DragDropEvent* de = dynamic_cast<const DragDropEvent*>(self->event))
         {
             s = de->stringContent().c_str();
         }
-        else if (const GenericStringEvent* e =
-                     dynamic_cast<const GenericStringEvent*>(self->event))
+        else if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(self->event))
         {
             s = e->stringContent().c_str();
         }
-        else if (const RawDataEvent* e =
-                     dynamic_cast<const RawDataEvent*>(self->event))
+        else if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(self->event))
         {
             if (e->utf8())
             {
@@ -279,8 +262,7 @@ namespace TwkApp
                 return badArgument();
             }
         }
-        else if (const RenderEvent* re =
-                     dynamic_cast<const RenderEvent*>(self->event))
+        else if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(self->event))
         {
             s = re->stringContent().c_str();
         }
@@ -299,8 +281,7 @@ namespace TwkApp
             return badArgument();
         const char* s = "";
 
-        if (const GenericStringEvent* e =
-                dynamic_cast<const GenericStringEvent*>(self->event))
+        if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(self->event))
         {
             s = e->returnContent().c_str();
         }
@@ -313,8 +294,7 @@ namespace TwkApp
         PyLockObject locker;
         if (!self->event)
             return badArgument();
-        if (const RawDataEvent* e =
-                dynamic_cast<const RawDataEvent*>(self->event))
+        if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(self->event))
         {
             int sz = e->rawDataSize();
             PyObject* list = PyList_New(sz);
@@ -337,8 +317,7 @@ namespace TwkApp
             return badArgument();
         int rval = 0;
 
-        if (const DragDropEvent* de =
-                dynamic_cast<const DragDropEvent*>(self->event))
+        if (const DragDropEvent* de = dynamic_cast<const DragDropEvent*>(self->event))
         {
             switch (de->contentType())
             {
@@ -371,13 +350,11 @@ namespace TwkApp
             return badArgument();
         const char* s = "";
 
-        if (const RawDataEvent* e =
-                dynamic_cast<const RawDataEvent*>(self->event))
+        if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(self->event))
         {
             s = e->contentType().c_str();
         }
-        else if (const GenericStringEvent* e =
-                     dynamic_cast<const GenericStringEvent*>(self->event))
+        else if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(self->event))
         {
             s = "text/plain";
         }
@@ -414,13 +391,11 @@ namespace TwkApp
         const char* s;
         int ok = PyArg_ParseTuple(args, "s", &s); /* A string */
 
-        if (const GenericStringEvent* se =
-                dynamic_cast<const GenericStringEvent*>(self->event))
+        if (const GenericStringEvent* se = dynamic_cast<const GenericStringEvent*>(self->event))
         {
             se->setReturnContent(s);
         }
-        else if (const RawDataEvent* rde =
-                     dynamic_cast<const RawDataEvent*>(self->event))
+        else if (const RawDataEvent* rde = dynamic_cast<const RawDataEvent*>(self->event))
         {
             rde->setReturnContent(s);
         }
@@ -439,8 +414,7 @@ namespace TwkApp
             return badArgument();
         double d = 1.0;
 
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             d = te->pressure();
         }
@@ -455,8 +429,7 @@ namespace TwkApp
             return badArgument();
         double d = 1.0;
 
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             d = te->tangentialPressure();
         }
@@ -471,8 +444,7 @@ namespace TwkApp
             return badArgument();
         double d = 1.0;
 
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             d = te->rotation();
         }
@@ -487,8 +459,7 @@ namespace TwkApp
             return badArgument();
         long d = 1.0;
 
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             d = te->xTilt();
         }
@@ -503,8 +474,7 @@ namespace TwkApp
             return badArgument();
         long d = 1.0;
 
-        if (const TabletEvent* te =
-                dynamic_cast<const TabletEvent*>(self->event))
+        if (const TabletEvent* te = dynamic_cast<const TabletEvent*>(self->event))
         {
             d = te->yTilt();
         }
@@ -519,8 +489,7 @@ namespace TwkApp
             return badArgument();
         double d = 0.0;
 
-        if (const PointerButtonPressEvent* pe =
-                dynamic_cast<const PointerButtonPressEvent*>(self->event))
+        if (const PointerButtonPressEvent* pe = dynamic_cast<const PointerButtonPressEvent*>(self->event))
         {
             d = pe->activationTime();
         }
@@ -529,43 +498,30 @@ namespace TwkApp
     }
 
     static PyMethodDef methods[] = {
-        {"pointer", (PyCFunction)pointer, METH_NOARGS,
-         "Return the pointer position"},
-        {"relativePointer", (PyCFunction)relativePointer, METH_NOARGS,
-         "Return the pointer position"},
+        {"pointer", (PyCFunction)pointer, METH_NOARGS, "Return the pointer position"},
+        {"relativePointer", (PyCFunction)relativePointer, METH_NOARGS, "Return the pointer position"},
         {"domain", (PyCFunction)domain, METH_NOARGS, "Return the domain size"},
-        {"subDomain", (PyCFunction)subDomain, METH_NOARGS,
-         "Return the domain size"},
-        {"domainVerticalFlip", (PyCFunction)domainVerticalFlip, METH_NOARGS,
-         "Return the domain vflip flag"},
-        {"buttons", (PyCFunction)buttons, METH_NOARGS,
-         "Return the button mask"},
-        {"modifiers", (PyCFunction)modifiers, METH_NOARGS,
-         "Return the modifier mask"},
+        {"subDomain", (PyCFunction)subDomain, METH_NOARGS, "Return the domain size"},
+        {"domainVerticalFlip", (PyCFunction)domainVerticalFlip, METH_NOARGS, "Return the domain vflip flag"},
+        {"buttons", (PyCFunction)buttons, METH_NOARGS, "Return the button mask"},
+        {"modifiers", (PyCFunction)modifiers, METH_NOARGS, "Return the modifier mask"},
         {"key", (PyCFunction)key, METH_NOARGS, "Return the key"},
         {"name", (PyCFunction)name, METH_NOARGS, "Return the key"},
         {"contents", (PyCFunction)contents, METH_NOARGS, "Return the key"},
-        {"returnContents", (PyCFunction)returnContents, METH_NOARGS,
-         "Return the key"},
-        {"dataContents", (PyCFunction)dataContents, METH_NOARGS,
-         "Return the key"},
+        {"returnContents", (PyCFunction)returnContents, METH_NOARGS, "Return the key"},
+        {"dataContents", (PyCFunction)dataContents, METH_NOARGS, "Return the key"},
         {"sender", (PyCFunction)sender, METH_NOARGS, "Return the key"},
-        {"contentType", (PyCFunction)contentType, METH_NOARGS,
-         "Return the key"},
-        {"contentMimeType", (PyCFunction)contentMimeType, METH_NOARGS,
-         "Return the key"},
+        {"contentType", (PyCFunction)contentType, METH_NOARGS, "Return the key"},
+        {"contentMimeType", (PyCFunction)contentMimeType, METH_NOARGS, "Return the key"},
         {"timeStamp", (PyCFunction)timeStamp, METH_NOARGS, "Return the key"},
         {"reject", (PyCFunction)reject, METH_NOARGS, "Return the key"},
-        {"setReturnContent", (PyCFunction)setReturnContent, METH_VARARGS,
-         "Return the key"},
+        {"setReturnContent", (PyCFunction)setReturnContent, METH_VARARGS, "Return the key"},
         {"pressure", (PyCFunction)pressure, METH_NOARGS, "Return the key"},
-        {"tangentialPressure", (PyCFunction)tangentialPressure, METH_NOARGS,
-         "Return the key"},
+        {"tangentialPressure", (PyCFunction)tangentialPressure, METH_NOARGS, "Return the key"},
         {"rotation", (PyCFunction)rotation, METH_NOARGS, "Return the key"},
         {"xTilt", (PyCFunction)xTilt, METH_NOARGS, "Return the key"},
         {"yTilt", (PyCFunction)yTilt, METH_NOARGS, "Return the key"},
-        {"activationTime", (PyCFunction)activationTime, METH_NOARGS,
-         "Return the key"},
+        {"activationTime", (PyCFunction)activationTime, METH_NOARGS, "Return the key"},
         {NULL} /* Sentinel */
     };
 

@@ -20,12 +20,8 @@
 
 #include <limits>
 
-#define DECLARE_SYMBOL(NAME, QUALIFIER, TYPE)                            \
-    const Symbol* NAME()                                                 \
-    {                                                                    \
-        return new Symbol((Symbol::Qualifier)(Symbol::QUALIFIER), #NAME, \
-                          Symbol::TYPE);                                 \
-    }
+#define DECLARE_SYMBOL(NAME, QUALIFIER, TYPE) \
+    const Symbol* NAME() { return new Symbol((Symbol::Qualifier)(Symbol::QUALIFIER), #NAME, Symbol::TYPE); }
 
 //
 //  External source code blobs. NOTE: has to be in the global
@@ -368,17 +364,11 @@ namespace IPCore
             if (!Shader_Dither)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "seed",
-                                            Symbol::FloatType));
-                Shader_Dither = new Shader::Function(
-                    "main", Dither_glsl, Shader::Function::UndecidedType,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "seed", Symbol::FloatType));
+                Shader_Dither = new Shader::Function("main", Dither_glsl, Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_Dither;
@@ -389,15 +379,10 @@ namespace IPCore
             if (!Shader_StencilBox)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxX",
-                                            Symbol::Vec2fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxY",
-                                            Symbol::Vec2fType));
-                Shader_StencilBox = new Shader::Function(
-                    "main", StencilBox_glsl, Shader::Function::Color, params,
-                    globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxX", Symbol::Vec2fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxY", Symbol::Vec2fType));
+                Shader_StencilBox = new Shader::Function("main", StencilBox_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_StencilBox;
@@ -408,15 +393,10 @@ namespace IPCore
             if (!Shader_StencilBoxNegAlpha)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxX",
-                                            Symbol::Vec2fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxY",
-                                            Symbol::Vec2fType));
-                Shader_StencilBoxNegAlpha = new Shader::Function(
-                    "main", StencilBoxNegAlpha_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxX", Symbol::Vec2fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "boxY", Symbol::Vec2fType));
+                Shader_StencilBoxNegAlpha = new Shader::Function("main", StencilBoxNegAlpha_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_StencilBoxNegAlpha;
@@ -427,21 +407,12 @@ namespace IPCore
             if (!Shader_StereoChecker)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "parityXOffset",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "parityYOffset",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                Shader_StereoChecker = new Shader::Function(
-                    "main", StereoChecker_glsl, Shader::Function::UndecidedType,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "parityXOffset", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "parityYOffset", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                Shader_StereoChecker = new Shader::Function("main", StereoChecker_glsl, Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_StereoChecker;
@@ -452,17 +423,11 @@ namespace IPCore
             if (!Shader_StereoScanline)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "parityOffset", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                Shader_StereoScanline = new Shader::Function(
-                    "main", StereoScanline_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "parityOffset", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                Shader_StereoScanline = new Shader::Function("main", StereoScanline_glsl, Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_StereoScanline;
@@ -473,13 +438,9 @@ namespace IPCore
             if (!Shader_StereoAnaglyph)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                Shader_StereoAnaglyph = new Shader::Function(
-                    "main", StereoAnaglyph_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                Shader_StereoAnaglyph = new Shader::Function("main", StereoAnaglyph_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_StereoAnaglyph;
@@ -490,16 +451,10 @@ namespace IPCore
             if (!Shader_StereoLumAnaglyph)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "lumaCoefficients",
-                                            Symbol::Vec3fType));
-                Shader_StereoLumAnaglyph = new Shader::Function(
-                    "main", StereoLumAnaglyph_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "lumaCoefficients", Symbol::Vec3fType));
+                Shader_StereoLumAnaglyph = new Shader::Function("main", StereoLumAnaglyph_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_StereoLumAnaglyph;
@@ -510,17 +465,12 @@ namespace IPCore
             if (!Shader_FilterUnsharpMask)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "amount",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "threshold", Symbol::FloatType));
-                Shader_FilterUnsharpMask = new Shader::Function(
-                    "FilterUnsharpMask", FilterUnsharpMask_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "amount", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "threshold", Symbol::FloatType));
+                Shader_FilterUnsharpMask =
+                    new Shader::Function("FilterUnsharpMask", FilterUnsharpMask_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_FilterUnsharpMask;
@@ -531,17 +481,12 @@ namespace IPCore
             if (!Shader_FilterNoiseReduction)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "amount",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "threshold", Symbol::FloatType));
-                Shader_FilterNoiseReduction = new Shader::Function(
-                    "FilterNoiseReduction", FilterNoiseReduction_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "amount", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "threshold", Symbol::FloatType));
+                Shader_FilterNoiseReduction =
+                    new Shader::Function("FilterNoiseReduction", FilterNoiseReduction_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_FilterNoiseReduction;
@@ -552,15 +497,10 @@ namespace IPCore
             if (!Shader_FilterClarity)
             {
                 SymbolVector params, globals;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1",
-                                            Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "amount",
-                                            Symbol::FloatType));
-                Shader_FilterClarity = new Shader::Function(
-                    "FilterClarity", FilterClarity_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in0", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "in1", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "amount", Symbol::FloatType));
+                Shader_FilterClarity = new Shader::Function("FilterClarity", FilterClarity_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_FilterClarity;
@@ -572,11 +512,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                Shader_Histogram = new Shader::Function(
-                    "Histogram", Histogram_glsl, Shader::Function::Filter,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                Shader_Histogram = new Shader::Function("Histogram", Histogram_glsl, Shader::Function::Filter, params, globals);
             }
 
             return Shader_Histogram;
@@ -588,15 +525,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "sigma",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                Shader_FilterGaussianVertical = new Shader::Function(
-                    "FilterGaussianVertical", FilterGaussianVertical_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "sigma", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                Shader_FilterGaussianVertical = new Shader::Function("FilterGaussianVertical", FilterGaussianVertical_glsl,
+                                                                     Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_FilterGaussianVertical;
@@ -608,15 +541,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "sigma",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                Shader_FilterGaussianHorizontal = new Shader::Function(
-                    "FilterGaussianHorizontal", FilterGaussianHorizontal_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "sigma", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                Shader_FilterGaussianHorizontal = new Shader::Function("FilterGaussianHorizontal", FilterGaussianHorizontal_glsl,
+                                                                       Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_FilterGaussianHorizontal;
@@ -628,17 +557,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "RGB_sampler",
-                                            Symbol::Sampler2DRectType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
-                Shader_FilterGaussianVerticalFast = new Shader::Function(
-                    "FilterGaussianVerticalFast",
-                    FilterGaussianVerticalFast_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "RGB_sampler", Symbol::Sampler2DRectType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
+                Shader_FilterGaussianVerticalFast = new Shader::Function("FilterGaussianVerticalFast", FilterGaussianVerticalFast_glsl,
+                                                                         Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_FilterGaussianVerticalFast;
@@ -650,17 +573,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "RGB_sampler",
-                                            Symbol::Sampler2DRectType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "RGB_sampler", Symbol::Sampler2DRectType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "radius", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
                 Shader_FilterGaussianHorizontalFast = new Shader::Function(
-                    "FilterGaussianHorizontalFast",
-                    FilterGaussianHorizontalFast_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                    "FilterGaussianHorizontalFast", FilterGaussianHorizontalFast_glsl, Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_FilterGaussianHorizontalFast;
@@ -672,14 +589,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
 
-                Shader_ResizeDownSample = new Shader::Function(
-                    "ResizeDownSample", ResizeDownSample_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeDownSample =
+                    new Shader::Function("ResizeDownSample", ResizeDownSample_glsl, Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeDownSample;
@@ -691,14 +605,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
 
-                Shader_ResizeDownSampleFast = new Shader::Function(
-                    "ResizeDownSampleFast", ResizeDownSampleFast_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeDownSampleFast = new Shader::Function("ResizeDownSampleFast", ResizeDownSampleFast_glsl,
+                                                                   Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeDownSampleFast;
@@ -711,10 +622,8 @@ namespace IPCore
                 SymbolVector params, globals;
                 params.push_back(in0());
 
-                Shader_ResizeDownSampleDerivative = new Shader::Function(
-                    "ResizeDownSampleDerivative",
-                    ResizeDownSampleDerivative_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeDownSampleDerivative = new Shader::Function("ResizeDownSampleDerivative", ResizeDownSampleDerivative_glsl,
+                                                                         Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeDownSampleDerivative;
@@ -726,13 +635,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
                 // params.push_back(_offset());
 
-                Shader_ResizeUpSampleVertical2 = new Shader::Function(
-                    "ResizeUpSampleVertical", ResizeUpSampleVertical_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeUpSampleVertical2 = new Shader::Function("ResizeUpSampleVertical", ResizeUpSampleVertical_glsl,
+                                                                      Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeUpSampleVertical2;
@@ -744,14 +651,12 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
                 // params.push_back(_offset());
 
-                Shader_ResizeUpSampleVerticalMitchell2 = new Shader::Function(
-                    "ResizeUpSampleVerticalMitchell",
-                    ResizeUpSampleVerticalMitchell_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeUpSampleVerticalMitchell2 =
+                    new Shader::Function("ResizeUpSampleVerticalMitchell", ResizeUpSampleVerticalMitchell_glsl,
+                                         Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeUpSampleVerticalMitchell2;
@@ -763,13 +668,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
                 // params.push_back(_offset());
 
-                Shader_ResizeUpSampleHorizontal2 = new Shader::Function(
-                    "ResizeUpSampleHorizontal", ResizeUpSampleHorizontal_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeUpSampleHorizontal2 = new Shader::Function("ResizeUpSampleHorizontal", ResizeUpSampleHorizontal_glsl,
+                                                                        Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeUpSampleHorizontal2;
@@ -781,14 +684,12 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(in0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "win",
-                                            Symbol::OutputImageType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "win", Symbol::OutputImageType));
                 // params.push_back(_offset());
 
-                Shader_ResizeUpSampleHorizontalMitchell2 = new Shader::Function(
-                    "ResizeUpSampleHorizontalMitchell",
-                    ResizeUpSampleHorizontalMitchell_glsl,
-                    Shader::Function::UndecidedType, params, globals);
+                Shader_ResizeUpSampleHorizontalMitchell2 =
+                    new Shader::Function("ResizeUpSampleHorizontalMitchell", ResizeUpSampleHorizontalMitchell_glsl,
+                                         Shader::Function::UndecidedType, params, globals);
             }
 
             return Shader_ResizeUpSampleHorizontalMitchell2;
@@ -801,11 +702,9 @@ namespace IPCore
                 SymbolVector params, globals;
                 params.push_back(in0());
                 params.push_back(_offset());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "invScale", Symbol::Vec2fType));
-                Shader_InlineBoxResize = new Shader::Function(
-                    "InlineBoxResize", InlineBoxResize_glsl,
-                    Shader::Function::MorphologicalFilter, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "invScale", Symbol::Vec2fType));
+                Shader_InlineBoxResize =
+                    new Shader::Function("InlineBoxResize", InlineBoxResize_glsl, Shader::Function::MorphologicalFilter, params, globals);
             }
 
             return Shader_InlineBoxResize;
@@ -818,9 +717,8 @@ namespace IPCore
                 SymbolVector params, globals;
                 params.push_back(in0());
                 params.push_back(_offset());
-                Shader_InlineAdaptiveBoxResize = new Shader::Function(
-                    "InlineAdaptiveBoxResize", InlineAdaptiveBoxResize_glsl,
-                    Shader::Function::MorphologicalFilter, params, globals);
+                Shader_InlineAdaptiveBoxResize = new Shader::Function("InlineAdaptiveBoxResize", InlineAdaptiveBoxResize_glsl,
+                                                                      Shader::Function::MorphologicalFilter, params, globals);
             }
 
             return Shader_InlineAdaptiveBoxResize;
@@ -836,12 +734,10 @@ namespace IPCore
             {
                 ostringstream str;
                 str << "i" << i;
-                params.push_back(new Symbol(Symbol::ParameterConstIn, str.str(),
-                                            Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, str.str(), Symbol::Vec4fType));
             }
 
-            return new Shader::Function(
-                funcName, shaderCode, Shader::Function::Color, params, globals);
+            return new Shader::Function(funcName, shaderCode, Shader::Function::Color, params, globals);
         }
 
         Function* colorQuantize()
@@ -850,11 +746,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "partitions", Symbol::FloatType));
-                Shader_ColorQuantize = new Shader::Function(
-                    "ColorQuantize", ColorQuantize_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "partitions", Symbol::FloatType));
+                Shader_ColorQuantize = new Shader::Function("ColorQuantize", ColorQuantize_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorQuantize;
@@ -866,17 +759,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "p1",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "p2",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "p3",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "p4",
-                                            Symbol::Vec3fType));
-                Shader_ColorCurve = new Shader::Function(
-                    "ColorCurve", ColorCurve_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "p1", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "p2", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "p3", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "p4", Symbol::Vec3fType));
+                Shader_ColorCurve = new Shader::Function("ColorCurve", ColorCurve_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCurve;
@@ -888,14 +775,10 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "coefficents", Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "highlightPoint",
-                                            Symbol::FloatType));
-                Shader_ColorHighlight = new Shader::Function(
-                    "ColorHighlight", ColorHighlight_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "coefficents", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "highlightPoint", Symbol::FloatType));
+                Shader_ColorHighlight =
+                    new Shader::Function("ColorHighlight", ColorHighlight_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorHighlight;
@@ -907,13 +790,9 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "coefficents", Symbol::Vec4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "shadowPoint", Symbol::FloatType));
-                Shader_ColorShadow = new Shader::Function(
-                    "ColorShadow", ColorShadow_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "coefficents", Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "shadowPoint", Symbol::FloatType));
+                Shader_ColorShadow = new Shader::Function("ColorShadow", ColorShadow_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorShadow;
@@ -925,13 +804,9 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "rec",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "saturation", Symbol::FloatType));
-                Shader_ColorVibrance = new Shader::Function(
-                    "ColorVibrance", ColorVibrance_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "rec", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "saturation", Symbol::FloatType));
+                Shader_ColorVibrance = new Shader::Function("ColorVibrance", ColorVibrance_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorVibrance;
@@ -943,9 +818,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorSRGBYCbCr = new Shader::Function(
-                    "ColorSRGBYCbCr", ColorSRGBYCbCr_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorSRGBYCbCr =
+                    new Shader::Function("ColorSRGBYCbCr", ColorSRGBYCbCr_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorSRGBYCbCr;
@@ -957,9 +831,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorYCbCrSRGB = new Shader::Function(
-                    "ColorYCbCrSRGB", ColorYCbCrSRGB_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorYCbCrSRGB =
+                    new Shader::Function("ColorYCbCrSRGB", ColorYCbCrSRGB_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorYCbCrSRGB;
@@ -971,9 +844,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorOutOfRange = new Shader::Function(
-                    "ColorOutOfRange", ColorOutOfRange_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorOutOfRange =
+                    new Shader::Function("ColorOutOfRange", ColorOutOfRange_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorOutOfRange;
@@ -985,12 +857,10 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "color",
-                                            Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "color", Symbol::Vec4fType));
 
-                Shader_ColorTemperatureOffset = new Shader::Function(
-                    "ColorTemperatureOffset", ColorTemperatureOffset_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorTemperatureOffset =
+                    new Shader::Function("ColorTemperatureOffset", ColorTemperatureOffset_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorTemperatureOffset;
@@ -1002,12 +872,10 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "color",
-                                            Symbol::Vec4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "color", Symbol::Vec4fType));
 
-                Shader_ColorBlendWithConstant = new Shader::Function(
-                    "ColorBlendWithConstant", ColorBlendWithConstant_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorBlendWithConstant =
+                    new Shader::Function("ColorBlendWithConstant", ColorBlendWithConstant_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorBlendWithConstant;
@@ -1019,16 +887,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "power",
-                                            Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "power", Symbol::Vec3fType));
 
-                Shader_ColorCDL = new Shader::Function(
-                    "ColorCDL", ColorCDL_glsl, Shader::Function::Color, params,
-                    globals);
+                Shader_ColorCDL = new Shader::Function("ColorCDL", ColorCDL_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCDL;
@@ -1040,18 +903,12 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "power",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "S",
-                                            Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "power", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "S", Symbol::Matrix4fType));
 
-                Shader_ColorCDL_SAT = new Shader::Function(
-                    "ColorCDL_SAT", ColorCDL_SAT_glsl, Shader::Function::Color,
-                    params, globals);
+                Shader_ColorCDL_SAT = new Shader::Function("ColorCDL_SAT", ColorCDL_SAT_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCDL_SAT;
@@ -1063,18 +920,13 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "power",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "S",
-                                            Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "power", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "S", Symbol::Matrix4fType));
 
-                Shader_ColorCDL_SAT_noClamp = new Shader::Function(
-                    "ColorCDL_SAT_noClamp", ColorCDL_SAT_noClamp_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorCDL_SAT_noClamp =
+                    new Shader::Function("ColorCDL_SAT_noClamp", ColorCDL_SAT_noClamp_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCDL_SAT_noClamp;
@@ -1086,33 +938,20 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "power",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "saturation", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "lumaCoefficients",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "refLow",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "refHigh",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "toACES",
-                                            Symbol::Matrix4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "fromACES", Symbol::Matrix4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "minClamp", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "maxClamp", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "power", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "saturation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "lumaCoefficients", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "refLow", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "refHigh", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "toACES", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "fromACES", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "minClamp", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "maxClamp", Symbol::FloatType));
 
-                Shader_ColorCDLForACESLinear = new Shader::Function(
-                    "ColorCDLForACESLinear", ColorCDLForACESLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorCDLForACESLinear =
+                    new Shader::Function("ColorCDLForACESLinear", ColorCDLForACESLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCDLForACESLinear;
@@ -1124,33 +963,20 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "power",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "saturation", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "lumaCoefficients",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "refLow",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "refHigh",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "toACES",
-                                            Symbol::Matrix4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "fromACES", Symbol::Matrix4fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "minClamp", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "maxClamp", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "scale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "offset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "power", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "saturation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "lumaCoefficients", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "refLow", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "refHigh", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "toACES", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "fromACES", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "minClamp", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "maxClamp", Symbol::FloatType));
 
-                Shader_ColorCDLForACESLog = new Shader::Function(
-                    "ColorCDLForACESLog", ColorCDLForACESLog_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorCDLForACESLog =
+                    new Shader::Function("ColorCDLForACESLog", ColorCDLForACESLog_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCDLForACESLog;
@@ -1168,23 +994,14 @@ namespace IPCore
 
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "RGB_sampler",
-                                            Symbol::Sampler3DType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "sizeMinusOne", Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "inScale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "inOffset", Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "outScale", Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "outOffset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "RGB_sampler", Symbol::Sampler3DType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "sizeMinusOne", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "inScale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "inOffset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "outScale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "outOffset", Symbol::Vec3fType));
 
-                Shader_Color3DLUT = new Shader::Function(
-                    "Color3DLUT", Color3DLUT_glsl, Shader::Function::Color,
-                    params, globals, 1);
+                Shader_Color3DLUT = new Shader::Function("Color3DLUT", Color3DLUT_glsl, Shader::Function::Color, params, globals, 1);
             }
 
             return Shader_Color3DLUT;
@@ -1202,21 +1019,14 @@ namespace IPCore
 
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "RGB_sampler",
-                                            Symbol::Sampler3DType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "inScale",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "inOffset", Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "outScale", Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "outOffset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "RGB_sampler", Symbol::Sampler3DType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "inScale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "inOffset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "outScale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "outOffset", Symbol::Vec3fType));
 
-                Shader_Color3DLUTGLSampling = new Shader::Function(
-                    "Color3DLUTGLSampling", Color3DLUTGLSampling_glsl,
-                    Shader::Function::Color, params, globals, 1);
+                Shader_Color3DLUTGLSampling =
+                    new Shader::Function("Color3DLUTGLSampling", Color3DLUTGLSampling_glsl, Shader::Function::Color, params, globals, 1);
             }
 
             return Shader_Color3DLUTGLSampling;
@@ -1234,20 +1044,13 @@ namespace IPCore
 
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "RGB_sampler",
-                                            Symbol::Sampler2DRectType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "widthMinusOne",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "outScale", Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "outOffset", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "RGB_sampler", Symbol::Sampler2DRectType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "widthMinusOne", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "outScale", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "outOffset", Symbol::Vec3fType));
 
-                Shader_ColorChannelLUT = new Shader::Function(
-                    "ColorChannelLUT", ColorChannelLUT_glsl,
-                    Shader::Function::Color, params, globals, 3);
+                Shader_ColorChannelLUT =
+                    new Shader::Function("ColorChannelLUT", ColorChannelLUT_glsl, Shader::Function::Color, params, globals, 3);
             }
 
             return Shader_ColorChannelLUT;
@@ -1259,16 +1062,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "RGB_sampler",
-                                            Symbol::Sampler2DRectType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "widthMinusOne",
-                                            Symbol::Vec2fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "RGB_sampler", Symbol::Sampler2DRectType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "widthMinusOne", Symbol::Vec2fType));
 
-                Shader_ColorLuminanceLUT = new Shader::Function(
-                    "ColorLuminanceLUT", ColorLuminanceLUT_glsl,
-                    Shader::Function::Color, params, globals, 1);
+                Shader_ColorLuminanceLUT =
+                    new Shader::Function("ColorLuminanceLUT", ColorLuminanceLUT_glsl, Shader::Function::Color, params, globals, 1);
             }
 
             return Shader_ColorLuminanceLUT;
@@ -1280,24 +1078,16 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_A",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_B",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_C",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_D",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_X",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_Y",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "logC_cutoff", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_A", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_B", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_C", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_D", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_X", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_Y", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "logC_cutoff", Symbol::FloatType));
 
-                Shader_ColorLogCLinear = new Shader::Function(
-                    "ColorLogCLinear", ColorLogCLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLogCLinear =
+                    new Shader::Function("ColorLogCLinear", ColorLogCLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLogCLinear;
@@ -1309,26 +1099,17 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "pbs",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "eo",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "eg",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "gs",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "bo",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "ls",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "lo",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "cutoff",
-                                            Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "pbs", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "eo", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "eg", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "gs", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "bo", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "ls", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "lo", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cutoff", Symbol::FloatType));
 
-                Shader_ColorLinearLogC = new Shader::Function(
-                    "ColorLinearLogC", ColorLinearLogC_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearLogC =
+                    new Shader::Function("ColorLinearLogC", ColorLinearLogC_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearLogC;
@@ -1340,15 +1121,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinBlack", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinWhiteBlackDiff",
-                                            Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinBlack", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinWhiteBlackDiff", Symbol::FloatType));
 
-                Shader_ColorCineonLogLinear = new Shader::Function(
-                    "ColorCineonLogLinear", ColorCineonLogLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorCineonLogLinear =
+                    new Shader::Function("ColorCineonLogLinear", ColorCineonLogLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCineonLogLinear;
@@ -1360,26 +1137,15 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinBlack", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinWhiteBlackDiff",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinSoftClip", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinBreakpoint",
-                                            Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinKneeGain", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "cinKneeOffset",
-                                            Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinBlack", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinWhiteBlackDiff", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinSoftClip", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinBreakpoint", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinKneeGain", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "cinKneeOffset", Symbol::FloatType));
 
                 Shader_ColorCineonSoftClipLogLinear = new Shader::Function(
-                    "ColorCineonSoftClipLogLinear",
-                    ColorCineonSoftClipLogLinear_glsl, Shader::Function::Color,
-                    params, globals);
+                    "ColorCineonSoftClipLogLinear", ColorCineonSoftClipLogLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorCineonSoftClipLogLinear;
@@ -1391,14 +1157,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "refBlack", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "refWhite", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "refBlack", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "refWhite", Symbol::FloatType));
 
-                Shader_ColorLinearCineonLog = new Shader::Function(
-                    "ColorLinearCineonLog", ColorLinearCineonLog_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearCineonLog =
+                    new Shader::Function("ColorLinearCineonLog", ColorLinearCineonLog_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearCineonLog;
@@ -1410,9 +1173,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorViperLogLinear = new Shader::Function(
-                    "ColorViperLogLinear", ColorViperLogLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorViperLogLinear =
+                    new Shader::Function("ColorViperLogLinear", ColorViperLogLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorViperLogLinear;
@@ -1424,9 +1186,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorRedLogLinear = new Shader::Function(
-                    "ColorRedLogLinear", ColorRedLogLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorRedLogLinear =
+                    new Shader::Function("ColorRedLogLinear", ColorRedLogLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorRedLogLinear;
@@ -1438,9 +1199,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearRedLog = new Shader::Function(
-                    "ColorLinearRedLog", ColorLinearRedLog_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearRedLog =
+                    new Shader::Function("ColorLinearRedLog", ColorLinearRedLog_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearRedLog;
@@ -1452,9 +1212,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorPremult = new Shader::Function(
-                    "ColorPremult", ColorPremult_glsl,
-                    Shader::Function::LinearColor, params, globals);
+                Shader_ColorPremult =
+                    new Shader::Function("ColorPremult", ColorPremult_glsl, Shader::Function::LinearColor, params, globals);
             }
 
             return Shader_ColorPremult;
@@ -1466,9 +1225,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorPremultLight = new Shader::Function(
-                    "ColorPremultLight", ColorPremultLight_glsl,
-                    Shader::Function::LinearColor, params, globals);
+                Shader_ColorPremultLight =
+                    new Shader::Function("ColorPremultLight", ColorPremultLight_glsl, Shader::Function::LinearColor, params, globals);
             }
 
             return Shader_ColorPremultLight;
@@ -1480,9 +1238,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorUnpremult = new Shader::Function(
-                    "ColorUnpremult", ColorUnpremult_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorUnpremult =
+                    new Shader::Function("ColorUnpremult", ColorUnpremult_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorUnpremult;
@@ -1494,11 +1251,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "gamma",
-                                            Symbol::Vec3fType));
-                Shader_ColorGamma = new Shader::Function(
-                    "ColorGamma", ColorGamma_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "gamma", Symbol::Vec3fType));
+                Shader_ColorGamma = new Shader::Function("ColorGamma", ColorGamma_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorGamma;
@@ -1510,13 +1264,9 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "minValue", Symbol::FloatType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "maxValue", Symbol::FloatType));
-                Shader_ColorClamp = new Shader::Function(
-                    "ColorClamp", ColorClamp_glsl, Shader::Function::Color,
-                    params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "minValue", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "maxValue", Symbol::FloatType));
+                Shader_ColorClamp = new Shader::Function("ColorClamp", ColorClamp_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorClamp;
@@ -1528,12 +1278,9 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "M",
-                                            Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "M", Symbol::Matrix4fType));
 
-                Shader_ColorMatrix = new Shader::Function(
-                    "ColorMatrix", ColorMatrix_glsl,
-                    Shader::Function::LinearColor, params, globals);
+                Shader_ColorMatrix = new Shader::Function("ColorMatrix", ColorMatrix_glsl, Shader::Function::LinearColor, params, globals);
             }
 
             return Shader_ColorMatrix;
@@ -1545,12 +1292,10 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "M",
-                                            Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "M", Symbol::Matrix4fType));
 
-                Shader_ColorMatrix4D = new Shader::Function(
-                    "ColorMatrix4D", ColorMatrix4D_glsl,
-                    Shader::Function::LinearColor, params, globals);
+                Shader_ColorMatrix4D =
+                    new Shader::Function("ColorMatrix4D", ColorMatrix4D_glsl, Shader::Function::LinearColor, params, globals);
             }
 
             return Shader_ColorMatrix4D;
@@ -1562,9 +1307,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearGray = new Shader::Function(
-                    "ColorLinearGray", ColorLinearGray_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearGray =
+                    new Shader::Function("ColorLinearGray", ColorLinearGray_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearGray;
@@ -1576,9 +1320,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorHLGLinear = new Shader::Function(
-                    "ColorHLGLinear", ColorHLGLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorHLGLinear =
+                    new Shader::Function("ColorHLGLinear", ColorHLGLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorHLGLinear;
@@ -1590,9 +1333,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearHLG = new Shader::Function(
-                    "ColorLinearHLG", ColorLinearHLG_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearHLG =
+                    new Shader::Function("ColorLinearHLG", ColorLinearHLG_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearHLG;
@@ -1604,9 +1346,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorSRGBLinear = new Shader::Function(
-                    "ColorSRGBLinear", ColorSRGBLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorSRGBLinear =
+                    new Shader::Function("ColorSRGBLinear", ColorSRGBLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorSRGBLinear;
@@ -1618,9 +1359,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearSRGB = new Shader::Function(
-                    "ColorLinearSRGB", ColorLinearSRGB_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearSRGB =
+                    new Shader::Function("ColorLinearSRGB", ColorLinearSRGB_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearSRGB;
@@ -1632,17 +1372,11 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "a",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "b",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "c",
-                                            Symbol::Vec3fType));
-                params.push_back(new Symbol(Symbol::ParameterConstIn, "d",
-                                            Symbol::Vec3fType));
-                Shader_ICCLinearSRGB = new Shader::Function(
-                    "ICCLinearSRGB", ICCLinearSRGB_glsl,
-                    Shader::Function::Color, params, globals);
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "a", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "b", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "c", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "d", Symbol::Vec3fType));
+                Shader_ICCLinearSRGB = new Shader::Function("ICCLinearSRGB", ICCLinearSRGB_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ICCLinearSRGB;
@@ -1654,9 +1388,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorRec709Linear = new Shader::Function(
-                    "ColorRec709Linear", ColorRec709Linear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorRec709Linear =
+                    new Shader::Function("ColorRec709Linear", ColorRec709Linear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorRec709Linear;
@@ -1668,9 +1401,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearRec709 = new Shader::Function(
-                    "ColorLinearRec709", ColorLinearRec709_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearRec709 =
+                    new Shader::Function("ColorLinearRec709", ColorLinearRec709_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearRec709;
@@ -1682,9 +1414,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorSMPTE240MLinear = new Shader::Function(
-                    "ColorSMPTE240MLinear", ColorSMPTE240MLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorSMPTE240MLinear =
+                    new Shader::Function("ColorSMPTE240MLinear", ColorSMPTE240MLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorSMPTE240MLinear;
@@ -1696,9 +1427,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearSMPTE240M = new Shader::Function(
-                    "ColorLinearSMPTE240M", ColorLinearSMPTE240M_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearSMPTE240M =
+                    new Shader::Function("ColorLinearSMPTE240M", ColorLinearSMPTE240M_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearSMPTE240M;
@@ -1710,9 +1440,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorSMPTE2084Linear = new Shader::Function(
-                    "ColorSMPTE2084Linear", ColorSMPTE2084Linear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorSMPTE2084Linear =
+                    new Shader::Function("ColorSMPTE2084Linear", ColorSMPTE2084Linear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorSMPTE2084Linear;
@@ -1724,14 +1453,12 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearSMPTE2084 = new Shader::Function(
-                    "ColorLinearSMPTE2084", ColorLinearSMPTE2084_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearSMPTE2084 =
+                    new Shader::Function("ColorLinearSMPTE2084", ColorLinearSMPTE2084_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearSMPTE2084;
         }
-
 
         Function* colorACESLogToLinear()
         {
@@ -1739,9 +1466,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorACESLogLinear = new Shader::Function(
-                    "ColorACESLogLinear", ColorACESLogLinear_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorACESLogLinear =
+                    new Shader::Function("ColorACESLogLinear", ColorACESLogLinear_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorACESLogLinear;
@@ -1753,9 +1479,8 @@ namespace IPCore
             {
                 SymbolVector params, globals;
                 params.push_back(P());
-                Shader_ColorLinearACESLog = new Shader::Function(
-                    "ColorLinearACESLog", ColorLinearACESLog_glsl,
-                    Shader::Function::Color, params, globals);
+                Shader_ColorLinearACESLog =
+                    new Shader::Function("ColorLinearACESLog", ColorLinearACESLog_glsl, Shader::Function::Color, params, globals);
             }
 
             return Shader_ColorLinearACESLog;
@@ -1770,12 +1495,9 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceY = new Shader::Function("SourceY", SourceY_glsl,
-                                                      Shader::Function::Source,
-                                                      params, globals);
+                Shader_SourceY = new Shader::Function("SourceY", SourceY_glsl, Shader::Function::Source, params, globals);
             }
 
             return Shader_SourceY;
@@ -1792,12 +1514,9 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceYUncrop = new Shader::Function(
-                    "SourceYUncrop", SourceYUncrop_glsl,
-                    Shader::Function::Source, params, globals);
+                Shader_SourceYUncrop = new Shader::Function("SourceYUncrop", SourceYUncrop_glsl, Shader::Function::Source, params, globals);
             }
 
             return Shader_SourceYUncrop;
@@ -1810,17 +1529,13 @@ namespace IPCore
                 SymbolVector params, globals;
                 params.push_back(YVYU_sampler());
                 params.push_back(ST_coord());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
 
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceYVYU = new Shader::Function(
-                    "SourceYVYU", SourceYVYU_glsl, Shader::Function::Source,
-                    params, globals, 2);
+                Shader_SourceYVYU = new Shader::Function("SourceYVYU", SourceYVYU_glsl, Shader::Function::Source, params, globals, 2);
             }
 
             return Shader_SourceYVYU;
@@ -1835,12 +1550,9 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceYA = new Shader::Function(
-                    "SourceYA", SourceYA_glsl, Shader::Function::Source, params,
-                    globals, 1);
+                Shader_SourceYA = new Shader::Function("SourceYA", SourceYA_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceYA;
@@ -1857,12 +1569,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceYAUncrop = new Shader::Function(
-                    "SourceYAUncrop", SourceYAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceYAUncrop =
+                    new Shader::Function("SourceYAUncrop", SourceYAUncrop_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceYAUncrop;
@@ -1880,16 +1590,13 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "Yweights", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "Yweights", Symbol::Vec3fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYRYBYA = new Shader::Function(
-                    "SourcePlanarYRYBYA", SourcePlanarYRYBYA_glsl,
-                    Shader::Function::Source, params, globals, 4);
+                Shader_SourcePlanarYRYBYA =
+                    new Shader::Function("SourcePlanarYRYBYA", SourcePlanarYRYBYA_glsl, Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourcePlanarYRYBYA;
@@ -1907,18 +1614,15 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "Yweights", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "Yweights", Symbol::Vec3fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYRYBYAUncrop = new Shader::Function(
-                    "SourcePlanarYRYBYAUncrop", SourcePlanarYRYBYAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 4);
+                Shader_SourcePlanarYRYBYAUncrop = new Shader::Function("SourcePlanarYRYBYAUncrop", SourcePlanarYRYBYAUncrop_glsl,
+                                                                       Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourcePlanarYRYBYAUncrop;
@@ -1935,16 +1639,13 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "Yweights", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "Yweights", Symbol::Vec3fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYRYBY = new Shader::Function(
-                    "SourcePlanarYRYBY", SourcePlanarYRYBY_glsl,
-                    Shader::Function::Source, params, globals, 3);
+                Shader_SourcePlanarYRYBY =
+                    new Shader::Function("SourcePlanarYRYBY", SourcePlanarYRYBY_glsl, Shader::Function::Source, params, globals, 3);
             }
 
             return Shader_SourcePlanarYRYBY;
@@ -1961,18 +1662,15 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "Yweights", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "Yweights", Symbol::Vec3fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYRYBYUncrop = new Shader::Function(
-                    "SourcePlanarYRYBYUncrop", SourcePlanarYRYBYUncrop_glsl,
-                    Shader::Function::Source, params, globals, 3);
+                Shader_SourcePlanarYRYBYUncrop = new Shader::Function("SourcePlanarYRYBYUncrop", SourcePlanarYRYBYUncrop_glsl,
+                                                                      Shader::Function::Source, params, globals, 3);
             }
 
             return Shader_SourcePlanarYRYBYUncrop;
@@ -1987,16 +1685,13 @@ namespace IPCore
                 params.push_back(RYBY_sampler());
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "Yweights", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "Yweights", Symbol::Vec3fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYAC2 = new Shader::Function(
-                    "SourcePlanarYAC2", SourcePlanarYAC2_glsl,
-                    Shader::Function::Source, params, globals, 2);
+                Shader_SourcePlanarYAC2 =
+                    new Shader::Function("SourcePlanarYAC2", SourcePlanarYAC2_glsl, Shader::Function::Source, params, globals, 2);
             }
 
             return Shader_SourcePlanarYAC2;
@@ -2011,18 +1706,15 @@ namespace IPCore
                 params.push_back(RYBY_sampler());
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "Yweights", Symbol::Vec3fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "Yweights", Symbol::Vec3fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYAC2Uncrop = new Shader::Function(
-                    "SourcePlanarYAC2Uncrop", SourcePlanarYAC2Uncrop_glsl,
-                    Shader::Function::Source, params, globals, 2);
+                Shader_SourcePlanarYAC2Uncrop = new Shader::Function("SourcePlanarYAC2Uncrop", SourcePlanarYAC2Uncrop_glsl,
+                                                                     Shader::Function::Source, params, globals, 2);
             }
 
             return Shader_SourcePlanarYAC2Uncrop;
@@ -2038,12 +1730,10 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYA = new Shader::Function(
-                    "SourcePlanarYA", SourcePlanarYA_glsl,
-                    Shader::Function::Source, params, globals, 2);
+                Shader_SourcePlanarYA =
+                    new Shader::Function("SourcePlanarYA", SourcePlanarYA_glsl, Shader::Function::Source, params, globals, 2);
             }
 
             return Shader_SourcePlanarYA;
@@ -2061,12 +1751,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYAUncrop = new Shader::Function(
-                    "SourcePlanarYAUncrop", SourcePlanarYAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 2);
+                Shader_SourcePlanarYAUncrop =
+                    new Shader::Function("SourcePlanarYAUncrop", SourcePlanarYAUncrop_glsl, Shader::Function::Source, params, globals, 2);
             }
 
             return Shader_SourcePlanarYAUncrop;
@@ -2084,16 +1772,13 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYUVA = new Shader::Function(
-                    "SourcePlanarYUVA", SourcePlanarYUVA_glsl,
-                    Shader::Function::Source, params, globals, 4);
+                Shader_SourcePlanarYUVA =
+                    new Shader::Function("SourcePlanarYUVA", SourcePlanarYUVA_glsl, Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourcePlanarYUVA;
@@ -2106,16 +1791,12 @@ namespace IPCore
                 SymbolVector params, globals;
                 params.push_back(YUVA_sampler());
                 params.push_back(ST_coord());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceYUVA = new Shader::Function(
-                    "SourceYUVA", SourceYUVA_glsl, Shader::Function::Source,
-                    params, globals, 4);
+                Shader_SourceYUVA = new Shader::Function("SourceYUVA", SourceYUVA_glsl, Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourceYUVA;
@@ -2128,16 +1809,12 @@ namespace IPCore
                 SymbolVector params, globals;
                 params.push_back(YUVA_sampler());
                 params.push_back(ST_coord());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceAYUV = new Shader::Function(
-                    "SourceAYUV", SourceAYUV_glsl, Shader::Function::Source,
-                    params, globals, 4);
+                Shader_SourceAYUV = new Shader::Function("SourceAYUV", SourceAYUV_glsl, Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourceAYUV;
@@ -2155,18 +1832,15 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYUVAUncrop = new Shader::Function(
-                    "SourcePlanarYUVAUncrop", SourcePlanarYUVAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 4);
+                Shader_SourcePlanarYUVAUncrop = new Shader::Function("SourcePlanarYUVAUncrop", SourcePlanarYUVAUncrop_glsl,
+                                                                     Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourcePlanarYUVAUncrop;
@@ -2183,16 +1857,13 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYUV = new Shader::Function(
-                    "SourcePlanarYUV", SourcePlanarYUV_glsl,
-                    Shader::Function::Source, params, globals, 3);
+                Shader_SourcePlanarYUV =
+                    new Shader::Function("SourcePlanarYUV", SourcePlanarYUV_glsl, Shader::Function::Source, params, globals, 3);
             }
 
             return Shader_SourcePlanarYUV;
@@ -2207,16 +1878,13 @@ namespace IPCore
                 params.push_back(UV_sampler());
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanar2YUV = new Shader::Function(
-                    "SourcePlanar2YUV", SourcePlanar2YUV_glsl,
-                    Shader::Function::Source, params, globals, 2);
+                Shader_SourcePlanar2YUV =
+                    new Shader::Function("SourcePlanar2YUV", SourcePlanar2YUV_glsl, Shader::Function::Source, params, globals, 2);
             }
 
             return Shader_SourcePlanar2YUV;
@@ -2233,18 +1901,15 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(ratio0());
                 params.push_back(ratio1());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "YUVmatrix", Symbol::Matrix4fType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "YUVmatrix", Symbol::Matrix4fType));
                 params.push_back(offset());
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarYUVUncrop = new Shader::Function(
-                    "SourcePlanarYUVUncrop", SourcePlanarYUVUncrop_glsl,
-                    Shader::Function::Source, params, globals, 3);
+                Shader_SourcePlanarYUVUncrop =
+                    new Shader::Function("SourcePlanarYUVUncrop", SourcePlanarYUVUncrop_glsl, Shader::Function::Source, params, globals, 3);
             }
 
             return Shader_SourcePlanarYUVUncrop;
@@ -2263,12 +1928,10 @@ namespace IPCore
                 // params.push_back(ratio1());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarRGB = new Shader::Function(
-                    "SourcePlanarRGB", SourcePlanarRGB_glsl,
-                    Shader::Function::Source, params, globals, 3);
+                Shader_SourcePlanarRGB =
+                    new Shader::Function("SourcePlanarRGB", SourcePlanarRGB_glsl, Shader::Function::Source, params, globals, 3);
             }
 
             return Shader_SourcePlanarRGB;
@@ -2289,12 +1952,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarRGBUncrop = new Shader::Function(
-                    "SourcePlanarRGBUncrop", SourcePlanarRGBUncrop_glsl,
-                    Shader::Function::Source, params, globals, 3);
+                Shader_SourcePlanarRGBUncrop =
+                    new Shader::Function("SourcePlanarRGBUncrop", SourcePlanarRGBUncrop_glsl, Shader::Function::Source, params, globals, 3);
             }
 
             return Shader_SourcePlanarRGBUncrop;
@@ -2312,12 +1973,10 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarRGBA = new Shader::Function(
-                    "SourcePlanarRGBA", SourcePlanarRGBA_glsl,
-                    Shader::Function::Source, params, globals, 4);
+                Shader_SourcePlanarRGBA =
+                    new Shader::Function("SourcePlanarRGBA", SourcePlanarRGBA_glsl, Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourcePlanarRGBA;
@@ -2337,12 +1996,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourcePlanarRGBAUncrop = new Shader::Function(
-                    "SourcePlanarRGBAUncrop", SourcePlanarRGBAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 4);
+                Shader_SourcePlanarRGBAUncrop = new Shader::Function("SourcePlanarRGBAUncrop", SourcePlanarRGBAUncrop_glsl,
+                                                                     Shader::Function::Source, params, globals, 4);
             }
 
             return Shader_SourcePlanarRGBAUncrop;
@@ -2357,12 +2014,9 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceRGBA = new Shader::Function(
-                    "SourceRGBA", SourceRGBA_glsl, Shader::Function::Source,
-                    params, globals, 1);
+                Shader_SourceRGBA = new Shader::Function("SourceRGBA", SourceRGBA_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceRGBA;
@@ -2379,12 +2033,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceRGBAUncrop = new Shader::Function(
-                    "SourceRGBAUncrop", SourceRGBAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceRGBAUncrop =
+                    new Shader::Function("SourceRGBAUncrop", SourceRGBAUncrop_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceRGBAUncrop;
@@ -2399,12 +2051,9 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceBGRA = new Shader::Function(
-                    "SourceBGRA", SourceBGRA_glsl, Shader::Function::Source,
-                    params, globals, 1);
+                Shader_SourceBGRA = new Shader::Function("SourceBGRA", SourceBGRA_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceBGRA;
@@ -2421,12 +2070,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceBGRAUncrop = new Shader::Function(
-                    "SourceBGRAUncrop", SourceBGRAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceBGRAUncrop =
+                    new Shader::Function("SourceBGRAUncrop", SourceBGRAUncrop_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceBGRAUncrop;
@@ -2441,12 +2088,9 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceARGB = new Shader::Function(
-                    "SourceARGB", SourceARGB_glsl, Shader::Function::Source,
-                    params, globals, 1);
+                Shader_SourceARGB = new Shader::Function("SourceARGB", SourceARGB_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceARGB;
@@ -2463,12 +2107,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceARGBUncrop = new Shader::Function(
-                    "SourceARGBUncrop", SourceARGBUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceARGBUncrop =
+                    new Shader::Function("SourceARGBUncrop", SourceARGBUncrop_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceARGBUncrop;
@@ -2483,12 +2125,10 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceARGBfromBGRA = new Shader::Function(
-                    "SourceARGBfromBGRA", SourceARGBfromBGRA_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceARGBfromBGRA =
+                    new Shader::Function("SourceARGBfromBGRA", SourceARGBfromBGRA_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceARGBfromBGRA;
@@ -2505,12 +2145,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceARGBfromBGRAUncrop = new Shader::Function(
-                    "SourceARGBfromBGRAUncrop", SourceARGBfromBGRAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceARGBfromBGRAUncrop = new Shader::Function("SourceARGBfromBGRAUncrop", SourceARGBfromBGRAUncrop_glsl,
+                                                                       Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceARGBfromBGRAUncrop;
@@ -2525,12 +2163,9 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceABGR = new Shader::Function(
-                    "SourceABGR", SourceABGR_glsl, Shader::Function::Source,
-                    params, globals, 1);
+                Shader_SourceABGR = new Shader::Function("SourceABGR", SourceABGR_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceABGR;
@@ -2547,12 +2182,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceABGRUncrop = new Shader::Function(
-                    "SourceABGRUncrop", SourceABGRUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceABGRUncrop =
+                    new Shader::Function("SourceABGRUncrop", SourceABGRUncrop_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceABGRUncrop;
@@ -2567,12 +2200,10 @@ namespace IPCore
                 params.push_back(ST_coord());
                 params.push_back(offset());
                 params.push_back(samplerSize());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceABGRfromBGRA = new Shader::Function(
-                    "SourceABGRfromBGRA", SourceABGRfromBGRA_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceABGRfromBGRA =
+                    new Shader::Function("SourceABGRfromBGRA", SourceABGRfromBGRA_glsl, Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceABGRfromBGRA;
@@ -2589,12 +2220,10 @@ namespace IPCore
                 params.push_back(samplerSize());
                 params.push_back(uncropOrigin());
                 params.push_back(uncropDimension());
-                params.push_back(new Symbol(Symbol::ParameterConstIn,
-                                            "orientation", Symbol::FloatType));
+                params.push_back(new Symbol(Symbol::ParameterConstIn, "orientation", Symbol::FloatType));
 
-                Shader_SourceABGRfromBGRAUncrop = new Shader::Function(
-                    "SourceABGRfromBGRAUncrop", SourceABGRfromBGRAUncrop_glsl,
-                    Shader::Function::Source, params, globals, 1);
+                Shader_SourceABGRfromBGRAUncrop = new Shader::Function("SourceABGRfromBGRAUncrop", SourceABGRfromBGRAUncrop_glsl,
+                                                                       Shader::Function::Source, params, globals, 1);
             }
 
             return Shader_SourceABGRfromBGRAUncrop;
@@ -2604,8 +2233,7 @@ namespace IPCore
         {
             if (!Shader_BoxFilter)
             {
-                Shader_BoxFilter = new Shader::Function(
-                    "BoxFilter", BoxFilter_glsl, Shader::Function::Filter);
+                Shader_BoxFilter = new Shader::Function("BoxFilter", BoxFilter_glsl, Shader::Function::Filter);
             }
 
             return Shader_BoxFilter;
@@ -2618,9 +2246,7 @@ namespace IPCore
         {
             if (!Shader_LensWarpRadial)
             {
-                Shader_LensWarpRadial =
-                    new Shader::Function("LensWarpRadial", LensWarpRadial_glsl,
-                                         Shader::Function::Filter);
+                Shader_LensWarpRadial = new Shader::Function("LensWarpRadial", LensWarpRadial_glsl, Shader::Function::Filter);
             }
 
             return Shader_LensWarpRadial;
@@ -2630,9 +2256,7 @@ namespace IPCore
         {
             if (!Shader_LensWarpTangential)
             {
-                Shader_LensWarpTangential = new Shader::Function(
-                    "LensWarpTangential", LensWarpTangential_glsl,
-                    Shader::Function::Filter);
+                Shader_LensWarpTangential = new Shader::Function("LensWarpTangential", LensWarpTangential_glsl, Shader::Function::Filter);
             }
 
             return Shader_LensWarpTangential;
@@ -2642,9 +2266,8 @@ namespace IPCore
         {
             if (!Shader_LensWarpRadialAndTangential)
             {
-                Shader_LensWarpRadialAndTangential = new Shader::Function(
-                    "LensWarpRadialAndTangential",
-                    LensWarpRadialAndTangential_glsl, Shader::Function::Filter);
+                Shader_LensWarpRadialAndTangential =
+                    new Shader::Function("LensWarpRadialAndTangential", LensWarpRadialAndTangential_glsl, Shader::Function::Filter);
             }
 
             return Shader_LensWarpRadialAndTangential;
@@ -2655,9 +2278,7 @@ namespace IPCore
             if (!Shader_LensWarp3DE4AnamorphicDegree6)
             {
                 Shader_LensWarp3DE4AnamorphicDegree6 =
-                    new Shader::Function("LensWarp3DE4AnamorphicDegree6",
-                                         LensWarp3DE4AnamorphicDegree6_glsl,
-                                         Shader::Function::Filter);
+                    new Shader::Function("LensWarp3DE4AnamorphicDegree6", LensWarp3DE4AnamorphicDegree6_glsl, Shader::Function::Filter);
             }
 
             return Shader_LensWarp3DE4AnamorphicDegree6;
@@ -2667,8 +2288,7 @@ namespace IPCore
         {
             if (Shader_Opacity == nullptr)
             {
-                Shader_Opacity = new Shader::Function("Opacity", Opacity_glsl,
-                                                      Shader::Function::Color);
+                Shader_Opacity = new Shader::Function("Opacity", Opacity_glsl, Shader::Function::Color);
             }
 
             return Shader_Opacity;
@@ -2678,8 +2298,7 @@ namespace IPCore
         {
             if (Shader_AngularMask == nullptr)
             {
-                Shader_AngularMask = new Shader::Function(
-                    "AngularMask", AngularMask_glsl, Shader::Function::Filter);
+                Shader_AngularMask = new Shader::Function("AngularMask", AngularMask_glsl, Shader::Function::Filter);
             }
 
             return Shader_AngularMask;
@@ -2689,9 +2308,7 @@ namespace IPCore
         {
             if (Shader_ReverseAngularMask == nullptr)
             {
-                Shader_ReverseAngularMask = new Shader::Function(
-                    "ReverseAngularMask", ReverseAngularMask_glsl,
-                    Shader::Function::Filter);
+                Shader_ReverseAngularMask = new Shader::Function("ReverseAngularMask", ReverseAngularMask_glsl, Shader::Function::Filter);
             }
 
             return Shader_ReverseAngularMask;
@@ -2699,8 +2316,7 @@ namespace IPCore
 
         //--
 
-        Expression* newDither(const IPImage* image, Expression* A,
-                              size_t displayBits, size_t seed)
+        Expression* newDither(const IPImage* image, Expression* A, size_t displayBits, size_t seed)
         {
             const float scale = float((1 << displayBits) - 1);
             const float fSeed = float(seed % 1000) / 1000.0;
@@ -2757,9 +2373,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newStereoScanline(const IPImage* image,
-                                      const float parityYOffset,
-                                      const vector<Expression*>& FA1)
+        Expression* newStereoScanline(const IPImage* image, const float parityYOffset, const vector<Expression*>& FA1)
         {
             assert(FA1.size() == 2);
             const Function* F = stereoScanline();
@@ -2776,9 +2390,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newStereoChecker(const IPImage* image,
-                                     const float parityXOffset,
-                                     const float parityYOffset,
+        Expression* newStereoChecker(const IPImage* image, const float parityXOffset, const float parityYOffset,
                                      const vector<Expression*>& FA1)
         {
             assert(FA1.size() == 2);
@@ -2798,8 +2410,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newStereoAnaglyph(const IPImage* image,
-                                      const vector<Expression*>& FA1)
+        Expression* newStereoAnaglyph(const IPImage* image, const vector<Expression*>& FA1)
         {
             assert(FA1.size() == 2);
             const Function* F = stereoAnaglyph();
@@ -2812,8 +2423,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newStereoLumAnaglyph(const IPImage* image,
-                                         const vector<Expression*>& FA1)
+        Expression* newStereoLumAnaglyph(const IPImage* image, const vector<Expression*>& FA1)
         {
             assert(FA1.size() == 2);
 
@@ -2832,11 +2442,9 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newInlineBoxResize(bool adaptive, const IPImage* image,
-                                       Expression* A, const Vec2f& scale)
+        Expression* newInlineBoxResize(bool adaptive, const IPImage* image, Expression* A, const Vec2f& scale)
         {
-            const Function* F =
-                adaptive ? inlineAdaptiveBoxResize() : inlineBoxResize();
+            const Function* F = adaptive ? inlineAdaptiveBoxResize() : inlineBoxResize();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             assert(A);
@@ -2845,14 +2453,12 @@ namespace IPCore
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
             if (!adaptive)
-                args[i] =
-                    new BoundVec2f(F->parameters()[i], Vec2f(1.0f) / scale);
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(1.0f) / scale);
             i++;
             return new Expression(F, args, image);
         }
 
-        Expression* newSimpleBoxFilter(const IPImage* image, Expression* A,
-                                       const float size)
+        Expression* newSimpleBoxFilter(const IPImage* image, Expression* A, const float size)
         {
             const Function* F = boxFilter();
             ArgumentVector args(F->parameters().size());
@@ -2866,24 +2472,18 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newLensWarp(const IPImage* image, Expression* FA, float k1,
-                                float k2, float k3, float d, float p1, float p2,
-                                const Vec2f& center, const Vec2f& f,
-                                const Vec2f& cropRatio)
+        Expression* newLensWarp(const IPImage* image, Expression* FA, float k1, float k2, float k3, float d, float p1, float p2,
+                                const Vec2f& center, const Vec2f& f, const Vec2f& cropRatio)
         {
             bool doRadial = (k1 != 0.0f) || (k2 != 0.0f) || (k3 != 0.0f);
             bool doTangential = (p1 != 0.0f) || (p2 != 0.0f);
-            Vec2f fInPixels =
-                Vec2f((float)std::max(image->width, image->height)) * f
-                * cropRatio;
+            Vec2f fInPixels = Vec2f((float)std::max(image->width, image->height)) * f * cropRatio;
             assert(FA);
 
             // The convention for center property was specified in terms on
             // TOPLEFT framebuffer, so we adjust accordingly since our fb is now
             // internally BOTTOMLEFT after the source shaders.
-            Vec2f offsetInPixels =
-                Vec2f((float)image->width, (float)image->height)
-                * Vec2f(center.x, 1.0f - center.y);
+            Vec2f offsetInPixels = Vec2f((float)image->width, (float)image->height) * Vec2f(center.x, 1.0f - center.y);
 
             if (doRadial)
             {
@@ -2906,8 +2506,7 @@ namespace IPCore
                     i++;
                     args[i] = new BoundFloat(F->parameters()[i], p2);
                     i++;
-                    args[i] =
-                        new BoundVec2f(F->parameters()[i], offsetInPixels);
+                    args[i] = new BoundVec2f(F->parameters()[i], offsetInPixels);
                     i++;
                     args[i] = new BoundVec2f(F->parameters()[i], fInPixels);
                     i++;
@@ -2930,8 +2529,7 @@ namespace IPCore
                     i++;
                     args[i] = new BoundFloat(F->parameters()[i], d);
                     i++;
-                    args[i] =
-                        new BoundVec2f(F->parameters()[i], offsetInPixels);
+                    args[i] = new BoundVec2f(F->parameters()[i], offsetInPixels);
                     i++;
                     args[i] = new BoundVec2f(F->parameters()[i], fInPixels);
                     i++;
@@ -2953,8 +2551,7 @@ namespace IPCore
                     i++;
                     args[i] = new BoundFloat(F->parameters()[i], p2);
                     i++;
-                    args[i] =
-                        new BoundVec2f(F->parameters()[i], offsetInPixels);
+                    args[i] = new BoundVec2f(F->parameters()[i], offsetInPixels);
                     i++;
                     args[i] = new BoundVec2f(F->parameters()[i], fInPixels);
                     i++;
@@ -2969,30 +2566,21 @@ namespace IPCore
             }
         }
 
-        Expression* newLensWarp3DE4AnamorphicDegree6(
-            const IPImage* image, Expression* FA, const Vec2f& c02,
-            const Vec2f& c22, const Vec2f& c04, const Vec2f& c24,
-            const Vec2f& c44, const Vec2f& c06, const Vec2f& c26,
-            const Vec2f& c46, const Vec2f& c66, const Vec2f& center,
-            const Vec2f& f, const Vec2f& cropRatio)
+        Expression* newLensWarp3DE4AnamorphicDegree6(const IPImage* image, Expression* FA, const Vec2f& c02, const Vec2f& c22,
+                                                     const Vec2f& c04, const Vec2f& c24, const Vec2f& c44, const Vec2f& c06,
+                                                     const Vec2f& c26, const Vec2f& c46, const Vec2f& c66, const Vec2f& center,
+                                                     const Vec2f& f, const Vec2f& cropRatio)
         {
-            bool doDistort = (c02 != Vec2f(0.0f)) || (c22 != Vec2f(0.0f))
-                             || (c04 != Vec2f(0.0f)) || (c24 != Vec2f(0.0f))
-                             || (c44 != Vec2f(0.0f)) || (c06 != Vec2f(0.0f))
-                             || (c26 != Vec2f(0.0f)) || (c46 != Vec2f(0.0f))
+            bool doDistort = (c02 != Vec2f(0.0f)) || (c22 != Vec2f(0.0f)) || (c04 != Vec2f(0.0f)) || (c24 != Vec2f(0.0f))
+                             || (c44 != Vec2f(0.0f)) || (c06 != Vec2f(0.0f)) || (c26 != Vec2f(0.0f)) || (c46 != Vec2f(0.0f))
                              || (c66 != Vec2f(0.0f));
 
             assert(FA);
 
             if (doDistort)
             {
-                Vec2f offsetInPixels =
-                    Vec2f((float)image->width, (float)image->height) * center;
-                Vec2f fInPixels =
-                    Vec2f((float)0.5f
-                          * sqrtf(image->width * image->width
-                                  + image->height * image->height))
-                    * f * cropRatio;
+                Vec2f offsetInPixels = Vec2f((float)image->width, (float)image->height) * center;
+                Vec2f fInPixels = Vec2f((float)0.5f * sqrtf(image->width * image->width + image->height * image->height)) * f * cropRatio;
                 const Function* F = LensWarp3DE4AnamorphicDegree6();
                 ArgumentVector args(F->parameters().size());
                 size_t i = 0;
@@ -3028,22 +2616,16 @@ namespace IPCore
         }
 
         const char* overShaders[] = {Over2_glsl, Over3_glsl, Over4_glsl};
-        const char* replaceShaders[] = {Replace2_glsl, Replace3_glsl,
-                                        Replace4_glsl};
+        const char* replaceShaders[] = {Replace2_glsl, Replace3_glsl, Replace4_glsl};
         const char* addShaders[] = {Add2_glsl, Add3_glsl, Add4_glsl};
-        const char* differenceShaders[] = {Difference2_glsl, Difference3_glsl,
-                                           Difference4_glsl};
-        const char* reverseDifferenceShaders[] = {ReverseDifference2_glsl,
-                                                  ReverseDifference3_glsl,
-                                                  ReverseDifference4_glsl};
+        const char* differenceShaders[] = {Difference2_glsl, Difference3_glsl, Difference4_glsl};
+        const char* reverseDifferenceShaders[] = {ReverseDifference2_glsl, ReverseDifference3_glsl, ReverseDifference4_glsl};
 
         // generate a blend expr of a certain mode
         // with the input Expressions as input to the blend shaders (over, add,
         // etc.) the input Expressions are held in FA1, with starting position
         // as 'startPos', and number of Expressions as 'size'
-        Expression* newBlend(const IPImage* image,
-                             const vector<Expression*>& FA1,
-                             const IPImage::BlendMode mode)
+        Expression* newBlend(const IPImage* image, const vector<Expression*>& FA1, const IPImage::BlendMode mode)
         {
             int size = FA1.size();
             assert(size <= MAX_TEXTURE_PER_SHADER);
@@ -3063,9 +2645,8 @@ namespace IPCore
                           addShaders[size - 2]); //*2_glsl is at position 0
                 break;
             case IPImage::Difference:
-                F = blend(
-                    size, name,
-                    differenceShaders[size - 2]); //*2_glsl is at position 0
+                F = blend(size, name,
+                          differenceShaders[size - 2]); //*2_glsl is at position 0
                 break;
             case IPImage::ReverseDifference:
                 F = blend(size, name,
@@ -3093,8 +2674,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newHistogram(const IPImage* image,
-                                 const std::vector<Expression*>& FA1)
+        Expression* newHistogram(const IPImage* image, const std::vector<Expression*>& FA1)
         {
             const Function* F = histogram();
             ArgumentVector args(F->parameters().size());
@@ -3111,10 +2691,7 @@ namespace IPCore
         }
 
         // fb carries precomputed weights
-        Expression* newFilterGaussianVerticalFast(Expression* FA,
-                                                  const TwkFB::FrameBuffer* fb,
-                                                  const float radius,
-                                                  const float sigma)
+        Expression* newFilterGaussianVerticalFast(Expression* FA, const TwkFB::FrameBuffer* fb, const float radius, const float sigma)
         {
             const Function* F = filterGaussianVerticalFast();
             ArgumentVector args(F->parameters().size());
@@ -3132,9 +2709,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newFilterGaussianVertical(Expression* FA,
-                                              const float radius,
-                                              const float sigma)
+        Expression* newFilterGaussianVertical(Expression* FA, const float radius, const float sigma)
         {
             const Function* F = filterGaussianVertical();
             ArgumentVector args(F->parameters().size());
@@ -3153,10 +2728,7 @@ namespace IPCore
         }
 
         // fb carries precomputed weights
-        Expression*
-        newFilterGaussianHorizontalFast(Expression* FA,
-                                        const TwkFB::FrameBuffer* fb,
-                                        const float radius, const float sigma)
+        Expression* newFilterGaussianHorizontalFast(Expression* FA, const TwkFB::FrameBuffer* fb, const float radius, const float sigma)
         {
             const Function* F = filterGaussianHorizontalFast();
             ArgumentVector args(F->parameters().size());
@@ -3174,9 +2746,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newFilterGaussianHorizontal(Expression* FA,
-                                                const float radius,
-                                                const float sigma)
+        Expression* newFilterGaussianHorizontal(Expression* FA, const float radius, const float sigma)
         {
             const Function* F = filterGaussianHorizontal();
             ArgumentVector args(F->parameters().size());
@@ -3194,9 +2764,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newFilterUnsharpMask(const IPImage* image,
-                                         const std::vector<Expression*>& FA1,
-                                         const float amount,
+        Expression* newFilterUnsharpMask(const IPImage* image, const std::vector<Expression*>& FA1, const float amount,
                                          const float threshold)
         {
             assert(FA1.size() == 2);
@@ -3214,9 +2782,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newFilterNoiseReduction(const IPImage* image,
-                                            const std::vector<Expression*>& FA1,
-                                            const float amount,
+        Expression* newFilterNoiseReduction(const IPImage* image, const std::vector<Expression*>& FA1, const float amount,
                                             const float threshold)
         {
             assert(FA1.size() == 2);
@@ -3234,9 +2800,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newFilterClarity(const IPImage* image,
-                                     const std::vector<Expression*>& FA1,
-                                     const float amount)
+        Expression* newFilterClarity(const IPImage* image, const std::vector<Expression*>& FA1, const float amount)
         {
             assert(FA1.size() == 2);
             const Function* F = clarity();
@@ -3274,9 +2838,7 @@ namespace IPCore
         }
 
         // p1 - > p4 is monotonically increasing in x, y
-        Expression* newColorCurveonY(Expression* FA, const TwkMath::Vec3f& p1,
-                                     const TwkMath::Vec3f& p2,
-                                     const TwkMath::Vec3f& p3,
+        Expression* newColorCurveonY(Expression* FA, const TwkMath::Vec3f& p1, const TwkMath::Vec3f& p2, const TwkMath::Vec3f& p3,
                                      const TwkMath::Vec3f& p4)
         {
             const Function* F = colorCurve();
@@ -3295,9 +2857,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorHighlightonY(Expression* FA,
-                                         const TwkMath::Vec4f& coeff,
-                                         const float highlight)
+        Expression* newColorHighlightonY(Expression* FA, const TwkMath::Vec4f& coeff, const float highlight)
         {
             const Function* F = colorHighlight();
             ArgumentVector args(F->parameters().size());
@@ -3311,9 +2871,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorShadowonY(Expression* FA,
-                                      const TwkMath::Vec4f& coeff,
-                                      const float shadow)
+        Expression* newColorShadowonY(Expression* FA, const TwkMath::Vec4f& coeff, const float shadow)
         {
             const Function* F = colorShadow();
             ArgumentVector args(F->parameters().size());
@@ -3327,9 +2885,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorVibrance(Expression* FA,
-                                     const TwkMath::Vec3f& rgb709,
-                                     const float saturation)
+        Expression* newColorVibrance(Expression* FA, const TwkMath::Vec3f& rgb709, const float saturation)
         {
             const Function* F = colorVibrance();
             ArgumentVector args(F->parameters().size());
@@ -3347,10 +2903,7 @@ namespace IPCore
         {
             if (FA->function() == colorYCbCrSRGB())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3366,10 +2919,7 @@ namespace IPCore
         {
             if (FA->function() == colorSRGBYCbCr())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3412,10 +2962,7 @@ namespace IPCore
         {
             if (FA->function() == colorLinearToHLG())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3434,10 +2981,7 @@ namespace IPCore
         {
             if (FA->function() == colorHLGToLinear())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3452,9 +2996,7 @@ namespace IPCore
             }
         }
 
-        Expression* newColorLogCLinear(Expression* FA, float pbs, float eo,
-                                       float eg, float gs, float bo, float ls,
-                                       float lo, float cutoff)
+        Expression* newColorLogCLinear(Expression* FA, float pbs, float eo, float eg, float gs, float bo, float ls, float lo, float cutoff)
         {
             const float A = 1.0f / eg;
             const float B = -eo / eg;
@@ -3485,9 +3027,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorLinearLogC(Expression* FA, float pbs, float eo,
-                                       float eg, float gs, float bo, float ls,
-                                       float lo, float cutoff)
+        Expression* newColorLinearLogC(Expression* FA, float pbs, float eo, float eg, float gs, float bo, float ls, float lo, float cutoff)
         {
             const Function* F = colorLinearToLogC();
             ArgumentVector args(F->parameters().size());
@@ -3513,8 +3053,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorCineonLogToLinear(Expression* FA, double refBlack,
-                                              double refWhite, double softClip)
+        Expression* newColorCineonLogToLinear(Expression* FA, double refBlack, double refWhite, double softClip)
         {
             const double tf = 0.002 / 0.6;
 
@@ -3563,11 +3102,8 @@ namespace IPCore
                     softClip = softClip / 100.0;
                 }
 
-                double kneeOffset =
-                    (pow(10.0, breakpoint * 1023.0f * tf) - black)
-                    / whiteBlackDiff;
-                double kneeGain =
-                    (1.0 - kneeOffset) / pow(500 * softClip, softClip);
+                double kneeOffset = (pow(10.0, breakpoint * 1023.0f * tf) - black) / whiteBlackDiff;
+                double kneeGain = (1.0 - kneeOffset) / pow(500 * softClip, softClip);
 
                 const Function* F = colorCineonSoftClipLogToLinear();
                 ArgumentVector args(F->parameters().size());
@@ -3590,8 +3126,7 @@ namespace IPCore
             }
         }
 
-        Expression* newColorLinearToCineonLog(Expression* FA, double refBlack,
-                                              double refWhite)
+        Expression* newColorLinearToCineonLog(Expression* FA, double refBlack, double refWhite)
         {
             const Function* F = colorLinearToCineonLog();
             ArgumentVector args(F->parameters().size());
@@ -3605,8 +3140,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorClamp(Expression* FA, float minValue,
-                                  float maxValue)
+        Expression* newColorClamp(Expression* FA, float minValue, float maxValue)
         {
             const Function* F = colorClamp();
             ArgumentVector args(F->parameters().size());
@@ -3631,18 +3165,13 @@ namespace IPCore
 
             if (FA->function() == colorGamma())
             {
-                Vec3f g =
-                    static_cast<const BoundVec3f*>(FA->arguments()[1])->value()
-                    * v;
+                Vec3f g = static_cast<const BoundVec3f*>(FA->arguments()[1])->value() * v;
 
                 //
                 //  Make copy of the incoming expression argument
                 //
 
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
 
                 delete FA;
 
@@ -3685,18 +3214,13 @@ namespace IPCore
                 //  Get the existing Matrix and multiply it by incoming
                 //
 
-                Mat44f C = M
-                           * static_cast<const BoundMat44f*>(FA->arguments()[1])
-                                 ->value();
+                Mat44f C = M * static_cast<const BoundMat44f*>(FA->arguments()[1])->value();
 
                 //
                 //  Make copy of the incoming expression argument
                 //
 
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
 
                 delete FA;
 
@@ -3746,18 +3270,13 @@ namespace IPCore
                 //  Get the existing Matrix and multiply it by incoming
                 //
 
-                Mat44f C = M
-                           * static_cast<const BoundMat44f*>(FA->arguments()[1])
-                                 ->value();
+                Mat44f C = M * static_cast<const BoundMat44f*>(FA->arguments()[1])->value();
 
                 //
                 //  Make copy of the incoming expression argument
                 //
 
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
 
                 delete FA;
 
@@ -3795,10 +3314,7 @@ namespace IPCore
         {
             if (FA->function() == colorLinearToSRGB())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3817,10 +3333,7 @@ namespace IPCore
         {
             if (FA->function() == colorSRGBToLinear())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3835,10 +3348,8 @@ namespace IPCore
             }
         }
 
-        Expression*
-        newICCLinearToSRGB(Expression* FA, const TwkMath::Vec3f& gamma,
-                           const TwkMath::Vec3f& a, const TwkMath::Vec3f& b,
-                           const TwkMath::Vec3f& c, const TwkMath::Vec3f& d)
+        Expression* newICCLinearToSRGB(Expression* FA, const TwkMath::Vec3f& gamma, const TwkMath::Vec3f& a, const TwkMath::Vec3f& b,
+                                       const TwkMath::Vec3f& c, const TwkMath::Vec3f& d)
         {
             const Function* F = ICCLinearToSRGB();
             ArgumentVector args(F->parameters().size());
@@ -3862,10 +3373,7 @@ namespace IPCore
         {
             if (FA->function() == colorRec709ToLinear())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3884,10 +3392,7 @@ namespace IPCore
         {
             if (FA->function() == colorSMPTE240MToLinear())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3906,10 +3411,7 @@ namespace IPCore
         {
             if (FA->function() == colorSMPTE2084ToLinear())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3928,10 +3430,7 @@ namespace IPCore
         {
             if (FA->function() == colorACESLogToLinear())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -3956,8 +3455,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorTemperatureOffset(Expression* FA,
-                                              const Vec4f& color)
+        Expression* newColorTemperatureOffset(Expression* FA, const Vec4f& color)
         {
             const Function* F = colorTemperatureOffset();
             ArgumentVector args(F->parameters().size());
@@ -3969,8 +3467,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorBlendWithConstant(Expression* FA,
-                                              const Vec4f& color)
+        Expression* newColorBlendWithConstant(Expression* FA, const Vec4f& color)
         {
             const Function* F = colorBlendWithConstant();
             ArgumentVector args(F->parameters().size());
@@ -3991,10 +3488,7 @@ namespace IPCore
                 //  argument since adding a premult here is basically a no-op
                 //
 
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4018,10 +3512,7 @@ namespace IPCore
                 //  argument since adding a premult here is basically a no-op
                 //
 
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4046,10 +3537,7 @@ namespace IPCore
                 //  no-op
                 //
 
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4068,10 +3556,7 @@ namespace IPCore
         {
             if (FA->function() == colorLinearToRec709())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4090,10 +3575,7 @@ namespace IPCore
         {
             if (FA->function() == colorLinearToSMPTE240M())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4112,10 +3594,7 @@ namespace IPCore
         {
             if (FA->function() == colorLinearToSMPTE2084())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4134,10 +3613,7 @@ namespace IPCore
         {
             if (FA->function() == colorLinearToACESLog())
             {
-                Expression* fexpr =
-                    static_cast<const BoundExpression*>(FA->arguments()[0])
-                        ->value()
-                        ->copy();
+                Expression* fexpr = static_cast<const BoundExpression*>(FA->arguments()[0])->value()->copy();
                 delete FA;
                 return fexpr;
             }
@@ -4158,15 +3634,9 @@ namespace IPCore
         //  convert to that frame before we use them.
         //
 
-        static int nativeUncropX(const FrameBuffer* fb)
-        {
-            return fb->uncropX();
-        }
+        static int nativeUncropX(const FrameBuffer* fb) { return fb->uncropX(); }
 
-        static int nativeUncropY(const FrameBuffer* fb)
-        {
-            return fb->uncropY();
-        }
+        static int nativeUncropY(const FrameBuffer* fb) { return fb->uncropY(); }
 
         static float computeOrientation(const FrameBuffer* fb)
         {
@@ -4196,25 +3666,19 @@ namespace IPCore
             const FrameBuffer* U = fb->nextPlane();
             const FrameBuffer* V = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()),
-                                   float(U->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()), float(U->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()),
-                                   float(V->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()), float(V->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4226,8 +3690,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4237,33 +3700,26 @@ namespace IPCore
             return new Expression(F, args, img);
         }
 
-        Expression* newSourcePlanarYUVAUncrop(const IPImage* img,
-                                              const Mat44f& M)
+        Expression* newSourcePlanarYUVAUncrop(const IPImage* img, const Mat44f& M)
         {
             const FrameBuffer* fb = img->fb;
             const Function* F = sourcePlanarYUVAUncrop();
             const FrameBuffer* U = fb->nextPlane();
             const FrameBuffer* V = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()),
-                                   float(U->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()), float(U->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()),
-                                   float(V->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()), float(V->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4275,16 +3731,11 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4300,22 +3751,17 @@ namespace IPCore
             const FrameBuffer* U = fb->nextPlane();
             const FrameBuffer* V = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()),
-                                   float(U->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()), float(U->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()),
-                                   float(V->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()), float(V->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4327,8 +3773,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4344,8 +3789,7 @@ namespace IPCore
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4353,8 +3797,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4369,16 +3812,13 @@ namespace IPCore
             const Function* F = sourcePlanar2YUV();
             const FrameBuffer* UV = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(UV->width()) / float(fb->width()),
-                                   float(UV->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(UV->width()) / float(fb->width()), float(UV->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4388,8 +3828,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4399,30 +3838,24 @@ namespace IPCore
             return new Expression(F, args, img);
         }
 
-        Expression* newSourcePlanarYUVUncrop(const IPImage* img,
-                                             const Mat44f& M)
+        Expression* newSourcePlanarYUVUncrop(const IPImage* img, const Mat44f& M)
         {
             const FrameBuffer* fb = img->fb;
             const Function* F = sourcePlanarYUVUncrop();
             const FrameBuffer* U = fb->nextPlane();
             const FrameBuffer* V = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()),
-                                   float(U->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(U->width()) / float(fb->width()), float(U->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()),
-                                   float(V->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(V->width()) / float(fb->width()), float(V->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4434,16 +3867,11 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4460,22 +3888,17 @@ namespace IPCore
             const FrameBuffer* RY = fb->nextPlane();
             const FrameBuffer* BY = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()),
-                                   float(RY->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()), float(RY->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()),
-                                   float(BY->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()), float(BY->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4487,8 +3910,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4498,30 +3920,24 @@ namespace IPCore
             return new Expression(F, args, img);
         }
 
-        Expression* newSourcePlanarYRYBYUncrop(const IPImage* img,
-                                               const Vec3f& w)
+        Expression* newSourcePlanarYRYBYUncrop(const IPImage* img, const Vec3f& w)
         {
             const FrameBuffer* fb = img->fb;
             const Function* F = sourcePlanarYRYBYUncrop();
             const FrameBuffer* RY = fb->nextPlane();
             const FrameBuffer* BY = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()),
-                                   float(RY->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()), float(RY->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()),
-                                   float(BY->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()), float(BY->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4533,16 +3949,11 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4558,16 +3969,13 @@ namespace IPCore
             const Function* F = sourcePlanarYAC2();
             const FrameBuffer* C2 = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(C2->width()) / float(fb->width()),
-                                   float(C2->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(C2->width()) / float(fb->width()), float(C2->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4576,8 +3984,7 @@ namespace IPCore
             args[i] = new BoundVec3f(F->parameters()[i], w);
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4587,23 +3994,19 @@ namespace IPCore
             return new Expression(F, args, img);
         }
 
-        Expression* newSourcePlanarYAC2Uncrop(const IPImage* img,
-                                              const Vec3f& w)
+        Expression* newSourcePlanarYAC2Uncrop(const IPImage* img, const Vec3f& w)
         {
             const FrameBuffer* fb = img->fb;
             const Function* F = sourcePlanarYAC2Uncrop();
             const FrameBuffer* C2 = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(C2->width()) / float(fb->width()),
-                                   float(C2->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(C2->width()) / float(fb->width()), float(C2->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4612,16 +4015,11 @@ namespace IPCore
             args[i] = new BoundVec3f(F->parameters()[i], w);
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4638,8 +4036,7 @@ namespace IPCore
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4647,8 +4044,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4665,8 +4061,7 @@ namespace IPCore
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4674,8 +4069,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4691,18 +4085,15 @@ namespace IPCore
             const Function* F = sourcePlanarYA();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4718,26 +4109,19 @@ namespace IPCore
             const Function* F = sourcePlanarYAUncrop();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4754,25 +4138,19 @@ namespace IPCore
             const FrameBuffer* RY = fb->nextPlane();
             const FrameBuffer* BY = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()),
-                                   float(RY->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()), float(RY->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()),
-                                   float(BY->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()), float(BY->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4784,8 +4162,7 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4795,33 +4172,26 @@ namespace IPCore
             return new Expression(F, args, img);
         }
 
-        Expression* newSourcePlanarYRYBYAUncrop(const IPImage* img,
-                                                const Vec3f& w)
+        Expression* newSourcePlanarYRYBYAUncrop(const IPImage* img, const Vec3f& w)
         {
             const FrameBuffer* fb = img->fb;
             const Function* F = sourcePlanarYRYBYAUncrop();
             const FrameBuffer* RY = fb->nextPlane();
             const FrameBuffer* BY = fb->nextPlane();
 
-            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()),
-                                   float(RY->height()) / float(fb->height()));
+            const Vec2f r0 = Vec2f(float(RY->width()) / float(fb->width()), float(RY->height()) / float(fb->height()));
 
-            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()),
-                                   float(BY->height()) / float(fb->height()));
+            const Vec2f r1 = Vec2f(float(BY->width()) / float(fb->width()), float(BY->height()) / float(fb->height()));
 
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
@@ -4833,16 +4203,11 @@ namespace IPCore
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4858,21 +4223,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4888,29 +4249,21 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4926,24 +4279,19 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -4959,32 +4307,23 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 1));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 2));
             i++;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 3));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5000,15 +4339,13 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5024,23 +4361,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5056,15 +4387,13 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5080,23 +4409,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5115,8 +4438,7 @@ namespace IPCore
 
             if (fb)
             {
-                args[i] =
-                    new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+                args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
                 i++;
             }
             else
@@ -5131,14 +4453,12 @@ namespace IPCore
             i++;
             if (fb)
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(fb->width(), fb->height()));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
                 i++;
             }
             else
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(img->width, img->height));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(img->width, img->height));
                 i++;
             }
 
@@ -5155,23 +4475,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5190,8 +4504,7 @@ namespace IPCore
 
             if (fb)
             {
-                args[i] =
-                    new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+                args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
                 i++;
             }
             else
@@ -5206,14 +4519,12 @@ namespace IPCore
             i++;
             if (fb)
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(fb->width(), fb->height()));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
                 i++;
             }
             else
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(img->width, img->height));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(img->width, img->height));
                 i++;
             }
 
@@ -5230,23 +4541,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5265,8 +4570,7 @@ namespace IPCore
 
             if (fb)
             {
-                args[i] =
-                    new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+                args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
                 i++;
             }
             else
@@ -5281,14 +4585,12 @@ namespace IPCore
             i++;
             if (fb)
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(fb->width(), fb->height()));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
                 i++;
             }
             else
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(img->width, img->height));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(img->width, img->height));
                 i++;
             }
 
@@ -5305,23 +4607,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5340,8 +4636,7 @@ namespace IPCore
 
             if (fb)
             {
-                args[i] =
-                    new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+                args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
                 i++;
             }
             else
@@ -5356,14 +4651,12 @@ namespace IPCore
             i++;
             if (fb)
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(fb->width(), fb->height()));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
                 i++;
             }
             else
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(img->width, img->height));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(img->width, img->height));
                 i++;
             }
 
@@ -5380,23 +4673,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5415,8 +4702,7 @@ namespace IPCore
 
             if (fb)
             {
-                args[i] =
-                    new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+                args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
                 i++;
             }
             else
@@ -5431,14 +4717,12 @@ namespace IPCore
             i++;
             if (fb)
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(fb->width(), fb->height()));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
                 i++;
             }
             else
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(img->width, img->height));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(img->width, img->height));
                 i++;
             }
 
@@ -5455,23 +4739,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5490,8 +4768,7 @@ namespace IPCore
 
             if (fb)
             {
-                args[i] =
-                    new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+                args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
                 i++;
             }
             else
@@ -5506,14 +4783,12 @@ namespace IPCore
             i++;
             if (fb)
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(fb->width(), fb->height()));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
                 i++;
             }
             else
             {
-                args[i] = new BoundVec2f(F->parameters()[i],
-                                         Vec2f(img->width, img->height));
+                args[i] = new BoundVec2f(F->parameters()[i], Vec2f(img->width, img->height));
                 i++;
             }
 
@@ -5530,23 +4805,17 @@ namespace IPCore
             const FrameBuffer* fb = img->fb;
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
-            args[i] =
-                new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
+            args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(img, fb, 0));
             i++;
             args[i] = new BoundImageCoord(F->parameters()[i], ImageCoord(img));
             i++;
             args[i] = new BoundVec2f(F->parameters()[i], Vec2f(0.0f));
             i++;
-            args[i] = new BoundVec2f(F->parameters()[i],
-                                     Vec2f(fb->width(), fb->height()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width(), fb->height()));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(nativeUncropX(fb), nativeUncropY(fb)));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i],
-                               Vec2f(fb->uncropWidth(), fb->uncropHeight()));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->uncropWidth(), fb->uncropHeight()));
             i++;
 
             float orientation = computeOrientation(fb);
@@ -5556,8 +4825,7 @@ namespace IPCore
             return new Expression(F, args, img);
         }
 
-        Expression* newColor3DLUT(Expression* FA, const TwkFB::FrameBuffer* fb,
-                                  const Vec3f& outScale, const Vec3f& outOffset)
+        Expression* newColor3DLUT(Expression* FA, const TwkFB::FrameBuffer* fb, const Vec3f& outScale, const Vec3f& outOffset)
         {
             const Function* F = color3DLUT();
             ArgumentVector args(F->parameters().size());
@@ -5590,10 +4858,8 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression*
-        newColor3DLUTGLSampling(Expression* FA, const TwkFB::FrameBuffer* fb,
-                                const Vec3f& inScale, const Vec3f& inOffset,
-                                const Vec3f& outScale, const Vec3f& outOffset)
+        Expression* newColor3DLUTGLSampling(Expression* FA, const TwkFB::FrameBuffer* fb, const Vec3f& inScale, const Vec3f& inOffset,
+                                            const Vec3f& outScale, const Vec3f& outOffset)
         {
             const Function* F = color3DLUTGLSampling();
             ArgumentVector args(F->parameters().size());
@@ -5614,10 +4880,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorChannelLUT(Expression* FA,
-                                       const TwkFB::FrameBuffer* fb,
-                                       const Vec3f& outScale,
-                                       const Vec3f& outOffset)
+        Expression* newColorChannelLUT(Expression* FA, const TwkFB::FrameBuffer* fb, const Vec3f& outScale, const Vec3f& outOffset)
         {
             const Function* F = colorChannelLUT();
             ArgumentVector args(F->parameters().size());
@@ -5626,8 +4889,7 @@ namespace IPCore
             i++;
             args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(fb, 0));
             i++;
-            args[i] =
-                new BoundVec3f(F->parameters()[i], Vec3f(fb->width() - 1.0f));
+            args[i] = new BoundVec3f(F->parameters()[i], Vec3f(fb->width() - 1.0f));
             i++;
             args[i] = new BoundVec3f(F->parameters()[i], outScale);
             i++;
@@ -5637,8 +4899,7 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorLuminanceLUT(Expression* FA,
-                                         const TwkFB::FrameBuffer* fb)
+        Expression* newColorLuminanceLUT(Expression* FA, const TwkFB::FrameBuffer* fb)
         {
             const Function* F = colorLuminanceLUT();
             ArgumentVector args(F->parameters().size());
@@ -5647,21 +4908,16 @@ namespace IPCore
             i++;
             args[i] = new BoundSampler(F->parameters()[i], ImageOrFB(fb, 0));
             i++;
-            args[i] =
-                new BoundVec2f(F->parameters()[i], Vec2f(fb->width() - 1.0f));
+            args[i] = new BoundVec2f(F->parameters()[i], Vec2f(fb->width() - 1.0f));
             i++;
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorCDL(Expression* FA, const Vec3f& scale,
-                                const Vec3f& offset, const Vec3f& power,
-                                float s, bool noClamp)
+        Expression* newColorCDL(Expression* FA, const Vec3f& scale, const Vec3f& offset, const Vec3f& power, float s, bool noClamp)
         {
             bool useSAT = s != 1.0f || noClamp;
 
-            const Function* F = noClamp
-                                    ? colorCDL_SAT_noClamp()
-                                    : (useSAT ? colorCDL_SAT() : colorCDL());
+            const Function* F = noClamp ? colorCDL_SAT_noClamp() : (useSAT ? colorCDL_SAT() : colorCDL());
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], FA);
@@ -5704,30 +4960,24 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newColorCDLForACES(Expression* FA, const Vec3f& scale,
-                                       const Vec3f& offset, const Vec3f& power,
-                                       float saturation, bool noClamp,
-                                       bool isACESLog)
+        Expression* newColorCDLForACES(Expression* FA, const Vec3f& scale, const Vec3f& offset, const Vec3f& power, float saturation,
+                                       bool noClamp, bool isACESLog)
         {
-            const float minClamp =
-                (noClamp ? -std::numeric_limits<float>::max() : 0.0f);
-            const float maxClamp =
-                (noClamp ? std::numeric_limits<float>::max() : 1.0f);
+            const float minClamp = (noClamp ? -std::numeric_limits<float>::max() : 0.0f);
+            const float maxClamp = (noClamp ? std::numeric_limits<float>::max() : 1.0f);
 
             Mat44f M = TwkMath::Rec709FullRangeRGBToYUV8<float>();
             const Vec3f lumaCoefficients(M.m00, M.m01, M.m02);
 
             // Sees ACES spec for ACES Log for CDL.
-            const Vec3f refLow =
-                Vec3f(isACESLog ? 12860.643f : 0.001185417175293f);
+            const Vec3f refLow = Vec3f(isACESLog ? 12860.643f : 0.001185417175293f);
             const Vec3f refHigh = Vec3f(isACESLog ? 48742.586f : 222.875f);
 
             Mat44f toACES = TwkMath::Rec709ToACES<float>();
             Mat44f fromACES = TwkMath::ACESToRec709<float>();
             ;
 
-            const Function* F =
-                (isACESLog ? colorCDLForACESLog() : colorCDLForACESLinear());
+            const Function* F = (isACESLog ? colorCDLForACESLog() : colorCDLForACESLinear());
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], FA);
@@ -5758,11 +5008,9 @@ namespace IPCore
             return new Expression(F, args, FA->image());
         }
 
-        Expression* newDownSample(const IPImage* image, Expression* expr,
-                                  const int scale)
+        Expression* newDownSample(const IPImage* image, Expression* expr, const int scale)
         {
-            const Function* F =
-                scale % 2 ? resizeDownSample() : resizeDownSampleFast();
+            const Function* F = scale % 2 ? resizeDownSample() : resizeDownSampleFast();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], expr);
@@ -5789,11 +5037,9 @@ namespace IPCore
             return new Expression(F, args, expr->image());
         }
 
-        Expression* newUpSampleVertical(const IPImage* image, Expression* expr,
-                                        bool highQuality)
+        Expression* newUpSampleVertical(const IPImage* image, Expression* expr, bool highQuality)
         {
-            const Function* F = highQuality ? resizeUpSampleVerticalMitchell2()
-                                            : resizeUpSampleVertical2();
+            const Function* F = highQuality ? resizeUpSampleVerticalMitchell2() : resizeUpSampleVertical2();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], expr);
@@ -5806,12 +5052,9 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newUpSampleHorizontal(const IPImage* image,
-                                          Expression* expr, bool highQuality)
+        Expression* newUpSampleHorizontal(const IPImage* image, Expression* expr, bool highQuality)
         {
-            const Function* F = highQuality
-                                    ? resizeUpSampleHorizontalMitchell2()
-                                    : resizeUpSampleHorizontal2();
+            const Function* F = highQuality ? resizeUpSampleHorizontalMitchell2() : resizeUpSampleHorizontal2();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], expr);
@@ -5824,8 +5067,7 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newOpacity(const IPImage* image, Expression* expr,
-                               const float opacity)
+        Expression* newOpacity(const IPImage* image, Expression* expr, const float opacity)
         {
             const Function* F = Opacity();
             ArgumentVector args(F->parameters().size());
@@ -5838,13 +5080,10 @@ namespace IPCore
             return new Expression(F, args, image);
         }
 
-        Expression* newAngularMask(const IPImage* image, Expression* expr,
-                                   const TwkMath::Vec2f& pivot,
-                                   const float angleInRadians,
+        Expression* newAngularMask(const IPImage* image, Expression* expr, const TwkMath::Vec2f& pivot, const float angleInRadians,
                                    bool isReverseAngularMask)
         {
-            const Function* F =
-                isReverseAngularMask ? ReverseAngularMask() : AngularMask();
+            const Function* F = isReverseAngularMask ? ReverseAngularMask() : AngularMask();
             ArgumentVector args(F->parameters().size());
             size_t i = 0;
             args[i] = new BoundExpression(F->parameters()[i], expr);
@@ -5867,10 +5106,7 @@ namespace IPCore
 
             assert(image);
 
-            assert(
-                !(image->shaderExpr
-                  && image->shaderExpr->function()->type() == Function::Source
-                  && !force));
+            assert(!(image->shaderExpr && image->shaderExpr->function()->type() == Function::Source && !force));
 
             if (!fb)
             {
@@ -5884,8 +5120,7 @@ namespace IPCore
             //  Possibly swap in BGRA for RGBA or vice versa
             //
 
-            bgra = fb && bgra && fb->dataType() == FrameBuffer::UCHAR
-                   && fb->numChannels() == 4;
+            bgra = fb && bgra && fb->dataType() == FrameBuffer::UCHAR && fb->numChannels() == 4;
 
 #if 0
     if (image->shaderExpr && force && bgra &&
@@ -5929,15 +5164,11 @@ namespace IPCore
                     FrameBuffer* P2 = P1->nextPlane();
                     FrameBuffer* P3 = P2->nextPlane();
 
-                    if (P0->channelName(0) == "R" && P1->channelName(0) == "G"
-                        && P2->channelName(0) == "B"
-                        && P3->channelName(0) == "A")
+                    if (P0->channelName(0) == "R" && P1->channelName(0) == "G" && P2->channelName(0) == "B" && P3->channelName(0) == "A")
                     {
                         return newSourcePlanarRGBA(image);
                     }
-                    else if (P0->channelName(0) == "Y"
-                             && P1->channelName(0) == "U"
-                             && P2->channelName(0) == "V"
+                    else if (P0->channelName(0) == "Y" && P1->channelName(0) == "U" && P2->channelName(0) == "V"
                              && P3->channelName(0) == "A")
                     {
                         //
@@ -5946,9 +5177,7 @@ namespace IPCore
 
                         return newSourcePlanarYUVA(image, YUVtoRGBMatrix(fb));
                     }
-                    else if (P0->channelName(0) == "Y"
-                             && P1->channelName(0) == "RY"
-                             && P2->channelName(0) == "BY"
+                    else if (P0->channelName(0) == "Y" && P1->channelName(0) == "RY" && P2->channelName(0) == "BY"
                              && P3->channelName(0) == "A")
                     {
                         Vec3f w;
@@ -5967,23 +5196,18 @@ namespace IPCore
                     FrameBuffer* P1 = P0->nextPlane();
                     FrameBuffer* P2 = P1->nextPlane();
 
-                    if (P0->channelName(0) == "R" && P1->channelName(0) == "G"
-                        && P2->channelName(0) == "B")
+                    if (P0->channelName(0) == "R" && P1->channelName(0) == "G" && P2->channelName(0) == "B")
                     {
                         return newSourcePlanarRGB(image);
                     }
-                    else if (P0->channelName(0) == "Y"
-                             && P1->channelName(0) == "U"
-                             && P2->channelName(0) == "V")
+                    else if (P0->channelName(0) == "Y" && P1->channelName(0) == "U" && P2->channelName(0) == "V")
                     {
                         //
                         //    These are only for 8 bit
                         //
                         return newSourcePlanarYUV(image, YUVtoRGBMatrix(fb));
                     }
-                    else if (P0->channelName(0) == "Y"
-                             && P1->channelName(0) == "RY"
-                             && P2->channelName(0) == "BY")
+                    else if (P0->channelName(0) == "Y" && P1->channelName(0) == "RY" && P2->channelName(0) == "BY")
                     {
                         Vec3f w;
                         yrybyYweights(fb, w.x, w.y, w.z);
@@ -6000,9 +5224,7 @@ namespace IPCore
                 {
                     FrameBuffer* P1 = P0->nextPlane();
 
-                    if (P0->numChannels() == 1 && P1->numChannels() == 2
-                        && P0->channelName(0) == "Y"
-                        && P1->channelName(0) == "U"
+                    if (P0->numChannels() == 1 && P1->numChannels() == 2 && P0->channelName(0) == "Y" && P1->channelName(0) == "U"
                         && P1->channelName(1) == "V")
                     {
                         //
@@ -6011,11 +5233,8 @@ namespace IPCore
 
                         return newSourcePlanar2YUV(image, YUVtoRGBMatrix(fb));
                     }
-                    else if (P0->numChannels() == 2 && P1->numChannels() == 2
-                             && P0->channelName(0) == "Y"
-                             && P0->channelName(1) == "A"
-                             && P1->channelName(0) == "RY"
-                             && P1->channelName(1) == "BY")
+                    else if (P0->numChannels() == 2 && P1->numChannels() == 2 && P0->channelName(0) == "Y" && P0->channelName(1) == "A"
+                             && P1->channelName(0) == "RY" && P1->channelName(1) == "BY")
                     {
                         Vec3f w;
                         yrybyYweights(fb, w.x, w.y, w.z);
@@ -6047,23 +5266,19 @@ namespace IPCore
 
                     if (C0 == "R" && C1 == "G" && C2 == "B" && C3 == "A")
                     {
-                        return bgra ? newSourceBGRA(image)
-                                    : newSourceRGBA(image);
+                        return bgra ? newSourceBGRA(image) : newSourceRGBA(image);
                     }
                     else if (C0 == "B" && C1 == "G" && C2 == "R" && C3 == "A")
                     {
-                        return bgra ? newSourceRGBA(image)
-                                    : newSourceBGRA(image);
+                        return bgra ? newSourceRGBA(image) : newSourceBGRA(image);
                     }
                     else if (C0 == "A" && C1 == "R" && C2 == "G" && C3 == "B")
                     {
-                        return bgra ? newSourceARGBfromBGRA(image)
-                                    : newSourceARGB(image);
+                        return bgra ? newSourceARGBfromBGRA(image) : newSourceARGB(image);
                     }
                     else if (C0 == "A" && C1 == "B" && C2 == "G" && C3 == "R")
                     {
-                        return bgra ? newSourceABGRfromBGRA(image)
-                                    : newSourceABGR(image);
+                        return bgra ? newSourceABGRfromBGRA(image) : newSourceABGR(image);
                     }
                     else if (C0 == "Y" && C1 == "U" && C2 == "V" && C3 == "A")
                     {
@@ -6075,8 +5290,7 @@ namespace IPCore
                     }
                     else
                     {
-                        return bgra ? newSourceBGRA(image)
-                                    : newSourceRGBA(image);
+                        return bgra ? newSourceBGRA(image) : newSourceRGBA(image);
                     }
 
                     break;
@@ -6089,18 +5303,15 @@ namespace IPCore
 
                     if (C0 == "R" && C1 == "G" && C2 == "B")
                     {
-                        return bgra ? newSourceBGRA(image)
-                                    : newSourceRGBA(image);
+                        return bgra ? newSourceBGRA(image) : newSourceRGBA(image);
                     }
                     else if (C0 == "B" && C1 == "G" && C2 == "R")
                     {
-                        return bgra ? newSourceRGBA(image)
-                                    : newSourceBGRA(image);
+                        return bgra ? newSourceRGBA(image) : newSourceBGRA(image);
                     }
                     else
                     {
-                        return bgra ? newSourceBGRA(image)
-                                    : newSourceRGBA(image);
+                        return bgra ? newSourceBGRA(image) : newSourceRGBA(image);
                     }
                 }
 
@@ -6117,14 +5328,11 @@ namespace IPCore
                     {
                         return newSourceRGBA(image);
                     }
-                    else if (fb->dataType()
-                             == FrameBuffer::PACKED_X2_B10_G10_R10)
+                    else if (fb->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10)
                     {
                         return newSourceRGBA(image);
                     }
-                    else if (fb->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8
-                             || fb->dataType()
-                                    == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
+                    else if (fb->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8 || fb->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
                     {
                         return newSourceYVYU(image, YUVtoRGBMatrix(fb));
                     }
@@ -6142,8 +5350,7 @@ namespace IPCore
             return newSourceRGBA(image);
         }
 
-        Expression* replaceSourceWithExpression(Expression* root,
-                                                Expression* expr)
+        Expression* replaceSourceWithExpression(Expression* root, Expression* expr)
         {
             if (root->function()->type() == Function::Source)
             {
@@ -6155,8 +5362,7 @@ namespace IPCore
 
             for (size_t i = 0; i < args.size(); i++)
             {
-                if (BoundExpression* be =
-                        dynamic_cast<BoundExpression*>(args[i]))
+                if (BoundExpression* be = dynamic_cast<BoundExpression*>(args[i]))
                 {
                     Expression* value = be->value();
 
@@ -6166,8 +5372,7 @@ namespace IPCore
                         delete value;
                         return root;
                     }
-                    else if (Expression* rexpr =
-                                 replaceSourceWithExpression(value, expr))
+                    else if (Expression* rexpr = replaceSourceWithExpression(value, expr))
                     {
                         return root;
                     }
@@ -6188,8 +5393,7 @@ namespace IPCore
 
         // NOTE: global variable used to main gaussian weights
         // map key defined by radius and sigma
-        static std::map<unsigned int, TwkFB::FrameBuffer*>
-            allGaussianWeightsMap;
+        static std::map<unsigned int, TwkFB::FrameBuffer*> allGaussianWeightsMap;
         static boost::mutex gaussMutex;
 
         static unsigned int generateKeyForGaussian(size_t radius, float sigma)
@@ -6227,8 +5431,7 @@ namespace IPCore
             else
             {
                 // generate plain gaussian weights
-                vector<float> rawweights(
-                    radius + 1); // these are the plain gaussian weights
+                vector<float> rawweights(radius + 1); // these are the plain gaussian weights
                 rawweights[0] = 1.0;
                 for (int i = 1; i <= radius; ++i)
                 {
@@ -6241,16 +5444,13 @@ namespace IPCore
                 // weight (vec2) for each point we need to sample
                 size_t fastNo = radius / 2;
                 size_t dataSize = 1 + fastNo + radius % 2;
-                void* fbdata = FrameBuffer::allocateLargeBlock(3 * sizeof(float)
-                                                               * dataSize);
+                void* fbdata = FrameBuffer::allocateLargeBlock(3 * sizeof(float) * dataSize);
                 Vec3f* data = (Vec3f*)fbdata;
                 data[0] = Vec3f(0.0, 1.0, 0.0);
                 for (size_t i = 1; i <= fastNo; ++i)
                 {
                     data[i].y = rawweights[2 * i - 1] + rawweights[2 * i];
-                    data[i].x = ((2 * i - 1) * rawweights[2 * i - 1]
-                                 + 2 * i * rawweights[2 * i])
-                                / data[i].y;
+                    data[i].x = ((2 * i - 1) * rawweights[2 * i - 1] + 2 * i * rawweights[2 * i]) / data[i].y;
                     data[i].z = 0;
                 }
                 if (radius % 2 == 1)
@@ -6260,11 +5460,8 @@ namespace IPCore
                     data[fastNo + 1] = Vec3f(radius, rawweights[radius], 0);
                 }
 
-                result = new FrameBuffer(dataSize, 1, 3, FrameBuffer::FLOAT,
-                                         (unsigned char*)data, 0,
-                                         FrameBuffer::BOTTOMLEFT, false);
-                result->idstream()
-                    << "FastGaussianWeights" << radius << "_" << sigma;
+                result = new FrameBuffer(dataSize, 1, 3, FrameBuffer::FLOAT, (unsigned char*)data, 0, FrameBuffer::BOTTOMLEFT, false);
+                result->idstream() << "FastGaussianWeights" << radius << "_" << sigma;
 
                 allGaussianWeightsMap[gkey] = result;
             }
@@ -6283,15 +5480,13 @@ namespace IPCore
         }
 
         // utilize gl bilinear interp to reduce the number of samples we need
-        IPImage* applyFastGaussianFilter(const IPNode* node, IPImage* image,
-                                         size_t radius, float sigma)
+        IPImage* applyFastGaussianFilter(const IPNode* node, IPImage* image, size_t radius, float sigma)
         {
             size_t width = image->width;
             size_t height = image->height;
 
             // these are reference copies of the one in the global map
-            FrameBuffer* gaussFBH =
-                generateFastGaussianWeightsFB(radius, sigma);
+            FrameBuffer* gaussFBH = generateFastGaussianWeightsFB(radius, sigma);
             FrameBuffer* gaussFBV = gaussFBH->referenceCopy();
 
             // horizontal
@@ -6299,31 +5494,21 @@ namespace IPCore
             // upcoming image already has a number of complicated shaders on it,
             // it would be worth making this one intermediate. otherwise it
             // should be faster to make this current
-            IPImage* gaussHorizontal =
-                new IPImage(node, IPImage::BlendRenderType, width, height, 1.0,
-                            IPImage::IntermediateBuffer);
-            gaussHorizontal->shaderExpr =
-                Shader::newSourceRGBA(gaussHorizontal);
-            gaussHorizontal->shaderExpr =
-                Shader::newFilterGaussianHorizontalFast(
-                    gaussHorizontal->shaderExpr, gaussFBH, radius);
+            IPImage* gaussHorizontal = new IPImage(node, IPImage::BlendRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
+            gaussHorizontal->shaderExpr = Shader::newSourceRGBA(gaussHorizontal);
+            gaussHorizontal->shaderExpr = Shader::newFilterGaussianHorizontalFast(gaussHorizontal->shaderExpr, gaussFBH, radius);
 
             gaussHorizontal->appendChild(image);
 
             // vertical
-            IPImage* gaussVertical =
-                new IPImage(node, IPImage::BlendRenderType, width, height, 1.0,
-                            IPImage::IntermediateBuffer);
+            IPImage* gaussVertical = new IPImage(node, IPImage::BlendRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
             gaussVertical->shaderExpr = Shader::newSourceRGBA(gaussVertical);
-            gaussVertical->shaderExpr = Shader::newFilterGaussianVerticalFast(
-                gaussVertical->shaderExpr, gaussFBV, radius);
+            gaussVertical->shaderExpr = Shader::newFilterGaussianVerticalFast(gaussVertical->shaderExpr, gaussFBV, radius);
             gaussVertical->appendChild(gaussHorizontal);
 
             // this is to make sure the gaussian (both v and h) are rendered
             // into intermediate, and cached
-            IPImage* root =
-                new IPImage(node, IPImage::BlendRenderType, width, height, 1.0,
-                            IPImage::IntermediateBuffer);
+            IPImage* root = new IPImage(node, IPImage::BlendRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
             root->shaderExpr = Shader::newSourceRGBA(root);
             root->appendChild(gaussVertical);
 
@@ -6331,8 +5516,7 @@ namespace IPCore
         }
 
         // use default sigma (e^-3)
-        IPImage* applyFastGaussianFilter(const IPNode* node, IPImage* image,
-                                         size_t radius)
+        IPImage* applyFastGaussianFilter(const IPNode* node, IPImage* image, size_t radius)
         {
             // 3 sigma away is 0.05 (this is a good default value)
             // 4.5 sigma away is 0.01 effectively 0 as far as filter is
@@ -6345,8 +5529,7 @@ namespace IPCore
         // plain gaussian, no magic. compute exp in shader. for small kernels
         // like 3 by 3, it is not worth sending weights in as a framebuffer. do
         // it the old fashioned way
-        IPImage* applyGaussianFilter(const IPNode* node, IPImage* image,
-                                     size_t radius, float sigma)
+        IPImage* applyGaussianFilter(const IPNode* node, IPImage* image, size_t radius, float sigma)
         {
 
             size_t width = image->width;
@@ -6357,29 +5540,20 @@ namespace IPCore
             // upcoming image already has a number of complicated shaders on it,
             // it would be worth making this one intermediate. otherwise it
             // should be faster to make this current
-            IPImage* gaussHorizontal =
-                new IPImage(node, IPImage::BlendRenderType, width, height, 1.0,
-                            IPImage::IntermediateBuffer);
-            gaussHorizontal->shaderExpr =
-                Shader::newSourceRGBA(gaussHorizontal);
-            gaussHorizontal->shaderExpr = Shader::newFilterGaussianHorizontal(
-                gaussHorizontal->shaderExpr, radius, sigma);
+            IPImage* gaussHorizontal = new IPImage(node, IPImage::BlendRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
+            gaussHorizontal->shaderExpr = Shader::newSourceRGBA(gaussHorizontal);
+            gaussHorizontal->shaderExpr = Shader::newFilterGaussianHorizontal(gaussHorizontal->shaderExpr, radius, sigma);
             gaussHorizontal->appendChild(image);
 
             // vertical
-            IPImage* gaussVertical =
-                new IPImage(node, IPImage::BlendRenderType, width, height, 1.0,
-                            IPImage::IntermediateBuffer);
+            IPImage* gaussVertical = new IPImage(node, IPImage::BlendRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
             gaussVertical->shaderExpr = Shader::newSourceRGBA(gaussVertical);
-            gaussVertical->shaderExpr = Shader::newFilterGaussianVertical(
-                gaussVertical->shaderExpr, radius, sigma);
+            gaussVertical->shaderExpr = Shader::newFilterGaussianVertical(gaussVertical->shaderExpr, radius, sigma);
             gaussVertical->appendChild(gaussHorizontal);
 
             // this is to make sure the gaussian (both v and h) are rendered
             // into intermediate, and cached
-            IPImage* root =
-                new IPImage(node, IPImage::BlendRenderType, width, height, 1.0,
-                            IPImage::IntermediateBuffer);
+            IPImage* root = new IPImage(node, IPImage::BlendRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
             root->shaderExpr = Shader::newSourceRGBA(root);
             root->appendChild(gaussVertical);
 
@@ -6387,8 +5561,7 @@ namespace IPCore
         }
 
         // use default sigma (e^-3)
-        IPImage* applyGaussianFilter(const IPNode* node, IPImage* image,
-                                     size_t radius)
+        IPImage* applyGaussianFilter(const IPNode* node, IPImage* image, size_t radius)
         {
             // 3 sigma away is 0.05 (this is a good default value)
             // 4.5 sigma away is 0.01 effectively 0 as far as filter is

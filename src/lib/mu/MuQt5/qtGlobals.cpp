@@ -50,9 +50,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    bool qt__operatorBang_EQ__bool_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                               Pointer param_s1,
-                                               Pointer param_s2)
+    bool qt__operatorBang_EQ__bool_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_s1, Pointer param_s2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg0 = getqtype<QSizeType>(param_s1);
@@ -60,9 +58,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    Pointer qt__operatorStar__QSize_QSize_double(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_size,
-                                                 double param_factor)
+    Pointer qt__operatorStar__QSize_QSize_double(Mu::Thread& NODE_THREAD, Pointer param_size, double param_factor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg0 = getqtype<QSizeType>(param_size);
@@ -70,9 +66,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, ::operator*(arg0, arg1), "qt.QSize");
     }
 
-    Pointer qt__operatorStar__QSize_double_QSize(Mu::Thread& NODE_THREAD,
-                                                 double param_factor,
-                                                 Pointer param_size)
+    Pointer qt__operatorStar__QSize_double_QSize(Mu::Thread& NODE_THREAD, double param_factor, Pointer param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_factor);
@@ -80,9 +74,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, ::operator*(arg0, arg1), "qt.QSize");
     }
 
-    Pointer qt__operatorPlus__QSize_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                                Pointer param_s1,
-                                                Pointer param_s2)
+    Pointer qt__operatorPlus__QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_s1, Pointer param_s2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg0 = getqtype<QSizeType>(param_s1);
@@ -90,9 +82,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, ::operator+(arg0, arg1), "qt.QSize");
     }
 
-    Pointer qt__operatorMinus__QSize_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_s1,
-                                                 Pointer param_s2)
+    Pointer qt__operatorMinus__QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_s1, Pointer param_s2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg0 = getqtype<QSizeType>(param_s1);
@@ -100,9 +90,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, ::operator-(arg0, arg1), "qt.QSize");
     }
 
-    Pointer qt__operatorSlash__QSize_QSize_double(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_size,
-                                                  double param_divisor)
+    Pointer qt__operatorSlash__QSize_QSize_double(Mu::Thread& NODE_THREAD, Pointer param_size, double param_divisor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg0 = getqtype<QSizeType>(param_size);
@@ -110,8 +98,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, ::operator/(arg0, arg1), "qt.QSize");
     }
 
-    bool qt__operatorEQ_EQ__bool_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                             Pointer param_s1, Pointer param_s2)
+    bool qt__operatorEQ_EQ__bool_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_s1, Pointer param_s2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg0 = getqtype<QSizeType>(param_s1);
@@ -119,9 +106,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorBang_EQ__bool_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_p1,
-                                                 Pointer param_p2)
+    bool qt__operatorBang_EQ__bool_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_p1);
@@ -129,9 +114,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    Pointer qt__operatorStar__QPoint_QPoint_double(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_point,
-                                                   double param_factor)
+    Pointer qt__operatorStar__QPoint_QPoint_double(Mu::Thread& NODE_THREAD, Pointer param_point, double param_factor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
@@ -139,9 +122,7 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator*(arg0, arg1), "qt.QPoint");
     }
 
-    Pointer qt__operatorStar__QPoint_double_QPoint(Mu::Thread& NODE_THREAD,
-                                                   double param_factor,
-                                                   Pointer param_point)
+    Pointer qt__operatorStar__QPoint_double_QPoint(Mu::Thread& NODE_THREAD, double param_factor, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_factor);
@@ -149,9 +130,7 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator*(arg0, arg1), "qt.QPoint");
     }
 
-    Pointer qt__operatorPlus__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_p1,
-                                                   Pointer param_p2)
+    Pointer qt__operatorPlus__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_p1);
@@ -159,9 +138,7 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator+(arg0, arg1), "qt.QPoint");
     }
 
-    Pointer qt__operatorMinus__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_p1,
-                                                    Pointer param_p2)
+    Pointer qt__operatorMinus__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_p1);
@@ -169,17 +146,14 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator-(arg0, arg1), "qt.QPoint");
     }
 
-    Pointer qt__operatorMinus__QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                             Pointer param_point)
+    Pointer qt__operatorMinus__QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
         return makeqtype<QPointType>(c, ::operator-(arg0), "qt.QPoint");
     }
 
-    Pointer qt__operatorSlash__QPoint_QPoint_double(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_point,
-                                                    double param_divisor)
+    Pointer qt__operatorSlash__QPoint_QPoint_double(Mu::Thread& NODE_THREAD, Pointer param_point, double param_divisor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
@@ -187,9 +161,7 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator/(arg0, arg1), "qt.QPoint");
     }
 
-    bool qt__operatorEQ_EQ__bool_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                               Pointer param_p1,
-                                               Pointer param_p2)
+    bool qt__operatorEQ_EQ__bool_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_p1);
@@ -197,9 +169,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorBang_EQ__bool_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                               Pointer param_r1,
-                                               Pointer param_r2)
+    bool qt__operatorBang_EQ__bool_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_r1, Pointer param_r2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRect arg0 = getqtype<QRectType>(param_r1);
@@ -207,8 +177,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                             Pointer param_r1, Pointer param_r2)
+    bool qt__operatorEQ_EQ__bool_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_r1, Pointer param_r2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRect arg0 = getqtype<QRectType>(param_r1);
@@ -216,9 +185,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorBang_EQ__bool_QVariant_QVariant(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_v1,
-                                                     Pointer param_v2)
+    bool qt__operatorBang_EQ__bool_QVariant_QVariant(Mu::Thread& NODE_THREAD, Pointer param_v1, Pointer param_v2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QVariant arg0 = getqtype<QVariantType>(param_v1);
@@ -226,9 +193,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_QVariant_QVariant(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_v1,
-                                                   Pointer param_v2)
+    bool qt__operatorEQ_EQ__bool_QVariant_QVariant(Mu::Thread& NODE_THREAD, Pointer param_v1, Pointer param_v2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QVariant arg0 = getqtype<QVariantType>(param_v1);
@@ -236,8 +201,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_QKeyEvent_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_e, int param_key)
+    bool qt__operatorEQ_EQ__bool_QKeyEvent_int(Mu::Thread& NODE_THREAD, Pointer param_e, int param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_e);
@@ -245,8 +209,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                               int param_key, Pointer param_e)
+    bool qt__operatorEQ_EQ__bool_int_QKeyEvent(Mu::Thread& NODE_THREAD, int param_key, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeySequence::StandardKey arg0 = (QKeySequence::StandardKey)(param_key);
@@ -268,8 +231,7 @@ namespace Mu
         return ::qBlue(arg0);
     }
 
-    int qt__qGray_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r,
-                                  int param_g, int param_b)
+    int qt__qGray_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r, int param_g, int param_b)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_r);
@@ -299,8 +261,7 @@ namespace Mu
         return ::qRed(arg0);
     }
 
-    int qt__qRgb_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r,
-                                 int param_g, int param_b)
+    int qt__qRgb_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r, int param_g, int param_b)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_r);
@@ -309,8 +270,7 @@ namespace Mu
         return ::qRgb(arg0, arg1, arg2);
     }
 
-    int qt__qRgba_int_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r,
-                                      int param_g, int param_b, int param_a)
+    int qt__qRgba_int_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r, int param_g, int param_b, int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_r);
@@ -320,28 +280,22 @@ namespace Mu
         return ::qRgba(arg0, arg1, arg2, arg3);
     }
 
-    Pointer qt__qCompress_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_data,
-                                                    int param_compressionLevel)
+    Pointer qt__qCompress_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_data, int param_compressionLevel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_data);
         int arg1 = (int)(param_compressionLevel);
-        return makeqtype<QByteArrayType>(c, ::qCompress(arg0, arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, ::qCompress(arg0, arg1), "qt.QByteArray");
     }
 
-    Pointer qt__qUncompress_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_data)
+    Pointer qt__qUncompress_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_data)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_data);
-        return makeqtype<QByteArrayType>(c, ::qUncompress(arg0),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, ::qUncompress(arg0), "qt.QByteArray");
     }
 
-    bool qt__operatorBang_EQ__bool_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
+    bool qt__operatorBang_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
@@ -349,19 +303,15 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    Pointer qt__operatorPlus__QByteArray_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
+    Pointer qt__operatorPlus__QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
         const QByteArray arg1 = getqtype<QByteArrayType>(param_a2);
-        return makeqtype<QByteArrayType>(c, ::operator+(arg0, arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, ::operator+(arg0, arg1), "qt.QByteArray");
     }
 
-    bool qt__operatorLT__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_a1,
-                                                    Pointer param_a2)
+    bool qt__operatorLT__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
@@ -369,9 +319,7 @@ namespace Mu
         return ::operator<(arg0, arg1);
     }
 
-    bool qt__operatorLT_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_a1,
-                                                       Pointer param_a2)
+    bool qt__operatorLT_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
@@ -379,9 +327,7 @@ namespace Mu
         return ::operator<=(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_a1,
-                                                       Pointer param_a2)
+    bool qt__operatorEQ_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
@@ -389,9 +335,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorGT__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_a1,
-                                                    Pointer param_a2)
+    bool qt__operatorGT__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
@@ -399,9 +343,7 @@ namespace Mu
         return ::operator>(arg0, arg1);
     }
 
-    bool qt__operatorGT_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_a1,
-                                                       Pointer param_a2)
+    bool qt__operatorGT_EQ__bool_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_a1, Pointer param_a2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_a1);
@@ -409,9 +351,7 @@ namespace Mu
         return ::operator>=(arg0, arg1);
     }
 
-    bool qt__operatorBang_EQ__bool_QMargins_QMargins(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_m1,
-                                                     Pointer param_m2)
+    bool qt__operatorBang_EQ__bool_QMargins_QMargins(Mu::Thread& NODE_THREAD, Pointer param_m1, Pointer param_m2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QMargins arg0 = getqtype<QMarginsType>(param_m1);
@@ -419,9 +359,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_QMargins_QMargins(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_m1,
-                                                   Pointer param_m2)
+    bool qt__operatorEQ_EQ__bool_QMargins_QMargins(Mu::Thread& NODE_THREAD, Pointer param_m1, Pointer param_m2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QMargins arg0 = getqtype<QMarginsType>(param_m1);
@@ -429,9 +367,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__qFuzzyCompare_bool_QMatrix_QMatrix(Mu::Thread& NODE_THREAD,
-                                                Pointer param_m1,
-                                                Pointer param_m2)
+    bool qt__qFuzzyCompare_bool_QMatrix_QMatrix(Mu::Thread& NODE_THREAD, Pointer param_m1, Pointer param_m2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QMatrix arg0 = getqtype<QMatrixType>(param_m1);
@@ -439,9 +375,7 @@ namespace Mu
         return ::qFuzzyCompare(arg0, arg1);
     }
 
-    Pointer qt__operatorStar__QPoint_QPoint_QMatrix(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_point,
-                                                    Pointer param_matrix)
+    Pointer qt__operatorStar__QPoint_QPoint_QMatrix(Mu::Thread& NODE_THREAD, Pointer param_point, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
@@ -449,9 +383,7 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator*(arg0, arg1), "qt.QPoint");
     }
 
-    Pointer qt__operatorStar__QPointF_QPointF_QMatrix(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_point,
-                                                      Pointer param_matrix)
+    Pointer qt__operatorStar__QPointF_QPointF_QMatrix(Mu::Thread& NODE_THREAD, Pointer param_point, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_point);
@@ -459,9 +391,7 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator*(arg0, arg1), "qt.QPointF");
     }
 
-    Pointer qt__operatorStar__QRegion_QRegion_QMatrix(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_region,
-                                                      Pointer param_matrix)
+    Pointer qt__operatorStar__QRegion_QRegion_QMatrix(Mu::Thread& NODE_THREAD, Pointer param_region, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion arg0 = getqtype<QRegionType>(param_region);
@@ -469,9 +399,7 @@ namespace Mu
         return makeqtype<QRegionType>(c, ::operator*(arg0, arg1), "qt.QRegion");
     }
 
-    bool qt__qFuzzyCompare_bool_QTransform_QTransform(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_t1,
-                                                      Pointer param_t2)
+    bool qt__qFuzzyCompare_bool_QTransform_QTransform(Mu::Thread& NODE_THREAD, Pointer param_t1, Pointer param_t2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTransform arg0 = getqtype<QTransformType>(param_t1);
@@ -479,9 +407,7 @@ namespace Mu
         return ::qFuzzyCompare(arg0, arg1);
     }
 
-    Pointer qt__operatorStar__QPoint_QPoint_QTransform(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_point,
-                                                       Pointer param_matrix)
+    Pointer qt__operatorStar__QPoint_QPoint_QTransform(Mu::Thread& NODE_THREAD, Pointer param_point, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
@@ -489,8 +415,7 @@ namespace Mu
         return makeqtype<QPointType>(c, ::operator*(arg0, arg1), "qt.QPoint");
     }
 
-    Pointer qt__operatorStar__QPointF_QPointF_QTransform(
-        Mu::Thread& NODE_THREAD, Pointer param_point, Pointer param_matrix)
+    Pointer qt__operatorStar__QPointF_QPointF_QTransform(Mu::Thread& NODE_THREAD, Pointer param_point, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_point);
@@ -498,8 +423,7 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator*(arg0, arg1), "qt.QPointF");
     }
 
-    Pointer qt__operatorStar__QRegion_QRegion_QTransform(
-        Mu::Thread& NODE_THREAD, Pointer param_region, Pointer param_matrix)
+    Pointer qt__operatorStar__QRegion_QRegion_QTransform(Mu::Thread& NODE_THREAD, Pointer param_region, Pointer param_matrix)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion arg0 = getqtype<QRegionType>(param_region);
@@ -507,9 +431,7 @@ namespace Mu
         return makeqtype<QRegionType>(c, ::operator*(arg0, arg1), "qt.QRegion");
     }
 
-    bool qt__operatorBang_EQ__bool_QPointF_QPointF(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_p1,
-                                                   Pointer param_p2)
+    bool qt__operatorBang_EQ__bool_QPointF_QPointF(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_p1);
@@ -517,9 +439,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    Pointer qt__operatorStar__QPointF_QPointF_double(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_point,
-                                                     double param_factor)
+    Pointer qt__operatorStar__QPointF_QPointF_double(Mu::Thread& NODE_THREAD, Pointer param_point, double param_factor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_point);
@@ -527,9 +447,7 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator*(arg0, arg1), "qt.QPointF");
     }
 
-    Pointer qt__operatorStar__QPointF_double_QPointF(Mu::Thread& NODE_THREAD,
-                                                     double param_factor,
-                                                     Pointer param_point)
+    Pointer qt__operatorStar__QPointF_double_QPointF(Mu::Thread& NODE_THREAD, double param_factor, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_factor);
@@ -537,9 +455,7 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator*(arg0, arg1), "qt.QPointF");
     }
 
-    Pointer qt__operatorPlus__QPointF_QPointF_QPointF(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_p1,
-                                                      Pointer param_p2)
+    Pointer qt__operatorPlus__QPointF_QPointF_QPointF(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_p1);
@@ -547,9 +463,7 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator+(arg0, arg1), "qt.QPointF");
     }
 
-    Pointer qt__operatorMinus__QPointF_QPointF_QPointF(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_p1,
-                                                       Pointer param_p2)
+    Pointer qt__operatorMinus__QPointF_QPointF_QPointF(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_p1);
@@ -557,17 +471,14 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator-(arg0, arg1), "qt.QPointF");
     }
 
-    Pointer qt__operatorMinus__QPointF_QPointF(Mu::Thread& NODE_THREAD,
-                                               Pointer param_point)
+    Pointer qt__operatorMinus__QPointF_QPointF(Mu::Thread& NODE_THREAD, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_point);
         return makeqtype<QPointFType>(c, ::operator-(arg0), "qt.QPointF");
     }
 
-    Pointer qt__operatorSlash__QPointF_QPointF_double(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_point,
-                                                      double param_divisor)
+    Pointer qt__operatorSlash__QPointF_QPointF_double(Mu::Thread& NODE_THREAD, Pointer param_point, double param_divisor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_point);
@@ -575,9 +486,7 @@ namespace Mu
         return makeqtype<QPointFType>(c, ::operator/(arg0, arg1), "qt.QPointF");
     }
 
-    bool qt__operatorEQ_EQ__bool_QPointF_QPointF(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_p1,
-                                                 Pointer param_p2)
+    bool qt__operatorEQ_EQ__bool_QPointF_QPointF(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg0 = getqtype<QPointFType>(param_p1);
@@ -585,9 +494,7 @@ namespace Mu
         return ::operator==(arg0, arg1);
     }
 
-    bool qt__operatorBang_EQ__bool_QRectF_QRectF(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_r1,
-                                                 Pointer param_r2)
+    bool qt__operatorBang_EQ__bool_QRectF_QRectF(Mu::Thread& NODE_THREAD, Pointer param_r1, Pointer param_r2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRectF arg0 = getqtype<QRectFType>(param_r1);
@@ -595,9 +502,7 @@ namespace Mu
         return ::operator!=(arg0, arg1);
     }
 
-    bool qt__operatorEQ_EQ__bool_QRectF_QRectF(Mu::Thread& NODE_THREAD,
-                                               Pointer param_r1,
-                                               Pointer param_r2)
+    bool qt__operatorEQ_EQ__bool_QRectF_QRectF(Mu::Thread& NODE_THREAD, Pointer param_r1, Pointer param_r2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRectF arg0 = getqtype<QRectFType>(param_r1);
@@ -607,346 +512,277 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QSize_QSize(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QSize_QSize(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_0, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QSize_QSize_double(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt__operatorStar__QSize_QSize_double(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_1, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QSize_double_QSize(
-            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QSize_double_QSize(NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_0, Pointer)
     {
-        NODE_RETURN(qt__operatorPlus__QSize_QSize_QSize(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorPlus__QSize_QSize_QSize(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_0, Pointer)
     {
-        NODE_RETURN(qt__operatorMinus__QSize_QSize_QSize(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorMinus__QSize_QSize_QSize(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorSlash_0, Pointer)
     {
-        NODE_RETURN(qt__operatorSlash__QSize_QSize_double(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt__operatorSlash__QSize_QSize_double(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QSize_QSize(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QSize_QSize(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_1, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QPoint_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QPoint_QPoint(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_2, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPoint_QPoint_double(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt__operatorStar__QPoint_QPoint_double(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_3, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPoint_double_QPoint(
-            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QPoint_double_QPoint(NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_1, Pointer)
     {
-        NODE_RETURN(qt__operatorPlus__QPoint_QPoint_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorPlus__QPoint_QPoint_QPoint(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_1, Pointer)
     {
-        NODE_RETURN(qt__operatorMinus__QPoint_QPoint_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorMinus__QPoint_QPoint_QPoint(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_2, Pointer)
     {
-        NODE_RETURN(qt__operatorMinus__QPoint_QPoint(NODE_THREAD,
-                                                     NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt__operatorMinus__QPoint_QPoint(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorSlash_1, Pointer)
     {
-        NODE_RETURN(qt__operatorSlash__QPoint_QPoint_double(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt__operatorSlash__QPoint_QPoint_double(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_1, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QPoint_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QPoint_QPoint(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_2, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QRect_QRect(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QRect_QRect(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_2, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QRect_QRect(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QRect_QRect(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_3, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QVariant_QVariant(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QVariant_QVariant(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_3, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QVariant_QVariant(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QVariant_QVariant(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_4, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QKeyEvent_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QKeyEvent_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_5, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_int_QKeyEvent(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_int_QKeyEvent(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_qAlpha0, int)
-    {
-        NODE_RETURN(qt__qAlpha_int_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_qAlpha0, int) { NODE_RETURN(qt__qAlpha_int_int(NODE_THREAD, NODE_ARG(0, int))); }
 
-    static NODE_IMPLEMENTATION(_n_qBlue0, int)
-    {
-        NODE_RETURN(qt__qBlue_int_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_qBlue0, int) { NODE_RETURN(qt__qBlue_int_int(NODE_THREAD, NODE_ARG(0, int))); }
 
     static NODE_IMPLEMENTATION(_n_qGray0, int)
     {
-        NODE_RETURN(qt__qGray_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int)));
+        NODE_RETURN(qt__qGray_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_qGray1, int)
-    {
-        NODE_RETURN(qt__qGray_int_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_qGray1, int) { NODE_RETURN(qt__qGray_int_int(NODE_THREAD, NODE_ARG(0, int))); }
 
-    static NODE_IMPLEMENTATION(_n_qGreen0, int)
-    {
-        NODE_RETURN(qt__qGreen_int_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_qGreen0, int) { NODE_RETURN(qt__qGreen_int_int(NODE_THREAD, NODE_ARG(0, int))); }
 
-    static NODE_IMPLEMENTATION(_n_qRed0, int)
-    {
-        NODE_RETURN(qt__qRed_int_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_qRed0, int) { NODE_RETURN(qt__qRed_int_int(NODE_THREAD, NODE_ARG(0, int))); }
 
     static NODE_IMPLEMENTATION(_n_qRgb0, int)
     {
-        NODE_RETURN(qt__qRgb_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int)));
+        NODE_RETURN(qt__qRgb_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_qRgba0, int)
     {
-        NODE_RETURN(qt__qRgba_int_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int),
-            NODE_ARG(3, int)));
+        NODE_RETURN(qt__qRgba_int_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_qCompress0, Pointer)
     {
-        NODE_RETURN(qt__qCompress_QByteArray_QByteArray_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt__qCompress_QByteArray_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_qUncompress0, Pointer)
     {
-        NODE_RETURN(qt__qUncompress_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt__qUncompress_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_4, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_6, Pointer)
     {
-        NODE_RETURN(qt__operatorPlus__QByteArray_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorPlus__QByteArray_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorLT_0, bool)
     {
-        NODE_RETURN(qt__operatorLT__bool_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorLT__bool_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorLT_EQ_0, bool)
     {
-        NODE_RETURN(qt__operatorLT_EQ__bool_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorLT_EQ__bool_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_6, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorGT_0, bool)
     {
-        NODE_RETURN(qt__operatorGT__bool_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorGT__bool_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorGT_EQ_0, bool)
     {
-        NODE_RETURN(qt__operatorGT_EQ__bool_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorGT_EQ__bool_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_7, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QMargins_QMargins(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QMargins_QMargins(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_9, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QMargins_QMargins(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QMargins_QMargins(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_qFuzzyCompare0, bool)
     {
-        NODE_RETURN(qt__qFuzzyCompare_bool_QMatrix_QMatrix(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__qFuzzyCompare_bool_QMatrix_QMatrix(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_4, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPoint_QPoint_QMatrix(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QPoint_QPoint_QMatrix(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_5, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPointF_QPointF_QMatrix(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QPointF_QPointF_QMatrix(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_10, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QRegion_QRegion_QMatrix(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QRegion_QRegion_QMatrix(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_qFuzzyCompare1, bool)
     {
-        NODE_RETURN(qt__qFuzzyCompare_bool_QTransform_QTransform(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__qFuzzyCompare_bool_QTransform_QTransform(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_12, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPoint_QPoint_QTransform(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QPoint_QPoint_QTransform(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_13, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPointF_QPointF_QTransform(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QPointF_QPointF_QTransform(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_18, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QRegion_QRegion_QTransform(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QRegion_QRegion_QTransform(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_8, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QPointF_QPointF(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QPointF_QPointF(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_20, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPointF_QPointF_double(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt__operatorStar__QPointF_QPointF_double(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorStar_21, Pointer)
     {
-        NODE_RETURN(qt__operatorStar__QPointF_double_QPointF(
-            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorStar__QPointF_double_QPointF(NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_7, Pointer)
     {
-        NODE_RETURN(qt__operatorPlus__QPointF_QPointF_QPointF(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorPlus__QPointF_QPointF_QPointF(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_3, Pointer)
     {
-        NODE_RETURN(qt__operatorMinus__QPointF_QPointF_QPointF(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorMinus__QPointF_QPointF_QPointF(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_4, Pointer)
     {
-        NODE_RETURN(qt__operatorMinus__QPointF_QPointF(NODE_THREAD,
-                                                       NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt__operatorMinus__QPointF_QPointF(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorSlash_2, Pointer)
     {
-        NODE_RETURN(qt__operatorSlash__QPointF_QPointF_double(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt__operatorSlash__QPointF_QPointF_double(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_10, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QPointF_QPointF(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QPointF_QPointF(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_9, bool)
     {
-        NODE_RETURN(qt__operatorBang_EQ__bool_QRectF_QRectF(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorBang_EQ__bool_QRectF_QRectF(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_11, bool)
     {
-        NODE_RETURN(qt__operatorEQ_EQ__bool_QRectF_QRectF(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt__operatorEQ_EQ__bool_QRectF_QRectF(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void qtModule::loadGlobals()
@@ -992,46 +828,28 @@ namespace Mu
             // qVariantSetValue (void; QVariant variant, "const T &" value)
             // MISSING: qVariantValue ("T"; QVariant value)
             // MISSING: qvariant_cast ("T"; QVariant value)
-            new Function(c, "qAlpha", _n_qAlpha0, None, Compiled,
-                         qt__qAlpha_int_int, Return, "int", Parameters,
+            new Function(c, "qAlpha", _n_qAlpha0, None, Compiled, qt__qAlpha_int_int, Return, "int", Parameters,
                          new Param(c, "rgba", "int"), End),
-            new Function(c, "qBlue", _n_qBlue0, None, Compiled,
-                         qt__qBlue_int_int, Return, "int", Parameters,
-                         new Param(c, "rgb", "int"), End),
-            new Function(c, "qGray", _n_qGray0, None, Compiled,
-                         qt__qGray_int_int_int_int, Return, "int", Parameters,
-                         new Param(c, "r", "int"), new Param(c, "g", "int"),
-                         new Param(c, "b", "int"), End),
-            new Function(c, "qGray", _n_qGray1, None, Compiled,
-                         qt__qGray_int_int, Return, "int", Parameters,
-                         new Param(c, "rgb", "int"), End),
-            new Function(c, "qGreen", _n_qGreen0, None, Compiled,
-                         qt__qGreen_int_int, Return, "int", Parameters,
-                         new Param(c, "rgb", "int"), End),
-            new Function(c, "qRed", _n_qRed0, None, Compiled, qt__qRed_int_int,
-                         Return, "int", Parameters, new Param(c, "rgb", "int"),
+            new Function(c, "qBlue", _n_qBlue0, None, Compiled, qt__qBlue_int_int, Return, "int", Parameters, new Param(c, "rgb", "int"),
                          End),
-            new Function(c, "qRgb", _n_qRgb0, None, Compiled,
-                         qt__qRgb_int_int_int_int, Return, "int", Parameters,
-                         new Param(c, "r", "int"), new Param(c, "g", "int"),
-                         new Param(c, "b", "int"), End),
-            new Function(c, "qRgba", _n_qRgba0, None, Compiled,
-                         qt__qRgba_int_int_int_int_int, Return, "int",
-                         Parameters, new Param(c, "r", "int"),
-                         new Param(c, "g", "int"), new Param(c, "b", "int"),
-                         new Param(c, "a", "int"), End),
+            new Function(c, "qGray", _n_qGray0, None, Compiled, qt__qGray_int_int_int_int, Return, "int", Parameters,
+                         new Param(c, "r", "int"), new Param(c, "g", "int"), new Param(c, "b", "int"), End),
+            new Function(c, "qGray", _n_qGray1, None, Compiled, qt__qGray_int_int, Return, "int", Parameters, new Param(c, "rgb", "int"),
+                         End),
+            new Function(c, "qGreen", _n_qGreen0, None, Compiled, qt__qGreen_int_int, Return, "int", Parameters, new Param(c, "rgb", "int"),
+                         End),
+            new Function(c, "qRed", _n_qRed0, None, Compiled, qt__qRed_int_int, Return, "int", Parameters, new Param(c, "rgb", "int"), End),
+            new Function(c, "qRgb", _n_qRgb0, None, Compiled, qt__qRgb_int_int_int_int, Return, "int", Parameters, new Param(c, "r", "int"),
+                         new Param(c, "g", "int"), new Param(c, "b", "int"), End),
+            new Function(c, "qRgba", _n_qRgba0, None, Compiled, qt__qRgba_int_int_int_int_int, Return, "int", Parameters,
+                         new Param(c, "r", "int"), new Param(c, "g", "int"), new Param(c, "b", "int"), new Param(c, "a", "int"), End),
             // MISSING: qChecksum ("quint16"; "const char *" data, int len)
-            new Function(c, "qCompress", _n_qCompress0, None, Compiled,
-                         qt__qCompress_QByteArray_QByteArray_int, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "data", "qt.QByteArray"),
-                         new Param(c, "compressionLevel", "int"), End),
+            new Function(c, "qCompress", _n_qCompress0, None, Compiled, qt__qCompress_QByteArray_QByteArray_int, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "data", "qt.QByteArray"), new Param(c, "compressionLevel", "int"), End),
             // MISSING: qCompress (QByteArray; "const uchar *" data, int nbytes,
             // int compressionLevel)
-            new Function(c, "qUncompress", _n_qUncompress0, None, Compiled,
-                         qt__qUncompress_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "data", "qt.QByteArray"), End),
+            new Function(c, "qUncompress", _n_qUncompress0, None, Compiled, qt__qUncompress_QByteArray_QByteArray, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "data", "qt.QByteArray"), End),
             // MISSING: qUncompress (QByteArray; "const uchar *" data, int
             // nbytes) MISSING: qsnprintf (int; "char *" str, "size_t" n, "const
             // char *" fmt, "..." _p45) MISSING: qstrcmp (int; "const char *"
@@ -1045,114 +863,64 @@ namespace Mu
             // char *" str2, int len) MISSING: qstrnlen (int; "const char *"
             // str, int maxlen) MISSING: qvsnprintf (int; "char *" str, "size_t"
             // n, "const char *" fmt, "va_list" ap)
-            new Function(c, "qFuzzyCompare", _n_qFuzzyCompare0, None, Compiled,
-                         qt__qFuzzyCompare_bool_QMatrix_QMatrix, Return, "bool",
-                         Parameters, new Param(c, "m1", "qt.QMatrix"),
-                         new Param(c, "m2", "qt.QMatrix"), End),
-            new Function(c, "qFuzzyCompare", _n_qFuzzyCompare1, None, Compiled,
-                         qt__qFuzzyCompare_bool_QTransform_QTransform, Return,
-                         "bool", Parameters,
-                         new Param(c, "t1", "qt.QTransform"),
-                         new Param(c, "t2", "qt.QTransform"), End),
+            new Function(c, "qFuzzyCompare", _n_qFuzzyCompare0, None, Compiled, qt__qFuzzyCompare_bool_QMatrix_QMatrix, Return, "bool",
+                         Parameters, new Param(c, "m1", "qt.QMatrix"), new Param(c, "m2", "qt.QMatrix"), End),
+            new Function(c, "qFuzzyCompare", _n_qFuzzyCompare1, None, Compiled, qt__qFuzzyCompare_bool_QTransform_QTransform, Return,
+                         "bool", Parameters, new Param(c, "t1", "qt.QTransform"), new Param(c, "t2", "qt.QTransform"), End),
             EndArguments);
         globalScope()->addSymbols(
             // MISSING: << ("QDataStream &"; "QDataStream &" s, QFont font)
             // MISSING: >> ("QDataStream &"; "QDataStream &" s, QFont font)
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QSize_QSize, Return, "bool",
-                         Parameters, new Param(c, "s1", "qt.QSize"),
-                         new Param(c, "s2", "qt.QSize"), End),
-            new Function(c, "*", _n_operatorStar_0, Op, Compiled,
-                         qt__operatorStar__QSize_QSize_double, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "size", "qt.QSize"),
-                         new Param(c, "factor", "double"), End),
-            new Function(c, "*", _n_operatorStar_1, Op, Compiled,
-                         qt__operatorStar__QSize_double_QSize, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "factor", "double"),
-                         new Param(c, "size", "qt.QSize"), End),
-            new Function(c, "+", _n_operatorPlus_0, Op, Compiled,
-                         qt__operatorPlus__QSize_QSize_QSize, Return,
-                         "qt.QSize", Parameters, new Param(c, "s1", "qt.QSize"),
-                         new Param(c, "s2", "qt.QSize"), End),
-            new Function(c, "-", _n_operatorMinus_0, Op, Compiled,
-                         qt__operatorMinus__QSize_QSize_QSize, Return,
-                         "qt.QSize", Parameters, new Param(c, "s1", "qt.QSize"),
-                         new Param(c, "s2", "qt.QSize"), End),
-            new Function(c, "/", _n_operatorSlash_0, Op, Compiled,
-                         qt__operatorSlash__QSize_QSize_double, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "size", "qt.QSize"),
-                         new Param(c, "divisor", "double"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt__operatorBang_EQ__bool_QSize_QSize, Return, "bool", Parameters,
+                         new Param(c, "s1", "qt.QSize"), new Param(c, "s2", "qt.QSize"), End),
+            new Function(c, "*", _n_operatorStar_0, Op, Compiled, qt__operatorStar__QSize_QSize_double, Return, "qt.QSize", Parameters,
+                         new Param(c, "size", "qt.QSize"), new Param(c, "factor", "double"), End),
+            new Function(c, "*", _n_operatorStar_1, Op, Compiled, qt__operatorStar__QSize_double_QSize, Return, "qt.QSize", Parameters,
+                         new Param(c, "factor", "double"), new Param(c, "size", "qt.QSize"), End),
+            new Function(c, "+", _n_operatorPlus_0, Op, Compiled, qt__operatorPlus__QSize_QSize_QSize, Return, "qt.QSize", Parameters,
+                         new Param(c, "s1", "qt.QSize"), new Param(c, "s2", "qt.QSize"), End),
+            new Function(c, "-", _n_operatorMinus_0, Op, Compiled, qt__operatorMinus__QSize_QSize_QSize, Return, "qt.QSize", Parameters,
+                         new Param(c, "s1", "qt.QSize"), new Param(c, "s2", "qt.QSize"), End),
+            new Function(c, "/", _n_operatorSlash_0, Op, Compiled, qt__operatorSlash__QSize_QSize_double, Return, "qt.QSize", Parameters,
+                         new Param(c, "size", "qt.QSize"), new Param(c, "divisor", "double"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, QSize size)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QSize_QSize, Return, "bool",
-                         Parameters, new Param(c, "s1", "qt.QSize"),
-                         new Param(c, "s2", "qt.QSize"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt__operatorEQ_EQ__bool_QSize_QSize, Return, "bool", Parameters,
+                         new Param(c, "s1", "qt.QSize"), new Param(c, "s2", "qt.QSize"), End),
             // MISSING: >> ("QDataStream &"; "QDataStream &" stream, QSize size)
-            new Function(c, "!=", _n_operatorBang_EQ_1, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QPoint_QPoint, Return,
-                         "bool", Parameters, new Param(c, "p1", "qt.QPoint"),
-                         new Param(c, "p2", "qt.QPoint"), End),
-            new Function(c, "*", _n_operatorStar_2, Op, Compiled,
-                         qt__operatorStar__QPoint_QPoint_double, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "point", "qt.QPoint"),
-                         new Param(c, "factor", "double"), End),
-            new Function(c, "*", _n_operatorStar_3, Op, Compiled,
-                         qt__operatorStar__QPoint_double_QPoint, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "factor", "double"),
+            new Function(c, "!=", _n_operatorBang_EQ_1, Op, Compiled, qt__operatorBang_EQ__bool_QPoint_QPoint, Return, "bool", Parameters,
+                         new Param(c, "p1", "qt.QPoint"), new Param(c, "p2", "qt.QPoint"), End),
+            new Function(c, "*", _n_operatorStar_2, Op, Compiled, qt__operatorStar__QPoint_QPoint_double, Return, "qt.QPoint", Parameters,
+                         new Param(c, "point", "qt.QPoint"), new Param(c, "factor", "double"), End),
+            new Function(c, "*", _n_operatorStar_3, Op, Compiled, qt__operatorStar__QPoint_double_QPoint, Return, "qt.QPoint", Parameters,
+                         new Param(c, "factor", "double"), new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "+", _n_operatorPlus_1, Op, Compiled, qt__operatorPlus__QPoint_QPoint_QPoint, Return, "qt.QPoint", Parameters,
+                         new Param(c, "p1", "qt.QPoint"), new Param(c, "p2", "qt.QPoint"), End),
+            new Function(c, "-", _n_operatorMinus_1, Op, Compiled, qt__operatorMinus__QPoint_QPoint_QPoint, Return, "qt.QPoint", Parameters,
+                         new Param(c, "p1", "qt.QPoint"), new Param(c, "p2", "qt.QPoint"), End),
+            new Function(c, "-", _n_operatorMinus_2, Op, Compiled, qt__operatorMinus__QPoint_QPoint, Return, "qt.QPoint", Parameters,
                          new Param(c, "point", "qt.QPoint"), End),
-            new Function(c, "+", _n_operatorPlus_1, Op, Compiled,
-                         qt__operatorPlus__QPoint_QPoint_QPoint, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "p1", "qt.QPoint"),
-                         new Param(c, "p2", "qt.QPoint"), End),
-            new Function(c, "-", _n_operatorMinus_1, Op, Compiled,
-                         qt__operatorMinus__QPoint_QPoint_QPoint, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "p1", "qt.QPoint"),
-                         new Param(c, "p2", "qt.QPoint"), End),
-            new Function(c, "-", _n_operatorMinus_2, Op, Compiled,
-                         qt__operatorMinus__QPoint_QPoint, Return, "qt.QPoint",
-                         Parameters, new Param(c, "point", "qt.QPoint"), End),
-            new Function(c, "/", _n_operatorSlash_1, Op, Compiled,
-                         qt__operatorSlash__QPoint_QPoint_double, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "point", "qt.QPoint"),
-                         new Param(c, "divisor", "double"), End),
+            new Function(c, "/", _n_operatorSlash_1, Op, Compiled, qt__operatorSlash__QPoint_QPoint_double, Return, "qt.QPoint", Parameters,
+                         new Param(c, "point", "qt.QPoint"), new Param(c, "divisor", "double"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, QPoint
             // point)
-            new Function(c, "==", _n_operatorEQ_EQ_1, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QPoint_QPoint, Return, "bool",
-                         Parameters, new Param(c, "p1", "qt.QPoint"),
-                         new Param(c, "p2", "qt.QPoint"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_1, Op, Compiled, qt__operatorEQ_EQ__bool_QPoint_QPoint, Return, "bool", Parameters,
+                         new Param(c, "p1", "qt.QPoint"), new Param(c, "p2", "qt.QPoint"), End),
             // MISSING: >> ("QDataStream &"; "QDataStream &" stream, QPoint
             // point)
-            new Function(c, "!=", _n_operatorBang_EQ_2, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QRect_QRect, Return, "bool",
-                         Parameters, new Param(c, "r1", "qt.QRect"),
-                         new Param(c, "r2", "qt.QRect"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_2, Op, Compiled, qt__operatorBang_EQ__bool_QRect_QRect, Return, "bool", Parameters,
+                         new Param(c, "r1", "qt.QRect"), new Param(c, "r2", "qt.QRect"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, QRect
             // rectangle)
-            new Function(c, "==", _n_operatorEQ_EQ_2, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QRect_QRect, Return, "bool",
-                         Parameters, new Param(c, "r1", "qt.QRect"),
-                         new Param(c, "r2", "qt.QRect"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_2, Op, Compiled, qt__operatorEQ_EQ__bool_QRect_QRect, Return, "bool", Parameters,
+                         new Param(c, "r1", "qt.QRect"), new Param(c, "r2", "qt.QRect"), End),
             // MISSING: >> ("QDataStream &"; "QDataStream &" stream, QRect
             // rectangle) MISSING: << ("QDataStream &"; "QDataStream &" stream,
             // QIcon icon) MISSING: >> ("QDataStream &"; "QDataStream &" stream,
             // QIcon icon)
-            new Function(c, "!=", _n_operatorBang_EQ_3, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QVariant_QVariant, Return,
-                         "bool", Parameters, new Param(c, "v1", "qt.QVariant"),
-                         new Param(c, "v2", "qt.QVariant"), End),
-            new Function(c, "==", _n_operatorEQ_EQ_3, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QVariant_QVariant, Return,
-                         "bool", Parameters, new Param(c, "v1", "qt.QVariant"),
-                         new Param(c, "v2", "qt.QVariant"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_3, Op, Compiled, qt__operatorBang_EQ__bool_QVariant_QVariant, Return, "bool",
+                         Parameters, new Param(c, "v1", "qt.QVariant"), new Param(c, "v2", "qt.QVariant"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_3, Op, Compiled, qt__operatorEQ_EQ__bool_QVariant_QVariant, Return, "bool", Parameters,
+                         new Param(c, "v1", "qt.QVariant"), new Param(c, "v2", "qt.QVariant"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" out, QStandardItem
             // item) MISSING: >> ("QDataStream &"; "QDataStream &" in,
             // QStandardItem item) MISSING: << ("QDataStream &"; "QDataStream &"
@@ -1167,14 +935,10 @@ namespace Mu
             // MISSING: << ("QDataStream &"; "QDataStream &" stream,
             // QKeySequence sequence) MISSING: >> ("QDataStream &"; "QDataStream
             // &" stream, QKeySequence sequence)
-            new Function(c, "==", _n_operatorEQ_EQ_4, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QKeyEvent_int, Return, "bool",
-                         Parameters, new Param(c, "e", "qt.QKeyEvent"),
-                         new Param(c, "key", "int"), End),
-            new Function(c, "==", _n_operatorEQ_EQ_5, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_int_QKeyEvent, Return, "bool",
-                         Parameters, new Param(c, "key", "int"),
-                         new Param(c, "e", "qt.QKeyEvent"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_4, Op, Compiled, qt__operatorEQ_EQ__bool_QKeyEvent_int, Return, "bool", Parameters,
+                         new Param(c, "e", "qt.QKeyEvent"), new Param(c, "key", "int"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_5, Op, Compiled, qt__operatorEQ_EQ__bool_int_QKeyEvent, Return, "bool", Parameters,
+                         new Param(c, "key", "int"), new Param(c, "e", "qt.QKeyEvent"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" out, QRegExp
             // regExp) MISSING: >> ("QDataStream &"; "QDataStream &" in, QRegExp
             // regExp) MISSING: << ("QDataStream &"; "QDataStream &" s, QRegion
@@ -1191,56 +955,35 @@ namespace Mu
             // &" in, QTableWidgetItem item) MISSING: << ("QDataStream &";
             // "QDataStream &" out, QUrl url) MISSING: >> ("QDataStream &";
             // "QDataStream &" in, QUrl url)
-            new Function(c, "!=", _n_operatorBang_EQ_4, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QByteArray_QByteArray,
-                         Return, "bool", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_4, Op, Compiled, qt__operatorBang_EQ__bool_QByteArray_QByteArray, Return, "bool",
+                         Parameters, new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
             // MISSING: != (bool; QByteArray a1, "const char *" a2)
             // MISSING: != (bool; "const char *" a1, QByteArray a2)
             // MISSING: + (QByteArray; QByteArray a1, "const char *" a2)
             // MISSING: + (QByteArray; QByteArray a1, "char" a2)
             // MISSING: + (QByteArray; "const char *" a1, QByteArray a2)
             // MISSING: + (QByteArray; "char" a1, QByteArray a2)
-            new Function(c, "+", _n_operatorPlus_6, Op, Compiled,
-                         qt__operatorPlus__QByteArray_QByteArray_QByteArray,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
-            new Function(c, "<", _n_operatorLT_0, Op, Compiled,
-                         qt__operatorLT__bool_QByteArray_QByteArray, Return,
-                         "bool", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, "+", _n_operatorPlus_6, Op, Compiled, qt__operatorPlus__QByteArray_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, "<", _n_operatorLT_0, Op, Compiled, qt__operatorLT__bool_QByteArray_QByteArray, Return, "bool", Parameters,
+                         new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
             // MISSING: < (bool; QByteArray a1, "const char *" a2)
             // MISSING: < (bool; "const char *" a1, QByteArray a2)
             // MISSING: << ("QDataStream &"; "QDataStream &" out, QByteArray ba)
-            new Function(c, "<=", _n_operatorLT_EQ_0, Op, Compiled,
-                         qt__operatorLT_EQ__bool_QByteArray_QByteArray, Return,
-                         "bool", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, "<=", _n_operatorLT_EQ_0, Op, Compiled, qt__operatorLT_EQ__bool_QByteArray_QByteArray, Return, "bool",
+                         Parameters, new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
             // MISSING: <= (bool; QByteArray a1, "const char *" a2)
             // MISSING: <= (bool; "const char *" a1, QByteArray a2)
-            new Function(c, "==", _n_operatorEQ_EQ_6, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QByteArray_QByteArray, Return,
-                         "bool", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_6, Op, Compiled, qt__operatorEQ_EQ__bool_QByteArray_QByteArray, Return, "bool",
+                         Parameters, new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
             // MISSING: == (bool; QByteArray a1, "const char *" a2)
             // MISSING: == (bool; "const char *" a1, QByteArray a2)
-            new Function(c, ">", _n_operatorGT_0, Op, Compiled,
-                         qt__operatorGT__bool_QByteArray_QByteArray, Return,
-                         "bool", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, ">", _n_operatorGT_0, Op, Compiled, qt__operatorGT__bool_QByteArray_QByteArray, Return, "bool", Parameters,
+                         new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
             // MISSING: > (bool; QByteArray a1, "const char *" a2)
             // MISSING: > (bool; "const char *" a1, QByteArray a2)
-            new Function(c, ">=", _n_operatorGT_EQ_0, Op, Compiled,
-                         qt__operatorGT_EQ__bool_QByteArray_QByteArray, Return,
-                         "bool", Parameters,
-                         new Param(c, "a1", "qt.QByteArray"),
-                         new Param(c, "a2", "qt.QByteArray"), End),
+            new Function(c, ">=", _n_operatorGT_EQ_0, Op, Compiled, qt__operatorGT_EQ__bool_QByteArray_QByteArray, Return, "bool",
+                         Parameters, new Param(c, "a1", "qt.QByteArray"), new Param(c, "a2", "qt.QByteArray"), End),
             // MISSING: >= (bool; QByteArray a1, "const char *" a2)
             // MISSING: >= (bool; "const char *" a1, QByteArray a2)
             // MISSING: >> ("QDataStream &"; "QDataStream &" in, QByteArray ba)
@@ -1253,120 +996,73 @@ namespace Mu
             // "QDataStream &" stream, QPixmap pixmap) MISSING: << ("QDataStream
             // &"; "QDataStream &" out, QHostAddress address) MISSING: >>
             // ("QDataStream &"; "QDataStream &" in, QHostAddress address)
-            new Function(c, "!=", _n_operatorBang_EQ_7, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QMargins_QMargins, Return,
-                         "bool", Parameters, new Param(c, "m1", "qt.QMargins"),
-                         new Param(c, "m2", "qt.QMargins"), End),
-            new Function(c, "==", _n_operatorEQ_EQ_9, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QMargins_QMargins, Return,
-                         "bool", Parameters, new Param(c, "m1", "qt.QMargins"),
-                         new Param(c, "m2", "qt.QMargins"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_7, Op, Compiled, qt__operatorBang_EQ__bool_QMargins_QMargins, Return, "bool",
+                         Parameters, new Param(c, "m1", "qt.QMargins"), new Param(c, "m2", "qt.QMargins"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_9, Op, Compiled, qt__operatorEQ_EQ__bool_QMargins_QMargins, Return, "bool", Parameters,
+                         new Param(c, "m1", "qt.QMargins"), new Param(c, "m2", "qt.QMargins"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, QBrush
             // brush) MISSING: >> ("QDataStream &"; "QDataStream &" stream,
             // QBrush brush)
-            new Function(c, "*", _n_operatorStar_4, Op, Compiled,
-                         qt__operatorStar__QPoint_QPoint_QMatrix, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "point", "qt.QPoint"),
-                         new Param(c, "matrix", "qt.QMatrix"), End),
-            new Function(c, "*", _n_operatorStar_5, Op, Compiled,
-                         qt__operatorStar__QPointF_QPointF_QMatrix, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "point", "qt.QPointF"),
-                         new Param(c, "matrix", "qt.QMatrix"), End),
+            new Function(c, "*", _n_operatorStar_4, Op, Compiled, qt__operatorStar__QPoint_QPoint_QMatrix, Return, "qt.QPoint", Parameters,
+                         new Param(c, "point", "qt.QPoint"), new Param(c, "matrix", "qt.QMatrix"), End),
+            new Function(c, "*", _n_operatorStar_5, Op, Compiled, qt__operatorStar__QPointF_QPointF_QMatrix, Return, "qt.QPointF",
+                         Parameters, new Param(c, "point", "qt.QPointF"), new Param(c, "matrix", "qt.QMatrix"), End),
             // MISSING: * ("QLineF"; "const QLineF &" line, QMatrix matrix)
             // MISSING: * ("QLine"; "const QLine &" line, QMatrix matrix)
             // MISSING: * ("QPolygon"; "const QPolygon &" polygon, QMatrix
             // matrix) MISSING: * ("QPolygonF"; "const QPolygonF &" polygon,
             // QMatrix matrix)
-            new Function(c, "*", _n_operatorStar_10, Op, Compiled,
-                         qt__operatorStar__QRegion_QRegion_QMatrix, Return,
-                         "qt.QRegion", Parameters,
-                         new Param(c, "region", "qt.QRegion"),
-                         new Param(c, "matrix", "qt.QMatrix"), End),
+            new Function(c, "*", _n_operatorStar_10, Op, Compiled, qt__operatorStar__QRegion_QRegion_QMatrix, Return, "qt.QRegion",
+                         Parameters, new Param(c, "region", "qt.QRegion"), new Param(c, "matrix", "qt.QMatrix"), End),
             // MISSING: * (QPainterPath; "const QPainterPath &" path, QMatrix
             // matrix) MISSING: << ("QDataStream &"; "QDataStream &" stream,
             // QMatrix matrix) MISSING: >> ("QDataStream &"; "QDataStream &"
             // stream, QMatrix matrix)
-            new Function(c, "*", _n_operatorStar_12, Op, Compiled,
-                         qt__operatorStar__QPoint_QPoint_QTransform, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "point", "qt.QPoint"),
-                         new Param(c, "matrix", "qt.QTransform"), End),
-            new Function(c, "*", _n_operatorStar_13, Op, Compiled,
-                         qt__operatorStar__QPointF_QPointF_QTransform, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "point", "qt.QPointF"),
-                         new Param(c, "matrix", "qt.QTransform"), End),
+            new Function(c, "*", _n_operatorStar_12, Op, Compiled, qt__operatorStar__QPoint_QPoint_QTransform, Return, "qt.QPoint",
+                         Parameters, new Param(c, "point", "qt.QPoint"), new Param(c, "matrix", "qt.QTransform"), End),
+            new Function(c, "*", _n_operatorStar_13, Op, Compiled, qt__operatorStar__QPointF_QPointF_QTransform, Return, "qt.QPointF",
+                         Parameters, new Param(c, "point", "qt.QPointF"), new Param(c, "matrix", "qt.QTransform"), End),
             // MISSING: * ("QLineF"; "const QLineF &" line, QTransform matrix)
             // MISSING: * ("QLine"; "const QLine &" line, QTransform matrix)
             // MISSING: * ("QPolygon"; "const QPolygon &" polygon, QTransform
             // matrix) MISSING: * ("QPolygonF"; "const QPolygonF &" polygon,
             // QTransform matrix)
-            new Function(c, "*", _n_operatorStar_18, Op, Compiled,
-                         qt__operatorStar__QRegion_QRegion_QTransform, Return,
-                         "qt.QRegion", Parameters,
-                         new Param(c, "region", "qt.QRegion"),
-                         new Param(c, "matrix", "qt.QTransform"), End),
+            new Function(c, "*", _n_operatorStar_18, Op, Compiled, qt__operatorStar__QRegion_QRegion_QTransform, Return, "qt.QRegion",
+                         Parameters, new Param(c, "region", "qt.QRegion"), new Param(c, "matrix", "qt.QTransform"), End),
             // MISSING: * (QPainterPath; "const QPainterPath &" path, QTransform
             // matrix) MISSING: << ("QDataStream &"; "QDataStream &" stream,
             // QTransform matrix) MISSING: >> ("QDataStream &"; "QDataStream &"
             // stream, QTransform matrix)
-            new Function(c, "!=", _n_operatorBang_EQ_8, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QPointF_QPointF, Return,
-                         "bool", Parameters, new Param(c, "p1", "qt.QPointF"),
-                         new Param(c, "p2", "qt.QPointF"), End),
-            new Function(c, "*", _n_operatorStar_20, Op, Compiled,
-                         qt__operatorStar__QPointF_QPointF_double, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "point", "qt.QPointF"),
-                         new Param(c, "factor", "double"), End),
-            new Function(c, "*", _n_operatorStar_21, Op, Compiled,
-                         qt__operatorStar__QPointF_double_QPointF, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "factor", "double"),
+            new Function(c, "!=", _n_operatorBang_EQ_8, Op, Compiled, qt__operatorBang_EQ__bool_QPointF_QPointF, Return, "bool", Parameters,
+                         new Param(c, "p1", "qt.QPointF"), new Param(c, "p2", "qt.QPointF"), End),
+            new Function(c, "*", _n_operatorStar_20, Op, Compiled, qt__operatorStar__QPointF_QPointF_double, Return, "qt.QPointF",
+                         Parameters, new Param(c, "point", "qt.QPointF"), new Param(c, "factor", "double"), End),
+            new Function(c, "*", _n_operatorStar_21, Op, Compiled, qt__operatorStar__QPointF_double_QPointF, Return, "qt.QPointF",
+                         Parameters, new Param(c, "factor", "double"), new Param(c, "point", "qt.QPointF"), End),
+            new Function(c, "+", _n_operatorPlus_7, Op, Compiled, qt__operatorPlus__QPointF_QPointF_QPointF, Return, "qt.QPointF",
+                         Parameters, new Param(c, "p1", "qt.QPointF"), new Param(c, "p2", "qt.QPointF"), End),
+            new Function(c, "-", _n_operatorMinus_3, Op, Compiled, qt__operatorMinus__QPointF_QPointF_QPointF, Return, "qt.QPointF",
+                         Parameters, new Param(c, "p1", "qt.QPointF"), new Param(c, "p2", "qt.QPointF"), End),
+            new Function(c, "-", _n_operatorMinus_4, Op, Compiled, qt__operatorMinus__QPointF_QPointF, Return, "qt.QPointF", Parameters,
                          new Param(c, "point", "qt.QPointF"), End),
-            new Function(c, "+", _n_operatorPlus_7, Op, Compiled,
-                         qt__operatorPlus__QPointF_QPointF_QPointF, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "p1", "qt.QPointF"),
-                         new Param(c, "p2", "qt.QPointF"), End),
-            new Function(c, "-", _n_operatorMinus_3, Op, Compiled,
-                         qt__operatorMinus__QPointF_QPointF_QPointF, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "p1", "qt.QPointF"),
-                         new Param(c, "p2", "qt.QPointF"), End),
-            new Function(c, "-", _n_operatorMinus_4, Op, Compiled,
-                         qt__operatorMinus__QPointF_QPointF, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "point", "qt.QPointF"), End),
-            new Function(c, "/", _n_operatorSlash_2, Op, Compiled,
-                         qt__operatorSlash__QPointF_QPointF_double, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "point", "qt.QPointF"),
-                         new Param(c, "divisor", "double"), End),
+            new Function(c, "/", _n_operatorSlash_2, Op, Compiled, qt__operatorSlash__QPointF_QPointF_double, Return, "qt.QPointF",
+                         Parameters, new Param(c, "point", "qt.QPointF"), new Param(c, "divisor", "double"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, QPointF
             // point)
-            new Function(c, "==", _n_operatorEQ_EQ_10, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QPointF_QPointF, Return,
-                         "bool", Parameters, new Param(c, "p1", "qt.QPointF"),
-                         new Param(c, "p2", "qt.QPointF"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_10, Op, Compiled, qt__operatorEQ_EQ__bool_QPointF_QPointF, Return, "bool", Parameters,
+                         new Param(c, "p1", "qt.QPointF"), new Param(c, "p2", "qt.QPointF"), End),
             // MISSING: >> ("QDataStream &"; "QDataStream &" stream, QPointF
             // point) MISSING: << ("QDataStream &"; "QDataStream &" s, QPalette
             // p) MISSING: >> ("QDataStream &"; "QDataStream &" s, QPalette p)
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, "const
             // QPainterPath &" path) MISSING: >> ("QDataStream &"; "QDataStream
             // &" stream, "QPainterPath &" path)
-            new Function(c, "!=", _n_operatorBang_EQ_9, Op, Compiled,
-                         qt__operatorBang_EQ__bool_QRectF_QRectF, Return,
-                         "bool", Parameters, new Param(c, "r1", "qt.QRectF"),
-                         new Param(c, "r2", "qt.QRectF"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_9, Op, Compiled, qt__operatorBang_EQ__bool_QRectF_QRectF, Return, "bool", Parameters,
+                         new Param(c, "r1", "qt.QRectF"), new Param(c, "r2", "qt.QRectF"), End),
             // MISSING: << ("QDataStream &"; "QDataStream &" stream, QRectF
             // rectangle)
-            new Function(c, "==", _n_operatorEQ_EQ_11, Op, Compiled,
-                         qt__operatorEQ_EQ__bool_QRectF_QRectF, Return, "bool",
-                         Parameters, new Param(c, "r1", "qt.QRectF"),
-                         new Param(c, "r2", "qt.QRectF"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_11, Op, Compiled, qt__operatorEQ_EQ__bool_QRectF_QRectF, Return, "bool", Parameters,
+                         new Param(c, "r1", "qt.QRectF"), new Param(c, "r2", "qt.QRectF"), End),
             // MISSING: >> ("QDataStream &"; "QDataStream &" stream, QRectF
             // rectangle)
             EndArguments);

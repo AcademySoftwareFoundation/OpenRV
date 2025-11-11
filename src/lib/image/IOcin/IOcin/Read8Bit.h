@@ -39,22 +39,15 @@ namespace TwkFB
 
         typedef U8 Pixel;
 
-        static void planarConfig(TwkFB::FrameBuffer&, int, int,
-                                 TwkFB::FrameBuffer::DataType);
+        static void planarConfig(TwkFB::FrameBuffer&, int, int, TwkFB::FrameBuffer::DataType);
 
-        static void readRGB8(const std::string&, const unsigned char*,
-                             TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                             bool swap, bool useRaw = false,
-                             unsigned char* deletePointer = 0);
+        static void readRGB8(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap,
+                             bool useRaw = false, unsigned char* deletePointer = 0);
 
-        static void readRGBA8(const std::string&, const unsigned char*,
-                              TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                              bool swap, bool useRaw = false,
-                              unsigned char* deletePointer = 0);
+        static void readRGBA8(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap,
+                              bool useRaw = false, unsigned char* deletePointer = 0);
 
-        static void readRGB8_PLANAR(const std::string&, const unsigned char*,
-                                    TwkFB::FrameBuffer&, int, int,
-                                    size_t maxbytes, bool swap);
+        static void readRGB8_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
     };
 
 } // namespace TwkFB

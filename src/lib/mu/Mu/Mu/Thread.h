@@ -120,8 +120,7 @@ namespace Mu
         //  Call will invoke the function using this thread
         //
 
-        const Value call(const Function*, Function::ArgumentVector&,
-                         bool returnArguments);
+        const Value call(const Function*, Function::ArgumentVector&, bool returnArguments);
 
         //
         //  Similar to the above, but dynamically looks up func by
@@ -129,9 +128,7 @@ namespace Mu
         //  ClassInstance object (the "this" arg).
         //
 
-        const Value callMethodByName(const char* func,
-                                     Function::ArgumentVector&,
-                                     bool returnArguments);
+        const Value callMethodByName(const char* func, Function::ArgumentVector&, bool returnArguments);
 
         //
         //	This will block the calling thread until this thread has
@@ -388,30 +385,15 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    inline void Thread::StackRecord::beginActivation(size_t s)
-    {
-        _thread->beginActivation(s);
-    }
+    inline void Thread::StackRecord::beginActivation(size_t s) { _thread->beginActivation(s); }
 
-    inline void Thread::StackRecord::newStackFrame(size_t s)
-    {
-        _thread->newStackFrame(s);
-    }
+    inline void Thread::StackRecord::newStackFrame(size_t s) { _thread->newStackFrame(s); }
 
-    inline void Thread::StackRecord::endParameters()
-    {
-        _thread->endParameters(_size);
-    }
+    inline void Thread::StackRecord::endParameters() { _thread->endParameters(_size); }
 
-    inline void Thread::StackRecord::setParameter(size_t n, const Value& v)
-    {
-        _thread->setParameter(_size + n, v);
-    }
+    inline void Thread::StackRecord::setParameter(size_t n, const Value& v) { _thread->setParameter(_size + n, v); }
 
-    inline void Thread::StackRecord::popStackFrame()
-    {
-        _thread->popStackFrame(_offset, _size);
-    }
+    inline void Thread::StackRecord::popStackFrame() { _thread->popStackFrame(_offset, _size); }
 
 } // namespace Mu
 

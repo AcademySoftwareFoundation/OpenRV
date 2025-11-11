@@ -60,11 +60,9 @@ void BonjourServiceResolver::resolveBonjourRecord(const BonjourRecord& record)
         qWarning("resolve in process, aborting");
         return;
     }
-    DNSServiceErrorType err = DNSServiceResolve(
-        &dnssref, 0, 0, record.serviceName.toUtf8().constData(),
-        record.registeredType.toUtf8().constData(),
-        record.replyDomain.toUtf8().constData(),
-        (DNSServiceResolveReply)bonjourResolveReply, this);
+    DNSServiceErrorType err =
+        DNSServiceResolve(&dnssref, 0, 0, record.serviceName.toUtf8().constData(), record.registeredType.toUtf8().constData(),
+                          record.replyDomain.toUtf8().constData(), (DNSServiceResolveReply)bonjourResolveReply, this);
     if (err != kDNSServiceErr_NoError)
     {
         emit error(err);
@@ -78,10 +76,8 @@ void BonjourServiceResolver::resolveBonjourRecord(const BonjourRecord& record)
         }
         else
         {
-            bonjourSocket =
-                new QSocketNotifier(sockfd, QSocketNotifier::Read, this);
-            connect(bonjourSocket, SIGNAL(activated(int)), this,
-                    SLOT(bonjourSocketReadyRead()));
+            bonjourSocket = new QSocketNotifier(sockfd, QSocketNotifier::Read, this);
+            connect(bonjourSocket, SIGNAL(activated(int)), this, SLOT(bonjourSocketReadyRead()));
         }
     }
 }
@@ -93,13 +89,10 @@ void BonjourServiceResolver::bonjourSocketReadyRead()
         emit error(err);
 }
 
-void BonjourServiceResolver::bonjourResolveReply(
-    DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType errorCode,
-    const char*, const char* hosttarget, quint16 port, quint16, const char*,
-    void* context)
+void BonjourServiceResolver::bonjourResolveReply(DNSServiceRef, DNSServiceFlags, quint32, DNSServiceErrorType errorCode, const char*,
+                                                 const char* hosttarget, quint16 port, quint16, const char*, void* context)
 {
-    BonjourServiceResolver* serviceResolver =
-        static_cast<BonjourServiceResolver*>(context);
+    BonjourServiceResolver* serviceResolver = static_cast<BonjourServiceResolver*>(context);
     if (errorCode != kDNSServiceErr_NoError)
     {
         emit serviceResolver->error(errorCode);
@@ -111,8 +104,7 @@ void BonjourServiceResolver::bonjourResolveReply(
     }
 #endif
     serviceResolver->bonjourPort = port;
-    QHostInfo::lookupHost(QString::fromUtf8(hosttarget), serviceResolver,
-                          SLOT(finishConnect(const QHostInfo&)));
+    QHostInfo::lookupHost(QString::fromUtf8(hosttarget), serviceResolver, SLOT(finishConnect(const QHostInfo&)));
 }
 
 void BonjourServiceResolver::finishConnect(const QHostInfo& hostInfo)

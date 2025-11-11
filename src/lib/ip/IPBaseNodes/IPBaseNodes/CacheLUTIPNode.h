@@ -28,8 +28,7 @@ namespace IPCore
         //  Constructors
         //
 
-        CacheLUTIPNode(const std::string& name, const NodeDefinition* def,
-                       IPGraph*, GroupIPNode* group = 0);
+        CacheLUTIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group = 0);
         virtual ~CacheLUTIPNode();
 
         virtual IPImage* evaluate(const Context&);

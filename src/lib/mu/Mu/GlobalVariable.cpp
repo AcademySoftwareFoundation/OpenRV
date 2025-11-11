@@ -16,9 +16,8 @@ namespace Mu
 
     using namespace std;
 
-    GlobalVariable::GlobalVariable(Context* context, const char* name,
-                                   const Type* storageClass, int offset,
-                                   Variable::Attributes a, Node* initializer)
+    GlobalVariable::GlobalVariable(Context* context, const char* name, const Type* storageClass, int offset, Variable::Attributes a,
+                                   Node* initializer)
 
         : Variable(context, name, storageClass, offset, a)
         , _initializer(initializer)
@@ -47,9 +46,6 @@ namespace Mu
         o << " (global)";
     }
 
-    void GlobalVariable::outputNode(std::ostream& o, const Node* n) const
-    {
-        o << n->type()->name() << " global " << name();
-    }
+    void GlobalVariable::outputNode(std::ostream& o, const Node* n) const { o << n->type()->name() << " global " << name(); }
 
 } // namespace Mu

@@ -101,75 +101,45 @@ namespace Mu
 
 #define T Thread&
 
-    float __C_math_util_clamp_float_float_float_float(T, float a, float b,
-                                                      float c)
-    {
-        return float(a < b ? b : (a > c ? c : a));
-    }
+    float __C_math_util_clamp_float_float_float_float(T, float a, float b, float c) { return float(a < b ? b : (a > c ? c : a)); }
 
-    float __C_math_util_step_float_float_float(T, float a, float b)
-    {
-        return a < b ? 0.0f : 1.0f;
-    }
+    float __C_math_util_step_float_float_float(T, float a, float b) { return a < b ? 0.0f : 1.0f; }
 
-    float __C_math_util_linstep_float_float_float_float(T, float a, float b,
-                                                        float c)
-    {
-        return linstep(a, b, c);
-    }
+    float __C_math_util_linstep_float_float_float_float(T, float a, float b, float c) { return linstep(a, b, c); }
 
-    float __C_math_util_smoothstep_float_float_float_float(T, float a, float b,
-                                                           float c)
-    {
-        return smoothstep(a, b, c);
-    }
+    float __C_math_util_smoothstep_float_float_float_float(T, float a, float b, float c) { return smoothstep(a, b, c); }
 
-    float __C_math_util_hermite_float_float_float_float_float_float(
-        T, float a, float b, float c, float d, float e)
+    float __C_math_util_hermite_float_float_float_float_float_float(T, float a, float b, float c, float d, float e)
     {
         return hermite(a, b, c, d, e);
     }
 
-    float __C_math_util_lerp_float_float_float_float(T, float a, float b,
-                                                     float t)
-    {
-        return float(b * t + a * (1.0f - t));
-    }
+    float __C_math_util_lerp_float_float_float_float(T, float a, float b, float t) { return float(b * t + a * (1.0f - t)); }
 
-    Vector2f
-    __C_math_util_lerp_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(
-        T, Vector2f& a, Vector2f& b, float t)
+    Vector2f __C_math_util_lerp_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, Vector2f& a, Vector2f& b, float t)
     {
         return b * t + a * (1.0f - t);
     }
 
-    Vector3f
-    __C_math_util_lerp_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(
-        T, Vector3f& a, Vector3f& b, float t)
+    Vector3f __C_math_util_lerp_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, Vector3f& a, Vector3f& b, float t)
     {
         return b * t + a * (1.0f - t);
     }
 
-    Vector4f
-    __C_math_util_lerp_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(
-        T, Vector4f& a, Vector4f& b, float t)
+    Vector4f __C_math_util_lerp_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, Vector4f& a, Vector4f& b, float t)
     {
         return b * t + a * (1.0f - t);
     }
 
-    Vector3f
-    __C_math_util_rotate_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_float(
-        T, Vector3f p, Vector3f axis, float radians)
+    Vector3f __C_math_util_rotate_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_float(T, Vector3f p, Vector3f axis,
+                                                                                                         float radians)
     {
         return rotate(p, axis, radians);
     }
 
     float __C_math_util_degrees_float_float(T, float a) { return a * 57.29578; }
 
-    float __C_math_util_radians_float_float(T, float a)
-    {
-        return a * 0.017453293;
-    }
+    float __C_math_util_radians_float_float(T, float a) { return a * 0.017453293; }
 
     float __C_math_util_random_float_float(T, float a) { return frand(a); }
 
@@ -179,15 +149,9 @@ namespace Mu
     // void __C_math_util_seed_void_int(T, int a) { return ::srandom(a); }
     void __C_math_util_seed_void_int(T, int a) { return srand(a); }
 
-    Vector3f __C_math_util_sphrand_vector_floatBSB_3ESB_(T)
-    {
-        return sphrand();
-    }
+    Vector3f __C_math_util_sphrand_vector_floatBSB_3ESB_(T) { return sphrand(); }
 
-    float __C_math_util_random_float_float_float(T, float a, float b)
-    {
-        return frand(b - a) + a;
-    }
+    float __C_math_util_random_float_float_float(T, float a, float b) { return frand(b - a) + a; }
 
     int __C_math_util_random_int_int(T, int a)
     {
@@ -196,32 +160,15 @@ namespace Mu
         return a ? int(rand()) % a : 0;
     }
 
-    Vector3f __C_math_util_dnoise3_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(
-        T, Vector3f a)
-    {
-        return Mu::dnoise3(a);
-    }
+    Vector3f __C_math_util_dnoise3_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, Vector3f a) { return Mu::dnoise3(a); }
 
-    Vector2f __C_math_util_dnoise2_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(
-        T, Vector2f a)
-    {
-        return Mu::dnoise2(a);
-    }
+    Vector2f __C_math_util_dnoise2_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, Vector2f a) { return Mu::dnoise2(a); }
 
-    float __C_math_util_dnoise1_float_float(T, float a)
-    {
-        return Mu::dnoise1(a);
-    }
+    float __C_math_util_dnoise1_float_float(T, float a) { return Mu::dnoise1(a); }
 
-    float __C_math_util_noise3_float_vector_floatBSB_3ESB_(T, Vector3f a)
-    {
-        return Mu::noise3(a);
-    }
+    float __C_math_util_noise3_float_vector_floatBSB_3ESB_(T, Vector3f a) { return Mu::noise3(a); }
 
-    float __C_math_util_noise2_float_vector_floatBSB_2ESB_(T, Vector2f a)
-    {
-        return Mu::noise2(a);
-    }
+    float __C_math_util_noise2_float_vector_floatBSB_2ESB_(T, Vector2f a) { return Mu::noise2(a); }
 
     float __C_math_util_noise1_float_float(T, float a) { return Mu::noise1(a); }
 
@@ -242,115 +189,82 @@ namespace Mu
         Context* c = context();
 
         addSymbols(
-            new Function(c, "clamp", MathUtilModule::clamp, Mapped, Compiled,
-                         __C_math_util_clamp_float_float_float_float, Return,
+            new Function(c, "clamp", MathUtilModule::clamp, Mapped, Compiled, __C_math_util_clamp_float_float_float_float, Return, "float",
+                         Args, "float", "float", "float", End),
+
+            new Function(c, "step", MathUtilModule::step, Mapped, Compiled, __C_math_util_step_float_float_float, Return, "float", Args,
+                         "float", "float", End),
+
+            new Function(c, "linstep", MathUtilModule::linstep, Mapped, Compiled, __C_math_util_linstep_float_float_float_float, Return,
                          "float", Args, "float", "float", "float", End),
 
-            new Function(c, "step", MathUtilModule::step, Mapped, Compiled,
-                         __C_math_util_step_float_float_float, Return, "float",
-                         Args, "float", "float", End),
-
-            new Function(c, "linstep", MathUtilModule::linstep, Mapped,
-                         Compiled,
-                         __C_math_util_linstep_float_float_float_float, Return,
-                         "float", Args, "float", "float", "float", End),
-
-            new Function(c, "smoothstep", MathUtilModule::smoothstep, Mapped,
-                         Compiled,
-                         __C_math_util_smoothstep_float_float_float_float,
+            new Function(c, "smoothstep", MathUtilModule::smoothstep, Mapped, Compiled, __C_math_util_smoothstep_float_float_float_float,
                          Return, "float", Args, "float", "float", "float", End),
 
-            new Function(
-                c, "hermite", MathUtilModule::hermite, Mapped, Compiled,
-                __C_math_util_hermite_float_float_float_float_float_float,
-                Return, "float", Args, "float", "float", "float", "float",
-                "float", End),
+            new Function(c, "hermite", MathUtilModule::hermite, Mapped, Compiled, __C_math_util_hermite_float_float_float_float_float_float,
+                         Return, "float", Args, "float", "float", "float", "float", "float", End),
 
-            new Function(c, "lerp", MathUtilModule::lerp, Mapped, Compiled,
-                         __C_math_util_lerp_float_float_float_float, Return,
-                         "float", Args, "float", "float", "float", End),
+            new Function(c, "lerp", MathUtilModule::lerp, Mapped, Compiled, __C_math_util_lerp_float_float_float_float, Return, "float",
+                         Args, "float", "float", "float", End),
 
-            new Function(
-                c, "lerp", MathUtilModule::lerp2f, None, Compiled,
-                __C_math_util_lerp_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_,
-                Return, "vector float[2]", Args, "vector float[2]",
-                "vector float[2]", "float", End),
+            new Function(c, "lerp", MathUtilModule::lerp2f, None, Compiled,
+                         __C_math_util_lerp_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_, Return, "vector float[2]",
+                         Args, "vector float[2]", "vector float[2]", "float", End),
 
-            new Function(
-                c, "lerp", MathUtilModule::lerp3f, None, Compiled,
-                __C_math_util_lerp_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_,
-                Return, "vector float[3]", Args, "vector float[3]",
-                "vector float[3]", "float", End),
+            new Function(c, "lerp", MathUtilModule::lerp3f, None, Compiled,
+                         __C_math_util_lerp_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_, Return, "vector float[3]",
+                         Args, "vector float[3]", "vector float[3]", "float", End),
 
-            new Function(
-                c, "lerp", MathUtilModule::lerp4f, None, Compiled,
-                __C_math_util_lerp_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_,
-                Return, "vector float[4]", Args, "vector float[4]",
-                "vector float[4]", "float", End),
+            new Function(c, "lerp", MathUtilModule::lerp4f, None, Compiled,
+                         __C_math_util_lerp_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_, Return, "vector float[4]",
+                         Args, "vector float[4]", "vector float[4]", "float", End),
 
-            new Function(
-                c, "rotate", MathUtilModule::rotate, Mapped, Compiled,
-                __C_math_util_rotate_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_float,
-                Return, "vector float[3]", Args, "vector float[3]",
-                "vector float[3]", "float", End),
+            new Function(c, "rotate", MathUtilModule::rotate, Mapped, Compiled,
+                         __C_math_util_rotate_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_float, Return,
+                         "vector float[3]", Args, "vector float[3]", "vector float[3]", "float", End),
 
-            new Function(c, "degrees", MathUtilModule::degrees, Mapped,
-                         Compiled, __C_math_util_degrees_float_float, Return,
-                         "float", Args, "float", End),
-
-            new Function(c, "radians", MathUtilModule::radians, Mapped,
-                         Compiled, __C_math_util_radians_float_float, Return,
-                         "float", Args, "float", End),
-
-            new Function(c, "random", MathUtilModule::randomf2, None, Compiled,
-                         __C_math_util_random_float_float_float, Return,
-                         "float", Args, "float", "float", End),
-
-            new Function(c, "random", MathUtilModule::randomf, None, Compiled,
-                         __C_math_util_random_float_float, Return, "float",
-                         Args, "float", End, End),
-
-            new Function(c, "random", MathUtilModule::random, None, Compiled,
-                         __C_math_util_random_int_int, Return, "int", Args,
-                         "int", End),
-
-            new Function(c, "gauss", MathUtilModule::gauss, None, Compiled,
-                         __C_math_util_gauss_float_float, Return, "float", Args,
+            new Function(c, "degrees", MathUtilModule::degrees, Mapped, Compiled, __C_math_util_degrees_float_float, Return, "float", Args,
                          "float", End),
 
-            new Function(c, "seed", MathUtilModule::seed, None, Compiled,
-                         __C_math_util_seed_void_int, Return, "void", Args,
-                         "int", End),
+            new Function(c, "radians", MathUtilModule::radians, Mapped, Compiled, __C_math_util_radians_float_float, Return, "float", Args,
+                         "float", End),
 
-            new Function(c, "sphrand", MathUtilModule::sphrand, None, Compiled,
-                         __C_math_util_sphrand_vector_floatBSB_3ESB_, Return,
+            new Function(c, "random", MathUtilModule::randomf2, None, Compiled, __C_math_util_random_float_float_float, Return, "float",
+                         Args, "float", "float", End),
+
+            new Function(c, "random", MathUtilModule::randomf, None, Compiled, __C_math_util_random_float_float, Return, "float", Args,
+                         "float", End, End),
+
+            new Function(c, "random", MathUtilModule::random, None, Compiled, __C_math_util_random_int_int, Return, "int", Args, "int",
+                         End),
+
+            new Function(c, "gauss", MathUtilModule::gauss, None, Compiled, __C_math_util_gauss_float_float, Return, "float", Args, "float",
+                         End),
+
+            new Function(c, "seed", MathUtilModule::seed, None, Compiled, __C_math_util_seed_void_int, Return, "void", Args, "int", End),
+
+            new Function(c, "sphrand", MathUtilModule::sphrand, None, Compiled, __C_math_util_sphrand_vector_floatBSB_3ESB_, Return,
                          "vector float[3]", End),
 
-            new Function(c, "noise", MathUtilModule::noise1, Mapped, Compiled,
-                         __C_math_util_noise1_float_float, Return, "float",
-                         Args, "float", End),
+            new Function(c, "noise", MathUtilModule::noise1, Mapped, Compiled, __C_math_util_noise1_float_float, Return, "float", Args,
+                         "float", End),
 
-            new Function(c, "noise", MathUtilModule::noise2, Mapped, Compiled,
-                         __C_math_util_noise2_float_vector_floatBSB_2ESB_,
-                         Return, "float", Args, "vector float[2]", End),
+            new Function(c, "noise", MathUtilModule::noise2, Mapped, Compiled, __C_math_util_noise2_float_vector_floatBSB_2ESB_, Return,
+                         "float", Args, "vector float[2]", End),
 
-            new Function(c, "noise", MathUtilModule::noise3, Mapped, Compiled,
-                         __C_math_util_noise3_float_vector_floatBSB_3ESB_,
-                         Return, "float", Args, "vector float[3]", End),
+            new Function(c, "noise", MathUtilModule::noise3, Mapped, Compiled, __C_math_util_noise3_float_vector_floatBSB_3ESB_, Return,
+                         "float", Args, "vector float[3]", End),
 
-            new Function(c, "dnoise", MathUtilModule::dnoise1, Mapped, Compiled,
-                         __C_math_util_dnoise1_float_float, Return, "float",
-                         Args, "float", End),
+            new Function(c, "dnoise", MathUtilModule::dnoise1, Mapped, Compiled, __C_math_util_dnoise1_float_float, Return, "float", Args,
+                         "float", End),
 
-            new Function(
-                c, "dnoise", MathUtilModule::dnoise2, Mapped, Compiled,
-                __C_math_util_dnoise2_vector_floatBSB_2ESB__vector_floatBSB_2ESB_,
-                Return, "vector float[2]", Args, "vector float[2]", End),
+            new Function(c, "dnoise", MathUtilModule::dnoise2, Mapped, Compiled,
+                         __C_math_util_dnoise2_vector_floatBSB_2ESB__vector_floatBSB_2ESB_, Return, "vector float[2]", Args,
+                         "vector float[2]", End),
 
-            new Function(
-                c, "dnoise", MathUtilModule::dnoise3, Mapped, Compiled,
-                __C_math_util_dnoise3_vector_floatBSB_3ESB__vector_floatBSB_3ESB_,
-                Return, "vector float[3]", Args, "vector float[3]", End),
+            new Function(c, "dnoise", MathUtilModule::dnoise3, Mapped, Compiled,
+                         __C_math_util_dnoise3_vector_floatBSB_3ESB__vector_floatBSB_3ESB_, Return, "vector float[3]", Args,
+                         "vector float[3]", End),
 
             EndArguments);
     }
@@ -365,15 +279,9 @@ namespace Mu
 
     float extrand(float a) { return frand(a); }
 
-    NODE_IMPLEMENTATION(MathUtilModule::gauss, float)
-    {
-        NODE_RETURN(Mu::gauss(NODE_ARG(0, float)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::gauss, float) { NODE_RETURN(Mu::gauss(NODE_ARG(0, float))); }
 
-    NODE_IMPLEMENTATION(MathUtilModule::randomf, float)
-    {
-        NODE_RETURN(frand(NODE_ARG(0, float)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::randomf, float) { NODE_RETURN(frand(NODE_ARG(0, float))); }
 
     NODE_IMPLEMENTATION(MathUtilModule::randomf2, float)
     {
@@ -403,8 +311,7 @@ namespace Mu
         const float t3 = t2 * t;
         const float t2_x3 = t2 * 3.0f;
         const float t3_x2 = t3 * 2.0f;
-        return (float(p0 * (t3_x2 - t2_x3) + p1 * (-t3_x2 + t2_x3)
-                      + r0 * (t3 - 2.0f * t2 + t) + r1 * (t3 - t2)));
+        return (float(p0 * (t3_x2 - t2_x3) + p1 * (-t3_x2 + t2_x3) + r0 * (t3 - 2.0f * t2 + t) + r1 * (t3 - t2)));
     }
 
     NODE_IMPLEMENTATION(MathUtilModule::hermite, float)
@@ -565,33 +472,21 @@ namespace Mu
     //  sphrand
     //
 
-    NODE_IMPLEMENTATION(MathUtilModule::sphrand, Vector3f)
-    {
-        NODE_RETURN(Mu::sphrand());
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::sphrand, Vector3f) { NODE_RETURN(Mu::sphrand()); }
 
     //
     //  These are defined as macros for the native versions
     //
 
-    NODE_IMPLEMENTATION(MathUtilModule::degrees, float)
-    {
-        NODE_RETURN(float(NODE_ARG(0, float) * 57.29578));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::degrees, float) { NODE_RETURN(float(NODE_ARG(0, float) * 57.29578)); }
 
-    NODE_IMPLEMENTATION(MathUtilModule::radians, float)
-    {
-        NODE_RETURN(float(NODE_ARG(0, float) * 0.017453293));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::radians, float) { NODE_RETURN(float(NODE_ARG(0, float) * 0.017453293)); }
 
     //
     //  noise1
     //
 
-    NODE_IMPLEMENTATION(MathUtilModule::noise1, float)
-    {
-        NODE_RETURN(Mu::noise1(NODE_ARG(0, float)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::noise1, float) { NODE_RETURN(Mu::noise1(NODE_ARG(0, float))); }
 
     //
     //  noise2
@@ -599,10 +494,7 @@ namespace Mu
 
     float noise2(const Vector2f& v) { return Mu::noise2((const float*)&v); }
 
-    NODE_IMPLEMENTATION(MathUtilModule::noise2, float)
-    {
-        NODE_RETURN(Mu::noise2(NODE_ARG(0, Vector2f)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::noise2, float) { NODE_RETURN(Mu::noise2(NODE_ARG(0, Vector2f))); }
 
     //
     //  noise3
@@ -610,10 +502,7 @@ namespace Mu
 
     float noise3(const Vector3f& v) { return Mu::noise3((const float*)&v); }
 
-    NODE_IMPLEMENTATION(MathUtilModule::noise3, float)
-    {
-        NODE_RETURN(Mu::noise3(NODE_ARG(0, Vector3f)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::noise3, float) { NODE_RETURN(Mu::noise3(NODE_ARG(0, Vector3f))); }
 
     //
     //  dnoise1
@@ -626,28 +515,19 @@ namespace Mu
         return grad;
     }
 
-    NODE_IMPLEMENTATION(MathUtilModule::dnoise1, float)
-    {
-        NODE_RETURN(Mu::dnoise1(NODE_ARG(0, float)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::dnoise1, float) { NODE_RETURN(Mu::dnoise1(NODE_ARG(0, float))); }
 
     //
     //  dnoise 2
     //
 
-    NODE_IMPLEMENTATION(MathUtilModule::dnoise2, Vector2f)
-    {
-        NODE_RETURN(Mu::dnoise2(NODE_ARG(0, Vector2f)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::dnoise2, Vector2f) { NODE_RETURN(Mu::dnoise2(NODE_ARG(0, Vector2f))); }
 
     //
     //  dnoise3
     //
 
-    NODE_IMPLEMENTATION(MathUtilModule::dnoise3, Vector3f)
-    {
-        NODE_RETURN(Mu::dnoise3(NODE_ARG(0, Vector3f)));
-    }
+    NODE_IMPLEMENTATION(MathUtilModule::dnoise3, Vector3f) { NODE_RETURN(Mu::dnoise3(NODE_ARG(0, Vector3f))); }
 
     //
     //  rotate

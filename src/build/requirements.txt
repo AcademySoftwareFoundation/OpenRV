@@ -3,8 +3,8 @@
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
 # We need to use the main branch of the OTIO Github repo since the latest release available as a Pypi package is missing some features we need for Live Review
-# It is pinned to a specific commit since the latest breaks the module with the OpenRV python build.
-git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@7a76cf3c33212f3fc56464e2c016a80f6a264819#egg=OpenTimelineIO # License: Other/Proprietary License (Modified Apache 2.0 License)
+# Using the latest from main branch.
+git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@main#egg=OpenTimelineIO # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL                # License: BSD License (BSD)
 
 # MacOS only - PyOpenGL_accelerate is built from source in python3.cmake as a workaround until the fix
@@ -23,3 +23,4 @@ wheel                   # License: MIT License (MIT)
 packaging               # License: Apache Software License, BSD License
 requests                # License: Apache Software License (Apache 2.0)
 cryptography            # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
+pydantic                # License: MIT License (MIT)

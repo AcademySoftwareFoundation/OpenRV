@@ -42,8 +42,7 @@ namespace IPCore
         //  Constructors
         //
 
-        OCIOIPNode(const std::string& name, const NodeDefinition* def,
-                   IPGraph* graph, GroupIPNode* group = 0);
+        OCIOIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~OCIOIPNode();
         virtual IPImage* evaluate(const Context& context);

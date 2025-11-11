@@ -31,17 +31,11 @@ namespace IPCore
 #else
     inline CSProfile newColorSyncProfileFromData(void*, size_t) { return 0; }
 
-    inline CSProfile newColorSyncProfileFromPath(const std::string&)
-    {
-        return 0;
-    }
+    inline CSProfile newColorSyncProfileFromPath(const std::string&) { return 0; }
 
     inline void deleteColorSyncProfile(CSProfile) {}
 
-    inline CSTransform newColorSyncTransformFromProfiles(CSProfile, CSProfile)
-    {
-        return 0;
-    }
+    inline CSTransform newColorSyncTransformFromProfiles(CSProfile, CSProfile) { return 0; }
 
     inline void deleteColorSyncTransform(CSTransform) {}
 

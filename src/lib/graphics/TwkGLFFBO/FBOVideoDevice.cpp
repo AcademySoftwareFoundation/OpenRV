@@ -94,8 +94,7 @@ namespace TwkGLF
     };
 #endif
 
-    FBOVideoDevice::FBOVideoDevice(VideoModule* m, int w, int h, bool alpha,
-                                   int numFBOs)
+    FBOVideoDevice::FBOVideoDevice(VideoModule* m, int w, int h, bool alpha, int numFBOs)
         : GLVideoDevice(m, "fbo-rb", GLVideoDevice::ImageOutput)
         , m_width(w)
         , m_height(h)
@@ -108,33 +107,29 @@ namespace TwkGLF
 
 #if defined(PLATFORM_DARWIN)
 
-        unsigned long hwAttrs[] = {
-            kCGLPFAAccelerated,
-            kCGLPFAColorFloat, /* color buffers store floating point pixels */
-            kCGLPFAColorSize,
-            3 * 16,
-            kCGLPFAAlphaSize,
-            1 * 16,
-            0};
+        unsigned long hwAttrs[] = {kCGLPFAAccelerated,
+                                   kCGLPFAColorFloat, /* color buffers store floating point pixels */
+                                   kCGLPFAColorSize,
+                                   3 * 16,
+                                   kCGLPFAAlphaSize,
+                                   1 * 16,
+                                   0};
 
-        unsigned long swAttrs[] = {
-            kCGLPFAAllRenderers,
-            kCGLPFARendererID,
-            kCGLRendererAppleSWID,
-            kCGLPFAColorFloat, /* color buffers store floating point pixels */
-            kCGLPFAColorSize,
-            3 * 32,
-            kCGLPFAAlphaSize,
-            1 * 32,
-            0};
+        unsigned long swAttrs[] = {kCGLPFAAllRenderers,
+                                   kCGLPFARendererID,
+                                   kCGLRendererAppleSWID,
+                                   kCGLPFAColorFloat, /* color buffers store floating point pixels */
+                                   kCGLPFAColorSize,
+                                   3 * 32,
+                                   kCGLPFAAlphaSize,
+                                   1 * 32,
+                                   0};
 
         unsigned long* attrs = (m_swRendererOnMac) ? swAttrs : hwAttrs;
 
-        if (CGLError err = CGLChoosePixelFormat((CGLPixelFormatAttribute*)attrs,
-                                                &m_imp->pfo, &m_imp->npfo))
+        if (CGLError err = CGLChoosePixelFormat((CGLPixelFormatAttribute*)attrs, &m_imp->pfo, &m_imp->npfo))
         {
-            cout << "ERROR: choosing pixel format: " << CGLErrorString(err)
-                 << endl;
+            cout << "ERROR: choosing pixel format: " << CGLErrorString(err) << endl;
             exit(-1);
         }
 
@@ -148,8 +143,7 @@ namespace TwkGLF
 
         if (CGLError err = CGLSetCurrentContext(m_imp->ctx))
         {
-            cout << "ERROR: CGLSetCurrentContext " << CGLErrorString(err)
-                 << endl;
+            cout << "ERROR: CGLSetCurrentContext " << CGLErrorString(err) << endl;
             exit(-1);
         }
 
@@ -161,17 +155,14 @@ namespace TwkGLF
 
         m_imp->display = XOpenDisplay(0);
         m_imp->root = DefaultRootWindow(m_imp->display);
-        m_imp->vis = glXChooseVisual(m_imp->display,
-                                     DefaultScreen(m_imp->display), attrs);
+        m_imp->vis = glXChooseVisual(m_imp->display, DefaultScreen(m_imp->display), attrs);
 
-        swa.colormap = XCreateColormap(m_imp->display, m_imp->root,
-                                       m_imp->vis->visual, AllocNone);
+        swa.colormap = XCreateColormap(m_imp->display, m_imp->root, m_imp->vis->visual, AllocNone);
 
         swa.event_mask = ExposureMask | KeyPressMask;
 
-        m_imp->tiny = XCreateWindow(
-            m_imp->display, m_imp->root, 0, 0, 64, 64, 0, m_imp->vis->depth,
-            InputOutput, m_imp->vis->visual, CWColormap | CWEventMask, &swa);
+        m_imp->tiny = XCreateWindow(m_imp->display, m_imp->root, 0, 0, 64, 64, 0, m_imp->vis->depth, InputOutput, m_imp->vis->visual,
+                                    CWColormap | CWEventMask, &swa);
 
         m_imp->ctx = glXCreateContext(m_imp->display, m_imp->vis, 0, True);
 
@@ -211,8 +202,7 @@ namespace TwkGLF
             }
         }
 
-        m_imp->window =
-            CreateWindow(className, 0, 0, 0, 0, 0, 0, 0, 0, hInstance, 0);
+        m_imp->window = CreateWindow(className, 0, 0, 0, 0, 0, 0, 0, 0, hInstance, 0);
         assert(m_imp->window != NULL);
 
         m_imp->deviceContext = GetDC(m_imp->window);
@@ -222,8 +212,7 @@ namespace TwkGLF
 
         m_imp->format.nSize = sizeof(PIXELFORMATDESCRIPTOR);
         m_imp->format.nVersion = 1;
-        m_imp->format.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL
-                                | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
+        m_imp->format.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
         m_imp->format.iPixelType = PFD_TYPE_RGBA;
         m_imp->format.cColorBits = 32;
         m_imp->format.cRedBits = 8;
@@ -261,8 +250,7 @@ namespace TwkGLF
 
         for (int i = 0; i < numFBOs; ++i)
         {
-            m_fbos.push_back(
-                new GLFBO(w, h, m_alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB));
+            m_fbos.push_back(new GLFBO(w, h, m_alpha ? GL_RGBA16F_ARB : GL_RGB16F_ARB));
             m_fbos.back()->newColorRenderBuffer();
         }
         setDefaultFBOIndex(0);
@@ -322,10 +310,7 @@ namespace TwkGLF
         GLVideoDevice::makeCurrent();
     }
 
-    std::string FBOVideoDevice::hardwareIdentification() const
-    {
-        return "fbo-rb";
-    }
+    std::string FBOVideoDevice::hardwareIdentification() const { return "fbo-rb"; }
 
     //----------------------------------------------------------------------
 

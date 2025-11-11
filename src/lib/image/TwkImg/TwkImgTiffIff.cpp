@@ -81,8 +81,7 @@ namespace TwkImg
         TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
         TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bitsPerSample);
 
-        TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples,
-                              &sampleinfo);
+        TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples, &sampleinfo);
 
         bool hasAlpha = false;
         if (extrasamples == 1)
@@ -217,8 +216,7 @@ namespace TwkImg
         TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
         TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bitsPerSample);
 
-        TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples,
-                              &sampleinfo);
+        TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples, &sampleinfo);
 
         bool hasAlpha = false;
         if (extrasamples == 1)
@@ -240,24 +238,17 @@ namespace TwkImg
                 if (hasAlpha)
                 {
                     Col4f* srcPixel = (Col4f*)buf;
-                    (*dstPixel).x = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).x * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).y = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).y * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).z = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).z * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).w = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).w * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).x = (unsigned char)(TwkMath::clamp((*srcPixel).x * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).y = (unsigned char)(TwkMath::clamp((*srcPixel).y * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).z = (unsigned char)(TwkMath::clamp((*srcPixel).z * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).w = (unsigned char)(TwkMath::clamp((*srcPixel).w * 255.0f, 0.0f, 255.0f));
                 }
                 else
                 {
                     Col3f* srcPixel = (Col3f*)buf;
-                    (*dstPixel).x = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).x * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).y = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).y * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).z = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).z * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).x = (unsigned char)(TwkMath::clamp((*srcPixel).x * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).y = (unsigned char)(TwkMath::clamp((*srcPixel).y * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).z = (unsigned char)(TwkMath::clamp((*srcPixel).z * 255.0f, 0.0f, 255.0f));
                     (*dstPixel).w = 255;
                 }
             }
@@ -273,14 +264,10 @@ namespace TwkImg
                     Col4us* srcPixel = (Col4us*)buf;
                     for (int x = 0; x < width; ++x, ++dstPixel, ++srcPixel)
                     {
-                        (*dstPixel).x = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).x / 255.0f, 0.0f, 255.0f));
-                        (*dstPixel).y = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).y / 255.0f, 0.0f, 255.0f));
-                        (*dstPixel).z = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).z / 255.0f, 0.0f, 255.0f));
-                        (*dstPixel).w = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).w / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).x = (unsigned char)(TwkMath::clamp((*srcPixel).x / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).y = (unsigned char)(TwkMath::clamp((*srcPixel).y / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).z = (unsigned char)(TwkMath::clamp((*srcPixel).z / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).w = (unsigned char)(TwkMath::clamp((*srcPixel).w / 255.0f, 0.0f, 255.0f));
                     }
                 }
                 else
@@ -288,12 +275,9 @@ namespace TwkImg
                     Col3us* srcPixel = (Col3us*)buf;
                     for (int x = 0; x < width; ++x, ++dstPixel, ++srcPixel)
                     {
-                        (*dstPixel).x = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).x / 255.0f, 0.0f, 255.0f));
-                        (*dstPixel).y = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).y / 255.0f, 0.0f, 255.0f));
-                        (*dstPixel).z = (unsigned char)(TwkMath::clamp(
-                            (*srcPixel).z / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).x = (unsigned char)(TwkMath::clamp((*srcPixel).x / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).y = (unsigned char)(TwkMath::clamp((*srcPixel).y / 255.0f, 0.0f, 255.0f));
+                        (*dstPixel).z = (unsigned char)(TwkMath::clamp((*srcPixel).z / 255.0f, 0.0f, 255.0f));
                         (*dstPixel).w = 255;
                     }
                 }
@@ -341,9 +325,8 @@ namespace TwkImg
 #define TIFFTAG_SCREEN_MATRIX 33305
 
     //*****************************************************************************
-    static bool TiffIff_write_f(const Img4f* img, const char* fileName,
-                                const TwkMath::Mat44f* Mcamera,
-                                const TwkMath::Mat44f* Mscreen, const int depth)
+    static bool TiffIff_write_f(const Img4f* img, const char* fileName, const TwkMath::Mat44f* Mcamera, const TwkMath::Mat44f* Mscreen,
+                                const int depth)
     {
         if (depth != 8 && depth != 16 && depth != 32)
         {
@@ -370,13 +353,11 @@ namespace TwkImg
 
         if (Mcamera != NULL)
         {
-            TIFFSetField(tif, TIFFTAG_CAMERA_MATRIX, (uint16)16,
-                         (const float*)Mcamera);
+            TIFFSetField(tif, TIFFTAG_CAMERA_MATRIX, (uint16)16, (const float*)Mcamera);
         }
         if (Mscreen != NULL)
         {
-            TIFFSetField(tif, TIFFTAG_SCREEN_MATRIX, (uint16)16,
-                         (const float*)Mscreen);
+            TIFFSetField(tif, TIFFTAG_SCREEN_MATRIX, (uint16)16, (const float*)Mscreen);
         }
 
         char hostname[64];
@@ -413,14 +394,10 @@ namespace TwkImg
 
                 for (int x = 0; x < img->width(); ++x, dstPixel++, ++srcPixel)
                 {
-                    (*dstPixel).x = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).x * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).y = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).y * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).z = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).z * 255.0f, 0.0f, 255.0f));
-                    (*dstPixel).w = (unsigned char)(TwkMath::clamp(
-                        (*srcPixel).w * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).x = (unsigned char)(TwkMath::clamp((*srcPixel).x * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).y = (unsigned char)(TwkMath::clamp((*srcPixel).y * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).z = (unsigned char)(TwkMath::clamp((*srcPixel).z * 255.0f, 0.0f, 255.0f));
+                    (*dstPixel).w = (unsigned char)(TwkMath::clamp((*srcPixel).w * 255.0f, 0.0f, 255.0f));
                 }
                 if (TIFFWriteScanline(tif, buf, y, 0) == -1)
                 {
@@ -437,14 +414,10 @@ namespace TwkImg
 
                 for (int x = 0; x < img->width(); ++x, dstPixel++, ++srcPixel)
                 {
-                    (*dstPixel).x = (unsigned short)(TwkMath::clamp(
-                        (*srcPixel).x * 65535.0f, 0.0f, 65535.0f));
-                    (*dstPixel).y = (unsigned short)(TwkMath::clamp(
-                        (*srcPixel).y * 65535.0f, 0.0f, 65535.0f));
-                    (*dstPixel).z = (unsigned short)(TwkMath::clamp(
-                        (*srcPixel).z * 65535.0f, 0.0f, 65535.0f));
-                    (*dstPixel).w = (unsigned short)(TwkMath::clamp(
-                        (*srcPixel).w * 65535.0f, 0.0f, 65535.0f));
+                    (*dstPixel).x = (unsigned short)(TwkMath::clamp((*srcPixel).x * 65535.0f, 0.0f, 65535.0f));
+                    (*dstPixel).y = (unsigned short)(TwkMath::clamp((*srcPixel).y * 65535.0f, 0.0f, 65535.0f));
+                    (*dstPixel).z = (unsigned short)(TwkMath::clamp((*srcPixel).z * 65535.0f, 0.0f, 65535.0f));
+                    (*dstPixel).w = (unsigned short)(TwkMath::clamp((*srcPixel).w * 65535.0f, 0.0f, 65535.0f));
                 }
                 if (TIFFWriteScanline(tif, buf, y, 0) == -1)
                 {
@@ -475,8 +448,7 @@ namespace TwkImg
 
     // *****************************************************************************
     //*****************************************************************************
-    static bool TiffIff_write_uc(const Img4uc* img, const char* fileName,
-                                 const Mat44f* Mcamera, const Mat44f* Mscreen)
+    static bool TiffIff_write_uc(const Img4uc* img, const char* fileName, const Mat44f* Mcamera, const Mat44f* Mscreen)
     {
         TIFF* tif = TIFFOpen(fileName, "w");
         if (tif == NULL)
@@ -497,13 +469,11 @@ namespace TwkImg
 
         if (Mcamera != NULL)
         {
-            TIFFSetField(tif, TIFFTAG_CAMERA_MATRIX, (uint16)16,
-                         (const float*)Mcamera);
+            TIFFSetField(tif, TIFFTAG_CAMERA_MATRIX, (uint16)16, (const float*)Mcamera);
         }
         if (Mscreen != NULL)
         {
-            TIFFSetField(tif, TIFFTAG_SCREEN_MATRIX, (uint16)16,
-                         (const float*)Mscreen);
+            TIFFSetField(tif, TIFFTAG_SCREEN_MATRIX, (uint16)16, (const float*)Mscreen);
         }
 
         char hostname[64];
@@ -535,8 +505,7 @@ namespace TwkImg
 
     // *****************************************************************************
     //*****************************************************************************
-    static bool TiffIff_write_us(const Img4us* img, const char* fileName,
-                                 const Mat44f* Mcamera, const Mat44f* Mscreen)
+    static bool TiffIff_write_us(const Img4us* img, const char* fileName, const Mat44f* Mcamera, const Mat44f* Mscreen)
     {
         TIFF* tif = TIFFOpen(fileName, "w");
         if (tif == NULL)
@@ -557,13 +526,11 @@ namespace TwkImg
 
         if (Mcamera != NULL)
         {
-            TIFFSetField(tif, TIFFTAG_CAMERA_MATRIX, (uint16)16,
-                         (const float*)Mcamera);
+            TIFFSetField(tif, TIFFTAG_CAMERA_MATRIX, (uint16)16, (const float*)Mcamera);
         }
         if (Mscreen != NULL)
         {
-            TIFFSetField(tif, TIFFTAG_SCREEN_MATRIX, (uint16)16,
-                         (const float*)Mscreen);
+            TIFFSetField(tif, TIFFTAG_SCREEN_MATRIX, (uint16)16, (const float*)Mscreen);
         }
 
         char hostname[64];
@@ -600,33 +567,22 @@ namespace TwkImg
         return TiffIff_write_f(img, fileName, NULL, NULL, depth);
     }
 
-    bool TiffIff::write(const Img4f* img, const char* fileName,
-                        const TwkMath::Mat44f& Mcamera,
-                        const TwkMath::Mat44f& Mscreen, const int depth)
+    bool TiffIff::write(const Img4f* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen,
+                        const int depth)
     {
         return TiffIff_write_f(img, fileName, &Mcamera, &Mscreen, depth);
     }
 
-    bool TiffIff::write(const Img4uc* img, const char* fileName)
-    {
-        return TiffIff_write_uc(img, fileName, NULL, NULL);
-    }
+    bool TiffIff::write(const Img4uc* img, const char* fileName) { return TiffIff_write_uc(img, fileName, NULL, NULL); }
 
-    bool TiffIff::write(const Img4uc* img, const char* fileName,
-                        const TwkMath::Mat44f& Mcamera,
-                        const TwkMath::Mat44f& Mscreen)
+    bool TiffIff::write(const Img4uc* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen)
     {
         return TiffIff_write_uc(img, fileName, &Mcamera, &Mscreen);
     }
 
-    bool TiffIff::write(const Img4us* img, const char* fileName)
-    {
-        return TiffIff_write_us(img, fileName, NULL, NULL);
-    }
+    bool TiffIff::write(const Img4us* img, const char* fileName) { return TiffIff_write_us(img, fileName, NULL, NULL); }
 
-    bool TiffIff::write(const Img4us* img, const char* fileName,
-                        const TwkMath::Mat44f& Mcamera,
-                        const TwkMath::Mat44f& Mscreen)
+    bool TiffIff::write(const Img4us* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen)
     {
         return TiffIff_write_us(img, fileName, &Mcamera, &Mscreen);
     }

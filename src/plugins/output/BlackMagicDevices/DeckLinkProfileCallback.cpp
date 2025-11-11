@@ -17,8 +17,7 @@ namespace BlackMagicDevices
     // Constructor
     //
 
-    DeckLinkProfileCallback::DeckLinkProfileCallback(
-        IDeckLinkProfile* requestedProfile)
+    DeckLinkProfileCallback::DeckLinkProfileCallback(IDeckLinkProfile* requestedProfile)
         : m_refCount(1)
         , m_requestedProfile(requestedProfile)
         , m_requestedProfileActivated(false)
@@ -30,10 +29,7 @@ namespace BlackMagicDevices
     // Destructor
     //
 
-    DeckLinkProfileCallback::~DeckLinkProfileCallback()
-    {
-        m_requestedProfile->Release();
-    }
+    DeckLinkProfileCallback::~DeckLinkProfileCallback() { m_requestedProfile->Release(); }
 
     //
     // WaitForProfileActivation()
@@ -44,8 +40,7 @@ namespace BlackMagicDevices
 
         // Check whether requested profile is already the active profile, then
         // we can return without waiting
-        if ((m_requestedProfile->IsActive(&isActiveProfile) == S_OK)
-            && isActiveProfile)
+        if ((m_requestedProfile->IsActive(&isActiveProfile) == S_OK) && isActiveProfile)
         {
             return true;
         }
@@ -57,9 +52,7 @@ namespace BlackMagicDevices
         }
 
         // Wait until the ProfileActivated callback occurs
-        return m_profileActivatedCondition.wait_for(
-            lock, kProfileActivationTimeout,
-            [&] { return m_requestedProfileActivated; });
+        return m_profileActivatedCondition.wait_for(lock, kProfileActivationTimeout, [&] { return m_requestedProfileActivated; });
     }
 
     // IDeckLinkInputCallback interface
@@ -67,9 +60,8 @@ namespace BlackMagicDevices
     //
     // IDeckLinkInputCallback::ProfileChanging
     //
-    HRESULT STDMETHODCALLTYPE DeckLinkProfileCallback::ProfileChanging(
-        IDeckLinkProfile* /*profileToBeActivated*/,
-        dlbool_t /*streamsWillBeForcedToStop*/)
+    HRESULT STDMETHODCALLTYPE DeckLinkProfileCallback::ProfileChanging(IDeckLinkProfile* /*profileToBeActivated*/,
+                                                                       dlbool_t /*streamsWillBeForcedToStop*/)
     {
         return S_OK;
     }
@@ -77,8 +69,7 @@ namespace BlackMagicDevices
     //
     // IDeckLinkInputCallback::ProfileActivated
     //
-    HRESULT STDMETHODCALLTYPE DeckLinkProfileCallback::ProfileActivated(
-        IDeckLinkProfile* activatedProfile)
+    HRESULT STDMETHODCALLTYPE DeckLinkProfileCallback::ProfileActivated(IDeckLinkProfile* activatedProfile)
     {
         {
             std::lock_guard<std::mutex> lock(m_profileActivatedMutex);
@@ -93,17 +84,13 @@ namespace BlackMagicDevices
     // IUnknown interface
     //
 
-    HRESULT STDMETHODCALLTYPE
-    DeckLinkProfileCallback::QueryInterface(REFIID iid, LPVOID* ppv)
+    HRESULT STDMETHODCALLTYPE DeckLinkProfileCallback::QueryInterface(REFIID iid, LPVOID* ppv)
     {
         *ppv = nullptr;
         return E_NOINTERFACE;
     }
 
-    ULONG STDMETHODCALLTYPE DeckLinkProfileCallback::AddRef()
-    {
-        return ++m_refCount;
-    }
+    ULONG STDMETHODCALLTYPE DeckLinkProfileCallback::AddRef() { return ++m_refCount; }
 
     ULONG STDMETHODCALLTYPE DeckLinkProfileCallback::Release()
     {

@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QRegularExpressionType(Context* context, const char* name,
-                               Class* superClass = 0);
+        QRegularExpressionType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QRegularExpressionType();
 
         //

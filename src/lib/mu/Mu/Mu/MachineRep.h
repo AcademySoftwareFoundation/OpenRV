@@ -58,8 +58,7 @@ namespace Mu
         //	A composed (vector) machine type
         //
 
-        MachineRep(const char* name, const char* fmtName,
-                   MachineRep* elementRep, size_t width);
+        MachineRep(const char* name, const char* fmtName, MachineRep* elementRep, size_t width);
 
         virtual ~MachineRep();
 
@@ -108,29 +107,17 @@ namespace Mu
 
         NodeFunc referenceGlobalFunc() const { return _referenceGlobalFunc; }
 
-        NodeFunc dereferenceGlobalFunc() const
-        {
-            return _dereferenceGlobalFunc;
-        }
+        NodeFunc dereferenceGlobalFunc() const { return _dereferenceGlobalFunc; }
 
         NodeFunc referenceMemberFunc() const { return _referenceMemberFunc; }
 
-        NodeFunc dereferenceMemberFunc() const
-        {
-            return _dereferenceMemberFunc;
-        }
+        NodeFunc dereferenceMemberFunc() const { return _dereferenceMemberFunc; }
 
         NodeFunc extractMemberFunc() const { return _extractMemberFunc; }
 
-        NodeFunc dereferenceClassMemberFunc() const
-        {
-            return _dereferenceClassMemberFunc;
-        }
+        NodeFunc dereferenceClassMemberFunc() const { return _dereferenceClassMemberFunc; }
 
-        NodeFunc referenceClassMemberFunc() const
-        {
-            return _referenceClassMemberFunc;
-        }
+        NodeFunc referenceClassMemberFunc() const { return _referenceClassMemberFunc; }
 
         NodeFunc callMethodFunc() const { return _callMethodFunc; }
 
@@ -142,24 +129,15 @@ namespace Mu
 
         NodeFunc patternBlockFunc() const { return _patternBlockFunc; }
 
-        NodeFunc functionActivationFunc() const
-        {
-            return _functionActivationFunc;
-        }
+        NodeFunc functionActivationFunc() const { return _functionActivationFunc; }
 
         NodeFunc functionReturnFunc() const { return _functionReturnFunc; }
 
-        NodeFunc dynamicActivationFunc() const
-        {
-            return _dynamicActivationFunc;
-        }
+        NodeFunc dynamicActivationFunc() const { return _dynamicActivationFunc; }
 
         NodeFunc functionTailFuseFunc() const { return _functionTailFuseFunc; }
 
-        NodeFunc variantConstructorFunc() const
-        {
-            return _variantConstructorFunc;
-        }
+        NodeFunc variantConstructorFunc() const { return _variantConstructorFunc; }
 
         NodeFunc unpackVariant() const { return _unpackVariantFunc; }
 

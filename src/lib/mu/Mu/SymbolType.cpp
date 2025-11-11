@@ -26,8 +26,7 @@ namespace Mu
 
     SymbolType::~SymbolType() {}
 
-    void SymbolType::outputValue(ostream& o, const Value& value,
-                                 bool full) const
+    void SymbolType::outputValue(ostream& o, const Value& value, bool full) const
     {
         o << "<#" << fullyQualifiedName() << " ";
 
@@ -44,8 +43,7 @@ namespace Mu
         o << ">";
     }
 
-    void SymbolType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                          ValueOutputState& state) const
+    void SymbolType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         Pointer p = *reinterpret_cast<Pointer*>(vp);
 

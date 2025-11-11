@@ -13,8 +13,7 @@
 namespace Rv
 {
 
-#define RV_QSETTINGS \
-    Rv::RvSettings& settings = Rv::RvSettings::globalSettings();
+#define RV_QSETTINGS Rv::RvSettings& settings = Rv::RvSettings::globalSettings();
 
     class RvSettings
     {
@@ -26,8 +25,7 @@ namespace Rv
         //
         void beginGroup(const QString& prefix);
         void endGroup();
-        QVariant value(const QString& key,
-                       const QVariant& defaultValue = QVariant()) const;
+        QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
         void setValue(const QString& key, const QVariant& value);
         void remove(const QString& key);
         bool contains(const QString& key) const;
@@ -187,12 +185,10 @@ namespace Rv
         virtual bool uninstallPackage(Package&);
 
         virtual bool isBundle(const QString&);
-        virtual std::vector<QString> handleBundle(const QString&,
-                                                  const QString&);
+        virtual std::vector<QString> handleBundle(const QString&, const QString&);
 
         virtual ModeEntryList loadModeFile(const QString&);
-        virtual void writeModeFile(const QString&, const ModeEntryList&,
-                                   int version = 0);
+        virtual void writeModeFile(const QString&, const ModeEntryList&, int version = 0);
 
         virtual int findPackageIndexByZip(const QString&);
         virtual void findPackageDependencies();

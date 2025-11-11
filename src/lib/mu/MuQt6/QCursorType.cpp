@@ -57,38 +57,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QCursorType::Instance* i =
-            new QCursorType::Instance((Class*)NODE_THIS.type());
+        QCursorType::Instance* i = new QCursorType::Instance((Class*)NODE_THIS.type());
         QCursorType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QCursorType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QCursorType::finalizer, 0, 0, 0);
-    }
+    void QCursorType::registerFinalizer(void* o) { GC_register_finalizer(o, QCursorType::finalizer, 0, 0, 0); }
 
     void QCursorType::finalizer(void* obj, void* data)
     {
-        QCursorType::Instance* i =
-            reinterpret_cast<QCursorType::Instance*>(obj);
+        QCursorType::Instance* i = reinterpret_cast<QCursorType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QCursor_QCursor_QCursor_QCursor(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QCursor_QCursor_QCursor_QCursor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QCursorType>(param_this, QCursor());
         return param_this;
     }
 
-    Pointer qt_QCursor_QCursor_QCursor_QCursor_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_shape)
+    Pointer qt_QCursor_QCursor_QCursor_QCursor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_shape)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::CursorShape arg1 = (Qt::CursorShape)(param_shape);
@@ -96,9 +88,8 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QCursor_QCursor_QCursor_QCursor_QBitmap_QBitmap_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_bitmap,
-        Pointer param_mask, int param_hotX, int param_hotY)
+    Pointer qt_QCursor_QCursor_QCursor_QCursor_QBitmap_QBitmap_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_bitmap,
+                                                                       Pointer param_mask, int param_hotX, int param_hotY)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBitmap arg1 = getqtype<QBitmapType>(param_bitmap);
@@ -109,9 +100,8 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QCursor_QCursor_QCursor_QCursor_QPixmap_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pixmap,
-        int param_hotX, int param_hotY)
+    Pointer qt_QCursor_QCursor_QCursor_QCursor_QPixmap_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pixmap,
+                                                               int param_hotX, int param_hotY)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPixmap arg1 = getqtype<QPixmapType>(param_pixmap);
@@ -121,25 +111,21 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QCursor_hotSpot_QPoint_QCursor(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QCursor_hotSpot_QPoint_QCursor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QCursor& arg0 = getqtype<QCursorType>(param_this);
         return makeqtype<QPointType>(c, arg0.hotSpot(), "qt.QPoint");
     }
 
-    Pointer qt_QCursor_pixmap_QPixmap_QCursor(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QCursor_pixmap_QPixmap_QCursor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QCursor& arg0 = getqtype<QCursorType>(param_this);
         return makeqtype<QPixmapType>(c, arg0.pixmap(), "qt.QPixmap");
     }
 
-    void qt_QCursor_setShape_void_QCursor_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_shape)
+    void qt_QCursor_setShape_void_QCursor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_shape)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCursor& arg0 = getqtype<QCursorType>(param_this);
@@ -148,17 +134,14 @@ namespace Mu
         setqtype<QCursorType>(param_this, arg0);
     }
 
-    int qt_QCursor_shape_int_QCursor(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QCursor_shape_int_QCursor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QCursor& arg0 = getqtype<QCursorType>(param_this);
         return int(arg0.shape());
     }
 
-    void qt_QCursor_swap_void_QCursor_QCursor(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_other)
+    void qt_QCursor_swap_void_QCursor_QCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCursor& arg0 = getqtype<QCursorType>(param_this);
@@ -173,16 +156,14 @@ namespace Mu
         return makeqtype<QPointType>(c, QCursor::pos(), "qt.QPoint");
     }
 
-    Pointer qt_QCursor_pos_QPoint_QScreen(Mu::Thread& NODE_THREAD,
-                                          Pointer param_screen)
+    Pointer qt_QCursor_pos_QPoint_QScreen(Mu::Thread& NODE_THREAD, Pointer param_screen)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QScreen* arg0 = object<QScreen>(param_screen);
         return makeqtype<QPointType>(c, QCursor::pos(arg0), "qt.QPoint");
     }
 
-    void qt_QCursor_setPos_void_int_int(Mu::Thread& NODE_THREAD, int param_x,
-                                        int param_y)
+    void qt_QCursor_setPos_void_int_int(Mu::Thread& NODE_THREAD, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_x);
@@ -190,9 +171,7 @@ namespace Mu
         QCursor::setPos(arg0, arg1);
     }
 
-    void qt_QCursor_setPos_void_QScreen_int_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_screen,
-                                                int param_x, int param_y)
+    void qt_QCursor_setPos_void_QScreen_int_int(Mu::Thread& NODE_THREAD, Pointer param_screen, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_screen);
@@ -208,9 +187,7 @@ namespace Mu
         QCursor::setPos(arg0);
     }
 
-    void qt_QCursor_setPos_void_QScreen_QPoint(Mu::Thread& NODE_THREAD,
-                                               Pointer param_screen,
-                                               Pointer param_p)
+    void qt_QCursor_setPos_void_QScreen_QPoint(Mu::Thread& NODE_THREAD, Pointer param_screen, Pointer param_p)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_screen);
@@ -220,93 +197,64 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QCursor0, Pointer)
     {
-        NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCursor1, Pointer)
     {
-        NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCursor2, Pointer)
     {
         NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor_QBitmap_QBitmap_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, int), NODE_ARG(4, int)));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCursor3, Pointer)
     {
-        NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor_QPixmap_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QCursor_QCursor_QCursor_QCursor_QPixmap_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_hotSpot0, Pointer)
     {
-        NODE_RETURN(qt_QCursor_hotSpot_QPoint_QCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCursor_hotSpot_QPoint_QCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixmap0, Pointer)
     {
-        NODE_RETURN(qt_QCursor_pixmap_QPixmap_QCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCursor_pixmap_QPixmap_QCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setShape0, void)
     {
-        qt_QCursor_setShape_void_QCursor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QCursor_setShape_void_QCursor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_shape0, int)
-    {
-        NODE_RETURN(qt_QCursor_shape_int_QCursor(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_shape0, int) { NODE_RETURN(qt_QCursor_shape_int_QCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QCursor_swap_void_QCursor_QCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCursor_swap_void_QCursor_QCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_pos0, Pointer)
-    {
-        NODE_RETURN(qt_QCursor_pos_QPoint(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_pos0, Pointer) { NODE_RETURN(qt_QCursor_pos_QPoint(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_pos1, Pointer)
-    {
-        NODE_RETURN(
-            qt_QCursor_pos_QPoint_QScreen(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_pos1, Pointer) { NODE_RETURN(qt_QCursor_pos_QPoint_QScreen(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_setPos0, void)
-    {
-        qt_QCursor_setPos_void_int_int(NODE_THREAD, NODE_ARG(0, int),
-                                       NODE_ARG(1, int));
-    }
+    static NODE_IMPLEMENTATION(_n_setPos0, void) { qt_QCursor_setPos_void_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)); }
 
     static NODE_IMPLEMENTATION(_n_setPos1, void)
     {
-        qt_QCursor_setPos_void_QScreen_int_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QCursor_setPos_void_QScreen_int_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_setPos2, void)
-    {
-        qt_QCursor_setPos_void_QPoint(NODE_THREAD, NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_setPos2, void) { qt_QCursor_setPos_void_QPoint(NODE_THREAD, NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_setPos3, void)
     {
-        qt_QCursor_setPos_void_QScreen_QPoint(NODE_THREAD, NODE_ARG(0, Pointer),
-                                              NODE_ARG(1, Pointer));
+        qt_QCursor_setPos_void_QScreen_QPoint(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QCursorType::load()
@@ -326,89 +274,55 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QCursor", _n_QCursor0, None, Compiled,
-                         qt_QCursor_QCursor_QCursor_QCursor, Return,
-                         "qt.QCursor", Parameters,
+            new Function(c, "QCursor", _n_QCursor0, None, Compiled, qt_QCursor_QCursor_QCursor_QCursor, Return, "qt.QCursor", Parameters,
                          new Param(c, "this", "qt.QCursor"), End),
-            new Function(c, "QCursor", _n_QCursor1, None, Compiled,
-                         qt_QCursor_QCursor_QCursor_QCursor_int, Return,
-                         "qt.QCursor", Parameters,
-                         new Param(c, "this", "qt.QCursor"),
-                         new Param(c, "shape", "int"), End),
-            new Function(
-                c, "QCursor", _n_QCursor2, None, Compiled,
-                qt_QCursor_QCursor_QCursor_QCursor_QBitmap_QBitmap_int_int,
-                Return, "qt.QCursor", Parameters,
-                new Param(c, "this", "qt.QCursor"),
-                new Param(c, "bitmap", "qt.QBitmap"),
-                new Param(c, "mask", "qt.QBitmap"),
-                new Param(c, "hotX", "int", Value((int)-1)),
-                new Param(c, "hotY", "int", Value((int)-1)), End),
-            new Function(c, "QCursor", _n_QCursor3, None, Compiled,
-                         qt_QCursor_QCursor_QCursor_QCursor_QPixmap_int_int,
-                         Return, "qt.QCursor", Parameters,
-                         new Param(c, "this", "qt.QCursor"),
-                         new Param(c, "pixmap", "qt.QPixmap"),
-                         new Param(c, "hotX", "int", Value((int)-1)),
+            new Function(c, "QCursor", _n_QCursor1, None, Compiled, qt_QCursor_QCursor_QCursor_QCursor_int, Return, "qt.QCursor",
+                         Parameters, new Param(c, "this", "qt.QCursor"), new Param(c, "shape", "int"), End),
+            new Function(c, "QCursor", _n_QCursor2, None, Compiled, qt_QCursor_QCursor_QCursor_QCursor_QBitmap_QBitmap_int_int, Return,
+                         "qt.QCursor", Parameters, new Param(c, "this", "qt.QCursor"), new Param(c, "bitmap", "qt.QBitmap"),
+                         new Param(c, "mask", "qt.QBitmap"), new Param(c, "hotX", "int", Value((int)-1)),
                          new Param(c, "hotY", "int", Value((int)-1)), End),
+            new Function(c, "QCursor", _n_QCursor3, None, Compiled, qt_QCursor_QCursor_QCursor_QCursor_QPixmap_int_int, Return,
+                         "qt.QCursor", Parameters, new Param(c, "this", "qt.QCursor"), new Param(c, "pixmap", "qt.QPixmap"),
+                         new Param(c, "hotX", "int", Value((int)-1)), new Param(c, "hotY", "int", Value((int)-1)), End),
             // MISSING: QCursor (QCursor; QCursor this, QCursor c)
             // MISSING: QCursor (QCursor; QCursor this, "QCursor & &" other)
-            new Function(c, "hotSpot", _n_hotSpot0, None, Compiled,
-                         qt_QCursor_hotSpot_QPoint_QCursor, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QCursor"), End),
-            new Function(c, "pixmap", _n_pixmap0, None, Compiled,
-                         qt_QCursor_pixmap_QPixmap_QCursor, Return,
-                         "qt.QPixmap", Parameters,
+            new Function(c, "hotSpot", _n_hotSpot0, None, Compiled, qt_QCursor_hotSpot_QPoint_QCursor, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QCursor"), End),
-            new Function(c, "setShape", _n_setShape0, None, Compiled,
-                         qt_QCursor_setShape_void_QCursor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QCursor"),
-                         new Param(c, "shape", "int"), End),
-            new Function(c, "shape", _n_shape0, None, Compiled,
-                         qt_QCursor_shape_int_QCursor, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QCursor"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QCursor_swap_void_QCursor_QCursor, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QCursor"),
-                         new Param(c, "other", "qt.QCursor"), End),
+            new Function(c, "pixmap", _n_pixmap0, None, Compiled, qt_QCursor_pixmap_QPixmap_QCursor, Return, "qt.QPixmap", Parameters,
+                         new Param(c, "this", "qt.QCursor"), End),
+            new Function(c, "setShape", _n_setShape0, None, Compiled, qt_QCursor_setShape_void_QCursor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QCursor"), new Param(c, "shape", "int"), End),
+            new Function(c, "shape", _n_shape0, None, Compiled, qt_QCursor_shape_int_QCursor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QCursor"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QCursor_swap_void_QCursor_QCursor, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QCursor"), new Param(c, "other", "qt.QCursor"), End),
             // MISSING: QVariant ("QVariant operator"; QCursor this)
             // static functions
-            new Function(c, "pos", _n_pos0, None, Compiled,
-                         qt_QCursor_pos_QPoint, Return, "qt.QPoint", End),
-            new Function(c, "pos", _n_pos1, None, Compiled,
-                         qt_QCursor_pos_QPoint_QScreen, Return, "qt.QPoint",
-                         Parameters, new Param(c, "screen", "qt.QScreen"), End),
-            new Function(c, "setPos", _n_setPos0, None, Compiled,
-                         qt_QCursor_setPos_void_int_int, Return, "void",
-                         Parameters, new Param(c, "x", "int"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "setPos", _n_setPos1, None, Compiled,
-                         qt_QCursor_setPos_void_QScreen_int_int, Return, "void",
-                         Parameters, new Param(c, "screen", "qt.QScreen"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         End),
-            new Function(c, "setPos", _n_setPos2, None, Compiled,
-                         qt_QCursor_setPos_void_QPoint, Return, "void",
-                         Parameters, new Param(c, "p", "qt.QPoint"), End),
-            new Function(c, "setPos", _n_setPos3, None, Compiled,
-                         qt_QCursor_setPos_void_QScreen_QPoint, Return, "void",
-                         Parameters, new Param(c, "screen", "qt.QScreen"),
+            new Function(c, "pos", _n_pos0, None, Compiled, qt_QCursor_pos_QPoint, Return, "qt.QPoint", End),
+            new Function(c, "pos", _n_pos1, None, Compiled, qt_QCursor_pos_QPoint_QScreen, Return, "qt.QPoint", Parameters,
+                         new Param(c, "screen", "qt.QScreen"), End),
+            new Function(c, "setPos", _n_setPos0, None, Compiled, qt_QCursor_setPos_void_int_int, Return, "void", Parameters,
+                         new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "setPos", _n_setPos1, None, Compiled, qt_QCursor_setPos_void_QScreen_int_int, Return, "void", Parameters,
+                         new Param(c, "screen", "qt.QScreen"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "setPos", _n_setPos2, None, Compiled, qt_QCursor_setPos_void_QPoint, Return, "void", Parameters,
                          new Param(c, "p", "qt.QPoint"), End),
+            new Function(c, "setPos", _n_setPos3, None, Compiled, qt_QCursor_setPos_void_QScreen_QPoint, Return, "void", Parameters,
+                         new Param(c, "screen", "qt.QScreen"), new Param(c, "p", "qt.QPoint"), End),
             EndArguments);
         globalScope()->addSymbols(
             // MISSING: = (QCursor; QCursor this, QCursor c)

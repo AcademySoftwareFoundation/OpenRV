@@ -55,10 +55,8 @@ namespace Rv
 
     struct MediaDirItem
     {
-        MediaDirItem(const QFileInfo& i, unsigned int detail,
-                     unsigned int hidden, unsigned int sortFlags,
-                     const FileTypeTraits* traits, size_t m_fileTraitsIndex,
-                     MediaDirItem* p);
+        MediaDirItem(const QFileInfo& i, unsigned int detail, unsigned int hidden, unsigned int sortFlags, const FileTypeTraits* traits,
+                     size_t m_fileTraitsIndex, MediaDirItem* p);
         ~MediaDirItem();
 
         void populate();
@@ -91,9 +89,7 @@ namespace Rv
                 const auto path = UTF8::qconvert(fi->absoluteFilePath());
 
                 data << fi->owner() << fi->size()
-                     << (QString(TwkUtil::isReadable(path.c_str()) ? "r" : "-")
-                         + QString(TwkUtil::isWritable(path.c_str()) ? "w"
-                                                                     : "-"))
+                     << (QString(TwkUtil::isReadable(path.c_str()) ? "r" : "-") + QString(TwkUtil::isWritable(path.c_str()) ? "w" : "-"))
                      << fi->lastModified();
             }
             else
@@ -102,9 +98,7 @@ namespace Rv
 
     }; // namespace
 
-    MediaDirItem::MediaDirItem(const QFileInfo& i, unsigned int d,
-                               unsigned int h, unsigned int s,
-                               const FileTypeTraits* traits,
+    MediaDirItem::MediaDirItem(const QFileInfo& i, unsigned int d, unsigned int h, unsigned int s, const FileTypeTraits* traits,
                                size_t fileTraitsIndex, MediaDirItem* p)
         : info(i)
         , parent(p)
@@ -132,14 +126,12 @@ namespace Rv
                     fillData(data, &info);
                 else
                 {
-                    ExistingFileList files = existingFilesInSequence(
-                        UTF8::qconvert(info.absoluteFilePath()));
+                    ExistingFileList files = existingFilesInSequence(UTF8::qconvert(info.absoluteFilePath()));
 
                     if (files.size())
                     {
                         QDir dir = parent->info.absoluteDir();
-                        QFileInfo fi = QFileInfo(dir.absoluteFilePath(
-                            UTF8::qconvert(files.back().name)));
+                        QFileInfo fi = QFileInfo(dir.absoluteFilePath(UTF8::qconvert(files.back().name)));
                         fillData(data, &fi);
                     }
                     else
@@ -150,8 +142,7 @@ namespace Rv
             case 2:
                 if (!info.isDir())
                 {
-                    if (MovieReader* reader =
-                            TwkMovie::GenericIO::movieReader(sfile, false))
+                    if (MovieReader* reader = TwkMovie::GenericIO::movieReader(sfile, false))
                     {
                         try
                         {
@@ -239,19 +230,16 @@ namespace Rv
 
         if (populated)
             return;
-        DB("MediaDirItem::populate info "
-           << UTF8::qconvert(info.absoluteFilePath()));
+        DB("MediaDirItem::populate info " << UTF8::qconvert(info.absoluteFilePath()));
 
         if (info.isDir())
         {
             QDir dir(info.absoluteFilePath());
 
-            QDir::Filters filter = QDir::NoDotAndDotDot | QDir::AllEntries
-                                   | QDir::System | QDir::AllDirs
-                                   | (hidden ? QDir::Hidden : QDir::Filters(0));
+            QDir::Filters filter =
+                QDir::NoDotAndDotDot | QDir::AllEntries | QDir::System | QDir::AllDirs | (hidden ? QDir::Hidden : QDir::Filters(0));
 
-            QFileInfoList infos =
-                dir.entryInfoList(filter, (QDir::SortFlags)sortFlags);
+            QFileInfoList infos = dir.entryInfoList(filter, (QDir::SortFlags)sortFlags);
             DB("    found files: " << infos.size());
 
 #ifdef PLATFORM_DARWIN
@@ -289,8 +277,7 @@ namespace Rv
                 ifiles.push_back(fname.toUtf8().data());
             }
 
-            SequenceNameList seqs =
-                sequencesInFileList(ifiles, GlobalExtensionPredicate);
+            SequenceNameList seqs = sequencesInFileList(ifiles, GlobalExtensionPredicate);
             DB("    found sequences: " << seqs.size());
 
             //
@@ -317,21 +304,15 @@ namespace Rv
 
                 QFileInfo sinfo(dirName + "/" + UTF8::qconvert(seq.c_str()));
 
-                if (sinfo.isDir()
-                    || m_fileTraits->isKnown(m_fileTraitsIndex,
-                                             sinfo.absoluteFilePath()))
+                if (sinfo.isDir() || m_fileTraits->isKnown(m_fileTraitsIndex, sinfo.absoluteFilePath()))
                 {
-                    DB("    pushing seq #"
-                       << i << " " << sinfo.absoluteFilePath().toUtf8().data());
+                    DB("    pushing seq #" << i << " " << sinfo.absoluteFilePath().toUtf8().data());
                     ;
-                    children.push_back(new MediaDirItem(
-                        sinfo, detail, hidden, sortFlags, m_fileTraits,
-                        m_fileTraitsIndex, this));
+                    children.push_back(new MediaDirItem(sinfo, detail, hidden, sortFlags, m_fileTraits, m_fileTraitsIndex, this));
                 }
                 else
                 {
-                    DB("   excluding seq #"
-                       << i << sinfo.absoluteFilePath().toUtf8().data());
+                    DB("   excluding seq #" << i << sinfo.absoluteFilePath().toUtf8().data());
                 }
             }
         }
@@ -345,21 +326,15 @@ namespace Rv
             {
                 QString path = dir.absoluteFilePath(files[i].name.c_str());
                 QFileInfo sinfo(path);
-                if (sinfo.isDir()
-                    || m_fileTraits->isKnown(m_fileTraitsIndex,
-                                             sinfo.absoluteFilePath()))
+                if (sinfo.isDir() || m_fileTraits->isKnown(m_fileTraitsIndex, sinfo.absoluteFilePath()))
                 {
-                    DB("    pushing file #"
-                       << i << " " << sinfo.absoluteFilePath().toUtf8().data());
+                    DB("    pushing file #" << i << " " << sinfo.absoluteFilePath().toUtf8().data());
                     ;
-                    children.push_back(new MediaDirItem(
-                        sinfo, detail, hidden, sortFlags, m_fileTraits,
-                        m_fileTraitsIndex, this));
+                    children.push_back(new MediaDirItem(sinfo, detail, hidden, sortFlags, m_fileTraits, m_fileTraitsIndex, this));
                 }
                 else
                 {
-                    DB("   excluding seq #"
-                       << i << sinfo.absoluteFilePath().toUtf8().data());
+                    DB("   excluding seq #" << i << sinfo.absoluteFilePath().toUtf8().data());
                 }
             }
         }
@@ -383,15 +358,11 @@ namespace Rv
         return false;
     }
 
-    int MediaDirItem::row()
-    {
-        return parent ? parent->children.indexOf(this) : 0;
-    }
+    int MediaDirItem::row() { return parent ? parent->children.indexOf(this) : 0; }
 
     //----------------------------------------------------------------------
 
-    MediaDirModel::MediaDirModel(const QDir& dir, FileTypeTraits* traits,
-                                 Details d, QObject* parent)
+    MediaDirModel::MediaDirModel(const QDir& dir, FileTypeTraits* traits, Details d, QObject* parent)
         : QAbstractItemModel(parent)
         , m_detail(d)
         , m_root(0)
@@ -445,9 +416,7 @@ namespace Rv
         // const char* c = dir.toUtf8().data();
         // const char* o = odir.toUtf8().data();
         // cout << "reload = " << c << endl;
-        m_root =
-            new MediaDirItem(QFileInfo(dir), m_detail, m_hidden, m_sortFlags,
-                             m_fileTraits, m_fileTraitsIndex, 0);
+        m_root = new MediaDirItem(QFileInfo(dir), m_detail, m_hidden, m_sortFlags, m_fileTraits, m_fileTraitsIndex, 0);
         m_root->populate();
         beginResetModel();
         endResetModel();
@@ -467,11 +436,8 @@ namespace Rv
         QString rootStr = dir.absolutePath();
         if (!rootStr.endsWith("/"))
             rootStr += "/";
-        m_root =
-            new MediaDirItem(QFileInfo(rootStr), (unsigned int)d, m_hidden,
-                             m_sortFlags, m_fileTraits, m_fileTraitsIndex, 0);
-        DB("    new item fileName "
-           << m_root->info.absoluteFilePath().toUtf8().data());
+        m_root = new MediaDirItem(QFileInfo(rootStr), (unsigned int)d, m_hidden, m_sortFlags, m_fileTraits, m_fileTraitsIndex, 0);
+        DB("    new item fileName " << m_root->info.absoluteFilePath().toUtf8().data());
         DB("    calling populate()");
         m_root->populate();
         DB("    calling reset()");
@@ -480,20 +446,14 @@ namespace Rv
         DB("MDM::setDirectory done");
     }
 
-    int MediaDirModel::columnCount(const QModelIndex& parent) const
-    {
-        return m_root ? m_root->data.size() : 0;
-    }
+    int MediaDirModel::columnCount(const QModelIndex& parent) const { return m_root ? m_root->data.size() : 0; }
 
     QVariant MediaDirModel::data(const QModelIndex& index, int role) const
     {
         if (!m_root || !index.isValid())
             return QVariant();
 
-        MediaDirItem* item =
-            !index.isValid()
-                ? m_root
-                : static_cast<MediaDirItem*>(index.internalPointer());
+        MediaDirItem* item = !index.isValid() ? m_root : static_cast<MediaDirItem*>(index.internalPointer());
 
         if (role == Qt::DisplayRole)
         {
@@ -510,12 +470,8 @@ namespace Rv
 
                 if (!item->info.exists())
                 {
-                    QString name =
-                        firstFileInPattern(
-                            item->info.absoluteFilePath().toUtf8().data())
-                            .c_str();
-                    QFileInfo ninfo(
-                        item->info.absoluteDir().absoluteFilePath(name));
+                    QString name = firstFileInPattern(item->info.absoluteFilePath().toUtf8().data()).c_str();
+                    QFileInfo ninfo(item->info.absoluteDir().absoluteFilePath(name));
                     item->icon = m_fileTraits->fileInfoIcon(ninfo);
                 }
                 else
@@ -547,15 +503,12 @@ namespace Rv
         }
     }
 
-    QModelIndex MediaDirModel::index(int row, int column,
-                                     const QModelIndex& i) const
+    QModelIndex MediaDirModel::index(int row, int column, const QModelIndex& i) const
     {
         if (!m_root || !hasIndex(row, column, i))
             return QModelIndex();
 
-        MediaDirItem* p = !i.isValid()
-                              ? m_root
-                              : static_cast<MediaDirItem*>(i.internalPointer());
+        MediaDirItem* p = !i.isValid() ? m_root : static_cast<MediaDirItem*>(i.internalPointer());
 
         MediaDirItem* c = p->children[row];
         return c ? createIndex(row, column, c) : QModelIndex();
@@ -565,8 +518,7 @@ namespace Rv
     {
         if (m_root && index.isValid())
         {
-            MediaDirItem* item =
-                static_cast<MediaDirItem*>(index.internalPointer());
+            MediaDirItem* item = static_cast<MediaDirItem*>(index.internalPointer());
             if (item->parent == m_root || item->parent == 0)
                 return QModelIndex();
             return createIndex(item->parent->row(), 0, item->parent);
@@ -582,16 +534,12 @@ namespace Rv
         if (!m_root || index.column() > 0)
             return 0;
 
-        MediaDirItem* item =
-            !index.isValid()
-                ? m_root
-                : static_cast<MediaDirItem*>(index.internalPointer());
+        MediaDirItem* item = !index.isValid() ? m_root : static_cast<MediaDirItem*>(index.internalPointer());
 
         return item->rows();
     }
 
-    QVariant MediaDirModel::headerData(int section, Qt::Orientation orientation,
-                                       int role) const
+    QVariant MediaDirModel::headerData(int section, Qt::Orientation orientation, int role) const
     {
         if (m_root && orientation == Qt::Horizontal && role == Qt::DisplayRole)
         {
@@ -608,10 +556,7 @@ namespace Rv
         if (!m_root || index.column() > 0)
             return 0;
 
-        MediaDirItem* item =
-            !index.isValid()
-                ? m_root
-                : static_cast<MediaDirItem*>(index.internalPointer());
+        MediaDirItem* item = !index.isValid() ? m_root : static_cast<MediaDirItem*>(index.internalPointer());
 
         return item->hasChildren();
     }
@@ -621,10 +566,7 @@ namespace Rv
         if (!m_root || index.column() > 0)
             return 0;
 
-        MediaDirItem* item =
-            !index.isValid()
-                ? m_root
-                : static_cast<MediaDirItem*>(index.internalPointer());
+        MediaDirItem* item = !index.isValid() ? m_root : static_cast<MediaDirItem*>(index.internalPointer());
 
         return item->info.absoluteFilePath();
     }
@@ -637,18 +579,14 @@ namespace Rv
         {
             if (index.isValid())
             {
-                MediaDirItem* item =
-                    static_cast<MediaDirItem*>(index.internalPointer());
+                MediaDirItem* item = static_cast<MediaDirItem*>(index.internalPointer());
 
-                if (!item->info.isDir()
-                    && !m_fileTraits->isKnown(m_fileTraitsIndex,
-                                              item->info.absoluteFilePath()))
+                if (!item->info.isDir() && !m_fileTraits->isKnown(m_fileTraitsIndex, item->info.absoluteFilePath()))
                 {
                     return Qt::NoItemFlags;
                 }
 
-                return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled
-                       | defaultFlags;
+                return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | defaultFlags;
             }
             else
             {
@@ -673,8 +611,7 @@ namespace Rv
 
         if (info.isRoot())
         {
-            if (!qstringEQ(info.absoluteFilePath(),
-                           m_root->info.absoluteFilePath()))
+            if (!qstringEQ(info.absoluteFilePath(), m_root->info.absoluteFilePath()))
             {
                 DB("    root differs -- setting dir");
                 setDirectory(info.absoluteFilePath(), Details(m_root->detail));
@@ -717,8 +654,7 @@ namespace Rv
             if (!qstringEQ(m_root->info.absoluteFilePath(), dirPath))
             {
                 DB("    not at correct root -- setting dir")
-                DB("    m_root is at "
-                   << UTF8::qconvert(m_root->info.absoluteFilePath()));
+                DB("    m_root is at " << UTF8::qconvert(m_root->info.absoluteFilePath()));
                 DB("    new root is " << UTF8::qconvert(dirPath));
                 setDirectory(dirPath, Details(m_root->detail));
                 return createIndex(m_root->row(), 0, m_root);
@@ -730,8 +666,7 @@ namespace Rv
                 item->populate();
                 QString p1 = parts[i];
                 DB("    part " << i << ": " << UTF8::qconvert(p1));
-                DB("        item "
-                   << UTF8::qconvert(item->info.absoluteFilePath()));
+                DB("        item " << UTF8::qconvert(item->info.absoluteFilePath()));
                 DB("        has children " << item->hasChildren());
 
                 for (int q = 0; !matchItem && q < item->children.size(); q++)
@@ -748,11 +683,8 @@ namespace Rv
                         //
                         //  This is a sequence
                         //
-                        DB("    child "
-                           << UTF8::qconvert(child->info.absoluteFilePath())
-                           << " does not exist, assumint it is a sequence");
-                        for (int j = 0;
-                             !matchItem && j < child->children.size(); j++)
+                        DB("    child " << UTF8::qconvert(child->info.absoluteFilePath()) << " does not exist, assumint it is a sequence");
+                        for (int j = 0; !matchItem && j < child->children.size(); j++)
                         {
                             MediaDirItem* gchild = child->children[j];
 
@@ -782,10 +714,8 @@ namespace Rv
                             //
 
                             QFileInfo sinfo(idir.absoluteFilePath(p1));
-                            item->children.push_back(new MediaDirItem(
-                                sinfo, item->detail, item->hidden,
-                                item->sortFlags, m_fileTraits,
-                                m_fileTraitsIndex, item));
+                            item->children.push_back(new MediaDirItem(sinfo, item->detail, item->hidden, item->sortFlags, m_fileTraits,
+                                                                      m_fileTraitsIndex, item));
                             DB("        hidden match");
                             matchItem = item->children.back();
                         }
@@ -823,8 +753,7 @@ namespace Rv
         //  m_root if the incoming dir is not equal to that of m_root.
         //
         {
-            QString dirPath =
-                info.isDir() ? info.absoluteFilePath() : info.absolutePath();
+            QString dirPath = info.isDir() ? info.absoluteFilePath() : info.absolutePath();
 
             //
             // Make sure this path is compared as a directory by forcing the
@@ -837,8 +766,7 @@ namespace Rv
             if (!qstringEQ(m_root->info.absoluteFilePath(), dirPath))
             {
                 DB("    not at correct root -- setting dir")
-                DB("    m_root is at "
-                   << m_root->info.absoluteFilePath().toUtf8().data());
+                DB("    m_root is at " << m_root->info.absoluteFilePath().toUtf8().data());
                 DB("    new root is " << dirPath.toUtf8().data());
                 setDirectory(dirPath, Details(m_root->detail));
             }
@@ -862,8 +790,7 @@ namespace Rv
             for (int q = 0; !matchItem && q < m_root->children.size(); q++)
             {
                 MediaDirItem* child = m_root->children[q];
-                DB("    child[" << q << "] "
-                                << child->info.fileName().toUtf8().data());
+                DB("    child[" << q << "] " << child->info.fileName().toUtf8().data());
 
                 if (qstringEQ(child->info.fileName(), baseName))
                 {
@@ -875,8 +802,7 @@ namespace Rv
                     //  This is a sequence
                     //
 
-                    for (int j = 0; !matchItem && j < child->children.size();
-                         j++)
+                    for (int j = 0; !matchItem && j < child->children.size(); j++)
                     {
                         MediaDirItem* gchild = child->children[j];
 
@@ -905,10 +831,8 @@ namespace Rv
                         //
 
                         QFileInfo sinfo(idir.absoluteFilePath(baseName));
-                        m_root->children.push_back(new MediaDirItem(
-                            sinfo, m_root->detail, m_root->hidden,
-                            m_root->sortFlags, m_fileTraits, m_fileTraitsIndex,
-                            m_root));
+                        m_root->children.push_back(new MediaDirItem(sinfo, m_root->detail, m_root->hidden, m_root->sortFlags, m_fileTraits,
+                                                                    m_fileTraitsIndex, m_root));
                         matchItem = m_root->children.back();
                     }
                 }
@@ -937,9 +861,7 @@ namespace Rv
             item = matchItem;
         }
 
-        DB("    match found, row "
-           << item->row() << " info "
-           << UTF8::qconvert(item->info.absoluteFilePath()));
+        DB("    match found, row " << item->row() << " info " << UTF8::qconvert(item->info.absoluteFilePath()));
         return createIndex(item->row(), 0, item);
     }
 
@@ -975,8 +897,7 @@ namespace Rv
         {
             m_hidden = b;
             if (m_root)
-                setDirectory(m_root->info.absolutePath(),
-                             Details(m_root->detail));
+                setDirectory(m_root->info.absolutePath(), Details(m_root->detail));
         }
     }
 

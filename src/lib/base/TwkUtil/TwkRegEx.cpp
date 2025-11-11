@@ -107,10 +107,7 @@ namespace TwkUtil
     }
 
     // *****************************************************************************
-    bool RegEx::matches(const char* fullStr) const
-    {
-        return regexec(&m_preg, fullStr, 0, NULL, 0) == 0;
-    }
+    bool RegEx::matches(const char* fullStr) const { return regexec(&m_preg, fullStr, 0, NULL, 0) == 0; }
 
     //******************************************************************************
     const RegEx& RegEx::nothing()
@@ -233,8 +230,7 @@ namespace TwkUtil
             m_pmatch = new regmatch_t[m_regex->subCount() + 1];
         }
 
-        int result = regexec(m_regex->preg(), m_fullStr.c_str(),
-                             m_regex->subCount(), m_pmatch, 0);
+        int result = regexec(m_regex->preg(), m_fullStr.c_str(), m_regex->subCount(), m_pmatch, 0);
 
         if (result == 0)
         {

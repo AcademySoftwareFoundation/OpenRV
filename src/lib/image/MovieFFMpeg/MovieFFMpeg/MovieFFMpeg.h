@@ -84,8 +84,7 @@ namespace TwkMovie
         typedef std::pair<std::string, unsigned int> MFFormat;
         typedef std::map<std::string, MFFormat> MFFormatMap;
 
-        MovieFFMpegIO(CodecFilterFunction filter, bool bruteForce,
-                      int codecThreads, std::string language, double defaultFPS,
+        MovieFFMpegIO(CodecFilterFunction filter, bool bruteForce, int codecThreads, std::string language, double defaultFPS,
                       void (*registerCustomCodecs)() = nullptr);
 
         virtual ~MovieFFMpegIO();
@@ -97,8 +96,7 @@ namespace TwkMovie
         virtual std::string about() const;
         virtual MovieReader* movieReader() const;
         virtual MovieWriter* movieWriter() const;
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
 
         //
         // Public Lookup Methods
@@ -117,8 +115,7 @@ namespace TwkMovie
         // Format Output Methods
         //
 
-        void collectParameters(const AVClass* avClass, ParameterVector* eparams,
-                               ParameterVector* dparams, std::string codec,
+        void collectParameters(const AVClass* avClass, ParameterVector* eparams, ParameterVector* dparams, std::string codec,
                                std::string prefix);
 
         //
@@ -153,11 +150,9 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         virtual bool canConvertAudioChannels() const;
         void close();
@@ -166,10 +161,8 @@ namespace TwkMovie
         //  Movie API
         //
 
-        virtual void imagesAtFrame(const ReadRequest& request,
-                                   FrameBufferVector&);
-        virtual void identifiersAtFrame(const ReadRequest& request,
-                                        IdentifierVector& ids);
+        virtual void imagesAtFrame(const ReadRequest& request, FrameBufferVector&);
+        virtual void identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids);
         virtual size_t audioFillBuffer(const AudioReadRequest&, AudioBuffer&);
         virtual MovieReader* clone() const;
         virtual void audioConfigure(const AudioConfiguration& config);
@@ -189,8 +182,7 @@ namespace TwkMovie
         void initializeVideo(int height, int width);
         void initializeAudio();
         bool openAVFormat();
-        bool openAVCodec(int index, AVCodecContext** avCodecContext,
-                         HardwareContext* hardwareContext = nullptr);
+        bool openAVCodec(int index, AVCodecContext** avCodecContext, HardwareContext* hardwareContext = nullptr);
         void findStreamInfo();
 
         //
@@ -205,19 +197,16 @@ namespace TwkMovie
         // Metadata & Lookup Methods
         //
 
-        void collectPlaybackTiming(std::vector<bool> heroVideoTracks,
-                                   std::vector<bool> heroAudioTracks);
+        void collectPlaybackTiming(std::vector<bool> heroVideoTracks, std::vector<bool> heroAudioTracks);
         int64_t getFirstFrame(AVRational rate);
-        void snagMetadata(AVDictionary* dict, std::string source,
-                          FrameBuffer* fb);
+        void snagMetadata(AVDictionary* dict, std::string source, FrameBuffer* fb);
         bool snagColr(AVCodecContext* videoCodecContext, VideoTrack* track);
         FrameBuffer::Orientation snagOrientation(VideoTrack* track);
         bool snagVideoColorInformation(VideoTrack* track);
         std::string snagVideoFrameType(VideoTrack* track);
         void addVideoFBAttrs(VideoTrack* track);
         void finishTrackFBAttrs(FrameBuffer* fb, std::string view);
-        void trackFromStreamIndex(int index, VideoTrack*& vTrack,
-                                  AudioTrack*& aTrack);
+        void trackFromStreamIndex(int index, VideoTrack*& vTrack, AudioTrack*& aTrack);
         void populateTimecodeMetadata(const AVDictionaryEntry* tcEntry, const AVTimecode& avTimecode);
         AVRational getTimecodeRate(AVStream* tsStream, AVFormatContext* formatContext);
 
@@ -228,26 +217,21 @@ namespace TwkMovie
         ChannelsVector idAudioChannels(AVChannelLayout layout, int numChannels);
         SampleTime oneTrackAudioFillBuffer(AudioTrack* track);
         int decodeAudioForBuffer(AudioTrack* track);
-        template <typename T>
-        int translateAVAudio(AudioTrack* track, double max, int offset);
+        template <typename T> int translateAVAudio(AudioTrack* track, double max, int offset);
 
         //
         // Video Methods
         //
 
         FrameBuffer* decodeImageAtFrame(int inframe, VideoTrack* track);
-        FrameBuffer* configureYUVPlanes(FrameBuffer::DataType dataType,
-                                        int width, int height, int rowSpan,
-                                        int rowSpanUV, int usampling,
-                                        int vsampling, bool addAlpha,
-                                        FrameBuffer::Orientation orientation);
+        FrameBuffer* configureYUVPlanes(FrameBuffer::DataType dataType, int width, int height, int rowSpan, int rowSpanUV, int usampling,
+                                        int vsampling, bool addAlpha, FrameBuffer::Orientation orientation);
         void identifier(int frame, std::ostream&);
 
         // Seek to the requested frame and perform drain if requested.
         // This function also flush the buffers and clear the timestamp track
         // list.
-        void seekToFrame(int inframe, double frameDur, AVStream* videoStream,
-                         VideoTrack* track);
+        void seekToFrame(int inframe, double frameDur, AVStream* videoStream, VideoTrack* track);
 
         // Read a packet from the video stream and updates the timestamp track
         // list if necessary.
@@ -263,22 +247,17 @@ namespace TwkMovie
         // uses the new FFMpeg API. i.e. It uses avcodec_send_packet() and
         // avcodec_receive_frame() rather
         //      than avcodec_decode_video2().
-        bool findImageWithBestTimestamp(int inframe, double frameDur,
-                                        AVStream* videoStream,
-                                        VideoTrack* track);
+        bool findImageWithBestTimestamp(int inframe, double frameDur, AVStream* videoStream, VideoTrack* track);
 
         // check if the input format is jpeg_pipe or png_pipe
         bool isImageFormat(const char* iformat);
 
         // Copy the source frame to the destination frame and convert image
         // format if requested
-        static void copyFrame(const AVFrame* srcFrame, AVFrame* dstFrame,
-                              int width, int height, bool convertFormat,
+        static void copyFrame(const AVFrame* srcFrame, AVFrame* dstFrame, int width, int height, bool convertFormat,
                               SwsContext*& imgConvertContext);
 
-        
-        FrameBuffer*  jpeg2000Decode(int inframe, VideoTrack* track);
-
+        FrameBuffer* jpeg2000Decode(int inframe, VideoTrack* track);
 
         //
         // Data Members
@@ -328,11 +307,8 @@ namespace TwkMovie
         // MovieWriter API
         //
 
-        virtual MovieInfo open(const MovieInfo& info,
-                               const std::string& filename,
-                               const WriteRequest& request);
-        virtual bool write(Movie* inMovie, const std::string& filename,
-                           WriteRequest& request);
+        virtual MovieInfo open(const MovieInfo& info, const std::string& filename, const WriteRequest& request);
+        virtual bool write(Movie* inMovie, const std::string& filename, WriteRequest& request);
         virtual bool write(Movie* inMovie);
 
     private:
@@ -340,48 +316,37 @@ namespace TwkMovie
         // Init Methods
         //
 
-        void addTrack(bool isVideo, std::string codec,
-                      bool removeAppliedCodecParametersFromTheList = true);
-        void addChapter(int id, int startFrame, int endFrame,
-                        std::string title);
+        void addTrack(bool isVideo, std::string codec, bool removeAppliedCodecParametersFromTheList = true);
+        void addChapter(int id, int startFrame, int endFrame, std::string title);
         void collectWriteInfo(std::string videoCodec, std::string audioCodec);
         void initRefMovie(ReformattingMovie* refMovie);
         void validateCodecs(std::string* videoCodec, std::string* audioCodec);
-        std::string getWriterCodec(std::string type,
-                                   std::vector<std::string> guesses);
+        std::string getWriterCodec(std::string type, std::vector<std::string> guesses);
 
         //
         // Arg & Option Methods
         //
 
-        bool setOption(const AVOption* opt, void* avObj,
-                       const std::string value);
-        void applyCodecParameters(
-            AVCodecContext* avCodecContext,
-            bool removeAppliedCodecParametersFromTheList = true);
+        bool setOption(const AVOption* opt, void* avObj, const std::string value);
+        void applyCodecParameters(AVCodecContext* avCodecContext, bool removeAppliedCodecParametersFromTheList = true);
         void applyFormatParameters();
 
         //
         // Audio Methods
         //
 
-        void encodeAudio(AVCodecContext* audioCodecContext, AVFrame* frame,
-                         AVPacket* pkt, AVStream* audioStream,
-                         SampleTime* nsamps, int64_t lastEncAudio);
+        void encodeAudio(AVCodecContext* audioCodecContext, AVFrame* frame, AVPacket* pkt, AVStream* audioStream, SampleTime* nsamps,
+                         int64_t lastEncAudio);
         bool fillAudio(Movie* inMovie, double overflow, bool lastPass);
         template <typename T>
-        void translateRVAudio(int audioChannels,
-                              TwkAudio::AudioBuffer* audioBuffer, double max,
-                              int offset, bool planar);
+        void translateRVAudio(int audioChannels, TwkAudio::AudioBuffer* audioBuffer, double max, int offset, bool planar);
 
         //
         // Video Methods
         //
 
-        void encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt,
-                         AVStream* stream, int lastEncVideo);
-        void fillVideo(FrameBufferVector fbs, int trackIndex, int frameIndex,
-                       bool lastPass);
+        void encodeVideo(AVCodecContext* ctx, AVFrame* frame, AVPacket* pkt, AVStream* stream, int lastEncVideo);
+        void fillVideo(FrameBufferVector fbs, int trackIndex, int frameIndex, bool lastPass);
         void initVideoTrack(AVStream* avStream);
 
         //

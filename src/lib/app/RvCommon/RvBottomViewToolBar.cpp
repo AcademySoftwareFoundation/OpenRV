@@ -145,18 +145,12 @@ namespace Rv
             }
         }
 
-        connect(m_smAction, SIGNAL(triggered(bool)), this,
-                SLOT(smActionTriggered(bool)));
-        connect(m_paintAction, SIGNAL(triggered(bool)), this,
-                SLOT(paintActionTriggered(bool)));
-        connect(m_infoAction, SIGNAL(triggered(bool)), this,
-                SLOT(infoActionTriggered(bool)));
-        connect(m_timelineAction, SIGNAL(triggered(bool)), this,
-                SLOT(timelineActionTriggered(bool)));
-        connect(m_timelineMagAction, SIGNAL(triggered(bool)), this,
-                SLOT(timelineMagActionTriggered(bool)));
-        connect(m_networkAction, SIGNAL(triggered(bool)), this,
-                SLOT(networkActionTriggered(bool)));
+        connect(m_smAction, SIGNAL(triggered(bool)), this, SLOT(smActionTriggered(bool)));
+        connect(m_paintAction, SIGNAL(triggered(bool)), this, SLOT(paintActionTriggered(bool)));
+        connect(m_infoAction, SIGNAL(triggered(bool)), this, SLOT(infoActionTriggered(bool)));
+        connect(m_timelineAction, SIGNAL(triggered(bool)), this, SLOT(timelineActionTriggered(bool)));
+        connect(m_timelineMagAction, SIGNAL(triggered(bool)), this, SLOT(timelineMagActionTriggered(bool)));
+        connect(m_networkAction, SIGNAL(triggered(bool)), this, SLOT(networkActionTriggered(bool)));
 
         a = addAction("");
         a->setIcon(QIcon(":/images/ghost.png"));
@@ -176,10 +170,8 @@ namespace Rv
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
         m_holdAction = a;
 
-        connect(m_ghostAction, SIGNAL(triggered(bool)), this,
-                SLOT(ghostTriggered(bool)));
-        connect(m_holdAction, SIGNAL(triggered(bool)), this,
-                SLOT(holdTriggered(bool)));
+        connect(m_ghostAction, SIGNAL(triggered(bool)), this, SLOT(ghostTriggered(bool)));
+        connect(m_holdAction, SIGNAL(triggered(bool)), this, SLOT(holdTriggered(bool)));
 
         //
         //  Add some expanding space before the play buttons
@@ -246,18 +238,12 @@ namespace Rv
         b->setObjectName("lastFrameButton");
         m_forwardMarkAction = a;
 
-        connect(m_backStepAction, SIGNAL(triggered()), this,
-                SLOT(backStepTriggered()));
-        connect(m_forwardStepAction, SIGNAL(triggered()), this,
-                SLOT(forwardStepTriggered()));
-        connect(m_backPlayAction, SIGNAL(triggered()), this,
-                SLOT(backPlayTriggered()));
-        connect(m_forwardPlayAction, SIGNAL(triggered()), this,
-                SLOT(forwardPlayTriggered()));
-        connect(m_backMarkAction, SIGNAL(triggered()), this,
-                SLOT(backMarkTriggered()));
-        connect(m_forwardMarkAction, SIGNAL(triggered()), this,
-                SLOT(forwardMarkTriggered()));
+        connect(m_backStepAction, SIGNAL(triggered()), this, SLOT(backStepTriggered()));
+        connect(m_forwardStepAction, SIGNAL(triggered()), this, SLOT(forwardStepTriggered()));
+        connect(m_backPlayAction, SIGNAL(triggered()), this, SLOT(backPlayTriggered()));
+        connect(m_forwardPlayAction, SIGNAL(triggered()), this, SLOT(forwardPlayTriggered()));
+        connect(m_backMarkAction, SIGNAL(triggered()), this, SLOT(backMarkTriggered()));
+        connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
 
         //
         //  Add some expanding space after the play buttons
@@ -308,25 +294,18 @@ namespace Rv
 
         m_playModeMenu = new QMenu(b);
         m_playModeMenu->addAction("Playback")->setDisabled(true);
-        m_playModeMenu->addAction("  Once")->setData(
-            enumCodeMap(Session::PlayOnce, "commands.setPlayMode(PlayOnce)"));
-        m_playModeMenu->addAction("  Loop")->setData(
-            enumCodeMap(Session::PlayLoop, "commands.setPlayMode(PlayLoop)"));
-        m_playModeMenu->addAction("  PingPong")
-            ->setData(enumCodeMap(Session::PlayPingPong,
-                                  "commands.setPlayMode(PlayPingPong)"));
+        m_playModeMenu->addAction("  Once")->setData(enumCodeMap(Session::PlayOnce, "commands.setPlayMode(PlayOnce)"));
+        m_playModeMenu->addAction("  Loop")->setData(enumCodeMap(Session::PlayLoop, "commands.setPlayMode(PlayLoop)"));
+        m_playModeMenu->addAction("  PingPong")->setData(enumCodeMap(Session::PlayPingPong, "commands.setPlayMode(PlayPingPong)"));
         //  m_playModeMenu->addAction("  Loop with Black 0.5 Second");
         //  m_playModeMenu->addAction("  Loop with Black 1.0 Second");
 
         b->setMenu(m_playModeMenu);
 
-        connect(m_playModeMenu, SIGNAL(triggered(QAction*)), this,
-                SLOT(playModeMenuTriggered(QAction*)));
-        connect(m_playModeMenu, SIGNAL(aboutToShow()), this,
-                SLOT(playModeMenuUpdate()));
+        connect(m_playModeMenu, SIGNAL(triggered(QAction*)), this, SLOT(playModeMenuTriggered(QAction*)));
+        connect(m_playModeMenu, SIGNAL(aboutToShow()), this, SLOT(playModeMenuUpdate()));
 
-        int volumeLevel =
-            (int)(100.0f * IPCore::SoundTrackIPNode::defaultVolume);
+        int volumeLevel = (int)(100.0f * IPCore::SoundTrackIPNode::defaultVolume);
         m_audioAction = addAction("");
         m_audioAction->setToolTip("Audio control");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_audioAction));
@@ -352,28 +331,25 @@ namespace Rv
         b->setMenu(m);
         m_audioMenu = m;
 
-        connect(m_muteAction, SIGNAL(triggered(bool)), this,
-                SLOT(audioMuteTriggered(bool)));
-        connect(m_audioMenu, SIGNAL(aboutToShow()), this,
-                SLOT(audioMenuTriggered()));
-        connect(m_audioSlider, SIGNAL(valueChanged(int)), this,
-                SLOT(audioSliderChanged(int)));
-        connect(m_audioSlider, SIGNAL(sliderReleased()), this,
-                SLOT(audioSliderReleased()));
+        connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(audioMuteTriggered(bool)));
+        connect(m_audioMenu, SIGNAL(aboutToShow()), this, SLOT(audioMenuTriggered()));
+        connect(m_audioSlider, SIGNAL(valueChanged(int)), this, SLOT(audioSliderChanged(int)));
+        connect(m_audioSlider, SIGNAL(sliderReleased()), this, SLOT(audioSliderReleased()));
 
-        m_liveReviewFilteredActions = {
-            {m_smAction, m_smAction->toolTip()},
-            {m_paintAction, m_paintAction->toolTip()},
-            {m_holdAction, m_holdAction->toolTip()},
-            {m_ghostAction, m_ghostAction->toolTip()},
-            {m_backStepAction, m_backStepAction->toolTip()},
-            {m_forwardStepAction, m_forwardStepAction->toolTip()},
-            {m_backPlayAction, m_backPlayAction->toolTip()},
-            {m_forwardPlayAction, m_forwardPlayAction->toolTip()},
-            {m_backMarkAction, m_backMarkAction->toolTip()},
-            {m_forwardMarkAction, m_forwardMarkAction->toolTip()},
-            {m_playModeAction, m_playModeAction->toolTip()},
-        };
+        // Map toolbar actions to their corresponding event categories
+        m_actionCategoryMappings = {{
+            {m_smAction, IPCore::EventCategories::sessionmanagerCategory, m_smAction->toolTip()},
+            {m_paintAction, IPCore::EventCategories::annotateCategory, m_paintAction->toolTip()},
+            {m_holdAction, IPCore::EventCategories::annotateCategory, m_holdAction->toolTip()},
+            {m_ghostAction, IPCore::EventCategories::annotateCategory, m_ghostAction->toolTip()},
+            {m_backStepAction, IPCore::EventCategories::playcontrolCategory, m_backStepAction->toolTip()},
+            {m_forwardStepAction, IPCore::EventCategories::playcontrolCategory, m_forwardStepAction->toolTip()},
+            {m_backPlayAction, IPCore::EventCategories::playcontrolCategory, m_backPlayAction->toolTip()},
+            {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
+            {m_backMarkAction, IPCore::EventCategories::markCategory, m_backMarkAction->toolTip()},
+            {m_forwardMarkAction, IPCore::EventCategories::markCategory, m_forwardMarkAction->toolTip()},
+            {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
+        }};
 
         if (m_session)
             setSession(m_session);
@@ -393,8 +369,7 @@ namespace Rv
 
     EventNode::Result RvBottomViewToolBar::receiveEvent(const Event& event)
     {
-        if (const GenericStringEvent* gevent =
-                dynamic_cast<const GenericStringEvent*>(&event))
+        if (const GenericStringEvent* gevent = dynamic_cast<const GenericStringEvent*>(&event))
         {
             const string& name = event.name();
             const string& contents = gevent->stringContent();
@@ -406,8 +381,7 @@ namespace Rv
                 IPGraph::PropertyVector props;
 
                 IPNode* node = m_session->graph().findNode(parts.front());
-                m_session->graph().findProperty(m_session->currentFrame(),
-                                                props, contents);
+                m_session->graph().findProperty(m_session->currentFrame(), props, contents);
 
                 if (!node)
                 {
@@ -417,18 +391,15 @@ namespace Rv
 
                 if (dynamic_cast<SoundTrackIPNode*>(node))
                 {
-                    if (parts.back() == "volume"
-                        && parts[parts.size() - 2] == "audio")
+                    if (parts.back() == "volume" && parts[parts.size() - 2] == "audio")
                     {
-                        if (FloatProperty* fp =
-                                dynamic_cast<FloatProperty*>(props[0]))
+                        if (FloatProperty* fp = dynamic_cast<FloatProperty*>(props[0]))
                         {
                             m_audioSlider->setValue(fp->front() * 99.0);
                         }
                     }
 
-                    if (parts.back() == "mute"
-                        && parts[parts.size() - 2] == "audio")
+                    if (parts.back() == "mute" && parts[parts.size() - 2] == "audio")
                     {
                         setVolumeIcon();
                     }
@@ -436,10 +407,8 @@ namespace Rv
             }
             else if (name == "play-start")
             {
-                QToolButton* bb = dynamic_cast<QToolButton*>(
-                    widgetForAction(m_backPlayAction));
-                QToolButton* bf = dynamic_cast<QToolButton*>(
-                    widgetForAction(m_forwardPlayAction));
+                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backPlayAction));
+                QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
 
                 if (m_session->inc() == -1)
                 {
@@ -452,18 +421,15 @@ namespace Rv
             }
             else if (name == "play-stop")
             {
-                QToolButton* bb = dynamic_cast<QToolButton*>(
-                    widgetForAction(m_backPlayAction));
-                QToolButton* bf = dynamic_cast<QToolButton*>(
-                    widgetForAction(m_forwardPlayAction));
+                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backPlayAction));
+                QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
 
                 bb->setIcon(QIcon(":/images/control_bplay.png"));
                 bf->setIcon(QIcon(":/images/control_play.png"));
             }
             else if (name == "play-mode-changed")
             {
-                if (QToolButton* b = dynamic_cast<QToolButton*>(
-                        widgetForAction(m_playModeAction)))
+                if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
                 {
                     switch (m_session->playMode())
                     {
@@ -489,13 +455,11 @@ namespace Rv
                 bool isChecked = (contents == "1");
                 m_holdAction->setChecked(isChecked);
             }
-            // Commented out temporarily and will be reworked soon.
-            //else if (name == "internal-sync-presenter-changed"
-            //         || name == "sync-session-ended")
-            //{
-            //    bool isDisabled = m_session->filterLiveReviewEvents();
-            //    setLiveReviewFilteredActions(isDisabled);
-            //}
+            else if (name == "event-category-state-changed")
+            {
+                // Update action availability when presenter changes or session mode changes
+                updateActionAvailability();
+            }
         }
 
         return EventAcceptAndContinue;
@@ -505,48 +469,25 @@ namespace Rv
     //  SLOTS
     //
 
-    void RvBottomViewToolBar::smActionTriggered(bool b)
-    {
-        m_session->userGenericEvent("mode-manager-toggle-mode",
-                                    "session_manager");
-    }
+    void RvBottomViewToolBar::smActionTriggered(bool b) { m_session->userGenericEvent("mode-manager-toggle-mode", "session_manager"); }
 
-    void RvBottomViewToolBar::paintActionTriggered(bool)
-    {
-        m_session->userGenericEvent("mode-manager-toggle-mode",
-                                    "annotate_mode");
-    }
+    void RvBottomViewToolBar::paintActionTriggered(bool) { m_session->userGenericEvent("mode-manager-toggle-mode", "annotate_mode"); }
 
-    void RvBottomViewToolBar::infoActionTriggered(bool)
-    {
-        m_session->userGenericEvent("toggle-hud-info-widget", "");
-    }
+    void RvBottomViewToolBar::infoActionTriggered(bool) { m_session->userGenericEvent("toggle-hud-info-widget", ""); }
 
-    void RvBottomViewToolBar::timelineActionTriggered(bool)
-    {
-        m_session->userGenericEvent("toggle-hud-timeline-widget", "");
-    }
+    void RvBottomViewToolBar::timelineActionTriggered(bool) { m_session->userGenericEvent("toggle-hud-timeline-widget", ""); }
 
-    void RvBottomViewToolBar::timelineMagActionTriggered(bool)
-    {
-        m_session->userGenericEvent("toggle-hud-timeline-mag-widget", "");
-    }
+    void RvBottomViewToolBar::timelineMagActionTriggered(bool) { m_session->userGenericEvent("toggle-hud-timeline-mag-widget", ""); }
 
-    void RvBottomViewToolBar::networkActionTriggered(bool)
-    {
-        RvApp()->showNetworkDialog();
-    }
+    void RvBottomViewToolBar::networkActionTriggered(bool) { RvApp()->showNetworkDialog(); }
 
     void RvBottomViewToolBar::ghostTriggered(bool isChecked)
     {
         auto* sessionNode = m_session->graph().sessionNode();
         if (sessionNode != nullptr)
         {
-            sessionNode->setProperty<IPNode::IntProperty>("paintEffects.ghost",
-                                                          isChecked ? 1 : 0);
-            m_session->userGenericEvent("graph-state-change",
-                                        sessionNode->name()
-                                            + ".paintEffects.ghost");
+            sessionNode->setProperty<IPNode::IntProperty>("paintEffects.ghost", isChecked ? 1 : 0);
+            m_session->userGenericEvent("graph-state-change", sessionNode->name() + ".paintEffects.ghost");
         }
     }
 
@@ -555,25 +496,14 @@ namespace Rv
         auto* sessionNode = m_session->graph().sessionNode();
         if (sessionNode != nullptr)
         {
-            sessionNode->setProperty<IPNode::IntProperty>("paintEffects.hold",
-                                                          isChecked ? 1 : 0);
-            m_session->userGenericEvent("graph-state-change",
-                                        sessionNode->name()
-                                            + ".paintEffects.hold");
+            sessionNode->setProperty<IPNode::IntProperty>("paintEffects.hold", isChecked ? 1 : 0);
+            m_session->userGenericEvent("graph-state-change", sessionNode->name() + ".paintEffects.hold");
         }
     }
 
-    void RvBottomViewToolBar::backStepTriggered()
-    {
-        m_session->userGenericEvent("remote-eval",
-                                    "extra_commands.stepBackward(1)");
-    }
+    void RvBottomViewToolBar::backStepTriggered() { m_session->userGenericEvent("remote-eval", "extra_commands.stepBackward(1)"); }
 
-    void RvBottomViewToolBar::forwardStepTriggered()
-    {
-        m_session->userGenericEvent("remote-eval",
-                                    "extra_commands.stepForward(1)");
-    }
+    void RvBottomViewToolBar::forwardStepTriggered() { m_session->userGenericEvent("remote-eval", "extra_commands.stepForward(1)"); }
 
     void RvBottomViewToolBar::backPlayTriggered()
     {
@@ -592,12 +522,10 @@ namespace Rv
             // If we are going from scrubbing to play; we must turn off
             // scrubbing.
             if (m_session->isScrubbingAudio())
-                m_session->userGenericEvent(
-                    "remote-eval", "commands.scrubAudio(false); "
-                                   "commands.setInc(-1); commands.play();");
+                m_session->userGenericEvent("remote-eval", "commands.scrubAudio(false); "
+                                                           "commands.setInc(-1); commands.play();");
             else
-                m_session->userGenericEvent(
-                    "remote-eval", "commands.setInc(-1); commands.play();");
+                m_session->userGenericEvent("remote-eval", "commands.setInc(-1); commands.play();");
         }
     }
 
@@ -618,25 +546,16 @@ namespace Rv
             // If we are going from scrubbing to play; we must turn off
             // scrubbing.
             if (m_session->isScrubbingAudio())
-                m_session->userGenericEvent(
-                    "remote-eval", "commands.scrubAudio(false); "
-                                   "commands.setInc(1); commands.play();");
+                m_session->userGenericEvent("remote-eval", "commands.scrubAudio(false); "
+                                                           "commands.setInc(1); commands.play();");
             else
-                m_session->userGenericEvent(
-                    "remote-eval", "commands.setInc(1); commands.play();");
+                m_session->userGenericEvent("remote-eval", "commands.setInc(1); commands.play();");
         }
     }
 
-    void RvBottomViewToolBar::backMarkTriggered()
-    {
-        m_session->userGenericEvent("remote-eval",
-                                    "rvui.previousMarkedFrame()");
-    }
+    void RvBottomViewToolBar::backMarkTriggered() { m_session->userGenericEvent("remote-eval", "rvui.previousMarkedFrame()"); }
 
-    void RvBottomViewToolBar::forwardMarkTriggered()
-    {
-        m_session->userGenericEvent("remote-eval", "rvui.nextMarkedFrame()");
-    }
+    void RvBottomViewToolBar::forwardMarkTriggered() { m_session->userGenericEvent("remote-eval", "rvui.nextMarkedFrame()"); }
 
     void RvBottomViewToolBar::audioSliderReleased()
     {
@@ -650,9 +569,7 @@ namespace Rv
     void RvBottomViewToolBar::audioSliderChanged(int value)
     {
         const float v = float(value) / 99.0;
-        FloatPropertyEditor editor(m_session->graph(),
-                                   m_session->currentFrame(),
-                                   "#RVSoundTrack.audio.volume");
+        FloatPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.volume");
 
         // Has the volume changed?
         if (v != editor.value())
@@ -667,12 +584,9 @@ namespace Rv
 
     void RvBottomViewToolBar::setVolumeIcon()
     {
-        if (QToolButton* b =
-                dynamic_cast<QToolButton*>(widgetForAction(m_audioAction)))
+        if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_audioAction)))
         {
-            IntPropertyEditor editor(m_session->graph(),
-                                     m_session->currentFrame(),
-                                     "#RVSoundTrack.audio.mute");
+            IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
 
             if (editor.value())
             {
@@ -689,8 +603,7 @@ namespace Rv
 
     void RvBottomViewToolBar::audioMuteTriggered(bool v)
     {
-        IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 "#RVSoundTrack.audio.mute");
+        IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
         editor.setValue(v ? 1 : 0);
 
         setVolumeIcon();
@@ -698,12 +611,9 @@ namespace Rv
 
     void RvBottomViewToolBar::audioMenuTriggered()
     {
-        FloatPropertyEditor veditor(m_session->graph(),
-                                    m_session->currentFrame(),
-                                    "#RVSoundTrack.audio.volume");
+        FloatPropertyEditor veditor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.volume");
 
-        IntPropertyEditor meditor(m_session->graph(), m_session->currentFrame(),
-                                  "#RVSoundTrack.audio.mute");
+        IntPropertyEditor meditor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
 
         m_audioSlider->setValue(veditor.value() * 99.0);
 
@@ -726,8 +636,7 @@ namespace Rv
                 continue;
 
             a->setCheckable(true);
-            a->setChecked(a->data().toMap()["enum"].toInt()
-                          == m_session->playMode());
+            a->setChecked(a->data().toMap()["enum"].toInt() == m_session->playMode());
         }
     }
 
@@ -736,12 +645,9 @@ namespace Rv
         if (!m_session)
             return;
 
-        m_session->userGenericEvent(
-            "remote-eval",
-            UTF8::qconvert(a->data().toMap()["code"].toString()));
+        m_session->userGenericEvent("remote-eval", UTF8::qconvert(a->data().toMap()["code"].toString()));
 
-        if (QToolButton* b =
-                dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
+        if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
         {
             switch (m_session->playMode())
             {
@@ -760,18 +666,21 @@ namespace Rv
         }
     }
 
-    void RvBottomViewToolBar::setLiveReviewFilteredActions(bool isDisabled)
+    void RvBottomViewToolBar::updateActionAvailability()
     {
-        for (const auto& button : m_liveReviewFilteredActions)
-        {
-            QAction* action = button.first;
-            QString tooltipText = button.second;
+        if (!m_session)
+            return;
 
-            if (action != nullptr)
+        // Update action enabled/disabled state based on event category filtering
+        for (const auto& mapping : m_actionCategoryMappings)
+        {
+            if (mapping.action != nullptr)
             {
-                action->setDisabled(isDisabled);
-                action->setToolTip(isDisabled ? "You must be presenter to use"
-                                              : tooltipText);
+                bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
+
+                mapping.action->setEnabled(categoryEnabled);
+                mapping.action->setToolTip(categoryEnabled ? mapping.defaultTooltip
+                                                           : QString("You must be presenter to use ") + mapping.defaultTooltip);
             }
         }
     }

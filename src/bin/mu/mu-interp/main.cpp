@@ -149,23 +149,15 @@ int main(int argc, char** argv)
 
     GarbageCollector::init();
 
-    if (arg_parse(
-            argc, argv, "", "Usage: %s [options]", argv[0], "[%S]", &inFile,
-            "input .mu source file", "-print", ARG_FLAG(&print),
-            "print parse tree in lispy form", "-printFunc %S", &printFunc,
-            "print function in lispy form", "-stdin", ARG_FLAG(&noninteractive),
-            "non interactive mode", "-no-readline", ARG_FLAG(&noReadline),
-            "don't use readline library", "-why", ARG_FLAG(&why),
-            "verbose function choice information", "-debug", ARG_FLAG(&debug),
-            "include debug information", "-symbols", ARG_FLAG(&symbols),
-            "output root symbol table", "-compile", ARG_FLAG(&compile),
-            "compile muc files on demand", "-noeval", ARG_FLAG(&noeval),
-            "don't evaluate", "-notruncate", ARG_FLAG(&notruncate),
-            "don't truncate long output", "-no-gc", ARG_FLAG(&disableGC),
-            "turn off garbage collector", "-usage", ARG_FLAG(&usage),
-            "show usage", "-name", ARG_FLAG(&streamName),
-            "name to use for error reporting", "-main", ARG_FLAG(&callmain),
-            "call the main() function if it exists", NULL)
+    if (arg_parse(argc, argv, "", "Usage: %s [options]", argv[0], "[%S]", &inFile, "input .mu source file", "-print", ARG_FLAG(&print),
+                  "print parse tree in lispy form", "-printFunc %S", &printFunc, "print function in lispy form", "-stdin",
+                  ARG_FLAG(&noninteractive), "non interactive mode", "-no-readline", ARG_FLAG(&noReadline), "don't use readline library",
+                  "-why", ARG_FLAG(&why), "verbose function choice information", "-debug", ARG_FLAG(&debug), "include debug information",
+                  "-symbols", ARG_FLAG(&symbols), "output root symbol table", "-compile", ARG_FLAG(&compile), "compile muc files on demand",
+                  "-noeval", ARG_FLAG(&noeval), "don't evaluate", "-notruncate", ARG_FLAG(&notruncate), "don't truncate long output",
+                  "-no-gc", ARG_FLAG(&disableGC), "turn off garbage collector", "-usage", ARG_FLAG(&usage), "show usage", "-name",
+                  ARG_FLAG(&streamName), "name to use for error reporting", "-main", ARG_FLAG(&callmain),
+                  "call the main() function if it exists", NULL)
         < 0)
     {
         exit(0);
@@ -293,21 +285,17 @@ int main(int argc, char** argv)
     {
         QualifiedName n = context->internName(printFunc);
 
-        if (const Symbol* sym =
-                context->globalScope()->findSymbolByQualifiedName(n, false))
+        if (const Symbol* sym = context->globalScope()->findSymbolByQualifiedName(n, false))
         {
-            for (const Symbol* s = sym->firstOverload(); s;
-                 s = s->nextOverload())
+            for (const Symbol* s = sym->firstOverload(); s; s = s->nextOverload())
             {
-                if (const Mu::Function* f =
-                        dynamic_cast<const Mu::Function*>(s))
+                if (const Mu::Function* f = dynamic_cast<const Mu::Function*>(s))
                 {
                     cout << "Function: " << f->name() << " ";
 
                     if (f->body())
                     {
-                        NodePrinter printer(f->body(), cout,
-                                            NodePrinter::Lispy);
+                        NodePrinter printer(f->body(), cout, NodePrinter::Lispy);
                         printer.traverse();
                     }
                     else
@@ -325,15 +313,11 @@ int main(int argc, char** argv)
     {
         if (Name n = context->lookupName("main"))
         {
-            if (Mu::Function* f =
-                    context->globalScope()->findSymbolOfType<Mu::Function>(n))
+            if (Mu::Function* f = context->globalScope()->findSymbolOfType<Mu::Function>(n))
             {
-                StringType* stype =
-                    context->globalScope()->findSymbolOfType<StringType>(
-                        context->lookupName("string"));
+                StringType* stype = context->globalScope()->findSymbolOfType<StringType>(context->lookupName("string"));
 
-                DynamicArrayType* arrayType = static_cast<DynamicArrayType*>(
-                    context->arrayType(stype, 1, 0));
+                DynamicArrayType* arrayType = static_cast<DynamicArrayType*>(context->arrayType(stype, 1, 0));
                 DynamicArray* array = new DynamicArray(arrayType, 1);
 
                 array->resize(argc);

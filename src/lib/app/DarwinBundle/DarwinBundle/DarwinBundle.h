@@ -29,10 +29,8 @@ namespace TwkApp
     class DarwinBundle : public Bundle
     {
     public:
-        DarwinBundle(const FileName& AppName, size_t majorVersion,
-                     size_t minorVersion, size_t revisionNumber,
-                     bool protocolHandler = false, bool sandboxed = false,
-                     bool inheritedSandbox = false);
+        DarwinBundle(const FileName& AppName, size_t majorVersion, size_t minorVersion, size_t revisionNumber, bool protocolHandler = false,
+                     bool sandboxed = false, bool inheritedSandbox = false);
 
         virtual ~DarwinBundle();
 
@@ -56,8 +54,7 @@ namespace TwkApp
         //  contains the filtered arguments.
         //
 
-        static void removePSN(int& argc, char* argv[],
-                              std::vector<char*>& nargv);
+        static void removePSN(int& argc, char* argv[], std::vector<char*>& nargv);
 
         //
         //  Bundle API
@@ -71,8 +68,7 @@ namespace TwkApp
         virtual Path executableFile(const FileName& name);
         virtual Path application(const FileName& name);
         virtual PathVector supportPath();
-        virtual Path rcfile(const FileName& rcfileName, const FileName& type,
-                            const EnvVar& rcenv);
+        virtual Path rcfile(const FileName& rcfileName, const FileName& type, const EnvVar& rcenv);
         virtual Path userPluginPath(const DirName& pluginType);
         virtual PathVector pluginPath(const DirName& pluginType);
         virtual PathVector scriptPath(const DirName& scriptType);
@@ -80,23 +76,16 @@ namespace TwkApp
         virtual Path appScriptPath(const DirName& scriptType);
         virtual Path userCacheDir();
         virtual Path resource(const FileName& name, const FileName& type);
-        virtual PathVector licenseFiles(const FileName& licFileName,
-                                        const FileName& type);
-        virtual Path defaultLicense(const FileName& licFileName,
-                                    const FileName& type);
-        virtual void setEnvVar(const EnvVar& name, const Path& value,
-                               bool force = false);
-        virtual void addPathToEnvVar(const EnvVar& name,
-                                     const PathVector& value);
-        virtual void addPathToEnvVar(const EnvVar& name, const Path& value,
-                                     bool toHead = false);
+        virtual PathVector licenseFiles(const FileName& licFileName, const FileName& type);
+        virtual Path defaultLicense(const FileName& licFileName, const FileName& type);
+        virtual void setEnvVar(const EnvVar& name, const Path& value, bool force = false);
+        virtual void addPathToEnvVar(const EnvVar& name, const PathVector& value);
+        virtual void addPathToEnvVar(const EnvVar& name, const Path& value, bool toHead = false);
         virtual FileName crashLogFile();
         virtual Path crashLogDirectory();
 
-        virtual FileAccessPermission
-        permissionForFileAccess(const Path&, bool readonly) const;
-        virtual AccessObject
-        beginFileAccessWithPermission(const FileAccessPermission&) const;
+        virtual FileAccessPermission permissionForFileAccess(const Path&, bool readonly) const;
+        virtual AccessObject beginFileAccessWithPermission(const FileAccessPermission&) const;
         virtual void endFileAccessWithPermission(AccessObject) const;
 
         //

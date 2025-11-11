@@ -156,9 +156,9 @@ namespace IPCore
             RightBuffer,        // device right
             MainBuffer,         // main window buffer
             NoBuffer,           // not rendered
-            OutputTexture, // upload texture for UI use. requires textureID tag
-            DataBuffer // eithr a opencl node or cpu node will write its result
-                       // into this buffer
+            OutputTexture,      // upload texture for UI use. requires textureID tag
+            DataBuffer          // eithr a opencl node or cpu node will write its result
+                                // into this buffer
         };
 
         enum BlendMode
@@ -206,19 +206,14 @@ namespace IPCore
 
         IPImage(const IPNode*); // default
 
-        IPImage(const IPNode*, const VideoDevice* device, RenderType type,
-                RenderDestination dest, SamplerType stype = Rect2DSampler,
+        IPImage(const IPNode*, const VideoDevice* device, RenderType type, RenderDestination dest, SamplerType stype = Rect2DSampler,
                 bool useDeviceMargins = true);
 
         IPImage(const IPNode*, // for a source or from cache
-                RenderType type, FrameBuffer* fb,
-                RenderDestination dest = CurrentFrameBuffer,
-                SamplerType stype = Rect2DSampler);
+                RenderType type, FrameBuffer* fb, RenderDestination dest = CurrentFrameBuffer, SamplerType stype = Rect2DSampler);
 
-        IPImage(const IPNode*, RenderType type, size_t width = 0,
-                size_t height = 0, float pixelAspect = 1.0f,
-                RenderDestination dest = CurrentFrameBuffer,
-                InternalDataType dataType = NoInternalDataType,
+        IPImage(const IPNode*, RenderType type, size_t width = 0, size_t height = 0, float pixelAspect = 1.0f,
+                RenderDestination dest = CurrentFrameBuffer, InternalDataType dataType = NoInternalDataType,
                 SamplerType stype = Rect2DSampler);
 
         ~IPImage();
@@ -227,23 +222,16 @@ namespace IPCore
         //  These are constructors for special images
         //
 
-        static FrameBuffer* newBlankFrameBuffer(size_t w = 1280,
-                                                size_t h = 720);
-        static FrameBuffer* newBlackFrameBuffer(size_t w = 1280,
-                                                size_t h = 720);
-        static FrameBuffer* newNoImageFrameBuffer(size_t w = 1280,
-                                                  size_t h = 720);
-        static FrameBuffer* newErrorFrameBuffer(size_t w = 1280,
-                                                size_t h = 720);
-        static FrameBuffer*
-        newNoImageFrameBufferWithAttrs(IPNode*, size_t w, size_t h,
-                                       const std::string& message);
+        static FrameBuffer* newBlankFrameBuffer(size_t w = 1280, size_t h = 720);
+        static FrameBuffer* newBlackFrameBuffer(size_t w = 1280, size_t h = 720);
+        static FrameBuffer* newNoImageFrameBuffer(size_t w = 1280, size_t h = 720);
+        static FrameBuffer* newErrorFrameBuffer(size_t w = 1280, size_t h = 720);
+        static FrameBuffer* newNoImageFrameBufferWithAttrs(IPNode*, size_t w, size_t h, const std::string& message);
 
         static IPImage* newBlankImage(IPNode*, size_t w, size_t h);
         static IPImage* newBlackImage(IPNode*, size_t w, size_t h);
         static IPImage* newNoImage(IPNode*, const std::string& message = "");
-        static IPImage* newErrorImage(IPNode*,
-                                      const std::string& errorMessage = "");
+        static IPImage* newErrorImage(IPNode*, const std::string& errorMessage = "");
 
         static IPImageID* newBlankImageID(size_t w, size_t h);
         static IPImageID* newBlackImageID(size_t w, size_t h);
@@ -274,8 +262,7 @@ namespace IPCore
         //  exists on the image
         //
 
-        void setErrorState(IPNode*, const std::string& message = "",
-                           const std::string& type = "Error");
+        void setErrorState(IPNode*, const std::string& message = "", const std::string& type = "Error");
 
         void setHistogram(bool h) { isHistogram = h; }
 
@@ -291,7 +278,7 @@ namespace IPCore
 
         const std::string& graphID() const;
         const std::string& renderID() const;
-        const std::string& renderIDWithPartialPaint() const;
+        const std::string& renderIDWithPartialPaint(const bool force_recompute = false) const;
         HashValue fbHash() const;
         HashValue renderIDHash() const;
 
@@ -304,10 +291,7 @@ namespace IPCore
         int displayWidth() const;
         int displayHeight() const;
 
-        float displayAspect() const
-        {
-            return float(displayWidth()) / float(displayHeight());
-        }
+        float displayAspect() const { return float(displayWidth()) / float(displayHeight()); }
 
         float displayPixelAspect() const;
 
@@ -336,8 +320,7 @@ namespace IPCore
             }
 
             Matrix parentMatrix;
-            Matrix
-                parentMatrixGlobal; //  includes intermediate buffer transitions
+            Matrix parentMatrixGlobal; //  includes intermediate buffer transitions
             size_t outputWidth;
             size_t outputHeight;
             Matrix projectionMatrix;
@@ -354,10 +337,8 @@ namespace IPCore
         };
 
         void populateTransformAsNeeded();
-        void computeMatrices(const VideoDevice* controlDevice,
-                             const VideoDevice* outputDevice);
-        void
-        computeMatricesRecursive(const InternalGLMatricesContext& baseContext);
+        void computeMatrices(const VideoDevice* controlDevice, const VideoDevice* outputDevice);
+        void computeMatricesRecursive(const InternalGLMatricesContext& baseContext);
         TwkMath::Mat44f computeOrientationMatrix(const FrameBuffer* fb) const;
 
         void computeRenderIDRecursive();
@@ -407,9 +388,9 @@ namespace IPCore
         //  Geometric State
         //
 
-        const MovieInfo* info;  // original source info
-        Matrix transformMatrix; // image geometry transform (rotation, etc)
-        Matrix modelViewMatrix; // modelView matrix
+        const MovieInfo* info;         // original source info
+        Matrix transformMatrix;        // image geometry transform (rotation, etc)
+        Matrix modelViewMatrix;        // modelView matrix
         Matrix modelViewMatrixGlobal;  // modelView matrix (including
                                        // intermediate buffer transitions)
         Matrix projectionMatrix;       // perspective matrix
@@ -506,8 +487,7 @@ namespace IPCore
     public:
         typedef std::string ID;
 
-        IPImageID(const ID& id_ = "", IPImageID* next_ = 0,
-                  IPImageID* children_ = 0)
+        IPImageID(const ID& id_ = "", IPImageID* next_ = 0, IPImageID* children_ = 0)
             : id(id_)
             , next(next_)
             , children(children_)
@@ -538,8 +518,7 @@ namespace IPCore
     //  function to accumulate state.
     //
 
-    template <class Image, class Callable>
-    void foreach_ip(Image* root, Callable& callable)
+    template <class Image, class Callable> void foreach_ip(Image* root, Callable& callable)
     {
         if (!root)
             return;
@@ -561,17 +540,14 @@ namespace IPCore
     //  the return type (Rtype).
     //
 
-    template <class Rtype, class Image, class Callable>
-    Rtype* transform_ip(Image* root, Callable& callable)
+    template <class Rtype, class Image, class Callable> Rtype* transform_ip(Image* root, Callable& callable)
     {
         if (!root)
             return 0;
 
         Rtype* newRoot = callable(root);
-        newRoot->next =
-            transform_ip<Rtype, Image, Callable>(root->next, callable);
-        newRoot->children =
-            transform_ip<Rtype, Image, Callable>(root->children, callable);
+        newRoot->next = transform_ip<Rtype, Image, Callable>(root->next, callable);
+        newRoot->children = transform_ip<Rtype, Image, Callable>(root->children, callable);
         return newRoot;
     }
 

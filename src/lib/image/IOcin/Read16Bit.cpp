@@ -37,8 +37,7 @@ namespace TwkFB
 #define restrict __restrict
 #endif
 
-    void Read16Bit::planarConfig(FrameBuffer& fb, int w, int h,
-                                 FrameBuffer::DataType type)
+    void Read16Bit::planarConfig(FrameBuffer& fb, int w, int h, FrameBuffer::DataType type)
     {
         vector<string> planeNames(3);
         planeNames[0] = "R";
@@ -47,14 +46,11 @@ namespace TwkFB
         fb.restructurePlanar(w, h, planeNames, type, FrameBuffer::TOPLEFT);
     }
 
-    void Read16Bit::readRGB16(const string& filename, const unsigned char* data,
-                              FrameBuffer& fb, int w, int h, size_t maxBytes,
-                              bool swap, bool useRaw,
-                              unsigned char* deletePointer)
+    void Read16Bit::readRGB16(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes, bool swap,
+                              bool useRaw, unsigned char* deletePointer)
     {
-        fb.restructure(
-            w, h, 0, 3, FrameBuffer::USHORT, useRaw ? (unsigned char*)data : 0,
-            0, FrameBuffer::TOPLEFT, true, 0, 0, useRaw ? deletePointer : 0);
+        fb.restructure(w, h, 0, 3, FrameBuffer::USHORT, useRaw ? (unsigned char*)data : 0, 0, FrameBuffer::TOPLEFT, true, 0, 0,
+                       useRaw ? deletePointer : 0);
 
         if (useRaw)
         {
@@ -86,9 +82,8 @@ namespace TwkFB
         }
     }
 
-    void Read16Bit::readRGB16_PLANAR(const string& filename,
-                                     const unsigned char* data, FrameBuffer& fb,
-                                     int w, int h, size_t maxBytes, bool swap)
+    void Read16Bit::readRGB16_PLANAR(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                     bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::USHORT);
 
@@ -127,15 +122,11 @@ namespace TwkFB
         }
     }
 
-    void Read16Bit::readRGBA16(const string& filename,
-                               const unsigned char* data, FrameBuffer& fb,
-                               int w, int h, size_t maxBytes, bool alpha,
-                               bool swap, bool useRaw,
-                               unsigned char* deletePointer)
+    void Read16Bit::readRGBA16(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                               bool alpha, bool swap, bool useRaw, unsigned char* deletePointer)
     {
-        fb.restructure(
-            w, h, 0, 4, FrameBuffer::USHORT, useRaw ? (unsigned char*)data : 0,
-            0, FrameBuffer::TOPLEFT, true, 0, 0, useRaw ? deletePointer : 0);
+        fb.restructure(w, h, 0, 4, FrameBuffer::USHORT, useRaw ? (unsigned char*)data : 0, 0, FrameBuffer::TOPLEFT, true, 0, 0,
+                       useRaw ? deletePointer : 0);
 
         int ch = fb.numChannels();
 

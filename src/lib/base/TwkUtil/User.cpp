@@ -37,8 +37,7 @@ namespace TwkUtil
 
         if (!OpenProcessToken(h, TOKEN_QUERY, &newH))
         {
-            std::cerr << "ERROR: OpenProcessToken failed: " << GetLastError()
-                      << std::endl;
+            std::cerr << "ERROR: OpenProcessToken failed: " << GetLastError() << std::endl;
             return string();
         }
 
@@ -49,8 +48,7 @@ namespace TwkUtil
         {
             if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
             {
-                std::cerr << "ERROR: GetTokenInformation failed: "
-                          << GetLastError() << std::endl;
+                std::cerr << "ERROR: GetTokenInformation failed: " << GetLastError() << std::endl;
                 return string();
             }
         }
@@ -58,8 +56,7 @@ namespace TwkUtil
         ptu = (PTOKEN_USER)malloc(outSize);
         if (!GetTokenInformation(newH, TokenUser, ptu, outSize, &outSize))
         {
-            std::cerr << "ERROR: GetTokenInformation failed: " << GetLastError()
-                      << std::endl;
+            std::cerr << "ERROR: GetTokenInformation failed: " << GetLastError() << std::endl;
             free(ptu);
             return string();
         }

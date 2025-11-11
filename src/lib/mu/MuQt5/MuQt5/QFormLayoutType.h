@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFormLayoutType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QFormLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QFormLayoutType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QFormLayout();
-        MuQt_QFormLayout(Pointer muobj, const CallEnvironment*,
-                         QWidget* parent);
+        MuQt_QFormLayout(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual void addItem(QLayoutItem* item);
         virtual int count() const;
         virtual Qt::Orientations expandingDirections() const;
@@ -89,11 +87,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QFormLayoutType::cachedInstance(const QFormLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QFormLayoutType::cachedInstance(const QFormLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

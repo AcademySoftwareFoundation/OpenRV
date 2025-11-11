@@ -4,15 +4,11 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-addSymbol(new Function(c, "toInt", toInt, None, Compiled, QVariant_toInt_int,
-                       Return, "int", Parameters,
+addSymbol(new Function(c, "toInt", toInt, None, Compiled, QVariant_toInt_int, Return, "int", Parameters,
                        new Param(c, "this", "qt.QVariant"), End));
 
-addSymbol(new Function(c, "QVariant", _n_QVariant80, None, Compiled,
-                       qt_QVariant_QVariant_QVariant_QVariant_QIcon, Return,
-                       "qt.QVariant", Parameters,
-                       new Param(c, "this", "qt.QVariant"),
-                       new Param(c, "val", "qt.QIcon"), End));
+addSymbol(new Function(c, "QVariant", _n_QVariant80, None, Compiled, qt_QVariant_QVariant_QVariant_QVariant_QIcon, Return, "qt.QVariant",
+                       Parameters, new Param(c, "this", "qt.QVariant"), new Param(c, "val", "qt.QIcon"), End));
 
 /*
 addSymbol( new Function(c, "toObject", toQObject, None,

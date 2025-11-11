@@ -24,8 +24,7 @@ namespace IPCore
     class RetimeGroupIPNode : public GroupIPNode
     {
     public:
-        RetimeGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        RetimeGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~RetimeGroupIPNode();
 

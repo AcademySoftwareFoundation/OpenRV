@@ -34,8 +34,7 @@ QAlertPanel::~QAlertPanel() {}
 void QAlertPanel::setupUI()
 {
     setModal(true);
-    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint
-                   | Qt::WindowCloseButtonHint);
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
 
     m_mainLayout = new QVBoxLayout(this);
     m_mainLayout->setSpacing(20);
@@ -112,8 +111,7 @@ QPushButton* QAlertPanel::addButton(const QString& text, ButtonRole role)
     connect(button, &QPushButton::clicked, this, &QAlertPanel::onButtonClicked);
 
     // Store reference for clickedButton()
-    connect(button, &QPushButton::clicked,
-            [this, button]() { m_clickedButton = button; });
+    connect(button, &QPushButton::clicked, [this, button]() { m_clickedButton = button; });
 
     return button;
 }
@@ -135,8 +133,7 @@ QPushButton* QAlertPanel::defaultButton() const
 
 QPushButton* QAlertPanel::rejectButton() const { return m_rejectButton; }
 
-QPushButton* QAlertPanel::nextPrevButton(QPushButton* fromButton,
-                                         bool next) const
+QPushButton* QAlertPanel::nextPrevButton(QPushButton* fromButton, bool next) const
 {
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
     if (buttons.isEmpty())
@@ -149,8 +146,7 @@ QPushButton* QAlertPanel::nextPrevButton(QPushButton* fromButton,
     if (buttons.size() == 1)
         return fromButton;
 
-    int newIndex = next ? (index + 1) % buttons.size()
-                        : (index - 1 + buttons.size()) % buttons.size();
+    int newIndex = next ? (index + 1) % buttons.size() : (index - 1 + buttons.size()) % buttons.size();
 
     return buttons.at(newIndex);
 }
@@ -187,7 +183,10 @@ void QAlertPanel::adjustBestFitDimensions()
 
         // Try different widths to find the best text wrapping
         float bestFitRatio = 1e100;
-        int bestWidth = 100; // Start with a reasonable width
+        // Start with a reasonable width to acount at least for margins and
+        // such: left margin (20) + icon (32) + spacing (15) + right margin (20)
+        // = 87
+        int bestWidth = 100;
         int bestHeight = 50;
 
         float targetBestFitRatio = 2.0;
@@ -195,8 +194,7 @@ void QAlertPanel::adjustBestFitDimensions()
         // Test widths from 100 to 1000 pixels to find optimal wrapping
         for (int testWidth = 100; testWidth <= 1000; testWidth += 20)
         {
-            QRect textRect = fm.boundingRect(QRect(0, 0, testWidth, 0),
-                                             Qt::TextWordWrap, m_text);
+            QRect textRect = fm.boundingRect(QRect(0, 0, testWidth, 0), Qt::TextWordWrap, m_text);
 
             float fitRatio = testWidth / (float)textRect.height();
 
@@ -215,9 +213,8 @@ void QAlertPanel::adjustBestFitDimensions()
         }
 
         // Calculate dialog size with reasonable padding
-        int dialogWidth = bestWidth + 80; // Add padding for icon and margins
-        int dialogHeight =
-            bestHeight + 80; // Add padding for buttons and margins
+        int dialogWidth = bestWidth + 100;  // Add padding for icon and margins (87 + buffer)
+        int dialogHeight = bestHeight + 80; // Add padding for buttons and margins
 
         // Set minimum size to calculated dimensions, but allow expansion
         setMinimumSize(dialogWidth, dialogHeight);
@@ -269,8 +266,7 @@ bool QAlertPanel::event(QEvent* event)
     {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 
-        if (keyEvent->key() == Qt::Key_Enter
-            || keyEvent->key() == Qt::Key_Return)
+        if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
         {
             event->accept();
 

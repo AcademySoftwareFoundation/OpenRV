@@ -1129,6 +1129,15 @@ class: SessionManagerMode : MinorMode
         event.reject();
     }
 
+    method: onCategoryStateChanged(void; Event event)
+    {
+        if (_active && !commands.isEventCategoryEnabled("sessionmanager_category"))
+        {
+            toggle();
+        }
+        event.reject();
+    }
+
     method: activate (void;) 
     { 
         if (_dockWidget neq nil) _dockWidget.installEventFilter(_eventFilter);
@@ -2844,6 +2853,7 @@ class: SessionManagerMode : MinorMode
                ("key-down--@", showRows, "show'em"),
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
+               ("event-category-state-changed", onCategoryStateChanged, "Category state changed")
                ],
              nil,
              nil);

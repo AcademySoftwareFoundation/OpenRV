@@ -108,8 +108,7 @@ namespace IPCore
     using namespace TwkGLF;
 
     static ENVVAR_BOOL(evUsePBOs, "RV_RENDERING_USE_PBOS", true);
-    static ENVVAR_INT(evMaxConcurrentPBOs, "RV_RENDERING_MAX_CONCURRENT_PBOS",
-                      10);
+    static ENVVAR_INT(evMaxConcurrentPBOs, "RV_RENDERING_MAX_CONCURRENT_PBOS", 10);
 
 #define NOT_A_FRAME (std::numeric_limits<int>::min())
 #define NOT_A_COORDINATE (GLuint(-1))
@@ -153,8 +152,7 @@ namespace IPCore
                 // us better performance. however in practice the gain is
                 // probably not significant.
                 //
-                renderer->manager()->insertTextureFence(
-                    renderer->uploadRootHash());
+                renderer->manager()->insertTextureFence(renderer->uploadRootHash());
 
                 // signal renderer to proceed
                 renderer->notifyDraw();
@@ -165,16 +163,14 @@ namespace IPCore
 
     } // namespace
 
-    ImageRenderer::BGPattern ImageRenderer::defaultBGPattern =
-        ImageRenderer::Solid0;
+    ImageRenderer::BGPattern ImageRenderer::defaultBGPattern = ImageRenderer::Solid0;
 
     //
     //  Device
     //
 
-    ImageRenderer::Device::Device(const VideoDevice* d, const GLVideoDevice* g,
-                                  const GLBindableVideoDevice* bd,
-                                  size_t ringBufferSize, size_t nviews)
+    ImageRenderer::Device::Device(const VideoDevice* d, const GLVideoDevice* g, const GLBindableVideoDevice* bd, size_t ringBufferSize,
+                                  size_t nviews)
         : device(d)
         , glDevice(g)
         , glBindableDevice(bd)
@@ -212,8 +208,7 @@ namespace IPCore
         }
     }
 
-    void ImageRenderer::Device::allocateFBOs(size_t w, size_t h, GLenum iformat,
-                                             size_t vindex)
+    void ImageRenderer::Device::allocateFBOs(size_t w, size_t h, GLenum iformat, size_t vindex)
     {
         for (size_t i = 0; i < fboRingBuffer.size(); i++)
         {
@@ -450,8 +445,7 @@ namespace IPCore
         if (const char* p = getenv("TWK_IPCORE_RINGBUFFER_SIZE"))
         {
             m_defaultDeviceFBORingBufferSize = atoi(p);
-            cout << "INFO: ringbuffer size is "
-                 << m_defaultDeviceFBORingBufferSize << endl;
+            cout << "INFO: ringbuffer size is " << m_defaultDeviceFBORingBufferSize << endl;
         }
 
         initProfilingState(0);
@@ -554,8 +548,7 @@ namespace IPCore
         o << "pa" << img->displayPixelAspect();
         if (img->isCropped)
         {
-            o << "crop" << img->cropStartX << " " << img->cropStartY << " "
-              << img->cropEndX << " " << img->cropEndY << endl;
+            o << "crop" << img->cropStartX << " " << img->cropStartY << " " << img->cropEndX << " " << img->cropEndY << endl;
         }
         return o.str();
     }
@@ -572,13 +565,9 @@ namespace IPCore
         m_profilingState.uploadPlaneTime = 0.0;
     }
 
-    void ImageRenderer::setIntermediateLogging(bool b)
-    {
-        ImageFBOManager::setIntermediateLogging(b);
-    }
+    void ImageRenderer::setIntermediateLogging(bool b) { ImageFBOManager::setIntermediateLogging(b); }
 
-    ImageRenderer::FastPath
-    ImageRenderer::findFastPath(const FrameBuffer* fb) const
+    ImageRenderer::FastPath ImageRenderer::findFastPath(const FrameBuffer* fb) const
     {
         // NOTE this is probably no longer relevant because most cards nowadays
         // are fast either RGBA or BGRA
@@ -614,8 +603,7 @@ namespace IPCore
         const float gw = tw - margins.left - margins.right;
         const float gh = th - margins.bottom - margins.top;
 
-        return Box2f(Vec2f(margins.left, margins.bottom),
-                     Vec2f(margins.left + gw, margins.bottom + gh));
+        return Box2f(Vec2f(margins.left, margins.bottom), Vec2f(margins.left + gw, margins.bottom + gh));
     }
 
     void ImageRenderer::clearState()
@@ -637,8 +625,7 @@ namespace IPCore
     {
         m_setGLContext = true;
         delete m_uploadThreadDevice;
-        m_uploadThreadDevice =
-            controlDevice().glDevice->newSharedContextWorkerDevice();
+        m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
         controlDevice().glDevice->makeCurrent();
     }
 
@@ -646,8 +633,7 @@ namespace IPCore
     {
         const string glver = TwkGLF::safeGLGetString(GL_VERSION);
         TWK_GLDEBUG;
-        const string glslver =
-            TwkGLF::safeGLGetString(GL_SHADING_LANGUAGE_VERSION);
+        const string glslver = TwkGLF::safeGLGetString(GL_SHADING_LANGUAGE_VERSION);
         TWK_GLDEBUG;
         const string glven = TwkGLF::safeGLGetString(GL_VENDOR);
         TWK_GLDEBUG;
@@ -681,8 +667,7 @@ namespace IPCore
 
         string strExtension = TwkGLF::safeGLGetString(GL_EXTENSIONS);
         vector<string> extensions;
-        algorithm::split(extensions, strExtension, is_any_of(" "),
-                         token_compress_on);
+        algorithm::split(extensions, strExtension, is_any_of(" "), token_compress_on);
 
         GLint maxt = 0;
         GLint iunits = 0, tcoords = 0;
@@ -717,51 +702,32 @@ namespace IPCore
         TWK_GLDEBUG;
 #endif
 
-        node->declareProperty<StringProperty>("opengl.GL_VERSION", glver, 0,
-                                              true);
-        node->declareProperty<IntProperty>("opengl.majorVersion", glMajor, 0,
-                                           true);
-        node->declareProperty<IntProperty>("opengl.minorVersion", glMinor, 0,
-                                           true);
-        node->declareProperty<StringProperty>(
-            "opengl.GL_SHADING_LANGUAGE_VERSION", glslver, 0, true);
-        node->declareProperty<StringProperty>("opengl.GL_VENDOR", glven, 0,
-                                              true);
-        node->declareProperty<StringProperty>("opengl.GL_RENDERER", glren, 0,
-                                              true);
-        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_SIZE", maxt,
-                                           0, true);
+        node->declareProperty<StringProperty>("opengl.GL_VERSION", glver, 0, true);
+        node->declareProperty<IntProperty>("opengl.majorVersion", glMajor, 0, true);
+        node->declareProperty<IntProperty>("opengl.minorVersion", glMinor, 0, true);
+        node->declareProperty<StringProperty>("opengl.GL_SHADING_LANGUAGE_VERSION", glslver, 0, true);
+        node->declareProperty<StringProperty>("opengl.GL_VENDOR", glven, 0, true);
+        node->declareProperty<StringProperty>("opengl.GL_RENDERER", glren, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_SIZE", maxt, 0, true);
 #ifdef GL_MAX_TEXTURE_BUFFER_SIZE
-        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_BUFFER_SIZE",
-                                           maxtb, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_BUFFER_SIZE", maxtb, 0, true);
 #endif
-        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_IMAGE_UNITS",
-                                           iunits, 0, true);
-        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_COORDS",
-                                           tcoords, 0, true);
-        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_UNITS", maxtu,
-                                           0, true);
-        node->declareProperty<IntProperty>("opengl.GL_MAX_VERTEX_ATTRIBS",
-                                           maxva, 0, true);
-        node->declareProperty<IntProperty>("opengl.GL_MAX_DRAW_BUFFERS", maxdb,
-                                           0, true);
-        node->declareProperty<IntProperty>("opengl.GL_MAX_SAMPLES", maxsamp, 0,
-                                           true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_IMAGE_UNITS", iunits, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_COORDS", tcoords, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_UNITS", maxtu, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_VERTEX_ATTRIBS", maxva, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_DRAW_BUFFERS", maxdb, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_SAMPLES", maxsamp, 0, true);
 #ifdef GL_MAX_RECTANGLE_TEXTURE_SIZE
-        node->declareProperty<IntProperty>(
-            "opengl.GL_MAX_RECTANGLE_TEXTURE_SIZE", maxrtsize, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_RECTANGLE_TEXTURE_SIZE", maxrtsize, 0, true);
 #endif
-        node->declareProperty<IntProperty>("opengl.GL_MAX_3D_TEXTURE_SIZE",
-                                           max3d, 0, true);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_3D_TEXTURE_SIZE", max3d, 0, true);
 
-        StringProperty* sp =
-            node->createProperty<StringProperty>("opengl.GL_EXTENSIONS");
+        StringProperty* sp = node->createProperty<StringProperty>("opengl.GL_EXTENSIONS");
         sp->valueContainer() = extensions;
 
-        node->declareProperty<IntProperty>("opengl.glsl.majorVersion",
-                                           glslMajor, 0, true);
-        node->declareProperty<IntProperty>("opengl.glsl.minorVersion",
-                                           glslMinor, 0, true);
+        node->declareProperty<IntProperty>("opengl.glsl.majorVersion", glslMajor, 0, true);
+        node->declareProperty<IntProperty>("opengl.glsl.minorVersion", glslMinor, 0, true);
     }
 
     void ImageRenderer::queryGL()
@@ -789,8 +755,7 @@ namespace IPCore
 
         if (GLEW_OK != err)
         {
-            TWK_THROW_STREAM(RenderFailedExc,
-                             "glewInit FAILED: " << glewGetErrorString(err));
+            TWK_THROW_STREAM(RenderFailedExc, "glewInit FAILED: " << glewGetErrorString(err));
         }
 #else
         TWK_INIT_GL_EXTENSIONS;
@@ -800,8 +765,7 @@ namespace IPCore
 
         const string glver = TwkGLF::safeGLGetString(GL_VERSION);
         TWK_GLDEBUG;
-        const string glslver =
-            TwkGLF::safeGLGetString(GL_SHADING_LANGUAGE_VERSION);
+        const string glslver = TwkGLF::safeGLGetString(GL_SHADING_LANGUAGE_VERSION);
         TWK_GLDEBUG;
         const string glven = TwkGLF::safeGLGetString(GL_VENDOR);
         TWK_GLDEBUG;
@@ -827,19 +791,13 @@ namespace IPCore
         // TWK_GLDEBUG;
 
         m_rectTextures = TWK_GL_SUPPORTS("GL_ARB_texture_rectangle");
-        m_textureFloat = TWK_GL_SUPPORTS("GL_ARB_texture_float")
-                         || TWK_GL_SUPPORTS("GL_APPLE_float_pixels")
-                         || TWK_GL_SUPPORTS("GL_ATI_texture_float")
-                         || m_softwareGLRenderer;
-        m_halfFloat = TWK_GL_SUPPORTS("GL_ARB_half_float_pixel")
-                      || TWK_GL_SUPPORTS("GL_APPLE_float_pixels")
+        m_textureFloat = TWK_GL_SUPPORTS("GL_ARB_texture_float") || TWK_GL_SUPPORTS("GL_APPLE_float_pixels")
+                         || TWK_GL_SUPPORTS("GL_ATI_texture_float") || m_softwareGLRenderer;
+        m_halfFloat = TWK_GL_SUPPORTS("GL_ARB_half_float_pixel") || TWK_GL_SUPPORTS("GL_APPLE_float_pixels")
                       || TWK_GL_SUPPORTS("GL_ATI_texture_float");
-        m_floatBuffers = TWK_GL_SUPPORTS("GL_NV_float_buffer")
-                         || TWK_GL_SUPPORTS("GL_APPLE_float_pixels")
-                         || TWK_GL_SUPPORTS("GL_ARB_color_buffer_float")
-                         || TWK_GL_SUPPORTS("GL_ATI_pixel_format_float")
-                         || TWK_GL_SUPPORTS("WGL_ATI_pixel_format_float")
-                         || m_softwareGLRenderer;
+        m_floatBuffers = TWK_GL_SUPPORTS("GL_NV_float_buffer") || TWK_GL_SUPPORTS("GL_APPLE_float_pixels")
+                         || TWK_GL_SUPPORTS("GL_ARB_color_buffer_float") || TWK_GL_SUPPORTS("GL_ATI_pixel_format_float")
+                         || TWK_GL_SUPPORTS("WGL_ATI_pixel_format_float") || m_softwareGLRenderer;
         m_pixelBuffers = TWK_GL_SUPPORTS("GL_ARB_pixel_buffer_object");
         m_hasClientStorage = TWK_GL_SUPPORTS("GL_APPLE_client_storage");
         m_imaging = TWK_GL_SUPPORTS("GL_ARB_imaging");
@@ -852,12 +810,10 @@ namespace IPCore
             GLint ui;
             GLint tl;
 
-            glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
-                              GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB, &ui);
+            glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB, GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB, &ui);
             TWK_GLDEBUG;
 
-            glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
-                              GL_MAX_PROGRAM_TEMPORARIES_ARB, &tl);
+            glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB, GL_MAX_PROGRAM_TEMPORARIES_ARB, &tl);
             TWK_GLDEBUG;
 
             m_ALUinsnLimit = ui;
@@ -905,17 +861,14 @@ namespace IPCore
             cout << "INFO: non-power-of-two tex  = " << m_nonPowerOf2 << endl;
             cout << "INFO: floating buffers      = " << m_floatBuffers << endl;
             cout << "INFO: texture float         = " << m_textureFloat << endl;
-            cout << "INFO: client storage        = " << m_hasClientStorage
-                 << endl;
+            cout << "INFO: client storage        = " << m_hasClientStorage << endl;
             cout << "INFO: imaging               = " << m_imaging << endl;
-            cout << "INFO: fragment program      = " << m_fragmentProgram
-                 << endl;
+            cout << "INFO: fragment program      = " << m_fragmentProgram << endl;
             cout << "INFO: pixel buffer object   = " << m_pixelBuffers << endl;
             cout << "INFO: apple yuv 422         = " << m_ycbcrApple << endl;
             cout << "INFO: Max tex image units   = " << m_maxImageUnits << endl;
             cout << "INFO: Max tex coords        = " << m_maxTexCoords << endl;
-            cout << "INFO: Max vert attrs        = " << m_maxVertexAttrs
-                 << endl;
+            cout << "INFO: Max vert attrs        = " << m_maxVertexAttrs << endl;
             cout << "INFO: all GL extensions     = " << strExtension << endl;
         }
 
@@ -927,15 +880,12 @@ namespace IPCore
 
         if (!m_halfFloat)
         {
-            cerr << "WARNING: GPU cannot handle 16 bit float images natively"
-                 << endl;
+            cerr << "WARNING: GPU cannot handle 16 bit float images natively" << endl;
         }
 
         if (!m_textureFloat)
         {
-            cerr
-                << "WARNING: GPU does not handle floating point images natively"
-                << endl;
+            cerr << "WARNING: GPU does not handle floating point images natively" << endl;
         }
 
         if (!m_floatBuffers)
@@ -1017,46 +967,38 @@ namespace IPCore
         CGLContextObj currentGLContext = CGLGetCurrentContext();
         CGLShareGroupObj kCGLShareGroup = CGLGetShareGroup(currentGLContext);
 
-        cl_context_properties props[] = {
-            CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE,
-            (cl_context_properties)kCGLShareGroup, 0};
+        cl_context_properties props[] = {CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)kCGLShareGroup, 0};
         m_clContext.clContext = clCreateContext(props, 0, 0, NULL, 0, 0);
 
-        cl_int ret = clGetPlatformIDs(1, &m_clContext.platformID,
-                                      &m_clContext.platformNo);
+        cl_int ret = clGetPlatformIDs(1, &m_clContext.platformID, &m_clContext.platformNo);
         printCLError(ret);
 
         size_t dSize;
-        ret = clGetContextInfo(m_clContext.clContext, CL_CONTEXT_DEVICES, 0,
-                               NULL, &dSize);
+        ret = clGetContextInfo(m_clContext.clContext, CL_CONTEXT_DEVICES, 0, NULL, &dSize);
         printCLError(ret);
 
         size_t dNo = dSize / sizeof(cl_device_id);
         cl_device_id devices[dNo];
         m_clContext.deviceNo = dNo;
 
-        ret = clGetContextInfo(m_clContext.clContext, CL_CONTEXT_DEVICES, dSize,
-                               devices, &dSize);
+        ret = clGetContextInfo(m_clContext.clContext, CL_CONTEXT_DEVICES, dSize, devices, &dSize);
 
         for (size_t i = 0; i < dNo; i++)
         {
             cl_device_type deviceType;
-            ret = clGetDeviceInfo(devices[i], CL_DEVICE_TYPE,
-                                  sizeof(cl_device_type), &deviceType, &dSize);
+            ret = clGetDeviceInfo(devices[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &deviceType, &dSize);
             printCLError(ret);
 
             if (deviceType == CL_DEVICE_TYPE_GPU)
             {
                 m_clContext.deviceID = devices[i];
-                m_clContext.commandQueue = clCreateCommandQueue(
-                    m_clContext.clContext, m_clContext.deviceID,
-                    CL_QUEUE_PROFILING_ENABLE, &ret);
+                m_clContext.commandQueue =
+                    clCreateCommandQueue(m_clContext.clContext, m_clContext.deviceID, CL_QUEUE_PROFILING_ENABLE, &ret);
                 printCLError(ret);
 
                 // query opencl version
                 char v[128];
-                ret = clGetDeviceInfo(devices[i], CL_DEVICE_VERSION, 128,
-                                      (void*)v, NULL);
+                ret = clGetDeviceInfo(devices[i], CL_DEVICE_VERSION, 128, (void*)v, NULL);
                 string v2(v);
                 if (v2.find("1.0") != string::npos)
                     m_clContext.version = CLContext::OpenCL1_0;
@@ -1077,8 +1019,7 @@ namespace IPCore
         cl_int ret;
         // query card abilities: local memory size and workgroup size
         cl_ulong localMemSize;
-        ret = clGetDeviceInfo(m_clContext.deviceID, CL_DEVICE_LOCAL_MEM_SIZE,
-                              sizeof(cl_ulong), &localMemSize, NULL);
+        ret = clGetDeviceInfo(m_clContext.deviceID, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong), &localMemSize, NULL);
 
         const char* histoSrc = NULL;
         if (localMemSize <= 16 * 1024)
@@ -1088,38 +1029,29 @@ namespace IPCore
         else
             histoSrc = Histogram48k_cl;
 
-        m_clContext.clProgram.program = clCreateProgramWithSource(
-            m_clContext.clContext, 1, (const char**)&histoSrc, NULL, &ret);
+        m_clContext.clProgram.program = clCreateProgramWithSource(m_clContext.clContext, 1, (const char**)&histoSrc, NULL, &ret);
         printCLError(ret);
 
-        ret = clBuildProgram(m_clContext.clProgram.program, 1,
-                             &m_clContext.deviceID, NULL, NULL, NULL);
+        ret = clBuildProgram(m_clContext.clProgram.program, 1, &m_clContext.deviceID, NULL, NULL, NULL);
         printCLError(ret);
 
 #ifdef NDEBUG
 #else
         size_t len;
-        clGetProgramBuildInfo(m_clContext.clProgram.program,
-                              m_clContext.deviceID, CL_PROGRAM_BUILD_LOG, 0,
-                              NULL, &len);
+        clGetProgramBuildInfo(m_clContext.clProgram.program, m_clContext.deviceID, CL_PROGRAM_BUILD_LOG, 0, NULL, &len);
         vector<char> buffer(len);
-        clGetProgramBuildInfo(m_clContext.clProgram.program,
-                              m_clContext.deviceID, CL_PROGRAM_BUILD_LOG, len,
-                              &buffer[0], NULL);
+        clGetProgramBuildInfo(m_clContext.clProgram.program, m_clContext.deviceID, CL_PROGRAM_BUILD_LOG, len, &buffer[0], NULL);
 #endif
 
-        m_clContext.clProgram.kernels.push_back(clCreateKernel(
-            m_clContext.clProgram.program, "histogram256_float4", &ret));
+        m_clContext.clProgram.kernels.push_back(clCreateKernel(m_clContext.clProgram.program, "histogram256_float4", &ret));
         printCLError(ret);
 
-        m_clContext.clProgram.kernels.push_back(clCreateKernel(
-            m_clContext.clProgram.program, "mergeHistograms256_float4", &ret));
+        m_clContext.clProgram.kernels.push_back(clCreateKernel(m_clContext.clProgram.program, "mergeHistograms256_float4", &ret));
         printCLError(ret);
 
         size_t workGroupSize;
-        clGetKernelWorkGroupInfo(
-            m_clContext.clProgram.kernels[0], m_clContext.deviceID,
-            CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &workGroupSize, NULL);
+        clGetKernelWorkGroupInfo(m_clContext.clProgram.kernels[0], m_clContext.deviceID, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t),
+                                 &workGroupSize, NULL);
         m_clContext.workGroupSize = workGroupSize;
     }
 
@@ -1143,10 +1075,8 @@ namespace IPCore
         }
     }
 
-    void ImageRenderer::executeCLKernel(
-        const CLContext& context, const cl_kernel& kernel,
-        const size_t globalThreads[3], const size_t localThreads[3],
-        const vector<pair<size_t, const void*>>& args) const
+    void ImageRenderer::executeCLKernel(const CLContext& context, const cl_kernel& kernel, const size_t globalThreads[3],
+                                        const size_t localThreads[3], const vector<pair<size_t, const void*>>& args) const
     {
         cl_int err;
         for (size_t i = 0; i < args.size(); i++)
@@ -1158,9 +1088,7 @@ namespace IPCore
 
         cl_event event; // opencl event if used, needs to be released to avoid
                         // mem leak
-        err =
-            clEnqueueNDRangeKernel(context.commandQueue, kernel, 2, NULL,
-                                   globalThreads, localThreads, 0, NULL, NULL);
+        err = clEnqueueNDRangeKernel(context.commandQueue, kernel, 2, NULL, globalThreads, localThreads, 0, NULL, NULL);
         printCLError(err);
 
 #if 0
@@ -1186,8 +1114,7 @@ namespace IPCore
 
 #define HISTOGRAM_BIN_NO 256
 
-    void ImageRenderer::histogramOCL(cl_mem& image, cl_mem& hist,
-                                     const size_t w, const size_t h) const
+    void ImageRenderer::histogramOCL(cl_mem& image, cl_mem& hist, const size_t w, const size_t h) const
     {
         //
         // NOTE that the current cl code was optimized / tested on a couple of
@@ -1215,10 +1142,8 @@ namespace IPCore
         size_t workGroupNo = wg / g;
 
         cl_int err;
-        cl_mem subHist =
-            clCreateBuffer(m_clContext.clContext, CL_MEM_READ_WRITE,
-                           3 * HISTOGRAM_BIN_NO * workGroupNo * sizeof(uint),
-                           NULL, &err); // 3 channels
+        cl_mem subHist = clCreateBuffer(m_clContext.clContext, CL_MEM_READ_WRITE, 3 * HISTOGRAM_BIN_NO * workGroupNo * sizeof(uint), NULL,
+                                        &err); // 3 channels
         printCLError(err);
 
         vector<pair<size_t, const void*>> args;
@@ -1229,8 +1154,7 @@ namespace IPCore
         args.push_back(make_pair(sizeof(cl_uint), (void*)&w));
         args.push_back(make_pair(sizeof(cl_uint), (void*)&h));
 
-        executeCLKernel(m_clContext, m_clContext.clProgram.kernels[0],
-                        globalThreads, localThreads, args);
+        executeCLKernel(m_clContext, m_clContext.clProgram.kernels[0], globalThreads, localThreads, args);
 
         // merge
         size_t localThreads2[3] = {HISTOGRAM_BIN_NO, 1, 1};
@@ -1243,15 +1167,13 @@ namespace IPCore
         float imgSizef = w * h;
         args2.push_back(make_pair(sizeof(cl_float), (void*)&imgSizef));
 
-        executeCLKernel(m_clContext, m_clContext.clProgram.kernels[1],
-                        globalThreads2, localThreads2, args2);
+        executeCLKernel(m_clContext, m_clContext.clProgram.kernels[1], globalThreads2, localThreads2, args2);
 
         // TODO reuse this buffer
         clReleaseMemObject(subHist);
     }
 
-    void ImageRenderer::computeHistogram(const ConstFBOVector& childrenFBO,
-                                         const GLFBO* resultFBO) const
+    void ImageRenderer::computeHistogram(const ConstFBOVector& childrenFBO, const GLFBO* resultFBO) const
     {
         assert(childrenFBO.size() == 1);
         const GLFBO* fbo = childrenFBO[0];
@@ -1259,41 +1181,32 @@ namespace IPCore
         assert(fbo->hasColorAttachment());
         cl_int err;
 #ifdef CL_VERSION_1_2
-        cl_mem clImage = clCreateFromGLTexture(
-            m_clContext.clContext, CL_MEM_READ_ONLY, GL_TEXTURE_RECTANGLE_ARB,
-            0, fbo->colorID(0), &err);
+        cl_mem clImage = clCreateFromGLTexture(m_clContext.clContext, CL_MEM_READ_ONLY, GL_TEXTURE_RECTANGLE_ARB, 0, fbo->colorID(0), &err);
 #else
-        cl_mem clImage = clCreateFromGLTexture2D(
-            m_clContext.clContext, CL_MEM_READ_ONLY, GL_TEXTURE_RECTANGLE_ARB,
-            0, fbo->colorID(0), &err);
+        cl_mem clImage =
+            clCreateFromGLTexture2D(m_clContext.clContext, CL_MEM_READ_ONLY, GL_TEXTURE_RECTANGLE_ARB, 0, fbo->colorID(0), &err);
 #endif
         printCLError(err);
-        err = clEnqueueAcquireGLObjects(m_clContext.commandQueue, 1, &clImage,
-                                        0, 0, 0);
+        err = clEnqueueAcquireGLObjects(m_clContext.commandQueue, 1, &clImage, 0, 0, 0);
         printCLError(err);
 
         assert(resultFBO->hasColorAttachment());
 #ifdef CL_VERSION_1_2
-        cl_mem histoOut = clCreateFromGLTexture(
-            m_clContext.clContext, CL_MEM_WRITE_ONLY, GL_TEXTURE_RECTANGLE_ARB,
-            0, resultFBO->colorID(0), &err);
+        cl_mem histoOut =
+            clCreateFromGLTexture(m_clContext.clContext, CL_MEM_WRITE_ONLY, GL_TEXTURE_RECTANGLE_ARB, 0, resultFBO->colorID(0), &err);
 #else
-        cl_mem histoOut = clCreateFromGLTexture2D(
-            m_clContext.clContext, CL_MEM_WRITE_ONLY, GL_TEXTURE_RECTANGLE_ARB,
-            0, resultFBO->colorID(0), &err);
+        cl_mem histoOut =
+            clCreateFromGLTexture2D(m_clContext.clContext, CL_MEM_WRITE_ONLY, GL_TEXTURE_RECTANGLE_ARB, 0, resultFBO->colorID(0), &err);
 #endif
         printCLError(err);
-        err = clEnqueueAcquireGLObjects(m_clContext.commandQueue, 1, &histoOut,
-                                        0, 0, 0);
+        err = clEnqueueAcquireGLObjects(m_clContext.commandQueue, 1, &histoOut, 0, 0, 0);
         printCLError(err);
 
         histogramOCL(clImage, histoOut, fbo->width(), fbo->height());
 
-        err = clEnqueueReleaseGLObjects(m_clContext.commandQueue, 1, &clImage,
-                                        0, 0, 0);
+        err = clEnqueueReleaseGLObjects(m_clContext.commandQueue, 1, &clImage, 0, 0, 0);
         printCLError(err);
-        err = clEnqueueAcquireGLObjects(m_clContext.commandQueue, 1, &histoOut,
-                                        0, 0, 0);
+        err = clEnqueueAcquireGLObjects(m_clContext.commandQueue, 1, &histoOut, 0, 0, 0);
         printCLError(err);
         clFlush(m_clContext.commandQueue);
 
@@ -1307,8 +1220,7 @@ namespace IPCore
     //  Core functions
     //
 
-    void
-    ImageRenderer::setupContextFromDevice(InternalRenderContext& context) const
+    void ImageRenderer::setupContextFromDevice(InternalRenderContext& context) const
     {
         const VideoDevice* device = context.device;
 
@@ -1318,11 +1230,8 @@ namespace IPCore
         }
         else if (m_outputDevice.device == device)
         {
-            size_t index =
-                context.image->destination == IPImage::RightBuffer ? 1 : 0;
-            context.targetFBO =
-                m_outputDevice.fboRingBuffer[m_deviceFBORingBufferIndex]
-                    .views[index];
+            size_t index = context.image->destination == IPImage::RightBuffer ? 1 : 0;
+            context.targetFBO = m_outputDevice.fboRingBuffer[m_deviceFBORingBufferIndex].views[index];
         }
         else
         {
@@ -1356,8 +1265,7 @@ namespace IPCore
 
         if (d)
         {
-            Device device(d, dynamic_cast<const GLVideoDevice*>(d), 0,
-                          ringBufferSize, nviews);
+            Device device(d, dynamic_cast<const GLVideoDevice*>(d), 0, ringBufferSize, nviews);
             device.glDevice->makeCurrent();
             m_controlDevice.clearFBOs();
             m_controlDevice = device;
@@ -1411,24 +1319,17 @@ namespace IPCore
 
         m_deviceFBORingBufferIndex = 0;
 
-        const TwkGLF::GLVideoDevice* gld =
-            d ? dynamic_cast<const TwkGLF::GLVideoDevice*>(d) : 0;
-        const TwkGLF::GLBindableVideoDevice* glbd =
-            d ? dynamic_cast<const TwkGLF::GLBindableVideoDevice*>(d) : 0;
+        const TwkGLF::GLVideoDevice* gld = d ? dynamic_cast<const TwkGLF::GLVideoDevice*>(d) : 0;
+        const TwkGLF::GLBindableVideoDevice* glbd = d ? dynamic_cast<const TwkGLF::GLBindableVideoDevice*>(d) : 0;
 
-        const bool asyncReadBack =
-            d && d->capabilities() & VideoDevice::ASyncReadBack;
+        const bool asyncReadBack = d && d->capabilities() & VideoDevice::ASyncReadBack;
         const bool multipleOutputs = d && d != m_controlDevice.device;
         const bool dualOut = glbd && glbd->isDualStereo();
-        const size_t ringBufferSize = asyncReadBack
-                                          ? d->asyncMaxMappedBuffers()
-                                          : m_defaultDeviceFBORingBufferSize;
+        const size_t ringBufferSize = asyncReadBack ? d->asyncMaxMappedBuffers() : m_defaultDeviceFBORingBufferSize;
         const size_t nviews = 2;
 
         if ((ringBufferSize > m_defaultDeviceFBORingBufferSize)
-            || (ringBufferSize == m_defaultDeviceFBORingBufferSize
-                && m_controlDevice.ringBufferSize()
-                       != m_defaultDeviceFBORingBufferSize))
+            || (ringBufferSize == m_defaultDeviceFBORingBufferSize && m_controlDevice.ringBufferSize() != m_defaultDeviceFBORingBufferSize))
         {
             m_controlDevice.setRingBufferSize(ringBufferSize, nviews);
         }
@@ -1439,8 +1340,7 @@ namespace IPCore
 
         Device device(d, gld, glbd, ringBufferSize, nviews);
 
-        if (m_outputDevice.device != d
-            && m_outputDevice.device != m_controlDevice.device)
+        if (m_outputDevice.device != d && m_outputDevice.device != m_controlDevice.device)
         {
             if (m_outputDevice.glBindableDevice)
             {
@@ -1493,15 +1393,11 @@ namespace IPCore
             // The control FBO resolution comes from the *output* device
             //
 
-            const VideoDevice::DataFormat& df =
-                d->dataFormatAtIndex(d->currentDataFormat());
+            const VideoDevice::DataFormat& df = d->dataFormatAtIndex(d->currentDataFormat());
             GLenum iformat = TwkGLF::internalFormatFromDataFormat(df.iformat);
-            TwkGLF::GLenumPair tformat =
-                TwkGLF::textureFormatFromDataFormat(df.iformat);
-            GLuint ttarget = m_outputDevice.device->capabilities()
-                                     & VideoDevice::NormalizedCoordinates
-                                 ? GL_TEXTURE_2D
-                                 : GL_TEXTURE_RECTANGLE_ARB;
+            TwkGLF::GLenumPair tformat = TwkGLF::textureFormatFromDataFormat(df.iformat);
+            GLuint ttarget =
+                m_outputDevice.device->capabilities() & VideoDevice::NormalizedCoordinates ? GL_TEXTURE_2D : GL_TEXTURE_RECTANGLE_ARB;
 
             if (m_outputDevice.glDevice || m_outputDevice.glBindableDevice)
             {
@@ -1514,8 +1410,7 @@ namespace IPCore
                 {
                     try
                     {
-                        m_outputDevice.glBindableDevice->bind(
-                            m_controlDevice.glDevice);
+                        m_outputDevice.glBindableDevice->bind(m_controlDevice.glDevice);
                         TWK_GLDEBUG;
                     }
                     catch (std::exception& exc)
@@ -1534,8 +1429,7 @@ namespace IPCore
                 {
                     GLFBO* fbo = m_outputDevice.fboRingBuffer[i].views[0];
                     fbo->bind();
-                    fbo->newColorTexture(ttarget, tformat.first,
-                                         tformat.second);
+                    fbo->newColorTexture(ttarget, tformat.first, tformat.second);
                     glClear(GL_COLOR_BUFFER_BIT);
                     TWK_GLDEBUG;
                     fbo->unbind();
@@ -1551,8 +1445,7 @@ namespace IPCore
                     {
                         GLFBO* fbo = m_outputDevice.fboRingBuffer[i].views[1];
                         fbo->bind();
-                        fbo->newColorTexture(ttarget, tformat.first,
-                                             tformat.second);
+                        fbo->newColorTexture(ttarget, tformat.first, tformat.second);
                         glClear(GL_COLOR_BUFFER_BIT);
                         TWK_GLDEBUG;
                         fbo->unbind();
@@ -1587,11 +1480,8 @@ namespace IPCore
 
         void operator()(const IPImage* i)
         {
-            if (i->renderType != IPImage::GroupType
-                && i->destination != IPImage::MainBuffer
-                && i->destination != IPImage::LeftBuffer
-                && i->destination != IPImage::RightBuffer
-                && i->destination != IPImage::NoBuffer)
+            if (i->renderType != IPImage::GroupType && i->destination != IPImage::MainBuffer && i->destination != IPImage::LeftBuffer
+                && i->destination != IPImage::RightBuffer && i->destination != IPImage::NoBuffer)
             {
                 ncount++;
             }
@@ -1664,8 +1554,7 @@ namespace IPCore
             createGLContexts();
 
             // upload thread initialization
-            m_uploadThread =
-                Thread(uploadThreadTrampoline, this); // func and data
+            m_uploadThread = Thread(uploadThreadTrampoline, this); // func and data
         }
 
         notifyUpload();
@@ -1684,13 +1573,10 @@ namespace IPCore
         clearImagePassStates();
     }
 
-    void ImageRenderer::render(int frame, IPImage* root,
-                               const AuxRender* auxRender,
-                               const AuxAudio* auxAudio, IPImage* uploadRoot)
+    void ImageRenderer::render(int frame, IPImage* root, const AuxRender* auxRender, const AuxAudio* auxAudio, IPImage* uploadRoot)
     {
 #if defined(HOP_ENABLED)
-        std::string hopMsg = std::string("ImageRenderer::render(frame=")
-                             + std::to_string(frame) + std::string(")");
+        std::string hopMsg = std::string("ImageRenderer::render(frame=") + std::to_string(frame) + std::string(")");
         HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
 
@@ -1784,8 +1670,7 @@ namespace IPCore
 
         if (root->children && !root->children->next)
         {
-            if (root->destination == IPImage::OutputTexture
-                || root->destination == IPImage::DataBuffer)
+            if (root->destination == IPImage::OutputTexture || root->destination == IPImage::DataBuffer)
             {
                 // nothing
             }
@@ -1825,9 +1710,7 @@ namespace IPCore
         renderEnd(context);
     }
 
-    void ImageRenderer::renderOutputs(int frame, const IPImage* root,
-                                      const AuxRender* auxRenderer,
-                                      const AuxAudio* auxAudio)
+    void ImageRenderer::renderOutputs(int frame, const IPImage* root, const AuxRender* auxRenderer, const AuxAudio* auxAudio)
     {
         {
             HOP_CALL(glFinish();)
@@ -1841,15 +1724,11 @@ namespace IPCore
         const size_t riSize = m_controlDevice.fboRingBuffer.size();
         const size_t ri = m_deviceFBORingBufferIndex;
         const bool multipleOutputs = hasMultipleOutputs();
-        const bool internalBuffer =
-            m_controlDevice.fboRingBuffer[0].views[0] != 0;
+        const bool internalBuffer = m_controlDevice.fboRingBuffer[0].views[0] != 0;
         const GLFBO* controlFBO = m_controlDevice.glDevice->defaultFBO();
-        const GLFBO* outputFBO =
-            m_outputDevice.glDevice ? m_outputDevice.glDevice->defaultFBO() : 0;
-        const bool dualStereo = m_outputDevice.glBindableDevice
-                                && m_outputDevice.glBindableDevice->isStereo();
-        const bool willBlock =
-            multipleOutputs && m_outputDevice.device->willBlockOnTransfer();
+        const GLFBO* outputFBO = m_outputDevice.glDevice ? m_outputDevice.glDevice->defaultFBO() : 0;
+        const bool dualStereo = m_outputDevice.glBindableDevice && m_outputDevice.glBindableDevice->isStereo();
+        const bool willBlock = multipleOutputs && m_outputDevice.device->willBlockOnTransfer();
         TWK_GLDEBUG;
 
         {
@@ -1883,11 +1762,9 @@ namespace IPCore
                 {
                     if (auxAudio && auxAudio->isAvailable())
                     {
-                        size_t aindex =
-                            m_outputDevice.device->currentAudioFrameSizeIndex();
+                        size_t aindex = m_outputDevice.device->currentAudioFrameSizeIndex();
                         size_t asize;
-                        void* data =
-                            auxAudio->audioForFrame(frame, aindex, asize);
+                        void* data = auxAudio->audioForFrame(frame, aindex, asize);
 
                         if (data)
                         {
@@ -1904,8 +1781,7 @@ namespace IPCore
                     }
                 }
                 m_outputDevice.glDevice->makeCurrent();
-                m_outputDevice.fboRingBuffer[ri].views[0]->copyTo(
-                    outputFBO); // uses blit
+                m_outputDevice.fboRingBuffer[ri].views[0]->copyTo(outputFBO); // uses blit
 
                 m_controlDevice.glDevice->makeCurrent();
                 m_controlDevice.glDevice->redraw();
@@ -1919,16 +1795,13 @@ namespace IPCore
                     {
                         if (auxAudio && auxAudio->isAvailable())
                         {
-                            size_t aindex = m_outputDevice.device
-                                                ->currentAudioFrameSizeIndex();
+                            size_t aindex = m_outputDevice.device->currentAudioFrameSizeIndex();
                             size_t asize;
-                            void* data =
-                                auxAudio->audioForFrame(frame, aindex, asize);
+                            void* data = auxAudio->audioForFrame(frame, aindex, asize);
 
                             if (data)
                             {
-                                m_outputDevice.device->transferAudio(data,
-                                                                     asize);
+                                m_outputDevice.device->transferAudio(data, asize);
                             }
                             else
                             {
@@ -1957,8 +1830,7 @@ namespace IPCore
                             rightFBO = fbo0;
                         }
 
-                        m_outputDevice.glBindableDevice->transfer2(leftFBO,
-                                                                   rightFBO);
+                        m_outputDevice.glBindableDevice->transfer2(leftFBO, rightFBO);
                     }
                     else
                     {
@@ -1976,8 +1848,7 @@ namespace IPCore
 
             m_outputDevice.device->endTransfer();
 
-            m_deviceFBORingBufferIndex =
-                (m_deviceFBORingBufferIndex + 1) % riSize;
+            m_deviceFBORingBufferIndex = (m_deviceFBORingBufferIndex + 1) % riSize;
 
             HOP_CALL(glFinish();)
         }
@@ -1985,9 +1856,7 @@ namespace IPCore
         m_controlDevice.glDevice->makeCurrent();
     }
 
-    void ImageRenderer::renderMain(const GLFBO* target, const GLFBO* targetL,
-                                   const GLFBO* targetR,
-                                   const AuxRender* auxRenderer, int frame,
+    void ImageRenderer::renderMain(const GLFBO* target, const GLFBO* targetL, const GLFBO* targetR, const AuxRender* auxRenderer, int frame,
                                    const IPImage* root)
     {
         m_mainRenderSerialNumber++;
@@ -2008,8 +1877,7 @@ namespace IPCore
         renderRecursive(context);
     }
 
-    void ImageRenderer::renderCurrentImage(InternalRenderContext& baseContext,
-                                           const GLFBO* fbo)
+    void ImageRenderer::renderCurrentImage(InternalRenderContext& baseContext, const GLFBO* fbo)
     {
         const IPImage* root = baseContext.image;
         InternalRenderContext context;
@@ -2056,8 +1924,7 @@ namespace IPCore
         //  for merge context reverse is always false
         //
 
-        if (!context.mergeContext && root->supportReversedOrderBlending
-            && root->renderType != IPImage::GroupType)
+        if (!context.mergeContext && root->supportReversedOrderBlending && root->renderType != IPImage::GroupType)
         {
             switch (context.blendMode)
             {
@@ -2113,10 +1980,9 @@ namespace IPCore
                 if (dontBlendFirst && i == 0 && !childContext.doBlend)
                 {
                     childContext.blendMode = IPImage::Replace;
-                    context.doBlend =
-                        true; // set to true, because the first 'no blend' has
-                              // already happened. we want to blend for the rest
-                              // of the rendering pass
+                    context.doBlend = true; // set to true, because the first 'no blend' has
+                                            // already happened. we want to blend for the rest
+                                            // of the rendering pass
                 }
                 else
                 {
@@ -2142,8 +2008,7 @@ namespace IPCore
         }
     }
 
-    void ImageRenderer::renderIntermediate(InternalRenderContext& baseContext,
-                                           const GLFBO* incomingFBO)
+    void ImageRenderer::renderIntermediate(InternalRenderContext& baseContext, const GLFBO* incomingFBO)
     {
         HOP_CALL(glFinish();)
         HOP_PROF_FUNC();
@@ -2217,10 +2082,7 @@ namespace IPCore
                     HOP_CALL(glFinish();)
                     HOP_PROF("renderIntermediate - newImageFBO");
 
-                    fbo = m_imageFBOManager
-                              .newImageFBO(root, m_fullRenderSerialNumber,
-                                           renderID)
-                              ->fbo();
+                    fbo = m_imageFBOManager.newImageFBO(root, m_fullRenderSerialNumber, renderID)->fbo();
 
                     HOP_CALL(glFinish();)
                 }
@@ -2233,8 +2095,7 @@ namespace IPCore
         if (baseContext.norender)
             context.norender = true;
 
-        context.mergeContext =
-            renderType == IPImage::MergeRenderType ? &context : 0;
+        context.mergeContext = renderType == IPImage::MergeRenderType ? &context : 0;
         context.activeImages.clear();
 
         context.targetFBO = fbo;
@@ -2329,20 +2190,15 @@ namespace IPCore
             //  DEBUG WRITE THIS OUT AS AN EXR FILE
             //
 
-            TwkFB::FrameBuffer fb(fbo->width(), fbo->height(), 4,
-                                  TwkFB::FrameBuffer::HALF);
+            TwkFB::FrameBuffer fb(fbo->width(), fbo->height(), 4, TwkFB::FrameBuffer::HALF);
             vector<const TwkFB::FrameBuffer*> fbs(1);
             fbs.front() = &fb;
 
-            glReadPixels(0, 0, fbo->width(), fbo->height(), GL_RGBA,
-                         GL_HALF_FLOAT_ARB, fb.pixels<GLvoid>());
+            glReadPixels(0, 0, fbo->width(), fbo->height(), GL_RGBA, GL_HALF_FLOAT_ARB, fb.pixels<GLvoid>());
 
             ostringstream file;
-            file << root->node->name() << "_" << root->imageNum << "_"
-                 << root->graphID() << "." << m_mainRenderSerialNumber
-                 << ".exr";
-            TwkFB::GenericIO::writeImages(fbs, file.str(),
-                                          TwkFB::FrameBufferIO::WriteRequest());
+            file << root->node->name() << "_" << root->imageNum << "_" << root->graphID() << "." << m_mainRenderSerialNumber << ".exr";
+            TwkFB::GenericIO::writeImages(fbs, file.str(), TwkFB::FrameBufferIO::WriteRequest());
         }
 
         //
@@ -2371,8 +2227,7 @@ namespace IPCore
         //  If this was a TemporaryBuffer make it available immediately.
         //
 
-        if (root->destination == IPImage::TemporaryBuffer
-            && !baseContext.norender)
+        if (root->destination == IPImage::TemporaryBuffer && !baseContext.norender)
         {
             m_imageFBOManager.releaseImageFBO(fbo);
         }
@@ -2418,9 +2273,7 @@ namespace IPCore
             else
             {
                 string renderID = imageToFBOIdentifier(root);
-                fbo = m_imageFBOManager
-                          .newImageFBO(root, m_fullRenderSerialNumber, renderID)
-                          ->fbo();
+                fbo = m_imageFBOManager.newImageFBO(root, m_fullRenderSerialNumber, renderID)->fbo();
                 context.norender = false;
             }
         }
@@ -2428,8 +2281,7 @@ namespace IPCore
         if (baseContext.norender)
             context.norender = true;
 
-        context.mergeContext =
-            renderType == IPImage::MergeRenderType ? &context : 0;
+        context.mergeContext = renderType == IPImage::MergeRenderType ? &context : 0;
         context.targetFBO = baseContext.targetFBO;
         context.targetLFBO = baseContext.targetLFBO;
         context.targetRFBO = baseContext.targetRFBO;
@@ -2460,8 +2312,7 @@ namespace IPCore
             if (!baseContext.norender) // && root->isHistogram)
             {
                 ConstFBOVector childrenFBO;
-                for (IPImage* child = root->children; child;
-                     child = child->next)
+                for (IPImage* child = root->children; child; child = child->next)
                 {
                     ImageFBO* ifbo = findExistingImageFBO(child);
                     assert(ifbo);
@@ -2488,8 +2339,7 @@ namespace IPCore
         renderCurrentImage(baseContext, fbo);
     }
 
-    void
-    ImageRenderer::renderNonIntermediate(InternalRenderContext& baseContext)
+    void ImageRenderer::renderNonIntermediate(InternalRenderContext& baseContext)
     {
         InternalRenderContext context = baseContext;
 
@@ -2508,10 +2358,8 @@ namespace IPCore
         const GLFBO* fbo = context.targetFBO;
         const AuxRender* auxRender = context.auxRenderer;
         IPImage::RenderDestination dest = image->destination;
-        const bool left =
-            dest == IPImage::MainBuffer || dest == IPImage::LeftBuffer;
-        const bool right =
-            dest == IPImage::MainBuffer || dest == IPImage::RightBuffer;
+        const bool left = dest == IPImage::MainBuffer || dest == IPImage::LeftBuffer;
+        const bool right = dest == IPImage::MainBuffer || dest == IPImage::RightBuffer;
 
         context.norender = false;
 
@@ -2527,8 +2375,7 @@ namespace IPCore
             m_rootContext = &context;
             GLState::FixedFunctionPipeline FFP(m_glState);
             FFP.setViewport(0, 0, fbo->width(), fbo->height());
-            auxRender->render(VideoDevice::IndependentDisplayMode, left, right,
-                              controller, !controller);
+            auxRender->render(VideoDevice::IndependentDisplayMode, left, right, controller, !controller);
             m_rootContext = 0;
         }
     }
@@ -2545,15 +2392,11 @@ namespace IPCore
 
         const VideoDevice* device = context.device;
         const bool controller = device == m_controlDevice.device;
-        const GLFBO* fbo = context.targetFBO
-                               ? context.targetFBO
-                               : m_controlDevice.glDevice->defaultFBO();
+        const GLFBO* fbo = context.targetFBO ? context.targetFBO : m_controlDevice.glDevice->defaultFBO();
         const AuxRender* auxRender = context.auxRenderer;
         IPImage::RenderDestination dest = context.image->destination;
-        const bool left =
-            dest == IPImage::MainBuffer || dest == IPImage::LeftBuffer;
-        const bool right =
-            dest == IPImage::MainBuffer || dest == IPImage::RightBuffer;
+        const bool left = dest == IPImage::MainBuffer || dest == IPImage::LeftBuffer;
+        const bool right = dest == IPImage::MainBuffer || dest == IPImage::RightBuffer;
 
         //
         //  Don't touch this buffer yet if the device isn't done yet. This
@@ -2610,8 +2453,7 @@ namespace IPCore
 
         renderAllChildren(context);
 
-        if (controller
-            && (dest == IPImage::LeftBuffer || dest == IPImage::RightBuffer))
+        if (controller && (dest == IPImage::LeftBuffer || dest == IPImage::RightBuffer))
         {
             renderCurrentImage(context);
         }
@@ -2755,8 +2597,7 @@ namespace IPCore
         }
         catch (...)
         {
-            cout << "WARNING: render failed while rendering " << i->graphID()
-                 << endl;
+            cout << "WARNING: render failed while rendering " << i->graphID() << endl;
             throw;
         }
 
@@ -2810,8 +2651,7 @@ namespace IPCore
             m_glState->useGLProgram(crosshatchBGGLProgram());
 
         GLPipeline* glPipeline = m_glState->activeGLPipeline();
-        glPipeline->setViewport(0, 0, GLuint(target->width()),
-                                GLuint(target->height()));
+        glPipeline->setViewport(0, 0, GLuint(target->width()), GLuint(target->height()));
 
         float grey = 0.0;
         switch (m_bgpattern)
@@ -2872,21 +2712,16 @@ namespace IPCore
                             0,
                             static_cast<float>(target->height())};
 
-            PrimitiveData databuffer(data, NULL, GL_QUADS, 4, 1,
-                                     sizeof(float) * 16);
+            PrimitiveData databuffer(data, NULL, GL_QUADS, 4, 1, sizeof(float) * 16);
 
             vector<VertexAttribute> attributeInfo;
-            attributeInfo.push_back(
-                VertexAttribute("in_Position", GL_FLOAT, 2, 0,
-                                4 * sizeof(float))); // vertex
+            attributeInfo.push_back(VertexAttribute("in_Position", GL_FLOAT, 2, 0,
+                                                    4 * sizeof(float))); // vertex
 
-            attributeInfo.push_back(
-                VertexAttribute("in_TexCoord0", GL_FLOAT, 2, 2 * sizeof(float),
-                                4 * sizeof(float))); // texture
+            attributeInfo.push_back(VertexAttribute("in_TexCoord0", GL_FLOAT, 2, 2 * sizeof(float),
+                                                    4 * sizeof(float))); // texture
 
-            RenderPrimitives renderprimitives(m_glState->activeGLProgram(),
-                                              databuffer, attributeInfo,
-                                              m_glState->vboList());
+            RenderPrimitives renderprimitives(m_glState->activeGLProgram(), databuffer, attributeInfo, m_glState->vboList());
             renderprimitives.setupAndRender();
 
             TWK_GLDEBUG;
@@ -2926,8 +2761,7 @@ namespace IPCore
             string renderID = imageToFBOIdentifier(root);
             // if found one, findExistingImageFBO will mark it unavailable and
             // update serialNum
-            m_imageFBOManager.findExistingImageFBO(renderID,
-                                                   m_fullRenderSerialNumber);
+            m_imageFBOManager.findExistingImageFBO(renderID, m_fullRenderSerialNumber);
         }
     }
 
@@ -2951,21 +2785,14 @@ namespace IPCore
         if (m_noGPUCache)
             return 0;
         string renderID = imageToFBOIdentifier(image);
-        return m_imageFBOManager.findExistingImageFBO(renderID,
-                                                      m_fullRenderSerialNumber);
+        return m_imageFBOManager.findExistingImageFBO(renderID, m_fullRenderSerialNumber);
     }
 
-    ImageFBO* ImageRenderer::findExistingImageFBO(GLuint textureID)
-    {
-        return m_imageFBOManager.findExistingImageFBO(textureID);
-    }
+    ImageFBO* ImageRenderer::findExistingImageFBO(GLuint textureID) { return m_imageFBOManager.findExistingImageFBO(textureID); }
 
-    ImageFBO* ImageRenderer::newOutputOnlyImageFBO(GLenum format,
-                                                   size_t samples)
+    ImageFBO* ImageRenderer::newOutputOnlyImageFBO(GLenum format, size_t samples)
     {
-        return m_imageFBOManager.newOutputOnlyImageFBO(
-            format, m_outputDevice.device->width(),
-            m_outputDevice.device->height(), samples);
+        return m_imageFBOManager.newOutputOnlyImageFBO(format, m_outputDevice.device->width(), m_outputDevice.device->height(), samples);
     }
 
     //----------------------------------------------------------------------
@@ -3001,8 +2828,7 @@ namespace IPCore
         std::string hopMsg = std::string("ImageRenderer::prefetchInternal()");
         if (fb)
         {
-            hopMsg += std::string(" - width=") + std::to_string(fb->width())
-                      + std::string(", height=") + std::to_string(fb->height());
+            hopMsg += std::string(" - width=") + std::to_string(fb->width()) + std::string(", height=") + std::to_string(fb->height());
         }
         HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
@@ -3065,11 +2891,8 @@ namespace IPCore
         //  different and we end up over-uploading.
         //
 
-        if (root->destination != IPImage::NoBuffer
-            && root->destination != IPImage::MainBuffer
-            && root->destination != IPImage::LeftBuffer
-            && root->destination != IPImage::RightBuffer
-            && root->renderType != IPImage::GroupType)
+        if (root->destination != IPImage::NoBuffer && root->destination != IPImage::MainBuffer && root->destination != IPImage::LeftBuffer
+            && root->destination != IPImage::RightBuffer && root->renderType != IPImage::GroupType)
         {
             prefetchInternal(root);
         }
@@ -3101,12 +2924,10 @@ namespace IPCore
         //
         //  Assign (and possibly upload) all image planes and LUTs
         //
-        LogicalImage* limage =
-            m_imagePassStates[img->renderIDHash()]->primaryImage();
+        LogicalImage* limage = m_imagePassStates[img->renderIDHash()]->primaryImage();
         limage->imageNum = img->imageNum;
 
-        assignImage(limage, img, imageFBO, norender, context.mergeContext,
-                    context.fullSerialNum);
+        assignImage(limage, img, imageFBO, norender, context.mergeContext, context.fullSerialNum);
 
         assignAuxImages(img);
 
@@ -3118,13 +2939,11 @@ namespace IPCore
         //  merge)
         //
 
-        if (!context.mergeContext && !norender
-            && img->destination != IPImage::DataBuffer)
+        if (!context.mergeContext && !norender && img->destination != IPImage::DataBuffer)
         {
             const Shader::Program* prog = 0;
 
-            Shader::Expression* expr =
-                context.mergeRender ? img->mergeExpr : img->shaderExpr;
+            Shader::Expression* expr = context.mergeRender ? img->mergeExpr : img->shaderExpr;
 
             if ((!limage->isvirtual || context.mergeRender) && expr)
             {
@@ -3135,8 +2954,7 @@ namespace IPCore
                 }
                 catch (std::exception& e)
                 {
-                    cerr << "ERROR: failed to compile/select GL program: "
-                         << e.what() << endl;
+                    cerr << "ERROR: failed to compile/select GL program: " << e.what() << endl;
                     return;
                 }
 
@@ -3169,10 +2987,7 @@ namespace IPCore
         m_glState->useGLProgram(defaultGLProgram());
     }
 
-    void
-    ImageRenderer::markProgramRequirements(const IPImage* img,
-                                           const InternalRenderContext& context,
-                                           const Shader::Program* program)
+    void ImageRenderer::markProgramRequirements(const IPImage* img, const InternalRenderContext& context, const Shader::Program* program)
     {
         typedef Shader::Program::GraphIDSet GraphIDSet;
 
@@ -3184,9 +2999,7 @@ namespace IPCore
             for (size_t i = 0; i < n; i++)
             {
                 const IPImage* activeImage = context.activeImages[i];
-                LogicalImage* image =
-                    m_imagePassStates[activeImage->renderIDHash()]
-                        ->primaryImage();
+                LogicalImage* image = m_imagePassStates[activeImage->renderIDHash()]->primaryImage();
                 string graphid = image->ipToGraphIDs[activeImage];
                 image->outputST = outputSTSet.count(graphid) > 0;
                 image->outputSize = outputSizeSet.count(graphid) > 0;
@@ -3251,17 +3064,13 @@ namespace IPCore
                 TWK_GLDEBUG;
                 glBindTexture(plane.tile->target, id);
                 TWK_GLDEBUG;
-                glTexParameteri(plane.tile->target, GL_TEXTURE_MIN_FILTER,
-                                filterMode);
-                glTexParameteri(plane.tile->target, GL_TEXTURE_MAG_FILTER,
-                                filterMode);
+                glTexParameteri(plane.tile->target, GL_TEXTURE_MIN_FILTER, filterMode);
+                glTexParameteri(plane.tile->target, GL_TEXTURE_MAG_FILTER, filterMode);
             }
         }
     }
 
-    void ImageRenderer::computeMergeMatrix(const InternalRenderContext& context,
-                                           const LogicalImage* logicalImage,
-                                           const IPImage* ipImage,
+    void ImageRenderer::computeMergeMatrix(const InternalRenderContext& context, const LogicalImage* logicalImage, const IPImage* ipImage,
                                            Mat44f& mergeMatrix) const
     {
         //
@@ -3302,9 +3111,8 @@ namespace IPCore
         mergeMatrix = T0 * S1 * M * S0 * T1;
     }
 
-    void ImageRenderer::computeDataBufferMergeMatrix(
-        const InternalRenderContext& context, const IPImage* ipImage,
-        Mat44f& mergeMatrix) const
+    void ImageRenderer::computeDataBufferMergeMatrix(const InternalRenderContext& context, const IPImage* ipImage,
+                                                     Mat44f& mergeMatrix) const
     {
         assert(ipImage->destination == IPImage::DataBuffer);
 
@@ -3349,14 +3157,12 @@ namespace IPCore
         s.source = image->source;
         s.serialNum = image->serialNum;
         s.imageNum = image->imageNum;
-        s.textureID =
-            (image->planes.size()) ? image->planes.front().tile->id : 0;
+        s.textureID = (image->planes.size()) ? image->planes.front().tile->id : 0;
         s.node = image->node;
         s.tagMap = image->tagMap;
         s.index = img->fb ? img->fbHash() : img->renderIDHash();
         s.imageBox = Box2f(Vec2f(0, 0), Vec2f(1.0, 1.0));
-        s.stencilBox = Box2f(Vec2f(image->stencilMin.x, image->stencilMin.y),
-                             Vec2f(image->stencilMax.x, image->stencilMax.y));
+        s.stencilBox = Box2f(Vec2f(image->stencilMin.x, image->stencilMin.y), Vec2f(image->stencilMax.x, image->stencilMax.y));
         s.modelMatrix = img->imageMatrix;
         s.globalMatrix = img->modelViewMatrixGlobal;
         s.projectionMatrix = img->projectionMatrixGlobal;
@@ -3370,17 +3176,12 @@ namespace IPCore
         s.uncropX = image->uncropX;
         s.uncropY = image->uncropY;
         s.planar = image->planes.size() > 1;
-        s.numChannels = s.planar ? image->planes.size()
-                                 : (image->planes.size()
-                                        ? image->planes.front().tile->channels
-                                        : 4);
+        s.numChannels = s.planar ? image->planes.size() : (image->planes.size() ? image->planes.front().tile->channels : 4);
         s.pixelAspect = image->pixelAspect;
         s.initPixelAspect = image->initPixelAspect;
         s.device = (VideoDevice*)context.device;
 
-        GLuint channelType = image->planes.empty()
-                                 ? GL_FLOAT
-                                 : image->planes.front().tile->channelType;
+        GLuint channelType = image->planes.empty() ? GL_FLOAT : image->planes.front().tile->channelType;
 
         switch (channelType)
         {
@@ -3425,8 +3226,7 @@ namespace IPCore
         // in this case (for instance audio texture) we need to call
         // activatePrimaryTexture which uploads the texture data from pbo to
         // texture
-        if (img->destination == IPImage::OutputTexture
-            || img->destination == IPImage::DataBuffer)
+        if (img->destination == IPImage::OutputTexture || img->destination == IPImage::DataBuffer)
         {
             activateTextures(istate->images);
         }
@@ -3448,9 +3248,7 @@ namespace IPCore
 
         glPipeline->setProjection(PM);
         glPipeline->setModelview(MV);
-        glPipeline->setViewport(viewport.min.x, viewport.min.y,
-                                viewport.max.x - viewport.min.x,
-                                viewport.max.y - viewport.min.y);
+        glPipeline->setViewport(viewport.min.x, viewport.min.y, viewport.max.x - viewport.min.x, viewport.max.y - viewport.min.y);
 
         vector<float> data(16);
         ImagePlane& plane = image->planes[0];
@@ -3507,21 +3305,17 @@ namespace IPCore
         ostringstream texcoordname;
         texcoordname << "in_TexCoord" << image->ipToGraphIDs[img];
 
-        PrimitiveData databuffer(&data.front(), NULL, GL_QUADS, 4, 1,
-                                 sizeof(float) * 16);
+        PrimitiveData databuffer(&data.front(), NULL, GL_QUADS, 4, 1, sizeof(float) * 16);
 
         vector<VertexAttribute> attributeInfo;
 
         attributeInfo.push_back(VertexAttribute("in_Position", GL_FLOAT, 2, 0,
                                                 4 * sizeof(float))); // vertex
 
-        attributeInfo.push_back(VertexAttribute(texcoordname.str(), GL_FLOAT, 2,
-                                                2 * sizeof(float),
+        attributeInfo.push_back(VertexAttribute(texcoordname.str(), GL_FLOAT, 2, 2 * sizeof(float),
                                                 4 * sizeof(float))); // texture
 
-        RenderPrimitives renderprimitives(m_glState->activeGLProgram(),
-                                          databuffer, attributeInfo,
-                                          m_glState->vboList());
+        RenderPrimitives renderprimitives(m_glState->activeGLProgram(), databuffer, attributeInfo, m_glState->vboList());
 
         renderprimitives.setupAndRender();
         TWK_GLDEBUG;
@@ -3529,9 +3323,7 @@ namespace IPCore
         glActiveTextureARB(GL_TEXTURE0_ARB);
     }
 
-    void ImageRenderer::assignMemberImages(
-        const IPImage* img,
-        const ImageRenderer::ActiveImageVector& activeImages)
+    void ImageRenderer::assignMemberImages(const IPImage* img, const ImageRenderer::ActiveImageVector& activeImages)
     {
         ImagePassState* istate = m_imagePassStates[img->renderIDHash()];
 
@@ -3572,15 +3364,12 @@ namespace IPCore
 
         glPipeline->setProjection(PM);
         glPipeline->setModelview(Mat44f());
-        glPipeline->setViewport(viewport.min.x, viewport.min.y,
-                                viewport.max.x - viewport.min.x,
-                                viewport.max.y - viewport.min.y);
+        glPipeline->setViewport(viewport.min.x, viewport.min.y, viewport.max.x - viewport.min.x, viewport.max.y - viewport.min.y);
 
         //  Active member image textures
         for (size_t i = 0; i < istate->memberImages.size(); i++)
         {
-            ImagePassState* mstate =
-                m_imagePassStates[istate->memberImages[i]->renderIDHash()];
+            ImagePassState* mstate = m_imagePassStates[istate->memberImages[i]->renderIDHash()];
             activateTextures(mstate->images);
         }
 
@@ -3599,9 +3388,8 @@ namespace IPCore
 
         vector<VertexAttribute> attributeInfo;
 
-        attributeInfo.push_back(
-            VertexAttribute("in_Position", GL_FLOAT, 2, 0,
-                            2 * sizeof(float))); // first all vertices
+        attributeInfo.push_back(VertexAttribute("in_Position", GL_FLOAT, 2, 0,
+                                                2 * sizeof(float))); // first all vertices
 
         size_t count = 0;
 
@@ -3618,9 +3406,8 @@ namespace IPCore
             texcoordstr << "in_TexCoord" << image->ipToGraphIDs[img2];
             string tname = texcoordstr.str(); // windows
 
-            attributeInfo.push_back(VertexAttribute(
-                tname, GL_FLOAT, 2, (8 + 8 * count) * sizeof(float),
-                2 * sizeof(float))); // texture
+            attributeInfo.push_back(VertexAttribute(tname, GL_FLOAT, 2, (8 + 8 * count) * sizeof(float),
+                                                    2 * sizeof(float))); // texture
 
             if (img2->destination == IPImage::DataBuffer)
             {
@@ -3654,8 +3441,7 @@ namespace IPCore
                 data.push_back(t.x);
                 data.push_back(t.y);
 
-                t = mergeMatrix
-                    * Vec4f(image->width, image->height, 0.0f, 1.0f);
+                t = mergeMatrix * Vec4f(image->width, image->height, 0.0f, 1.0f);
                 data.push_back(t.x);
                 data.push_back(t.y);
 
@@ -3666,13 +3452,10 @@ namespace IPCore
             count++;
         }
 
-        PrimitiveData databuffer(
-            &(data[0]), NULL, GL_QUADS, 4, 1,
-            sizeof(float)
-                * (8 + 8 * count)); // 8 for vertex, 8 per texcoord set
+        PrimitiveData databuffer(&(data[0]), NULL, GL_QUADS, 4, 1,
+                                 sizeof(float) * (8 + 8 * count)); // 8 for vertex, 8 per texcoord set
 
-        RenderPrimitives renderprimitives(glPipeline->glProgram(), databuffer,
-                                          attributeInfo, m_glState->vboList());
+        RenderPrimitives renderprimitives(glPipeline->glProgram(), databuffer, attributeInfo, m_glState->vboList());
 
         renderprimitives.setupAndRender();
 
@@ -3715,8 +3498,7 @@ namespace IPCore
             for (size_t i = 0; i < istate->memberImages.size(); i++)
             {
                 const IPImage* img2 = istate->memberImages[i];
-                LogicalImageVector& images =
-                    m_imagePassStates[img2->renderIDHash()]->images;
+                LogicalImageVector& images = m_imagePassStates[img2->renderIDHash()]->images;
                 for (size_t j = 0; j < images.size(); j++)
                 {
                     LogicalImage* image = &images[j];
@@ -3779,14 +3561,12 @@ namespace IPCore
             for (size_t i = 0; i < istate->memberImages.size(); i++)
             {
                 const IPImage* img2 = istate->memberImages[i];
-                LogicalImageVector& images =
-                    m_imagePassStates[img2->renderIDHash()]->images;
+                LogicalImageVector& images = m_imagePassStates[img2->renderIDHash()]->images;
                 for (size_t j = 0; j < images.size(); j++)
                 {
                     LogicalImage* image = &images[j];
                     size_t tunit = framebufferToTextureUnit[image->texturehash];
-                    bool assigned =
-                        assignTextureUnits2(img2, image, tunit, stunit);
+                    bool assigned = assignTextureUnits2(img2, image, tunit, stunit);
                     if (assigned)
                         stunit++;
                 }
@@ -3803,9 +3583,7 @@ namespace IPCore
         }
     }
 
-    bool ImageRenderer::assignTextureUnits2(const IPImage* img,
-                                            LogicalImage* image, size_t& tunit,
-                                            size_t stunit)
+    bool ImageRenderer::assignTextureUnits2(const IPImage* img, LogicalImage* image, size_t& tunit, size_t stunit)
     {
         if (image->planes.empty() && !image->outputST)
             return false;
@@ -3846,8 +3624,7 @@ namespace IPCore
                 ImageAndCoordinateUnit& a = m_unitAssignments[uindex];
 
                 if (!image->isPrimary)
-                    image->coordinateSet =
-                        NOT_A_COORDINATE; // aux images have no coordinates
+                    image->coordinateSet = NOT_A_COORDINATE; // aux images have no coordinates
 
                 a.textureUnit = plane.textureUnit;
                 a.coordinateSet = image->coordinateSet;
@@ -3878,8 +3655,7 @@ namespace IPCore
     void ImageRenderer::clearImagePassStates()
     {
         ImagePassStateMap::iterator it;
-        for (it = m_imagePassStates.begin(); it != m_imagePassStates.end();
-             it++)
+        for (it = m_imagePassStates.begin(); it != m_imagePassStates.end(); it++)
         {
             delete it->second;
         }
@@ -3923,8 +3699,7 @@ namespace IPCore
         }
     }
 
-    void ImageRenderer::assembleAuxLogicalImage(const FrameBuffer* fb,
-                                                LogicalImage* i)
+    void ImageRenderer::assembleAuxLogicalImage(const FrameBuffer* fb, LogicalImage* i)
     {
         i->isPrimary = false;
 
@@ -3938,14 +3713,11 @@ namespace IPCore
         }
         else
         {
-            TWK_THROW_STREAM(RenderFailedExc,
-                             "Cannot find texture description for auxFB"
-                                 << endl);
+            TWK_THROW_STREAM(RenderFailedExc, "Cannot find texture description for auxFB" << endl);
         }
     }
 
-    void ImageRenderer::assemblePrimaryLogicalImage(const IPImage* img,
-                                                    LogicalImage* i)
+    void ImageRenderer::assemblePrimaryLogicalImage(const IPImage* img, LogicalImage* i)
     {
         i->pixelAspect = img->displayPixelAspect();
         i->initPixelAspect = img->initPixelAspect;
@@ -3974,24 +3746,19 @@ namespace IPCore
         for (const FrameBuffer* p = img->fb; p; p = p->nextPlane(), ip++)
         {
             // find the right texture description
-            FBToTextureMap::iterator it =
-                m_uploadedTextures.find(p->identifier());
+            FBToTextureMap::iterator it = m_uploadedTextures.find(p->identifier());
             if (it != m_uploadedTextures.end())
             {
                 i->planes[ip].tile = it->second;
             }
             else
             {
-                TWK_THROW_STREAM(RenderFailedExc,
-                                 "Cannot find texture description for auxFB"
-                                     << endl);
+                TWK_THROW_STREAM(RenderFailedExc, "Cannot find texture description for auxFB" << endl);
             }
         }
     }
 
-    ImageRenderer::TextureDescription*
-    ImageRenderer::getTexture(const FrameBuffer* fb,
-                              TextureDescription::TextureMatch& match)
+    ImageRenderer::TextureDescription* ImageRenderer::getTexture(const FrameBuffer* fb, TextureDescription::TextureMatch& match)
     {
         //
         // find the best match available
@@ -4015,8 +3782,7 @@ namespace IPCore
         //
         // find one that matches our formats
         //
-        for (it = m_uploadedTextures.begin(); it != m_uploadedTextures.end();
-             it++)
+        for (it = m_uploadedTextures.begin(); it != m_uploadedTextures.end(); it++)
         {
             TextureDescription* tex = it->second;
 
@@ -4050,8 +3816,7 @@ namespace IPCore
     void ImageRenderer::freeOldTextures()
     {
         vector<string> needsDelete;
-        for (FBToTextureMap::iterator it = m_uploadedTextures.begin();
-             it != m_uploadedTextures.end(); it++)
+        for (FBToTextureMap::iterator it = m_uploadedTextures.begin(); it != m_uploadedTextures.end(); it++)
         {
             TextureDescription* tex = it->second;
             if (tex->age > 10)
@@ -4064,8 +3829,7 @@ namespace IPCore
 
         for (size_t i = 0; i < needsDelete.size(); i++)
         {
-            FBToTextureMap::iterator it =
-                m_uploadedTextures.find(needsDelete[i]);
+            FBToTextureMap::iterator it = m_uploadedTextures.find(needsDelete[i]);
 
             if (it != m_uploadedTextures.end())
             {
@@ -4080,8 +3844,7 @@ namespace IPCore
 
     void ImageRenderer::freeUploadedTextures()
     {
-        for (FBToTextureMap::iterator it = m_uploadedTextures.begin();
-             it != m_uploadedTextures.end(); it++)
+        for (FBToTextureMap::iterator it = m_uploadedTextures.begin(); it != m_uploadedTextures.end(); it++)
         {
             m_glState->deleteGLTexture(it->second->id);
             if (it->second->bufferId)
@@ -4091,17 +3854,13 @@ namespace IPCore
         m_uploadedTextures.clear();
     }
 
-    bool ImageRenderer::compatible(const FrameBuffer* fb,
-                                   const TextureDescription* tex) const
+    bool ImageRenderer::compatible(const FrameBuffer* fb, const TextureDescription* tex) const
     {
         //
         //  Check for basic geometry
         //
-        if (fb->height() != tex->height || fb->width() != tex->width
-            || fb->depth() != tex->depth || fb->numChannels() != tex->channels
-            || fb->pixelSize() != tex->pixelSize
-            || fb->uncropWidth() != tex->uncropWidth
-            || fb->uncropHeight() != tex->uncropHeight
+        if (fb->height() != tex->height || fb->width() != tex->width || fb->depth() != tex->depth || fb->numChannels() != tex->channels
+            || fb->pixelSize() != tex->pixelSize || fb->uncropWidth() != tex->uncropWidth || fb->uncropHeight() != tex->uncropHeight
             || fb->uncropX() != tex->uncropX || fb->uncropY() != tex->uncropY)
         {
             return false;
@@ -4113,9 +3872,8 @@ namespace IPCore
         TextureDescription b;
         initializeTextureFormat(fb, &b);
 
-        if (tex->channelType != b.channelType
-            || tex->internalFormat != b.internalFormat
-            || tex->format != b.format || tex->alignment != b.alignment)
+        if (tex->channelType != b.channelType || tex->internalFormat != b.internalFormat || tex->format != b.format
+            || tex->alignment != b.alignment)
         {
             return false;
         }
@@ -4123,9 +3881,7 @@ namespace IPCore
         return true;
     }
 
-    void ImageRenderer::initializePlane(const IPImage* img,
-                                        const GLFBO* imageFBO,
-                                        ImagePlane& plane) const
+    void ImageRenderer::initializePlane(const IPImage* img, const GLFBO* imageFBO, ImagePlane& plane) const
     {
         plane.width = imageFBO->width();
         plane.height = imageFBO->height();
@@ -4156,8 +3912,7 @@ namespace IPCore
         d->uncropY = 0;
     }
 
-    void ImageRenderer::computeImageGeometry(const IPImage* img,
-                                             ImagePlane& plane) const
+    void ImageRenderer::computeImageGeometry(const IPImage* img, ImagePlane& plane) const
     {
         if (img->fb)
         {
@@ -4180,8 +3935,7 @@ namespace IPCore
             plane.originY = img->cropStartY;
             plane.endX = img->cropEndX;
             plane.endY = img->cropEndY;
-            ia = (float)(plane.endX - plane.originX)
-                 / (float)(plane.endY - plane.originY);
+            ia = (float)(plane.endX - plane.originX) / (float)(plane.endY - plane.originY);
         }
 
         plane.x0 = 0;
@@ -4190,16 +3944,13 @@ namespace IPCore
         plane.y1 = 1;
     }
 
-    void ImageRenderer::computePlaneGeometry(const IPImage* img,
-                                             const FrameBuffer* fb,
-                                             ImagePlane& plane) const
+    void ImageRenderer::computePlaneGeometry(const IPImage* img, const FrameBuffer* fb, ImagePlane& plane) const
     {
         const float ia = 1.0; // fix this with the uncrop matrix
         double ma = ((float)img->width / img->height);
 
         TextureDescription* d = plane.tile;
-        const bool needsUncrop =
-            d->width != d->uncropWidth || d->height != d->uncropHeight;
+        const bool needsUncrop = d->width != d->uncropWidth || d->height != d->uncropHeight;
 
         plane.endX = d->width;
         plane.endY = d->height;
@@ -4213,8 +3964,7 @@ namespace IPCore
             plane.endX = img->cropEndX;
             plane.endY = img->cropEndY;
 
-            ma *= (float)(img->cropEndX - img->cropStartX) * (float)img->height
-                  / (float)(img->cropEndY - img->cropStartY)
+            ma *= (float)(img->cropEndX - img->cropStartX) * (float)img->height / (float)(img->cropEndY - img->cropStartY)
                   / (float)img->width;
         }
 
@@ -4239,16 +3989,10 @@ namespace IPCore
             // use width, height, uncrop width, height, crop origin to figure
             // out the size of the whole data quad
             float tx0, ty0, tx1, ty1;
-            ty0 = plane.y0
-                  - (fb->height() + fb->uncropY() - fb->uncropHeight())
-                        * (plane.y1 - plane.y0) / fb->uncropHeight();
-            ty1 = plane.y1
-                  - fb->uncropY() * (plane.y1 - plane.y0) / fb->uncropHeight();
-            tx0 = plane.x0
-                  + fb->uncropX() * (plane.x1 - plane.x0) / fb->uncropWidth();
-            tx1 = plane.x1
-                  + (fb->width() + fb->uncropX() - fb->uncropWidth())
-                        * (plane.x1 - plane.x0) / fb->uncropWidth();
+            ty0 = plane.y0 - (fb->height() + fb->uncropY() - fb->uncropHeight()) * (plane.y1 - plane.y0) / fb->uncropHeight();
+            ty1 = plane.y1 - fb->uncropY() * (plane.y1 - plane.y0) / fb->uncropHeight();
+            tx0 = plane.x0 + fb->uncropX() * (plane.x1 - plane.x0) / fb->uncropWidth();
+            tx1 = plane.x1 + (fb->width() + fb->uncropX() - fb->uncropWidth()) * (plane.x1 - plane.x0) / fb->uncropWidth();
 
             plane.x0 = tx0;
             plane.y0 = ty0;
@@ -4257,8 +4001,7 @@ namespace IPCore
         }
     }
 
-    void ImageRenderer::initializeTextureFormat(const FrameBuffer* fb,
-                                                TextureDescription* d) const
+    void ImageRenderer::initializeTextureFormat(const FrameBuffer* fb, TextureDescription* d) const
     {
         d->width = fb->width();
         d->height = fb->height();
@@ -4273,9 +4016,7 @@ namespace IPCore
 
         if (fb->coordinateType() == FrameBuffer::PixelCoordinates)
         {
-            d->target = (fb->coordinateType() == FrameBuffer::PixelCoordinates)
-                            ? GL_TEXTURE_RECTANGLE
-                            : GL_TEXTURE_2D;
+            d->target = (fb->coordinateType() == FrameBuffer::PixelCoordinates) ? GL_TEXTURE_RECTANGLE : GL_TEXTURE_2D;
         }
         else
         {
@@ -4444,8 +4185,7 @@ namespace IPCore
         case 4:
         {
 #if defined(TWK_BIG_ENDIAN) || defined(__BIG_ENDIAN__)
-            bool backwards =
-                fb->channelName(0) == "A" && fb->channelName(1) == "R";
+            bool backwards = fb->channelName(0) == "A" && fb->channelName(1) == "R";
 #else
             bool backwards = false;
 #endif
@@ -4491,15 +4231,13 @@ namespace IPCore
         assert(d->format);
     }
 
-    void ImageRenderer::initializeTexture(const FrameBuffer* fb,
-                                          TextureDescription* d) const
+    void ImageRenderer::initializeTexture(const FrameBuffer* fb, TextureDescription* d) const
     {
         HOP_PROF_FUNC();
 
         initializeTextureFormat(fb, d);
 
-        const size_t totalBytes =
-            d->width * d->height * d->depth * d->pixelSize;
+        const size_t totalBytes = d->width * d->height * d->depth * d->pixelSize;
         d->id = m_glState->createGLTexture(totalBytes);
 
         // Note: The minimum size restriction is to prevent an NVIDIA driver
@@ -4511,17 +4249,12 @@ namespace IPCore
         // switches to a large layout say with over 20 clips. These extra PBOs
         // can really stress a system and also make the default layout slow to
         // appear due to the time it takes to allocate all those extra PBOs.
-        const bool usePBO =
-            m_pixelBuffers
-            && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT)
-            && !useAppleClientStorage() && fb->scanlinePixelPadding() == 0
-            && totalBytes > 128 * 1024
-            && m_uploadedTextures.size() < evMaxConcurrentPBOs.getValue();
+        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
+                            && fb->scanlinePixelPadding() == 0 && totalBytes > 128 * 1024
+                            && m_uploadedTextures.size() < evMaxConcurrentPBOs.getValue();
         if (usePBO)
         {
-            d->pPBOToGPU =
-                std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(
-                    TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
+            d->pPBOToGPU = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
         }
     }
 
@@ -4529,8 +4262,7 @@ namespace IPCore
     {
         ImagePassState* istate = m_imagePassStates[img->renderIDHash()];
 
-        assert(istate->images.size() - 1
-               == img->auxFBs.size()); // first in images is primary
+        assert(istate->images.size() - 1 == img->auxFBs.size()); // first in images is primary
 
         for (size_t i = 1; i < istate->images.size(); ++i)
         {
@@ -4549,9 +4281,8 @@ namespace IPCore
         i->texturehash = i->fbhash;
     }
 
-    void ImageRenderer::assignImage(LogicalImage* i, const IPImage* img,
-                                    const GLFBO* imageFBO, bool norender,
-                                    bool isMergeContext, const size_t serialNum)
+    void ImageRenderer::assignImage(LogicalImage* i, const IPImage* img, const GLFBO* imageFBO, bool norender, bool isMergeContext,
+                                    const size_t serialNum)
     {
         const FrameBuffer* fb = img->fb;
 
@@ -4564,9 +4295,8 @@ namespace IPCore
         //  per-pixel lookup of input images
         //
 
-        i->render = img->destination != IPImage::OutputTexture
-                    && img->destination != IPImage::DataBuffer
-                    && !img->isBlank() && !img->isNoImage();
+        i->render =
+            img->destination != IPImage::OutputTexture && img->destination != IPImage::DataBuffer && !img->isBlank() && !img->isNoImage();
         i->isresident = imageFBO ? true : false;
         i->isvirtual = img->fb ? false : !i->isresident;
         i->node = img->node;
@@ -4658,9 +4388,7 @@ namespace IPCore
     //  Upload plane
     //
 
-    void ImageRenderer::upload3DTexture(const FrameBuffer* fb,
-                                        GLuint pixelInterpolation,
-                                        TextureDescription* tex)
+    void ImageRenderer::upload3DTexture(const FrameBuffer* fb, GLuint pixelInterpolation, TextureDescription* tex)
     {
         const int iw = tex->width;
         const int ih = tex->height;
@@ -4695,8 +4423,7 @@ namespace IPCore
         if (useAppleClientStorage())
         {
             glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
-            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_STORAGE_HINT_APPLE,
-                            GL_STORAGE_CACHED_APPLE);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE);
         }
 #endif
 
@@ -4718,15 +4445,11 @@ namespace IPCore
         tex->uploaded = true;
     }
 
-    void ImageRenderer::upload2DTexture(const FrameBuffer* fb,
-                                        GLuint pixelInterpolation,
-                                        TextureDescription* tex)
+    void ImageRenderer::upload2DTexture(const FrameBuffer* fb, GLuint pixelInterpolation, TextureDescription* tex)
     {
         if (tex->depth > 1)
         {
-            TWK_THROW_STREAM(
-                RenderFailedExc,
-                "Texture target is conflicting with its dimensions");
+            TWK_THROW_STREAM(RenderFailedExc, "Texture target is conflicting with its dimensions");
         }
 
         const int iw = tex->width;
@@ -4766,15 +4489,11 @@ namespace IPCore
         tex->uploaded = true;
     }
 
-    void ImageRenderer::upload1DTexture(const FrameBuffer* fb,
-                                        GLuint pixelInterpolation,
-                                        TextureDescription* tex)
+    void ImageRenderer::upload1DTexture(const FrameBuffer* fb, GLuint pixelInterpolation, TextureDescription* tex)
     {
         if (tex->height > 1 || tex->depth > 1)
         {
-            TWK_THROW_STREAM(
-                RenderFailedExc,
-                "Texture target is conflicting with its dimensions");
+            TWK_THROW_STREAM(RenderFailedExc, "Texture target is conflicting with its dimensions");
         }
 
         const int iw = tex->width;
@@ -4823,19 +4542,13 @@ namespace IPCore
             m_startTime = elapsed();
         }
 
-        ~ProfilerGuard()
-        {
-            m_profilingState.uploadPlaneTime += elapsed() - m_startTime;
-        }
+        ~ProfilerGuard() { m_profilingState.uploadPlaneTime += elapsed() - m_startTime; }
 
         ProfilerGuard(ProfilerGuard const&) = delete;
         ProfilerGuard& operator=(ProfilerGuard const&) = delete;
 
     protected:
-        double elapsed() const
-        {
-            return m_profTimer ? m_profTimer->elapsed() : 0.0;
-        }
+        double elapsed() const { return m_profTimer ? m_profTimer->elapsed() : 0.0; }
 
     private:
         ImageRenderer::ProfilingState& m_profilingState;
@@ -4843,8 +4556,7 @@ namespace IPCore
         double m_startTime;
     };
 
-    void ImageRenderer::uploadPlane(const FrameBuffer* fb,
-                                    TextureDescription* d, GLuint filter)
+    void ImageRenderer::uploadPlane(const FrameBuffer* fb, TextureDescription* d, GLuint filter)
     {
         HOP_CALL(glFinish();)
 
@@ -4852,10 +4564,8 @@ namespace IPCore
         std::string hopMsg = std::string("ImageRenderer::uploadPlane()");
         if (d && d->format && fb && fb->allocSize() != 0)
         {
-            hopMsg += std::string(" - width=") + std::to_string(d->width)
-                      + std::string(", height=") + std::to_string(d->height)
-                      + std::string(", pixelSize=")
-                      + std::to_string(d->pixelSize);
+            hopMsg += std::string(" - width=") + std::to_string(d->width) + std::string(", height=") + std::to_string(d->height)
+                      + std::string(", pixelSize=") + std::to_string(d->pixelSize);
         }
         HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
@@ -4865,11 +4575,9 @@ namespace IPCore
         if (fb->coordinateType() == FrameBuffer::NormalizedCoordinates)
         {
             GLuint pixelInterpolation = GL_LINEAR;
-            if (const TwkFB::FBAttribute* a =
-                    fb->findAttribute("texture_pixel_interpolation"))
+            if (const TwkFB::FBAttribute* a = fb->findAttribute("texture_pixel_interpolation"))
             {
-                if (const TwkFB::TypedFBAttribute<bool>* ta =
-                        dynamic_cast<const TwkFB::TypedFBAttribute<bool>*>(a))
+                if (const TwkFB::TypedFBAttribute<bool>* ta = dynamic_cast<const TwkFB::TypedFBAttribute<bool>*>(a))
                 {
                     pixelInterpolation = ta->value() ? GL_LINEAR : GL_NEAREST;
                 }
@@ -4896,8 +4604,7 @@ namespace IPCore
             case GL_TEXTURE_RECTANGLE:
                 break;
             default:
-                TWK_THROW_STREAM(RenderFailedExc,
-                                 "Texture target is unsupported");
+                TWK_THROW_STREAM(RenderFailedExc, "Texture target is unsupported");
                 break;
             }
         }
@@ -4927,15 +4634,10 @@ namespace IPCore
         //
 
         // We should support non-contiguous pixel data in the PBO path.
-        const bool contiguousData =
-            (fb->scanlineSize() / fb->pixelSize()) == fb->width();
+        const bool contiguousData = (fb->scanlineSize() / fb->pixelSize()) == fb->width();
 
-        const bool usePBO =
-            m_pixelBuffers
-            && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT)
-            && !useAppleClientStorage() && fb->scanlinePixelPadding() == 0
-            && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes
-            && contiguousData;
+        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
+                            && fb->scanlinePixelPadding() == 0 && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes && contiguousData;
 
         bool updateOnly = d->uploaded ? true : false;
 
@@ -4956,8 +4658,7 @@ namespace IPCore
 
                 cerr << "ERROR: glMapBuffer: " << estring << endl;
 
-                TWK_THROW_STREAM(RenderFailedExc,
-                                 "glMapBuffer FAILED" << estring);
+                TWK_THROW_STREAM(RenderFailedExc, "glMapBuffer FAILED" << estring);
             }
 
             FastMemcpy_MP(b, p, totalBytes);
@@ -4966,13 +4667,11 @@ namespace IPCore
             d->pPBOToGPU->bind();
 
             {
-                HOP_PROF(
-                    "ImageRenderer::uploadPlane() - usePBO - glBindTexture");
+                HOP_PROF("ImageRenderer::uploadPlane() - usePBO - glBindTexture");
 
                 glBindTexture(d->target, d->id);
                 TWK_GLDEBUG;
-                glPixelStorei(GL_UNPACK_ROW_LENGTH,
-                              d->width + fb->scanlinePixelPadding());
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, d->width + fb->scanlinePixelPadding());
                 TWK_GLDEBUG;
                 glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, d->height);
                 TWK_GLDEBUG;
@@ -5031,8 +4730,7 @@ namespace IPCore
 
             glBindTexture(d->target, d->id);
             TWK_GLDEBUG;
-            glPixelStorei(GL_UNPACK_ROW_LENGTH,
-                          fb->scanlineSize() / fb->pixelSize());
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, fb->scanlineSize() / fb->pixelSize());
             TWK_GLDEBUG;
             glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, d->height);
             TWK_GLDEBUG;
@@ -5047,8 +4745,7 @@ namespace IPCore
             {
                 glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE);
 
-                glTexParameteri(d->target, GL_TEXTURE_STORAGE_HINT_APPLE,
-                                GL_STORAGE_CACHED_APPLE);
+                glTexParameteri(d->target, GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE);
                 TWK_GLDEBUG;
             }
 #endif
@@ -5112,8 +4809,7 @@ namespace IPCore
         for (size_t i = 0; i < root->commands.size(); ++i)
         {
             if (root->commands[i]->getType() == Paint::Command::PolyLine
-                && ((Paint::PolyLine*)root->commands[i])->mode
-                       == Paint::PolyLine::EraseMode)
+                && ((Paint::PolyLine*)root->commands[i])->mode == Paint::PolyLine::EraseMode)
                 hasErase = true;
         }
         return hasErase;
@@ -5159,14 +4855,8 @@ namespace IPCore
 
         const string prenderID = imageToFBOIdentifier(root);
         // these two are for pingpong
-        const GLFBO* tempfbo1 =
-            m_imageFBOManager
-                .newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)
-                ->fbo();
-        const GLFBO* tempfbo2 =
-            m_imageFBOManager
-                .newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)
-                ->fbo();
+        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
 
         assert(fbo);
 
@@ -5195,14 +4885,21 @@ namespace IPCore
             // only cache up to the second last command
             //
 
-            ostringstream newRenderID;
-            newRenderID << root->renderIDWithPartialPaint() << " " << m_filter
-                        << " " << m_bgpattern << " " << fbo->width() << "x"
-                        << fbo->height() << " paintCmdNo" << curCmdNum - 1;
+            // Note: We always force a recompute of the renderID here to account
+            // for changes from potentially concurrent paint commands
+            // Example:
+            // In Live Review, multiple users could be painting on the same
+            // image, and each paint command could change the renderID which
+            // would lead to a stale render cache being used if we didn't force
+            // a recompute of the renderID which is a unique identifier
+            // associated with the render.
 
-            cachedFBO = m_imageFBOManager.findExistingPaintFBO(
-                fbo, newRenderID.str(), foundCachedFBO, lastCmdNum,
-                m_fullRenderSerialNumber);
+            ostringstream newRenderID;
+            newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
+                        << fbo->width() << "x" << fbo->height() << " paintCmdNo" << curCmdNum - 1;
+
+            cachedFBO =
+                m_imageFBOManager.findExistingPaintFBO(fbo, newRenderID.str(), foundCachedFBO, lastCmdNum, m_fullRenderSerialNumber);
             assert(lastCmdNum <= curCmdNum);
 
             if (foundCachedFBO)
@@ -5212,8 +4909,7 @@ namespace IPCore
             }
             else
             {
-                cachedFBO = m_imageFBOManager.newImageFBO(
-                    fbo, m_fullRenderSerialNumber, newRenderID.str());
+                cachedFBO = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, newRenderID.str());
                 fbo->copyTo(tempfbo1);
             }
         }
@@ -5226,8 +4922,7 @@ namespace IPCore
         int overlayLoc = -1;
         for (size_t i = 0; i < root->commands.size(); ++i)
         {
-            if (root->commands[i]->getType()
-                == Paint::Command::ExecuteAllBefore)
+            if (root->commands[i]->getType() == Paint::Command::ExecuteAllBefore)
             {
                 overlayLoc = i;
                 break;
@@ -5330,8 +5025,7 @@ namespace IPCore
                     {
                         tempfbo2->copyTo(fbo);
                     }
-                    paintContext.initialRender =
-                        fbo; // holds the source+overlay commands render
+                    paintContext.initialRender = fbo; // holds the source+overlay commands render
                     paintContext.tempRender1 = tempfbo1;
                     paintContext.tempRender2 = tempfbo2;
                     paintContext.commands.clear();

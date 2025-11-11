@@ -48,8 +48,7 @@ namespace TwkFB
         {
             char c = file.get();
 
-            if ((i == 0 && c != 'r') || (i == 1 && c != 'a')
-                || (i == 2 && c != 'y') || (i == 4 && c != '.')
+            if ((i == 0 && c != 'r') || (i == 1 && c != 'a') || (i == 2 && c != 'y') || (i == 4 && c != '.')
                 || ((i == 3 || i == 5) && (c < '0' || c > '9')))
             {
                 TWK_THROW_STREAM(Exception, "Not an mray stub file");
@@ -92,8 +91,7 @@ namespace TwkFB
         fbi.proxy.attribute<string>("Mental Ray Version") = buffers[0];
     }
 
-    void IOmray::readImage(FrameBuffer& fb, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOmray::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         FBInfo info;
         getImageInfo(filename, info);

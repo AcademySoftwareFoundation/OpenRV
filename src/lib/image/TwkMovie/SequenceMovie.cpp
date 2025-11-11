@@ -28,8 +28,7 @@ namespace TwkMovie
 
         for (int i = 0; i < m_movies.size(); i++)
         {
-            m->addMovie(m_movies[i].movie->clone(), m_movies[i].inStart,
-                        m_movies[i].inEnd);
+            m->addMovie(m_movies[i].movie->clone(), m_movies[i].inStart, m_movies[i].inEnd);
         }
 
         return m;
@@ -74,8 +73,7 @@ namespace TwkMovie
         }
     }
 
-    size_t SequenceMovie::audioFillBuffer(const AudioReadRequest& request,
-                                          AudioBuffer& inbuffer)
+    size_t SequenceMovie::audioFillBuffer(const AudioReadRequest& request, AudioBuffer& inbuffer)
     {
         Time t = request.startTime;
         Time d = request.duration;
@@ -104,13 +102,11 @@ namespace TwkMovie
                 size_t lsamps = nsamps < remaining ? nsamps : remaining;
                 Time tlen = samplesToTime(lsamps, rate);
 
-                AudioBuffer outbuffer(p, inbuffer.channels(), lsamps, tstart,
-                                      rate);
+                AudioBuffer outbuffer(p, inbuffer.channels(), lsamps, tstart, rate);
 
                 if (m->hasAudio())
                 {
-                    m->audioFillBuffer(AudioReadRequest(tstart, tlen),
-                                       outbuffer);
+                    m->audioFillBuffer(AudioReadRequest(tstart, tlen), outbuffer);
                 }
                 else
                 {
@@ -127,16 +123,14 @@ namespace TwkMovie
         return inbuffer.size();
     }
 
-    static void copyExtraData(TwkMovie::Movie::ReadRequest& dst,
-                              const TwkMovie::Movie::ReadRequest& src)
+    static void copyExtraData(TwkMovie::Movie::ReadRequest& dst, const TwkMovie::Movie::ReadRequest& src)
     {
         dst.views = src.views;
         dst.layers = src.layers;
         dst.missing = src.missing;
     }
 
-    void SequenceMovie::imagesAtFrame(const ReadRequest& request,
-                                      FrameBufferVector& fbs)
+    void SequenceMovie::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         int fstart = m_fs;
@@ -160,8 +154,7 @@ namespace TwkMovie
         }
     }
 
-    void SequenceMovie::identifiersAtFrame(const ReadRequest& request,
-                                           IdentifierVector& ids)
+    void SequenceMovie::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
         int fstart = m_fs;

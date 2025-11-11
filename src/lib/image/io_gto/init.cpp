@@ -49,14 +49,9 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()(
-                    "ioMethod", value<int>(&ioMethod)->default_value(ioMethod),
-                    "I/O Method")("ioSize",
-                                  value<int>(&ioSize)->default_value(ioSize),
-                                  "I/O Max async read size")(
-                    "ioMaxAsync",
-                    value<int>(&ioMaxAsync)->default_value(ioMaxAsync),
-                    "I/O Max ASync Requests");
+                desc.add_options()("ioMethod", value<int>(&ioMethod)->default_value(ioMethod),
+                                   "I/O Method")("ioSize", value<int>(&ioSize)->default_value(ioSize), "I/O Max async read size")(
+                    "ioMaxAsync", value<int>(&ioMaxAsync)->default_value(ioMaxAsync), "I/O Max ASync Requests");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);
@@ -73,8 +68,7 @@ extern "C"
             }
         }
 
-        return new IOgto((StreamingFrameBufferIO::IOType)ioMethod, ioSize,
-                         ioMaxAsync);
+        return new IOgto((StreamingFrameBufferIO::IOType)ioMethod, ioSize, ioMaxAsync);
     }
 
     void destroy(IOgto* plug) { delete plug; }

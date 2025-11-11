@@ -38,10 +38,8 @@ namespace TwkMovie
         //  Types
         //
 
-        typedef boost::interprocess::offset_ptr<void, int32_t, uint64_t>
-            interop_offset_ptr;
-        typedef boost::interprocess::message_queue_t<interop_offset_ptr>
-            interop_message_queue;
+        typedef boost::interprocess::offset_ptr<void, int32_t, uint64_t> interop_offset_ptr;
+        typedef boost::interprocess::message_queue_t<interop_offset_ptr> interop_message_queue;
         typedef interop_message_queue Queue;
         typedef boost::interprocess::shared_memory_object SharedMemory;
         typedef boost::interprocess::mapped_region MappedRegion;
@@ -64,21 +62,17 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         //
         //  Movie API
         //
 
         virtual bool canConvertAudioRate() const;
-        virtual void imagesAtFrame(const ReadRequest& request,
-                                   FrameBufferVector&);
-        virtual void identifiersAtFrame(const ReadRequest& request,
-                                        IdentifierVector&);
+        virtual void imagesAtFrame(const ReadRequest& request, FrameBufferVector&);
+        virtual void identifiersAtFrame(const ReadRequest& request, IdentifierVector&);
         virtual size_t audioFillBuffer(const AudioReadRequest&, AudioBuffer&);
         virtual void audioConfigure(const AudioConfiguration& conf);
         virtual void flush();

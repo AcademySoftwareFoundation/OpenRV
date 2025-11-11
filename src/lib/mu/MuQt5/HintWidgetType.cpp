@@ -36,21 +36,18 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer HintWidget_HintWidget(Thread& NODE_THREAD, Pointer obj,
-                                         Pointer tuple, Pointer p)
+    static Pointer HintWidget_HintWidget(Thread& NODE_THREAD, Pointer obj, Pointer tuple, Pointer p)
     {
         ClassInstance* self = reinterpret_cast<ClassInstance*>(obj);
         ClassInstance* parent = reinterpret_cast<ClassInstance*>(p);
         ClassInstance* i = reinterpret_cast<ClassInstance*>(tuple);
         const int* fields = i->data<int>();
         QWidget* parentWidget = parent ? object<QWidget>(parent) : 0;
-        setobject(self,
-                  new HintWidget(parentWidget, QSize(fields[0], fields[1])));
+        setobject(self, new HintWidget(parentWidget, QSize(fields[0], fields[1])));
         return obj;
     }
 
-    static void setWidget_void_HintWidget_Widget(Thread& NODE_THREAD,
-                                                 Pointer obj, Pointer wobj)
+    static void setWidget_void_HintWidget_Widget(Thread& NODE_THREAD, Pointer obj, Pointer wobj)
     {
         ClassInstance* self = reinterpret_cast<ClassInstance*>(obj);
         ClassInstance* other = reinterpret_cast<ClassInstance*>(wobj);
@@ -59,8 +56,7 @@ namespace Mu
         w->setWidget(wo);
     }
 
-    static void setContentSize_void_HintWidget_tuple(Thread& NODE_THREAD,
-                                                     Pointer obj, Pointer tuple)
+    static void setContentSize_void_HintWidget_tuple(Thread& NODE_THREAD, Pointer obj, Pointer tuple)
     {
         ClassInstance* self = reinterpret_cast<ClassInstance*>(obj);
         HintWidget* w = object<HintWidget>(self);
@@ -74,21 +70,17 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(construct, Pointer)
     {
-        NODE_RETURN(HintWidget_HintWidget(NODE_THREAD, NODE_ARG(0, Pointer),
-                                          NODE_ARG(1, Pointer),
-                                          NODE_ARG(2, Pointer)));
+        NODE_RETURN(HintWidget_HintWidget(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(setWidget, void)
     {
-        setWidget_void_HintWidget_Widget(NODE_THREAD, NODE_ARG(0, Pointer),
-                                         NODE_ARG(1, Pointer));
+        setWidget_void_HintWidget_Widget(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(setContentSize, void)
     {
-        setContentSize_void_HintWidget_tuple(NODE_THREAD, NODE_ARG(0, Pointer),
-                                             NODE_ARG(1, Pointer));
+        setContentSize_void_HintWidget_tuple(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void HintWidgetType::load()
@@ -113,32 +105,22 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", BaseFunctions::classAllocate, None,
-                         Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-            new Function(
-                c, tn, construct, None, Compiled, HintWidget_HintWidget, Return,
-                ftn, Parameters, new Param(c, "this", ftn),
-                new Param(c, "size", "(int,int)"),
-                new Param(c, "parent", "qt.QWidget", Value(Pointer(0))), End),
+                   new Function(c, tn, construct, None, Compiled, HintWidget_HintWidget, Return, ftn, Parameters, new Param(c, "this", ftn),
+                                new Param(c, "size", "(int,int)"), new Param(c, "parent", "qt.QWidget", Value(Pointer(0))), End),
 
-            new Function(c, "setWidget", Mu::setWidget, None, Compiled,
-                         setWidget_void_HintWidget_Widget, Return, "void",
-                         Parameters, new Param(c, "this", ftn),
-                         new Param(c, "widget", "qt.QWidget"), End),
+                   new Function(c, "setWidget", Mu::setWidget, None, Compiled, setWidget_void_HintWidget_Widget, Return, "void", Parameters,
+                                new Param(c, "this", ftn), new Param(c, "widget", "qt.QWidget"), End),
 
-            new Function(c, "setContentSize", Mu::setContentSize, None,
-                         Compiled, setContentSize_void_HintWidget_tuple, Return,
-                         "void", Parameters, new Param(c, "this", ftn),
-                         new Param(c, "size", "(int,int)"), End),
+                   new Function(c, "setContentSize", Mu::setContentSize, None, Compiled, setContentSize_void_HintWidget_tuple, Return,
+                                "void", Parameters, new Param(c, "this", ftn), new Param(c, "size", "(int,int)"), End),
 
-            EndArguments);
+                   EndArguments);
     }
 
 } // namespace Mu

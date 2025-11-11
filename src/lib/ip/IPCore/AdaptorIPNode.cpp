@@ -12,9 +12,7 @@ namespace IPCore
 {
     using namespace std;
 
-    AdaptorIPNode::AdaptorIPNode(const string& name, const NodeDefinition* def,
-                                 IPNode* groupInputNode, GroupIPNode* group,
-                                 IPGraph* graph)
+    AdaptorIPNode::AdaptorIPNode(const string& name, const NodeDefinition* def, IPNode* groupInputNode, GroupIPNode* group, IPGraph* graph)
         : IPNode(name, def, graph)
         , m_groupInputNode(groupInputNode)
     {
@@ -24,8 +22,7 @@ namespace IPCore
         setMaxInputs(0);
     }
 
-    AdaptorIPNode::AdaptorIPNode(const string& name, const NodeDefinition* def,
-                                 IPGraph* graph, GroupIPNode* group)
+    AdaptorIPNode::AdaptorIPNode(const string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph)
         , m_groupInputNode(0)
     {
@@ -45,16 +42,14 @@ namespace IPCore
             return IPNode::imageRangeInfo();
     }
 
-    IPNode::ImageStructureInfo
-    AdaptorIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo AdaptorIPNode::imageStructureInfo(const Context& context) const
     {
         if (m_groupInputNode)
             return m_groupInputNode->imageStructureInfo(context);
         return IPNode::imageStructureInfo(context);
     }
 
-    void AdaptorIPNode::mediaInfo(const Context& context,
-                                  MediaInfoVector& infos) const
+    void AdaptorIPNode::mediaInfo(const Context& context, MediaInfoVector& infos) const
     {
         if (m_groupInputNode)
             m_groupInputNode->mediaInfo(context, infos);
@@ -80,8 +75,7 @@ namespace IPCore
 
     IPImage* AdaptorIPNode::evaluate(const Context& context)
     {
-        return m_groupInputNode ? m_groupInputNode->evaluate(context)
-                                : IPNode::evaluate(context);
+        return m_groupInputNode ? m_groupInputNode->evaluate(context) : IPNode::evaluate(context);
     }
 
     IPImageID* AdaptorIPNode::evaluateIdentifier(const Context& context)
@@ -103,16 +97,14 @@ namespace IPCore
     void AdaptorIPNode::visitRecursive(NodeVisitor& visitor)
     {
         visitor.enter(this);
-        if (m_groupInputNode
-            && visitor.traverseChild(0, this, m_groupInputNode))
+        if (m_groupInputNode && visitor.traverseChild(0, this, m_groupInputNode))
         {
             m_groupInputNode->visitRecursive(visitor);
         }
         visitor.leave(this);
     }
 
-    void AdaptorIPNode::testEvaluate(const Context& context,
-                                     TestEvaluationResult& results)
+    void AdaptorIPNode::testEvaluate(const Context& context, TestEvaluationResult& results)
     {
         if (m_groupInputNode)
             m_groupInputNode->testEvaluate(context, results);
@@ -164,13 +156,11 @@ namespace IPCore
 
             const IPNodes& inputs = group()->inputs();
 
-            IPNodes::const_iterator i =
-                std::find(inputs.begin(), inputs.end(), m_groupInputNode);
+            IPNodes::const_iterator i = std::find(inputs.begin(), inputs.end(), m_groupInputNode);
 
             if (i != inputs.end())
             {
-                declareProperty<IntProperty>("input.index",
-                                             int(i - inputs.begin()));
+                declareProperty<IntProperty>("input.index", int(i - inputs.begin()));
             }
             else
             {

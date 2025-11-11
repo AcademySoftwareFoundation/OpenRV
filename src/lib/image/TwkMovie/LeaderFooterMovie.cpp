@@ -15,8 +15,7 @@ namespace TwkMovie
     using namespace std;
     using namespace TwkAudio;
 
-    LeaderFooterMovie::LeaderFooterMovie(Movie* movie, int fs, int fe,
-                                         Movie* leader, Movie* footer)
+    LeaderFooterMovie::LeaderFooterMovie(Movie* movie, int fs, int fe, Movie* leader, Movie* footer)
     {
         m_movie = movie;
         m_leader = leader;
@@ -53,8 +52,7 @@ namespace TwkMovie
             m_footer->audioConfigure(conf);
     }
 
-    size_t LeaderFooterMovie::audioFillBuffer(const AudioReadRequest& request,
-                                              AudioBuffer& inbuffer)
+    size_t LeaderFooterMovie::audioFillBuffer(const AudioReadRequest& request, AudioBuffer& inbuffer)
     {
         Time t = request.startTime;
         Time d = request.duration;
@@ -68,8 +66,7 @@ namespace TwkMovie
         inbuffer.reconfigure(nsamps, m_movie->info().audioChannels, rate, t);
         inbuffer.zero();
 
-        int leaderFrames =
-            (!m_leader) ? 0 : m_leader->info().end - m_leader->info().start + 1;
+        int leaderFrames = (!m_leader) ? 0 : m_leader->info().end - m_leader->info().start + 1;
         size_t nleader = timeToSamples(double(leaderFrames) / fps, rate);
 
         if (start < nleader)
@@ -94,8 +91,7 @@ namespace TwkMovie
             }
         }
 
-        start +=
-            timeToSamples(double(m_fs - m_movie->info().start) / fps, rate);
+        start += timeToSamples(double(m_fs - m_movie->info().start) / fps, rate);
 
         start -= m_offset;
         AudioReadRequest nrequest(samplesToTime(start, rate), d);
@@ -105,26 +101,22 @@ namespace TwkMovie
 
         if (osamps != nsamps)
         {
-            memmove((void*)(inbuffer.pointer() + (osamps - nsamps) * nc),
-                    (void*)inbuffer.pointer(), nsamps * sizeof(float) * nc);
+            memmove((void*)(inbuffer.pointer() + (osamps - nsamps) * nc), (void*)inbuffer.pointer(), nsamps * sizeof(float) * nc);
 
-            memset(inbuffer.pointer(), 0,
-                   sizeof(float) * nc * (osamps - nsamps));
+            memset(inbuffer.pointer(), 0, sizeof(float) * nc * (osamps - nsamps));
         }
 
         return inbuffer.size();
     }
 
-    static void copyExtraData(TwkMovie::Movie::ReadRequest& dst,
-                              const TwkMovie::Movie::ReadRequest& src)
+    static void copyExtraData(TwkMovie::Movie::ReadRequest& dst, const TwkMovie::Movie::ReadRequest& src)
     {
         dst.views = src.views;
         dst.layers = src.layers;
         dst.missing = src.missing;
     }
 
-    void LeaderFooterMovie::imagesAtFrame(const ReadRequest& request,
-                                          FrameBufferVector& fbs)
+    void LeaderFooterMovie::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         int leaderFrames = 0;
@@ -139,9 +131,7 @@ namespace TwkMovie
         {
             if (m_leader)
             {
-                ReadRequest r(frame - (m_fs - leaderFrames)
-                                  + m_leader->info().start,
-                              request.stereo);
+                ReadRequest r(frame - (m_fs - leaderFrames) + m_leader->info().start, request.stereo);
                 copyExtraData(r, request);
                 m_leader->imagesAtFrame(r, fbs);
             }
@@ -156,8 +146,7 @@ namespace TwkMovie
         {
             if (m_footer)
             {
-                ReadRequest r(frame - m_fe + m_footer->info().start,
-                              request.stereo);
+                ReadRequest r(frame - m_fe + m_footer->info().start, request.stereo);
                 copyExtraData(r, request);
                 m_footer->imagesAtFrame(r, fbs);
             }
@@ -170,8 +159,7 @@ namespace TwkMovie
         }
     }
 
-    void LeaderFooterMovie::identifiersAtFrame(const ReadRequest& request,
-                                               IdentifierVector& ids)
+    void LeaderFooterMovie::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
         int leaderFrames = 0;
@@ -186,9 +174,7 @@ namespace TwkMovie
         {
             if (m_leader)
             {
-                ReadRequest r(frame - (m_fs - leaderFrames)
-                                  + m_leader->info().start,
-                              request.stereo);
+                ReadRequest r(frame - (m_fs - leaderFrames) + m_leader->info().start, request.stereo);
                 m_leader->identifiersAtFrame(r, ids);
             }
             else
@@ -201,8 +187,7 @@ namespace TwkMovie
         {
             if (m_footer)
             {
-                ReadRequest r(frame - m_fe + m_footer->info().start,
-                              request.stereo);
+                ReadRequest r(frame - m_fe + m_footer->info().start, request.stereo);
                 m_footer->identifiersAtFrame(r, ids);
             }
             else

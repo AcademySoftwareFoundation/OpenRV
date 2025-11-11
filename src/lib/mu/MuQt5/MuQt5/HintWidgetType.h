@@ -29,8 +29,7 @@ namespace Mu
         //  Constructors
         //
 
-        HintWidgetType(Context* context, const char* name,
-                       Class* superClass = 0);
+        HintWidgetType(Context* context, const char* name, Class* superClass = 0);
         virtual ~HintWidgetType();
 
         //

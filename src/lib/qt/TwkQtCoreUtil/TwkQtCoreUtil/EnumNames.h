@@ -19,9 +19,7 @@ namespace TwkQtCoreUtil
         if (metaObject)
         {
             const int enumIndex = metaObject->indexOfEnumerator(enumName);
-            return QString("%1::%2::%3")
-                .arg(metaObject->className(), enumName,
-                     metaObject->enumerator(enumIndex).valueToKey(enumValue));
+            return QString("%1::%2::%3").arg(metaObject->className(), enumName, metaObject->enumerator(enumIndex).valueToKey(enumValue));
         }
 
         return QString("%1::%2").arg(enumName).arg(static_cast<int>(enumValue));

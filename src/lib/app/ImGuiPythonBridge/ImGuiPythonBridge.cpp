@@ -33,7 +33,7 @@ namespace Rv
             if (PyObject_RichCompareBool(it->get(), callable, Py_EQ))
             {
                 // Deleter will handle Py_DECREF automatically.
-                it = s_callbacks.erase(it); 
+                it = s_callbacks.erase(it);
                 return;
             }
             else
@@ -50,7 +50,7 @@ namespace Rv
         {
             return;
         }
-        
+
         for (auto& cb : s_callbacks)
         {
             PyGILState_STATE gstate = PyGILState_Ensure();
@@ -67,7 +67,7 @@ namespace Rv
     void ImGuiPythonBridge::clearCallbacks()
     {
         s_shuttingDown = true;
-        
+
         // During shutdown, we cannot safely call Py_DECREF, so we just release
         // the smart pointers without calling their deleters and let Python
         // handle cleanup during interpreter shutdown.
@@ -76,10 +76,10 @@ namespace Rv
             if (ptr)
             {
                 // Release without calling Py_DECREF.
-                ptr.release(); 
+                ptr.release();
             }
         }
-        
+
         s_callbacks.clear();
     }
 } // namespace Rv

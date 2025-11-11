@@ -41,8 +41,7 @@ namespace Mu
 {
     using namespace std;
 
-    QTabletEventType::QTabletEventType(Context* c, const char* name,
-                                       Class* super)
+    QTabletEventType::QTabletEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -52,48 +51,42 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    double qt_QTabletEvent_pressure_double_QTabletEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    double qt_QTabletEvent_pressure_double_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabletEvent* arg0 = getqpointer<QTabletEventType>(param_this);
         return arg0->pressure();
     }
 
-    double qt_QTabletEvent_rotation_double_QTabletEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    double qt_QTabletEvent_rotation_double_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabletEvent* arg0 = getqpointer<QTabletEventType>(param_this);
         return arg0->rotation();
     }
 
-    double qt_QTabletEvent_tangentialPressure_double_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    double qt_QTabletEvent_tangentialPressure_double_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabletEvent* arg0 = getqpointer<QTabletEventType>(param_this);
         return arg0->tangentialPressure();
     }
 
-    double qt_QTabletEvent_xTilt_double_QTabletEvent(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    double qt_QTabletEvent_xTilt_double_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabletEvent* arg0 = getqpointer<QTabletEventType>(param_this);
         return arg0->xTilt();
     }
 
-    double qt_QTabletEvent_yTilt_double_QTabletEvent(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    double qt_QTabletEvent_yTilt_double_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabletEvent* arg0 = getqpointer<QTabletEventType>(param_this);
         return arg0->yTilt();
     }
 
-    double qt_QTabletEvent_z_double_QTabletEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    double qt_QTabletEvent_z_double_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabletEvent* arg0 = getqpointer<QTabletEventType>(param_this);
@@ -102,38 +95,32 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_pressure0, double)
     {
-        NODE_RETURN(qt_QTabletEvent_pressure_double_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabletEvent_pressure_double_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rotation0, double)
     {
-        NODE_RETURN(qt_QTabletEvent_rotation_double_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabletEvent_rotation_double_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_tangentialPressure0, double)
     {
-        NODE_RETURN(qt_QTabletEvent_tangentialPressure_double_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabletEvent_tangentialPressure_double_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_xTilt0, double)
     {
-        NODE_RETURN(qt_QTabletEvent_xTilt_double_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabletEvent_xTilt_double_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_yTilt0, double)
     {
-        NODE_RETURN(qt_QTabletEvent_yTilt_double_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabletEvent_yTilt_double_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_z0, double)
     {
-        NODE_RETURN(qt_QTabletEvent_z_double_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabletEvent_z_double_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QTabletEventType::load()
@@ -153,13 +140,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -176,30 +161,18 @@ namespace Mu
             // float tangentialPressure, double rotation, float z, flags
             // Qt::KeyboardModifiers keyState, flags Qt::MouseButton button,
             // flags Qt::MouseButtons buttons)
-            new Function(c, "pressure", _n_pressure0, None, Compiled,
-                         qt_QTabletEvent_pressure_double_QTabletEvent, Return,
-                         "double", Parameters,
+            new Function(c, "pressure", _n_pressure0, None, Compiled, qt_QTabletEvent_pressure_double_QTabletEvent, Return, "double",
+                         Parameters, new Param(c, "this", "qt.QTabletEvent"), End),
+            new Function(c, "rotation", _n_rotation0, None, Compiled, qt_QTabletEvent_rotation_double_QTabletEvent, Return, "double",
+                         Parameters, new Param(c, "this", "qt.QTabletEvent"), End),
+            new Function(c, "tangentialPressure", _n_tangentialPressure0, None, Compiled,
+                         qt_QTabletEvent_tangentialPressure_double_QTabletEvent, Return, "double", Parameters,
                          new Param(c, "this", "qt.QTabletEvent"), End),
-            new Function(c, "rotation", _n_rotation0, None, Compiled,
-                         qt_QTabletEvent_rotation_double_QTabletEvent, Return,
-                         "double", Parameters,
+            new Function(c, "xTilt", _n_xTilt0, None, Compiled, qt_QTabletEvent_xTilt_double_QTabletEvent, Return, "double", Parameters,
                          new Param(c, "this", "qt.QTabletEvent"), End),
-            new Function(c, "tangentialPressure", _n_tangentialPressure0, None,
-                         Compiled,
-                         qt_QTabletEvent_tangentialPressure_double_QTabletEvent,
-                         Return, "double", Parameters,
+            new Function(c, "yTilt", _n_yTilt0, None, Compiled, qt_QTabletEvent_yTilt_double_QTabletEvent, Return, "double", Parameters,
                          new Param(c, "this", "qt.QTabletEvent"), End),
-            new Function(c, "xTilt", _n_xTilt0, None, Compiled,
-                         qt_QTabletEvent_xTilt_double_QTabletEvent, Return,
-                         "double", Parameters,
-                         new Param(c, "this", "qt.QTabletEvent"), End),
-            new Function(c, "yTilt", _n_yTilt0, None, Compiled,
-                         qt_QTabletEvent_yTilt_double_QTabletEvent, Return,
-                         "double", Parameters,
-                         new Param(c, "this", "qt.QTabletEvent"), End),
-            new Function(c, "z", _n_z0, None, Compiled,
-                         qt_QTabletEvent_z_double_QTabletEvent, Return,
-                         "double", Parameters,
+            new Function(c, "z", _n_z0, None, Compiled, qt_QTabletEvent_z_double_QTabletEvent, Return, "double", Parameters,
                          new Param(c, "this", "qt.QTabletEvent"), End),
             // static functions
             EndArguments);

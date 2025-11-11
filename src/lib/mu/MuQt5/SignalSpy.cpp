@@ -50,49 +50,36 @@ namespace Mu
 {
     using namespace std;
 
-    SignalSpy::SignalSpy(QObject* o, const char* sig, const Function* F,
-                         Process* p)
+    SignalSpy::SignalSpy(QObject* o, const char* sig, const Function* F, Process* p)
         : QSignalSpy(o, sig)
         , _F(F)
         , _process(p)
         , _env(p->callEnv())
     {
-        const MuLangContext* c =
-            static_cast<const MuLangContext*>(p->context());
+        const MuLangContext* c = static_cast<const MuLangContext*>(p->context());
         _argTypes.resize(F->numArgs());
 
-        const Class* otype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QObject"), false);
+        const Class* otype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QObject"), false);
 
-        const Class* ptype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QPoint"), false);
+        const Class* ptype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QPoint"), false);
 
-        const Class* twtype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QTreeWidgetItem"), false);
+        const Class* twtype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QTreeWidgetItem"), false);
 
-        const Class* tbtype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QTableWidgetItem"), false);
+        const Class* tbtype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QTableWidgetItem"), false);
 
-        const Class* lwtype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QListWidgetItem"), false);
+        const Class* lwtype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QListWidgetItem"), false);
 
-        const Class* sitype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QStandardItem"), false);
+        const Class* sitype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QStandardItem"), false);
 
-        const Class* mitype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QModelIndex"), false);
+        const Class* mitype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QModelIndex"), false);
 
-        const Class* istype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QItemSelection"), false);
+        const Class* istype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QItemSelection"), false);
 
-        const Class* ctype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QColor"), false);
+        const Class* ctype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QColor"), false);
 
-        const Class* utype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QUrl"), false);
+        const Class* utype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QUrl"), false);
 
-        const Class* vtype = c->findSymbolOfTypeByQualifiedName<Class>(
-            c->internName("qt.QVariant"), false);
+        const Class* vtype = c->findSymbolOfTypeByQualifiedName<Class>(c->internName("qt.QVariant"), false);
 
         for (size_t i = 0; i < _argTypes.size(); i++)
         {
@@ -138,8 +125,7 @@ namespace Mu
 
             if (_argTypes[i] == UnknownArg)
             {
-                cout << "WARNING: " << sig << " not translated correctly"
-                     << endl;
+                cout << "WARNING: " << sig << " not translated correctly" << endl;
             }
         }
     }
@@ -151,8 +137,7 @@ namespace Mu
         if (call == QMetaObject::InvokeMetaMethod)
         {
             Function::ArgumentVector args(_argTypes.size());
-            const MuLangContext* c =
-                static_cast<const MuLangContext*>(_F->context());
+            const MuLangContext* c = static_cast<const MuLangContext*>(_F->context());
             bool failed = false;
 
             for (size_t i = 0; i < _argTypes.size(); i++)
@@ -174,129 +159,102 @@ namespace Mu
                 case StringArg:
                 {
                     QString* s = reinterpret_cast<QString*>(a[i + 1]);
-                    args[i]._Pointer =
-                        c->stringType()->allocate(s->toUtf8().constData());
+                    args[i]._Pointer = c->stringType()->allocate(s->toUtf8().constData());
                 }
                 break;
 
                 case ObjectArg:
                 {
                     QObject** o = reinterpret_cast<QObject**>(a[i + 1]);
-                    args[i]._Pointer = makeinstance<QObjectType>(
-                        (QObjectType*)_F->argType(i), *o);
+                    args[i]._Pointer = makeinstance<QObjectType>((QObjectType*)_F->argType(i), *o);
                 }
                 break;
 
                 case ColorArg:
                 {
                     QColor* o = reinterpret_cast<QColor*>(a[i + 1]);
-                    args[i]._Pointer =
-                        makeqtype<QColorType>((Class*)_F->argType(i), *o);
+                    args[i]._Pointer = makeqtype<QColorType>((Class*)_F->argType(i), *o);
                 }
                 break;
 
                 case UrlArg:
                 {
                     QUrl* o = reinterpret_cast<QUrl*>(a[i + 1]);
-                    args[i]._Pointer =
-                        makeqtype<QUrlType>((Class*)_F->argType(i), *o);
+                    args[i]._Pointer = makeqtype<QUrlType>((Class*)_F->argType(i), *o);
                 }
                 break;
 
                 case VariantArg:
                 {
                     QVariant* v = reinterpret_cast<QVariant*>(a[i + 1]);
-                    args[i]._Pointer =
-                        makeqtype<QVariantType>((Class*)_F->argType(i), *v);
+                    args[i]._Pointer = makeqtype<QVariantType>((Class*)_F->argType(i), *v);
                 }
                 break;
 
                 case PointArg:
                 {
                     QPoint* o = reinterpret_cast<QPoint*>(a[i + 1]);
-                    args[i]._Pointer =
-                        makeqtype<QPointType>((Class*)_F->argType(i), *o);
+                    args[i]._Pointer = makeqtype<QPointType>((Class*)_F->argType(i), *o);
                 }
                 break;
 
                 case TreeItemArg:
                 {
-                    QMetaType::Type type =
-                        static_cast<QMetaType::Type>(this->args.at(i));
+                    QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
                     QVariant v(type, a[i + 1]);
                     QTreeWidgetItem* o = v.value<QTreeWidgetItem*>();
-                    args[i]._Pointer =
-                        !o ? NULL
-                           : makeqpointer<QTreeWidgetItemType>(
-                                 (QTreeWidgetItemType*)_F->argType(i), o);
+                    args[i]._Pointer = !o ? NULL : makeqpointer<QTreeWidgetItemType>((QTreeWidgetItemType*)_F->argType(i), o);
                 }
                 break;
 
                 case TableItemArg:
                 {
-                    QMetaType::Type type =
-                        static_cast<QMetaType::Type>(this->args.at(i));
+                    QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
                     QVariant v(type, a[i + 1]);
                     QTableWidgetItem* o = v.value<QTableWidgetItem*>();
-                    args[i]._Pointer =
-                        !o ? NULL
-                           : makeqpointer<QTableWidgetItemType>(
-                                 (QTableWidgetItemType*)_F->argType(i), o);
+                    args[i]._Pointer = !o ? NULL : makeqpointer<QTableWidgetItemType>((QTableWidgetItemType*)_F->argType(i), o);
                 }
                 break;
 
                 case ListItemArg:
                 {
-                    QMetaType::Type type =
-                        static_cast<QMetaType::Type>(this->args.at(i));
+                    QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
                     QVariant v(type, a[i + 1]);
                     QListWidgetItem* o = v.value<QListWidgetItem*>();
-                    args[i]._Pointer =
-                        !o ? NULL
-                           : makeqpointer<QListWidgetItemType>(
-                                 (QListWidgetItemType*)_F->argType(i), o);
+                    args[i]._Pointer = !o ? NULL : makeqpointer<QListWidgetItemType>((QListWidgetItemType*)_F->argType(i), o);
                 }
                 break;
 
                 case StandardItemArg:
                 {
-                    QMetaType::Type type =
-                        static_cast<QMetaType::Type>(this->args.at(i));
+                    QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
                     QVariant v(type, a[i + 1]);
                     QStandardItem* o = v.value<QStandardItem*>();
-                    args[i]._Pointer =
-                        !o ? NULL
-                           : makeqpointer<QStandardItemType>(
-                                 (QStandardItemType*)_F->argType(i), o);
+                    args[i]._Pointer = !o ? NULL : makeqpointer<QStandardItemType>((QStandardItemType*)_F->argType(i), o);
                 }
                 break;
 
                 case ModelIndexArg:
                 {
-                    QMetaType::Type type =
-                        static_cast<QMetaType::Type>(this->args.at(i));
+                    QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
                     QVariant v(type, a[i + 1]);
                     QModelIndex o = v.value<QModelIndex>();
-                    args[i]._Pointer = makeqtype<QModelIndexType>(
-                        (Context*)c, o, "qt.QModelIndex");
+                    args[i]._Pointer = makeqtype<QModelIndexType>((Context*)c, o, "qt.QModelIndex");
                 }
                 break;
 
                 case ItemSelectionArg:
                 {
-                    QMetaType::Type type =
-                        static_cast<QMetaType::Type>(this->args.at(i));
+                    QMetaType::Type type = static_cast<QMetaType::Type>(this->args.at(i));
                     QVariant v(type, a[i + 1]);
                     QItemSelection o = v.value<QItemSelection>();
-                    args[i]._Pointer = makeqtype<QItemSelectionType>(
-                        (Context*)c, o, "qt.QItemSelection");
+                    args[i]._Pointer = makeqtype<QItemSelectionType>((Context*)c, o, "qt.QItemSelection");
                 }
                 break;
 
                 default:
                     failed = true;
-                    cout << "SignalSpy::qt_metacall: don't know type: "
-                         << _argTypes[i] << endl;
+                    cout << "SignalSpy::qt_metacall: don't know type: " << _argTypes[i] << endl;
                     break;
                 }
             }

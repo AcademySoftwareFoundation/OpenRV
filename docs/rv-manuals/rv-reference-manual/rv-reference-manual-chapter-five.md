@@ -192,6 +192,8 @@ Some events will originate from RV itself. These include things like new-source 
 | after-graph-view-change | nodename |  | The current view node changed. |
 | new-node | nodename |  | A new view node was created. |
 | graph-new-node | nodename | nodename protocol version groupname | A new node of any kind was created. |
+| set-current-annotate-mode-node | nodename |  | Set the Paint node to use for the _currentNode in the annotate mode package. Calling this event with an empty string will reset its behaviour. |
+| annotate-mode-activated | | | The annotate mode package is activated |
 | before-progressive-loading |  |  | Loading will start |
 | after-progressive-loading |  |  | Loading is complete (sent immediately if no files will be loaded) |
 | graph-layer-change |  |  | **DEPRECATED** use after-graph-view-change |

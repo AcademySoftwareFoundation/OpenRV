@@ -31,8 +31,7 @@ namespace IPCore
         typedef std::pair<int, int> FrameRange;
         typedef std::vector<FrameRange> FrameRangeVector;
 
-        StackIPNode(const std::string& name, const NodeDefinition* def,
-                    IPGraph* graph, GroupIPNode* group = 0);
+        StackIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
         virtual ~StackIPNode();
         virtual IPImage* evaluate(const Context&);
         virtual void testEvaluate(const Context&, TestEvaluationResult&);
@@ -44,13 +43,11 @@ namespace IPCore
 
         virtual void setInputs(const IPNodes&);
         virtual ImageRangeInfo imageRangeInfo() const;
-        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         virtual void propertyChanged(const Property*);
         virtual void inputRangeChanged(int inputIndex, PropagateTarget target);
-        virtual void inputImageStructureChanged(int inputIndex,
-                                                PropagateTarget target);
+        virtual void inputImageStructureChanged(int inputIndex, PropagateTarget target);
         virtual void readCompleted(const std::string&, unsigned int);
 
         void setFitInputsToOutputAspect(bool b)
@@ -59,10 +56,7 @@ namespace IPCore
             setHasLinearTransform(b);
         }
 
-        static void setDefaultCompType(const std::string& type)
-        {
-            m_defaultCompType = type;
-        }
+        static void setDefaultCompType(const std::string& type) { m_defaultCompType = type; }
 
         FloatProperty* outputFPSProperty() const { return m_outputFPS; }
 
@@ -77,8 +71,7 @@ namespace IPCore
     protected:
         void computeRanges();
         int inputFrame(size_t, int, bool unconstrained = false);
-        void mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        void mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         void lock() const { pthread_mutex_lock(&m_lock); }
 
@@ -87,8 +80,7 @@ namespace IPCore
         void lazyUpdateRanges() const;
         void updateChosenAudioInput();
 
-        IPImage* collapseInputs(const Context&, IPImage::BlendMode,
-                                IPImageVector&, IPImageSet&);
+        IPImage* collapseInputs(const Context&, IPImage::BlendMode, IPImageVector&, IPImageSet&);
         bool interactiveSize(const Context&) const;
 
     protected:

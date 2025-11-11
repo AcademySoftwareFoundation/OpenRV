@@ -16,8 +16,7 @@ namespace TwkUtil
     class TWKUTIL_EXPORT SystemInfo
     {
     public:
-        TWK_EXC_DECLARE(SystemCallFailedException, TwkExc::Exception,
-                        "System call failed");
+        TWK_EXC_DECLARE(SystemCallFailedException, TwkExc::Exception, "System call failed");
 
         //
         //  CPU information
@@ -58,10 +57,8 @@ namespace TwkUtil
         //
         // returns true when successful. Unwanted information can be ignored by
         // providing NULL pointers.
-        static bool getSystemMemoryInfo(size_t* physTotal, size_t* physFree,
-                                        size_t* physUsed, size_t* physInactive,
-                                        size_t* physCached, size_t* swapTotal,
-                                        size_t* swapFree, size_t* swapUsed);
+        static bool getSystemMemoryInfo(size_t* physTotal, size_t* physFree, size_t* physUsed, size_t* physInactive, size_t* physCached,
+                                        size_t* swapTotal, size_t* swapFree, size_t* swapUsed);
 
         //
         //  Maximum usable VRAM (may be set by user)

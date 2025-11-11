@@ -110,8 +110,7 @@ namespace Mu
     class DynamicActivation : public Function
     {
     public:
-        DynamicActivation(Context* context, const String& returnType,
-                          const STLVector<String>::Type& args);
+        DynamicActivation(Context* context, const String& returnType, const STLVector<String>::Type& args);
 
         virtual NodeFunc func(Node* node = 0) const;
     };
@@ -158,9 +157,7 @@ namespace Mu
         virtual ~Curry();
         virtual const Type* nodeReturnType(const Node*) const;
         static NODE_DECLARATION(node, Pointer);
-        static FunctionObject* evaluate(Thread&, FunctionObject*,
-                                        const Function::ArgumentVector&,
-                                        const std::vector<bool>&, bool);
+        static FunctionObject* evaluate(Thread&, FunctionObject*, const Function::ArgumentVector&, const std::vector<bool>&, bool);
     };
 
     class DynamicPartialApplication : public Function

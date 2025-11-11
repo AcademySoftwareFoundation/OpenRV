@@ -21,8 +21,7 @@ namespace TwkFB
         IOmray();
         virtual ~IOmray();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
     };

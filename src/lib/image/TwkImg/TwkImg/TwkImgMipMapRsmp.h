@@ -38,13 +38,11 @@ namespace TwkImg
         MmLinRsmp(MIN_RSMP& minRsmp, MAX_RSMP& maxRsmp);
 
         // Sample a point in relative coordinates.
-        float sample(const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc,
-                     float minSampRad, float maxSampRad, float lodBias,
+        float sample(const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc, float minSampRad, float maxSampRad, float lodBias,
                      COLOR& samp) const;
 
         // Sample a point in absolute coordinates.
-        float sampleAbs(const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc,
-                        float minSampRad, float maxSampRad, float lodBias,
+        float sampleAbs(const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc, float minSampRad, float maxSampRad, float lodBias,
                         COLOR& samp) const;
 
     protected:
@@ -60,15 +58,11 @@ namespace TwkImg
 
         //******************************************************************************
         // Coverage function, which is very useful in all our classes.
-        static inline float coverage(const TwkMath::Box2i& bnds,
-                                     const TwkMath::Vec2f& loc, float rad)
+        static inline float coverage(const TwkMath::Box2i& bnds, const TwkMath::Vec2f& loc, float rad)
         {
             // For now, we'll simply use linear coverage.
-            TwkMath::Box2f bBox(
-                TwkMath::Vec2f((float)(bnds.min[0]), (float)(bnds.min[1]))
-                    - 0.5f,
-                TwkMath::Vec2f((float)(bnds.max[0]), (float)(bnds.max[1]))
-                    + 0.5f);
+            TwkMath::Box2f bBox(TwkMath::Vec2f((float)(bnds.min[0]), (float)(bnds.min[1])) - 0.5f,
+                                TwkMath::Vec2f((float)(bnds.max[0]), (float)(bnds.max[1])) + 0.5f);
 
             // Check for point sample
             if (rad <= 0.0f)
@@ -100,8 +94,7 @@ namespace TwkImg
     // TEMPLATE AND INLINE FUNCTIONS
     //******************************************************************************
     template <class COLOR, class MIN_RSMP, class MAX_RSMP>
-    inline MmLinRsmp<COLOR, MIN_RSMP, MAX_RSMP>::MmLinRsmp(MIN_RSMP& minRsmp,
-                                                           MAX_RSMP& maxRsmp)
+    inline MmLinRsmp<COLOR, MIN_RSMP, MAX_RSMP>::MmLinRsmp(MIN_RSMP& minRsmp, MAX_RSMP& maxRsmp)
         : m_minRsmp(minRsmp)
         , m_maxRsmp(maxRsmp)
     {
@@ -110,13 +103,11 @@ namespace TwkImg
 
     //******************************************************************************
     template <class COLOR, class MIN_RSMP, class MAX_RSMP>
-    float MmLinRsmp<COLOR, MIN_RSMP, MAX_RSMP>::sample(
-        const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc, float minSampRad,
-        float maxSampRad, float lodBias, COLOR& samp) const
+    float MmLinRsmp<COLOR, MIN_RSMP, MAX_RSMP>::sample(const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc, float minSampRad,
+                                                       float maxSampRad, float lodBias, COLOR& samp) const
     {
         // Determine the coverage.
-        const float cov = coverage(mip.lod(0)->bounds(), loc,
-                                   minSampRad * m_minRsmp.radius());
+        const float cov = coverage(mip.lod(0)->bounds(), loc, minSampRad * m_minRsmp.radius());
 
         // If zero radii, treat like a point sample
         if (minSampRad <= 0.0f || maxSampRad <= 0.0f)
@@ -170,8 +161,7 @@ namespace TwkImg
                 // The sample is somewhere between lod0 and lod1.
                 // sample both and linearly interpolate.
                 COLOR lod0samp;
-                const float lod0cov =
-                    m_maxRsmp.sample(*(mip.lod(0)), loc, lod0samp);
+                const float lod0cov = m_maxRsmp.sample(*(mip.lod(0)), loc, lod0samp);
                 if (lod0cov > 0.0f)
                 {
                     lod0samp /= lod0cov;
@@ -179,8 +169,7 @@ namespace TwkImg
 
                 // lods below 0 require coverage adjustment.
                 COLOR lod1samp;
-                const float lod1cov = m_minRsmp.sample(
-                    *(mip.lod(1)), (loc + 0.5f) * 0.5f - 0.5f, lod1samp);
+                const float lod1cov = m_minRsmp.sample(*(mip.lod(1)), (loc + 0.5f) * 0.5f - 0.5f, lod1samp);
 
                 if (lod1cov > 0.0f)
                 {
@@ -204,8 +193,7 @@ namespace TwkImg
                 // Only one sample is necessary, since we're at the bottom.
                 const int minLod = mip.numLods() - 1;
                 const float minRad = (const float)(1 << minLod);
-                const float minCov = m_minRsmp.sample(
-                    *(mip.lod(minLod)), ((loc + 0.5f) / minRad) - 0.5f, samp);
+                const float minCov = m_minRsmp.sample(*(mip.lod(minLod)), ((loc + 0.5f) / minRad) - 0.5f, samp);
                 if (minCov > 0.0f)
                 {
                     samp /= minCov;
@@ -232,9 +220,7 @@ namespace TwkImg
                 // Do the low sample
                 const float minRad = (const float)(1 << minLod);
                 COLOR minSamp;
-                const float minCov =
-                    m_minRsmp.sample(*(mip.lod(minLod)),
-                                     ((loc + 0.5f) / minRad) - 0.5f, minSamp);
+                const float minCov = m_minRsmp.sample(*(mip.lod(minLod)), ((loc + 0.5f) / minRad) - 0.5f, minSamp);
                 if (minCov > 0.0f)
                 {
                     minSamp /= minCov;
@@ -243,9 +229,7 @@ namespace TwkImg
                 // Do the high sample
                 const float maxRad = (const float)(1 << maxLod);
                 COLOR maxSamp;
-                const float maxCov =
-                    m_minRsmp.sample(*(mip.lod(maxLod)),
-                                     ((loc + 0.5f) / maxRad) - 0.5f, maxSamp);
+                const float maxCov = m_minRsmp.sample(*(mip.lod(maxLod)), ((loc + 0.5f) / maxRad) - 0.5f, maxSamp);
                 if (maxCov > 0.0f)
                 {
                     maxSamp /= maxCov;
@@ -267,13 +251,10 @@ namespace TwkImg
 
     //******************************************************************************
     template <class COLOR, class MIN_RSMP, class MAX_RSMP>
-    inline float MmLinRsmp<COLOR, MIN_RSMP, MAX_RSMP>::sampleAbs(
-        const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc, float minSampRad,
-        float maxSampRad, float lodBias, COLOR& samp) const
+    inline float MmLinRsmp<COLOR, MIN_RSMP, MAX_RSMP>::sampleAbs(const MipMap<COLOR>& mip, const TwkMath::Vec2f& loc, float minSampRad,
+                                                                 float maxSampRad, float lodBias, COLOR& samp) const
     {
-        return sample(mip,
-                      loc - TwkMath::Vec2f(mip.origin()[0], mip.origin()[1]),
-                      minSampRad, maxSampRad, lodBias, samp);
+        return sample(mip, loc - TwkMath::Vec2f(mip.origin()[0], mip.origin()[1]), minSampRad, maxSampRad, lodBias, samp);
     }
 
 } // End namespace TwkImg

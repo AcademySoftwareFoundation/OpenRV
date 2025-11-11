@@ -19,9 +19,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    CombineIPInstanceNode::CombineIPInstanceNode(const std::string& name,
-                                                 const NodeDefinition* def,
-                                                 IPGraph* g, GroupIPNode* group)
+    CombineIPInstanceNode::CombineIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPInstanceNode(name, def, g, group)
         , m_structureInfoDirty(true)
     {
@@ -38,13 +36,9 @@ namespace IPCore
         findProps();
     }
 
-    CombineIPInstanceNode::~CombineIPInstanceNode()
-    {
-        pthread_mutex_destroy(&m_lock);
-    }
+    CombineIPInstanceNode::~CombineIPInstanceNode() { pthread_mutex_destroy(&m_lock); }
 
-    bool CombineIPInstanceNode::testInputs(const IPNodes& inputs,
-                                           std::ostringstream& msg) const
+    bool CombineIPInstanceNode::testInputs(const IPNodes& inputs, std::ostringstream& msg) const
     {
         if (inputs.size() != 1)
         {
@@ -95,8 +89,7 @@ namespace IPCore
             m_frameProps.push_back(property<IntProperty>(frameName.str()));
             m_layerProps.push_back(property<StringProperty>(layerName.str()));
             m_viewProps.push_back(property<StringProperty>(viewName.str()));
-            m_channelProps.push_back(
-                property<StringProperty>(channelName.str()));
+            m_channelProps.push_back(property<StringProperty>(channelName.str()));
             m_eyeProps.push_back(property<IntProperty>(eyeName.str()));
         }
     }
@@ -130,8 +123,7 @@ namespace IPCore
         //
 
         m_rangeInfo = inputs()[0]->imageRangeInfo();
-        m_structureInfo = inputs()[0]->imageStructureInfo(
-            graph()->contextForFrame(m_rangeInfo.start));
+        m_structureInfo = inputs()[0]->imageStructureInfo(graph()->contextForFrame(m_rangeInfo.start));
         const float pa = m_structureInfo.pixelAspect;
 
         const float wpa = std::max(1.0f, pa);
@@ -149,27 +141,18 @@ namespace IPCore
         }
     }
 
-    void CombineIPInstanceNode::propertyDeleted(const std::string&)
-    {
-        findProps();
-    }
+    void CombineIPInstanceNode::propertyDeleted(const std::string&) { findProps(); }
 
-    void CombineIPInstanceNode::newPropertyCreated(const Property*)
-    {
-        findProps();
-    }
+    void CombineIPInstanceNode::newPropertyCreated(const Property*) { findProps(); }
 
-    void
-    CombineIPInstanceNode::inputImageStructureChanged(int inputIndex,
-                                                      PropagateTarget target)
+    void CombineIPInstanceNode::inputImageStructureChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_structureInfoDirty = true;
         unlock();
     }
 
-    IPNode::ImageStructureInfo
-    CombineIPInstanceNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo CombineIPInstanceNode::imageStructureInfo(const Context& context) const
     {
         if (m_structureInfoDirty)
             lazyUpdateRanges();
@@ -247,8 +230,7 @@ namespace IPCore
         const float aspect = float(width) / float(height);
 
         IPImage* root =
-            new IPImage(this, IPImage::MergeRenderType, width, height, 1.0,
-                        IPImage::IntermediateBuffer, IPImage::FloatDataType);
+            new IPImage(this, IPImage::MergeRenderType, width, height, 1.0, IPImage::IntermediateBuffer, IPImage::FloatDataType);
         IPNodes nodes = inputs();
         const int ninputs = nodes.size();
         if (ninputs == 0)
@@ -269,10 +251,7 @@ namespace IPCore
 
                 if (!current)
                 {
-                    TWK_THROW_STREAM(
-                        EvaluationFailedExc,
-                        "CombineIPInstanceNode evaluation failed on node "
-                            << nodes[0]->name());
+                    TWK_THROW_STREAM(EvaluationFailedExc, "CombineIPInstanceNode evaluation failed on node " << nodes[0]->name());
                 }
 
                 current->fitToAspect(aspect);
@@ -292,16 +271,12 @@ namespace IPCore
 
         convertBlendRenderTypeToIntermediate(images, modifiedImages);
 
-        balanceResourceUsage(F->isFilter() ? IPNode::filterAccumulate
-                                           : IPNode::accumulate,
-                             images, modifiedImages, 8, 8, 81);
+        balanceResourceUsage(F->isFilter() ? IPNode::filterAccumulate : IPNode::accumulate, images, modifiedImages, 8, 8, 81);
 
-        assembleMergeExpressions(root, images, modifiedImages, F->isFilter(),
-                                 inExpressions);
+        assembleMergeExpressions(root, images, modifiedImages, F->isFilter(), inExpressions);
 
         root->appendChildren(images);
-        root->mergeExpr =
-            bind(root, inExpressions, context); // IPInstanceNode::bind
+        root->mergeExpr = bind(root, inExpressions, context); // IPInstanceNode::bind
         root->shaderExpr = Shader::newSourceRGBA(root);
         root->recordResourceUsage();
 
@@ -335,8 +310,7 @@ namespace IPCore
         return imageID;
     }
 
-    void CombineIPInstanceNode::metaEvaluate(const Context& context,
-                                             MetaEvalVisitor& visitor)
+    void CombineIPInstanceNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         const Shader::Function* F = definition()->function();
 

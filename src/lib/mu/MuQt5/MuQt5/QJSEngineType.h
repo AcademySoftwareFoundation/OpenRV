@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QJSEngineType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QJSEngineType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QJSEngineType();
 
@@ -75,17 +74,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QJSEngine::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QJSEngine::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QJSEngine::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QJSEngine::timerEvent(event); }
 
     public:
         const QJSEngineType* _baseType;
@@ -93,11 +86,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QJSEngineType::cachedInstance(const QJSEngineType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QJSEngineType::cachedInstance(const QJSEngineType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -356,12 +356,10 @@ namespace
                                   "usubBorrow",
                                   0};
 
-    const char* glslPreProcessor[] = {
-        "define", "undef", "if",     "ifdef",     "ifndef",  "else", "elif",
-        "endif",  "error", "pragma", "extension", "version", "line", 0};
+    const char* glslPreProcessor[] = {"define", "undef", "if",     "ifdef",     "ifndef",  "else", "elif",
+                                      "endif",  "error", "pragma", "extension", "version", "line", 0};
 
-    const char* glslPreProcessorBuiltIns[] = {"__LINE__", "__FILE__",
-                                              "__VERSION__", 0};
+    const char* glslPreProcessorBuiltIns[] = {"__LINE__", "__FILE__", "__VERSION__", 0};
 
 } // namespace
 
@@ -474,13 +472,11 @@ namespace Rv
     {
         foreach (const HighlightingRule& rule, m_highlightingRules)
         {
-            QRegularExpressionMatchIterator matchIterator =
-                rule.pattern.globalMatch(text);
+            QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
             while (matchIterator.hasNext())
             {
                 QRegularExpressionMatch match = matchIterator.next();
-                setFormat(match.capturedStart(), match.capturedLength(),
-                          rule.format);
+                setFormat(match.capturedStart(), match.capturedLength(), rule.format);
             }
         }
 
@@ -490,15 +486,13 @@ namespace Rv
 
         if (previousBlockState() != 1)
         {
-            QRegularExpressionMatch match =
-                m_commentStartExpression.match(text);
+            QRegularExpressionMatch match = m_commentStartExpression.match(text);
             startIndex = match.capturedStart();
         }
 
         while (startIndex >= 0)
         {
-            QRegularExpressionMatch endMatch =
-                m_commentEndExpression.match(text, startIndex);
+            QRegularExpressionMatch endMatch = m_commentEndExpression.match(text, startIndex);
             int endIndex = endMatch.capturedStart();
             int commentLength;
 
@@ -509,14 +503,12 @@ namespace Rv
             }
             else
             {
-                commentLength =
-                    endIndex - startIndex + endMatch.capturedLength();
+                commentLength = endIndex - startIndex + endMatch.capturedLength();
             }
 
             setFormat(startIndex, commentLength, m_commentFormat);
 
-            QRegularExpressionMatch startMatch = m_commentStartExpression.match(
-                text, startIndex + commentLength);
+            QRegularExpressionMatch startMatch = m_commentStartExpression.match(text, startIndex + commentLength);
             startIndex = startMatch.capturedStart();
         }
     }

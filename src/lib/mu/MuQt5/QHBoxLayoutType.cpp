@@ -63,20 +63,17 @@ namespace Mu
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QHBoxLayoutType>(
-            c->internName("qt.QHBoxLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QHBoxLayoutType>(c->internName("qt.QHBoxLayout"));
     }
 
-    MuQt_QHBoxLayout::MuQt_QHBoxLayout(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent)
+    MuQt_QHBoxLayout::MuQt_QHBoxLayout(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QHBoxLayout(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QHBoxLayoutType>(
-            c->internName("qt.QHBoxLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QHBoxLayoutType>(c->internName("qt.QHBoxLayout"));
     }
 
     void MuQt_QHBoxLayout::addItem(QLayoutItem* item)
@@ -93,8 +90,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
+            args[1] = Value(makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
             Value rval = _env->call(F, args);
         }
         else
@@ -355,8 +351,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QHBoxLayoutType::QHBoxLayoutType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QHBoxLayoutType::QHBoxLayoutType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -366,8 +361,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QHBoxLayout_QHBoxLayout_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QHBoxLayout_QHBoxLayout_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -378,9 +372,7 @@ namespace Mu
         }
         else if (QHBoxLayout* w = object<QHBoxLayout>(widget))
         {
-            QHBoxLayoutType* type =
-                c->findSymbolOfTypeByQualifiedName<QHBoxLayoutType>(
-                    c->internName("qt.QHBoxLayout"), false);
+            QHBoxLayoutType* type = c->findSymbolOfTypeByQualifiedName<QHBoxLayoutType>(c->internName("qt.QHBoxLayout"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -391,36 +383,24 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QHBoxLayout_QHBoxLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QHBoxLayout_QHBoxLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer
-    qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        setobject(
-            param_this,
-            new MuQt_QHBoxLayout(param_this, NODE_THREAD.process()->callEnv()));
+        setobject(param_this, new MuQt_QHBoxLayout(param_this, NODE_THREAD.process()->callEnv()));
         return param_this;
     }
 
-    Pointer qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QHBoxLayout(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QHBoxLayout(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QHBoxLayout_addItem_void_QHBoxLayout_QLayoutItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QHBoxLayout_addItem_void_QHBoxLayout_QLayoutItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
@@ -431,47 +411,36 @@ namespace Mu
             arg0->addItem(arg1);
     }
 
-    int qt_QHBoxLayout_count_int_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QHBoxLayout_count_int_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
         return isMuQtObject(arg0) ? arg0->QHBoxLayout::count() : arg0->count();
     }
 
-    int
-    qt_QHBoxLayout_expandingDirections_int_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QHBoxLayout_expandingDirections_int_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(arg0->QHBoxLayout::expandingDirections())
-                   : int(arg0->expandingDirections());
+        return isMuQtObject(arg0) ? int(arg0->QHBoxLayout::expandingDirections()) : int(arg0->expandingDirections());
     }
 
-    bool
-    qt_QHBoxLayout_hasHeightForWidth_bool_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QHBoxLayout_hasHeightForWidth_bool_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QHBoxLayout::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QHBoxLayout::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QHBoxLayout_heightForWidth_int_QHBoxLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QHBoxLayout_heightForWidth_int_QHBoxLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QHBoxLayout::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QHBoxLayout::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    void qt_QHBoxLayout_invalidate_void_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QHBoxLayout_invalidate_void_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
@@ -481,56 +450,40 @@ namespace Mu
             arg0->invalidate();
     }
 
-    Pointer qt_QHBoxLayout_itemAt_QLayoutItem_QHBoxLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QHBoxLayout_itemAt_QLayoutItem_QHBoxLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QHBoxLayout::itemAt(arg1), "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QHBoxLayout::itemAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1), "qt.QLayoutItem");
     }
 
-    Pointer
-    qt_QHBoxLayout_maximumSize_QSize_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QHBoxLayout_maximumSize_QSize_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QHBoxLayout::maximumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QHBoxLayout::maximumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
     }
 
-    int qt_QHBoxLayout_minimumHeightForWidth_int_QHBoxLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QHBoxLayout_minimumHeightForWidth_int_QHBoxLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0)
-                   ? arg0->QHBoxLayout::minimumHeightForWidth(arg1)
-                   : arg0->minimumHeightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QHBoxLayout::minimumHeightForWidth(arg1) : arg0->minimumHeightForWidth(arg1);
     }
 
-    Pointer
-    qt_QHBoxLayout_minimumSize_QSize_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QHBoxLayout_minimumSize_QSize_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QHBoxLayout::minimumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QHBoxLayout::minimumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
     }
 
-    void qt_QHBoxLayout_setGeometry_void_QHBoxLayout_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
+    void qt_QHBoxLayout_setGeometry_void_QHBoxLayout_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
@@ -541,118 +494,97 @@ namespace Mu
             arg0->setGeometry(arg1);
     }
 
-    Pointer qt_QHBoxLayout_sizeHint_QSize_QHBoxLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QHBoxLayout_sizeHint_QSize_QHBoxLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QHBoxLayout::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QHBoxLayout::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QHBoxLayout_takeAt_QLayoutItem_QHBoxLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QHBoxLayout_takeAt_QLayoutItem_QHBoxLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHBoxLayout* arg0 = object<QHBoxLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QHBoxLayout::takeAt(arg1), "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QHBoxLayout::takeAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1), "qt.QLayoutItem");
     }
 
     static NODE_IMPLEMENTATION(_n_QHBoxLayout0, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QHBoxLayout1, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem0, void)
     {
-        qt_QHBoxLayout_addItem_void_QHBoxLayout_QLayoutItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHBoxLayout_addItem_void_QHBoxLayout_QLayoutItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QHBoxLayout_count_int_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_count_int_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_expandingDirections0, int)
     {
-        NODE_RETURN(qt_QHBoxLayout_expandingDirections_int_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_expandingDirections_int_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QHBoxLayout_hasHeightForWidth_bool_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_hasHeightForWidth_bool_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QHBoxLayout_heightForWidth_int_QHBoxLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHBoxLayout_heightForWidth_int_QHBoxLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_invalidate0, void)
     {
-        qt_QHBoxLayout_invalidate_void_QHBoxLayout(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QHBoxLayout_invalidate_void_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt0, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_itemAt_QLayoutItem_QHBoxLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHBoxLayout_itemAt_QLayoutItem_QHBoxLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumSize0, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_maximumSize_QSize_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_maximumSize_QSize_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumHeightForWidth0, int)
     {
-        NODE_RETURN(qt_QHBoxLayout_minimumHeightForWidth_int_QHBoxLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHBoxLayout_minimumHeightForWidth_int_QHBoxLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSize0, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_minimumSize_QSize_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_minimumSize_QSize_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setGeometry0, void)
     {
-        qt_QHBoxLayout_setGeometry_void_QHBoxLayout_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHBoxLayout_setGeometry_void_QHBoxLayout_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_sizeHint_QSize_QHBoxLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHBoxLayout_sizeHint_QSize_QHBoxLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeAt0, Pointer)
     {
-        NODE_RETURN(qt_QHBoxLayout_takeAt_QLayoutItem_QHBoxLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHBoxLayout_takeAt_QLayoutItem_QHBoxLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QHBoxLayoutType::load()
@@ -672,17 +604,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QHBoxLayout_QHBoxLayout_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QHBoxLayout_QHBoxLayout_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -690,82 +618,45 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QHBoxLayout", _n_QHBoxLayout0, None, Compiled,
-                         qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout,
-                         Return, "qt.QHBoxLayout", Parameters,
-                         new Param(c, "this", "qt.QHBoxLayout"), End),
-            new Function(
-                c, "QHBoxLayout", _n_QHBoxLayout1, None, Compiled,
-                qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout_QWidget,
-                Return, "qt.QHBoxLayout", Parameters,
-                new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            _func[0] = new MemberFunction(
-                c, "addItem", _n_addItem0, None, Compiled,
-                qt_QHBoxLayout_addItem_void_QHBoxLayout_QLayoutItem, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "item", "qt.QLayoutItem"), End),
-            _func[1] = new MemberFunction(
-                c, "count", _n_count0, None, Compiled,
-                qt_QHBoxLayout_count_int_QHBoxLayout, Return, "int", Parameters,
-                new Param(c, "this", "qt.QHBoxLayout"), End),
-            _func[2] = new MemberFunction(
-                c, "expandingDirections", _n_expandingDirections0, None,
-                Compiled, qt_QHBoxLayout_expandingDirections_int_QHBoxLayout,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QHBoxLayout"), End),
-            _func[3] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QHBoxLayout_hasHeightForWidth_bool_QHBoxLayout, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QHBoxLayout"),
-                End),
-            _func[4] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QHBoxLayout_heightForWidth_int_QHBoxLayout_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "w", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "invalidate", _n_invalidate0, None, Compiled,
-                qt_QHBoxLayout_invalidate_void_QHBoxLayout, Return, "void",
-                Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
-            _func[6] = new MemberFunction(
-                c, "itemAt", _n_itemAt0, None, Compiled,
-                qt_QHBoxLayout_itemAt_QLayoutItem_QHBoxLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "index", "int"), End),
-            _func[7] = new MemberFunction(
-                c, "maximumSize", _n_maximumSize0, None, Compiled,
-                qt_QHBoxLayout_maximumSize_QSize_QHBoxLayout, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QHBoxLayout"),
-                End),
-            _func[8] = new MemberFunction(
-                c, "minimumHeightForWidth", _n_minimumHeightForWidth0, None,
-                Compiled,
-                qt_QHBoxLayout_minimumHeightForWidth_int_QHBoxLayout_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "w", "int"), End),
-            _func[9] = new MemberFunction(
-                c, "minimumSize", _n_minimumSize0, None, Compiled,
-                qt_QHBoxLayout_minimumSize_QSize_QHBoxLayout, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QHBoxLayout"),
-                End),
-            _func[10] = new MemberFunction(
-                c, "setGeometry", _n_setGeometry0, None, Compiled,
-                qt_QHBoxLayout_setGeometry_void_QHBoxLayout_QRect, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "r", "qt.QRect"), End),
-            _func[11] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QHBoxLayout_sizeHint_QSize_QHBoxLayout, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
-            _func[12] = new MemberFunction(
-                c, "takeAt", _n_takeAt0, None, Compiled,
-                qt_QHBoxLayout_takeAt_QLayoutItem_QHBoxLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QHBoxLayout"),
-                new Param(c, "index", "int"), End),
+            new Function(c, "QHBoxLayout", _n_QHBoxLayout0, None, Compiled, qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout, Return,
+                         "qt.QHBoxLayout", Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
+            new Function(c, "QHBoxLayout", _n_QHBoxLayout1, None, Compiled, qt_QHBoxLayout_QHBoxLayout_QHBoxLayout_QHBoxLayout_QWidget,
+                         Return, "qt.QHBoxLayout", Parameters, new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "parent", "qt.QWidget"),
+                         End),
+            _func[0] =
+                new MemberFunction(c, "addItem", _n_addItem0, None, Compiled, qt_QHBoxLayout_addItem_void_QHBoxLayout_QLayoutItem, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "item", "qt.QLayoutItem"), End),
+            _func[1] = new MemberFunction(c, "count", _n_count0, None, Compiled, qt_QHBoxLayout_count_int_QHBoxLayout, Return, "int",
+                                          Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[2] = new MemberFunction(c, "expandingDirections", _n_expandingDirections0, None, Compiled,
+                                          qt_QHBoxLayout_expandingDirections_int_QHBoxLayout, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[3] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QHBoxLayout_hasHeightForWidth_bool_QHBoxLayout, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[4] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QHBoxLayout_heightForWidth_int_QHBoxLayout_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "w", "int"), End),
+            _func[5] = new MemberFunction(c, "invalidate", _n_invalidate0, None, Compiled, qt_QHBoxLayout_invalidate_void_QHBoxLayout,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[6] =
+                new MemberFunction(c, "itemAt", _n_itemAt0, None, Compiled, qt_QHBoxLayout_itemAt_QLayoutItem_QHBoxLayout_int, Return,
+                                   "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "index", "int"), End),
+            _func[7] = new MemberFunction(c, "maximumSize", _n_maximumSize0, None, Compiled, qt_QHBoxLayout_maximumSize_QSize_QHBoxLayout,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[8] = new MemberFunction(c, "minimumHeightForWidth", _n_minimumHeightForWidth0, None, Compiled,
+                                          qt_QHBoxLayout_minimumHeightForWidth_int_QHBoxLayout_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "w", "int"), End),
+            _func[9] = new MemberFunction(c, "minimumSize", _n_minimumSize0, None, Compiled, qt_QHBoxLayout_minimumSize_QSize_QHBoxLayout,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[10] =
+                new MemberFunction(c, "setGeometry", _n_setGeometry0, None, Compiled, qt_QHBoxLayout_setGeometry_void_QHBoxLayout_QRect,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "r", "qt.QRect"), End),
+            _func[11] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QHBoxLayout_sizeHint_QSize_QHBoxLayout, Return,
+                                           "qt.QSize", Parameters, new Param(c, "this", "qt.QHBoxLayout"), End),
+            _func[12] =
+                new MemberFunction(c, "takeAt", _n_takeAt0, None, Compiled, qt_QHBoxLayout_takeAt_QLayoutItem_QHBoxLayout_int, Return,
+                                   "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QHBoxLayout"), new Param(c, "index", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

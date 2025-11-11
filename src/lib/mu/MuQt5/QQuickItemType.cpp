@@ -69,16 +69,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QQuickItem::MuQt_QQuickItem(Pointer muobj, const CallEnvironment* ce,
-                                     QQuickItem* parent)
+    MuQt_QQuickItem::MuQt_QQuickItem(Pointer muobj, const CallEnvironment* ce, QQuickItem* parent)
         : QQuickItem(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QQuickItemType>(
-            c->internName("qt.QQuickItem"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QQuickItemType>(c->internName("qt.QQuickItem"));
     }
 
     bool MuQt_QQuickItem::contains(const QPointF& point) const
@@ -154,8 +152,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QQuickItemType>(c, item, "qt.QQuickItem"));
+            args[1] = Value(makeinstance<QQuickItemType>(c, item, "qt.QQuickItem"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -180,8 +177,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -204,8 +200,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -228,8 +223,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -252,8 +246,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -276,8 +269,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -300,8 +292,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -310,8 +301,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QQuickItem::geometryChanged(const QRectF& newGeometry,
-                                          const QRectF& oldGeometry)
+    void MuQt_QQuickItem::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
     {
         if (!_env)
         {
@@ -349,8 +339,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QHoverEventType>(c, event, "qt.QHoverEvent"));
+            args[1] = Value(makeqpointer<QHoverEventType>(c, event, "qt.QHoverEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -373,8 +362,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QHoverEventType>(c, event, "qt.QHoverEvent"));
+            args[1] = Value(makeqpointer<QHoverEventType>(c, event, "qt.QHoverEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -397,8 +385,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QHoverEventType>(c, event, "qt.QHoverEvent"));
+            args[1] = Value(makeqpointer<QHoverEventType>(c, event, "qt.QHoverEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -421,8 +408,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -445,8 +431,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -469,8 +454,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -493,8 +477,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -517,8 +500,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -541,8 +523,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -653,8 +634,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -739,8 +719,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -788,8 +767,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -801,8 +779,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QQuickItemType::QQuickItemType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QQuickItemType::QQuickItemType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -812,8 +789,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QQuickItem_QQuickItem_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QQuickItem_QQuickItem_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -824,9 +800,7 @@ namespace Mu
         }
         else if (QQuickItem* w = object<QQuickItem>(widget))
         {
-            QQuickItemType* type =
-                c->findSymbolOfTypeByQualifiedName<QQuickItemType>(
-                    c->internName("qt.QQuickItem"), false);
+            QQuickItemType* type = c->findSymbolOfTypeByQualifiedName<QQuickItemType>(c->internName("qt.QQuickItem"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -837,98 +811,77 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QQuickItem_QQuickItem_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QQuickItem_QQuickItem_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QQuickItem_QQuickItem_QQuickItem_QQuickItem_QQuickItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QQuickItem_QQuickItem_QQuickItem_QQuickItem_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg1 = object<QQuickItem>(param_parent);
-        setobject(param_this,
-                  new MuQt_QQuickItem(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QQuickItem(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    bool
-    qt_QQuickItem_acceptHoverEvents_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QQuickItem_acceptHoverEvents_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return arg0->acceptHoverEvents();
     }
 
-    int
-    qt_QQuickItem_acceptedMouseButtons_int_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QQuickItem_acceptedMouseButtons_int_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return int(arg0->acceptedMouseButtons());
     }
 
-    Pointer qt_QQuickItem_childAt_QQuickItem_QQuickItem_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
-        double param_y)
+    Pointer qt_QQuickItem_childAt_QQuickItem_QQuickItem_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
+                                                                      double param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         qreal arg1 = (double)(param_x);
         qreal arg2 = (double)(param_y);
-        return makeinstance<QQuickItemType>(c, arg0->childAt(arg1, arg2),
-                                            "qt.QQuickItem");
+        return makeinstance<QQuickItemType>(c, arg0->childAt(arg1, arg2), "qt.QQuickItem");
     }
 
-    bool qt_QQuickItem_contains_bool_QQuickItem_QPointF(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_point)
+    bool qt_QQuickItem_contains_bool_QQuickItem_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QPointF arg1 = getqtype<QPointFType>(param_point);
-        return isMuQtObject(arg0) ? arg0->QQuickItem::contains(arg1)
-                                  : arg0->contains(arg1);
+        return isMuQtObject(arg0) ? arg0->QQuickItem::contains(arg1) : arg0->contains(arg1);
     }
 
-    Pointer qt_QQuickItem_cursor_QCursor_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QQuickItem_cursor_QCursor_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return makeqtype<QCursorType>(c, arg0->cursor(), "qt.QCursor");
     }
 
-    bool qt_QQuickItem_filtersChildMouseEvents_bool_QQuickItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QQuickItem_filtersChildMouseEvents_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return arg0->filtersChildMouseEvents();
     }
 
-    int qt_QQuickItem_flags_int_QQuickItem(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QQuickItem_flags_int_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return int(arg0->flags());
     }
 
-    void qt_QQuickItem_forceActiveFocus_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QQuickItem_forceActiveFocus_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         arg0->forceActiveFocus();
     }
 
-    void qt_QQuickItem_forceActiveFocus_void_QQuickItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_reason)
+    void qt_QQuickItem_forceActiveFocus_void_QQuickItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_reason)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -936,151 +889,122 @@ namespace Mu
         arg0->forceActiveFocus(arg1);
     }
 
-    void qt_QQuickItem_grabMouse_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    void qt_QQuickItem_grabMouse_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         arg0->grabMouse();
     }
 
-    double
-    qt_QQuickItem_implicitWidth_double_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    double qt_QQuickItem_implicitWidth_double_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return arg0->implicitWidth();
     }
 
-    Pointer qt_QQuickItem_inputMethodQuery_QVariant_QQuickItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QQuickItem_inputMethodQuery_QVariant_QQuickItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QQuickItem::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QQuickItem::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QQuickItem_isFocusScope_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QQuickItem_isFocusScope_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return arg0->isFocusScope();
     }
 
-    bool
-    qt_QQuickItem_isTextureProvider_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QQuickItem_isTextureProvider_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
-        return isMuQtObject(arg0) ? arg0->QQuickItem::isTextureProvider()
-                                  : arg0->isTextureProvider();
+        return isMuQtObject(arg0) ? arg0->QQuickItem::isTextureProvider() : arg0->isTextureProvider();
     }
 
-    bool qt_QQuickItem_keepMouseGrab_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QQuickItem_keepMouseGrab_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return arg0->keepMouseGrab();
     }
 
-    bool qt_QQuickItem_keepTouchGrab_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QQuickItem_keepTouchGrab_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return arg0->keepTouchGrab();
     }
 
-    Pointer qt_QQuickItem_mapFromItem_QPointF_QQuickItem_QQuickItem_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        Pointer param_point)
+    Pointer qt_QQuickItem_mapFromItem_QPointF_QQuickItem_QQuickItem_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
+                                                                            Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QQuickItem* arg1 = object<QQuickItem>(param_item);
         const QPointF arg2 = getqtype<QPointFType>(param_point);
-        return makeqtype<QPointFType>(c, arg0->mapFromItem(arg1, arg2),
-                                      "qt.QPointF");
+        return makeqtype<QPointFType>(c, arg0->mapFromItem(arg1, arg2), "qt.QPointF");
     }
 
-    Pointer qt_QQuickItem_mapFromScene_QPointF_QQuickItem_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QQuickItem_mapFromScene_QPointF_QQuickItem_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QPointF arg1 = getqtype<QPointFType>(param_point);
-        return makeqtype<QPointFType>(c, arg0->mapFromScene(arg1),
-                                      "qt.QPointF");
+        return makeqtype<QPointFType>(c, arg0->mapFromScene(arg1), "qt.QPointF");
     }
 
-    Pointer qt_QQuickItem_mapRectFromItem_QRectF_QQuickItem_QQuickItem_QRectF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        Pointer param_rect)
+    Pointer qt_QQuickItem_mapRectFromItem_QRectF_QQuickItem_QQuickItem_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_item, Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QQuickItem* arg1 = object<QQuickItem>(param_item);
         const QRectF arg2 = getqtype<QRectFType>(param_rect);
-        return makeqtype<QRectFType>(c, arg0->mapRectFromItem(arg1, arg2),
-                                     "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0->mapRectFromItem(arg1, arg2), "qt.QRectF");
     }
 
-    Pointer qt_QQuickItem_mapRectFromScene_QRectF_QQuickItem_QRectF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
+    Pointer qt_QQuickItem_mapRectFromScene_QRectF_QQuickItem_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QRectF arg1 = getqtype<QRectFType>(param_rect);
-        return makeqtype<QRectFType>(c, arg0->mapRectFromScene(arg1),
-                                     "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0->mapRectFromScene(arg1), "qt.QRectF");
     }
 
-    Pointer qt_QQuickItem_mapRectToItem_QRectF_QQuickItem_QQuickItem_QRectF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        Pointer param_rect)
+    Pointer qt_QQuickItem_mapRectToItem_QRectF_QQuickItem_QQuickItem_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
+                                                                            Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QQuickItem* arg1 = object<QQuickItem>(param_item);
         const QRectF arg2 = getqtype<QRectFType>(param_rect);
-        return makeqtype<QRectFType>(c, arg0->mapRectToItem(arg1, arg2),
-                                     "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0->mapRectToItem(arg1, arg2), "qt.QRectF");
     }
 
-    Pointer qt_QQuickItem_mapRectToScene_QRectF_QQuickItem_QRectF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
+    Pointer qt_QQuickItem_mapRectToScene_QRectF_QQuickItem_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QRectF arg1 = getqtype<QRectFType>(param_rect);
-        return makeqtype<QRectFType>(c, arg0->mapRectToScene(arg1),
-                                     "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0->mapRectToScene(arg1), "qt.QRectF");
     }
 
-    Pointer qt_QQuickItem_mapToItem_QPointF_QQuickItem_QQuickItem_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        Pointer param_point)
+    Pointer qt_QQuickItem_mapToItem_QPointF_QQuickItem_QQuickItem_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
+                                                                          Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         const QQuickItem* arg1 = object<QQuickItem>(param_item);
         const QPointF arg2 = getqtype<QPointFType>(param_point);
-        return makeqtype<QPointFType>(c, arg0->mapToItem(arg1, arg2),
-                                      "qt.QPointF");
+        return makeqtype<QPointFType>(c, arg0->mapToItem(arg1, arg2), "qt.QPointF");
     }
 
-    Pointer qt_QQuickItem_mapToScene_QPointF_QQuickItem_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QQuickItem_mapToScene_QPointF_QQuickItem_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1088,36 +1012,29 @@ namespace Mu
         return makeqtype<QPointFType>(c, arg0->mapToScene(arg1), "qt.QPointF");
     }
 
-    Pointer qt_QQuickItem_nextItemInFocusChain_QQuickItem_QQuickItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_forward)
+    Pointer qt_QQuickItem_nextItemInFocusChain_QQuickItem_QQuickItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_forward)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         bool arg1 = (bool)(param_forward);
-        return makeinstance<QQuickItemType>(c, arg0->nextItemInFocusChain(arg1),
-                                            "qt.QQuickItem");
+        return makeinstance<QQuickItemType>(c, arg0->nextItemInFocusChain(arg1), "qt.QQuickItem");
     }
 
-    void qt_QQuickItem_polish_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    void qt_QQuickItem_polish_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         arg0->polish();
     }
 
-    Pointer
-    qt_QQuickItem_scopedFocusItem_QQuickItem_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QQuickItem_scopedFocusItem_QQuickItem_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
-        return makeinstance<QQuickItemType>(c, arg0->scopedFocusItem(),
-                                            "qt.QQuickItem");
+        return makeinstance<QQuickItemType>(c, arg0->scopedFocusItem(), "qt.QQuickItem");
     }
 
-    void qt_QQuickItem_setAcceptHoverEvents_void_QQuickItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enabled)
+    void qt_QQuickItem_setAcceptHoverEvents_void_QQuickItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enabled)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1125,8 +1042,7 @@ namespace Mu
         arg0->setAcceptHoverEvents(arg1);
     }
 
-    void qt_QQuickItem_setAcceptedMouseButtons_void_QQuickItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_buttons)
+    void qt_QQuickItem_setAcceptedMouseButtons_void_QQuickItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_buttons)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1134,8 +1050,7 @@ namespace Mu
         arg0->setAcceptedMouseButtons(arg1);
     }
 
-    void qt_QQuickItem_setCursor_void_QQuickItem_QCursor(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cursor)
+    void qt_QQuickItem_setCursor_void_QQuickItem_QCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cursor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1143,8 +1058,7 @@ namespace Mu
         arg0->setCursor(arg1);
     }
 
-    void qt_QQuickItem_setFiltersChildMouseEvents_void_QQuickItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_filter)
+    void qt_QQuickItem_setFiltersChildMouseEvents_void_QQuickItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_filter)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1152,10 +1066,7 @@ namespace Mu
         arg0->setFiltersChildMouseEvents(arg1);
     }
 
-    void qt_QQuickItem_setFlag_void_QQuickItem_int_bool(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_flag,
-                                                        bool param_enabled)
+    void qt_QQuickItem_setFlag_void_QQuickItem_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flag, bool param_enabled)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1164,9 +1075,7 @@ namespace Mu
         arg0->setFlag(arg1, arg2);
     }
 
-    void qt_QQuickItem_setFlags_void_QQuickItem_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_flags)
+    void qt_QQuickItem_setFlags_void_QQuickItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1174,8 +1083,7 @@ namespace Mu
         arg0->setFlags(arg1);
     }
 
-    void qt_QQuickItem_setKeepMouseGrab_void_QQuickItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_keep)
+    void qt_QQuickItem_setKeepMouseGrab_void_QQuickItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_keep)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1183,8 +1091,7 @@ namespace Mu
         arg0->setKeepMouseGrab(arg1);
     }
 
-    void qt_QQuickItem_setKeepTouchGrab_void_QQuickItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_keep)
+    void qt_QQuickItem_setKeepTouchGrab_void_QQuickItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_keep)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1192,8 +1099,7 @@ namespace Mu
         arg0->setKeepTouchGrab(arg1);
     }
 
-    void qt_QQuickItem_stackAfter_void_QQuickItem_QQuickItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sibling)
+    void qt_QQuickItem_stackAfter_void_QQuickItem_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sibling)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1201,8 +1107,7 @@ namespace Mu
         arg0->stackAfter(arg1);
     }
 
-    void qt_QQuickItem_stackBefore_void_QQuickItem_QQuickItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sibling)
+    void qt_QQuickItem_stackBefore_void_QQuickItem_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sibling)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1210,48 +1115,39 @@ namespace Mu
         arg0->stackBefore(arg1);
     }
 
-    void qt_QQuickItem_ungrabMouse_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    void qt_QQuickItem_ungrabMouse_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         arg0->ungrabMouse();
     }
 
-    void
-    qt_QQuickItem_ungrabTouchPoints_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QQuickItem_ungrabTouchPoints_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         arg0->ungrabTouchPoints();
     }
 
-    void qt_QQuickItem_unsetCursor_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    void qt_QQuickItem_unsetCursor_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         arg0->unsetCursor();
     }
 
-    bool qt_QQuickItem_childMouseEventFilter_bool_QQuickItem_QQuickItem_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        Pointer param_event)
+    bool qt_QQuickItem_childMouseEventFilter_bool_QQuickItem_QQuickItem_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_item, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         QQuickItem* arg1 = object<QQuickItem>(param_item);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QQuickItem*)arg0)
-                         ->childMouseEventFilter_pub_parent(arg1, arg2)
-                   : ((MuQt_QQuickItem*)arg0)
-                         ->childMouseEventFilter_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QQuickItem*)arg0)->childMouseEventFilter_pub_parent(arg1, arg2)
+                                  : ((MuQt_QQuickItem*)arg0)->childMouseEventFilter_pub(arg1, arg2);
     }
 
-    void qt_QQuickItem_dragEnterEvent_void_QQuickItem_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_dragEnterEvent_void_QQuickItem_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1262,8 +1158,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_dragLeaveEvent_void_QQuickItem_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_dragLeaveEvent_void_QQuickItem_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1274,8 +1169,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_dragMoveEvent_void_QQuickItem_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_dragMoveEvent_void_QQuickItem_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1286,8 +1180,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_dropEvent_void_QQuickItem_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_dropEvent_void_QQuickItem_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1298,8 +1191,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_focusInEvent_void_QQuickItem_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_focusInEvent_void_QQuickItem_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1310,8 +1202,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_focusOutEvent_void_QQuickItem_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_focusOutEvent_void_QQuickItem_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1322,9 +1213,8 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_geometryChanged_void_QQuickItem_QRectF_QRectF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_newGeometry,
-        Pointer param_oldGeometry)
+    void qt_QQuickItem_geometryChanged_void_QQuickItem_QRectF_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_newGeometry,
+                                                                     Pointer param_oldGeometry)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1336,16 +1226,14 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->geometryChanged_pub(arg1, arg2);
     }
 
-    bool qt_QQuickItem_heightValid_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    bool qt_QQuickItem_heightValid_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return ((MuQt_QQuickItem*)arg0)->heightValid_pub();
     }
 
-    void qt_QQuickItem_hoverEnterEvent_void_QQuickItem_QHoverEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_hoverEnterEvent_void_QQuickItem_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1356,8 +1244,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->hoverEnterEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_hoverLeaveEvent_void_QQuickItem_QHoverEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_hoverLeaveEvent_void_QQuickItem_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1368,8 +1255,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->hoverLeaveEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_hoverMoveEvent_void_QQuickItem_QHoverEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_hoverMoveEvent_void_QQuickItem_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1380,17 +1266,14 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->hoverMoveEvent_pub(arg1);
     }
 
-    bool
-    qt_QQuickItem_isComponentComplete_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QQuickItem_isComponentComplete_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return ((MuQt_QQuickItem*)arg0)->isComponentComplete_pub();
     }
 
-    void qt_QQuickItem_keyPressEvent_void_QQuickItem_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_keyPressEvent_void_QQuickItem_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1401,8 +1284,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_keyReleaseEvent_void_QQuickItem_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_keyReleaseEvent_void_QQuickItem_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1413,8 +1295,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_mouseDoubleClickEvent_void_QQuickItem_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_mouseDoubleClickEvent_void_QQuickItem_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1425,8 +1306,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_mouseMoveEvent_void_QQuickItem_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_mouseMoveEvent_void_QQuickItem_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1437,8 +1317,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_mousePressEvent_void_QQuickItem_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_mousePressEvent_void_QQuickItem_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1449,8 +1328,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_mouseReleaseEvent_void_QQuickItem_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_mouseReleaseEvent_void_QQuickItem_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1461,8 +1339,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_mouseUngrabEvent_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QQuickItem_mouseUngrabEvent_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1472,8 +1349,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->mouseUngrabEvent_pub();
     }
 
-    void qt_QQuickItem_releaseResources_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QQuickItem_releaseResources_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1483,8 +1359,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->releaseResources_pub();
     }
 
-    void qt_QQuickItem_touchUngrabEvent_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QQuickItem_touchUngrabEvent_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1494,8 +1369,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->touchUngrabEvent_pub();
     }
 
-    void qt_QQuickItem_updateInputMethod_void_QQuickItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_queries)
+    void qt_QQuickItem_updateInputMethod_void_QQuickItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_queries)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1503,8 +1377,7 @@ namespace Mu
         ((MuQt_QQuickItem*)arg0)->updateInputMethod_pub(arg1);
     }
 
-    void qt_QQuickItem_updatePolish_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QQuickItem_updatePolish_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1514,8 +1387,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->updatePolish_pub();
     }
 
-    void qt_QQuickItem_wheelEvent_void_QQuickItem_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_wheelEvent_void_QQuickItem_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1526,16 +1398,14 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->wheelEvent_pub(arg1);
     }
 
-    bool qt_QQuickItem_widthValid_bool_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    bool qt_QQuickItem_widthValid_bool_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         return ((MuQt_QQuickItem*)arg0)->widthValid_pub();
     }
 
-    void qt_QQuickItem_classBegin_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    void qt_QQuickItem_classBegin_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1545,9 +1415,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->classBegin_pub();
     }
 
-    void
-    qt_QQuickItem_componentComplete_void_QQuickItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QQuickItem_componentComplete_void_QQuickItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1557,32 +1425,25 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->componentComplete_pub();
     }
 
-    bool qt_QQuickItem_event_bool_QQuickItem_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_ev)
+    bool qt_QQuickItem_event_bool_QQuickItem_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_ev);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QQuickItem*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QQuickItem*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QQuickItem*)arg0)->event_pub_parent(arg1) : ((MuQt_QQuickItem*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QQuickItem_eventFilter_bool_QQuickItem_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QQuickItem_eventFilter_bool_QQuickItem_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QQuickItem::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QQuickItem::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QQuickItem_customEvent_void_QQuickItem_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_customEvent_void_QQuickItem_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1593,8 +1454,7 @@ namespace Mu
             ((MuQt_QQuickItem*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QQuickItem_timerEvent_void_QQuickItem_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQuickItem_timerEvent_void_QQuickItem_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQuickItem* arg0 = object<QQuickItem>(param_this);
@@ -1607,455 +1467,369 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QQuickItem0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_QQuickItem_QQuickItem_QQuickItem_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QQuickItem_QQuickItem_QQuickItem_QQuickItem_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_acceptHoverEvents0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_acceptHoverEvents_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_acceptHoverEvents_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_acceptedMouseButtons0, int)
     {
-        NODE_RETURN(qt_QQuickItem_acceptedMouseButtons_int_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_acceptedMouseButtons_int_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_childAt0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_childAt_QQuickItem_QQuickItem_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double)));
+        NODE_RETURN(qt_QQuickItem_childAt_QQuickItem_QQuickItem_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                              NODE_ARG(2, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_contains0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_contains_bool_QQuickItem_QPointF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQuickItem_contains_bool_QQuickItem_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cursor0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_cursor_QCursor_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_cursor_QCursor_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_filtersChildMouseEvents0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_filtersChildMouseEvents_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_filtersChildMouseEvents_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_flags0, int)
     {
-        NODE_RETURN(qt_QQuickItem_flags_int_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_flags_int_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_forceActiveFocus0, void)
     {
-        qt_QQuickItem_forceActiveFocus_void_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_forceActiveFocus_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_forceActiveFocus1, void)
     {
-        qt_QQuickItem_forceActiveFocus_void_QQuickItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QQuickItem_forceActiveFocus_void_QQuickItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_grabMouse0, void)
-    {
-        qt_QQuickItem_grabMouse_void_QQuickItem(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_grabMouse0, void) { qt_QQuickItem_grabMouse_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_implicitWidth0, double)
     {
-        NODE_RETURN(qt_QQuickItem_implicitWidth_double_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_implicitWidth_double_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_inputMethodQuery_QVariant_QQuickItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QQuickItem_inputMethodQuery_QVariant_QQuickItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isFocusScope0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_isFocusScope_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_isFocusScope_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isTextureProvider0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_isTextureProvider_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_isTextureProvider_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keepMouseGrab0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_keepMouseGrab_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_keepMouseGrab_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keepTouchGrab0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_keepTouchGrab_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_keepTouchGrab_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapFromItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QQuickItem_mapFromItem_QPointF_QQuickItem_QQuickItem_QPointF(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapFromItem_QPointF_QQuickItem_QQuickItem_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapFromScene0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_mapFromScene_QPointF_QQuickItem_QPointF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapFromScene_QPointF_QQuickItem_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapRectFromItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QQuickItem_mapRectFromItem_QRectF_QQuickItem_QQuickItem_QRectF(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapRectFromItem_QRectF_QQuickItem_QQuickItem_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapRectFromScene0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_mapRectFromScene_QRectF_QQuickItem_QRectF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QQuickItem_mapRectFromScene_QRectF_QQuickItem_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapRectToItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QQuickItem_mapRectToItem_QRectF_QQuickItem_QQuickItem_QRectF(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapRectToItem_QRectF_QQuickItem_QQuickItem_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapRectToScene0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_mapRectToScene_QRectF_QQuickItem_QRectF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapRectToScene_QRectF_QQuickItem_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapToItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QQuickItem_mapToItem_QPointF_QQuickItem_QQuickItem_QPointF(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapToItem_QPointF_QQuickItem_QQuickItem_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapToScene0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_mapToScene_QPointF_QQuickItem_QPointF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQuickItem_mapToScene_QPointF_QQuickItem_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_nextItemInFocusChain0, Pointer)
     {
         NODE_RETURN(
-            qt_QQuickItem_nextItemInFocusChain_QQuickItem_QQuickItem_bool(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+            qt_QQuickItem_nextItemInFocusChain_QQuickItem_QQuickItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
-    static NODE_IMPLEMENTATION(_n_polish0, void)
-    {
-        qt_QQuickItem_polish_void_QQuickItem(NODE_THREAD,
-                                             NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_polish0, void) { qt_QQuickItem_polish_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_scopedFocusItem0, Pointer)
     {
-        NODE_RETURN(qt_QQuickItem_scopedFocusItem_QQuickItem_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_scopedFocusItem_QQuickItem_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAcceptHoverEvents0, void)
     {
-        qt_QQuickItem_setAcceptHoverEvents_void_QQuickItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QQuickItem_setAcceptHoverEvents_void_QQuickItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setAcceptedMouseButtons0, void)
     {
-        qt_QQuickItem_setAcceptedMouseButtons_void_QQuickItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QQuickItem_setAcceptedMouseButtons_void_QQuickItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCursor0, void)
     {
-        qt_QQuickItem_setCursor_void_QQuickItem_QCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_setCursor_void_QQuickItem_QCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setFiltersChildMouseEvents0, void)
     {
-        qt_QQuickItem_setFiltersChildMouseEvents_void_QQuickItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QQuickItem_setFiltersChildMouseEvents_void_QQuickItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setFlag0, void)
     {
-        qt_QQuickItem_setFlag_void_QQuickItem_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QQuickItem_setFlag_void_QQuickItem_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setFlags0, void)
     {
-        qt_QQuickItem_setFlags_void_QQuickItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QQuickItem_setFlags_void_QQuickItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setKeepMouseGrab0, void)
     {
-        qt_QQuickItem_setKeepMouseGrab_void_QQuickItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QQuickItem_setKeepMouseGrab_void_QQuickItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setKeepTouchGrab0, void)
     {
-        qt_QQuickItem_setKeepTouchGrab_void_QQuickItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QQuickItem_setKeepTouchGrab_void_QQuickItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_stackAfter0, void)
     {
-        qt_QQuickItem_stackAfter_void_QQuickItem_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_stackAfter_void_QQuickItem_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_stackBefore0, void)
     {
-        qt_QQuickItem_stackBefore_void_QQuickItem_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_stackBefore_void_QQuickItem_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_ungrabMouse0, void)
     {
-        qt_QQuickItem_ungrabMouse_void_QQuickItem(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_ungrabMouse_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_ungrabTouchPoints0, void)
     {
-        qt_QQuickItem_ungrabTouchPoints_void_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_ungrabTouchPoints_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_unsetCursor0, void)
     {
-        qt_QQuickItem_unsetCursor_void_QQuickItem(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_unsetCursor_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_childMouseEventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QQuickItem_childMouseEventFilter_bool_QQuickItem_QQuickItem_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQuickItem_childMouseEventFilter_bool_QQuickItem_QQuickItem_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QQuickItem_dragEnterEvent_void_QQuickItem_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_dragEnterEvent_void_QQuickItem_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QQuickItem_dragLeaveEvent_void_QQuickItem_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_dragLeaveEvent_void_QQuickItem_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QQuickItem_dragMoveEvent_void_QQuickItem_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_dragMoveEvent_void_QQuickItem_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QQuickItem_dropEvent_void_QQuickItem_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_dropEvent_void_QQuickItem_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QQuickItem_focusInEvent_void_QQuickItem_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_focusInEvent_void_QQuickItem_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QQuickItem_focusOutEvent_void_QQuickItem_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_focusOutEvent_void_QQuickItem_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_geometryChanged0, void)
     {
-        qt_QQuickItem_geometryChanged_void_QQuickItem_QRectF_QRectF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QQuickItem_geometryChanged_void_QQuickItem_QRectF_QRectF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                    NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_heightValid0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_heightValid_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_heightValid_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hoverEnterEvent0, void)
     {
-        qt_QQuickItem_hoverEnterEvent_void_QQuickItem_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_hoverEnterEvent_void_QQuickItem_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hoverLeaveEvent0, void)
     {
-        qt_QQuickItem_hoverLeaveEvent_void_QQuickItem_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_hoverLeaveEvent_void_QQuickItem_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hoverMoveEvent0, void)
     {
-        qt_QQuickItem_hoverMoveEvent_void_QQuickItem_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_hoverMoveEvent_void_QQuickItem_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isComponentComplete0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_isComponentComplete_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_isComponentComplete_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QQuickItem_keyPressEvent_void_QQuickItem_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_keyPressEvent_void_QQuickItem_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QQuickItem_keyReleaseEvent_void_QQuickItem_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_keyReleaseEvent_void_QQuickItem_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QQuickItem_mouseDoubleClickEvent_void_QQuickItem_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_mouseDoubleClickEvent_void_QQuickItem_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QQuickItem_mouseMoveEvent_void_QQuickItem_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_mouseMoveEvent_void_QQuickItem_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QQuickItem_mousePressEvent_void_QQuickItem_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_mousePressEvent_void_QQuickItem_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QQuickItem_mouseReleaseEvent_void_QQuickItem_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_mouseReleaseEvent_void_QQuickItem_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseUngrabEvent0, void)
     {
-        qt_QQuickItem_mouseUngrabEvent_void_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_mouseUngrabEvent_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_releaseResources0, void)
     {
-        qt_QQuickItem_releaseResources_void_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_releaseResources_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_touchUngrabEvent0, void)
     {
-        qt_QQuickItem_touchUngrabEvent_void_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_touchUngrabEvent_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_updateInputMethod0, void)
     {
-        qt_QQuickItem_updateInputMethod_void_QQuickItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QQuickItem_updateInputMethod_void_QQuickItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_updatePolish0, void)
     {
-        qt_QQuickItem_updatePolish_void_QQuickItem(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_updatePolish_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QQuickItem_wheelEvent_void_QQuickItem_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_wheelEvent_void_QQuickItem_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_widthValid0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_widthValid_bool_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQuickItem_widthValid_bool_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_classBegin0, void)
-    {
-        qt_QQuickItem_classBegin_void_QQuickItem(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_classBegin0, void) { qt_QQuickItem_classBegin_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_componentComplete0, void)
     {
-        qt_QQuickItem_componentComplete_void_QQuickItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QQuickItem_componentComplete_void_QQuickItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_event_bool_QQuickItem_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQuickItem_event_bool_QQuickItem_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QQuickItem_eventFilter_bool_QQuickItem_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQuickItem_eventFilter_bool_QQuickItem_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QQuickItem_customEvent_void_QQuickItem_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_customEvent_void_QQuickItem_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QQuickItem_timerEvent_void_QQuickItem_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQuickItem_timerEvent_void_QQuickItem_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QQuickItemType::load()
@@ -2075,17 +1849,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QQuickItem_QQuickItem_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QQuickItem_QQuickItem_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -2093,63 +1863,37 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QQuickItem", _n_QQuickItem0, None, Compiled,
-                qt_QQuickItem_QQuickItem_QQuickItem_QQuickItem_QQuickItem,
-                Return, "qt.QQuickItem", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "parent", "qt.QQuickItem"), End),
-            new Function(
-                c, "acceptHoverEvents", _n_acceptHoverEvents0, None, Compiled,
-                qt_QQuickItem_acceptHoverEvents_bool_QQuickItem, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(c, "acceptedMouseButtons", _n_acceptedMouseButtons0,
-                         None, Compiled,
-                         qt_QQuickItem_acceptedMouseButtons_int_QQuickItem,
-                         Return, "int", Parameters,
+            new Function(c, "QQuickItem", _n_QQuickItem0, None, Compiled, qt_QQuickItem_QQuickItem_QQuickItem_QQuickItem_QQuickItem, Return,
+                         "qt.QQuickItem", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "parent", "qt.QQuickItem"), End),
+            new Function(c, "acceptHoverEvents", _n_acceptHoverEvents0, None, Compiled, qt_QQuickItem_acceptHoverEvents_bool_QQuickItem,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "acceptedMouseButtons", _n_acceptedMouseButtons0, None, Compiled,
+                         qt_QQuickItem_acceptedMouseButtons_int_QQuickItem, Return, "int", Parameters,
                          new Param(c, "this", "qt.QQuickItem"), End),
             // PROP: activeFocusOnTab (bool; QQuickItem this)
             // PROP: antialiasing (bool; QQuickItem this)
             // PROP: baselineOffset (double; QQuickItem this)
-            new Function(
-                c, "childAt", _n_childAt0, None, Compiled,
-                qt_QQuickItem_childAt_QQuickItem_QQuickItem_double_double,
-                Return, "qt.QQuickItem", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "x", "double"), new Param(c, "y", "double"), End),
+            new Function(c, "childAt", _n_childAt0, None, Compiled, qt_QQuickItem_childAt_QQuickItem_QQuickItem_double_double, Return,
+                         "qt.QQuickItem", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "x", "double"),
+                         new Param(c, "y", "double"), End),
             // MISSING: childItems ("QList<QQuickItem * >"; QQuickItem this)
             // PROP: childrenRect (QRectF; QQuickItem this)
             // PROP: clip (bool; QQuickItem this)
-            _func[0] = new MemberFunction(
-                c, "contains", _n_contains0, None, Compiled,
-                qt_QQuickItem_contains_bool_QQuickItem_QPointF, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "point", "qt.QPointF"), End),
-            new Function(c, "cursor", _n_cursor0, None, Compiled,
-                         qt_QQuickItem_cursor_QCursor_QQuickItem, Return,
-                         "qt.QCursor", Parameters,
+            _func[0] =
+                new MemberFunction(c, "contains", _n_contains0, None, Compiled, qt_QQuickItem_contains_bool_QQuickItem_QPointF, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "point", "qt.QPointF"), End),
+            new Function(c, "cursor", _n_cursor0, None, Compiled, qt_QQuickItem_cursor_QCursor_QQuickItem, Return, "qt.QCursor", Parameters,
                          new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(c, "filtersChildMouseEvents",
-                         _n_filtersChildMouseEvents0, None, Compiled,
-                         qt_QQuickItem_filtersChildMouseEvents_bool_QQuickItem,
-                         Return, "bool", Parameters,
+            new Function(c, "filtersChildMouseEvents", _n_filtersChildMouseEvents0, None, Compiled,
+                         qt_QQuickItem_filtersChildMouseEvents_bool_QQuickItem, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(c, "flags", _n_flags0, None, Compiled,
-                         qt_QQuickItem_flags_int_QQuickItem, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QQuickItem"),
-                         End),
-            new Function(
-                c, "forceActiveFocus", _n_forceActiveFocus0, None, Compiled,
-                qt_QQuickItem_forceActiveFocus_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(
-                c, "forceActiveFocus", _n_forceActiveFocus1, None, Compiled,
-                qt_QQuickItem_forceActiveFocus_void_QQuickItem_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "reason", "int"), End),
-            new Function(c, "grabMouse", _n_grabMouse0, None, Compiled,
-                         qt_QQuickItem_grabMouse_void_QQuickItem, Return,
-                         "void", Parameters,
+            new Function(c, "flags", _n_flags0, None, Compiled, qt_QQuickItem_flags_int_QQuickItem, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "forceActiveFocus", _n_forceActiveFocus0, None, Compiled, qt_QQuickItem_forceActiveFocus_void_QQuickItem,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "forceActiveFocus", _n_forceActiveFocus1, None, Compiled, qt_QQuickItem_forceActiveFocus_void_QQuickItem_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "reason", "int"), End),
+            new Function(c, "grabMouse", _n_grabMouse0, None, Compiled, qt_QQuickItem_grabMouse_void_QQuickItem, Return, "void", Parameters,
                          new Param(c, "this", "qt.QQuickItem"), End),
             // MISSING: grabToImage ("QSharedPointer<QQuickItemGrabResult>";
             // QQuickItem this, QSize targetSize) MISSING: grabTouchPoints
@@ -2157,162 +1901,90 @@ namespace Mu
             // hasActiveFocus (bool; QQuickItem this) PROP: hasFocus (bool;
             // QQuickItem this) PROP: height (double; QQuickItem this) PROP:
             // implicitHeight (double; QQuickItem this)
-            new Function(c, "implicitWidth", _n_implicitWidth0, None, Compiled,
-                         qt_QQuickItem_implicitWidth_double_QQuickItem, Return,
-                         "double", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            _func[1] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QQuickItem_inputMethodQuery_QVariant_QQuickItem_int, Return,
-                "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "query", "int"), End),
+            new Function(c, "implicitWidth", _n_implicitWidth0, None, Compiled, qt_QQuickItem_implicitWidth_double_QQuickItem, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[1] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QQuickItem_inputMethodQuery_QVariant_QQuickItem_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "query", "int"), End),
             // PROP: isEnabled (bool; QQuickItem this)
-            new Function(c, "isFocusScope", _n_isFocusScope0, None, Compiled,
-                         qt_QQuickItem_isFocusScope_bool_QQuickItem, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            _func[2] = new MemberFunction(
-                c, "isTextureProvider", _n_isTextureProvider0, None, Compiled,
-                qt_QQuickItem_isTextureProvider_bool_QQuickItem, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "isFocusScope", _n_isFocusScope0, None, Compiled, qt_QQuickItem_isFocusScope_bool_QQuickItem, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[2] = new MemberFunction(c, "isTextureProvider", _n_isTextureProvider0, None, Compiled,
+                                          qt_QQuickItem_isTextureProvider_bool_QQuickItem, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), End),
             // PROP: isVisible (bool; QQuickItem this)
-            new Function(c, "keepMouseGrab", _n_keepMouseGrab0, None, Compiled,
-                         qt_QQuickItem_keepMouseGrab_bool_QQuickItem, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(c, "keepTouchGrab", _n_keepTouchGrab0, None, Compiled,
-                         qt_QQuickItem_keepTouchGrab_bool_QQuickItem, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(
-                c, "mapFromItem", _n_mapFromItem0, None, Compiled,
-                qt_QQuickItem_mapFromItem_QPointF_QQuickItem_QQuickItem_QPointF,
-                Return, "qt.QPointF", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "item", "qt.QQuickItem"),
-                new Param(c, "point", "qt.QPointF"), End),
-            new Function(c, "mapFromScene", _n_mapFromScene0, None, Compiled,
-                         qt_QQuickItem_mapFromScene_QPointF_QQuickItem_QPointF,
-                         Return, "qt.QPointF", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
+            new Function(c, "keepMouseGrab", _n_keepMouseGrab0, None, Compiled, qt_QQuickItem_keepMouseGrab_bool_QQuickItem, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "keepTouchGrab", _n_keepTouchGrab0, None, Compiled, qt_QQuickItem_keepTouchGrab_bool_QQuickItem, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "mapFromItem", _n_mapFromItem0, None, Compiled, qt_QQuickItem_mapFromItem_QPointF_QQuickItem_QQuickItem_QPointF,
+                         Return, "qt.QPointF", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "item", "qt.QQuickItem"),
                          new Param(c, "point", "qt.QPointF"), End),
-            new Function(
-                c, "mapRectFromItem", _n_mapRectFromItem0, None, Compiled,
-                qt_QQuickItem_mapRectFromItem_QRectF_QQuickItem_QQuickItem_QRectF,
-                Return, "qt.QRectF", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "item", "qt.QQuickItem"),
-                new Param(c, "rect", "qt.QRectF"), End),
-            new Function(
-                c, "mapRectFromScene", _n_mapRectFromScene0, None, Compiled,
-                qt_QQuickItem_mapRectFromScene_QRectF_QQuickItem_QRectF, Return,
-                "qt.QRectF", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "rect", "qt.QRectF"), End),
-            new Function(
-                c, "mapRectToItem", _n_mapRectToItem0, None, Compiled,
-                qt_QQuickItem_mapRectToItem_QRectF_QQuickItem_QQuickItem_QRectF,
-                Return, "qt.QRectF", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "item", "qt.QQuickItem"),
-                new Param(c, "rect", "qt.QRectF"), End),
-            new Function(
-                c, "mapRectToScene", _n_mapRectToScene0, None, Compiled,
-                qt_QQuickItem_mapRectToScene_QRectF_QQuickItem_QRectF, Return,
-                "qt.QRectF", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "rect", "qt.QRectF"), End),
-            new Function(
-                c, "mapToItem", _n_mapToItem0, None, Compiled,
-                qt_QQuickItem_mapToItem_QPointF_QQuickItem_QQuickItem_QPointF,
-                Return, "qt.QPointF", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "item", "qt.QQuickItem"),
-                new Param(c, "point", "qt.QPointF"), End),
-            new Function(c, "mapToScene", _n_mapToScene0, None, Compiled,
-                         qt_QQuickItem_mapToScene_QPointF_QQuickItem_QPointF,
-                         Return, "qt.QPointF", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
+            new Function(c, "mapFromScene", _n_mapFromScene0, None, Compiled, qt_QQuickItem_mapFromScene_QPointF_QQuickItem_QPointF, Return,
+                         "qt.QPointF", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "point", "qt.QPointF"), End),
+            new Function(c, "mapRectFromItem", _n_mapRectFromItem0, None, Compiled,
+                         qt_QQuickItem_mapRectFromItem_QRectF_QQuickItem_QQuickItem_QRectF, Return, "qt.QRectF", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "item", "qt.QQuickItem"), new Param(c, "rect", "qt.QRectF"),
+                         End),
+            new Function(c, "mapRectFromScene", _n_mapRectFromScene0, None, Compiled,
+                         qt_QQuickItem_mapRectFromScene_QRectF_QQuickItem_QRectF, Return, "qt.QRectF", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "rect", "qt.QRectF"), End),
+            new Function(c, "mapRectToItem", _n_mapRectToItem0, None, Compiled,
+                         qt_QQuickItem_mapRectToItem_QRectF_QQuickItem_QQuickItem_QRectF, Return, "qt.QRectF", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "item", "qt.QQuickItem"), new Param(c, "rect", "qt.QRectF"),
+                         End),
+            new Function(c, "mapRectToScene", _n_mapRectToScene0, None, Compiled, qt_QQuickItem_mapRectToScene_QRectF_QQuickItem_QRectF,
+                         Return, "qt.QRectF", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "rect", "qt.QRectF"), End),
+            new Function(c, "mapToItem", _n_mapToItem0, None, Compiled, qt_QQuickItem_mapToItem_QPointF_QQuickItem_QQuickItem_QPointF,
+                         Return, "qt.QPointF", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "item", "qt.QQuickItem"),
                          new Param(c, "point", "qt.QPointF"), End),
-            new Function(
-                c, "nextItemInFocusChain", _n_nextItemInFocusChain0, None,
-                Compiled,
-                qt_QQuickItem_nextItemInFocusChain_QQuickItem_QQuickItem_bool,
-                Return, "qt.QQuickItem", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "forward", "bool"), End),
+            new Function(c, "mapToScene", _n_mapToScene0, None, Compiled, qt_QQuickItem_mapToScene_QPointF_QQuickItem_QPointF, Return,
+                         "qt.QPointF", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "point", "qt.QPointF"), End),
+            new Function(c, "nextItemInFocusChain", _n_nextItemInFocusChain0, None, Compiled,
+                         qt_QQuickItem_nextItemInFocusChain_QQuickItem_QQuickItem_bool, Return, "qt.QQuickItem", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "forward", "bool"), End),
             // PROP: opacity (double; QQuickItem this)
             // PROP: parentItem (QQuickItem; QQuickItem this)
-            new Function(c, "polish", _n_polish0, None, Compiled,
-                         qt_QQuickItem_polish_void_QQuickItem, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QQuickItem"),
-                         End),
+            new Function(c, "polish", _n_polish0, None, Compiled, qt_QQuickItem_polish_void_QQuickItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), End),
             // PROP: resetAntialiasing (void; QQuickItem this)
             // PROP: resetHeight (void; QQuickItem this)
             // PROP: resetWidth (void; QQuickItem this)
             // PROP: rotation (double; QQuickItem this)
             // PROP: scale (double; QQuickItem this)
-            new Function(c, "scopedFocusItem", _n_scopedFocusItem0, None,
-                         Compiled,
-                         qt_QQuickItem_scopedFocusItem_QQuickItem_QQuickItem,
-                         Return, "qt.QQuickItem", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(
-                c, "setAcceptHoverEvents", _n_setAcceptHoverEvents0, None,
-                Compiled,
-                qt_QQuickItem_setAcceptHoverEvents_void_QQuickItem_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "enabled", "bool"), End),
-            new Function(
-                c, "setAcceptedMouseButtons", _n_setAcceptedMouseButtons0, None,
-                Compiled,
-                qt_QQuickItem_setAcceptedMouseButtons_void_QQuickItem_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "buttons", "int"), End),
+            new Function(c, "scopedFocusItem", _n_scopedFocusItem0, None, Compiled, qt_QQuickItem_scopedFocusItem_QQuickItem_QQuickItem,
+                         Return, "qt.QQuickItem", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "setAcceptHoverEvents", _n_setAcceptHoverEvents0, None, Compiled,
+                         qt_QQuickItem_setAcceptHoverEvents_void_QQuickItem_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "enabled", "bool"), End),
+            new Function(c, "setAcceptedMouseButtons", _n_setAcceptedMouseButtons0, None, Compiled,
+                         qt_QQuickItem_setAcceptedMouseButtons_void_QQuickItem_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "buttons", "int"), End),
             // PROP: setActiveFocusOnTab (void; QQuickItem this, bool _p5)
             // PROP: setAntialiasing (void; QQuickItem this, bool _p5)
             // PROP: setBaselineOffset (void; QQuickItem this, double _p6)
             // PROP: setClip (void; QQuickItem this, bool _p5)
-            new Function(c, "setCursor", _n_setCursor0, None, Compiled,
-                         qt_QQuickItem_setCursor_void_QQuickItem_QCursor,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
-                         new Param(c, "cursor", "qt.QCursor"), End),
+            new Function(c, "setCursor", _n_setCursor0, None, Compiled, qt_QQuickItem_setCursor_void_QQuickItem_QCursor, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "cursor", "qt.QCursor"), End),
             // PROP: setEnabled (void; QQuickItem this, bool _p5)
-            new Function(
-                c, "setFiltersChildMouseEvents", _n_setFiltersChildMouseEvents0,
-                None, Compiled,
-                qt_QQuickItem_setFiltersChildMouseEvents_void_QQuickItem_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "filter", "bool"), End),
-            new Function(c, "setFlag", _n_setFlag0, None, Compiled,
-                         qt_QQuickItem_setFlag_void_QQuickItem_int_bool, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
-                         new Param(c, "flag", "int"),
-                         new Param(c, "enabled", "bool"), End),
-            new Function(c, "setFlags", _n_setFlags0, None, Compiled,
-                         qt_QQuickItem_setFlags_void_QQuickItem_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
-                         new Param(c, "flags", "int"), End),
+            new Function(c, "setFiltersChildMouseEvents", _n_setFiltersChildMouseEvents0, None, Compiled,
+                         qt_QQuickItem_setFiltersChildMouseEvents_void_QQuickItem_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQuickItem"), new Param(c, "filter", "bool"), End),
+            new Function(c, "setFlag", _n_setFlag0, None, Compiled, qt_QQuickItem_setFlag_void_QQuickItem_int_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "flag", "int"), new Param(c, "enabled", "bool"),
+                         End),
+            new Function(c, "setFlags", _n_setFlags0, None, Compiled, qt_QQuickItem_setFlags_void_QQuickItem_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "flags", "int"), End),
             // PROP: setFocus (void; QQuickItem this, bool _p5)
             // PROP: setFocus (void; QQuickItem this, bool focus, flags
             // Qt::FocusReason reason) PROP: setHeight (void; QQuickItem this,
             // double _p6) PROP: setImplicitHeight (void; QQuickItem this,
             // double _p6) PROP: setImplicitWidth (void; QQuickItem this, double
             // _p6)
-            new Function(
-                c, "setKeepMouseGrab", _n_setKeepMouseGrab0, None, Compiled,
-                qt_QQuickItem_setKeepMouseGrab_void_QQuickItem_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "keep", "bool"), End),
-            new Function(
-                c, "setKeepTouchGrab", _n_setKeepTouchGrab0, None, Compiled,
-                qt_QQuickItem_setKeepTouchGrab_void_QQuickItem_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "keep", "bool"), End),
+            new Function(c, "setKeepMouseGrab", _n_setKeepMouseGrab0, None, Compiled, qt_QQuickItem_setKeepMouseGrab_void_QQuickItem_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "keep", "bool"), End),
+            new Function(c, "setKeepTouchGrab", _n_setKeepTouchGrab0, None, Compiled, qt_QQuickItem_setKeepTouchGrab_void_QQuickItem_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "keep", "bool"), End),
             // PROP: setOpacity (void; QQuickItem this, double _p6)
             // PROP: setParentItem (void; QQuickItem this, QQuickItem parent)
             // PROP: setRotation (void; QQuickItem this, double _p6)
@@ -2325,224 +1997,135 @@ namespace Mu
             // double _p6) PROP: setX (void; QQuickItem this, double _p6) PROP:
             // setY (void; QQuickItem this, double _p6) PROP: setZ (void;
             // QQuickItem this, double _p6) PROP: smooth (bool; QQuickItem this)
-            new Function(c, "stackAfter", _n_stackAfter0, None, Compiled,
-                         qt_QQuickItem_stackAfter_void_QQuickItem_QQuickItem,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
-                         new Param(c, "sibling", "qt.QQuickItem"), End),
-            new Function(c, "stackBefore", _n_stackBefore0, None, Compiled,
-                         qt_QQuickItem_stackBefore_void_QQuickItem_QQuickItem,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"),
-                         new Param(c, "sibling", "qt.QQuickItem"), End),
+            new Function(c, "stackAfter", _n_stackAfter0, None, Compiled, qt_QQuickItem_stackAfter_void_QQuickItem_QQuickItem, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "sibling", "qt.QQuickItem"), End),
+            new Function(c, "stackBefore", _n_stackBefore0, None, Compiled, qt_QQuickItem_stackBefore_void_QQuickItem_QQuickItem, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "sibling", "qt.QQuickItem"), End),
             // PROP: state (string; QQuickItem this)
             // MISSING: textureProvider ("QSGTextureProvider *"; QQuickItem
             // this) PROP: transformOrigin (flags QQuickItem::TransformOrigin;
             // QQuickItem this)
-            new Function(c, "ungrabMouse", _n_ungrabMouse0, None, Compiled,
-                         qt_QQuickItem_ungrabMouse_void_QQuickItem, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(
-                c, "ungrabTouchPoints", _n_ungrabTouchPoints0, None, Compiled,
-                qt_QQuickItem_ungrabTouchPoints_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(c, "unsetCursor", _n_unsetCursor0, None, Compiled,
-                         qt_QQuickItem_unsetCursor_void_QQuickItem, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "ungrabMouse", _n_ungrabMouse0, None, Compiled, qt_QQuickItem_ungrabMouse_void_QQuickItem, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "ungrabTouchPoints", _n_ungrabTouchPoints0, None, Compiled, qt_QQuickItem_ungrabTouchPoints_void_QQuickItem,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "unsetCursor", _n_unsetCursor0, None, Compiled, qt_QQuickItem_unsetCursor_void_QQuickItem, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
             // PROP: width (double; QQuickItem this)
             // MISSING: window ("QQuickWindow *"; QQuickItem this)
             // PROP: x (double; QQuickItem this)
             // PROP: y (double; QQuickItem this)
             // PROP: z (double; QQuickItem this)
-            _func[3] = new MemberFunction(
-                c, "childMouseEventFilter", _n_childMouseEventFilter0, None,
-                Compiled,
-                qt_QQuickItem_childMouseEventFilter_bool_QQuickItem_QQuickItem_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "item", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QQuickItem_dragEnterEvent_void_QQuickItem_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QQuickItem_dragLeaveEvent_void_QQuickItem_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QQuickItem_dragMoveEvent_void_QQuickItem_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QQuickItem_dropEvent_void_QQuickItem_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QQuickItem_focusInEvent_void_QQuickItem_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QQuickItem_focusOutEvent_void_QQuickItem_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "geometryChanged", _n_geometryChanged0, None, Compiled,
-                qt_QQuickItem_geometryChanged_void_QQuickItem_QRectF_QRectF,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "newGeometry", "qt.QRectF"),
-                new Param(c, "oldGeometry", "qt.QRectF"), End),
-            new Function(c, "heightValid", _n_heightValid0, None, Compiled,
-                         qt_QQuickItem_heightValid_bool_QQuickItem, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            _func[11] = new MemberFunction(
-                c, "hoverEnterEvent", _n_hoverEnterEvent0, None, Compiled,
-                qt_QQuickItem_hoverEnterEvent_void_QQuickItem_QHoverEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QHoverEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "hoverLeaveEvent", _n_hoverLeaveEvent0, None, Compiled,
-                qt_QQuickItem_hoverLeaveEvent_void_QQuickItem_QHoverEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QHoverEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "hoverMoveEvent", _n_hoverMoveEvent0, None, Compiled,
-                qt_QQuickItem_hoverMoveEvent_void_QQuickItem_QHoverEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QHoverEvent"), End),
+            _func[3] = new MemberFunction(c, "childMouseEventFilter", _n_childMouseEventFilter0, None, Compiled,
+                                          qt_QQuickItem_childMouseEventFilter_bool_QQuickItem_QQuickItem_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "item", "qt.QQuickItem"),
+                                          new Param(c, "event", "qt.QEvent"), End),
+            _func[4] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                          qt_QQuickItem_dragEnterEvent_void_QQuickItem_QDragEnterEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[5] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                          qt_QQuickItem_dragLeaveEvent_void_QQuickItem_QDragLeaveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[6] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                          qt_QQuickItem_dragMoveEvent_void_QQuickItem_QDragMoveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[7] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled, qt_QQuickItem_dropEvent_void_QQuickItem_QDropEvent,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
+                                          new Param(c, "event", "qt.QDropEvent"), End),
+            _func[8] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QQuickItem_focusInEvent_void_QQuickItem_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[9] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                          qt_QQuickItem_focusOutEvent_void_QQuickItem_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[10] = new MemberFunction(c, "geometryChanged", _n_geometryChanged0, None, Compiled,
+                                           qt_QQuickItem_geometryChanged_void_QQuickItem_QRectF_QRectF, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "newGeometry", "qt.QRectF"),
+                                           new Param(c, "oldGeometry", "qt.QRectF"), End),
+            new Function(c, "heightValid", _n_heightValid0, None, Compiled, qt_QQuickItem_heightValid_bool_QQuickItem, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[11] = new MemberFunction(c, "hoverEnterEvent", _n_hoverEnterEvent0, None, Compiled,
+                                           qt_QQuickItem_hoverEnterEvent_void_QQuickItem_QHoverEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QHoverEvent"), End),
+            _func[12] = new MemberFunction(c, "hoverLeaveEvent", _n_hoverLeaveEvent0, None, Compiled,
+                                           qt_QQuickItem_hoverLeaveEvent_void_QQuickItem_QHoverEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QHoverEvent"), End),
+            _func[13] = new MemberFunction(c, "hoverMoveEvent", _n_hoverMoveEvent0, None, Compiled,
+                                           qt_QQuickItem_hoverMoveEvent_void_QQuickItem_QHoverEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QHoverEvent"), End),
             // MISSING: inputMethodEvent (void; QQuickItem this,
             // "QInputMethodEvent *" event) // protected
-            new Function(c, "isComponentComplete", _n_isComponentComplete0,
-                         None, Compiled,
-                         qt_QQuickItem_isComponentComplete_bool_QQuickItem,
-                         Return, "bool", Parameters,
+            new Function(c, "isComponentComplete", _n_isComponentComplete0, None, Compiled,
+                         qt_QQuickItem_isComponentComplete_bool_QQuickItem, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QQuickItem"), End),
             // MISSING: itemChange (void; QQuickItem this, flags
             // QQuickItem::ItemChange change, "const ItemChangeData &" value) //
             // protected
-            _func[14] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QQuickItem_keyPressEvent_void_QQuickItem_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QQuickItem_keyReleaseEvent_void_QQuickItem_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QQuickItem_mouseDoubleClickEvent_void_QQuickItem_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QQuickItem_mouseMoveEvent_void_QQuickItem_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QQuickItem_mousePressEvent_void_QQuickItem_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QQuickItem_mouseReleaseEvent_void_QQuickItem_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "mouseUngrabEvent", _n_mouseUngrabEvent0, None, Compiled,
-                qt_QQuickItem_mouseUngrabEvent_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            _func[21] = new MemberFunction(
-                c, "releaseResources", _n_releaseResources0, None, Compiled,
-                qt_QQuickItem_releaseResources_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[14] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QQuickItem_keyPressEvent_void_QQuickItem_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[15] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QQuickItem_keyReleaseEvent_void_QQuickItem_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[16] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QQuickItem_mouseDoubleClickEvent_void_QQuickItem_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[17] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QQuickItem_mouseMoveEvent_void_QQuickItem_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[18] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QQuickItem_mousePressEvent_void_QQuickItem_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[19] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QQuickItem_mouseReleaseEvent_void_QQuickItem_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[20] = new MemberFunction(c, "mouseUngrabEvent", _n_mouseUngrabEvent0, None, Compiled,
+                                           qt_QQuickItem_mouseUngrabEvent_void_QQuickItem, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), End),
+            _func[21] = new MemberFunction(c, "releaseResources", _n_releaseResources0, None, Compiled,
+                                           qt_QQuickItem_releaseResources_void_QQuickItem, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), End),
             // MISSING: touchEvent (void; QQuickItem this, "QTouchEvent *"
             // event) // protected
-            _func[22] = new MemberFunction(
-                c, "touchUngrabEvent", _n_touchUngrabEvent0, None, Compiled,
-                qt_QQuickItem_touchUngrabEvent_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            new Function(
-                c, "updateInputMethod", _n_updateInputMethod0, None, Compiled,
-                qt_QQuickItem_updateInputMethod_void_QQuickItem_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "queries", "int", Value((int)Qt::ImQueryInput)),
-                End),
+            _func[22] = new MemberFunction(c, "touchUngrabEvent", _n_touchUngrabEvent0, None, Compiled,
+                                           qt_QQuickItem_touchUngrabEvent_void_QQuickItem, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), End),
+            new Function(c, "updateInputMethod", _n_updateInputMethod0, None, Compiled, qt_QQuickItem_updateInputMethod_void_QQuickItem_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
+                         new Param(c, "queries", "int", Value((int)Qt::ImQueryInput)), End),
             // MISSING: updatePaintNode ("QSGNode *"; QQuickItem this, "QSGNode
             // *" oldNode, "UpdatePaintNodeData *" updatePaintNodeData) //
             // protected
-            _func[23] = new MemberFunction(
-                c, "updatePolish", _n_updatePolish0, None, Compiled,
-                qt_QQuickItem_updatePolish_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            _func[24] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QQuickItem_wheelEvent_void_QQuickItem_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
-            new Function(c, "widthValid", _n_widthValid0, None, Compiled,
-                         qt_QQuickItem_widthValid_bool_QQuickItem, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QQuickItem"), End),
-            _func[25] = new MemberFunction(
-                c, "classBegin", _n_classBegin0, None, Compiled,
-                qt_QQuickItem_classBegin_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            _func[26] = new MemberFunction(
-                c, "componentComplete", _n_componentComplete0, None, Compiled,
-                qt_QQuickItem_componentComplete_void_QQuickItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QQuickItem"), End),
-            _func[27] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QQuickItem_event_bool_QQuickItem_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QQuickItem_eventFilter_bool_QQuickItem_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[23] = new MemberFunction(c, "updatePolish", _n_updatePolish0, None, Compiled, qt_QQuickItem_updatePolish_void_QQuickItem,
+                                           Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[24] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QQuickItem_wheelEvent_void_QQuickItem_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QWheelEvent"), End),
+            new Function(c, "widthValid", _n_widthValid0, None, Compiled, qt_QQuickItem_widthValid_bool_QQuickItem, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[25] = new MemberFunction(c, "classBegin", _n_classBegin0, None, Compiled, qt_QQuickItem_classBegin_void_QQuickItem,
+                                           Return, "void", Parameters, new Param(c, "this", "qt.QQuickItem"), End),
+            _func[26] = new MemberFunction(c, "componentComplete", _n_componentComplete0, None, Compiled,
+                                           qt_QQuickItem_componentComplete_void_QQuickItem, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), End),
+            _func[27] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QQuickItem_event_bool_QQuickItem_QEvent, Return,
+                                           "bool", Parameters, new Param(c, "this", "qt.QQuickItem"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[28] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                           qt_QQuickItem_eventFilter_bool_QQuickItem_QObject_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "watched", "qt.QObject"),
+                                           new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QQuickItem this)
             // MISSING: childEvent (void; QQuickItem this, "QChildEvent *"
             // event) // protected MISSING: connectNotify (void; QQuickItem
             // this, "const QMetaMethod &" signal) // protected
-            _func[29] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QQuickItem_customEvent_void_QQuickItem_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[29] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                           qt_QQuickItem_customEvent_void_QQuickItem_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QQuickItem this, "const
             // QMetaMethod &" signal) // protected
-            _func[30] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QQuickItem_timerEvent_void_QQuickItem_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQuickItem"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[30] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QQuickItem_timerEvent_void_QQuickItem_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QQuickItem"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

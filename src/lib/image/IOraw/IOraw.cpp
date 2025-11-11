@@ -34,8 +34,7 @@ namespace
             Vec2f blue = TwkMath::Chromaticities<float>::AdobeRGB().blue;
             Vec2f white = TwkMath::Chromaticities<float>::AdobeRGB().white;
 
-            fb->setPrimaries(white[0], white[1], red[0], red[1], green[0],
-                             green[1], blue[0], blue[1]);
+            fb->setPrimaries(white[0], white[1], red[0], red[1], green[0], green[1], blue[0], blue[1]);
         }
         else
         {
@@ -46,8 +45,7 @@ namespace
             Vec2f blue = TwkMath::Chromaticities<float>::sRGB().blue;
             Vec2f white = TwkMath::Chromaticities<float>::sRGB().white;
 
-            fb->setPrimaries(white[0], white[1], red[0], red[1], green[0],
-                             green[1], blue[0], blue[1]);
+            fb->setPrimaries(white[0], white[1], red[0], red[1], green[0], green[1], blue[0], blue[1]);
         }
 
         fb->setTransferFunction(TwkFB::ColorSpace::Linear());
@@ -56,9 +54,7 @@ namespace
         // Pull metadata from the file
         ostringstream value;
 
-        value << ip->imgdata.color.pre_mul[0] << ", "
-              << ip->imgdata.color.pre_mul[1] << ", "
-              << ip->imgdata.color.pre_mul[2] << ", "
+        value << ip->imgdata.color.pre_mul[0] << ", " << ip->imgdata.color.pre_mul[1] << ", " << ip->imgdata.color.pre_mul[2] << ", "
               << ip->imgdata.color.pre_mul[3];
         fb->newAttribute("WhiteBalance", value.str());
         value.clear();
@@ -74,8 +70,7 @@ namespace
         value.clear();
         value.str("");
 
-        value << "1/" << truncateFloat(1.0f / ip->imgdata.other.shutter)
-              << " secs";
+        value << "1/" << truncateFloat(1.0f / ip->imgdata.other.shutter) << " secs";
         fb->newAttribute("Shutter", value.str());
         value.clear();
         value.str("");
@@ -97,8 +92,7 @@ namespace
 
         time_t tt = static_cast<time_t>(ip->imgdata.other.timestamp);
         boost::posix_time::ptime pt = boost::posix_time::from_time_t(tt);
-        boost::local_time::time_zone_ptr zone(
-            new boost::local_time::posix_time_zone("UTC"));
+        boost::local_time::time_zone_ptr zone(new boost::local_time::posix_time_zone("UTC"));
         boost::local_time::local_date_time ldt_with_zone(pt, zone);
         value << ldt_with_zone;
         fb->newAttribute("Created", value.str());
@@ -116,10 +110,7 @@ namespace TwkFB
         // Assign the number of threads. Use -1 for auto threads.
         //
 
-        m_threadCount =
-            (threads == -1)
-                ? (int)floor(0.75 * std::thread::hardware_concurrency() + 0.5)
-                : threads;
+        m_threadCount = (threads == -1) ? (int)floor(0.75 * std::thread::hardware_concurrency() + 0.5) : threads;
 
         //
         // Look for a user specified scaling factor and color space primaries.
@@ -176,8 +167,7 @@ namespace TwkFB
         return str.str();
     }
 
-    void IOraw::readImage(FrameBuffer& fb, const std::string& filename,
-                          const ReadRequest& request) const
+    void IOraw::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         //
         // Initialize the libraw image processor with the desired number of
@@ -190,14 +180,12 @@ namespace TwkFB
         // Default options to use with dcraw
         //
 
-        iProcessor.imgdata.params.no_auto_bright = 1; // '-W'
-        iProcessor.imgdata.params.use_camera_wb = 1;  // '-w'
-        iProcessor.imgdata.params.output_bps = 16;    // '-8' need '-9'
-        iProcessor.imgdata.params.output_color =
-            (m_primaries == "AdobeRGB") ? 2 : 1; // '-o 1'
-        iProcessor.imgdata.params.adjust_maximum_thr =
-            0; // This is LibRAW-ism;
-               // the prevent maximum adjust on a preframe basis.
+        iProcessor.imgdata.params.no_auto_bright = 1;                                 // '-W'
+        iProcessor.imgdata.params.use_camera_wb = 1;                                  // '-w'
+        iProcessor.imgdata.params.output_bps = 16;                                    // '-8' need '-9'
+        iProcessor.imgdata.params.output_color = (m_primaries == "AdobeRGB") ? 2 : 1; // '-o 1'
+        iProcessor.imgdata.params.adjust_maximum_thr = 0;                             // This is LibRAW-ism;
+                                                                                      // the prevent maximum adjust on a preframe basis.
 
         //
         // Set for linear data output
@@ -228,10 +216,8 @@ namespace TwkFB
 
         if (scale_factor == -1.0)
         {
-            double max01 = max(iProcessor.imgdata.color.pre_mul[0],
-                               iProcessor.imgdata.color.pre_mul[1]);
-            double max23 = max(iProcessor.imgdata.color.pre_mul[2],
-                               iProcessor.imgdata.color.pre_mul[3]);
+            double max01 = max(iProcessor.imgdata.color.pre_mul[0], iProcessor.imgdata.color.pre_mul[1]);
+            double max23 = max(iProcessor.imgdata.color.pre_mul[2], iProcessor.imgdata.color.pre_mul[3]);
             scale_factor = max(max01, max23);
 
             //
@@ -293,8 +279,7 @@ namespace TwkFB
             planeNames.push_back("G");
             planeNames.push_back("B");
 
-            fb.restructurePlanar(width, height, full, full, planeNames,
-                                 FrameBuffer::USHORT, FrameBuffer::BOTTOMLEFT,
+            fb.restructurePlanar(width, height, full, full, planeNames, FrameBuffer::USHORT, FrameBuffer::BOTTOMLEFT,
                                  1); //  1 channel per plane.
 
             unsigned short* u16Buffer = new unsigned short[width * height * 3];
@@ -339,8 +324,7 @@ namespace TwkFB
         setFBAttributes(&info.proxy, &iProcessor, m_primaries);
 
         int bps;
-        iProcessor.get_mem_image_format(&info.width, &info.height,
-                                        &info.numChannels, &bps);
+        iProcessor.get_mem_image_format(&info.width, &info.height, &info.numChannels, &bps);
         info.dataType = FrameBuffer::USHORT;
         info.orientation = FrameBuffer::TOPLEFT;
 

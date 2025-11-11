@@ -26,8 +26,7 @@ namespace AJADevices
 {
     using namespace std;
 
-    AJAModule::AJAModule(NativeDisplayPtr p, unsigned int appID,
-                         OperationMode mode)
+    AJAModule::AJAModule(NativeDisplayPtr p, unsigned int appID, OperationMode mode)
         : VideoModule()
         , m_mode(mode)
         , m_appID(appID)
@@ -42,17 +41,13 @@ namespace AJADevices
 
     AJAModule::~AJAModule() { close(); }
 
-    string AJAModule::name() const
-    {
-        return m_mode == OperationMode::SimpleMode ? "AJA (Control Panel)"
-                                                   : "AJA";
-    }
+    string AJAModule::name() const { return m_mode == OperationMode::SimpleMode ? "AJA (Control Panel)" : "AJA"; }
 
     string AJAModule::SDKIdentifier() const
     {
         ostringstream str;
-        str << "AJA NTV2 SDK Version " << AJA_NTV2_SDK_VERSION_MAJOR << "."
-            << AJA_NTV2_SDK_VERSION_MINOR << "." << AJA_NTV2_SDK_VERSION_POINT;
+        str << "AJA NTV2 SDK Version " << AJA_NTV2_SDK_VERSION_MAJOR << "." << AJA_NTV2_SDK_VERSION_MINOR << "."
+            << AJA_NTV2_SDK_VERSION_POINT;
         return str.str();
     }
 
@@ -70,9 +65,8 @@ namespace AJADevices
 
         while (CNTV2DeviceScanner::GetDeviceAtIndex(deviceIndex, device))
         {
-            auto konaVideoDevice = std::make_unique<KonaVideoDevice>(
-                this, device.GetDisplayName(), deviceIndex, m_appID,
-                static_cast<KonaVideoDevice::OperationMode>(m_mode));
+            auto konaVideoDevice = std::make_unique<KonaVideoDevice>(this, device.GetDisplayName(), deviceIndex, m_appID,
+                                                                     static_cast<KonaVideoDevice::OperationMode>(m_mode));
 
             m_devices.push_back(konaVideoDevice.release());
 
@@ -84,9 +78,7 @@ namespace AJADevices
         if (error != GLEW_OK)
         {
             std::string message = "AJA: GLEW initialization failed: ";
-            throw std::runtime_error(
-                message
-                + reinterpret_cast<const char*>(glewGetErrorString(error)));
+            throw std::runtime_error(message + reinterpret_cast<const char*>(glewGetErrorString(error)));
         }
 #endif
     }

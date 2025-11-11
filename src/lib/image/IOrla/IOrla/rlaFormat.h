@@ -67,9 +67,7 @@ namespace TwkFB
         void conformByteOrder();
     };
 
-    unsigned char* rlaDecodeScanline(unsigned char* input,
-                                     unsigned char* output, int xFile,
-                                     int xImage, int stride);
+    unsigned char* rlaDecodeScanline(unsigned char* input, unsigned char* output, int xFile, int xImage, int stride);
 
     // *****************************************************************************
     // Stuff for reading Discreet's poorly implemented and RLA "extensions"
@@ -121,10 +119,8 @@ namespace TwkFB
 
         TwkMath::Mat44f asMat44() const
         {
-            return TwkMath::Mat44f(m[0][0], m[0][1], m[0][2], 0.0f, m[1][0],
-                                   m[1][1], m[1][2], 0.0f, m[2][0], m[2][1],
-                                   m[2][2], 0.0f, m[3][0], m[3][1], m[3][2],
-                                   1.0f);
+            return TwkMath::Mat44f(m[0][0], m[0][1], m[0][2], 0.0f, m[1][0], m[1][1], m[1][2], 0.0f, m[2][0], m[2][1], m[2][2], 0.0f,
+                                   m[3][0], m[3][1], m[3][2], 1.0f);
         }
     };
 

@@ -99,15 +99,9 @@ namespace TwkApp
 
         BindingMap::const_iterator end() const { return m_map.end(); }
 
-        RegExBindings::const_iterator beginRegex() const
-        {
-            return m_reBindings.begin();
-        }
+        RegExBindings::const_iterator beginRegex() const { return m_reBindings.begin(); }
 
-        RegExBindings::const_iterator endRegex() const
-        {
-            return m_reBindings.end();
-        }
+        RegExBindings::const_iterator endRegex() const { return m_reBindings.end(); }
 
         //
         //  Mode access

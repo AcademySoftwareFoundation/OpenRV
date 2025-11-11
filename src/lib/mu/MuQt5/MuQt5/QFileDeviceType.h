@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFileDeviceType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QFileDeviceType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QFileDeviceType();
 
@@ -87,11 +86,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QFileDeviceType::cachedInstance(const QFileDeviceType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QFileDeviceType::cachedInstance(const QFileDeviceType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

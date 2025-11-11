@@ -24,10 +24,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorHighlightIPNode::ColorHighlightIPNode(const std::string& name,
-                                               const NodeDefinition* def,
-                                               IPGraph* graph,
-                                               GroupIPNode* group)
+    ColorHighlightIPNode::ColorHighlightIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -36,8 +33,7 @@ namespace IPCore
         info->setPersistent(false);
 
         m_active = declareProperty<IntProperty>("color.active", 1);
-        m_colorHighlight =
-            declareProperty<FloatProperty>("color.highlight", 0.0f);
+        m_colorHighlight = declareProperty<FloatProperty>("color.highlight", 0.0f);
     }
 
     ColorHighlightIPNode::~ColorHighlightIPNode() {}
@@ -91,22 +87,17 @@ namespace IPCore
             Mat44f mInv = m.inverted();
 
             Vec4f coeff;
-            coeff[0] =
-                mInv[0][0] * 1 + mInv[0][1] * up + mInv[0][2] * highlightPoint;
-            coeff[1] =
-                mInv[1][0] * 1 + mInv[1][1] * up + mInv[1][2] * highlightPoint;
-            coeff[2] =
-                mInv[2][0] * 1 + mInv[2][1] * up + mInv[2][2] * highlightPoint;
-            coeff[3] =
-                mInv[3][0] * 1 + mInv[3][1] * up + mInv[3][2] * highlightPoint;
+            coeff[0] = mInv[0][0] * 1 + mInv[0][1] * up + mInv[0][2] * highlightPoint;
+            coeff[1] = mInv[1][0] * 1 + mInv[1][1] * up + mInv[1][2] * highlightPoint;
+            coeff[2] = mInv[2][0] * 1 + mInv[2][1] * up + mInv[2][2] * highlightPoint;
+            coeff[3] = mInv[3][0] * 1 + mInv[3][1] * up + mInv[3][2] * highlightPoint;
 
             coeff[0] += mInv[0][3];
             coeff[1] += mInv[1][3];
             coeff[2] += mInv[2][3];
             coeff[3] += mInv[3][3];
 
-            img->shaderExpr = Shader::newColorHighlightonY(
-                img->shaderExpr, coeff, highlightPoint);
+            img->shaderExpr = Shader::newColorHighlightonY(img->shaderExpr, coeff, highlightPoint);
 
             img->shaderExpr = Shader::newColorYCbCrSRGB(img->shaderExpr);
         }

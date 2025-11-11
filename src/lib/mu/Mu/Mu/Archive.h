@@ -235,8 +235,7 @@ namespace Mu
             //  context.h
             //
 
-            void collectSymbolsFromFile(Name filename, SymbolVector&,
-                                        bool userOnly = true) const;
+            void collectSymbolsFromFile(Name filename, SymbolVector&, bool userOnly = true) const;
 
             void collectPrimarySymbols(const Symbol* root, SymbolVector&) const;
             void collectAllPrimarySymbols(SymbolVector&) const;
@@ -296,34 +295,23 @@ namespace Mu
             void writeHeader(std::ostream&);
             void writeNameTable(std::ostream&);
             void writeRequiredModules(std::ostream&);
-            void writePartialDeclarations(std::ostream&, const Symbol*,
-                                          bool root = false);
+            void writePartialDeclarations(std::ostream&, const Symbol*, bool root = false);
             void writePartialChildDeclarations(std::ostream&, const Symbol*);
-            void writeFullDeclarations(std::ostream&, const Symbol*,
-                                       bool root = false);
+            void writeFullDeclarations(std::ostream&, const Symbol*, bool root = false);
             void writeChildDeclarations(std::ostream&, const Symbol*);
             void writeDerivedTypes(std::ostream&);
 
-            void writePartialVariantDeclaration(std::ostream&,
-                                                const VariantType*);
-            void writePartialVariantTagDeclaration(std::ostream&,
-                                                   const VariantTagType*);
+            void writePartialVariantDeclaration(std::ostream&, const VariantType*);
+            void writePartialVariantTagDeclaration(std::ostream&, const VariantTagType*);
             void writePartialClassDeclaration(std::ostream&, const Class*);
             void writePartialAliasDeclaration(std::ostream&, const Alias*);
             void writePartialModuleDeclaration(std::ostream&, const Module*);
-            void writePartialFunctionDeclaration(std::ostream&,
-                                                 const Function*);
-            void writePartialNamespaceDeclaration(std::ostream&,
-                                                  const Namespace*);
-            void writePartialStackDeclaration(std::ostream&,
-                                              const StackVariable*);
-            void writePartialGlobalDeclaration(std::ostream&,
-                                               const GlobalVariable*);
-            void writePartialMemberVariableDeclaration(std::ostream&,
-                                                       const MemberVariable*);
-            void
-            writePartialSymbolicConstantDeclaration(std::ostream&,
-                                                    const SymbolicConstant*);
+            void writePartialFunctionDeclaration(std::ostream&, const Function*);
+            void writePartialNamespaceDeclaration(std::ostream&, const Namespace*);
+            void writePartialStackDeclaration(std::ostream&, const StackVariable*);
+            void writePartialGlobalDeclaration(std::ostream&, const GlobalVariable*);
+            void writePartialMemberVariableDeclaration(std::ostream&, const MemberVariable*);
+            void writePartialSymbolicConstantDeclaration(std::ostream&, const SymbolicConstant*);
 
             void writeClassDeclaration(std::ostream&, const Class*);
             void writeAliasDeclaration(std::ostream&, const Alias*);
@@ -333,8 +321,7 @@ namespace Mu
             void writeStackDeclaration(std::ostream&, const StackVariable*);
             void writeGlobalDeclaration(std::ostream&, const GlobalVariable*);
             void writeVariantDeclaration(std::ostream&, const VariantType*);
-            void writeVariantTagDeclaration(std::ostream&,
-                                            const VariantTagType*);
+            void writeVariantTagDeclaration(std::ostream&, const VariantTagType*);
 
             size_t writeObjects(std::ostream&);
             void writeExpression(std::ostream&, const Node*);
@@ -342,8 +329,7 @@ namespace Mu
 
             void collectRecursive(const Symbol*);
 
-            void writeSymbolDocumentation(std::ostream&, const Symbol*,
-                                          Object*);
+            void writeSymbolDocumentation(std::ostream&, const Symbol*, Object*);
 
         private:
             Process* _process;
@@ -413,10 +399,7 @@ namespace Mu
 
             void setDebugOutput(bool b) { _debugOutput = b; }
 
-            bool hasAnnotation() const
-            {
-                return _header.flags & Header::AnnotationFlag;
-            }
+            bool hasAnnotation() const { return _header.flags & Header::AnnotationFlag; }
 
             const Objects& read(std::istream&);
 
@@ -428,10 +411,7 @@ namespace Mu
 
             const NameVector& nameTable() const { return _nameTable; }
 
-            const NameVector& requiredModules() const
-            {
-                return _requiredModules;
-            }
+            const NameVector& requiredModules() const { return _requiredModules; }
 
             const Modules& modules() const { return _modules; }
 

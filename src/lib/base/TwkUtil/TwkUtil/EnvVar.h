@@ -29,10 +29,9 @@ namespace TwkUtil
 
     // Use the following for global and static EnvVar variables.
 
-#define ENVVAR_STRING(T, V, D)                                                 \
-    TwkUtil::EnvVar<std::string> T = {{V, false, 0, 0}, D, 0, false};          \
-    static TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq, __LINE__)( \
-        __FILE__, T)
+#define ENVVAR_STRING(T, V, D)                                        \
+    TwkUtil::EnvVar<std::string> T = {{V, false, 0, 0}, D, 0, false}; \
+    static TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
 #ifdef INTERNAL
 #define ENVVAR_STRING_INTERNAL ENVVAR_STRING
@@ -46,8 +45,7 @@ namespace TwkUtil
 
 #define ENVVAR_BOOL(T, V, D)                                   \
     TwkUtil::EnvVar<bool> T = {{V, false, 0, 0}, D, D, false}; \
-    static TwkUtil::RegEnvVar<bool> ENVVAR_CONCAT(evRegUniq,   \
-                                                  __LINE__)(__FILE__, T)
+    static TwkUtil::RegEnvVar<bool> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
 #ifdef INTERNAL
 #define ENVVAR_BOOL_INTERNAL ENVVAR_BOOL
@@ -61,8 +59,7 @@ namespace TwkUtil
 
 #define ENVVAR_INT(T, V, D)                                   \
     TwkUtil::EnvVar<int> T = {{V, false, 0, 0}, D, D, false}; \
-    static TwkUtil::RegEnvVar<int> ENVVAR_CONCAT(evRegUniq,   \
-                                                 __LINE__)(__FILE__, T)
+    static TwkUtil::RegEnvVar<int> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
 #ifdef INTERNAL
 #define ENVVAR_INT_INTERNAL ENVVAR_INT
@@ -76,8 +73,7 @@ namespace TwkUtil
 
 #define ENVVAR_FLOAT(T, V, D)                                   \
     TwkUtil::EnvVar<float> T = {{V, false, 0, 0}, D, D, false}; \
-    static TwkUtil::RegEnvVar<float> ENVVAR_CONCAT(evRegUniq,   \
-                                                   __LINE__)(__FILE__, T)
+    static TwkUtil::RegEnvVar<float> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
 #ifdef INTERNAL
 #define ENVVAR_FLOAT_INTERNAL ENVVAR_FLOAT
@@ -93,8 +89,7 @@ namespace TwkUtil
 
 #define ONSTACK_ENVVAR_STRING(T, V, D)                                \
     TwkUtil::EnvVar<std::string> T = {{V, false, 0, 0}, D, 0, false}; \
-    TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq,          \
-                                                  __LINE__)(__FILE__, T)
+    TwkUtil::RegEnvVar<std::string> ENVVAR_CONCAT(evRegUniq, __LINE__)(__FILE__, T)
 
 #define ONSTACK_ENVVAR_BOOL(T, V, D)                           \
     TwkUtil::EnvVar<bool> T = {{V, false, 0, 0}, D, D, false}; \
@@ -161,9 +156,7 @@ namespace TwkUtil
         const char* getName() const;
 
         // Set a callback
-        void setChangeValueCallback(
-            ChangeValueCallBackFunctionDef changeValueFunctionCallback,
-            void* changeValueCallbackParameter);
+        void setChangeValueCallback(ChangeValueCallBackFunctionDef changeValueFunctionCallback, void* changeValueCallbackParameter);
 
         // Called when the value of this envVar change, invoke the callback
         // function if it have been set.
@@ -221,8 +214,7 @@ namespace TwkUtil
         const char* getName() const;
 
         // Set a callback
-        void setChangeValueCallback(BaseEnvVar::ChangeValueCallBackFunctionDef
-                                        changeValueFunctionCallback,
+        void setChangeValueCallback(BaseEnvVar::ChangeValueCallBackFunctionDef changeValueFunctionCallback,
                                     void* changeValueCallbackParameter);
 
         // Called when the value of this envVar change, invoke the callback
@@ -407,8 +399,7 @@ namespace TwkUtil
 
         virtual BaseRegEnvVar* getEnvVar(int i) const = 0;
 
-        virtual std::vector<int> search(const char* searchStr, int searchType,
-                                        bool exact) = 0;
+        virtual std::vector<int> search(const char* searchStr, int searchType, bool exact) = 0;
 
         virtual int getNumElements() const = 0;
 

@@ -23,17 +23,14 @@ namespace TwkUtil
         namespace bai = boost::archive::iterators;
         stringstream os;
 
-        typedef bai::base64_from_binary<bai::transform_width<const char*, 6, 8>>
-            base64_enc;
+        typedef bai::base64_from_binary<bai::transform_width<const char*, 6, 8>> base64_enc;
 
-        copy(base64_enc(data), base64_enc(data + size),
-             ostream_iterator<char>(os));
+        copy(base64_enc(data), base64_enc(data + size), ostream_iterator<char>(os));
 
         return os.str();
     }
 
-    string id64Encode(const char* data, size_t size, char t62, char t63,
-                      char pad)
+    string id64Encode(const char* data, size_t size, char t62, char t63, char pad)
     {
         string x = base64Encode(data, size);
 
@@ -54,14 +51,12 @@ namespace TwkUtil
     {
         data.clear();
         namespace bai = boost::archive::iterators;
-        typedef bai::transform_width<bai::binary_from_base64<const char*>, 8, 6>
-            base64_dec;
+        typedef bai::transform_width<bai::binary_from_base64<const char*>, 8, 6> base64_dec;
 
         copy(base64_dec(c), base64_dec(c + size), back_inserter(data));
     }
 
-    void id64Decode(const char* c, size_t size, vector<char>& data, char t62,
-                    char t63, char pad)
+    void id64Decode(const char* c, size_t size, vector<char>& data, char t62, char t63, char pad)
     {
         vector<char> buffer(size);
         copy(c, c + size, buffer.begin());

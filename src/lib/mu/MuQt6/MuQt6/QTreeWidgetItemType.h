@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTreeWidgetItemType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QTreeWidgetItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTreeWidgetItemType();
 
         //

@@ -32,9 +32,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    YCToRGBIPNode::YCToRGBIPNode(const std::string& name,
-                                 const NodeDefinition* def, IPGraph* graph,
-                                 GroupIPNode* group)
+    YCToRGBIPNode::YCToRGBIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_conversionName(0)
         , m_active(0)
@@ -48,20 +46,15 @@ namespace IPCore
         //  do that.
         //
 
-        PropertyInfo* info = new PropertyInfo(
-            PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit, 1);
+        PropertyInfo* info = new PropertyInfo(PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit, 1);
 
         m_active = declareProperty<IntProperty>("node.active", 1);
-        m_conversionName = declareProperty<StringProperty>(
-            "color.YUVconversion", "File", info);
+        m_conversionName = declareProperty<StringProperty>("color.YUVconversion", "File", info);
     }
 
     YCToRGBIPNode::~YCToRGBIPNode() {}
 
-    void YCToRGBIPNode::setConversion(const std::string& s)
-    {
-        setProperty(m_conversionName, s);
-    }
+    void YCToRGBIPNode::setConversion(const std::string& s) { setProperty(m_conversionName, s); }
 
     IPImage* YCToRGBIPNode::evaluate(const Context& context)
     {
@@ -76,8 +69,7 @@ namespace IPCore
         string conversion = propertyValue(m_conversionName, "File");
 
         if (fb
-            && (fb->isYUV() || fb->isYUVPlanar() || fb->isYUVBiPlanar()
-                || fb->dataType() == TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
+            && (fb->isYUV() || fb->isYUVPlanar() || fb->isYUVBiPlanar() || fb->dataType() == TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
                 || fb->dataType() == TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
             && conversion != "File")
         {
@@ -127,8 +119,7 @@ namespace IPCore
                 // leave it
             }
 
-            if (colorName != ""
-                && (colorName != fb->conversion() || rangeName != fb->range()))
+            if (colorName != "" && (colorName != fb->conversion() || rangeName != fb->range()))
             {
                 Mat44f M;
                 TwkFB::getYUVtoRGBMatrix(M, colorName, rangeName);

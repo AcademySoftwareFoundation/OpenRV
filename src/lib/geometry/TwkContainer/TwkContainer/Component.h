@@ -86,11 +86,9 @@ namespace TwkContainer
         //	Will return an existing component.
         //
 
-        Component* createComponent(const std::string& fullname,
-                                   bool synchronized = false);
+        Component* createComponent(const std::string& fullname, bool synchronized = false);
 
-        Component* createComponent(NameIterator i, NameIterator end,
-                                   bool synchronized = false);
+        Component* createComponent(NameIterator i, NameIterator end, bool synchronized = false);
 
         //
         //	Property management
@@ -191,16 +189,9 @@ namespace TwkContainer
 
     //----------------------------------------------------------------------
 
-    template <class T> inline T* Component::property(const std::string& name)
-    {
-        return dynamic_cast<T*>(find(name));
-    }
+    template <class T> inline T* Component::property(const std::string& name) { return dynamic_cast<T*>(find(name)); }
 
-    template <class T>
-    inline const T* Component::property(const std::string& name) const
-    {
-        return dynamic_cast<const T*>(find(name));
-    }
+    template <class T> inline const T* Component::property(const std::string& name) const { return dynamic_cast<const T*>(find(name)); }
 
 } // namespace TwkContainer
 

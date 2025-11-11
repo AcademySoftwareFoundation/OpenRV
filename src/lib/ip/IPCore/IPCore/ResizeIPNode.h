@@ -25,8 +25,7 @@ namespace IPCore
     class ResizeIPNode : public IPNode
     {
     public:
-        ResizeIPNode(const std::string& name, const NodeDefinition* def,
-                     IPGraph* graph, GroupIPNode* group = 0);
+        ResizeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ResizeIPNode();
         virtual IPImage* evaluate(const Context&);

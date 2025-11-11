@@ -20,10 +20,7 @@ namespace IPCore
 
         struct CompareExpr
         {
-            bool operator()(const Expression* A, const Expression* B) const
-            {
-                return A->lessThan(B);
-            }
+            bool operator()(const Expression* A, const Expression* B) const { return A->lessThan(B); }
         };
 
         //
@@ -114,8 +111,7 @@ namespace IPCore
 
             struct LocalFunction
             {
-                LocalFunction(const std::string& n, const std::string& gid,
-                              const Expression* r, bool e = true)
+                LocalFunction(const std::string& n, const std::string& gid, const Expression* r, bool e = true)
                     : name(n)
                     , graphID(gid)
                     , root(r)
@@ -168,8 +164,7 @@ namespace IPCore
             void releaseCompiledState();
             bool validate() const;
 
-            void bind(const Expression*, const TextureUnitAssignments&,
-                      const TwkMath::Vec2f&) const;
+            void bind(const Expression*, const TextureUnitAssignments&, const TwkMath::Vec2f&) const;
 
             const GraphIDSet& outputSTSet() const { return m_outputSTSet; }
 
@@ -177,9 +172,7 @@ namespace IPCore
 
         private:
             void collectSymbolNames(const Expression*, size_t);
-            void bind2(size_t&, const Expression*, const Expression*,
-                       const TextureUnitAssignments&,
-                       const TwkMath::Vec2f&) const;
+            void bind2(size_t&, const Expression*, const Expression*, const TextureUnitAssignments&, const TwkMath::Vec2f&) const;
 
             std::string recursiveOutputExpr(const Expression*, bool);
 
@@ -213,8 +206,7 @@ namespace IPCore
             ProgramCache();
             ~ProgramCache();
 
-            typedef std::map<const Expression*, Program*, CompareExpr>
-                ProgramCacheMap;
+            typedef std::map<const Expression*, Program*, CompareExpr> ProgramCacheMap;
             typedef std::vector<Function*> FunctionVector;
 
             //

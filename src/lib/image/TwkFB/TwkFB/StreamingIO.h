@@ -32,9 +32,7 @@ namespace TwkFB
             AsyncUnbufferedIO
         };
 
-        StreamingFrameBufferIO(const std::string& identifier,
-                               const std::string& sortKey,
-                               IOType type = StandardIO,
+        StreamingFrameBufferIO(const std::string& identifier, const std::string& sortKey, IOType type = StandardIO,
                                size_t chunkSize = 61440, int maxAsync = 16)
             : FrameBufferIO(identifier, sortKey)
             , m_iotype(type)

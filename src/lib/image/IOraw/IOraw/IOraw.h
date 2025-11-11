@@ -17,20 +17,17 @@ namespace TwkFB
     class IOraw : public FrameBufferIO
     {
     public:
-        IOraw(int threads, double scale, std::string primaries,
-              bool bruteForce);
+        IOraw(int threads, double scale, std::string primaries, bool bruteForce);
         virtual ~IOraw();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
 
         //    virtual void writeImage(const FrameBuffer& img,
         //                            const std::string& filename,
         //                            const WriteRequest& request) const;
 
         virtual std::string about() const;
-        virtual void getImageInfo(const std::string& filename,
-                                  FBInfo& info) const;
+        virtual void getImageInfo(const std::string& filename, FBInfo& info) const;
 
     private:
         int m_threadCount;

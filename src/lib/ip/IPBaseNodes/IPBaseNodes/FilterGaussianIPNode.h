@@ -17,8 +17,7 @@ namespace IPCore
     class FilterGaussianIPNode : public IPNode
     {
     public:
-        FilterGaussianIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group = 0);
+        FilterGaussianIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~FilterGaussianIPNode();
 

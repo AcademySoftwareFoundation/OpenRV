@@ -83,10 +83,7 @@ namespace Mu
         _argv = NULL;
     }
 
-    const Type* Node::type() const
-    {
-        return _symbol ? _symbol->nodeReturnType(this) : 0;
-    }
+    const Type* Node::type() const { return _symbol ? _symbol->nodeReturnType(this) : 0; }
 
     size_t Node::numArgs() const
     {
@@ -142,10 +139,7 @@ Node::setArgs(Node *arg1, ...)
     void Node::setArg(Node* arg, int index) { _argv[index] = arg; }
 
 #ifdef MU_FUNCTION_UNION
-    const Value Node::eval(Thread& t) const
-    {
-        return type()->nodeEval(this, t);
-    }
+    const Value Node::eval(Thread& t) const { return type()->nodeEval(this, t); }
 #endif
 
     void Node::markChangeEnd()
@@ -180,9 +174,7 @@ Node::setArgs(Node *arg1, ...)
     {
     }
 
-    AnnotatedNode::AnnotatedNode(int numArgs, NodeFunc F, const Symbol* s,
-                                 unsigned short linenum, unsigned short charnum,
-                                 Name file)
+    AnnotatedNode::AnnotatedNode(int numArgs, NodeFunc F, const Symbol* s, unsigned short linenum, unsigned short charnum, Name file)
 
         : Node(numArgs, F, s)
         , _line(linenum)

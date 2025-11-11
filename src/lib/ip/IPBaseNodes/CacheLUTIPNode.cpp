@@ -23,9 +23,7 @@ namespace IPCore
     using namespace TwkMath;
     using namespace TwkFB;
 
-    CacheLUTIPNode::CacheLUTIPNode(const std::string& name,
-                                   const NodeDefinition* def, IPGraph* g,
-                                   GroupIPNode* group)
+    CacheLUTIPNode::CacheLUTIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : LUTIPNode(name, def, g, group)
     {
         m_useHalfLUTProp = false;
@@ -36,8 +34,7 @@ namespace IPCore
 
     CacheLUTIPNode::~CacheLUTIPNode() {}
 
-    static void applyLUT(const float* inp, float* outp, int channels,
-                         int nelements, void* inlut)
+    static void applyLUT(const float* inp, float* outp, int channels, int nelements, void* inlut)
     {
         FrameBuffer* lut = (FrameBuffer*)inlut;
 
@@ -73,8 +70,7 @@ namespace IPCore
             }
             catch (...)
             {
-                cout << "ERROR: caught exception from channelLUTTransform"
-                     << endl;
+                cout << "ERROR: caught exception from channelLUTTransform" << endl;
             }
 
             if (lut2d->hasAttribute("scale"))
@@ -82,8 +78,7 @@ namespace IPCore
                 float scale = lut->attribute<float>("scale");
                 float offset = lut->attribute<float>("offset");
 
-                IPImage::Matrix M(scale, 0, 0, offset, 0, scale, 0, offset, 0,
-                                  0, scale, offset, 0, 0, 0, 1);
+                IPImage::Matrix M(scale, 0, 0, offset, 0, scale, 0, offset, 0, 0, scale, offset, 0, 0, 0, 1);
 
                 if (M != IPImage::Matrix())
                     linearColorTransform(inp, outp, channels, nelements, &M);
@@ -99,8 +94,7 @@ namespace IPCore
                 float scale = lut->attribute<float>("scale");
                 float offset = lut->attribute<float>("offset");
 
-                IPImage::Matrix M(scale, 0, 0, offset, 0, scale, 0, offset, 0,
-                                  0, scale, offset, 0, 0, 0, 1);
+                IPImage::Matrix M(scale, 0, 0, offset, 0, scale, 0, offset, 0, 0, scale, offset, 0, 0, 0, 1);
 
                 if (M != IPImage::Matrix())
                     linearColorTransform(inp, outp, channels, nelements, &M);
@@ -130,9 +124,7 @@ namespace IPCore
         {
             if (FrameBuffer* fb = i->fb)
             {
-                if (fb->isPlanar() || fb->isYRYBY() || fb->isYUV()
-                    || fb->dataType()
-                           > TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10)
+                if (fb->isPlanar() || fb->isYRYBY() || fb->isYUV() || fb->dataType() > TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10)
                 {
                     FrameBuffer* nfb = convertToLinearRGB709(fb);
                     delete fb;

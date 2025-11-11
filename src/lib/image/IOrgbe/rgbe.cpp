@@ -77,8 +77,7 @@ namespace TwkFB
 
     /* standard conversion from float pixels to rgbe pixels */
     /* note: you can remove the "inline"s if your compiler complains about it */
-    void IOrgbe::float2rgbe(unsigned char rgbe[4], float red, float green,
-                            float blue) const
+    void IOrgbe::float2rgbe(unsigned char rgbe[4], float red, float green, float blue) const
     {
         float v;
         int e;
@@ -105,8 +104,7 @@ namespace TwkFB
     /* standard conversion from rgbe to float pixels */
     /* note: Ward uses ldexp(col+0.5,exp-(128+8)).  However we wanted pixels */
     /*       in the range [0,1] to map back into the range [0,1].            */
-    void IOrgbe::rgbe2float(float* red, float* green, float* blue,
-                            unsigned char rgbe[4]) const
+    void IOrgbe::rgbe2float(float* red, float* green, float* blue, unsigned char rgbe[4]) const
     {
         float f;
 
@@ -122,8 +120,7 @@ namespace TwkFB
     }
 
     /* default minimal header. modify if you want more information in header */
-    int IOrgbe::RGBE_WriteHeader(FILE* fp, int width, int height,
-                                 rgbe_header_info* info) const
+    int IOrgbe::RGBE_WriteHeader(FILE* fp, int width, int height, rgbe_header_info* info) const
     {
         char* programtype = (char*)"RGBE";
 
@@ -149,8 +146,7 @@ namespace TwkFB
         return RGBE_RETURN_SUCCESS;
     }
 
-    int IOrgbe::RGBE_ReadHeader(FILE* fp, int* width, int* height,
-                                rgbe_header_info* info, bool silent) const
+    int IOrgbe::RGBE_ReadHeader(FILE* fp, int* width, int* height, rgbe_header_info* info, bool silent) const
     {
         if (info)
         {
@@ -247,8 +243,7 @@ namespace TwkFB
     }
 
     /* minimal header reading.  modify if you want to parse more information */
-    int IOrgbe::RGBE_ReadHeader_OLD(FILE* fp, int* width, int* height,
-                                    rgbe_header_info* info, bool silent) const
+    int IOrgbe::RGBE_ReadHeader_OLD(FILE* fp, int* width, int* height, rgbe_header_info* info, bool silent) const
     {
         char buf[128];
         int found_format;
@@ -286,8 +281,7 @@ namespace TwkFB
         for (;;)
         {
             if ((buf[0] == 0) || (buf[0] == '\n'))
-                return rgbe_error(rgbe_format_error,
-                                  (char*)"no FORMAT specifier found", silent);
+                return rgbe_error(rgbe_format_error, (char*)"no FORMAT specifier found", silent);
             else if (strcmp(buf, (char*)"FORMAT=32-bit_rle_rgbe\n") == 0)
                 break; /* format found so break out of loop */
             else if (info && (sscanf(buf, "GAMMA=%g", &tempf) == 1))
@@ -306,14 +300,11 @@ namespace TwkFB
         if (fgets(buf, sizeof(buf) / sizeof(buf[0]), fp) == 0)
             return rgbe_error(rgbe_read_error, NULL, silent);
         if (strcmp(buf, "\n") != 0)
-            return rgbe_error(
-                rgbe_format_error,
-                (char*)"missing blank line after FORMAT specifier", silent);
+            return rgbe_error(rgbe_format_error, (char*)"missing blank line after FORMAT specifier", silent);
         if (fgets(buf, sizeof(buf) / sizeof(buf[0]), fp) == 0)
             return rgbe_error(rgbe_read_error, NULL, silent);
         if (sscanf(buf, "-Y %d +X %d", height, width) < 2)
-            return rgbe_error(rgbe_format_error,
-                              (char*)"missing image size specifier", silent);
+            return rgbe_error(rgbe_format_error, (char*)"missing image size specifier", silent);
         return RGBE_RETURN_SUCCESS;
     }
 
@@ -326,8 +317,7 @@ namespace TwkFB
 
         while (numpixels-- > 0)
         {
-            float2rgbe(rgbe, data[RGBE_DATA_RED], data[RGBE_DATA_GREEN],
-                       data[RGBE_DATA_BLUE]);
+            float2rgbe(rgbe, data[RGBE_DATA_RED], data[RGBE_DATA_GREEN], data[RGBE_DATA_BLUE]);
             data += RGBE_DATA_SIZE;
             if (fwrite(rgbe, sizeof(rgbe), 1, fp) < 1)
                 return rgbe_error(rgbe_write_error, NULL);
@@ -344,8 +334,7 @@ namespace TwkFB
         {
             if (fread(rgbe, sizeof(rgbe), 1, fp) < 1)
                 return rgbe_error(rgbe_read_error, NULL);
-            rgbe2float(&data[RGBE_DATA_RED], &data[RGBE_DATA_GREEN],
-                       &data[RGBE_DATA_BLUE], rgbe);
+            rgbe2float(&data[RGBE_DATA_RED], &data[RGBE_DATA_GREEN], &data[RGBE_DATA_BLUE], rgbe);
             data += RGBE_DATA_SIZE;
         }
         return RGBE_RETURN_SUCCESS;
@@ -356,8 +345,7 @@ namespace TwkFB
     /* save some space.  For each scanline, each channel (r,g,b,e) is */
     /* encoded separately for better compression. */
 
-    int IOrgbe::RGBE_WriteBytes_RLE(FILE* fp, unsigned char* data,
-                                    int numbytes) const
+    int IOrgbe::RGBE_WriteBytes_RLE(FILE* fp, unsigned char* data, int numbytes) const
     {
 #define MINRUNLENGTH 4
         int cur, beg_run, run_count, old_run_count, nonrun_count;
@@ -374,8 +362,7 @@ namespace TwkFB
                 beg_run += run_count;
                 old_run_count = run_count;
                 run_count = 1;
-                while ((data[beg_run] == data[beg_run + run_count])
-                       && (beg_run + run_count < numbytes) && (run_count < 127))
+                while ((data[beg_run] == data[beg_run + run_count]) && (beg_run + run_count < numbytes) && (run_count < 127))
                     run_count++;
             }
             /* if data before next big run is a short run then write it as such
@@ -397,8 +384,7 @@ namespace TwkFB
                 buf[0] = nonrun_count;
                 if (fwrite(buf, sizeof(buf[0]), 1, fp) < 1)
                     return rgbe_error(rgbe_write_error, NULL);
-                if (fwrite(&data[cur], sizeof(data[0]) * nonrun_count, 1, fp)
-                    < 1)
+                if (fwrite(&data[cur], sizeof(data[0]) * nonrun_count, 1, fp) < 1)
                     return rgbe_error(rgbe_write_error, NULL);
                 cur += nonrun_count;
             }
@@ -416,8 +402,7 @@ namespace TwkFB
 #undef MINRUNLENGTH
     }
 
-    int IOrgbe::RGBE_WritePixels_RLE(FILE* fp, float* data, int scanline_width,
-                                     int num_scanlines) const
+    int IOrgbe::RGBE_WritePixels_RLE(FILE* fp, float* data, int scanline_width, int num_scanlines) const
     {
         unsigned char rgbe[4];
         unsigned char* buffer;
@@ -426,8 +411,7 @@ namespace TwkFB
         if ((scanline_width < 8) || (scanline_width > 0x7fff))
             /* run length encoding is not allowed so write flat*/
             return RGBE_WritePixels(fp, data, scanline_width * num_scanlines);
-        buffer =
-            (unsigned char*)malloc(sizeof(unsigned char) * 4 * scanline_width);
+        buffer = (unsigned char*)malloc(sizeof(unsigned char) * 4 * scanline_width);
         if (buffer == NULL)
             /* no buffer space so write flat */
             return RGBE_WritePixels(fp, data, scanline_width * num_scanlines);
@@ -444,8 +428,7 @@ namespace TwkFB
             }
             for (i = 0; i < scanline_width; i++)
             {
-                float2rgbe(rgbe, data[RGBE_DATA_RED], data[RGBE_DATA_GREEN],
-                           data[RGBE_DATA_BLUE]);
+                float2rgbe(rgbe, data[RGBE_DATA_RED], data[RGBE_DATA_GREEN], data[RGBE_DATA_BLUE]);
                 buffer[i] = rgbe[0];
                 buffer[i + scanline_width] = rgbe[1];
                 buffer[i + 2 * scanline_width] = rgbe[2];
@@ -457,9 +440,7 @@ namespace TwkFB
             /* first red, then green, then blue, then exponent */
             for (i = 0; i < 4; i++)
             {
-                if ((err = RGBE_WriteBytes_RLE(fp, &buffer[i * scanline_width],
-                                               scanline_width))
-                    != RGBE_RETURN_SUCCESS)
+                if ((err = RGBE_WriteBytes_RLE(fp, &buffer[i * scanline_width], scanline_width)) != RGBE_RETURN_SUCCESS)
                 {
                     free(buffer);
                     return err;
@@ -470,8 +451,7 @@ namespace TwkFB
         return RGBE_RETURN_SUCCESS;
     }
 
-    int IOrgbe::RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width,
-                                    int num_scanlines) const
+    int IOrgbe::RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width, int num_scanlines) const
     {
         unsigned char rgbe[4], *scanline_buffer, *ptr, *ptr_end;
         int i, count;
@@ -495,21 +475,17 @@ namespace TwkFB
                 rgbe2float(&data[0], &data[1], &data[2], rgbe);
                 data += RGBE_DATA_SIZE;
                 free(scanline_buffer);
-                return RGBE_ReadPixels(fp, data,
-                                       scanline_width * num_scanlines - 1);
+                return RGBE_ReadPixels(fp, data, scanline_width * num_scanlines - 1);
             }
             if ((((int)rgbe[2]) << 8 | rgbe[3]) != scanline_width)
             {
                 free(scanline_buffer);
-                return rgbe_error(rgbe_format_error,
-                                  (char*)"wrong scanline width");
+                return rgbe_error(rgbe_format_error, (char*)"wrong scanline width");
             }
             if (scanline_buffer == NULL)
-                scanline_buffer = (unsigned char*)malloc(sizeof(unsigned char)
-                                                         * 4 * scanline_width);
+                scanline_buffer = (unsigned char*)malloc(sizeof(unsigned char) * 4 * scanline_width);
             if (scanline_buffer == NULL)
-                return rgbe_error(rgbe_memory_error,
-                                  (char*)"unable to allocate buffer space");
+                return rgbe_error(rgbe_memory_error, (char*)"unable to allocate buffer space");
 
             ptr = &scanline_buffer[0];
             /* read each of the four channels for the scanline into the buffer
@@ -531,8 +507,7 @@ namespace TwkFB
                         if ((count == 0) || (count > ptr_end - ptr))
                         {
                             free(scanline_buffer);
-                            return rgbe_error(rgbe_format_error,
-                                              (char*)"bad scanline data");
+                            return rgbe_error(rgbe_format_error, (char*)"bad scanline data");
                         }
                         while (count-- > 0)
                             *ptr++ = buf[1];
@@ -544,8 +519,7 @@ namespace TwkFB
                         if ((count == 0) || (count > ptr_end - ptr))
                         {
                             free(scanline_buffer);
-                            return rgbe_error(rgbe_format_error,
-                                              (char*)"bad scanline data");
+                            return rgbe_error(rgbe_format_error, (char*)"bad scanline data");
                         }
                         *ptr++ = buf[1];
                         if (--count > 0)
@@ -567,8 +541,7 @@ namespace TwkFB
                 rgbe[1] = scanline_buffer[i + scanline_width];
                 rgbe[2] = scanline_buffer[i + 2 * scanline_width];
                 rgbe[3] = scanline_buffer[i + 3 * scanline_width];
-                rgbe2float(&data[RGBE_DATA_RED], &data[RGBE_DATA_GREEN],
-                           &data[RGBE_DATA_BLUE], rgbe);
+                rgbe2float(&data[RGBE_DATA_RED], &data[RGBE_DATA_GREEN], &data[RGBE_DATA_BLUE], rgbe);
                 data += RGBE_DATA_SIZE;
             }
             num_scanlines--;

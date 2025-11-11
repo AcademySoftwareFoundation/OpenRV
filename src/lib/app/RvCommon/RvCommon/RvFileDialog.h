@@ -63,9 +63,7 @@ namespace Rv
             SaveFileRole
         };
 
-        RvFileDialog(QWidget* parent, FileTypeTraits*, Role role,
-                     Qt::WindowFlags flags = Qt::Sheet,
-                     QString settingsGroup = "FileDialog");
+        RvFileDialog(QWidget* parent, FileTypeTraits*, Role role, Qt::WindowFlags flags = Qt::Sheet, QString settingsGroup = "FileDialog");
 
         virtual ~RvFileDialog();
 
@@ -108,8 +106,7 @@ namespace Rv
         void viewComboChanged(int);
         void sortComboChanged(int);
 
-        void columnSelectionChanged(const QItemSelection&,
-                                    const QItemSelection&);
+        void columnSelectionChanged(const QItemSelection&, const QItemSelection&);
         void columnUpdatePreview(const QModelIndex&);
 
         void treeSelectionChanged(const QItemSelection&, const QItemSelection&);

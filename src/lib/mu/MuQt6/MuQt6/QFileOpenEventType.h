@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFileOpenEventType(Context* context, const char* name,
-                           Class* superClass = 0);
+        QFileOpenEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QFileOpenEventType();
 
         //

@@ -20,10 +20,7 @@ namespace Rv
     using namespace TwkQtChat;
     using namespace std;
 
-    Connection* StreamConnection::connectionFactory(QObject* obj, bool pingpong)
-    {
-        return new StreamConnection(obj, pingpong);
-    }
+    Connection* StreamConnection::connectionFactory(QObject* obj, bool pingpong) { return new StreamConnection(obj, pingpong); }
 
 #define STREAM_CONNECTION_MAGIC_NUMBER 312967
 #define STREAM_CONNECTION_VERSION 1
@@ -53,8 +50,7 @@ namespace Rv
         QString fileName(baseDir.c_str());
 
 #ifdef PLATFORM_WINDOWS
-        fileName.append(
-            QString("/rv-network-stream-%1").arg((unsigned __int64)this));
+        fileName.append(QString("/rv-network-stream-%1").arg((unsigned __int64)this));
 #else
         fileName.append(QString("/rv-network-stream-%1").arg(uint64_t(this)));
 #endif
@@ -63,15 +59,13 @@ namespace Rv
 
         if (!m_streamFile->open(QIODevice::WriteOnly))
         {
-            cerr << "ERROR: storeStream cannot open file '"
-                 << UTF8::qconvert(fileName) << endl;
+            cerr << "ERROR: storeStream cannot open file '" << UTF8::qconvert(fileName) << endl;
             return;
         }
 
         m_streamDataStream = new QDataStream(m_streamFile);
 
-        *m_streamDataStream << int(STREAM_CONNECTION_MAGIC_NUMBER)
-                            << int(STREAM_CONNECTION_VERSION);
+        *m_streamDataStream << int(STREAM_CONNECTION_MAGIC_NUMBER) << int(STREAM_CONNECTION_VERSION);
         m_streamFile->flush();
 
         m_eventTimer.start();
@@ -79,8 +73,7 @@ namespace Rv
         m_streamState = StoringState;
     }
 
-    static int validateStreamConnection(QDataStream* stream,
-                                        const string& fileName, bool verbose)
+    static int validateStreamConnection(QDataStream* stream, const string& fileName, bool verbose)
     {
         int magic;
         *stream >> magic;
@@ -88,8 +81,7 @@ namespace Rv
             cerr << "stream magic: " << magic << endl;
         if (magic != STREAM_CONNECTION_MAGIC_NUMBER)
         {
-            cerr << "ERROR: file '" << fileName
-                 << "' is not an RV StreamConnection file." << endl;
+            cerr << "ERROR: file '" << fileName << "' is not an RV StreamConnection file." << endl;
             return 0;
         }
 
@@ -99,9 +91,7 @@ namespace Rv
             cerr << "stream version: " << version << endl;
         if (version != STREAM_CONNECTION_VERSION)
         {
-            cerr << "ERROR: file '" << fileName
-                 << "': unknown RV StreamConnection version: " << version
-                 << endl;
+            cerr << "ERROR: file '" << fileName << "': unknown RV StreamConnection version: " << version << endl;
             return 0;
         }
 
@@ -114,8 +104,7 @@ namespace Rv
         m_streamFile->open(QIODevice::ReadOnly);
         m_streamDataStream = new QDataStream(m_streamFile);
 
-        int version =
-            validateStreamConnection(m_streamDataStream, fileName, true);
+        int version = validateStreamConnection(m_streamDataStream, fileName, true);
         if (version == 0)
             return;
 
@@ -131,15 +120,12 @@ namespace Rv
             {
             case MessageItemType:
                 *m_streamDataStream >> currentMessage;
-                cerr << "message " << m_currentTime << " '"
-                     << UTF8::qconvert(currentMessage) << "'" << endl;
+                cerr << "message " << m_currentTime << " '" << UTF8::qconvert(currentMessage) << "'" << endl;
                 break;
 
             case DataItemType:
                 *m_streamDataStream >> m_currentTime >> currentData;
-                cerr << "data " << m_currentTime << " '"
-                     << UTF8::qconvert(currentInterp)
-                     << "', bytes: " << currentData.size() << endl;
+                cerr << "data " << m_currentTime << " '" << UTF8::qconvert(currentInterp) << "', bytes: " << currentData.size() << endl;
                 break;
             }
         }
@@ -162,11 +148,8 @@ namespace Rv
             *m_streamDataStream >> currentMessage;
             if (m_verbose)
             {
-                diff = 1000.0
-                       * (m_timeScale * m_currentTime
-                          - float(m_eventTimer.elapsed()));
-                cerr << "message " << m_currentTime << " (diff " << diff
-                     << ") '" << UTF8::qconvert(currentMessage) << "'" << endl;
+                diff = 1000.0 * (m_timeScale * m_currentTime - float(m_eventTimer.elapsed()));
+                cerr << "message " << m_currentTime << " (diff " << diff << ") '" << UTF8::qconvert(currentMessage) << "'" << endl;
             }
             emit newMessage(remoteContactName(), currentMessage);
             break;
@@ -175,11 +158,8 @@ namespace Rv
             *m_streamDataStream >> currentInterp >> currentData;
             if (m_verbose)
             {
-                diff = 1000.0
-                       * (m_timeScale * m_currentTime
-                          - float(m_eventTimer.elapsed()));
-                cerr << "data " << m_currentTime << " (diff " << diff << ") '"
-                     << UTF8::qconvert(currentInterp)
+                diff = 1000.0 * (m_timeScale * m_currentTime - float(m_eventTimer.elapsed()));
+                cerr << "data " << m_currentTime << " (diff " << diff << ") '" << UTF8::qconvert(currentInterp)
                      << "', bytes: " << currentData.size() << endl;
             }
             emit newData(remoteContactName(), currentInterp, currentData);
@@ -202,8 +182,7 @@ namespace Rv
         }
         else
         {
-            float diff =
-                m_timeScale * m_currentTime - float(m_eventTimer.elapsed());
+            float diff = m_timeScale * m_currentTime - float(m_eventTimer.elapsed());
 
             //
             //  If we're "behind" handle the next event immediately, otherwise
@@ -227,8 +206,7 @@ namespace Rv
         m_streamFile = new QFile(fileName.c_str());
         if (!m_streamFile->open(QIODevice::ReadOnly))
         {
-            cerr << "ERROR: can't open network stream file '" << fileName << "'"
-                 << endl;
+            cerr << "ERROR: can't open network stream file '" << fileName << "'" << endl;
             return false;
         }
 
@@ -237,15 +215,13 @@ namespace Rv
 
         m_streamDataStream = new QDataStream(m_streamFile);
 
-        int version =
-            validateStreamConnection(m_streamDataStream, fileName, verbose);
+        int version = validateStreamConnection(m_streamDataStream, fileName, verbose);
         if (version == 0)
         {
             return false;
         }
 
-        connect(&m_intervalTimer, SIGNAL(timeout()), this,
-                SLOT(handleNextEvent()));
+        connect(&m_intervalTimer, SIGNAL(timeout()), this, SLOT(handleNextEvent()));
 
         m_streamState = SpoofingState;
 
@@ -274,8 +250,7 @@ namespace Rv
     {
         if (m_streamState == StoringState)
         {
-            *m_streamDataStream << float(m_eventTimer.elapsed())
-                                << int(MessageItemType) << message;
+            *m_streamDataStream << float(m_eventTimer.elapsed()) << int(MessageItemType) << message;
             m_streamFile->flush();
         }
         else if (m_streamState == SpoofingState)
@@ -285,13 +260,11 @@ namespace Rv
         return Connection::sendMessage(message);
     }
 
-    bool StreamConnection::sendData(const QString& interp,
-                                    const QByteArray& data)
+    bool StreamConnection::sendData(const QString& interp, const QByteArray& data)
     {
         if (m_streamState == StoringState)
         {
-            *m_streamDataStream << float(m_eventTimer.elapsed())
-                                << int(DataItemType) << interp << data;
+            *m_streamDataStream << float(m_eventTimer.elapsed()) << int(DataItemType) << interp << data;
             m_streamFile->flush();
         }
         else if (m_streamState == SpoofingState)

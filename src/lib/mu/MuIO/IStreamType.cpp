@@ -45,10 +45,7 @@ namespace Mu
 
     Object* IStreamType::newObject() const { return new IStream(this); }
 
-    void IStreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<IStreamType::IStream*>(obj);
-    }
+    void IStreamType::deleteObject(Object* obj) const { delete static_cast<IStreamType::IStream*>(obj); }
 
     void IStreamType::load()
     {
@@ -68,55 +65,41 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "istream&", this),
 
-                      new Function(c, "istream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "istream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
-        addSymbols(
-            new Function(c, "getc", IStreamType::sgetc, None, Return, tn, End),
+        addSymbols(new Function(c, "getc", IStreamType::sgetc, None, Return, tn, End),
 
-            new Function(c, "gets", IStreamType::gets, None, Return, "string",
-                         Args, tn, "string", End),
+                   new Function(c, "gets", IStreamType::gets, None, Return, "string", Args, tn, "string", End),
 
-            new Function(c, "read", IStreamType::read, None, Return, "byte",
-                         Args, tn, End),
+                   new Function(c, "read", IStreamType::read, None, Return, "byte", Args, tn, End),
 
-            new Function(c, "read", IStreamType::readBytes, None, Return, "int",
-                         Args, tn, "byte[]", "int", End),
+                   new Function(c, "read", IStreamType::readBytes, None, Return, "int", Args, tn, "byte[]", "int", End),
 
-            new Function(c, "seekg", IStreamType::seek, None, Return, tn, Args,
-                         tn, "int", End),
+                   new Function(c, "seekg", IStreamType::seek, None, Return, tn, Args, tn, "int", End),
 
-            new Function(c, "seekg", IStreamType::seek2, None, Return, tn, Args,
-                         tn, "int", "int", End),
+                   new Function(c, "seekg", IStreamType::seek2, None, Return, tn, Args, tn, "int", "int", End),
 
-            new Function(c, "tellg", IStreamType::tell, None, Return, "int",
-                         Args, tn, End),
+                   new Function(c, "tellg", IStreamType::tell, None, Return, "int", Args, tn, End),
 
-            new Function(c, "gcount", IStreamType::count, None, Return, "int",
-                         Args, tn, End),
+                   new Function(c, "gcount", IStreamType::count, None, Return, "int", Args, tn, End),
 
-            new Function(c, "putback", IStreamType::putback, None, Return, tn,
-                         Args, tn, "int", End),
+                   new Function(c, "putback", IStreamType::putback, None, Return, tn, Args, tn, "int", End),
 
-            new Function(c, "unget", IStreamType::unget, None, Return, tn, Args,
-                         tn, End),
+                   new Function(c, "unget", IStreamType::unget, None, Return, tn, Args, tn, End),
 
-            new Function(c, "in_avail", IStreamType::in_avail, None, Return,
-                         "int", Args, tn, End),
+                   new Function(c, "in_avail", IStreamType::in_avail, None, Return, "int", Args, tn, End),
 
-            EndArguments);
+                   EndArguments);
     }
 
     NODE_IMPLEMENTATION(IStreamType::sgetc, char)

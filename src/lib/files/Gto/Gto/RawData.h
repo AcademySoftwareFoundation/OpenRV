@@ -32,22 +32,18 @@ namespace Gto
         //  These are deprecated constructors from v3
         //
 
-        Property(const std::string& n, const std::string& i, Gto::DataType t,
-                 size_t s, size_t w, bool allocate = false);
+        Property(const std::string& n, const std::string& i, Gto::DataType t, size_t s, size_t w, bool allocate = false);
 
-        Property(const std::string& n, Gto::DataType t, size_t s, size_t w,
-                 bool allocate = false);
+        Property(const std::string& n, Gto::DataType t, size_t s, size_t w, bool allocate = false);
 
         //
         //  New constructors take all three dimensions
         //
 
-        Property(const std::string& n, const std::string& fn,
-                 const std::string& i, Gto::DataType t, size_t s,
-                 const Dimensions& d, bool allocate = false);
+        Property(const std::string& n, const std::string& fn, const std::string& i, Gto::DataType t, size_t s, const Dimensions& d,
+                 bool allocate = false);
 
-        Property(const std::string& n, const std::string& fn, Gto::DataType t,
-                 size_t s, const Dimensions& d, bool allocate = false);
+        Property(const std::string& n, const std::string& fn, Gto::DataType t, size_t s, const Dimensions& d, bool allocate = false);
 
         ~Property();
 
@@ -165,18 +161,12 @@ namespace Gto
         RawDataBase* dataBase() { return m_dataBase; }
 
     protected:
-        virtual Request object(const std::string& name,
-                               const std::string& protocol,
-                               unsigned int protocolVersion,
+        virtual Request object(const std::string& name, const std::string& protocol, unsigned int protocolVersion,
                                const ObjectInfo& header);
 
-        virtual Request component(const std::string& name,
-                                  const std::string& interp,
-                                  const ComponentInfo& header);
+        virtual Request component(const std::string& name, const std::string& interp, const ComponentInfo& header);
 
-        virtual Request property(const std::string& name,
-                                 const std::string& interp,
-                                 const PropertyInfo& header);
+        virtual Request property(const std::string& name, const std::string& interp, const PropertyInfo& header);
 
         virtual void* data(const PropertyInfo&, size_t bytes);
         virtual void dataRead(const PropertyInfo&);
@@ -202,13 +192,9 @@ namespace Gto
         {
         }
 
-        bool write(const char* filename, const RawDataBase&,
-                   Writer::FileType type = Writer::CompressedGTO);
+        bool write(const char* filename, const RawDataBase&, Writer::FileType type = Writer::CompressedGTO);
 
-        bool write(const char* f, const RawDataBase& db, bool c)
-        {
-            return write(f, db, c ? Writer::CompressedGTO : Writer::BinaryGTO);
-        }
+        bool write(const char* f, const RawDataBase& db, bool c) { return write(f, db, c ? Writer::CompressedGTO : Writer::BinaryGTO); }
 
         void close() { m_writer.close(); }
 

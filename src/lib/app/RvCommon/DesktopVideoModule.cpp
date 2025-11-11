@@ -31,12 +31,10 @@ namespace Rv
 
     static bool useQtOnDarwinArm() { return true; }
 
-    DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np,
-                                           QTGLVideoDevice* shareDevice)
+    DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np, QTGLVideoDevice* shareDevice)
         : VideoModule()
     {
-        m_devices =
-            DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice);
+        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice);
     }
 
     DesktopVideoModule::~DesktopVideoModule() {}
@@ -49,8 +47,7 @@ namespace Rv
 
     bool DesktopVideoModule::isOpen() const { return true; }
 
-    TwkApp::VideoDevice* DesktopVideoModule::deviceFromPosition(int x,
-                                                                int y) const
+    TwkApp::VideoDevice* DesktopVideoModule::deviceFromPosition(int x, int y) const
     {
         TwkApp::VideoDevice* device = 0;
 
@@ -68,8 +65,7 @@ namespace Rv
                     //
                     TwkApp::VideoDevice* d = m_devices[i];
 
-                    if (DesktopVideoDevice* dd =
-                            dynamic_cast<DesktopVideoDevice*>(d))
+                    if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(d))
                     {
                         if (dd->qtScreen() == screen)
                         {

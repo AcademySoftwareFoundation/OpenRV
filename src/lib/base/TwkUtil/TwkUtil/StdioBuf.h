@@ -25,14 +25,9 @@ namespace TwkUtil
         virtual int uflow();
         virtual int pbackfail(int c = EOF);
         virtual int sync();
-        virtual std::streampos
-        seekoff(std::streamoff off, std::ios_base::seekdir way,
-                std::ios_base::openmode which = std::ios_base::in
-                                                | std::ios_base::out);
-        virtual std::streampos
-        seekpos(std::streampos sp,
-                std::ios_base::openmode which = std::ios_base::in
-                                                | std::ios_base::out);
+        virtual std::streampos seekoff(std::streamoff off, std::ios_base::seekdir way,
+                                       std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+        virtual std::streampos seekpos(std::streampos sp, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
 
     private:
         FILE* m_file;

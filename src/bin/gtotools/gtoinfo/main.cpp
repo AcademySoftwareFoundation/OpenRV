@@ -55,16 +55,12 @@ public:
 
     virtual void descriptionComplete();
 
-    virtual Request object(const std::string& name, const std::string& protocol,
-                           unsigned int protocolVersion,
+    virtual Request object(const std::string& name, const std::string& protocol, unsigned int protocolVersion,
                            const Gto::Reader::ObjectInfo& header);
 
-    virtual Request component(const std::string& name,
-                              const std::string& interp,
-                              const Gto::Reader::ComponentInfo& header);
+    virtual Request component(const std::string& name, const std::string& interp, const Gto::Reader::ComponentInfo& header);
 
-    virtual Request property(const std::string& name, const std::string& interp,
-                             const Gto::Reader::PropertyInfo& header);
+    virtual Request property(const std::string& name, const std::string& interp, const Gto::Reader::PropertyInfo& header);
 
     virtual void* data(const PropertyInfo&, size_t bytes);
     virtual void dataRead(const PropertyInfo&);
@@ -75,11 +71,9 @@ public:
 
     virtual void data(const PropertyInfo&, const int*, size_t numItems);
 
-    virtual void data(const PropertyInfo&, const unsigned short*,
-                      size_t numItems);
+    virtual void data(const PropertyInfo&, const unsigned short*, size_t numItems);
 
-    virtual void data(const PropertyInfo&, const unsigned char*,
-                      size_t numItems);
+    virtual void data(const PropertyInfo&, const unsigned char*, size_t numItems);
 
     virtual void data(const PropertyInfo&, bool);
 };
@@ -98,8 +92,7 @@ void Reader::headerOutput(const Gto::Reader::PropertyInfo& pinfo)
         m_objectName = oinfo->name;
         m_componentName = "";
 
-        cout << "object \"" << stringFromId(m_objectName) << "\" protocol \""
-             << stringFromId(oinfo->protocolName) << "\" v"
+        cout << "object \"" << stringFromId(m_objectName) << "\" protocol \"" << stringFromId(oinfo->protocolName) << "\" v"
              << oinfo->protocolVersion << endl;
     }
 
@@ -115,8 +108,7 @@ void Reader::headerOutput(const Gto::Reader::PropertyInfo& pinfo)
 
         if (outputInterp && stringFromId(cinfo->interpretation) != "")
         {
-            cout << " interpret as \"" << stringFromId(cinfo->interpretation)
-                 << "\" ";
+            cout << " interpret as \"" << stringFromId(cinfo->interpretation) << "\" ";
         }
 
         cout << endl;
@@ -137,8 +129,7 @@ void Reader::descriptionComplete()
 
     if (outputHeader)
     {
-        cout << "GTO file version " << fileHeader().version << ", "
-             << fileHeader().numStrings << " strings, ";
+        cout << "GTO file version " << fileHeader().version << ", " << fileHeader().numStrings << " strings, ";
 
         if (fileHeader().magic == Gto::Header::MagicText)
         {
@@ -162,8 +153,7 @@ void Reader::descriptionComplete()
             }
         }
 
-        for (Gto::Reader::Properties::const_iterator p = properties().begin();
-             p != properties().end(); ++p)
+        for (Gto::Reader::Properties::const_iterator p = properties().begin(); p != properties().end(); ++p)
         {
             outputPropertyHeader(*p);
         }
@@ -190,30 +180,25 @@ void Reader::outputStringTable()
     exit(0);
 }
 
-Reader::Request Reader::object(const std::string& name,
-                               const std::string& protocol,
-                               unsigned int version,
+Reader::Request Reader::object(const std::string& name, const std::string& protocol, unsigned int version,
                                const Gto::Reader::ObjectInfo& info)
 {
     return Request(outputData);
 }
 
-Reader::Request Reader::component(const std::string& n, const std::string& i,
-                                  const Gto::Reader::ComponentInfo& c)
+Reader::Request Reader::component(const std::string& n, const std::string& i, const Gto::Reader::ComponentInfo& c)
 {
     return Request(outputData);
 }
 
-Reader::Request Reader::property(const std::string&, const std::string&,
-                                 const Gto::Reader::PropertyInfo& info)
+Reader::Request Reader::property(const std::string&, const std::string&, const Gto::Reader::PropertyInfo& info)
 {
     if (!outputData)
         return Request(false);
 
     if (filtered)
     {
-        return Request(filteredProperties.find(&info)
-                       != filteredProperties.end());
+        return Request(filteredProperties.find(&info) != filteredProperties.end());
     }
     else
     {
@@ -273,8 +258,7 @@ void Reader::outputPropertyHeader(const Gto::Reader::PropertyInfo& info)
 
     if (outputInterp && stringFromId(info.interpretation) != "")
     {
-        cout << " interpret as \"" << stringFromId(info.interpretation)
-             << "\" ";
+        cout << " interpret as \"" << stringFromId(info.interpretation) << "\" ";
     }
 
     cout << endl;
@@ -354,8 +338,8 @@ void Reader::data(const PropertyInfo& info, const float* data, size_t numItems)
         cout << "," << info.dims.z;
     if (info.dims.w > 0)
         cout << "," << info.dims.w;
-    cout << "] " << stringFromId(info.component->object->name) << "."
-         << info.component->fullName << "." << stringFromId(info.name) << " = ";
+    cout << "] " << stringFromId(info.component->object->name) << "." << info.component->fullName << "." << stringFromId(info.name)
+         << " = ";
 
     if (formatData)
     {
@@ -405,8 +389,8 @@ void Reader::data(const PropertyInfo& info, const double* data, size_t numItems)
         cout << "," << info.dims.z;
     if (info.dims.w > 0)
         cout << "," << info.dims.w;
-    cout << "] " << stringFromId(info.component->object->name) << "."
-         << info.component->fullName << "." << stringFromId(info.name) << " = ";
+    cout << "] " << stringFromId(info.component->object->name) << "." << info.component->fullName << "." << stringFromId(info.name)
+         << " = ";
 
     if (formatData)
     {
@@ -459,8 +443,7 @@ void Reader::data(const PropertyInfo& info, const int* data, size_t numItems)
             cout << "," << info.dims.z;
         if (info.dims.w > 0)
             cout << "," << info.dims.w;
-        cout << "] " << stringFromId(info.component->object->name) << "."
-             << info.component->fullName << "." << stringFromId(info.name)
+        cout << "] " << stringFromId(info.component->object->name) << "." << info.component->fullName << "." << stringFromId(info.name)
              << " = ";
 
         if (formatData)
@@ -506,8 +489,7 @@ void Reader::data(const PropertyInfo& info, const int* data, size_t numItems)
             cout << "," << info.dims.z;
         if (info.dims.w > 0)
             cout << "," << info.dims.w;
-        cout << "] " << stringFromId(info.component->object->name) << "."
-             << info.component->fullName << "." << stringFromId(info.name)
+        cout << "] " << stringFromId(info.component->object->name) << "." << info.component->fullName << "." << stringFromId(info.name)
              << " = ";
 
         if (formatData)
@@ -563,8 +545,7 @@ void Reader::data(const PropertyInfo& info, const int* data, size_t numItems)
     cout << (formatData ? "" : " ") << "]" << endl;
 }
 
-void Reader::data(const PropertyInfo& info, const unsigned short* data,
-                  size_t numItems)
+void Reader::data(const PropertyInfo& info, const unsigned short* data, size_t numItems)
 {
     if (!outputData)
         return;
@@ -578,8 +559,7 @@ void Reader::data(const PropertyInfo& info, const unsigned short* data,
             cout << "," << info.dims.z;
         if (info.dims.w > 0)
             cout << "," << info.dims.w;
-        cout << "] " << stringFromId(info.component->object->name) << "."
-             << info.component->fullName << "." << stringFromId(info.name)
+        cout << "] " << stringFromId(info.component->object->name) << "." << info.component->fullName << "." << stringFromId(info.name)
              << " = ";
 
         if (formatData)
@@ -620,8 +600,7 @@ void Reader::data(const PropertyInfo& info, const unsigned short* data,
     cout << (formatData ? "" : " ") << "]" << endl;
 }
 
-void Reader::data(const PropertyInfo& info, const unsigned char* data,
-                  size_t numItems)
+void Reader::data(const PropertyInfo& info, const unsigned char* data, size_t numItems)
 {
     if (!outputData)
         return;
@@ -635,8 +614,7 @@ void Reader::data(const PropertyInfo& info, const unsigned char* data,
             cout << "," << info.dims.z;
         if (info.dims.w > 0)
             cout << "," << info.dims.w;
-        cout << "] " << stringFromId(info.component->object->name) << "."
-             << info.component->fullName << "." << stringFromId(info.name)
+        cout << "] " << stringFromId(info.component->object->name) << "." << info.component->fullName << "." << stringFromId(info.name)
              << " = ";
 
         if (formatData)
@@ -788,8 +766,7 @@ int utf8Main(int argc, char* argv[])
             {
                 numericStrings = true;
             }
-            else if (!strcmp(arg, "-i")
-                     || !strcmp(arg, "--interpretation-strings"))
+            else if (!strcmp(arg, "-i") || !strcmp(arg, "--interpretation-strings"))
             {
                 outputInterp = true;
             }

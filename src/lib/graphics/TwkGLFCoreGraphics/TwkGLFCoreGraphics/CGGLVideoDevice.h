@@ -18,8 +18,7 @@ namespace TwkGLF
     class CGGLVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
-        CGGLVideoDevice(TwkApp::VideoModule*, int w, int h, bool alpha,
-                        CGLContextObj context, bool owner);
+        CGGLVideoDevice(TwkApp::VideoModule*, int w, int h, bool alpha, CGLContextObj context, bool owner);
 
         virtual ~CGGLVideoDevice();
 

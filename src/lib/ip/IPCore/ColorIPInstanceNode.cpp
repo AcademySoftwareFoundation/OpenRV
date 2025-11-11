@@ -18,9 +18,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    ColorIPInstanceNode::ColorIPInstanceNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* g, GroupIPNode* group)
+    ColorIPInstanceNode::ColorIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPInstanceNode(name, def, g, group)
     {
         const Shader::Function* F = def->function();
@@ -44,9 +42,7 @@ namespace IPCore
 
         if (!current)
         {
-            TWK_THROW_STREAM(EvaluationFailedExc,
-                             "ColorIPInstanceNode evaluation failed on node "
-                                 << nodes[0]->name());
+            TWK_THROW_STREAM(EvaluationFailedExc, "ColorIPInstanceNode evaluation failed on node " << nodes[0]->name());
         }
 
         if (IntProperty* active = property<IntProperty>("color", "active"))

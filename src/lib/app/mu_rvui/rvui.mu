@@ -3604,7 +3604,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     let mode = cacheMode(),
         presMode = presentationMode();
 
-    sendInternalEvent ("before-session-clear-everything", "", "rvui");
+    let result = sendInternalEvent ("before-session-clear-everything", "", "rvui");
+    if (result == "cancel")
+        return;
 
     setPresentationMode(false);
     clearSession();
@@ -6767,13 +6769,13 @@ global bool debugGC = false;
     // bound by menuItem("7:1") // bind("key-down--7", pixelRelativeScale(7.0), "Scale 7:1");
     // bound by menuItem("8:1") // bind("key-down--8", pixelRelativeScale(8.0), "Scale 8:1");
     // bound by menuItem("Play All Frames") // bind("key-down--A", toggleRealtime, "Toggle Real-Time Playback");
-    bind("key-down--C", toggleCacheModeFunc(CacheGreedy), "Toggle Region Caching");
+    bind("key-down--C", "system_category", toggleCacheModeFunc(CacheGreedy), "Toggle Region Caching");
     // bound by menuItem("Display LUT Active") // bind("key-down--D", toggleDisplayLUT, "Toggle Display LUT");
     // bound by menuItem("Custom...") // bind("key-down--F", enterFPS, "Enter FPS Value From Keyboard");
     // bound by menuItem("Go To Frame...") // bind("key-down--G", enterFrame, "Set Frame Number Using Keyboard");
     // bound by menuItem("Invert") // bind("key-down--I", toggleInvert, "Toggle Color Invert");
     // bound by menuItem("   Cineon/DPX Log") // bind("key-down--L", setLinConvert("Cineon Log"), "Toggle Cineon Log to Linear Conversion");
-    bind("key-down--M", cycleMatteOpacity, "Cycle Matte Opacity");
+    bind("key-down--M", "viewmode_category", cycleMatteOpacity, "Cycle Matte Opacity");
     // bound by menuItem("PingPong") // bind("key-down--P", togglePingPong, "Toggle Ping/Pong Playback");
     // bound by menuItem("Force Reload Current Frame") // bind("key-down--R", ~reload, "Force Reload of Current Source");
     // bound by menuItem("Active") // bind("key-down--T", toggleLuminanceLUT, "Toggle Current Luminance LUT");
@@ -6785,24 +6787,24 @@ global bool debugGC = false;
     // bound by menuItem("Alpha") // bind("key-down--a", showChannel(4), "Show Alpha Channel");
     // bound by menuItem("Blue") // bind("key-down--b", showChannel(3), "Show Blue Channel");
     // bound by menuItem("Color (All Channels)") // bind("key-down--c", showChannel(0), "Normal Color Channel Display");
-    bind("key-down--alt--l", ~rotateImage(-90, true), "Rotate Image 90deg Counter-Clockwise");
-    bind("key-down--alt--r", ~rotateImage(90, true), "Rotate Image 90deg Clockwise");
+    bind("key-down--alt--l", "source_category", ~rotateImage(-90, true), "Rotate Image 90deg Counter-Clockwise");
+    bind("key-down--alt--r", "source_category", ~rotateImage(90, true), "Rotate Image 90deg Clockwise");
     // bound by menuItem("Prev Marked Frame") // bind("key-down--alt--left", previousMarkedFrame, "Go to Previous Marked Frame");
     // bound by menuItem("Next Marked Frame") // bind("key-down--alt--right", nextMarkedFrame, "Go to Next Marked Frame");
     // bound by menuItem("Matching Frame Of Previous Source") // bind("key-down--<", previousMatchedFrame, "Go to Matching Frame of Previous Source");
     // bound by menuItem("Matching Frame Of Next Source") // bind("key-down-->", nextMatchedFrame, "Go to Matching Frame of Next Source");
-    bind("key-down--shift--left", prevView, "Go to Previous View");
-    bind("key-down--shift--right", nextView, "Go to Next View");
+    bind("key-down--shift--left", "viewmode_category", prevView, "Go to Previous View");
+    bind("key-down--shift--right", "viewmode_category", nextView, "Go to Next View");
     // bound by menuItem("Quicktime Movie...") // bind("key-down--control--e", exportAs(, "mov", "Quicktime Export"), "Export Quicktime Movie");
     // bound by menuItem("Close Session") // bind("key-down--control--q", queryClose, "Close Session");
     // bound by menuItem("Clear") // bind("key-down--control--N", clearEverything, "Clear Session");
     // bound by menuItem("Save Session As...") // bind("key-down--control--S", saveAs, "Save Session As");
     // bound by menuItem("Open...") // bind("key-down--control--i", addMovieOrImageSources(,true,false), "Add Source");
     // bound by menuItem("Save Session") // bind("key-down--control--s", save, "Save Session");
-    bind("key-down--control--w", queryClose, "Close Session");
+    bind("key-down--control--w", "system_category", queryClose, "Close Session");
     // bound by menuItem("Merge...") // bind("key-down--control--o", addMovieOrImageSources(,true,false), "Open File");
     // bound by menuItem("Open in New Session...") // bind("key-down--control--O", openMovieOrImage, "Open in New Session");
-    bind("key-down--control--1", pixelRelativeScale(1.0/1.0), "Scale 1:1"); // same as just "1"
+    bind("key-down--control--1", "viewmode_category", pixelRelativeScale(1.0/1.0), "Scale 1:1"); // same as just "1"
     // bound by menuItem("1:2") // bind("key-down--control--2", pixelRelativeScale(1.0/2.0), "Scale 1:2");
     // bound by menuItem("1:3") // bind("key-down--control--3", pixelRelativeScale(1.0/3.0), "Scale 1:3");
     // bound by menuItem("1:4") // bind("key-down--control--4", pixelRelativeScale(1.0/4.0), "Scale 1:4");
@@ -6810,8 +6812,8 @@ global bool debugGC = false;
     // bound by menuItem("1:6") // bind("key-down--control--6", pixelRelativeScale(1.0/6.0), "Scale 1:6");
     // bound by menuItem("1:7") // bind("key-down--control--7", pixelRelativeScale(1.0/7.0), "Scale 1:7");
     // bound by menuItem("1:8") // bind("key-down--control--8", pixelRelativeScale(1.0/8.0), "Scale 1:8");
-    bind("key-down--control--l", toggleCacheModeFunc(CacheBuffer), "Toggle Look-Ahead Caching");
-    bind("key-down--control--m", cycleMatte, "Cycle Mattes");
+    bind("key-down--control--l", "system_category", toggleCacheModeFunc(CacheBuffer), "Toggle Look-Ahead Caching");
+    bind("key-down--control--m", "viewmode_category", cycleMatte, "Cycle Mattes");
     // bound by menuItem("Prev Range From Marks/Boundaries") // bind("key-down--control--left", previousMarkedRange, "Set In/Out to Previous Marked Range");
     // bound by menuItem("Next Range From Marks/Boundaries") // bind("key-down--control--right", nextMarkedRange, "Set In/Out to Next Marked Range");
     // bound by menuItem("Expand Range From Marks/Boundaries") // bind("key-down--control--up", expandMarkedRange, "Expand In/Out to Neighboring Marked Ranges");
@@ -6820,7 +6822,7 @@ global bool debugGC = false;
     // bound by menuItem("Force Reload Region") // bind("key-down--control--R", ~reloadInOut, "Reload In/Out Region");
     // bound by menuItem("Reload Changed Frames") // bind("key-down--control--C", ~loadCurrentSourcesChangedFrames, "Load Changed Frames of Current Sources");
     // bound by menuItem("Frame Width") // bind("key-down--control--f", frameWidth, "Frame Image Width");
-    bind("key-down--down", togglePlayFunc, "Toggle Play");
+    bind("key-down--down", "playcontrol_category", togglePlayFunc, "Toggle Play");
     // bound by menuItem("Jump To Ending") // bind("key-down--end", ending, "Go to End of In/Out Region");
     // bound by menuItem("Frame") // bind("key-down--f", frameImage, "Frame Image in View");
     // bound by menuItem("Menu Bar") // bind("key-down--f1", toggleMenuBar, "Toggle Menu Bar Visibility");
@@ -6835,113 +6837,113 @@ global bool debugGC = false;
     // bound by menuItem("Green") // bind("key-down--g", showChannel(2), "Show Green Channel");
     // bound by menuItem("Jump To Beginning") // bind("key-down--home", beginning, "Go to Beginning of In/Out Range");
     // bound by menuItem("Reset All Color") // bind("key-down--shift--home", resetAllColorParameters, "Reset All Color");
-    bind("key-down--i", toggleInfo, "Toggle Heads-Up Image Info");
+    bind("key-down--i", "info_category", toggleInfo, "Toggle Heads-Up Image Info");
     // bound by menuItem("Luminance") // bind("key-down--l", showChannel(5), "Show Image Luminance");
     // bound by menuItem("Step Backward") // bind("key-down--left", stepBackward1, "Move Back One Frame");
     // bound by menuItem("Mark Frame") // bind("key-down--m", toggleMark, "Toggle Mark At Frame");
     // bound by menuItem("Linear Filter") // bind("key-down--n", toggleFilter, "Toggle Nearest Neighbor/Linear Filter");
-    bind("key-down--p", togglePremult, "Toggle Premult Display");
-    bind("key-down--page-down", previousMarkedRange, "Set In/Out to Previous Marked Range");
-    bind("key-down--page-up", nextMarkedRange, "Set In/Out to Next Marked Range");
+    bind("key-down--p", "viewmode_category", togglePremult, "Toggle Premult Display");
+    bind("key-down--page-down", "mark_category", previousMarkedRange, "Set In/Out to Previous Marked Range");
+    bind("key-down--page-up", "mark_category", nextMarkedRange, "Set In/Out to Next Marked Range");
     // bound by menuItem("Presentation Mode") // bind("key-down--control--p", togglePresentationMode, "Toggle Presentation Mode");
     // bound by menuItem("Red") // bind("key-down--r", showChannel(1), "Show Red Channel");
     // bound by menuItem("Step Forward") // bind("key-down--right", stepForward1, "Step Forward 1 Frame");
-    bind("key-down--t", toggleTimeline, "Toggle Heads-Up Timeline");
-    bind("key-down--tab", toggleTimeline, "Toggle Heads-Up Timeline");
+    bind("key-down--t", "system_category", toggleTimeline, "Toggle Heads-Up Timeline");
+    bind("key-down--tab", "system_category", toggleTimeline, "Toggle Heads-Up Timeline");
     // bound by menuItem("Reverse") // bind("key-down--up", toggleForwardsBackwards, "Toggle Forward/Backward Playback");
     // bound by menuItem("   Display Gamma...") // bind("key-down--v", enterDispGamma, "Enter Display Gamma");
     // bound by menuItem("Set Range From Marks/Boundaries") // bind("key-down--|", setInOutMarkedRange, "Set In/Out Range From Surrounding Marks");
-    bind("key-down--~", toggleTimeline, "Toggle Timeline");
-    bind("pointer--wheeldown", stepForward1, "Step Forward 1 Frame");
-    bind("pointer--wheelup", stepBackward1, "Step Backward 1 Frame");
-    bind("pointer-3--wheeldown", stepForward10, "Step Forward 10 Frames");
-    bind("pointer-3--wheelup", stepBackward10, "Step Backward 10 Frames");
-    bind("pointer-2-3--wheeldown", stepForward100, "Step Forward 100 Frames");
-    bind("pointer-2-3--wheelup", stepBackward100, "Step Backward 100 Frames");
-    bind("pointer--control--wheeldown", stepForward10, "Step Forward 10 Frames");
-    bind("pointer--control--wheelup", stepBackward10, "Step Backward 10 Frames");
-    bind("pointer--alt-control--wheeldown", stepForward100, "Step Forward 100 Frames");
-    bind("pointer--alt-control--wheelup", stepBackward100, "Step Backward 100 Frames");
-    bind("pointer-1--alt--drag", dragMoveLocked(false,), "Translate View");
-    bind("pointer-1--alt-shift--drag", dragMoveLocked(true,), "Translate View");
-    bind("pointer-1--alt--push", beginMoveOrZoom);
-    bind("pointer-1--alt-shift--push", beginMoveOrZoom);
-    bind("pointer-1--alt-control--drag", dragMoveLocked(false,), "Translate View");
-    bind("pointer-1--alt-shift-control--drag", dragMoveLocked(true,), "Translate View");
-    bind("pointer-1--alt-control--push", beginMoveOrZoom);
-    bind("pointer-1--alt-shift-control--push", beginMoveOrZoom);
-    bind("pointer-1--control--drag", dragZoom);
-    bind("pointer-1--control--push", beginMoveOrZoom);
-    bind("pointer-1--control-shift--push", beginMoveOrZoom);
-    bind("pointer-1--drag", dragScrub(false,), "Scrub Frames");
-    bind("pointer-1--push", beginScrub);
-    bind("pointer-1--release", releaseScrub);
-    bind("pointer-1--double",  doubleClick);
-    bind("pointer-1-2--alt--drag", dragZoom, "Zoom View");
-    bind("pointer-1-2--alt--push", beginMoveOrZoom);
-    bind("pointer-1-2--alt-shift--push", beginMoveOrZoom);
-    bind("pointer-2--alt--drag", dragMoveLocked(false,), "Translate View");
-    bind("pointer-2--alt-shift--drag", dragMoveLocked(true,), "Translate View");
-    bind("pointer-2--alt--push", beginMoveOrZoom);
-    bind("pointer-2--alt-shift--push", beginMoveOrZoom);
-    bind("pointer-2--control--drag", dragZoom, "Zoom View");
-    bind("pointer-2--control--push", beginMoveOrZoom);
-    bind("pointer-2--control-shift--push", beginMoveOrZoom);
-    bind("pointer-2--drag", dragMoveLocked(false,), "Translate View");
-    bind("pointer-2--shift--drag", dragMoveLocked(true,), "Translate View");
-    bind("pointer-2--push", beginMoveOrZoom);
-    bind("pointer-2--shift--push", beginMoveOrZoom);
+    bind("key-down--~", "system_category", toggleTimeline, "Toggle Timeline");
+    bind("pointer--wheeldown", "playcontrol_category", stepForward1, "Step Forward 1 Frame");
+    bind("pointer--wheelup", "playcontrol_category", stepBackward1, "Step Backward 1 Frame");
+    bind("pointer-3--wheeldown", "playcontrol_category", stepForward10, "Step Forward 10 Frames");
+    bind("pointer-3--wheelup", "playcontrol_category", stepBackward10, "Step Backward 10 Frames");
+    bind("pointer-2-3--wheeldown", "playcontrol_category", stepForward100, "Step Forward 100 Frames");
+    bind("pointer-2-3--wheelup", "playcontrol_category", stepBackward100, "Step Backward 100 Frames");
+    bind("pointer--control--wheeldown", "playcontrol_category", stepForward10, "Step Forward 10 Frames");
+    bind("pointer--control--wheelup", "playcontrol_category", stepBackward10, "Step Backward 10 Frames");
+    bind("pointer--alt-control--wheeldown", "playcontrol_category", stepForward100, "Step Forward 100 Frames");
+    bind("pointer--alt-control--wheelup", "playcontrol_category", stepBackward100, "Step Backward 100 Frames");
+    bind("pointer-1--alt--drag", "viewmode_category", dragMoveLocked(false,), "Translate View");
+    bind("pointer-1--alt-shift--drag", "viewmode_category", dragMoveLocked(true,), "Translate View");
+    bind("pointer-1--alt--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1--alt-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1--alt-control--drag", "viewmode_category", dragMoveLocked(false,), "Translate View");
+    bind("pointer-1--alt-shift-control--drag", "viewmode_category", dragMoveLocked(true,), "Translate View");
+    bind("pointer-1--alt-control--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1--alt-shift-control--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1--control--drag", "viewmode_category", dragZoom);
+    bind("pointer-1--control--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1--control-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1--drag", "playcontrol_category", dragScrub(false,), "Scrub Frames");
+    bind("pointer-1--push", "playcontrol_category", beginScrub);
+    bind("pointer-1--release", "playcontrol_category", releaseScrub);
+    bind("pointer-1--double", "playcontrol_category", doubleClick);
+    bind("pointer-1-2--alt--drag", "viewmode_category", dragZoom, "Zoom View");
+    bind("pointer-1-2--alt--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-1-2--alt-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-2--alt--drag", "viewmode_category", dragMoveLocked(false,), "Translate View");
+    bind("pointer-2--alt-shift--drag", "viewmode_category", dragMoveLocked(true,), "Translate View");
+    bind("pointer-2--alt--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-2--alt-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-2--control--drag", "viewmode_category", dragZoom, "Zoom View");
+    bind("pointer-2--control--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-2--control-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-2--drag", "viewmode_category", dragMoveLocked(false,), "Translate View");
+    bind("pointer-2--shift--drag", "viewmode_category", dragMoveLocked(true,), "Translate View");
+    bind("pointer-2--push", "viewmode_category", beginMoveOrZoom);
+    bind("pointer-2--shift--push", "viewmode_category", beginMoveOrZoom);
     bind("pointer-3--push", popupMenu(,nil), "Popup Menu");
 
-    bind("toggle-hud-info-widget", toggleInfo, "Toggle info widget via event");
-    bind("toggle-hud-timeline-widget", toggleTimeline, "Toggle timeline widget via event");
-    bind("toggle-hud-timeline-mag-widget", toggleMotionScope, "Toggle timeline magnifier widget via event");
+    bind("toggle-hud-info-widget", "system_category", toggleInfo, "Toggle info widget via event");
+    bind("toggle-hud-timeline-widget", "system_category", toggleTimeline, "Toggle timeline widget via event");
+    bind("toggle-hud-timeline-mag-widget", "system_category", toggleMotionScope, "Toggle timeline magnifier widget via event");
 
     //
     //  back-door scrubbing, works even if scrubbing is "disabled"
     //
-    bind("pointer-1--control-shift--push", beginScrub);
-    bind("pointer-1--control-shift--drag", dragScrub(true,), "Scrub Frames");
-    bind("pointer-1--control-shift--release", releaseScrub);
-    bind("stylus-pen--control-shift--push", beginScrub);
-    bind("stylus-pen--control-shift--drag", dragScrub(true,), "Scrub Frames");
-    bind("stylus-pen--control-shift--release", releaseScrub);
+    bind("pointer-1--control-shift--push", "playcontrol_category", beginScrub);
+    bind("pointer-1--control-shift--drag", "playcontrol_category", dragScrub(true,), "Scrub Frames");
+    bind("pointer-1--control-shift--release", "playcontrol_category", releaseScrub);
+    bind("stylus-pen--control-shift--push", "playcontrol_category", beginScrub);
+    bind("stylus-pen--control-shift--drag", "playcontrol_category", dragScrub(true,), "Scrub Frames");
+    bind("stylus-pen--control-shift--release", "playcontrol_category", releaseScrub);
 
-    bind("pointer-1--shift--push", \: (void; Event event)
+    bind("pointer-1--shift--push", "info_category", \: (void; Event event)
     {
         toggleColorInspector();
         event.reject();  // it will find the bindings in the inspector
     },
     "Color Inspector");
 
-    bind("stylus-pen--shift--push", \: (void; Event event)
+    bind("stylus-pen--shift--push", "info_category", \: (void; Event event)
     {
         toggleColorInspector();
         event.reject();  // it will find the bindings in the inspector
     },
     "Color Inspector");
 
-    bind("stylus-pen--move", moveCallback);
-    bind("stylus-pen--enter", pointerEnterSession);
-    bind("stylus-pen--leave", pointerLeaveSession);
-    bind("stylus-pen--alt--drag", dragMoveLocked(false,), "Translate View");
-    bind("stylus-pen--alt-shift--drag", dragMoveLocked(true,), "Translate View");
-    bind("stylus-pen--alt--push", beginMoveOrZoom);
-    bind("stylus-pen--alt-shift--push", beginMoveOrZoom);
-    bind("stylus-pen--alt-control--drag", dragMoveLocked(false,), "Translate View");
-    bind("stylus-pen--alt-shift-control--drag", dragMoveLocked(true,), "Translate View");
-    bind("stylus-pen--alt-control--push", beginMoveOrZoom);
-    bind("stylus-pen--alt-shift-control--push", beginMoveOrZoom);
-    bind("stylus-pen--control--drag", dragZoom);
-    bind("stylus-pen--control--push", beginMoveOrZoom);
-    bind("stylus-pen--control-shift--push", beginMoveOrZoom);
-    bind("stylus-pen--drag", dragScrub(false,), "Scrub Frames");
-    bind("stylus-pen--push", beginScrub);
-    bind("stylus-pen--release", releaseScrub);
-    bind("stylus-eraser--push", popupMenu(,nil), "Popup Menu");
+    bind("stylus-pen--move", "system_category", moveCallback);
+    bind("stylus-pen--enter", "system_category", pointerEnterSession);
+    bind("stylus-pen--leave", "system_category", pointerLeaveSession);
+    bind("stylus-pen--alt--drag", "viewmode_category", dragMoveLocked(false,), "Translate View");
+    bind("stylus-pen--alt-shift--drag", "viewmode_category", dragMoveLocked(true,), "Translate View");
+    bind("stylus-pen--alt--push", "viewmode_category", beginMoveOrZoom);
+    bind("stylus-pen--alt-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("stylus-pen--alt-control--drag", "viewmode_category", dragMoveLocked(false,), "Translate View");
+    bind("stylus-pen--alt-shift-control--drag", "viewmode_category", dragMoveLocked(true,), "Translate View");
+    bind("stylus-pen--alt-control--push", "viewmode_category", beginMoveOrZoom);
+    bind("stylus-pen--alt-shift-control--push", "viewmode_category", beginMoveOrZoom);
+    bind("stylus-pen--control--drag", "viewmode_category", dragZoom);
+    bind("stylus-pen--control--push", "viewmode_category", beginMoveOrZoom);
+    bind("stylus-pen--control-shift--push", "viewmode_category", beginMoveOrZoom);
+    bind("stylus-pen--drag", "playcontrol_category", dragScrub(false,), "Scrub Frames");
+    bind("stylus-pen--push", "viewmode_category", beginScrub);
+    bind("stylus-pen--release", "viewmode_category", releaseScrub);
+    bind("stylus-eraser--push", "", popupMenu(,nil), "Popup Menu");
 
     // bound by menuItem("Presentation Settings") // bind("key-down--alt--alt", noop, "Intercept Menu Navigation");
-    bind("key-up--alt--alt", noop, "Intercept Menu Navigation");
+    bind("key-up--alt--alt", "", noop, "Intercept Menu Navigation");
 
     bind("remote-connection-start", ~activateSync, "Auto start sync mode");
 
@@ -6949,7 +6951,7 @@ global bool debugGC = false;
     bind("margins-changed", marginsChanged, "RV View Margins Changed");
     bind("state-initialized", stateInitialized, "RVUI State Initialized");
 
-    bind("key-down--keypad-enter", enterFrame, "Set Frame Number Using Keyboard");
+    bind("key-down--keypad-enter", "playcontrol_category", enterFrame, "Set Frame Number Using Keyboard");
     bindRegex("default", "global", "key-down--keypad-[0-9.].*", enterFrame);
     bindRegex("default", "global", ".*--caplock.*", lockWarning(,"cap-lock is ON"));
     bindRegex("default", "global", ".*--scrolllock.*", lockWarning(,"scroll-lock is ON"));
@@ -7010,28 +7012,28 @@ global bool debugGC = false;
     bindRegex("default", "textentry", "^key-down.*", selfInsert);
     bindRegex("default", "textentry", "^pointer-.*--push", cancelEntry);
 
-    bind("default", "stereo", "key-down--a", setStereo("anaglyph"), "Anaglyph Mode");
-    bind("default", "stereo", "key-down--l", setStereo("lumanaglyph"), "Luminance Anaglyph Mode");
-    bind("default", "stereo", "key-down--d", setStereo("checker"), "Checked Stereo Mode");
-    bind("default", "stereo", "key-down--k", setStereo("scanline"), "Scanline Stereo Mode");
-    bind("default", "stereo", "key-down--s", setStereo("pair"), "Side-by-Side Stereo Mode");
-    bind("default", "stereo", "key-down--p", setStereo("pair"), "Side-by-Side Stereo Mode");
-    bind("default", "stereo", "key-down--m", setStereo("mirror"), "Mirrored Side-by-Side Stereo Mode");
-    bind("default", "stereo", "key-down--z", setStereo("hsqueezed"), "Horizontal Squeezed Stereo Mode");
-    bind("default", "stereo", "key-down--v", setStereo("vsqueezed"), "Vertical Squeezed Stereo Mode");
-    bind("default", "stereo", "key-down--h", setStereo("hardware"), "Hardware Stereo Mode");
-    bind("default", "stereo", "key-down--,", setStereo("left"), "Left Eye Only Stereo Mode");
-    bind("default", "stereo", "key-down--.", setStereo("right"), "Right Eye Only Stereo Mode");
-    bind("default", "stereo", "key-down--<", setStereo("left"), "Left Eye Only Stereo Mode");
-    bind("default", "stereo", "key-down-->", setStereo("right"), "Right Eye Only Stereo Mode");
-    bind("default", "stereo", "key-down--O", setStereo("off"), "Stereo Off");
-    bind("default", "stereo", "key-down--S", toggleSwapEyes, "Swap Eyes");
-    bind("default", "stereo", "key-down--o", stereoOffsetMode, "Edit Stereo Offset");
-    bind("default", "stereo", "key-down--r", stereoROffsetMode, "Edit Right-Eye-Only Stereo Offset");
-    bind("default", "stereo", "key-down--c", sourceStereoOffsetMode, "Edit Source/Clip Stereo Offset");
-    bind("default", "stereo", "key-down--R", sourceStereoROffsetMode, "Edit Source/Clip Right-Eye-Only Stereo Offset");
-    bind("default", "stereo", "key-down--/", resetStereoOffsets, "Reset Stereo Offsets");
-    bind("default", "stereo", "key-down--alt--s", releaseStereo, "Turn Off Stereo Keys");
+    bind("default", "stereo", "key-down--a", "viewmode_category", setStereo("anaglyph"), "Anaglyph Mode");
+    bind("default", "stereo", "key-down--l", "viewmode_category", setStereo("lumanaglyph"), "Luminance Anaglyph Mode");
+    bind("default", "stereo", "key-down--d", "viewmode_category", setStereo("checker"), "Checked Stereo Mode");
+    bind("default", "stereo", "key-down--k", "viewmode_category", setStereo("scanline"), "Scanline Stereo Mode");
+    bind("default", "stereo", "key-down--s", "viewmode_category", setStereo("pair"), "Side-by-Side Stereo Mode");
+    bind("default", "stereo", "key-down--p", "viewmode_category", setStereo("pair"), "Side-by-Side Stereo Mode");
+    bind("default", "stereo", "key-down--m", "viewmode_category", setStereo("mirror"), "Mirrored Side-by-Side Stereo Mode");
+    bind("default", "stereo", "key-down--z", "viewmode_category", setStereo("hsqueezed"), "Horizontal Squeezed Stereo Mode");
+    bind("default", "stereo", "key-down--v", "viewmode_category", setStereo("vsqueezed"), "Vertical Squeezed Stereo Mode");
+    bind("default", "stereo", "key-down--h", "viewmode_category", setStereo("hardware"), "Hardware Stereo Mode");
+    bind("default", "stereo", "key-down--,", "viewmode_category", setStereo("left"), "Left Eye Only Stereo Mode");
+    bind("default", "stereo", "key-down--.", "viewmode_category", setStereo("right"), "Right Eye Only Stereo Mode");
+    bind("default", "stereo", "key-down--<", "viewmode_category", setStereo("left"), "Left Eye Only Stereo Mode");
+    bind("default", "stereo", "key-down-->", "viewmode_category", setStereo("right"), "Right Eye Only Stereo Mode");
+    bind("default", "stereo", "key-down--O", "viewmode_category", setStereo("off"), "Stereo Off");
+    bind("default", "stereo", "key-down--S", "viewmode_category", toggleSwapEyes, "Swap Eyes");
+    bind("default", "stereo", "key-down--o", "viewmode_category", stereoOffsetMode, "Edit Stereo Offset");
+    bind("default", "stereo", "key-down--r", "viewmode_category", stereoROffsetMode, "Edit Right-Eye-Only Stereo Offset");
+    bind("default", "stereo", "key-down--c", "viewmode_category", sourceStereoOffsetMode, "Edit Source/Clip Stereo Offset");
+    bind("default", "stereo", "key-down--R", "viewmode_category", sourceStereoROffsetMode, "Edit Source/Clip Right-Eye-Only Stereo Offset");
+    bind("default", "stereo", "key-down--/", "viewmode_category", resetStereoOffsets, "Reset Stereo Offsets");
+    bind("default", "stereo", "key-down--alt--s", "viewmode_category", releaseStereo, "Turn Off Stereo Keys");
 
     bind("key-down--alt--s", \: (void; Event ev)
     {
@@ -7040,23 +7042,23 @@ global bool debugGC = false;
         pushEventTable("stereo");
     }, "Turn On Stereo Keys");
 
-    bind("default", "nudge", "key-down--right", nudge(-.01,0,1), "Nudge Right");
-    bind("default", "nudge", "key-down--left", nudge(.01,0,1), "Nudge Left");
-    bind("default", "nudge", "key-down--up", nudge(0,-.01,1), "Nudge Up");
-    bind("default", "nudge", "key-down--down", nudge(0,.01,1), "Nudge Down");
-    bind("default", "nudge", "key-down--control--right", nudge(-0.001,0,1), "Nudge Right Tiny");
-    bind("default", "nudge", "key-down--control--left", nudge(0.001,0,1), "Nudge Left Tiny");
-    bind("default", "nudge", "key-down--control--up", nudge(0,-.001,1), "Nudge Up Tiny");
-    bind("default", "nudge", "key-down--control--down", nudge(0,.001,1), "Nudge Down Tiny");
-    bind("default", "nudge", "key-down--shift--right", nudge(-.1,0,1), "Nudge Right Big");
-    bind("default", "nudge", "key-down--shift--left", nudge(.1,0,1), "Nudge Left Big");
-    bind("default", "nudge", "key-down--shift--up", nudge(0,-.1,1), "Nudge Up Big");
-    bind("default", "nudge", "key-down--shift--down", nudge(0,.1,1), "Nudge Down Big");
-    bind("default", "nudge", "key-down--z", nudge(0,0,1.1), "Nudge Zoom-In");
-    bind("default", "nudge", "key-down--control--z", nudge(0,0,1.01), "Nudge Big Zoom-Out");
-    bind("default", "nudge", "key-down--alt--n", releaseNudge, "Turn Off Nudge Keys");
+    bind("default", "nudge", "key-down--right", "viewmode_category", nudge(-.01,0,1), "Nudge Right");
+    bind("default", "nudge", "key-down--left", "viewmode_category", nudge(.01,0,1), "Nudge Left");
+    bind("default", "nudge", "key-down--up", "viewmode_category", nudge(0,-.01,1), "Nudge Up");
+    bind("default", "nudge", "key-down--down", "viewmode_category", nudge(0,.01,1), "Nudge Down");
+    bind("default", "nudge", "key-down--control--right", "viewmode_category", nudge(-0.001,0,1), "Nudge Right Tiny");
+    bind("default", "nudge", "key-down--control--left", "viewmode_category", nudge(0.001,0,1), "Nudge Left Tiny");
+    bind("default", "nudge", "key-down--control--up", "viewmode_category", nudge(0,-.001,1), "Nudge Up Tiny");
+    bind("default", "nudge", "key-down--control--down", "viewmode_category", nudge(0,.001,1), "Nudge Down Tiny");
+    bind("default", "nudge", "key-down--shift--right", "viewmode_category", nudge(-.1,0,1), "Nudge Right Big");
+    bind("default", "nudge", "key-down--shift--left", "viewmode_category", nudge(.1,0,1), "Nudge Left Big");
+    bind("default", "nudge", "key-down--shift--up", "viewmode_category", nudge(0,-.1,1), "Nudge Up Big");
+    bind("default", "nudge", "key-down--shift--down", "viewmode_category", nudge(0,.1,1), "Nudge Down Big");
+    bind("default", "nudge", "key-down--z", "viewmode_category", nudge(0,0,1.1), "Nudge Zoom-In");
+    bind("default", "nudge", "key-down--control--z", "viewmode_category", nudge(0,0,1.01), "Nudge Big Zoom-Out");
+    bind("default", "nudge", "key-down--alt--n", "viewmode_category", releaseNudge, "Turn Off Nudge Keys");
 
-    bind("key-down--alt--n", \: (void; Event ev)
+    bind("key-down--alt--n", "viewmode_category", \: (void; Event ev)
     {
         displayFeedback("Nudge Keys (toggle)...", 10e6);
         redraw();
